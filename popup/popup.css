@@ -1,6 +1,31 @@
-/* Salesforce Lightning Design System 2.0 Colors */
+/* Dark-specific input overrides for better visibility */
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] .select-input {
+    background-color: #2A2C35;
+    color: #FFFFFF;
+    border-color: #555555;
+}
+
+[data-theme="dark"] input[type="text"]:focus,
+[data-theme="dark"] .select-input:focus {
+    border-color: #3B99FC;
+    box-shadow: 0 0 0 1px #3B99FC;
+}
+
+/* Improve range slider visibility in dark mode */
+[data-theme="dark"] .range-input {
+    background-color: #555555;
+}
+
+[data-theme="dark"] .range-input::-webkit-slider-thumb {
+    background: #3B99FC;
+}
+
+[data-theme="dark"] .range-input::-moz-range-thumb {
+    background: #3B99FC;
+}/* Salesforce Lightning Design System 2.0 Colors */
 :root {
-    /* Primary brand colors */
+    /* Light Theme Colors */
     --slds-brand-primary: #0070D2;     /* Salesforce primary blue */
     --slds-brand-secondary: #005FB2;   /* Darker blue for hover states */
     
@@ -23,6 +48,42 @@
     /* Interactive colors */
     --slds-color-hover: #F4F6FE;      /* Hover background */
     --slds-color-selection: #D8EDFF;   /* Selection color */
+    
+    /* Theme-specific variables */
+    --color-background: var(--slds-gray-2);
+    --color-text: var(--slds-gray-7);
+    --color-text-weak: var(--slds-gray-6);
+    --color-border: var(--slds-gray-3);
+    --color-input-background: var(--slds-gray-2);
+    --color-header: var(--slds-brand-primary);
+    --color-header-text: var(--slds-gray-1);
+    --color-section-header: var(--slds-gray-3);
+    --color-item-background: var(--slds-gray-1);
+    --color-toggle-background: var(--slds-gray-4);
+    --color-modal-overlay: rgba(0, 0, 0, 0.7);
+    --color-icon-fill: var(--slds-gray-5);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --color-background: #1A1C21;
+    --color-text: #FFFFFF;
+    --color-text-weak: #CCCCCC;
+    --color-border: #444444;
+    --color-input-background: #2A2C35;
+    --color-header: #0F6BAE; /* Darker brand blue for dark mode */
+    --color-header-text: #FFFFFF;
+    --color-section-header: #2A2C35;
+    --color-item-background: #2A2C35;
+    --color-toggle-background: #555555;
+    --color-modal-overlay: rgba(0, 0, 0, 0.8);
+    --color-icon-fill: #AAAAAA;
+    
+    /* Also override some functional colors for better visibility in dark mode */
+    --slds-color-success: #45C65A;
+    --slds-color-warning: #FFD166; /* Brighter yellow for better contrast */
+    --slds-color-info: #3B99FC; /* Brighter blue for better contrast */
+    --slds-color-error: #FF5252; /* Brighter red for better contrast */
 }
 
 * {
@@ -35,22 +96,45 @@ body {
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 14px;
-    color: var(--slds-gray-7);
-    background-color: var(--slds-gray-2);
+    color: var(--color-text);
+    background-color: var(--color-background);
 }
 
 .container {
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 500px;
+    min-height: 500px; /* Default height, can be overridden via JS */
+    max-height: 100vh; /* Prevent exceeding viewport height */
+    overflow: hidden;
 }
 
 header {
-    background-color: var(--slds-brand-primary);
-    color: var(--slds-gray-1);
+    background-color: var(--color-header);
+    color: var(--color-header-text);
     padding: 12px 16px;
     border-radius: 4px 4px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.icon-button {
+    background: transparent;
+    border: none;
+    color: var(--color-header-text);
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 0;
+}
+
+.icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 h1 {
@@ -66,7 +150,7 @@ h2 {
 }
 
 .section-header {
-    background-color: var(--slds-gray-3);
+    background-color: var(--color-section-header);
     padding: 8px 16px;
     margin: 8px 0;
     border-radius: 4px;
@@ -74,15 +158,15 @@ h2 {
 
 .tab-list {
     margin: 0 8px;
-    max-height: 240px;
+    max-height: calc(100% - 150px); /* Adjustable based on panel height */
     overflow-y: auto;
 }
 
 .tab-item {
     display: flex;
     align-items: center;
-    background-color: var(--slds-gray-1);
-    border: 1px solid var(--slds-gray-3);
+    background-color: var(--color-item-background);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     padding: 8px 12px;
     margin-bottom: 8px;
@@ -91,7 +175,7 @@ h2 {
 }
 
 .drag-handle {
-    background-color: var(--slds-gray-3);
+    background-color: var(--color-border);
     border-radius: 4px;
     width: 24px;
     height: 24px;
@@ -113,7 +197,7 @@ h2 {
 
 .tab-path {
     font-size: 12px;
-    color: var(--slds-gray-6);
+    color: var(--color-text-weak);
 }
 
 .tab-actions {
@@ -137,7 +221,7 @@ h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--slds-gray-4);
+    background-color: var(--color-toggle-background);
     border-radius: 10px;
     transition: .4s;
 }
@@ -178,7 +262,7 @@ input:checked + .toggle-switch:before {
 }
 
 .delete-button:hover {
-    background-color: var(--slds-gray-3);
+    background-color: var(--color-border);
 }
 
 .delete-button:hover svg path {
@@ -186,7 +270,7 @@ input:checked + .toggle-switch:before {
 }
 
 .delete-button svg {
-    fill: var(--slds-gray-5);
+    fill: var(--color-icon-fill);
 }
 
 #delete-modal-confirm-button {
@@ -200,12 +284,13 @@ input:checked + .toggle-switch:before {
 .empty-state {
     text-align: center;
     padding: 20px;
-    color: var(--slds-gray-6);
+    color: var(--color-text-weak);
+    font-weight: 500; /* Added for better visibility */
 }
 
 .tab-form {
-    background-color: var(--slds-gray-1);
-    border: 1px solid var(--slds-gray-3);
+    background-color: var(--color-item-background);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     margin: 8px;
     padding: 12px;
@@ -216,22 +301,24 @@ input:checked + .toggle-switch:before {
 }
 
 .form-group {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 label {
     display: block;
     font-size: 12px;
-    color: var(--slds-gray-6);
+    color: var(--color-text-weak);
     margin-bottom: 4px;
+    font-weight: 500; /* Added for better visibility */
 }
 
 input[type="text"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid var(--slds-gray-4);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    background-color: var(--slds-gray-2);
+    background-color: var(--color-input-background);
+    color: var(--color-text);
     font-size: 14px;
 }
 
@@ -241,10 +328,65 @@ input[type="text"]:focus {
     box-shadow: 0 0 0 1px var(--slds-brand-primary);
 }
 
+.select-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: var(--color-input-background);
+    color: var(--color-text);
+    font-size: 14px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: var(--slds-brand-primary);
+    box-shadow: 0 0 0 1px var(--slds-brand-primary);
+}
+
+.range-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.range-input {
+    flex: 1;
+    height: 6px;
+    appearance: none;
+    background-color: var(--color-border);
+    border-radius: 3px;
+    outline: none;
+}
+
+.range-input::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--slds-brand-primary);
+    cursor: pointer;
+}
+
+.range-input::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--slds-brand-primary);
+    cursor: pointer;
+    border: none;
+}
+
 .help-text {
     font-size: 11px;
-    color: var(--slds-gray-6);
+    color: var(--color-text-weak);
     margin-top: 4px;
+    font-weight: 500; /* Added for better visibility */
 }
 
 .checkbox-group {
@@ -256,7 +398,7 @@ input[type="text"]:focus {
     display: flex;
     align-items: center;
     margin: 0;
-    color: var(--slds-gray-7);
+    color: var(--color-text);
     font-size: 14px;
 }
 
@@ -272,7 +414,7 @@ input[type="text"]:focus {
 
 .primary-button {
     background-color: var(--slds-brand-primary);
-    color: var(--slds-gray-1);
+    color: white;
     border: none;
     border-radius: 4px;
     padding: 8px 16px;
@@ -286,10 +428,19 @@ input[type="text"]:focus {
     background-color: var(--slds-brand-secondary);
 }
 
+[data-theme="dark"] .primary-button {
+    background-color: #0F6BAE; /* Ensure good contrast in dark mode */
+    color: white;
+}
+
+[data-theme="dark"] .primary-button:hover {
+    background-color: #1A7FCE; /* Brighter on hover for better feedback */
+}
+
 .secondary-button {
     background-color: transparent;
-    color: var(--slds-gray-7);
-    border: 1px solid var(--slds-gray-4);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     padding: 8px 16px;
     font-size: 14px;
@@ -300,7 +451,7 @@ input[type="text"]:focus {
 }
 
 .secondary-button:hover {
-    background-color: var(--slds-gray-3);
+    background-color: var(--color-border);
 }
 
 .action-buttons {
@@ -310,8 +461,9 @@ input[type="text"]:focus {
 }
 
 .reset-button {
-    color: var(--slds-gray-6);
-    margin-right: 0;
+    color: var(--color-text);
+    width: 100%;
+    margin: 0;
 }
 
 .reset-button:hover {
@@ -322,15 +474,16 @@ input[type="text"]:focus {
 footer {
     margin-top: auto;
     padding: 8px;
-    background-color: var(--slds-gray-3);
+    background-color: var(--color-section-header);
     border-radius: 0 0 4px 4px;
 }
 
 .status-message {
     text-align: center;
     font-size: 12px;
-    color: var(--slds-gray-6);
+    color: var(--color-text-weak);
     min-height: 24px;
+    font-weight: 500; /* Added for better visibility */
 }
 
 /* Status message colors */
@@ -353,9 +506,33 @@ footer {
     transform: translateY(4px);
 }
 
+/* Panel and form visibility */
+#main-content, #settings-panel {
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+}
+
+#main-content.active, #settings-panel.active {
+    display: block;
+}
+
 /* Initially hide form */
 .tab-form {
     display: none;
+}
+
+/* Settings panel */
+.settings-panel {
+    padding: 0 8px;
+}
+
+.settings-form {
+    background-color: var(--color-item-background);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 8px;
 }
 
 /* Modal styles */
@@ -366,7 +543,7 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--color-modal-overlay);
     z-index: 1000;
     justify-content: center;
     align-items: center;
@@ -377,7 +554,7 @@ footer {
 }
 
 .modal-content {
-    background-color: var(--slds-gray-2);
+    background-color: var(--color-background);
     border-radius: 8px;
     max-width: 90%;
     width: 300px;
@@ -397,8 +574,8 @@ footer {
 }
 
 .modal-header {
-    background-color: var(--slds-brand-primary);
-    color: var(--slds-gray-1);
+    background-color: var(--color-header);
+    color: var(--color-header-text);
     padding: 12px 16px;
     border-radius: 8px 8px 0 0;
 }
@@ -410,7 +587,7 @@ footer {
 
 .modal-body {
     padding: 16px;
-    color: var(--slds-gray-7);
+    color: var(--color-text);
 }
 
 .modal-body p {
@@ -422,7 +599,7 @@ footer {
     padding: 12px 16px;
     display: flex;
     justify-content: flex-end;
-    border-top: 1px solid var(--slds-gray-3);
+    border-top: 1px solid var(--color-border);
     border-radius: 0 0 8px 8px;
 }
 
@@ -432,4 +609,12 @@ footer {
 
 #modal-confirm-button:hover {
     background-color: #AA0000;
+}
+
+[data-theme="dark"] #modal-confirm-button {
+    background-color: #FF5252; /* Brighter red for better contrast */
+}
+
+[data-theme="dark"] #modal-confirm-button:hover {
+    background-color: #FF6E6E; /* Even brighter on hover */
 }

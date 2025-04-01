@@ -9,7 +9,6 @@ let openInNewTabCheckbox;
 let addTabButton;
 let saveButton;
 let cancelButton;
-let resetButton;
 let statusMessage;
 let confirmModal;
 let modalCancelButton;
@@ -18,10 +17,24 @@ let deleteConfirmModal;
 let deleteModalCancelButton;
 let deleteModalConfirmButton;
 
+// Settings Elements
+let settingsButton;
+let settingsPanel;
+let mainContent;
+let settingsBackButton;
+let themeMode;
+let panelHeight;
+let panelHeightValue;
+let settingsResetButton;
+
 // State
 let customTabs = [];
 let editingTabId = null;
 let draggedItem = null;
+let userSettings = {
+  themeMode: 'light',
+  panelHeight: 500
+};
 
 // Default tabs configuration
 const defaultTabs = [
@@ -62,6 +75,12 @@ const defaultTabs = [
   }
 ];
 
+// Default user settings
+const defaultSettings = {
+  themeMode: 'light',
+  panelHeight: 500
+};
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded event fired');
@@ -77,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
   addTabButton = document.getElementById('add-tab-button');
   saveButton = document.getElementById('save-button');
   cancelButton = document.getElementById('cancel-button');
-  resetButton = document.getElementById('reset-button');
   statusMessage = document.getElementById('status-message');
   confirmModal = document.getElementById('confirm-modal');
   modalCancelButton = document.getElementById('modal-cancel-button');
@@ -86,28 +104,121 @@ document.addEventListener('DOMContentLoaded', () => {
   deleteModalCancelButton = document.getElementById('delete-modal-cancel-button');
   deleteModalConfirmButton = document.getElementById('delete-modal-confirm-button');
   
-  // Debug: Log all DOM elements
-  console.log('DOM Elements initialized:', {
-    tabList,
-    emptyState,
-    tabForm,
-    formTitle,
-    tabNameInput,
-    tabPathInput,
-    openInNewTabCheckbox,
-    addTabButton,
-    saveButton,
-    cancelButton,
-    resetButton,
-    statusMessage,
-    confirmModal,
-    modalCancelButton,
-    modalConfirmButton
-  });
+  // Settings elements
+  settingsButton = document.getElementById('settings-button');
+  settingsPanel = document.getElementById('settings-panel');
+  mainContent = document.getElementById('main-content');
+  settingsBackButton = document.getElementById('settings-back-button');
+  themeMode = document.getElementById('theme-mode');
+  panelHeight = document.getElementById('panel-height');
+  panelHeightValue = document.getElementById('panel-height-value');
+  settingsResetButton = document.getElementById('settings-reset-button');
   
-  loadTabsFromStorage();
-  setupEventListeners();
+  // Debug: Log all DOM elements
+  console.log('DOM Elements initialized');
+  
+  // Load settings first
+  loadUserSettings().then(() => {
+    // Then load tabs
+    loadTabsFromStorage();
+    setupEventListeners();
+    
+    // Show main content by default
+    showMainContent();
+    
+    // Apply theme based on settings
+    applyTheme();
+    
+    // Apply panel height
+    applyPanelHeight();
+  });
 });
+
+// Load user settings from storage
+function loadUserSettings() {
+  console.log('Loading user settings from storage');
+  return browser.storage.sync.get('userSettings')
+    .then((result) => {
+      console.log('Settings result:', result);
+      if (result.userSettings) {
+        userSettings = { ...defaultSettings, ...result.userSettings };
+      } else {
+        userSettings = { ...defaultSettings };
+        saveUserSettings();
+      }
+      
+      // Update UI to reflect loaded settings
+      updateSettingsUI();
+      
+      return userSettings;
+    })
+    .catch((error) => {
+      console.error('Error loading settings from storage:', error);
+      showStatus('Error loading settings: ' + error.message, true);
+      return defaultSettings;
+    });
+}
+
+// Save user settings to storage
+function saveUserSettings() {
+  console.log('Saving user settings to storage:', userSettings);
+  return browser.storage.sync.set({ userSettings })
+    .then(() => {
+      console.log('Settings saved successfully');
+      showStatus('Settings saved', false);
+    })
+    .catch((error) => {
+      console.error('Error saving settings to storage:', error);
+      showStatus('Error saving settings: ' + error.message, true);
+    });
+}
+
+// Update settings UI to reflect current settings
+function updateSettingsUI() {
+  // Update theme select
+  themeMode.value = userSettings.themeMode;
+  
+  // Update panel height slider
+  panelHeight.value = userSettings.panelHeight;
+  panelHeightValue.textContent = `${userSettings.panelHeight}px`;
+}
+
+// Reset settings to defaults
+function resetSettings() {
+  userSettings = { ...defaultSettings };
+  saveUserSettings();
+  updateSettingsUI();
+  applyTheme();
+  applyPanelHeight();
+  showStatus('Settings reset to defaults', false);
+}
+
+// Apply theme based on settings
+function applyTheme() {
+  if (userSettings.themeMode === 'system') {
+    // Check system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+    
+    // Listen for changes in system theme
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      const newTheme = e.matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+    });
+  } else {
+    // Apply user selected theme
+    document.documentElement.setAttribute('data-theme', userSettings.themeMode);
+  }
+}
+
+// Apply panel height
+function applyPanelHeight() {
+  const container = document.querySelector('.container');
+  container.style.minHeight = `${userSettings.panelHeight}px`;
+}
 
 // Load tabs from storage
 function loadTabsFromStorage() {
@@ -204,6 +315,18 @@ function showConfirmModal(onConfirm) {
   };
 }
 
+// Show main content panel
+function showMainContent() {
+  mainContent.classList.add('active');
+  settingsPanel.classList.remove('active');
+}
+
+// Show settings panel
+function showSettingsPanel() {
+  mainContent.classList.remove('active');
+  settingsPanel.classList.add('active');
+}
+
 // Setup event listeners
 function setupEventListeners() {
   console.log('Setting up event listeners');
@@ -226,10 +349,45 @@ function setupEventListeners() {
     hideTabForm();
   });
   
-  // Reset button
-  resetButton.addEventListener('click', () => {
-    console.log('Reset button clicked');
-    showConfirmModal(resetToDefaults);
+  // Settings button
+  settingsButton.addEventListener('click', () => {
+    console.log('Settings button clicked');
+    showSettingsPanel();
+  });
+  
+  // Settings back button
+  settingsBackButton.addEventListener('click', () => {
+    console.log('Settings back button clicked');
+    showMainContent();
+  });
+  
+  // Settings reset button
+  settingsResetButton.addEventListener('click', () => {
+    console.log('Settings reset button clicked');
+    showConfirmModal(() => {
+      resetToDefaults();
+      resetSettings();
+    });
+  });
+  
+  // Theme mode change
+  themeMode.addEventListener('change', () => {
+    console.log('Theme mode changed to:', themeMode.value);
+    userSettings.themeMode = themeMode.value;
+    saveUserSettings();
+    applyTheme();
+  });
+  
+  // Panel height change
+  panelHeight.addEventListener('input', () => {
+    panelHeightValue.textContent = `${panelHeight.value}px`;
+  });
+  
+  panelHeight.addEventListener('change', () => {
+    console.log('Panel height changed to:', panelHeight.value);
+    userSettings.panelHeight = parseInt(panelHeight.value);
+    saveUserSettings();
+    applyPanelHeight();
   });
   
   // Enter key in form fields
@@ -271,76 +429,76 @@ function renderTabList() {
 
 // Create tab list item element
 function createTabElement(tab) {
-    const tabItem = document.createElement('div');
-    tabItem.className = 'tab-item';
-    tabItem.dataset.id = tab.id;
-    
-    const dragHandle = document.createElement('div');
-    dragHandle.className = 'drag-handle';
-    dragHandle.innerHTML = '⋮⋮'; // Simple drag handle
-    dragHandle.setAttribute('title', 'Drag to reorder');
-    
-    const tabInfo = document.createElement('div');
-    tabInfo.className = 'tab-info';
-    
-    const tabName = document.createElement('div');
-    tabName.className = 'tab-name';
-    tabName.textContent = tab.label;
-    
-    const tabPath = document.createElement('div');
-    tabPath.className = 'tab-path';
-    tabPath.textContent = tab.path;
-    
-    const tabActions = document.createElement('div');
-    tabActions.className = 'tab-actions';
-    
-    // New tab toggle
-    const newTabToggle = document.createElement('label');
-    newTabToggle.className = 'new-tab-toggle';
-    newTabToggle.setAttribute('title', 'Open in new tab');
-    
-    const toggleInput = document.createElement('input');
-    toggleInput.type = 'checkbox';
-    toggleInput.checked = tab.openInNewTab;
-    toggleInput.style.display = 'none';
-    toggleInput.addEventListener('change', () => {
-      tab.openInNewTab = toggleInput.checked;
-      saveTabsToStorage();
-    });
-    
-    const toggleSwitch = document.createElement('span');
-    toggleSwitch.className = 'toggle-switch';
-    
-    newTabToggle.appendChild(toggleInput);
-    newTabToggle.appendChild(toggleSwitch);
-    
-    // Delete button with trash icon
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'delete-button';
-    deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"></path></svg>';
-    deleteButton.setAttribute('title', 'Remove tab');
-    deleteButton.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent event from bubbling up to tabInfo
-      deleteTab(tab.id);
-    });
-    
-    // Edit functionality
-    tabInfo.addEventListener('click', () => {
-      editTab(tab.id);
-    });
-    
-    // Assemble the tab item
-    tabInfo.appendChild(tabName);
-    tabInfo.appendChild(tabPath);
-    tabActions.appendChild(newTabToggle);
-    tabActions.appendChild(deleteButton);
-    
-    tabItem.appendChild(dragHandle);
-    tabItem.appendChild(tabInfo);
-    tabItem.appendChild(tabActions);
-    
-    return tabItem;
-  }
+  const tabItem = document.createElement('div');
+  tabItem.className = 'tab-item';
+  tabItem.dataset.id = tab.id;
+  
+  const dragHandle = document.createElement('div');
+  dragHandle.className = 'drag-handle';
+  dragHandle.innerHTML = '⋮⋮'; // Simple drag handle
+  dragHandle.setAttribute('title', 'Drag to reorder');
+  
+  const tabInfo = document.createElement('div');
+  tabInfo.className = 'tab-info';
+  
+  const tabName = document.createElement('div');
+  tabName.className = 'tab-name';
+  tabName.textContent = tab.label;
+  
+  const tabPath = document.createElement('div');
+  tabPath.className = 'tab-path';
+  tabPath.textContent = tab.path;
+  
+  const tabActions = document.createElement('div');
+  tabActions.className = 'tab-actions';
+  
+  // New tab toggle
+  const newTabToggle = document.createElement('label');
+  newTabToggle.className = 'new-tab-toggle';
+  newTabToggle.setAttribute('title', 'Open in new tab');
+  
+  const toggleInput = document.createElement('input');
+  toggleInput.type = 'checkbox';
+  toggleInput.checked = tab.openInNewTab;
+  toggleInput.style.display = 'none';
+  toggleInput.addEventListener('change', () => {
+    tab.openInNewTab = toggleInput.checked;
+    saveTabsToStorage();
+  });
+  
+  const toggleSwitch = document.createElement('span');
+  toggleSwitch.className = 'toggle-switch';
+  
+  newTabToggle.appendChild(toggleInput);
+  newTabToggle.appendChild(toggleSwitch);
+  
+  // Delete button with trash icon
+  const deleteButton = document.createElement('button');
+  deleteButton.className = 'delete-button';
+  deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"></path></svg>';
+  deleteButton.setAttribute('title', 'Remove tab');
+  deleteButton.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent event from bubbling up to tabInfo
+    deleteTab(tab.id);
+  });
+  
+  // Edit functionality
+  tabInfo.addEventListener('click', () => {
+    editTab(tab.id);
+  });
+  
+  // Assemble the tab item
+  tabInfo.appendChild(tabName);
+  tabInfo.appendChild(tabPath);
+  tabActions.appendChild(newTabToggle);
+  tabActions.appendChild(deleteButton);
+  
+  tabItem.appendChild(dragHandle);
+  tabItem.appendChild(tabInfo);
+  tabItem.appendChild(tabActions);
+  
+  return tabItem;
+}
 
 // Setup drag and drop functionality
 function setupDragAndDrop() {
@@ -435,46 +593,44 @@ function updateTabPositions() {
 
 // Show tab form for adding/editing
 function showTabForm(tabId = null) {
-    console.log('Showing tab form', { tabId });
-    // Clear previous values
-    tabNameInput.value = '';
-    tabPathInput.value = '';
-    openInNewTabCheckbox.checked = false;
-    
-    if (tabId) {
-      // Edit mode
-      const tab = customTabs.find(t => t.id === tabId);
-      if (tab) {
-        editingTabId = tabId;
-        formTitle.textContent = 'Edit Tab';
-        tabNameInput.value = tab.label;
-        tabPathInput.value = tab.path;
-        openInNewTabCheckbox.checked = tab.openInNewTab;
-      }
-    } else {
-      // Add mode
-      editingTabId = null;
-      formTitle.textContent = 'Add New Tab';
+  console.log('Showing tab form', { tabId });
+  // Clear previous values
+  tabNameInput.value = '';
+  tabPathInput.value = '';
+  openInNewTabCheckbox.checked = false;
+  
+  if (tabId) {
+    // Edit mode
+    const tab = customTabs.find(t => t.id === tabId);
+    if (tab) {
+      editingTabId = tabId;
+      formTitle.textContent = 'Edit Tab';
+      tabNameInput.value = tab.label;
+      tabPathInput.value = tab.path;
+      openInNewTabCheckbox.checked = tab.openInNewTab;
     }
-    
-    // Show the form
-    tabForm.style.display = 'block';
-    addTabButton.style.display = 'none';
-    resetButton.style.display = 'none';
-    
-    // Ensure the form is visible by scrolling it into view
-    setTimeout(() => {
-      tabForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      tabNameInput.focus();
-    }, 100);
+  } else {
+    // Add mode
+    editingTabId = null;
+    formTitle.textContent = 'Add New Tab';
   }
+  
+  // Show the form
+  tabForm.style.display = 'block';
+  addTabButton.style.display = 'none';
+  
+  // Ensure the form is visible by scrolling it into view
+  setTimeout(() => {
+    tabForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    tabNameInput.focus();
+  }, 100);
+}
 
 // Hide tab form
 function hideTabForm() {
   console.log('Hiding tab form');
   tabForm.style.display = 'none';
   addTabButton.style.display = 'block';
-  resetButton.style.display = 'block';
   editingTabId = null;
 }
 
@@ -516,45 +672,45 @@ function saveTabForm() {
 
 // Delete tab
 function deleteTab(tabId) {
-    console.log('Delete tab requested', { tabId });
-    showDeleteConfirmModal(tabId);
+  console.log('Delete tab requested', { tabId });
+  showDeleteConfirmModal(tabId);
+}
+
+// Use our custom modal instead of confirm()
+function showDeleteConfirmModal(tabId) {
+  console.log('showDeleteConfirmModal called for tab', tabId);
+  
+  if (!deleteConfirmModal) {
+    console.error('Delete confirmation modal not found!');
+    return;
   }
   
-  // Use our custom modal instead of confirm()
-  function showDeleteConfirmModal(tabId) {
-    console.log('showDeleteConfirmModal called for tab', tabId);
+  deleteConfirmModal.classList.add('show');
+  
+  // Handle Cancel button
+  deleteModalCancelButton.onclick = function() {
+    console.log('Delete cancelled');
+    deleteConfirmModal.classList.remove('show');
+  };
+  
+  // Handle Confirm button
+  deleteModalConfirmButton.onclick = function() {
+    console.log('Delete confirmed for tab', tabId);
+    deleteConfirmModal.classList.remove('show');
     
-    if (!deleteConfirmModal) {
-      console.error('Delete confirmation modal not found!');
-      return;
+    // Perform the actual deletion
+    customTabs = customTabs.filter(tab => tab.id !== tabId);
+    saveTabsToStorage();
+  };
+  
+  // Close modal when clicking outside
+  deleteConfirmModal.onclick = function(event) {
+    if (event.target === deleteConfirmModal) {
+      console.log('Clicked outside delete modal');
+      deleteConfirmModal.classList.remove('show');
     }
-    
-    deleteConfirmModal.classList.add('show');
-    
-    // Handle Cancel button
-    deleteModalCancelButton.onclick = function() {
-      console.log('Delete cancelled');
-      deleteConfirmModal.classList.remove('show');
-    };
-    
-    // Handle Confirm button
-    deleteModalConfirmButton.onclick = function() {
-      console.log('Delete confirmed for tab', tabId);
-      deleteConfirmModal.classList.remove('show');
-      
-      // Perform the actual deletion
-      customTabs = customTabs.filter(tab => tab.id !== tabId);
-      saveTabsToStorage();
-    };
-    
-    // Close modal when clicking outside
-    deleteConfirmModal.onclick = function(event) {
-      if (event.target === deleteConfirmModal) {
-        console.log('Clicked outside delete modal');
-        deleteConfirmModal.classList.remove('show');
-      }
-    };
-  }
+  };
+}
 
 // Edit tab
 function editTab(tabId) {
@@ -571,21 +727,18 @@ function generateId() {
 function showStatus(message, isError = false) {
   console.log('Showing status message', { message, isError });
   statusMessage.textContent = message;
-  statusMessage.style.color = isError ? 'var(--red-50)' : 'var(--green-50)';
+  
+  // Apply appropriate class
+  statusMessage.classList.remove('success', 'error');
+  if (isError) {
+    statusMessage.classList.add('error');
+  } else if (message) {
+    statusMessage.classList.add('success');
+  }
   
   // Clear message after a delay
   setTimeout(() => {
     statusMessage.textContent = '';
+    statusMessage.classList.remove('success', 'error');
   }, 3000);
 }
-
-// Force show modal for testing purposes (uncomment if needed)
-// setTimeout(() => {
-//   console.log('Testing modal visibility');
-//   if (confirmModal) {
-//     console.log('Forcing modal to show for testing');
-//     confirmModal.classList.add('show');
-//   } else {
-//     console.error('Modal not found for testing!');
-//   }
-// }, 2000);

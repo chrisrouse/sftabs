@@ -8,58 +8,100 @@
   <div class="container">
     <header>
       <h1>Salesforce Custom Tabs</h1>
+      <button id="settings-button" class="icon-button" title="Settings">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
     </header>
     
-    <div class="section-header">
-      <h2>Custom Tabs</h2>
+    <!-- Main Section -->
+    <div id="main-content">
+      <div class="section-header">
+        <h2>Custom Tabs</h2>
+      </div>
+      
+      <div class="tab-list" id="tab-list">
+        <!-- Tab items will be added here via JavaScript -->
+        <div class="empty-state" id="empty-state">
+          <p>No custom tabs yet. Add your first tab below.</p>
+        </div>
+      </div>
+      
+      <div class="tab-form" id="tab-form">
+        <div class="form-header">
+          <h2 id="form-title">Add New Tab</h2>
+        </div>
+        
+        <div class="form-group">
+          <label for="tab-name">Tab Name</label>
+          <input type="text" id="tab-name" placeholder="e.g., User Management">
+        </div>
+        
+        <div class="form-group">
+          <label for="tab-path">URL Path</label>
+          <input type="text" id="tab-path" placeholder="e.g., ManageUsers">
+          <div class="help-text">Just enter the path component, not the full URL</div>
+        </div>
+        
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="open-in-new-tab">
+            <span>Open in New Tab</span>
+          </label>
+        </div>
+        
+        <div class="button-group">
+          <button id="cancel-button" class="secondary-button">Cancel</button>
+          <button id="save-button" class="primary-button">Save</button>
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        <button id="add-tab-button" class="primary-button">Add Tab</button>
+      </div>
     </div>
-    
-    <div class="tab-list" id="tab-list">
-      <!-- Tab items will be added here via JavaScript -->
-      <div class="empty-state" id="empty-state">
-        <p>No custom tabs yet. Add your first tab below.</p>
-      </div>
-    </div>
-    
-    <div class="tab-form" id="tab-form">
-      <div class="form-header">
-        <h2 id="form-title">Add New Tab</h2>
+
+    <!-- Settings Section -->
+    <div id="settings-panel" class="settings-panel">
+      <div class="section-header">
+        <h2>Settings</h2>
       </div>
       
-      <div class="form-group">
-        <label for="tab-name">Tab Name</label>
-        <input type="text" id="tab-name" placeholder="e.g., User Management">
+      <div class="settings-form">
+        <div class="form-group">
+          <label for="theme-mode">Theme Mode</label>
+          <select id="theme-mode" class="select-input">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="system">System (Auto)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="panel-height">Panel Height</label>
+          <div class="range-container">
+            <input type="range" id="panel-height" min="500" max="800" step="50" value="500" class="range-input">
+            <span id="panel-height-value">500px</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <button id="settings-reset-button" class="secondary-button reset-button">Reset to Defaults</button>
+        </div>
+        
+        <div class="button-group">
+          <button id="settings-back-button" class="primary-button">Back to Tabs</button>
+        </div>
       </div>
-      
-      <div class="form-group">
-        <label for="tab-path">URL Path</label>
-        <input type="text" id="tab-path" placeholder="e.g., ManageUsers">
-        <div class="help-text">Just enter the path component, not the full URL</div>
-      </div>
-      
-      <div class="form-group checkbox-group">
-        <label>
-          <input type="checkbox" id="open-in-new-tab">
-          <span>Open in New Tab</span>
-        </label>
-      </div>
-      
-      <div class="button-group">
-        <button id="cancel-button" class="secondary-button">Cancel</button>
-        <button id="save-button" class="primary-button">Save</button>
-      </div>
-    </div>
-    
-    <div class="action-buttons">
-      <button id="add-tab-button" class="primary-button">Add Tab</button>
-      <button id="reset-button" class="secondary-button reset-button">Reset to Defaults</button>
     </div>
     
     <footer>
       <div class="status-message" id="status-message"></div>
     </footer>
 
-    <!-- Moved both modals here, outside of other containers -->
+    <!-- Confirm Reset Modal -->
     <div id="confirm-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -75,6 +117,7 @@
       </div>
     </div>
 
+    <!-- Delete Tab Modal -->
     <div id="delete-confirm-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
