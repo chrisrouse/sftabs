@@ -1,87 +1,97 @@
-/* Firefox-style UI */
+/* Salesforce Lightning Design System 2.0 Colors */
 :root {
-    --blue-50: #0a84ff;
-    --blue-60: #0060df;
-    --blue-70: #003eaa;
-    --grey-10: #f9f9fa;
-    --grey-20: #ededf0;
-    --grey-30: #d7d7db;
-    --grey-40: #b1b1b3;
-    --grey-50: #737373;
-    --grey-60: #4a4a4f;
-    --grey-70: #38383d;
-    --grey-80: #2a2a2e;
-    --red-50: #ff0039;
-    --green-50: #30e60b;
-  }
-  
-  * {
+    /* Primary brand colors */
+    --slds-brand-primary: #0070D2;     /* Salesforce primary blue */
+    --slds-brand-secondary: #005FB2;   /* Darker blue for hover states */
+    
+    /* Neutral palette - more accessible grays */
+    --slds-gray-1: #FFFFFF;    /* White */
+    --slds-gray-2: #F3F3F3;    /* Near white / Light gray background */
+    --slds-gray-3: #E5E5E5;    /* Light gray borders */
+    --slds-gray-4: #D3D3D3;    /* Medium light gray */
+    --slds-gray-5: #A8A8A8;    /* Medium gray */
+    --slds-gray-6: #747474;    /* Darker gray text that meets contrast requirements */
+    --slds-gray-7: #444444;    /* Nearly black text */
+    --slds-gray-8: #181818;    /* Deepest gray, almost black */
+    
+    /* Functional colors for states/feedback */
+    --slds-color-error: #C23934;       /* Red for errors */
+    --slds-color-success: #04844B;     /* Green for success */
+    --slds-color-warning: #FFB75D;     /* Amber for warnings */
+    --slds-color-info: #0070D2;        /* Blue for info/links */
+    
+    /* Interactive colors */
+    --slds-color-hover: #F4F6FE;      /* Hover background */
+    --slds-color-selection: #D8EDFF;   /* Selection color */
+}
+
+* {
     box-sizing: border-box;
-  }
-  
-  body {
+}
+
+body {
     width: 360px;
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 14px;
-    color: var(--grey-80);
-    background-color: var(--grey-10);
-  }
-  
-  .container {
+    color: var(--slds-gray-7);
+    background-color: var(--slds-gray-2);
+}
+
+.container {
     display: flex;
     flex-direction: column;
     height: 100%;
     min-height: 500px;
-  }
-  
-  header {
-    background-color: var(--blue-60);
-    color: white;
+}
+
+header {
+    background-color: var(--slds-brand-primary);
+    color: var(--slds-gray-1);
     padding: 12px 16px;
     border-radius: 4px 4px 0 0;
-  }
-  
-  h1 {
+}
+
+h1 {
     font-size: 16px;
     font-weight: 600;
     margin: 0;
-  }
-  
-  h2 {
+}
+
+h2 {
     font-size: 14px;
     font-weight: 600;
     margin: 0;
-  }
-  
-  .section-header {
-    background-color: var(--grey-20);
+}
+
+.section-header {
+    background-color: var(--slds-gray-3);
     padding: 8px 16px;
     margin: 8px 0;
     border-radius: 4px;
-  }
-  
-  .tab-list {
+}
+
+.tab-list {
     margin: 0 8px;
     max-height: 240px;
     overflow-y: auto;
-  }
-  
-  .tab-item {
+}
+
+.tab-item {
     display: flex;
     align-items: center;
-    background-color: white;
-    border: 1px solid var(--grey-30);
+    background-color: var(--slds-gray-1);
+    border: 1px solid var(--slds-gray-3);
     border-radius: 4px;
     padding: 8px 12px;
     margin-bottom: 8px;
     cursor: move;
     position: relative;
-  }
-  
-  .drag-handle {
-    background-color: var(--grey-20);
+}
+
+.drag-handle {
+    background-color: var(--slds-gray-3);
     border-radius: 4px;
     width: 24px;
     height: 24px;
@@ -90,69 +100,69 @@
     justify-content: center;
     margin-right: 8px;
     cursor: grab;
-  }
-  
-  .tab-info {
+}
+
+.tab-info {
     flex-grow: 1;
-  }
-  
-  .tab-name {
+}
+
+.tab-name {
     font-weight: 500;
     margin-bottom: 2px;
-  }
-  
-  .tab-path {
+}
+
+.tab-path {
     font-size: 12px;
-    color: var(--grey-50);
-  }
-  
-  .tab-actions {
+    color: var(--slds-gray-6);
+}
+
+.tab-actions {
     display: flex;
     align-items: center;
     height: 24px;
-  }
-  
-  .new-tab-toggle {
+}
+
+.new-tab-toggle {
     display: inline-block;
     position: relative;
     width: 40px;
     height: 20px;
     margin-right: 8px;
-  }
-  
-  .toggle-switch {
+}
+
+.toggle-switch {
     position: absolute;
     cursor: pointer;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--grey-20);
+    background-color: var(--slds-gray-4);
     border-radius: 10px;
     transition: .4s;
-  }
-  
-  .toggle-switch:before {
+}
+
+.toggle-switch:before {
     position: absolute;
     content: "";
     height: 16px;
     width: 16px;
     left: 2px;
     bottom: 2px;
-    background-color: white;
+    background-color: var(--slds-gray-1);
     border-radius: 50%;
     transition: .4s;
-  }
-  
-  input:checked + .toggle-switch {
-    background-color: var(--blue-60);
-  }
-  
-  input:checked + .toggle-switch:before {
+}
+
+input:checked + .toggle-switch {
+    background-color: var(--slds-brand-primary);
+}
+
+input:checked + .toggle-switch:before {
     transform: translateX(20px);
-  }
-  
-  .delete-button {
+}
+
+.delete-button {
     background-color: transparent;
     border: none;
     border-radius: 4px;
@@ -165,104 +175,104 @@
     transition: all 0.2s;
     padding: 0;
     margin-left: 4px;
-  }
-  
-  .delete-button:hover {
-    background-color: var(--grey-20);
-  }
+}
 
-  .delete-button:hover svg path {
-    fill: var(--red-50);
-  }
-  
-  .delete-button svg {
-    fill: var(--grey-50);
-  }
-  
-  #delete-modal-confirm-button {
-    background-color: var(--red-50);
-  }
-  
-  #delete-modal-confirm-button:hover {
-    background-color: #cc0030;
-  }
-  
-  .empty-state {
+.delete-button:hover {
+    background-color: var(--slds-gray-3);
+}
+
+.delete-button:hover svg path {
+    fill: var(--slds-color-error);
+}
+
+.delete-button svg {
+    fill: var(--slds-gray-5);
+}
+
+#delete-modal-confirm-button {
+    background-color: var(--slds-color-error);
+}
+
+#delete-modal-confirm-button:hover {
+    background-color: #AA0000;
+}
+
+.empty-state {
     text-align: center;
     padding: 20px;
-    color: var(--grey-50);
-  }
-  
-  .tab-form {
-    background-color: white;
-    border: 1px solid var(--grey-30);
+    color: var(--slds-gray-6);
+}
+
+.tab-form {
+    background-color: var(--slds-gray-1);
+    border: 1px solid var(--slds-gray-3);
     border-radius: 4px;
     margin: 8px;
     padding: 12px;
-  }
-  
-  .form-header {
+}
+
+.form-header {
     margin-bottom: 12px;
-  }
-  
-  .form-group {
-    mardgin-bottom: 12px;
-  }
-  
-  label {
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+label {
     display: block;
     font-size: 12px;
-    color: var(--grey-50);
+    color: var(--slds-gray-6);
     margin-bottom: 4px;
-  }
-  
-  input[type="text"] {
+}
+
+input[type="text"] {
     width: 100%;
     padding: 8px;
-    border: 1px solid var(--grey-30);
+    border: 1px solid var(--slds-gray-4);
     border-radius: 4px;
-    background-color: var(--grey-20);
+    background-color: var(--slds-gray-2);
     font-size: 14px;
-  }
-  
-  input[type="text"]:focus {
+}
+
+input[type="text"]:focus {
     outline: none;
-    border-color: var(--blue-50);
-    box-shadow: 0 0 0 1px var(--blue-50);
-  }
-  
-  .help-text {
+    border-color: var(--slds-brand-primary);
+    box-shadow: 0 0 0 1px var(--slds-brand-primary);
+}
+
+.help-text {
     font-size: 11px;
-    color: var(--grey-50);
+    color: var(--slds-gray-6);
     margin-top: 4px;
-  }
-  
-  .checkbox-group {
+}
+
+.checkbox-group {
     display: flex;
     align-items: center;
-  }
-  
-  .checkbox-group label {
+}
+
+.checkbox-group label {
     display: flex;
     align-items: center;
     margin: 0;
-    color: var(--grey-80);
+    color: var(--slds-gray-7);
     font-size: 14px;
-  }
-  
-  .checkbox-group input[type="checkbox"] {
+}
+
+.checkbox-group input[type="checkbox"] {
     margin-right: 8px;
-  }
-  
-  .button-group {
+}
+
+.button-group {
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
-  }
-  
-  .primary-button {
-    background-color: var(--blue-60);
-    color: white;
+}
+
+.primary-button {
+    background-color: var(--slds-brand-primary);
+    color: var(--slds-gray-1);
     border: none;
     border-radius: 4px;
     padding: 8px 16px;
@@ -270,16 +280,16 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s;
-  }
-  
-  .primary-button:hover {
-    background-color: var(--blue-70);
-  }
-  
-  .secondary-button {
+}
+
+.primary-button:hover {
+    background-color: var(--slds-brand-secondary);
+}
+
+.secondary-button {
     background-color: transparent;
-    color: var(--grey-60);
-    border: 1px solid var(--grey-30);
+    color: var(--slds-gray-7);
+    border: 1px solid var(--slds-gray-4);
     border-radius: 4px;
     padding: 8px 16px;
     font-size: 14px;
@@ -287,130 +297,139 @@
     margin-right: 8px;
     cursor: pointer;
     transition: background-color 0.2s;
-  }
-  
-  .secondary-button:hover {
-    background-color: var(--grey-20);
-  }
-  
-  .action-buttons {
+}
+
+.secondary-button:hover {
+    background-color: var(--slds-gray-3);
+}
+
+.action-buttons {
     display: flex;
     justify-content: space-between;
     padding: 8px;
-  }
-  
-  .reset-button {
-    color: var(--grey-50);
+}
+
+.reset-button {
+    color: var(--slds-gray-6);
     margin-right: 0;
-  }
-  
-  .reset-button:hover {
-    color: var(--red-50);
-    border-color: var(--red-50);
-  }
-  
-  footer {
+}
+
+.reset-button:hover {
+    color: var(--slds-color-error);
+    border-color: var(--slds-color-error);
+}
+
+footer {
     margin-top: auto;
     padding: 8px;
-    background-color: var(--grey-20);
+    background-color: var(--slds-gray-3);
     border-radius: 0 0 4px 4px;
-  }
-  
-  .status-message {
+}
+
+.status-message {
     text-align: center;
     font-size: 12px;
-    color: var(--grey-50);
+    color: var(--slds-gray-6);
     min-height: 24px;
-  }
-  
-  /* Drag and drop styles */
-  .tab-item.dragging {
-    opacity: 0.5;
-    border: 2px dashed var(--blue-60);
-  }
-  
-  .tab-item.drag-over {
-    border: 2px dashed var(--blue-60);
-    transform: translateY(4px);
-  }
-  
-  /* Initially hide form */
-  .tab-form {
-    display: none;
-  }
+}
 
-  /* Modal styles */
+/* Status message colors */
+.status-message.success {
+    color: var(--slds-color-success);
+}
+
+.status-message.error {
+    color: var(--slds-color-error);
+}
+
+/* Drag and drop styles */
+.tab-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--slds-brand-primary);
+}
+
+.tab-item.drag-over {
+    border: 2px dashed var(--slds-brand-primary);
+    transform: translateY(4px);
+}
+
+/* Initially hide form */
+.tab-form {
+    display: none;
+}
+
+/* Modal styles */
 .modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal.show {
-  display: flex;
+    display: flex;
 }
 
 .modal-content {
-  background-color: var(--grey-10);
-  border-radius: 8px;
-  max-width: 90%;
-  width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  animation: modalFadeIn 0.3s;
+    background-color: var(--slds-gray-2);
+    border-radius: 8px;
+    max-width: 90%;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s;
 }
 
 @keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-header {
-  background-color: var(--blue-60);
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px 8px 0 0;
+    background-color: var(--slds-brand-primary);
+    color: var(--slds-gray-1);
+    padding: 12px 16px;
+    border-radius: 8px 8px 0 0;
 }
 
 .modal-header h2 {
-  margin: 0;
-  font-size: 16px;
+    margin: 0;
+    font-size: 16px;
 }
 
 .modal-body {
-  padding: 16px;
-  color: var(--grey-80);
+    padding: 16px;
+    color: var(--slds-gray-7);
 }
 
 .modal-body p {
-  margin: 0;
-  line-height: 1.5;
+    margin: 0;
+    line-height: 1.5;
 }
 
 .modal-footer {
-  padding: 12px 16px;
-  display: flex;
-  justify-content: flex-end;
-  border-top: 1px solid var(--grey-30);
-  border-radius: 0 0 8px 8px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid var(--slds-gray-3);
+    border-radius: 0 0 8px 8px;
 }
 
 #modal-confirm-button {
-  background-color: var(--red-50);
+    background-color: var(--slds-color-error);
 }
 
 #modal-confirm-button:hover {
-  background-color: #cc0030;
+    background-color: #AA0000;
 }
