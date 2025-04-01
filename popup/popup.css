@@ -1,0 +1,312 @@
+/* Firefox-style UI */
+:root {
+    --blue-50: #0a84ff;
+    --blue-60: #0060df;
+    --blue-70: #003eaa;
+    --grey-10: #f9f9fa;
+    --grey-20: #ededf0;
+    --grey-30: #d7d7db;
+    --grey-40: #b1b1b3;
+    --grey-50: #737373;
+    --grey-60: #4a4a4f;
+    --grey-70: #38383d;
+    --grey-80: #2a2a2e;
+    --red-50: #ff0039;
+    --green-50: #30e60b;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    width: 360px;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    color: var(--grey-80);
+    background-color: var(--grey-10);
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 500px;
+  }
+  
+  header {
+    background-color: var(--blue-60);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 4px 4px 0 0;
+  }
+  
+  h1 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  h2 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .section-header {
+    background-color: var(--grey-20);
+    padding: 8px 16px;
+    margin: 8px 0;
+    border-radius: 4px;
+  }
+  
+  .tab-list {
+    margin: 0 8px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  
+  .tab-item {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid var(--grey-30);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    cursor: move;
+    position: relative;
+  }
+  
+  .drag-handle {
+    background-color: var(--grey-20);
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    cursor: grab;
+  }
+  
+  .tab-info {
+    flex-grow: 1;
+  }
+  
+  .tab-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  
+  .tab-path {
+    font-size: 12px;
+    color: var(--grey-50);
+  }
+  
+  .tab-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .new-tab-toggle {
+    display: inline-block;
+    position: relative;
+    width: 40px;
+    height: 20px;
+    margin-right: 8px;
+  }
+  
+  .toggle-switch {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--grey-20);
+    border-radius: 10px;
+    transition: .4s;
+  }
+  
+  .toggle-switch:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+  }
+  
+  input:checked + .toggle-switch {
+    background-color: var(--blue-60);
+  }
+  
+  input:checked + .toggle-switch:before {
+    transform: translateX(20px);
+  }
+  
+  .delete-button {
+    background-color: transparent;
+    border: 1px solid var(--grey-30);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .delete-button:hover {
+    background-color: var(--red-50);
+    border-color: var(--red-50);
+    color: white;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 20px;
+    color: var(--grey-50);
+  }
+  
+  .tab-form {
+    background-color: white;
+    border: 1px solid var(--grey-30);
+    border-radius: 4px;
+    margin: 8px;
+    padding: 12px;
+  }
+  
+  .form-header {
+    margin-bottom: 12px;
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+  
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--grey-50);
+    margin-bottom: 4px;
+  }
+  
+  input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--grey-30);
+    border-radius: 4px;
+    background-color: var(--grey-20);
+    font-size: 14px;
+  }
+  
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--blue-50);
+    box-shadow: 0 0 0 1px var(--blue-50);
+  }
+  
+  .help-text {
+    font-size: 11px;
+    color: var(--grey-50);
+    margin-top: 4px;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    color: var(--grey-80);
+    font-size: 14px;
+  }
+  
+  .checkbox-group input[type="checkbox"] {
+    margin-right: 8px;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  
+  .primary-button {
+    background-color: var(--blue-60);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .primary-button:hover {
+    background-color: var(--blue-70);
+  }
+  
+  .secondary-button {
+    background-color: transparent;
+    color: var(--grey-60);
+    border: 1px solid var(--grey-30);
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .secondary-button:hover {
+    background-color: var(--grey-20);
+  }
+  
+  .add-button-container {
+    padding: 8px;
+    text-align: center;
+  }
+  
+  footer {
+    margin-top: auto;
+    padding: 8px;
+    background-color: var(--grey-20);
+    border-radius: 0 0 4px 4px;
+  }
+  
+  .status-message {
+    text-align: center;
+    font-size: 12px;
+    color: var(--grey-50);
+    min-height: 24px;
+  }
+  
+  /* Drag and drop styles */
+  .tab-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--blue-60);
+  }
+  
+  .tab-item.drag-over {
+    border: 2px dashed var(--blue-60);
+    transform: translateY(4px);
+  }
+  
+  /* Initially hide form */
+  .tab-form {
+    display: none;
+  }

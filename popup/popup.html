@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Salesforce Custom Tabs</h1>
+    </header>
+    
+    <div class="section-header">
+      <h2>Custom Tabs</h2>
+    </div>
+    
+    <div class="tab-list" id="tab-list">
+      <!-- Tab items will be added here via JavaScript -->
+      <div class="empty-state" id="empty-state">
+        <p>No custom tabs yet. Add your first tab below.</p>
+      </div>
+    </div>
+    
+    <div class="tab-form" id="tab-form">
+      <div class="form-header">
+        <h2 id="form-title">Add New Tab</h2>
+      </div>
+      
+      <div class="form-group">
+        <label for="tab-name">Tab Name</label>
+        <input type="text" id="tab-name" placeholder="e.g., User Management">
+      </div>
+      
+      <div class="form-group">
+        <label for="tab-path">URL Path</label>
+        <input type="text" id="tab-path" placeholder="e.g., ManageUsers">
+        <div class="help-text">Just enter the path component, not the full URL</div>
+      </div>
+      
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="open-in-new-tab">
+          <span>Open in New Tab</span>
+        </label>
+      </div>
+      
+      <div class="button-group">
+        <button id="cancel-button" class="secondary-button">Cancel</button>
+        <button id="save-button" class="primary-button">Save</button>
+      </div>
+    </div>
+    
+    <div class="add-button-container">
+      <button id="add-tab-button" class="primary-button">Add Tab</button>
+    </div>
+    
+    <footer>
+      <div class="status-message" id="status-message"></div>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

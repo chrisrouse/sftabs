@@ -1,0 +1,34 @@
+{
+    "manifest_version": 2,
+    "name": "Salesforce Custom Setup Tabs",
+    "version": "1.0",
+    "description": "Add custom tabs to the Salesforce setup menu",
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "salesforce-custom-tabs@example.com"
+      }
+    },
+    "permissions": [
+      "activeTab",
+      "storage",
+      "*://*.lightning.force.com/*"
+    ],
+    "browser_action": {
+      "default_icon": {
+        "48": "icons/icon-48.png",
+        "96": "icons/icon-96.png"
+      },
+      "default_title": "Salesforce Custom Tabs",
+      "default_popup": "popup/popup.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["*://*.lightning.force.com/lightning/setup/*"],
+        "js": ["content.js"]
+      }
+    ],
+    "icons": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    }
+  }
