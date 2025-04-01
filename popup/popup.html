@@ -50,13 +50,45 @@
       </div>
     </div>
     
-    <div class="add-button-container">
+    <div class="action-buttons">
       <button id="add-tab-button" class="primary-button">Add Tab</button>
+      <button id="reset-button" class="secondary-button reset-button">Reset to Defaults</button>
     </div>
     
     <footer>
       <div class="status-message" id="status-message"></div>
     </footer>
+
+    <!-- Moved both modals here, outside of other containers -->
+    <div id="confirm-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Reset to Default Tabs</h2>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.</p>
+        </div>
+        <div class="modal-footer">
+          <button id="modal-cancel-button" class="secondary-button">Cancel</button>
+          <button id="modal-confirm-button" class="primary-button">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="delete-confirm-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Remove Tab</h2>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to remove this tab?</p>
+        </div>
+        <div class="modal-footer">
+          <button id="delete-modal-cancel-button" class="secondary-button">Cancel</button>
+          <button id="delete-modal-confirm-button" class="primary-button">Remove</button>
+        </div>
+      </div>
+    </div>
   </div>
   
   <script src="popup.js"></script>

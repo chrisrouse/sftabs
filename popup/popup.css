@@ -109,6 +109,7 @@
   .tab-actions {
     display: flex;
     align-items: center;
+    height: 24px;
   }
   
   .new-tab-toggle {
@@ -153,8 +154,8 @@
   
   .delete-button {
     background-color: transparent;
-    border: 1px solid var(--grey-30);
-    border-radius: 50%;
+    border: none;
+    border-radius: 4px;
     width: 24px;
     height: 24px;
     display: flex;
@@ -162,12 +163,28 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
+    padding: 0;
+    margin-left: 4px;
   }
   
   .delete-button:hover {
+    background-color: var(--grey-20);
+  }
+
+  .delete-button:hover svg path {
+    fill: var(--red-50);
+  }
+  
+  .delete-button svg {
+    fill: var(--grey-50);
+  }
+  
+  #delete-modal-confirm-button {
     background-color: var(--red-50);
-    border-color: var(--red-50);
-    color: white;
+  }
+  
+  #delete-modal-confirm-button:hover {
+    background-color: #cc0030;
   }
   
   .empty-state {
@@ -189,7 +206,7 @@
   }
   
   .form-group {
-    margin-bottom: 12px;
+    mardgin-bottom: 12px;
   }
   
   label {
@@ -276,9 +293,20 @@
     background-color: var(--grey-20);
   }
   
-  .add-button-container {
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
     padding: 8px;
-    text-align: center;
+  }
+  
+  .reset-button {
+    color: var(--grey-50);
+    margin-right: 0;
+  }
+  
+  .reset-button:hover {
+    color: var(--red-50);
+    border-color: var(--red-50);
   }
   
   footer {
@@ -310,3 +338,79 @@
   .tab-form {
     display: none;
   }
+
+  /* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background-color: var(--grey-10);
+  border-radius: 8px;
+  max-width: 90%;
+  width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  background-color: var(--blue-60);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.modal-body {
+  padding: 16px;
+  color: var(--grey-80);
+}
+
+.modal-body p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--grey-30);
+  border-radius: 0 0 8px 8px;
+}
+
+#modal-confirm-button {
+  background-color: var(--red-50);
+}
+
+#modal-confirm-button:hover {
+  background-color: #cc0030;
+}
