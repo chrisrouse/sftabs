@@ -349,17 +349,31 @@ function setupEventListeners() {
     hideTabForm();
   });
   
-  // Settings button
-  settingsButton.addEventListener('click', () => {
-    console.log('Settings button clicked');
+  // Settings button - toggle between panels
+settingsButton.addEventListener('click', () => {
+  console.log('Settings button clicked');
+  if (mainContent.classList.contains('active')) {
     showSettingsPanel();
-  });
-  
-  // Settings back button
-  settingsBackButton.addEventListener('click', () => {
-    console.log('Settings back button clicked');
+  } else {
     showMainContent();
-  });
+  }
+});
+
+// Show settings panel
+function showSettingsPanel() {
+  mainContent.classList.remove('active');
+  settingsPanel.classList.add('active');
+  // Optionally update the icon or title to indicate "Back" functionality
+  settingsButton.title = "Back to Tabs";
+}
+
+// Show main content panel
+function showMainContent() {
+  mainContent.classList.add('active');
+  settingsPanel.classList.remove('active');
+  // Reset the title
+  settingsButton.title = "Settings";
+}
   
   // Settings reset button
   settingsResetButton.addEventListener('click', () => {
@@ -505,6 +519,14 @@ function setupDragAndDrop() {
   const tabItems = document.querySelectorAll('.tab-item');
   const dragHandles = document.querySelectorAll('.drag-handle');
   
+  // Create drop indicator element
+  const dropIndicator = document.createElement('div');
+  dropIndicator.className = 'drop-indicator';
+  dropIndicator.style.height = '2px';
+  dropIndicator.style.backgroundColor = 'var(--slds-brand-primary)';
+  dropIndicator.style.marginBottom = '8px';
+  dropIndicator.style.display = 'none';
+  
   dragHandles.forEach((handle, index) => {
     const item = tabItems[index];
     
@@ -537,6 +559,9 @@ function setupDragAndDrop() {
         const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
         item.style.display = '';
         
+        // Hide the drop indicator by default
+        dropIndicator.style.display = 'none';
+        
         if (!elemBelow) return;
         
         // Check if we're over another tab item
@@ -546,13 +571,21 @@ function setupDragAndDrop() {
           const rect = droppableItem.getBoundingClientRect();
           const middle = rect.top + rect.height / 2;
           
+          // Show the drop indicator
+          dropIndicator.style.display = 'block';
+          
           if (event.clientY < middle) {
-            tabList.insertBefore(item, droppableItem);
+            // Place above the droppable item
+            tabList.insertBefore(dropIndicator, droppableItem);
           } else {
-            tabList.insertBefore(item, droppableItem.nextSibling);
+            // Place below the droppable item
+            tabList.insertBefore(dropIndicator, droppableItem.nextSibling);
           }
         }
       }
+      
+      // Add drop indicator to the DOM
+      tabList.appendChild(dropIndicator);
       
       // Move on mousemove
       document.addEventListener('mousemove', onMouseMove);
@@ -568,6 +601,31 @@ function setupDragAndDrop() {
         item.style.top = '';
         item.style.left = '';
         item.classList.remove('dragging');
+        
+        // Remove the drop indicator
+        if (dropIndicator.parentNode) {
+          dropIndicator.parentNode.removeChild(dropIndicator);
+        }
+        
+        // Check if we're over another tab item for final positioning
+        item.style.display = 'none';
+        const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+        item.style.display = '';
+        
+        if (elemBelow) {
+          const droppableItem = elemBelow.closest('.tab-item');
+          if (droppableItem && droppableItem !== item) {
+            // Determine if we should place above or below
+            const rect = droppableItem.getBoundingClientRect();
+            const middle = rect.top + rect.height / 2;
+            
+            if (event.clientY < middle) {
+              tabList.insertBefore(item, droppableItem);
+            } else {
+              tabList.insertBefore(item, droppableItem.nextSibling);
+            }
+          }
+        }
         
         // Update positions
         updateTabPositions();
@@ -591,20 +649,23 @@ function updateTabPositions() {
   saveTabsToStorage();
 }
 
-// Show tab form for adding/editing
+// Show tab form for adding or editing
 function showTabForm(tabId = null) {
   console.log('Showing tab form', { tabId });
-  // Clear previous values
+  
+  // Reset form
   tabNameInput.value = '';
   tabPathInput.value = '';
   openInNewTabCheckbox.checked = false;
   
   if (tabId) {
     // Edit mode
+    editingTabId = tabId;
+    formTitle.textContent = 'Edit Tab';
+    
+    // Populate form with existing data
     const tab = customTabs.find(t => t.id === tabId);
     if (tab) {
-      editingTabId = tabId;
-      formTitle.textContent = 'Edit Tab';
       tabNameInput.value = tab.label;
       tabPathInput.value = tab.path;
       openInNewTabCheckbox.checked = tab.openInNewTab;
@@ -617,20 +678,15 @@ function showTabForm(tabId = null) {
   
   // Show the form
   tabForm.style.display = 'block';
-  addTabButton.style.display = 'none';
   
-  // Ensure the form is visible by scrolling it into view
-  setTimeout(() => {
-    tabForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    tabNameInput.focus();
-  }, 100);
+  // Focus on the first field
+  tabNameInput.focus();
 }
 
 // Hide tab form
 function hideTabForm() {
   console.log('Hiding tab form');
   tabForm.style.display = 'none';
-  addTabButton.style.display = 'block';
   editingTabId = null;
 }
 

@@ -104,20 +104,20 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 500px; /* Default height, can be overridden via JS */
-    max-height: 100vh; /* Prevent exceeding viewport height */
+    min-height: 500px;
+    max-height: 100vh;
     overflow: hidden;
-}
+    background-color: var(--color-background);
+  }
 
 header {
     background-color: var(--color-header);
     color: var(--color-header-text);
     padding: 12px 16px;
-    border-radius: 4px 4px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
+  }
 
 .icon-button {
     background: transparent;
@@ -456,8 +456,9 @@ input[type="text"]:focus {
 
 .action-buttons {
     display: flex;
-    justify-content: space-between;
-    padding: 8px;
+    justify-content: flex-end;
+    padding-right: 8px;
+    margin-right: 8px;
 }
 
 .reset-button {
@@ -511,6 +512,7 @@ footer {
     flex: 1;
     overflow-y: auto;
     display: none;
+    background-color: var(--color-background);
 }
 
 #main-content.active, #settings-panel.active {
@@ -524,15 +526,43 @@ footer {
 
 /* Settings panel */
 .settings-panel {
-    padding: 0 8px;
+    padding: 0;
+    background-color: var(--color-background);
 }
 
+/* Make ALL section headers full width */
+.section-header {
+    background-color: var(--color-section-header);
+    padding: 8px 16px;
+    margin: 0 0 8px 0;
+    border-radius: 0;
+}
+
+/* Apply proper margins for form inside settings panel */
 .settings-form {
+    margin: 8px;
     background-color: var(--color-item-background);
     border: 1px solid var(--color-border);
     border-radius: 4px;
     padding: 16px;
-    margin-bottom: 8px;
+}
+
+/* Form groups in settings */
+.settings-form .form-group {
+    margin-bottom: 24px;
+}
+
+.settings-form .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Apply proper margins for tab list */
+.tab-list {
+    margin: 0 8px;
+    max-height: calc(100% - 150px);
+    overflow-y: auto;
+    background-color: var(--color-background); 
+    padding: 8px;
 }
 
 /* Modal styles */
@@ -617,4 +647,58 @@ footer {
 
 [data-theme="dark"] #modal-confirm-button:hover {
     background-color: #FF6E6E; /* Even brighter on hover */
+}
+
+/* Menu icon color for dark mode */
+[data-theme="dark"] .icon-button svg {
+  stroke: var(--color-header-text);
+}
+
+/* Fix dropdown arrow color in dark mode */
+[data-theme="dark"] .select-input {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Dark theme item backgrounds */
+[data-theme="dark"] .tab-item {
+    background-color: #2A2C35 !important; /* Darker background for tab items in dark mode */
+    border-color: #444444;
+}
+
+/* Dark theme controls */
+[data-theme="dark"] .drag-handle {
+    background-color: #444444;
+}
+
+/* Ensure consistent dark mode for forms as well */
+[data-theme="dark"] .tab-form,
+[data-theme="dark"] .settings-form {
+    background-color: #2A2C35;
+    border-color: #444444;
+}
+
+/* Dark mode footer */
+[data-theme="dark"] footer {
+    background-color: #232530;
+}
+
+/* Drop indicator style */
+.drop-indicator {
+  height: 2px;
+  background-color: var(--slds-brand-primary);
+  margin-bottom: 8px;
+  display: none;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
 }
