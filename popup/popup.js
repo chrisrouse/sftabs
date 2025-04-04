@@ -35,6 +35,8 @@ let userSettings = {
   themeMode: 'light',
   panelHeight: 500
 };
+let quickAddButton;
+
 
 // Default tabs configuration
 const defaultTabs = [
@@ -330,6 +332,13 @@ function showSettingsPanel() {
 // Setup event listeners
 function setupEventListeners() {
   console.log('Setting up event listeners');
+
+  // Add quick add button
+  quickAddButton = document.getElementById('quick-add-button');
+  quickAddButton.addEventListener('click', () => {
+    console.log('Quick add button clicked');
+    addTabForCurrentPage();
+  });
   
   // Add tab button
   addTabButton.addEventListener('click', () => {
@@ -350,14 +359,93 @@ function setupEventListeners() {
   });
   
   // Settings button - toggle between panels
-settingsButton.addEventListener('click', () => {
-  console.log('Settings button clicked');
-  if (mainContent.classList.contains('active')) {
-    showSettingsPanel();
-  } else {
-    showMainContent();
-  }
-});
+  settingsButton.addEventListener('click', () => {
+    console.log('Settings button clicked');
+    if (mainContent.classList.contains('active')) {
+      showSettingsPanel();
+    } else {
+      showMainContent();
+    }
+  });
+
+// Handle Quick Add
+function addTabForCurrentPage() {
+  // Get the current active tab in the browser
+  browser.tabs.query({ active: true, currentWindow: true })
+    .then(tabs => {
+      if (tabs.length > 0) {
+        const currentUrl = tabs[0].url;
+        console.log('Current URL:', currentUrl);
+        
+        // Check if this is a Salesforce setup page
+        if (currentUrl.includes('/lightning/setup/')) {
+          // Extract the path component (after /setup/)
+          const urlParts = currentUrl.split('/lightning/setup/');
+          if (urlParts.length > 1) {
+            let path = urlParts[1].split('/')[0]; // Get the component after /setup/ and before the next slash
+            
+            // Get the page title to use as the tab name
+            const pageTitle = tabs[0].title;
+            
+            // Extract a reasonable name from either the page title or the path
+            let name = path;
+            
+            // Try to extract a better name from the page title if available
+            if (pageTitle) {
+              // Remove " | Salesforce" or similar suffix from title
+              let cleanTitle = pageTitle.split(' | ')[0];
+              
+              // If the title includes "Setup", try to get a cleaner name
+              if (cleanTitle.includes('Setup')) {
+                const setupParts = cleanTitle.split('Setup: ');
+                if (setupParts.length > 1) {
+                  cleanTitle = setupParts[1];
+                }
+              }
+              
+              // Use the cleaned title if we got something reasonable
+              if (cleanTitle && cleanTitle.length > 0) {
+                name = cleanTitle;
+              }
+            }
+            
+            // Convert path format from CamelCase to "Proper Name"
+            // This helps if we couldn't get a good name from the title
+            if (name === path) {
+              name = path
+                // Add space before uppercase letters
+                .replace(/([A-Z])/g, ' $1')
+                // Clean up any leading space and capitalize first letter
+                .replace(/^./, str => str.toUpperCase())
+                .trim();
+            }
+            
+            // Create a new tab object
+            const newTab = {
+              id: generateId(),
+              label: name,
+              path: path,
+              openInNewTab: false,
+              position: customTabs.length
+            };
+            
+            // Add the new tab
+            customTabs.push(newTab);
+            saveTabsToStorage();
+            
+            // Show success message
+            showStatus(`Added tab for "${name}"`, false);
+          }
+        } else {
+          showStatus('Not a Salesforce setup page', true);
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error accessing current tab:', error);
+      showStatus('Error accessing current tab', true);
+    });
+}
 
 // Show settings panel
 function showSettingsPanel() {

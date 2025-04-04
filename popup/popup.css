@@ -119,19 +119,52 @@ header {
     align-items: center;
   }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Consistent spacing between icons */
+    }
+
+
 .icon-button {
     background: transparent;
     border: none;
     color: var(--color-header-text);
     cursor: pointer;
-    width: 28px;
-    height: 28px;
+    width: 32px; /* Fixed width */
+    height: 32px; /* Fixed height */
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
     padding: 0;
+    transition: background-color 0.2s;
+    position: relative; /* For precise positioning */
 }
+
+/* Ensure all icon colors are consistent */
+.header-actions .icon-button svg {
+    stroke: var(--color-header-text) !important; /* Use !important to override any conflicting styles */
+    fill: none !important;
+  }
+
+  /* Specifically target the cloud-lightning icon if needed */
+.icon-button .feather-cloud-lightning {
+    stroke: var(--color-header-text) !important;
+    fill: none !important;
+  }
+
+/* Ensure SVGs are perfectly centered */
+.icon-button svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px; /* Fixed size */
+    height: 16px; /* Fixed size */
+    stroke: var(--color-header-text);
+    stroke-width: 2px; /* Consistent stroke width */
+  }
 
 .icon-button:hover {
     background-color: rgba(255, 255, 255, 0.1);
@@ -198,12 +231,6 @@ h2 {
 .tab-path {
     font-size: 12px;
     color: var(--color-text-weak);
-}
-
-.tab-actions {
-    display: flex;
-    align-items: center;
-    height: 24px;
 }
 
 .new-tab-toggle {
@@ -459,6 +486,7 @@ input[type="text"]:focus {
     justify-content: flex-end;
     padding: 0 8px 8px 0;
     margin: 0 8px 8px 0;
+    gap: 2px;
     
 }
 
@@ -724,3 +752,24 @@ footer {
     opacity: 0.4;
   }
 }
+
+/* Style for icon in the Quick Add button */
+#quick-add-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px; /* Space between icon and text */
+  }
+  
+  #quick-add-button svg {
+    stroke: var(--color-text);
+  }
+  
+  /* Dark mode adjustments */
+  [data-theme="dark"] #quick-add-button svg {
+    stroke: var(--color-text);
+  }
+  
+  [data-theme="dark"] #quick-add-button:hover svg {
+    stroke: var(--slds-brand-primary);
+  }
