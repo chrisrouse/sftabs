@@ -504,7 +504,7 @@ input[type="text"]:focus {
 footer {
     margin-top: auto;
     padding: 8px;
-    background-color: var(--color-section-header);
+    background-color: var(--color-background);
     border-radius: 0 0 4px 4px;
 }
 
