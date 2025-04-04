@@ -514,6 +514,7 @@ function createTabElement(tab) {
   return tabItem;
 }
 
+
 // Setup drag and drop functionality
 function setupDragAndDrop() {
   const tabItems = document.querySelectorAll('.tab-item');
@@ -685,17 +686,78 @@ function showTabForm(tabId = null) {
       tabPathInput.value = tab.path;
       openInNewTabCheckbox.checked = tab.openInNewTab;
     }
+    
+    // Find the tab element
+    const tabElement = document.querySelector(`.tab-item[data-id="${tabId}"]`);
+    if (tabElement) {
+      // Insert the form right after this tab
+      tabElement.after(tabForm);
+      
+      // Show the form
+      tabForm.style.display = 'block';
+      
+      // Scroll to make the form fully visible
+      ensureFormVisible(tabElement);
+    } else {
+      // Fallback to default position
+      tabList.after(tabForm);
+      tabForm.style.display = 'block';
+    }
   } else {
     // Add mode
     editingTabId = null;
     formTitle.textContent = 'Add New Tab';
+    
+    // Show form at the default position (at the end)
+    tabList.after(tabForm);
+    tabForm.style.display = 'block';
+    
+    // Ensure the Add button is visible
+    const addButton = document.getElementById('add-tab-button');
+    if (addButton) {
+      addButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
   }
-  
-  // Show the form
-  tabForm.style.display = 'block';
   
   // Focus on the first field
   tabNameInput.focus();
+}
+
+// Function to ensure the form is fully visible
+function ensureFormVisible(tabElement) {
+  // Use a slightly longer delay to ensure DOM is fully updated
+  setTimeout(() => {
+    // Get the main scrollable container
+    const mainContent = document.getElementById('main-content');
+    
+    // Calculate positions
+    const formRect = tabForm.getBoundingClientRect();
+    const containerRect = mainContent.getBoundingClientRect();
+    const containerHeight = mainContent.clientHeight;
+    const scrollTop = mainContent.scrollTop;
+    
+    // Calculate how much of the form is out of view
+    const formBottom = formRect.bottom - containerRect.top;
+    const overflow = formBottom - containerHeight;
+    
+    console.log('Form dimensions:', {
+      formBottom,
+      containerHeight,
+      overflow,
+      scrollTop
+    });
+    
+    // If form extends below the visible area, scroll it into view
+    if (overflow > 0) {
+      console.log('Scrolling to show form, overflow:', overflow);
+      
+      // Scroll the container to bring the form into view
+      mainContent.scrollTo({
+        top: scrollTop + overflow + 30, // Add padding
+        behavior: 'smooth'
+      });
+    }
+  }, 100);
 }
 
 // Hide tab form
@@ -703,6 +765,15 @@ function hideTabForm() {
   console.log('Hiding tab form');
   tabForm.style.display = 'none';
   editingTabId = null;
+  
+  // Move the form back to its default container if needed
+  // This ensures it's ready for the next use
+  if (tabForm.parentElement !== document.getElementById('main-content')) {
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+      mainContent.appendChild(tabForm);
+    }
+  }
 }
 
 // Save tab form data
@@ -786,6 +857,13 @@ function showDeleteConfirmModal(tabId) {
 // Edit tab
 function editTab(tabId) {
   console.log('Edit tab requested', { tabId });
+  
+  // First, hide the form if it's already visible
+  if (tabForm.style.display === 'block') {
+    hideTabForm();
+  }
+  
+  // Then show it in the right position
   showTabForm(tabId);
 }
 
