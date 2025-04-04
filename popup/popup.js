@@ -533,33 +533,49 @@ function setupDragAndDrop() {
     handle.addEventListener('mousedown', (e) => {
       e.preventDefault();
       draggedItem = item;
-      item.classList.add('dragging');
+      
+      // Get container width before starting drag
+      const tabListWidth = tabList.offsetWidth;
+      const tabItemWidth = item.offsetWidth;
+      
+      // Clone the dragged item for the "ghost" element
+      const clone = item.cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.zIndex = 1000;
+      clone.style.width = tabItemWidth + 'px'; // Set explicit width to maintain dimensions
+      clone.style.opacity = 0.7;
+      clone.classList.add('dragging');
+      
+      // Maintain the original item in place but make it semi-transparent
+      item.style.opacity = 0.3;
+      item.classList.add('being-dragged');
+      
+      // Add clone to the DOM at the same position
+      document.body.appendChild(clone);
       
       // Store original positions
       const rect = item.getBoundingClientRect();
       const shiftX = e.clientX - rect.left;
       const shiftY = e.clientY - rect.top;
       
-      // Move the element
+      // Move the clone element
       function moveAt(pageX, pageY) {
-        item.style.position = 'absolute';
-        item.style.zIndex = 1000;
-        item.style.top = pageY - shiftY + 'px';
-        item.style.left = pageX - shiftX + 'px';
+        clone.style.top = pageY - shiftY + 'px';
+        clone.style.left = pageX - shiftX + 'px';
       }
       
       moveAt(e.pageX, e.pageY);
       
-      // Find the element under the dragged item
+      // Function to find the element under the dragged item
       function onMouseMove(event) {
         moveAt(event.pageX, event.pageY);
         
-        // Hide the element so it doesn't interfere with elementFromPoint
-        item.style.display = 'none';
+        // Hide the clone temporarily so it doesn't interfere with elementFromPoint
+        clone.style.display = 'none';
         const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-        item.style.display = '';
+        clone.style.display = '';
         
-        // Hide the drop indicator by default
+        // Reset drop indicator visibility
         dropIndicator.style.display = 'none';
         
         if (!elemBelow) return;
@@ -573,6 +589,7 @@ function setupDragAndDrop() {
           
           // Show the drop indicator
           dropIndicator.style.display = 'block';
+          dropIndicator.style.width = tabItemWidth + 'px'; // Match tab width
           
           if (event.clientY < middle) {
             // Place above the droppable item
@@ -591,16 +608,16 @@ function setupDragAndDrop() {
       document.addEventListener('mousemove', onMouseMove);
       
       // Drop and cleanup
-      document.addEventListener('mouseup', function onMouseUp() {
+      document.addEventListener('mouseup', function onMouseUp(event) {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
         
-        // Reset styles
-        item.style.position = 'static';
-        item.style.zIndex = '';
-        item.style.top = '';
-        item.style.left = '';
-        item.classList.remove('dragging');
+        // Remove clone
+        document.body.removeChild(clone);
+        
+        // Restore original item's opacity
+        item.style.opacity = '';
+        item.classList.remove('being-dragged');
         
         // Remove the drop indicator
         if (dropIndicator.parentNode) {
@@ -608,9 +625,7 @@ function setupDragAndDrop() {
         }
         
         // Check if we're over another tab item for final positioning
-        item.style.display = 'none';
         const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-        item.style.display = '';
         
         if (elemBelow) {
           const droppableItem = elemBelow.closest('.tab-item');
