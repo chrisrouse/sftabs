@@ -21,7 +21,6 @@ let deleteModalConfirmButton;
 let settingsButton;
 let settingsPanel;
 let mainContent;
-let settingsBackButton;
 let themeMode;
 let panelHeight;
 let panelHeightValue;
@@ -110,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
   settingsButton = document.getElementById('settings-button');
   settingsPanel = document.getElementById('settings-panel');
   mainContent = document.getElementById('main-content');
-  settingsBackButton = document.getElementById('settings-back-button');
   themeMode = document.getElementById('theme-mode');
   panelHeight = document.getElementById('panel-height');
   panelHeightValue = document.getElementById('panel-height-value');
@@ -118,6 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Debug: Log all DOM elements
   console.log('DOM Elements initialized');
+
+   // Apply initial visibility to ensure content shows up
+   mainContent.style.display = 'block';
+   mainContent.classList.add('active');
+   settingsPanel.style.display = 'none';
   
   // Load settings first
   loadUserSettings().then(() => {
@@ -193,6 +196,17 @@ function resetSettings() {
   applyTheme();
   applyPanelHeight();
   showStatus('Settings reset to defaults', false);
+}
+
+// Add an event listener for the manage-config button
+const manageConfigButton = document.getElementById('manage-config-button');
+if (manageConfigButton) {
+  manageConfigButton.addEventListener('click', () => {
+    console.log('Opening import/export page');
+    browser.tabs.create({ url: "import_export.html" });
+  });
+} else {
+  console.error('Manage config button not found!');
 }
 
 // Apply theme based on settings
@@ -319,14 +333,20 @@ function showConfirmModal(onConfirm) {
 
 // Show main content panel
 function showMainContent() {
+  console.log('Showing main content');
   mainContent.classList.add('active');
+  mainContent.style.display = 'block'; // Add this line
   settingsPanel.classList.remove('active');
+  settingsPanel.style.display = 'none'; // Add this line
 }
 
 // Show settings panel
 function showSettingsPanel() {
+  console.log('Showing settings panel');
   mainContent.classList.remove('active');
+  mainContent.style.display = 'none'; // Add this line
   settingsPanel.classList.add('active');
+  settingsPanel.style.display = 'block'; // Add this line
 }
 
 // Setup event listeners
@@ -351,7 +371,7 @@ function setupEventListeners() {
     console.log('Save button clicked');
     saveTabForm();
   });
-  
+
   // Cancel button
   cancelButton.addEventListener('click', () => {
     console.log('Cancel button clicked');
@@ -367,6 +387,47 @@ function setupEventListeners() {
       showMainContent();
     }
   });
+  
+  // Settings reset button
+  settingsResetButton.addEventListener('click', () => {
+    console.log('Settings reset button clicked');
+    showConfirmModal(() => {
+      resetToDefaults();
+      resetSettings();
+    });
+  });
+  
+  // Theme mode change
+  themeMode.addEventListener('change', () => {
+    console.log('Theme mode changed to:', themeMode.value);
+    userSettings.themeMode = themeMode.value;
+    saveUserSettings();
+    applyTheme();
+  });
+  
+  // Panel height change
+  panelHeight.addEventListener('input', () => {
+    panelHeightValue.textContent = `${panelHeight.value}px`;
+  });
+  
+  panelHeight.addEventListener('change', () => {
+    console.log('Panel height changed to:', panelHeight.value);
+    userSettings.panelHeight = parseInt(panelHeight.value);
+    saveUserSettings();
+    applyPanelHeight();
+  });
+  
+  // Enter key in form fields
+  tabNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') saveTabForm();
+  });
+  
+  tabPathInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') saveTabForm();
+  });
+  
+  console.log('Event listeners setup complete');
+}
 
 // Handle Quick Add
 function addTabForCurrentPage() {
@@ -445,63 +506,6 @@ function addTabForCurrentPage() {
       console.error('Error accessing current tab:', error);
       showStatus('Error accessing current tab', true);
     });
-}
-
-// Show settings panel
-function showSettingsPanel() {
-  mainContent.classList.remove('active');
-  settingsPanel.classList.add('active');
-  // Optionally update the icon or title to indicate "Back" functionality
-  settingsButton.title = "Back to Tabs";
-}
-
-// Show main content panel
-function showMainContent() {
-  mainContent.classList.add('active');
-  settingsPanel.classList.remove('active');
-  // Reset the title
-  settingsButton.title = "Settings";
-}
-  
-  // Settings reset button
-  settingsResetButton.addEventListener('click', () => {
-    console.log('Settings reset button clicked');
-    showConfirmModal(() => {
-      resetToDefaults();
-      resetSettings();
-    });
-  });
-  
-  // Theme mode change
-  themeMode.addEventListener('change', () => {
-    console.log('Theme mode changed to:', themeMode.value);
-    userSettings.themeMode = themeMode.value;
-    saveUserSettings();
-    applyTheme();
-  });
-  
-  // Panel height change
-  panelHeight.addEventListener('input', () => {
-    panelHeightValue.textContent = `${panelHeight.value}px`;
-  });
-  
-  panelHeight.addEventListener('change', () => {
-    console.log('Panel height changed to:', panelHeight.value);
-    userSettings.panelHeight = parseInt(panelHeight.value);
-    saveUserSettings();
-    applyPanelHeight();
-  });
-  
-  // Enter key in form fields
-  tabNameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') saveTabForm();
-  });
-  
-  tabPathInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') saveTabForm();
-  });
-  
-  console.log('Event listeners setup complete');
 }
 
 // Render the tab list

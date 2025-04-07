@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+  <style>
+    body {
+      padding: 20px;
+      width: auto;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    section {
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: var(--slds-brand-primary);
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: var(--slds-brand-primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: var(--slds-brand-secondary);
+    }
+    hr {
+      border: none;
+      border-top: 1px solid var(--color-border);
+      margin: 20px 0;
+    }
+    #status-message {
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    #status-message.success {
+      background-color: rgba(4, 132, 75, 0.1);
+      color: var(--slds-color-success);
+    }
+    #status-message.error {
+      background-color: rgba(194, 57, 52, 0.1);
+      color: var(--slds-color-error);
+    }
+  </style>
+</head>
+<body>
+  <h1>SF Tabs Configuration</h1>
+  
+  <section>
+    <h2>Export</h2>
+    <p>Save your current custom tabs and settings to a JSON file.</p>
+    <button id="export-button">Export Configuration</button>
+  </section>
+  
+  <hr>
+  
+  <section>
+    <h2>Import</h2>
+    <p>Load tabs and settings from a previously exported JSON file. This will replace your current configuration.</p>
+    <button id="import-button">Import Configuration</button>
+    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+  </section>
+
+  <div id="status-message"></div>
+
+  <script src="import_export.js"></script>
+</body>
+</html>

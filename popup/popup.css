@@ -108,6 +108,7 @@ body {
     max-height: 100vh;
     overflow: hidden;
     background-color: var(--color-background);
+    transition: min-height 0.3s ease;
   }
 
 header {
@@ -481,14 +482,47 @@ input[type="text"]:focus {
     background-color: var(--color-border);
 }
 
-.action-buttons {
+/* Import/Export buttons styling */
+.import-export-buttons {
     display: flex;
-    justify-content: flex-end;
-    padding: 0 8px 8px 0;
-    margin: 0 8px 8px 0;
-    gap: 2px;
-    
-}
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .action-button:hover {
+    background-color: var(--color-border);
+  }
+  
+  .action-button svg {
+    stroke: var(--color-text);
+  }
+  
+  [data-theme="dark"] .action-button {
+    background-color: #2A2C35;
+    border-color: #444444;
+  }
+  
+  [data-theme="dark"] .action-button:hover {
+    background-color: #3A3D48;
+  }
 
 .reset-button {
     color: var(--color-text);
@@ -540,7 +574,7 @@ footer {
 #main-content, #settings-panel {
     flex: 1;
     overflow-y: auto;
-    display: none;
+    display: none; /* Initially hidden */
     background-color: var(--color-background);
 }
 

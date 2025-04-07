@@ -76,6 +76,7 @@
           <button id="save-button" class="primary-button">Save</button>
         </div>
       </div>
+    </div>
 
     <!-- Settings Section -->
     <div id="settings-panel" class="settings-panel">
@@ -102,6 +103,15 @@
         </div>
         
         <div class="form-group">
+          <div class="import-export-buttons"> <button id="manage-config-button" class="action-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <span>Import / Export Settings</span>
+          </button>
+        </div>
+        </div>
+
+        
+        <div class="form-group">
           <button id="settings-reset-button" class="secondary-button reset-button">Reset to Defaults</button>
         </div>
         
@@ -112,6 +122,8 @@
     <footer>
       <div class="status-message" id="status-message"></div>
     </footer>
+
+    
 
     <!-- Confirm Reset Modal -->
     <div id="confirm-modal" class="modal">
@@ -145,6 +157,7 @@
       </div>
     </div>
   </div>
+
   
   <script src="popup.js"></script>
 </body>

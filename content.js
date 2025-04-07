@@ -201,7 +201,7 @@ function removeCustomTabs() {
 
 // Setup an interval to try adding the tabs
 let setupMenuCheckAttempts = 0;
-const maxSetupMenuCheckAttempts = 30; // Increased max attempts
+const maxSetupMenuCheckAttempts = 3; // Increased max attempts
 const setupMenuCheckInterval = setInterval(function() {
   setupMenuCheckAttempts++;
   console.log(`Setup menu check attempt ${setupMenuCheckAttempts}/${maxSetupMenuCheckAttempts}`);
