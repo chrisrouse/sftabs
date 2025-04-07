@@ -29,7 +29,6 @@ let settingsResetButton;
 // State
 let customTabs = [];
 let editingTabId = null;
-let draggedItem = null;
 let userSettings = {
   themeMode: 'light',
   panelHeight: 500
@@ -203,7 +202,10 @@ const manageConfigButton = document.getElementById('manage-config-button');
 if (manageConfigButton) {
   manageConfigButton.addEventListener('click', () => {
     console.log('Opening import/export page');
-    browser.tabs.create({ url: "import_export.html" });
+    browser.tabs.create({ url: "import_export.html" }).then(() => {
+      // Close the popup after opening the new tab
+      window.close();
+    });
   });
 } else {
   console.error('Manage config button not found!');
@@ -284,51 +286,56 @@ function saveTabsToStorage() {
     });
 }
 
-// Show the confirmation modal
-function showConfirmModal(onConfirm) {
-  console.log('showConfirmModal called');
+/**
+ * Generic modal display function
+ * @param {HTMLElement} modalElement - The modal DOM element
+ * @param {HTMLElement} cancelButton - The cancel button in the modal
+ * @param {HTMLElement} confirmButton - The confirm button in the modal
+ * @param {Function} onConfirm - Callback to execute on confirmation
+ */
+function showModal(modalElement, cancelButton, confirmButton, onConfirm) {
+  console.log(`Showing modal: ${modalElement.id}`);
   
-  if (!confirmModal) {
+  if (!modalElement) {
     console.error('Modal element not found!');
     return;
   }
   
-  console.log('Modal before adding show class:', {
-    modal: confirmModal,
-    classList: Array.from(confirmModal.classList),
-    display: window.getComputedStyle(confirmModal).display
-  });
-  
-  confirmModal.classList.add('show');
-  
-  console.log('Modal after adding show class:', {
-    modal: confirmModal,
-    classList: Array.from(confirmModal.classList),
-    display: window.getComputedStyle(confirmModal).display
-  });
+  // Show the modal
+  modalElement.classList.add('show');
   
   // Handle Cancel button
-  modalCancelButton.onclick = function() {
+  cancelButton.onclick = function() {
     console.log('Cancel button clicked');
-    confirmModal.classList.remove('show');
+    modalElement.classList.remove('show');
   };
   
   // Handle Confirm button
-  modalConfirmButton.onclick = function() {
+  confirmButton.onclick = function() {
     console.log('Confirm button clicked');
-    confirmModal.classList.remove('show');
+    modalElement.classList.remove('show');
     if (typeof onConfirm === 'function') {
       onConfirm();
     }
   };
   
   // Close modal when clicking outside
-  confirmModal.onclick = function(event) {
-    if (event.target === confirmModal) {
+  modalElement.onclick = function(event) {
+    if (event.target === modalElement) {
       console.log('Clicked outside modal');
-      confirmModal.classList.remove('show');
+      modalElement.classList.remove('show');
     }
   };
+}
+
+// Show the confirmation modal
+function showConfirmModal(onConfirm) {
+  showModal(
+    confirmModal, 
+    modalCancelButton, 
+    modalConfirmButton, 
+    onConfirm
+  );
 }
 
 // Show main content panel
@@ -606,141 +613,165 @@ function createTabElement(tab) {
   return tabItem;
 }
 
-
 // Setup drag and drop functionality
 function setupDragAndDrop() {
   const tabItems = document.querySelectorAll('.tab-item');
   const dragHandles = document.querySelectorAll('.drag-handle');
   
   // Create drop indicator element
-  const dropIndicator = document.createElement('div');
-  dropIndicator.className = 'drop-indicator';
-  dropIndicator.style.height = '2px';
-  dropIndicator.style.backgroundColor = 'var(--slds-brand-primary)';
-  dropIndicator.style.marginBottom = '8px';
-  dropIndicator.style.display = 'none';
+  const dropIndicator = createDropIndicator();
   
+  // Add event listeners to drag handles
   dragHandles.forEach((handle, index) => {
     const item = tabItems[index];
-    
-    handle.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      draggedItem = item;
-      
-      // Get container width before starting drag
-      const tabListWidth = tabList.offsetWidth;
-      const tabItemWidth = item.offsetWidth;
-      
-      // Clone the dragged item for the "ghost" element
-      const clone = item.cloneNode(true);
-      clone.style.position = 'absolute';
-      clone.style.zIndex = 1000;
-      clone.style.width = tabItemWidth + 'px'; // Set explicit width to maintain dimensions
-      clone.style.opacity = 0.7;
-      clone.classList.add('dragging');
-      
-      // Maintain the original item in place but make it semi-transparent
-      item.style.opacity = 0.3;
-      item.classList.add('being-dragged');
-      
-      // Add clone to the DOM at the same position
-      document.body.appendChild(clone);
-      
-      // Store original positions
-      const rect = item.getBoundingClientRect();
-      const shiftX = e.clientX - rect.left;
-      const shiftY = e.clientY - rect.top;
-      
-      // Move the clone element
-      function moveAt(pageX, pageY) {
-        clone.style.top = pageY - shiftY + 'px';
-        clone.style.left = pageX - shiftX + 'px';
-      }
-      
-      moveAt(e.pageX, e.pageY);
-      
-      // Function to find the element under the dragged item
-      function onMouseMove(event) {
-        moveAt(event.pageX, event.pageY);
-        
-        // Hide the clone temporarily so it doesn't interfere with elementFromPoint
-        clone.style.display = 'none';
-        const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-        clone.style.display = '';
-        
-        // Reset drop indicator visibility
-        dropIndicator.style.display = 'none';
-        
-        if (!elemBelow) return;
-        
-        // Check if we're over another tab item
-        const droppableItem = elemBelow.closest('.tab-item');
-        if (droppableItem && droppableItem !== item) {
-          // Determine if we should place above or below
-          const rect = droppableItem.getBoundingClientRect();
-          const middle = rect.top + rect.height / 2;
-          
-          // Show the drop indicator
-          dropIndicator.style.display = 'block';
-          dropIndicator.style.width = tabItemWidth + 'px'; // Match tab width
-          
-          if (event.clientY < middle) {
-            // Place above the droppable item
-            tabList.insertBefore(dropIndicator, droppableItem);
-          } else {
-            // Place below the droppable item
-            tabList.insertBefore(dropIndicator, droppableItem.nextSibling);
-          }
-        }
-      }
-      
-      // Add drop indicator to the DOM
-      tabList.appendChild(dropIndicator);
-      
-      // Move on mousemove
-      document.addEventListener('mousemove', onMouseMove);
-      
-      // Drop and cleanup
-      document.addEventListener('mouseup', function onMouseUp(event) {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        
-        // Remove clone
-        document.body.removeChild(clone);
-        
-        // Restore original item's opacity
-        item.style.opacity = '';
-        item.classList.remove('being-dragged');
-        
-        // Remove the drop indicator
-        if (dropIndicator.parentNode) {
-          dropIndicator.parentNode.removeChild(dropIndicator);
-        }
-        
-        // Check if we're over another tab item for final positioning
-        const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-        
-        if (elemBelow) {
-          const droppableItem = elemBelow.closest('.tab-item');
-          if (droppableItem && droppableItem !== item) {
-            // Determine if we should place above or below
-            const rect = droppableItem.getBoundingClientRect();
-            const middle = rect.top + rect.height / 2;
-            
-            if (event.clientY < middle) {
-              tabList.insertBefore(item, droppableItem);
-            } else {
-              tabList.insertBefore(item, droppableItem.nextSibling);
-            }
-          }
-        }
-        
-        // Update positions
-        updateTabPositions();
-      });
-    });
+    handle.addEventListener('mousedown', (e) => handleDragStart(e, item, dropIndicator));
   });
 }
+
+// Create drop indicator element
+function createDropIndicator() {
+  const dropIndicator = document.createElement('div');
+  dropIndicator.className = 'drop-indicator';
+  return dropIndicator;
+}
+
+// Handle the start of dragging
+function handleDragStart(e, item, dropIndicator) {
+  e.preventDefault();
+  
+  // Get container width before starting drag
+  const tabItemWidth = item.offsetWidth;
+  
+  // Create and setup the clone/ghost element
+  const clone = createDragClone(item, tabItemWidth);
+  
+  // Mark the original item as being dragged
+  item.style.opacity = 0.3;
+  item.classList.add('being-dragged');
+  
+  // Store original positions
+  const rect = item.getBoundingClientRect();
+  const shiftX = e.clientX - rect.left;
+  const shiftY = e.clientY - rect.top;
+  
+  // Move the clone element to initial position
+  moveElement(clone, e.pageX - shiftX, e.pageY - shiftY);
+  
+  // Add drop indicator to the DOM
+  tabList.appendChild(dropIndicator);
+  
+  // Set up move and drop handlers
+  setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWidth);
+}
+
+// Create a clone of the element being dragged
+function createDragClone(item, width) {
+  const clone = item.cloneNode(true);
+  clone.classList.add('tab-item-clone');
+  clone.style.width = width + 'px'; // This one style might still be needed since it's dynamic
+  
+  // Add clone to the DOM
+  document.body.appendChild(clone);
+  
+  return clone;
+}
+
+// Move an element to specified coordinates
+function moveElement(element, x, y) {
+  element.style.top = y + 'px';
+  element.style.left = x + 'px';
+}
+
+// Set up handlers for dragging movement and dropping
+function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWidth) {
+  // Define mousemove handler
+  function onMouseMove(event) {
+    moveElement(clone, event.pageX - shiftX, event.pageY - shiftY);
+    
+    // Hide clone temporarily to get element underneath
+    clone.style.display = 'none';
+    const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+    clone.style.display = '';
+    
+    // Reset drop indicator visibility
+    dropIndicator.style.display = 'none';
+    
+    if (!elemBelow) return;
+    
+    // Handle drop indicator positioning
+    updateDropIndicator(elemBelow, item, event, dropIndicator, tabItemWidth);
+  }
+  
+  // Define mouseup/drop handler
+  function onMouseUp(event) {
+    // Clean up event listeners
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    
+    // Clean up DOM
+    document.body.removeChild(clone);
+    item.style.opacity = '';
+    item.classList.remove('being-dragged');
+    
+    if (dropIndicator.parentNode) {
+      dropIndicator.parentNode.removeChild(dropIndicator);
+    }
+    
+    // Handle final positioning
+    finalizeDrop(event, item);
+    
+    // Update the tab positions in storage
+    updateTabPositions();
+  }
+  
+  // Add the event listeners
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+}
+
+// Update the drop indicator position
+function updateDropIndicator(elemBelow, draggedItem, event, dropIndicator, tabItemWidth) {
+  // Check if we're over another tab item
+  const droppableItem = elemBelow.closest('.tab-item');
+  if (droppableItem && droppableItem !== draggedItem) {
+    // Determine if we should place above or below
+    const rect = droppableItem.getBoundingClientRect();
+    const middle = rect.top + rect.height / 2;
+    
+    // Show the drop indicator
+    dropIndicator.style.display = 'block';
+    dropIndicator.style.width = tabItemWidth + 'px'; // This might still be needed as it's dynamic
+    
+    if (event.clientY < middle) {
+      // Place above the droppable item
+      tabList.insertBefore(dropIndicator, droppableItem);
+    } else {
+      // Place below the droppable item
+      tabList.insertBefore(dropIndicator, droppableItem.nextSibling);
+    }
+  }
+}
+
+// Finalize the drop position
+function finalizeDrop(event, draggedItem) {
+  const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
+  
+  if (elemBelow) {
+    const droppableItem = elemBelow.closest('.tab-item');
+    if (droppableItem && droppableItem !== draggedItem) {
+      // Determine if we should place above or below
+      const rect = droppableItem.getBoundingClientRect();
+      const middle = rect.top + rect.height / 2;
+      
+      if (event.clientY < middle) {
+        tabList.insertBefore(draggedItem, droppableItem);
+      } else {
+        tabList.insertBefore(draggedItem, droppableItem.nextSibling);
+      }
+    }
+  }
+}
+
 
 // Update tab positions after dragging
 function updateTabPositions() {
@@ -912,39 +943,19 @@ function deleteTab(tabId) {
 
 // Use our custom modal instead of confirm()
 function showDeleteConfirmModal(tabId) {
-  console.log('showDeleteConfirmModal called for tab', tabId);
-  
-  if (!deleteConfirmModal) {
-    console.error('Delete confirmation modal not found!');
-    return;
-  }
-  
-  deleteConfirmModal.classList.add('show');
-  
-  // Handle Cancel button
-  deleteModalCancelButton.onclick = function() {
-    console.log('Delete cancelled');
-    deleteConfirmModal.classList.remove('show');
-  };
-  
-  // Handle Confirm button
-  deleteModalConfirmButton.onclick = function() {
-    console.log('Delete confirmed for tab', tabId);
-    deleteConfirmModal.classList.remove('show');
-    
-    // Perform the actual deletion
-    customTabs = customTabs.filter(tab => tab.id !== tabId);
-    saveTabsToStorage();
-  };
-  
-  // Close modal when clicking outside
-  deleteConfirmModal.onclick = function(event) {
-    if (event.target === deleteConfirmModal) {
-      console.log('Clicked outside delete modal');
-      deleteConfirmModal.classList.remove('show');
+  showModal(
+    deleteConfirmModal,
+    deleteModalCancelButton,
+    deleteModalConfirmButton,
+    () => {
+      console.log('Delete confirmed for tab', tabId);
+      // Perform the actual deletion
+      customTabs = customTabs.filter(tab => tab.id !== tabId);
+      saveTabsToStorage();
     }
-  };
+  );
 }
+
 
 // Edit tab
 function editTab(tabId) {

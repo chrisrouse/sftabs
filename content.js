@@ -1,19 +1,3 @@
-// Function to extract the base URL for the current Salesforce org
-function getBaseUrl() {
-  const currentUrl = window.location.href;
-  
-  // Check if the URL contains "/lightning/setup/"
-  if (currentUrl.includes('/lightning/setup/')) {
-    // Extract everything before "/lightning/setup/" plus "/lightning/setup/"
-    const baseUrl = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
-    console.log('Extracted base URL:', baseUrl);
-    return baseUrl;
-  }
-  
-  console.log('Could not extract base URL from:', currentUrl);
-  return null;
-}
-
 // Load custom tabs from storage
 function loadCustomTabs() {
   return browser.storage.sync.get('customTabs')
