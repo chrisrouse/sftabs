@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "SF Tabs",
   "version": "1.0.0",
-  "description": "Add custom tabs to the Salesforce setup menu",
+  "description": "Add custom tabs to the Salesforce setup menu.",
   "author": "Chris Rouse (byChris)",
   "homepage_url": "https://github.com/chrisrouse/sftabs", 
   "browser_specific_settings": {
