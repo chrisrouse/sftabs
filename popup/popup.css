@@ -773,11 +773,11 @@
   }
   
   [data-theme="dark"] #quick-add-button svg {
-    stroke: var(--color-text);
+    stroke: white;
   }
   
   [data-theme="dark"] #quick-add-button:hover svg {
-    stroke: var(--slds-brand-primary);
+    stroke: white;
   }
 
   /* Import/Export Page Styles */
