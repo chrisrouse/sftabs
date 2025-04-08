@@ -229,6 +229,7 @@
     margin-bottom: 8px;
     cursor: pointer;
     position: relative;
+    justify-content: space-between;
   }
   
   .tab-item-clone {
@@ -265,6 +266,7 @@
   
   .tab-info {
     flex-grow: 1;
+    margin-right: 8px;;
   }
   
   .tab-name {
@@ -277,6 +279,13 @@
     color: var(--color-text-weak);
   }
   
+  /* Tab Actions Styling */
+  .tab-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Consistent spacing between the toggle and delete button */
+  }
+
   /* Drop indicator */
   .drop-indicator {
     height: 2px;
@@ -298,7 +307,7 @@
     position: relative;
     width: 40px;
     height: 20px;
-    margin-right: 8px;
+    margin-right: 4px;
   }
   
   .toggle-switch {

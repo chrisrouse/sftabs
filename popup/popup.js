@@ -562,8 +562,11 @@ function createTabElement(tab) {
   tabPath.className = 'tab-path';
   tabPath.textContent = tab.path;
   
+  // Create a container for the toggle and delete button
   const tabActions = document.createElement('div');
   tabActions.className = 'tab-actions';
+  tabActions.style.display = 'flex';
+  tabActions.style.alignItems = 'center';
   
   // New tab toggle
   const newTabToggle = document.createElement('label');
@@ -603,16 +606,17 @@ function createTabElement(tab) {
   // Assemble the tab item
   tabInfo.appendChild(tabName);
   tabInfo.appendChild(tabPath);
+  
+  // Add toggle and delete button to the actions container
   tabActions.appendChild(newTabToggle);
   tabActions.appendChild(deleteButton);
   
   tabItem.appendChild(dragHandle);
   tabItem.appendChild(tabInfo);
-  tabItem.appendChild(tabActions);
+  tabItem.appendChild(tabActions); // Fixed: append tabActions instead of tabItem to itself
   
   return tabItem;
 }
-
 // Setup drag and drop functionality
 function setupDragAndDrop() {
   const tabItems = document.querySelectorAll('.tab-item');
