@@ -13,11 +13,15 @@
   },
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "tabs"
   ],
   "host_permissions": [
     "*://*.lightning.force.com/*",
-    "*://*.salesforce-setup.com/*"
+    "*://*.salesforce-setup.com/*",
+    "*://*.my.salesforce-setup.com/*",
+    "*://*.salesforce.com/*",
+    "*://*.my.salesforce.com/*"
   ],
   "action": {
     "default_icon": {
@@ -31,7 +35,10 @@
     {
       "matches": [
         "*://*.lightning.force.com/lightning/setup/*",
-        "*://*.salesforce-setup.com/lightning/setup/*"
+        "*://*.salesforce-setup.com/lightning/setup/*",
+        "*://*.my.salesforce-setup.com/lightning/setup/*",
+        "*://*.salesforce.com/lightning/setup/*",
+        "*://*.my.salesforce.com/lightning/setup/*"
       ],
       "js": ["content.js"]
     }
