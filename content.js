@@ -1,30 +1,62 @@
+// Default tabs configuration
+const defaultTabs = [
+  {
+    id: 'default_tab_flows',
+    label: 'Flows',
+    path: 'Flows',
+    openInNewTab: false,
+    position: 0
+  },
+  {
+    id: 'default_tab_packages',
+    label: 'Installed Packages',
+    path: 'ImportedPackage',
+    openInNewTab: false,
+    position: 1
+  },
+  {
+    id: 'default_tab_users',
+    label: 'Users',
+    path: 'ManageUsers',
+    openInNewTab: false,
+    position: 2
+  },
+  {
+    id: 'default_tab_profiles',
+    label: 'Profiles',
+    path: 'EnhancedProfiles',
+    openInNewTab: false,
+    position: 3
+  },
+  {
+    id: 'default_tab_permsets',
+    label: 'Permission Sets',
+    path: 'PermSets',
+    openInNewTab: false,
+    position: 4
+  }
+];
+
 // Load custom tabs from storage
 function loadCustomTabs() {
   return browser.storage.sync.get('customTabs')
     .then((result) => {
-      if (result.customTabs && Array.isArray(result.customTabs)) {
+      if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
         return result.customTabs;
       } else {
-        // Default tab if no settings
-        const defaultTab = {
-          id: 'default_tab',
-          label: 'User Management',
-          path: 'ManageUsers',
-          openInNewTab: false,
-          position: 0
-        };
+        // Use default tabs instead of just one
         
-        // Save it to storage for future use
+        // Save them to storage for future use
         browser.storage.sync.set({ 
-          customTabs: [defaultTab] 
+          customTabs: defaultTabs 
         });
         
-        return [defaultTab];
+        return defaultTabs;
       }
     })
     .catch((error) => {
       console.error('Error loading custom tabs:', error);
-      return [];
+      return defaultTabs; // Return defaults on error too
     });
 }
 

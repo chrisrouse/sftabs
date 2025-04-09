@@ -281,9 +281,7 @@
   
   /* Tab Actions Styling */
   .tab-actions {
-    display: flex;
-    align-items: center;
-    gap: 4px; /* Consistent spacing between the toggle and delete button */
+    gap: 4px;
   }
 
   /* Drop indicator */
@@ -307,7 +305,7 @@
     position: relative;
     width: 40px;
     height: 20px;
-    margin-right: 4px;
+    margin-right: 0;
   }
   
   .toggle-switch {
@@ -347,15 +345,17 @@
     background-color: transparent;
     border: none;
     border-radius: 4px;
-    width: 24px;
-    height: 24px;
+    width: 24px;         /* Slightly wider for better proportions */
+    height: 24px;        /* Reduced height to match toggle better */
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
     padding: 0;
-    margin-left: 4px;
+    margin: 0 0 0 4px;   /* Remove any top/bottom margin */
+    position: relative;  /* Add positioning context */
+    top: -2px;           /* Move button up slightly to better align with toggle */
   }
   
   .delete-button:hover {
@@ -368,6 +368,8 @@
   
   .delete-button svg {
     fill: var(--color-icon-fill);
+    width: 21px;
+    height: 21px;
   }
   
   /* Forms */
