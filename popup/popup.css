@@ -345,17 +345,17 @@
     background-color: transparent;
     border: none;
     border-radius: 4px;
-    width: 24px;         /* Slightly wider for better proportions */
-    height: 24px;        /* Reduced height to match toggle better */
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
     padding: 0;
-    margin: 0 0 0 4px;   /* Remove any top/bottom margin */
-    position: relative;  /* Add positioning context */
-    top: -2px;           /* Move button up slightly to better align with toggle */
+    margin: 0 0 0 4px;
+    position: relative;
+    top: -2px;
   }
   
   .delete-button:hover {
@@ -371,6 +371,16 @@
     width: 21px;
     height: 21px;
   }
+
+/* Icon in dark mode */
+[data-theme="dark"] .delete-button svg {
+  fill: var(--slds-gray-1);
+}
+
+/* Hover effect */
+.delete-button:hover svg {
+  fill: var(--slds-color-error);
+}
   
   /* Forms */
   .tab-form {
@@ -799,4 +809,3 @@
     border-top: 1px solid var(--color-border);
     margin: 20px 0;
   }
-  
