@@ -46,7 +46,7 @@ function applyThemeFromStorage() {
 function exportSettings() {
   console.log('Exporting settings');
   
-  browser.storage.sync.get(['customTabs', 'userSettings'])
+  chrome.storage.sync.get(['customTabs', 'userSettings'])
     .then((result) => {
       // Create a configuration object containing all settings
       const config = {
@@ -63,10 +63,21 @@ function exportSettings() {
       // Create an object URL for the blob
       const url = URL.createObjectURL(blob);
       
+      // Generate timestamp for the filename
+      const now = new Date();
+      const timestamp = now.getFullYear() + '-' +
+                ('0' + (now.getMonth() + 1)).slice(-2) + '-' +
+                ('0' + now.getDate()).slice(-2) + '_' +
+                ('0' + now.getHours()).slice(-2) + '-' +
+                ('0' + now.getMinutes()).slice(-2);
+      
+      // Create the filename with timestamp
+      const filename = `sftabs_config_${timestamp}.json`;
+      
       // Create a temporary anchor element
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'sftabs_config.json';
+      a.download = filename;
       
       // Append to the DOM
       document.body.appendChild(a);

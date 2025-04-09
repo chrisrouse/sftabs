@@ -202,7 +202,7 @@ const manageConfigButton = document.getElementById('manage-config-button');
 if (manageConfigButton) {
   manageConfigButton.addEventListener('click', () => {
     console.log('Opening import/export page');
-    browser.tabs.create({ url: "import_export.html" }).then(() => {
+    browser.tabs.create({ url: "/popup/import_export.html" }).then(() => {
       // Close the popup after opening the new tab
       window.close();
     });
