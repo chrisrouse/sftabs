@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0] - 2025
+## [1.0.0] - April 8, 2025
 
 ### Initial Release 🚀
 

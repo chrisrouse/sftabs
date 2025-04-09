@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="popup.css">
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="popup.css">
 </head>
+
 <body class="import-export-page">
-  <h1>SF Tabs Configuration</h1>
-  
-  <section class="config-section">
-    <h2>Export</h2>
-    <p>Save your current custom tabs and settings to a JSON file.</p>
-    <button id="export-button" class="primary-button">Export Configuration</button>
-  </section>
-  
-  <hr class="section-divider">
-  
-  <section class="config-section">
-    <h2>Import</h2>
-    <p>Load tabs and settings from a previously exported JSON file. This will replace your current configuration.</p>
-    <button id="import-button" class="primary-button">Import Configuration</button>
-    <input type="file" id="import-file-input" accept=".json" style="display: none;">
-  </section>
+	<h1>SF Tabs Configuration</h1>
 
-  <div id="status-message"></div>
+	<section class="config-section">
+		<h2>Export</h2>
+		<p>Save your current custom tabs and settings to a JSON file.</p>
+		<button id="export-button" class="primary-button">Export Configuration</button>
+	</section>
 
-  <script src="import_export.js"></script>
+	<hr class="section-divider">
+
+	<section class="config-section">
+		<h2>Import</h2>
+		<p>Load tabs and settings from a previously exported JSON file. This will replace your current configuration.</p>
+		<button id="import-button" class="primary-button">Import Configuration</button>
+		<input type="file" id="import-file-input" accept=".json" style="display: none;">
+	</section>
+
+	<div id="status-message"></div>
+
+	<script src="import_export.js"></script>
 </body>
+
 </html>
