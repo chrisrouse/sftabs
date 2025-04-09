@@ -1,45 +1,43 @@
 {
-  "manifest_version": 3,
-  "name": "SF Tabs",
-  "version": "1.0.0",
-  "description": "Add custom tabs to the Salesforce setup menu",
-  "author": "Chris Rouse",
-  "homepage_url": "https://github.com/chrisrouse/sftabs",
-  "permissions": [
-    "activeTab",
-    "storage",
-    "tabs"
-  ],
-  "host_permissions": [
-    "*://*.lightning.force.com/*",
-    "*://*.salesforce-setup.com/*",
-    "*://*.my.salesforce-setup.com/*",
-    "*://*.salesforce.com/*",
-    "*://*.my.salesforce.com/*"
-  ],
-  "action": {
-    "default_icon": {
-      "48": "icons/icon-48.png",
-      "96": "icons/icon-96.png"
-    },
-    "default_title": "SF Tabs",
-    "default_popup": "popup/popup.html"
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://*.lightning.force.com/lightning/setup/*",
-        "*://*.salesforce-setup.com/lightning/setup/*",
-        "*://*.my.salesforce-setup.com/lightning/setup/*",
-        "*://*.salesforce.com/lightning/setup/*",
-        "*://*.my.salesforce.com/lightning/setup/*"
-      ],
-      "js": ["content.js"]
-    }
-  ],
-  "icons": {
-    "16": "icons/icon-16.png",
-    "48": "icons/icon-48.png",
-    "96": "icons/icon-96.png"
-  }
+	"manifest_version": 3,
+	"name": "SF Tabs",
+	"version": "1.0.0",
+	"description": "Add custom tabs to the Salesforce setup menu",
+	"author": "Chris Rouse",
+	"homepage_url": "https://github.com/chrisrouse/sftabs",
+	"permissions": [
+		"activeTab",
+		"storage",
+		"tabs"
+	],
+	"host_permissions": [
+		"*://*.lightning.force.com/*",
+		"*://*.salesforce-setup.com/*",
+		"*://*.my.salesforce-setup.com/*",
+		"*://*.salesforce.com/*",
+		"*://*.my.salesforce.com/*"
+	],
+	"action": {
+		"default_icon": {
+			"48": "icons/icon-48.png",
+			"96": "icons/icon-96.png"
+		},
+		"default_title": "SF Tabs",
+		"default_popup": "popup/popup.html"
+	},
+	"content_scripts": [{
+		"matches": [
+			"*://*.lightning.force.com/lightning/setup/*",
+			"*://*.salesforce-setup.com/lightning/setup/*",
+			"*://*.my.salesforce-setup.com/lightning/setup/*",
+			"*://*.salesforce.com/lightning/setup/*",
+			"*://*.my.salesforce.com/lightning/setup/*"
+		],
+		"js": ["content.js"]
+	}],
+	"icons": {
+		"16": "icons/icon-16.png",
+		"48": "icons/icon-48.png",
+		"96": "icons/icon-96.png"
+	}
 }
