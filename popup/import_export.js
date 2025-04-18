@@ -46,7 +46,7 @@ function applyThemeFromStorage() {
 function exportSettings() {
 	console.log('Exporting settings');
 
-	chrome.storage.sync.get(['customTabs', 'userSettings'])
+	browser.storage.sync.get(['customTabs', 'userSettings'])
 		.then((result) => {
 			// Create a configuration object containing all settings
 			const config = {
