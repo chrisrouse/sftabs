@@ -39,7 +39,7 @@ const defaultTabs = [
 
 // Load custom tabs from storage
 function loadCustomTabs() {
-  return browser.storage.sync.get('customTabs')
+  return chrome.storage.sync.get('customTabs')
     .then((result) => {
       if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
         return result.customTabs;
@@ -47,7 +47,7 @@ function loadCustomTabs() {
         // Use default tabs instead of just one
         
         // Save them to storage for future use
-        browser.storage.sync.set({ 
+        chrome.storage.sync.set({ 
           customTabs: defaultTabs 
         });
         
@@ -254,4 +254,4 @@ window.addEventListener('popstate', function() {
 });
 
 // Listen for storage changes to update tabs in real-time
-browser.storage.onChanged.addListener(onStorageChange);
+chrome.storage.onChanged.addListener(onStorageChange);
