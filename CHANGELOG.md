@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.1] - April 19, 2025
+## [1.1.0] - April 19, 2025
 
 ### Enhancements
 - Hover color for tabs now follows the branding of the current theme in you org.
