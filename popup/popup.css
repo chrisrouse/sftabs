@@ -941,8 +941,3 @@ input[type="text"]:focus {
   color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
-
-/* Optional: Add a special border color for custom URL tabs for extra visual distinction */
-.tab-item.custom-url {
-  border-left: 3px solid #9061F9;
-}
