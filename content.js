@@ -37,6 +37,12 @@ const defaultTabs = [
   }
 ];
 
+// State tracking
+let lastActiveTab = '';
+let lastUrl = location.href;
+let setupMenuCheckAttempts = 0;
+const maxSetupMenuCheckAttempts = 5;
+
 // Load custom tabs from storage
 function loadCustomTabs() {
   return browser.storage.sync.get('customTabs')
@@ -67,55 +73,78 @@ function addCustomTabs(tabs) {
   // Log all navigation links for debugging
   const allLinks = document.querySelectorAll('a[href*="/lightning/setup/"]');
   console.log("Found setup links:", allLinks.length);
-  allLinks.forEach(link => {
-    console.log("Link:", link.href, link.textContent);
-  });
   
   // Look for the Object Manager tab which we want to insert our tabs after
   const objectManagerTab = document.querySelector('a[href*="/lightning/setup/ObjectManager/home"]');
+  const homeTab = document.querySelector('a[href*="/lightning/setup/Home/home"]');
   
-  if (!objectManagerTab) {
-    console.log("Object Manager tab not found yet, looking for alternative reference points");
+  // Check if we're on an Object Manager page
+  const isObjectManagerPage = window.location.href.includes('/lightning/setup/ObjectManager/');
+  console.log("Is Object Manager page:", isObjectManagerPage);
+  
+  // If we're on an Object Manager page, we need to be more aggressive in finding a reference point
+  if (isObjectManagerPage) {
+    console.log("On Object Manager page - using special handling");
     
-    // Try alternative reference points if Object Manager tab isn't found
-    const homeTab = document.querySelector('a[href*="/lightning/setup/Home/home"]');
-    if (homeTab) {
-      console.log("Found Home tab as alternative reference point");
-      const tabItem = homeTab.closest('li');
-      if (tabItem && tabItem.parentNode) {
-        console.log("Using Home tab as reference point");
-        processTabAddition(tabItem, tabs);
-        return;
-      }
+    // Look for ANY navigation list item
+    const anyNavItem = document.querySelector('.oneSetupNavContainer ul.slds-tree li');
+    
+    if (anyNavItem) {
+      console.log("Found a navigation list item to use as reference");
+      processTabAddition(anyNavItem, tabs);
+      
+      // After adding tabs, make sure they're visible
+      setTimeout(() => {
+        const customTabs = document.querySelectorAll('li[data-custom-tab-id]');
+        console.log(`Visibility check: Found ${customTabs.length} custom tabs`);
+        
+        customTabs.forEach(tab => {
+          // Make sure the tab is visible
+          tab.style.display = 'block';
+          console.log(`Ensuring tab ${tab.dataset.customTabId} is visible`);
+        });
+      }, 500);
+      
+      return;
     }
-    
-    // If we still can't find a reference point, try using any setup tab
-    const anySetupTab = document.querySelector('a[href*="/lightning/setup/"]');
-    if (anySetupTab) {
-      console.log("Found a setup tab as a last resort reference point");
-      const tabItem = anySetupTab.closest('li');
-      if (tabItem && tabItem.parentNode) {
-        console.log("Using a generic setup tab as reference point");
-        processTabAddition(tabItem, tabs);
-        return;
-      }
-    }
-    
-    console.log("No suitable reference points found");
-    return;
   }
   
-  // Find the parent <li> element of the Object Manager tab
-  const tabItem = objectManagerTab.closest('li');
-  
-  if (!tabItem || !tabItem.parentNode) {
-    console.log("Parent li element not found or has no parent");
-    return;
+  // Standard approach for non-Object Manager pages
+  if (objectManagerTab) {
+    // Find the parent <li> element of the Object Manager tab
+    const tabItem = objectManagerTab.closest('li');
+    
+    if (tabItem && tabItem.parentNode) {
+      console.log("Found Object Manager tab as reference point");
+      processTabAddition(tabItem, tabs);
+      return;
+    }
   }
   
-  console.log("Parent tab container found");
+  // Try alternative reference points if Object Manager tab isn't found
+  if (homeTab) {
+    console.log("Found Home tab as alternative reference point");
+    const tabItem = homeTab.closest('li');
+    if (tabItem && tabItem.parentNode) {
+      console.log("Using Home tab as reference point");
+      processTabAddition(tabItem, tabs);
+      return;
+    }
+  }
   
-  processTabAddition(tabItem, tabs);
+  // If we still can't find a reference point, try using any setup tab
+  const anySetupTab = document.querySelector('a[href*="/lightning/setup/"]');
+  if (anySetupTab) {
+    console.log("Found a setup tab as a last resort reference point");
+    const tabItem = anySetupTab.closest('li');
+    if (tabItem && tabItem.parentNode) {
+      console.log("Using a generic setup tab as reference point");
+      processTabAddition(tabItem, tabs);
+      return;
+    }
+  }
+  
+  console.log("No suitable reference points found, will try again later");
 }
 
 // Helper function to process tab addition
@@ -163,8 +192,6 @@ function processTabAddition(referenceTabItem, tabs) {
   });
   
   // Add each custom tab in REVERSE order to maintain the same order as in the popup
-  // This way, each tab is inserted at the same position after the reference tab,
-  // which will reverse the visual order in the menu
   for (let i = sortedTabs.length - 1; i >= 0; i--) {
     const tab = sortedTabs[i];
     
@@ -176,23 +203,25 @@ function processTabAddition(referenceTabItem, tabs) {
     // Create the link for the new tab
     const newTabLink = document.createElement('a');
     
-    // Check if tab has isObject property, default to false if not defined (for backward compatibility)
+    // Check if tab has isObject property, default to false if not defined
     const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
     
     // Determine correct URL based on tab type
-if (isObject) {
-  // Object page format: /lightning/o/ObjectName/home
-  newTabLink.href = `${baseUrlObject}${tab.path}/home`;
-} else if (tab.path.startsWith('ObjectManager/') && tab.path.endsWith('/view')) {
-  // Special case for ObjectManager paths that already have a /view suffix
-  newTabLink.href = `${baseUrlSetup}${tab.path}`;
-} else if (tab.path.startsWith('ObjectManager/')) {
-  // Special case for ObjectManager paths without a suffix - add /view
-  newTabLink.href = `${baseUrlSetup}${tab.path}/view`;
-} else {
-  // Standard setup page format: /lightning/setup/PageName/home
-  newTabLink.href = `${baseUrlSetup}${tab.path}/home`;
-}
+    if (isObject) {
+      // Object page format: /lightning/o/ObjectName/home
+      newTabLink.href = `${baseUrlObject}${tab.path}/home`;
+    } else if (tab.path.startsWith('ObjectManager/') && tab.path.endsWith('/view')) {
+      // Special case for ObjectManager paths that already have a /view suffix
+      newTabLink.href = `${baseUrlSetup}${tab.path}`;
+      console.log(`Using exact path for ObjectManager tab: ${newTabLink.href}`);
+    } else if (tab.path.startsWith('ObjectManager/')) {
+      // Special case for ObjectManager paths without a suffix - add /view
+      newTabLink.href = `${baseUrlSetup}${tab.path}/view`;
+      console.log(`Adding /view suffix for ObjectManager tab: ${newTabLink.href}`);
+    } else {
+      // Standard setup page format: /lightning/setup/PageName/home
+      newTabLink.href = `${baseUrlSetup}${tab.path}/home`;
+    }
 
     // Important: Set ARIA attributes to prevent active state
     newTabLink.setAttribute('aria-selected', 'false');
@@ -224,18 +253,13 @@ if (isObject) {
     
     // Log with appropriate URL based on tab type
     const baseUrl = isObject ? baseUrlObject : baseUrlSetup;
-    console.log(`Custom tab "${tab.label}" successfully added at ${baseUrl}${tab.path}/home`);
-  }
-}
-
-// Function to check and add tabs when storage changes
-function onStorageChange(changes, area) {
-  if (area === 'sync' && changes.customTabs) {
-    console.log('Storage changed, updating tabs');
-    // Remove existing custom tabs
-    removeCustomTabs();
-    // Add the updated tabs
-    addCustomTabs(changes.customTabs.newValue);
+    let logPath = tab.path;
+    if (tab.path.startsWith('ObjectManager/') && !tab.path.endsWith('/view')) {
+      logPath += '/view';
+    } else if (!tab.path.startsWith('ObjectManager/') && !isObject) {
+      logPath += '/home';
+    }
+    console.log(`Custom tab "${tab.label}" successfully added at ${baseUrl}${logPath}`);
   }
 }
 
@@ -245,9 +269,93 @@ function removeCustomTabs() {
   customTabs.forEach(tab => tab.remove());
 }
 
-// Setup an interval to try adding the tabs
-let setupMenuCheckAttempts = 0;
-const maxSetupMenuCheckAttempts = 3; // Increased max attempts
+// Function to check and add tabs when storage changes
+function onStorageChange(changes, area) {
+  if (area === 'sync' && changes.customTabs) {
+    console.log('Storage changed, updating tabs');
+    removeCustomTabs();
+    loadCustomTabs().then(tabs => {
+      addCustomTabs(tabs);
+    });
+  }
+}
+
+// Function to check for navigation changes
+function checkNavigation() {
+  const currentUrl = location.href;
+  
+  // Look for active tab header
+  const activeTab = document.querySelector('a.tabHeader[aria-selected="true"]');
+  const activeTabId = activeTab ? activeTab.getAttribute('data-tabid') : '';
+  
+  // Check if we've switched tabs
+  if (activeTabId && activeTabId !== lastActiveTab) {
+    console.log("Tab switch detected:", lastActiveTab, "->", activeTabId);
+    console.log("Active tab:", activeTab ? activeTab.getAttribute('title') : 'None');
+    
+    // Store new active tab
+    lastActiveTab = activeTabId;
+    
+    // Force refresh tabs with staggered timing to catch DOM changes
+    setTimeout(() => refreshTabs(), 100);
+    setTimeout(() => refreshTabs(), 500);
+    setTimeout(() => refreshTabs(), 1000);
+    setTimeout(() => refreshTabs(), 2000);
+  }
+  
+  // Also check URL changes as a backup method
+  if (currentUrl !== lastUrl) {
+    console.log("URL changed:", lastUrl, "->", currentUrl);
+    lastUrl = currentUrl;
+    
+    // If we're on an Object Manager page, we need special handling
+    if (currentUrl.includes('/lightning/setup/ObjectManager/')) {
+      console.log("Object Manager page detected through URL change");
+      setTimeout(() => refreshTabs(), 100);
+      setTimeout(() => refreshTabs(), 500);
+      setTimeout(() => refreshTabs(), 1000);
+      setTimeout(() => refreshTabs(), 2000);
+    }
+  }
+  
+  // Periodic check for missing tabs on setup pages
+  if ((currentUrl.includes('/lightning/setup/') || 
+       currentUrl.includes('/lightning/o/')) && 
+      !document.querySelector('li[data-custom-tab-id]')) {
+    
+    // But only refresh if we can see a navigation container
+    if (document.querySelector('.oneSetupNavContainer') || 
+        document.querySelector('.oneConsoleNav') ||
+        document.querySelector('.tabHeader')) {
+      
+      console.log("Setup page detected with missing custom tabs - refreshing");
+      refreshTabs();
+    }
+  }
+}
+
+// Helper function to refresh tabs
+function refreshTabs() {
+  // Look for tab containers that already exist
+  const tabContainer = document.querySelector('.oneSetupNavContainer ul') || 
+                      document.querySelector('.oneConsoleNav') ||
+                      document.querySelector('ul.slds-context-bar__vertical-menu');
+  
+  if (!tabContainer) {
+    console.log("No tab container found for adding tabs");
+    return;
+  }
+  
+  // Remove existing custom tabs to avoid duplicates
+  removeCustomTabs();
+  
+  // Load and add custom tabs
+  loadCustomTabs().then(tabs => {
+    addCustomTabs(tabs);
+  });
+}
+
+// Initial setup and tab addition
 const setupMenuCheckInterval = setInterval(function() {
   setupMenuCheckAttempts++;
   console.log(`Setup menu check attempt ${setupMenuCheckAttempts}/${maxSetupMenuCheckAttempts}`);
@@ -262,17 +370,85 @@ const setupMenuCheckInterval = setInterval(function() {
     console.log("Max check attempts reached, stopping automatic checks");
     clearInterval(setupMenuCheckInterval);
   }
-}, 1500); // Increased interval to give more time for the page to load
+}, 2000);
 
-// Also try when navigation happens
-window.addEventListener('popstate', function() {
-  console.log("Navigation detected (popstate)");
-  // Reset and try again
-  setupMenuCheckAttempts = 0;
-  loadCustomTabs().then(tabs => {
-    addCustomTabs(tabs);
-  });
+// Run navigation check frequently
+setInterval(checkNavigation, 200);
+
+// Create a unified MutationObserver that handles all DOM changes
+const unifiedObserver = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    // Handle childList changes
+    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+      // Check if we should refresh tabs based on DOM changes
+      let refreshNeeded = false;
+      
+      // Check for navigation container
+      const hasNavContainer = document.querySelector('.oneSetupNavContainer');
+      const hasCustomTabs = document.querySelector('li[data-custom-tab-id]');
+      
+      if (hasNavContainer && !hasCustomTabs) {
+        refreshNeeded = true;
+      }
+      
+      // Check for new navigation elements being added
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType === Node.ELEMENT_NODE && node.querySelector) {
+          if (node.querySelector('.oneSetupNavContainer') || 
+              node.querySelector('.oneConsoleNav') || 
+              node.querySelector('.tabHeader') ||
+              node.classList?.contains('oneSetupNavContainer') ||
+              node.classList?.contains('oneConsoleNav')) {
+            
+            refreshNeeded = true;
+            break;
+          }
+        }
+      }
+      
+      if (refreshNeeded) {
+        console.log("Navigation structure changed - refreshing tabs");
+        setTimeout(() => refreshTabs(), 200);
+      }
+    }
+    
+    // Handle attribute changes that indicate tab switching
+    if (mutation.type === 'attributes' && 
+        mutation.attributeName === 'aria-selected' &&
+        mutation.target.classList?.contains('tabHeader')) {
+      
+      console.log("Tab selection attribute changed");
+      setTimeout(() => refreshTabs(), 200);
+    }
+  }
 });
+
+// Start observing with a targeted approach
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  unifiedObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['aria-selected', 'class']
+  });
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    unifiedObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['aria-selected', 'class']
+    });
+  });
+}
 
 // Listen for storage changes to update tabs in real-time
 browser.storage.onChanged.addListener(onStorageChange);
+
+// Also watch for page navigation events
+window.addEventListener('popstate', function() {
+  console.log("Navigation detected (popstate)");
+  // Reset attempt counter
+  setupMenuCheckAttempts = 0;
+  refreshTabs();
+});
