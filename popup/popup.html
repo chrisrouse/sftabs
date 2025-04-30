@@ -39,9 +39,9 @@
 
 		<!-- Main Section -->
 		<div id="main-content">
-			<div class="section-header">
+			<!-- <div class="section-header">
 				<h2>Custom Tabs</h2>
-			</div>
+			</div> -->
 
 			<div class="tab-list" id="tab-list">
 				<!-- Tab items will be added here via JavaScript -->
@@ -66,13 +66,24 @@
 					<div class="help-text">Just add the page name from the URL.</div>
 				</div>
 
-				<div class="form-group checkbox-group">
-					<label>
-						<input type="checkbox" id="open-in-new-tab">
-						<span>Open in New Tab</span>
-					</label>
-				</div>
+				<!-- Checkbox for "Open in New Tab" with help text below -->
+<div class="form-group checkbox-group">
+    <label>
+        <input type="checkbox" id="open-in-new-tab">
+        <span>Open in New Tab</span>
+    </label>
+    <div class="help-text">Opens this tab in a new browser window instead of the current one</div>
+</div>
 
+<!-- Checkbox for "Object" with help text below -->
+<div class="form-group checkbox-group">
+    <label>
+        <input type="checkbox" id="is-object">
+        <span>Object</span>
+    </label>
+    <div class="help-text">Check this if the page is an object page instead of a setup page</div>
+</div>
+				
 				<div class="button-group">
 					<button id="cancel-button" class="secondary-button">Cancel</button>
 					<button id="save-button" class="primary-button">Save</button>

@@ -122,9 +122,11 @@ function addCustomTabs(tabs) {
 function processTabAddition(referenceTabItem, tabs) {
   // Get the base URL for the current org using the current page URL
   const currentUrl = window.location.href;
-  const baseUrl = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
   
-  console.log("Using base URL:", baseUrl);
+  console.log("Using base URL for setup:", baseUrlSetup);
+  console.log("Using base URL for objects:", baseUrlObject);
   
   // Sort tabs by position
   const sortedTabs = [...tabs].sort((a, b) => a.position - b.position);
@@ -134,8 +136,8 @@ function processTabAddition(referenceTabItem, tabs) {
   
   // Find the reference element classes for styling our new tabs
   let referenceClassName = referenceTabItem.className;
-    // Remove any active classes from the reference class names
-    referenceClassName = referenceClassName.replace(/\bactive\b|\bslds-is-active\b|\bselected\b/g, '').trim();
+  // Remove any active classes from the reference class names
+  referenceClassName = referenceClassName.replace(/\bactive\b|\bslds-is-active\b|\bselected\b/g, '').trim();
 
   let referenceLinkClassName = '';
   let referenceContentClassName = '';
@@ -143,9 +145,9 @@ function processTabAddition(referenceTabItem, tabs) {
   // Get a reference link to copy styles from
   const referenceLink = referenceTabItem.querySelector('a');
   if (referenceLink) {
-	referenceLinkClassName = referenceLink.className;
-	// Remove any active classes from the link class names
-	referenceLinkClassName = referenceLinkClassName.replace(/\bactive\b|\bslds-is-active\b|\bselected\b/g, '').trim();
+    referenceLinkClassName = referenceLink.className;
+    // Remove any active classes from the link class names
+    referenceLinkClassName = referenceLinkClassName.replace(/\bactive\b|\bslds-is-active\b|\bselected\b/g, '').trim();
     
     // Get reference content div if available
     const referenceContent = referenceLink.firstElementChild;
@@ -173,11 +175,28 @@ function processTabAddition(referenceTabItem, tabs) {
     
     // Create the link for the new tab
     const newTabLink = document.createElement('a');
-    newTabLink.href = `${baseUrl}${tab.path}/home`;
+    
+    // Check if tab has isObject property, default to false if not defined (for backward compatibility)
+    const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+    
+    // Determine correct URL based on tab type
+if (isObject) {
+  // Object page format: /lightning/o/ObjectName/home
+  newTabLink.href = `${baseUrlObject}${tab.path}/home`;
+} else if (tab.path.startsWith('ObjectManager/') && tab.path.endsWith('/view')) {
+  // Special case for ObjectManager paths that already have a /view suffix
+  newTabLink.href = `${baseUrlSetup}${tab.path}`;
+} else if (tab.path.startsWith('ObjectManager/')) {
+  // Special case for ObjectManager paths without a suffix - add /view
+  newTabLink.href = `${baseUrlSetup}${tab.path}/view`;
+} else {
+  // Standard setup page format: /lightning/setup/PageName/home
+  newTabLink.href = `${baseUrlSetup}${tab.path}/home`;
+}
 
     // Important: Set ARIA attributes to prevent active state
-	newTabLink.setAttribute('aria-selected', 'false');
-	newTabLink.setAttribute('role', 'tab');
+    newTabLink.setAttribute('aria-selected', 'false');
+    newTabLink.setAttribute('role', 'tab');
     
     // Handle "open in new tab" setting
     if (tab.openInNewTab) {
@@ -203,6 +222,8 @@ function processTabAddition(referenceTabItem, tabs) {
     // Insert our new tab after the reference tab
     referenceTabItem.parentNode.insertBefore(newTabLi, referenceTabItem.nextSibling);
     
+    // Log with appropriate URL based on tab type
+    const baseUrl = isObject ? baseUrlObject : baseUrlSetup;
     console.log(`Custom tab "${tab.label}" successfully added at ${baseUrl}${tab.path}/home`);
   }
 }

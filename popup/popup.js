@@ -16,6 +16,7 @@ let modalConfirmButton;
 let deleteConfirmModal;
 let deleteModalCancelButton;
 let deleteModalConfirmButton;
+let isObjectCheckbox;
 
 // Settings Elements
 let settingsButton;
@@ -42,6 +43,7 @@ const defaultTabs = [{
 		label: 'Flows',
 		path: 'Flows',
 		openInNewTab: false,
+		isObject: false,
 		position: 0
 	},
 	{
@@ -74,6 +76,35 @@ const defaultTabs = [{
 	}
 ];
 
+/**
+ * This function formats a Salesforce object name from URL format
+ * Examples: 
+ * - "Study_Group__c" becomes "Study Group"
+ * - "Campaign" stays "Campaign"
+ * - "ProductTransfer" becomes "Product Transfer"
+ * @param {string} objectNameFromURL - The object name from the URL path
+ * @return {string} The formatted, human-readable object name
+ */
+function formatObjectNameFromURL(objectNameFromURL) {
+	if (!objectNameFromURL) {
+	  return 'Object';
+	}
+	
+	// First, remove any __c or similar custom object suffix
+	let cleanName = objectNameFromURL.replace(/__c$/g, '');
+	
+	// Replace underscores with spaces
+	cleanName = cleanName.replace(/_/g, ' ');
+	
+	// Insert spaces between camelCase words (ProductTransfer -> Product Transfer)
+	cleanName = cleanName.replace(/([a-z])([A-Z])/g, '$1 $2');
+	
+	// Ensure proper capitalization
+	cleanName = cleanName.replace(/\b\w/g, letter => letter.toUpperCase());
+	
+	return cleanName;
+  }
+
 // Default user settings
 const defaultSettings = {
 	themeMode: 'light',
@@ -102,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	deleteConfirmModal = document.getElementById('delete-confirm-modal');
 	deleteModalCancelButton = document.getElementById('delete-modal-cancel-button');
 	deleteModalConfirmButton = document.getElementById('delete-modal-confirm-button');
+	isObjectCheckbox = document.getElementById('is-object');
 
 	// Settings elements
 	settingsButton = document.getElementById('settings-button');
@@ -439,80 +471,154 @@ function setupEventListeners() {
 function addTabForCurrentPage() {
 	// Get the current active tab in the browser
 	browser.tabs.query({ active: true, currentWindow: true })
-		.then(tabs => {
-			if (tabs.length > 0) {
-				const currentUrl = tabs[0].url;
-				console.log('Current URL:', currentUrl);
-
-				// Check if this is a Salesforce setup page
-				if (currentUrl.includes('/lightning/setup/')) {
-					// Extract the path component (after /setup/)
-					const urlParts = currentUrl.split('/lightning/setup/');
-					if (urlParts.length > 1) {
-						let path = urlParts[1].split('/')[0]; // Get the component after /setup/ and before the next slash
-
-						// Get the page title to use as the tab name
-						const pageTitle = tabs[0].title;
-
-						// Extract a reasonable name from either the page title or the path
-						let name = path;
-
-						// Try to extract a better name from the page title if available
-						if (pageTitle) {
-							// Remove " | Salesforce" or similar suffix from title
-							let cleanTitle = pageTitle.split(' | ')[0];
-
-							// If the title includes "Setup", try to get a cleaner name
-							if (cleanTitle.includes('Setup')) {
-								const setupParts = cleanTitle.split('Setup: ');
-								if (setupParts.length > 1) {
-									cleanTitle = setupParts[1];
-								}
-							}
-
-							// Use the cleaned title if we got something reasonable
-							if (cleanTitle && cleanTitle.length > 0) {
-								name = cleanTitle;
-							}
-						}
-
-						// Convert path format from CamelCase to "Proper Name"
-						// This helps if we couldn't get a good name from the title
-						if (name === path) {
-							name = path
-								// Add space before uppercase letters
-								.replace(/([A-Z])/g, ' $1')
-								// Clean up any leading space and capitalize first letter
-								.replace(/^./, str => str.toUpperCase())
-								.trim();
-						}
-
-						// Create a new tab object
-						const newTab = {
-							id: generateId(),
-							label: name,
-							path: path,
-							openInNewTab: false,
-							position: customTabs.length
-						};
-
-						// Add the new tab
-						customTabs.push(newTab);
-						saveTabsToStorage();
-
-						// Show success message
-						showStatus(`Added tab for "${name}"`, false);
-					}
-				} else {
-					showStatus('Not a Salesforce setup page', true);
-				}
+	  .then(tabs => {
+		if (tabs.length > 0) {
+		  const currentUrl = tabs[0].url;
+		  const pageTitle = tabs[0].title;
+		  console.log('Current URL:', currentUrl);
+		  
+		  let isObject = false;
+		  let path = '';
+		  let urlBase = '';
+  
+		  // Check if this is a Salesforce setup page
+		  if (currentUrl.includes('/lightning/setup/')) {
+			// Extract the full path component (after /setup/)
+			const urlParts = currentUrl.split('/lightning/setup/');
+			if (urlParts.length > 1) {
+			  // Get everything after /setup/ and before any query parameters
+			  const fullPath = urlParts[1].split('?')[0]; 
+			  
+			  // Special case for ObjectManager: keep the /view suffix
+			  if (fullPath.startsWith('ObjectManager/')) {
+				path = fullPath;
+			  } else {
+				// For other setup pages, remove trailing '/home' or '/view' if present
+				path = fullPath.replace(/\/(home|view)$/, '');
+			  }
+			  
+			  urlBase = '/lightning/setup/';
 			}
-		})
-		.catch(error => {
-			console.error('Error accessing current tab:', error);
-			showStatus('Error accessing current tab', true);
-		});
-}
+		  } 
+		  // Check if this is a Salesforce object page
+		  else if (currentUrl.includes('/lightning/o/')) {
+			isObject = true; // Mark as object page
+			// Extract the path component (after /o/)
+			const urlParts = currentUrl.split('/lightning/o/');
+			if (urlParts.length > 1) {
+			  // Get everything after /o/ and before any query parameters
+			  const fullPath = urlParts[1].split('?')[0];
+			  
+			  // Standard object pages (remove trailing suffixes)
+			  path = fullPath.replace(/\/(home|view)$/, '');
+			  
+			  urlBase = '/lightning/o/';
+			}
+		  }
+		  
+		  // If no valid path was found, show an error
+		  if (!path) {
+			showStatus('Not a Salesforce setup or object page', true);
+			return;
+		  }
+  
+		  // For object pages, use the formatted object name as the tab label
+		  let name = '';
+		  if (isObject) {
+			// Format the object name from the URL path
+			name = formatObjectNameFromURL(path.split('/')[0]);
+			console.log('Using formatted object name for label:', name);
+		  } else {
+			// Special case for ObjectManager paths
+			if (path.startsWith('ObjectManager/')) {
+			  // For ObjectManager paths, create a more descriptive label
+			  const pathSegments = path.split('/').filter(segment => segment.length > 0);
+			  
+			  if (pathSegments.length >= 3) {
+				// Format: "Object - Section"
+				// e.g., "Account - Fields And Relationships"
+				const objectName = formatObjectNameFromURL(pathSegments[1]);
+				const sectionName = pathSegments[2]
+				  .replace(/([A-Z])/g, ' $1') // Add space before uppercase letters
+				  .trim();
+				
+				name = `${objectName} - ${sectionName}`;
+			  } else if (pathSegments.length >= 2) {
+				// Just the object name if there's no section
+				name = formatObjectNameFromURL(pathSegments[1]);
+			  } else {
+				// Fallback to just "Object Manager"
+				name = "Object Manager";
+			  }
+			} else {
+			  // For standard setup pages, extract from the page title or path
+			  
+			  // Try to extract a better name from the page title if available
+			  if (pageTitle) {
+				// Remove " | Salesforce" or similar suffix from title
+				let cleanTitle = pageTitle.split(' | ')[0];
+  
+				// If the title includes "Setup", try to get a cleaner name
+				if (cleanTitle.includes('Setup')) {
+				  const setupParts = cleanTitle.split('Setup: ');
+				  if (setupParts.length > 1) {
+					cleanTitle = setupParts[1];
+				  }
+				}
+  
+				// Use the cleaned title if we got something reasonable
+				if (cleanTitle && cleanTitle.length > 0) {
+				  name = cleanTitle;
+				}
+			  }
+			  
+			  // If we couldn't get a good name from the title, use the last segment of the path
+			  if (!name || name.length === 0) {
+				// Get the last non-empty segment of the path
+				const pathSegments = path.split('/').filter(segment => segment.length > 0);
+				if (pathSegments.length > 0) {
+				  name = pathSegments[pathSegments.length - 1]
+					// Add space before uppercase letters
+					.replace(/([A-Z])/g, ' $1')
+					// Clean up any leading space and capitalize first letter
+					.replace(/^./, str => str.toUpperCase())
+					.trim();
+				} else {
+				  name = path; // Fallback to the full path
+				}
+			  }
+			}
+		  }
+  
+		  // For debugging
+		  console.log('Creating tab with path:', path);
+		  console.log('Is object page:', isObject);
+		  console.log('Tab label will be:', name);
+  
+		  // Create a new tab object
+		  const newTab = {
+			id: generateId(),
+			label: name,
+			path: path,
+			openInNewTab: false,
+			isObject: isObject,
+			position: customTabs.length
+		  };
+  
+		  // Add the new tab
+		  customTabs.push(newTab);
+		  saveTabsToStorage();
+  
+		  // Show success message with the type of page
+		  const pageType = isObject ? 'object' : 'setup';
+		  showStatus(`Added ${pageType} tab for "${name}"`, false);
+		}
+	  })
+	  .catch(error => {
+		console.error('Error accessing current tab:', error);
+		showStatus('Error accessing current tab', true);
+	  });
+  }
 
 // Render the tab list
 function renderTabList() {
@@ -559,7 +665,33 @@ function createTabElement(tab) {
 
 	const tabPath = document.createElement('div');
 	tabPath.className = 'tab-path';
-	tabPath.textContent = tab.path;
+	
+	// Create a badge to show the path type (setup or object)
+	const pathType = document.createElement('span');
+	// Check if tab has isObject property, default to false if not defined (for backward compatibility)
+	const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+	pathType.className = isObject ? 'path-type object' : 'path-type setup';
+	
+	// For object tabs, extract the object name from the URL path
+	if (isObject) {
+		// Debug logging
+		console.log('Creating object tab badge for:', tab.path);
+		
+		// Format the object name from the URL path
+		const objectName = formatObjectNameFromURL(tab.path);
+		console.log('Formatted object name:', objectName);
+		
+		pathType.textContent = 'Object';
+	} else {
+		pathType.textContent = 'Setup';
+	}
+	
+	// Add the path text as a separate text node
+	const pathText = document.createTextNode(' ' + tab.path);
+	
+	// Add both to the tab path div
+	tabPath.appendChild(pathType);
+	tabPath.appendChild(pathText);
 
 	// Create a container for the toggle and delete button
 	const tabActions = document.createElement('div');
@@ -612,10 +744,11 @@ function createTabElement(tab) {
 
 	tabItem.appendChild(dragHandle);
 	tabItem.appendChild(tabInfo);
-	tabItem.appendChild(tabActions); // Fixed: append tabActions instead of tabItem to itself
+	tabItem.appendChild(tabActions);
 
 	return tabItem;
 }
+
 // Setup drag and drop functionality
 function setupDragAndDrop() {
 	const tabItems = document.querySelectorAll('.tab-item');
@@ -799,6 +932,7 @@ function showTabForm(tabId = null) {
 	tabNameInput.value = '';
 	tabPathInput.value = '';
 	openInNewTabCheckbox.checked = false;
+	isObjectCheckbox.checked = false;
 
 	if (tabId) {
 		// Edit mode
@@ -811,6 +945,7 @@ function showTabForm(tabId = null) {
 			tabNameInput.value = tab.label;
 			tabPathInput.value = tab.path;
 			openInNewTabCheckbox.checked = tab.openInNewTab;
+			isObjectCheckbox.checked = tab.isObject || false;
 		}
 
 		// Find the tab element
@@ -920,6 +1055,7 @@ function saveTabForm() {
 			tab.label = name;
 			tab.path = path;
 			tab.openInNewTab = openInNewTabCheckbox.checked;
+			tab.isObject = isObjectCheckbox.checked;
 		}
 	} else {
 		// Add new tab
@@ -928,8 +1064,12 @@ function saveTabForm() {
 			label: name,
 			path: path,
 			openInNewTab: openInNewTabCheckbox.checked,
+			isObject: isObjectCheckbox.checked, // Make sure we set isObject property
 			position: customTabs.length
 		};
+
+		// Log the new tab for debugging
+		console.log('Created new tab:', newTab);
 
 		customTabs.push(newTab);
 	}
