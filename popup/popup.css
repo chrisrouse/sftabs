@@ -927,3 +927,22 @@ input[type="text"]:focus {
 	border-top: 1px solid var(--color-border);
 	margin: 20px 0;
 }
+
+/* Add styles for the Custom URL badge */
+.tab-path .path-type.custom {
+  background-color: #9061F9; /* Purple color for custom URLs */
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme specific style for custom URL badge */
+[data-theme="dark"] .tab-path .path-type.custom {
+  background-color: #9061F9; /* Same purple for consistency */
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Optional: Add a special border color for custom URL tabs for extra visual distinction */
+.tab-item.custom-url {
+  border-left: 3px solid #9061F9;
+}

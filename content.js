@@ -84,17 +84,25 @@ function initTabs(tabContainer) {
 }
 
 // Create tab element with appropriate structure and classes
+// Update the createTabElement function to handle custom URLs
+
 function createTabElement(tab) {
   // Get the base URL for the current org
   const currentUrl = window.location.href;
   const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
   const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
+  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
   
   // Determine the full URL based on tab type
   let fullUrl = '';
   const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+  const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
   
-  if (isObject) {
+  if (isCustomUrl) {
+    // Handle custom URL paths - use the path directly with the org's base URL
+    // Remove the slash to avoid double slashes in the resulting URL
+    fullUrl = `${baseUrlRoot}${tab.path}`; // Remove the extra "/" between
+  } else if (isObject) {
     fullUrl = `${baseUrlObject}${tab.path}/home`;
   } else if (tab.path.includes('ObjectManager/')) {
     fullUrl = `${baseUrlSetup}${tab.path}`;

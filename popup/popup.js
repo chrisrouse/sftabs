@@ -17,6 +17,7 @@ let deleteConfirmModal;
 let deleteModalCancelButton;
 let deleteModalConfirmButton;
 let isObjectCheckbox;
+let isCustomUrlCheckbox;
 
 // Settings Elements
 let settingsButton;
@@ -134,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	deleteModalCancelButton = document.getElementById('delete-modal-cancel-button');
 	deleteModalConfirmButton = document.getElementById('delete-modal-confirm-button');
 	isObjectCheckbox = document.getElementById('is-object');
+	isCustomUrlCheckbox = document.getElementById('is-custom-url');
 
 	// Settings elements
 	settingsButton = document.getElementById('settings-button');
@@ -478,6 +480,7 @@ function addTabForCurrentPage() {
 		  console.log('Current URL:', currentUrl);
 		  
 		  let isObject = false;
+		  let isCustomUrl = false;
 		  let path = '';
 		  let urlBase = '';
   
@@ -515,21 +518,66 @@ function addTabForCurrentPage() {
 			  urlBase = '/lightning/o/';
 			}
 		  }
+		  // NEW: Handle custom URLs (any other Salesforce URL pattern)
+		  else if (currentUrl.includes('.lightning.force.com/') || currentUrl.includes('.salesforce.com/')) {
+			isCustomUrl = true;
+			
+			// Get base domain
+			const urlParts = currentUrl.split('.com/');
+			if (urlParts.length > 1) {
+			  // Extract everything after the domain
+			  path = urlParts[1].split('?')[0]; // Remove query parameters
+			  
+			  // Check for specific custom URL patterns 
+			  // (e.g., interaction_explorer, console, visualforce pages, etc.)
+			  console.log('Detected custom URL path:', path);
+			}
+		  }
 		  
 		  // If no valid path was found, show an error
 		  if (!path) {
-			showStatus('Not a Salesforce setup or object page', true);
+			showStatus('Not a recognized Salesforce page', true);
 			return;
 		  }
   
-		  // For object pages, use the formatted object name as the tab label
+		  // Determine an appropriate name for the tab
 		  let name = '';
-		  if (isObject) {
+		  if (isCustomUrl) {
+			// For custom URLs, try to extract a meaningful name
+			if (pageTitle) {
+			  // Remove " | Salesforce" or similar suffix from title
+			  let cleanTitle = pageTitle.split(' | ')[0];
+			  name = cleanTitle;
+			}
+			
+			// If we couldn't get a good name from the title, use a path segment
+			if (!name || name.length === 0) {
+			  const pathSegments = path.split('/');
+			  // Look for the most meaningful segment (typically the app name)
+			  for (const segment of pathSegments) {
+				if (segment && segment.length > 0 && segment !== 'apex' && segment !== 'lightning') {
+				  name = segment
+					// Clean up the name - replace camelCase with spaces
+					.replace(/([A-Z])/g, ' $1')
+					// Remove file extensions
+					.replace(/\.(app|jsp|page)$/, '')
+					// Clean up any leading space and capitalize first letter
+					.replace(/^./, str => str.toUpperCase())
+					.trim();
+				  break;
+				}
+			  }
+			  
+			  // If still no name, use generic name with path
+			  if (!name || name.length === 0) {
+				name = 'Custom Page';
+			  }
+			}
+		  } else if (isObject) {
 			// Format the object name from the URL path
 			name = formatObjectNameFromURL(path.split('/')[0]);
-			console.log('Using formatted object name for label:', name);
 		  } else {
-			// Special case for ObjectManager paths
+			// Logic for setup page naming (existing code)
 			if (path.startsWith('ObjectManager/')) {
 			  // For ObjectManager paths, create a more descriptive label
 			  const pathSegments = path.split('/').filter(segment => segment.length > 0);
@@ -593,6 +641,7 @@ function addTabForCurrentPage() {
 		  // For debugging
 		  console.log('Creating tab with path:', path);
 		  console.log('Is object page:', isObject);
+		  console.log('Is custom URL:', isCustomUrl);
 		  console.log('Tab label will be:', name);
   
 		  // Create a new tab object
@@ -602,6 +651,7 @@ function addTabForCurrentPage() {
 			path: path,
 			openInNewTab: false,
 			isObject: isObject,
+			isCustomUrl: isCustomUrl,
 			position: customTabs.length
 		  };
   
@@ -610,7 +660,7 @@ function addTabForCurrentPage() {
 		  saveTabsToStorage();
   
 		  // Show success message with the type of page
-		  const pageType = isObject ? 'object' : 'setup';
+		  let pageType = isObject ? 'object' : (isCustomUrl ? 'custom' : 'setup');
 		  showStatus(`Added ${pageType} tab for "${name}"`, false);
 		}
 	  })
@@ -644,46 +694,59 @@ function renderTabList() {
 		setupDragAndDrop();
 	}
 }
+// Setup drag and drop functionality
+
+function setupDragAndDrop() {
+	const tabItems = document.querySelectorAll('.tab-item');
+	const dragHandles = document.querySelectorAll('.drag-handle');
+  
+	// Create drop indicator element
+	const dropIndicator = createDropIndicator();
+  
+	// Add event listeners to drag handles
+	dragHandles.forEach((handle, index) => {
+	  const item = tabItems[index];
+	  handle.addEventListener('mousedown', (e) => handleDragStart(e, item, dropIndicator));
+	});
+  }
 
 // Create tab list item element
 function createTabElement(tab) {
 	const tabItem = document.createElement('div');
 	tabItem.className = 'tab-item';
 	tabItem.dataset.id = tab.id;
-
+  
 	const dragHandle = document.createElement('div');
 	dragHandle.className = 'drag-handle';
 	dragHandle.innerHTML = '⋮⋮'; // Simple drag handle
 	dragHandle.setAttribute('title', 'Drag to reorder');
-
+  
 	const tabInfo = document.createElement('div');
 	tabInfo.className = 'tab-info';
-
+  
 	const tabName = document.createElement('div');
 	tabName.className = 'tab-name';
 	tabName.textContent = tab.label;
-
+  
 	const tabPath = document.createElement('div');
 	tabPath.className = 'tab-path';
 	
-	// Create a badge to show the path type (setup or object)
+	// Create a badge to show the path type (setup, object, or custom)
 	const pathType = document.createElement('span');
-	// Check if tab has isObject property, default to false if not defined (for backward compatibility)
-	const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
-	pathType.className = isObject ? 'path-type object' : 'path-type setup';
 	
-	// For object tabs, extract the object name from the URL path
-	if (isObject) {
-		// Debug logging
-		console.log('Creating object tab badge for:', tab.path);
-		
-		// Format the object name from the URL path
-		const objectName = formatObjectNameFromURL(tab.path);
-		console.log('Formatted object name:', objectName);
-		
-		pathType.textContent = 'Object';
+	// Check tab type properties (with backward compatibility)
+	const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+	const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
+	
+	if (isCustomUrl) {
+	  pathType.className = 'path-type custom';
+	  pathType.textContent = 'Custom';
+	} else if (isObject) {
+	  pathType.className = 'path-type object';
+	  pathType.textContent = 'Object';
 	} else {
-		pathType.textContent = 'Setup';
+	  pathType.className = 'path-type setup';
+	  pathType.textContent = 'Setup';
 	}
 	
 	// Add the path text as a separate text node
@@ -692,77 +755,62 @@ function createTabElement(tab) {
 	// Add both to the tab path div
 	tabPath.appendChild(pathType);
 	tabPath.appendChild(pathText);
-
+  
 	// Create a container for the toggle and delete button
 	const tabActions = document.createElement('div');
 	tabActions.className = 'tab-actions';
 	tabActions.style.display = 'flex';
 	tabActions.style.alignItems = 'center';
-
+  
 	// New tab toggle
 	const newTabToggle = document.createElement('label');
 	newTabToggle.className = 'new-tab-toggle';
 	newTabToggle.setAttribute('title', 'Open in new tab');
-
+  
 	const toggleInput = document.createElement('input');
 	toggleInput.type = 'checkbox';
 	toggleInput.checked = tab.openInNewTab;
 	toggleInput.style.display = 'none';
 	toggleInput.addEventListener('change', () => {
-		tab.openInNewTab = toggleInput.checked;
-		saveTabsToStorage();
+	  tab.openInNewTab = toggleInput.checked;
+	  saveTabsToStorage();
 	});
-
+  
 	const toggleSwitch = document.createElement('span');
 	toggleSwitch.className = 'toggle-switch';
-
+  
 	newTabToggle.appendChild(toggleInput);
 	newTabToggle.appendChild(toggleSwitch);
-
+  
 	// Delete button with trash icon
 	const deleteButton = document.createElement('button');
 	deleteButton.className = 'delete-button';
 	deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"></path></svg>';
 	deleteButton.setAttribute('title', 'Remove tab');
 	deleteButton.addEventListener('click', (e) => {
-		e.stopPropagation(); // Prevent event from bubbling up to tabInfo
-		deleteTab(tab.id);
+	  e.stopPropagation(); // Prevent event from bubbling up to tabInfo
+	  deleteTab(tab.id);
 	});
-
+  
 	// Edit functionality
 	tabInfo.addEventListener('click', () => {
-		editTab(tab.id);
+	  editTab(tab.id);
 	});
-
+  
 	// Assemble the tab item
 	tabInfo.appendChild(tabName);
 	tabInfo.appendChild(tabPath);
-
+  
 	// Add toggle and delete button to the actions container
 	tabActions.appendChild(newTabToggle);
 	tabActions.appendChild(deleteButton);
-
+  
 	tabItem.appendChild(dragHandle);
 	tabItem.appendChild(tabInfo);
 	tabItem.appendChild(tabActions);
-
+  
 	return tabItem;
-}
-
-// Setup drag and drop functionality
-function setupDragAndDrop() {
-	const tabItems = document.querySelectorAll('.tab-item');
-	const dragHandles = document.querySelectorAll('.drag-handle');
-
-	// Create drop indicator element
-	const dropIndicator = createDropIndicator();
-
-	// Add event listeners to drag handles
-	dragHandles.forEach((handle, index) => {
-		const item = tabItems[index];
-		handle.addEventListener('mousedown', (e) => handleDragStart(e, item, dropIndicator));
-	});
-}
+  }
 
 // Create drop indicator element
 function createDropIndicator() {
@@ -927,62 +975,66 @@ function updateTabPositions() {
 // Show tab form for adding or editing
 function showTabForm(tabId = null) {
 	console.log('Showing tab form', { tabId });
-
+  
 	// Reset form
 	tabNameInput.value = '';
 	tabPathInput.value = '';
 	openInNewTabCheckbox.checked = false;
 	isObjectCheckbox.checked = false;
+	isCustomUrlCheckbox.checked = false;
 
+  
 	if (tabId) {
-		// Edit mode
-		editingTabId = tabId;
-		formTitle.textContent = 'Edit Tab';
-
-		// Populate form with existing data
-		const tab = customTabs.find(t => t.id === tabId);
-		if (tab) {
-			tabNameInput.value = tab.label;
-			tabPathInput.value = tab.path;
-			openInNewTabCheckbox.checked = tab.openInNewTab;
-			isObjectCheckbox.checked = tab.isObject || false;
-		}
-
-		// Find the tab element
-		const tabElement = document.querySelector(`.tab-item[data-id="${tabId}"]`);
-		if (tabElement) {
-			// Insert the form right after this tab
-			tabElement.after(tabForm);
-
-			// Show the form
-			tabForm.style.display = 'block';
-
-			// Scroll to make the form fully visible
-			ensureFormVisible(tabElement);
-		} else {
-			// Fallback to default position
-			tabList.after(tabForm);
-			tabForm.style.display = 'block';
-		}
-	} else {
-		// Add mode
-		editingTabId = null;
-		formTitle.textContent = 'Add New Tab';
-
-		// Show form at the default position (at the end)
+	  // Edit mode
+	  editingTabId = tabId;
+	  formTitle.textContent = 'Edit Tab';
+  
+	  // Populate form with existing data
+	  const tab = customTabs.find(t => t.id === tabId);
+	  if (tab) {
+		tabNameInput.value = tab.label;
+		tabPathInput.value = tab.path;
+		openInNewTabCheckbox.checked = tab.openInNewTab;
+		isObjectCheckbox.checked = tab.isObject || false;
+		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
+		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
+	  }
+  
+	  // Find the tab element
+	  const tabElement = document.querySelector(`.tab-item[data-id="${tabId}"]`);
+	  if (tabElement) {
+		// Insert the form right after this tab
+		tabElement.after(tabForm);
+  
+		// Show the form
+		tabForm.style.display = 'block';
+  
+		// Scroll to make the form fully visible
+		ensureFormVisible(tabElement);
+	  } else {
+		// Fallback to default position
 		tabList.after(tabForm);
 		tabForm.style.display = 'block';
-
-		// Ensure the Add button is visible
-		const addButton = document.getElementById('add-tab-button');
-		if (addButton) {
-			addButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
-		}
+	  }
+	} else {
+	  // Add mode
+	  editingTabId = null;
+	  formTitle.textContent = 'Add New Tab';
+  
+	  // Show form at the default position (at the end)
+	  tabList.after(tabForm);
+	  tabForm.style.display = 'block';
+  
+	  // Ensure the Add button is visible
+	  const addButton = document.getElementById('add-tab-button');
+	  if (addButton) {
+		addButton.scrollIntoView({ behavior: 'smooth', block: 'end' });
+	  }
 	}
-
+  
 	// Focus on the first field
 	tabNameInput.focus();
-}
+  }
 
 // Function to ensure the form is fully visible
 function ensureFormVisible(tabElement) {
@@ -1042,41 +1094,52 @@ function saveTabForm() {
 	console.log('Saving tab form');
 	const name = tabNameInput.value.trim();
 	const path = tabPathInput.value.trim();
-
+  
 	if (!name || !path) {
-		showStatus('Tab name and path are required', true);
-		return;
+	  showStatus('Tab name and path are required', true);
+	  return;
 	}
-
+  
+	const isObject = isObjectCheckbox.checked;
+	const isCustomUrl = isCustomUrlCheckbox.checked;
+  
+	// If both object and custom URL are checked, warn the user
+	if (isObject && isCustomUrl) {
+	  showStatus('Tab cannot be both Object and Custom URL', true);
+	  return;
+	}
+  
 	if (editingTabId) {
-		// Update existing tab
-		const tab = customTabs.find(t => t.id === editingTabId);
-		if (tab) {
-			tab.label = name;
-			tab.path = path;
-			tab.openInNewTab = openInNewTabCheckbox.checked;
-			tab.isObject = isObjectCheckbox.checked;
-		}
+	  // Update existing tab
+	  const tab = customTabs.find(t => t.id === editingTabId);
+	  if (tab) {
+		tab.label = name;
+		tab.path = path;
+		tab.openInNewTab = openInNewTabCheckbox.checked;
+		tab.isObject = isObject;
+		tab.isCustomUrl = isCustomUrl;
+	  }
 	} else {
-		// Add new tab
-		const newTab = {
-			id: generateId(),
-			label: name,
-			path: path,
-			openInNewTab: openInNewTabCheckbox.checked,
-			isObject: isObjectCheckbox.checked, // Make sure we set isObject property
-			position: customTabs.length
-		};
-
-		// Log the new tab for debugging
-		console.log('Created new tab:', newTab);
-
-		customTabs.push(newTab);
+	  // Add new tab
+	  const newTab = {
+		id: generateId(),
+		label: name,
+		path: path,
+		openInNewTab: openInNewTabCheckbox.checked,
+		isObject: isObject,
+		isCustomUrl: isCustomUrl,
+		position: customTabs.length
+	  };
+  
+	  // Log the new tab for debugging
+	  console.log('Created new tab:', newTab);
+  
+	  customTabs.push(newTab);
 	}
-
+  
 	saveTabsToStorage();
 	hideTabForm();
-}
+  }
 
 // Delete tab
 function deleteTab(tabId) {
