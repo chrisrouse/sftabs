@@ -76,6 +76,7 @@ function initTabs(tabContainer) {
     
     // Add click event listeners after all tabs are inserted
     addTabClickListeners(tabsToUse);
+    highlightActiveCustomTab(tabsToUse);
     
     console.log("Tabs successfully added to container");
   }).catch(error => {
@@ -148,6 +149,41 @@ function createTabElement(tab) {
   return li;
 }
 
+function highlightActiveCustomTab(tabs) {
+  const currentUrl = window.location.href;
+  let matchedTab = null;
+
+  for (const tab of tabs) {
+    const baseUrl = window.location.origin;
+    const tabUrl = document.querySelector(`li[data-tab-id="${tab.id}"]`)?.getAttribute('data-url');
+    if (tabUrl && currentUrl.startsWith(tabUrl)) {
+      matchedTab = tab;
+      break;
+    }
+  }
+
+  if (matchedTab) {
+    // Only if a custom tab matches the current page
+    console.log(`Highlighting active custom tab: ${matchedTab.label}`);
+
+    const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
+    allTabs.forEach(tabEl => {
+      tabEl.classList.remove('slds-is-active');
+      const anchor = tabEl.querySelector('a');
+      if (anchor) anchor.setAttribute('aria-selected', 'false');
+    });
+
+    const activeEl = document.querySelector(`li[data-tab-id="${matchedTab.id}"]`);
+    if (activeEl) {
+      activeEl.classList.add('slds-is-active');
+      const anchor = activeEl.querySelector('a');
+      if (anchor) anchor.setAttribute('aria-selected', 'true');
+    }
+  } else {
+    console.log("No custom tab matched. Leaving default active tab styling.");
+  }
+}
+
 // Add click event listeners for tabs
 function addTabClickListeners(tabs) {
   // We only need to add listeners for tabs that open in new tabs
@@ -194,6 +230,24 @@ setTimeout(() => {
   delayLoadTabs(0);
 }, 2000);
 
+// Observe DOM mutations to apply active styling sooner
+const observer = new MutationObserver(() => {
+  const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+  if (tabContainer && tabContainer.querySelectorAll('.sf-tabs-custom-tab').length > 0) {
+    // Stop observing once tabs are loaded
+    observer.disconnect();
+
+    // Re-highlight the active tab now that DOM is ready
+    browser.storage.sync.get('customTabs').then(result => {
+      const tabsToUse = result.customTabs || defaultTabs;
+      highlightActiveCustomTab(tabsToUse);
+    });
+  }
+});
+
+// Start observing early DOM changes
+observer.observe(document.body, { childList: true, subtree: true });
+
 // Listen for storage changes to refresh tabs
 browser.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.customTabs) {
@@ -237,3 +291,4 @@ setInterval(() => {
     }, 1000);
   }
 }, 1000);
+
