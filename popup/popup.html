@@ -2,176 +2,189 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="popup.css">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
-	<div class="container">
-		<header>
-			<h1>SF Tabs</h1>
-			<div class="header-actions">
-				<!-- Quick Add button with cloud-lightning icon -->
-				<button id="quick-add-button" class="icon-button" title="Add tab for current page">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-cloud-lightning">
-						<path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path>
-						<polyline points="13 11 9 17 15 17 11 23"></polyline>
-					</svg>
-				</button>
+    <div class="container">
+        <header>
+            <h1>SF Tabs</h1>
+            <div class="header-actions">
+                <!-- Quick Add button with cloud-lightning icon -->
+                <button id="quick-add-button" class="icon-button" title="Add tab for current page">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-cloud-lightning">
+                        <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path>
+                        <polyline points="13 11 9 17 15 17 11 23"></polyline>
+                    </svg>
+                </button>
 
-				<!-- Add Tab button with plus icon -->
-				<button id="add-tab-button" class="icon-button" title="Add new tab">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
-						<line x1="12" y1="5" x2="12" y2="19"></line>
-						<line x1="5" y1="12" x2="19" y2="12"></line>
-					</svg>
-				</button>
+                <!-- Add Tab button with plus icon -->
+                <button id="add-tab-button" class="icon-button" title="Add new tab">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
 
-				<!-- Settings button (existing gear icon) -->
-				<button id="settings-button" class="icon-button" title="Settings">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
-						<circle cx="12" cy="12" r="3"></circle>
-						<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-					</svg>
-				</button>
-			</div>
-		</header>
+                <!-- Settings button (existing gear icon) -->
+                <button id="settings-button" class="icon-button" title="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
 
-		<!-- Main Section -->
-		<div id="main-content">
-			<!-- <div class="section-header">
-				<h2>Custom Tabs</h2>
-			</div> -->
+        <!-- Main Section -->
+        <div id="main-content">
+            <!-- <div class="section-header">
+                <h2>Custom Tabs</h2>
+            </div> -->
 
-			<div class="tab-list" id="tab-list">
-				<!-- Tab items will be added here via JavaScript -->
-				<div class="empty-state" id="empty-state">
-					<p>No custom tabs yet. Add your first tab below.</p>
-				</div>
-			</div>
+            <div class="tab-list" id="tab-list">
+                <!-- Tab items will be added here via JavaScript -->
+                <div class="empty-state" id="empty-state">
+                    <p>No custom tabs yet. Add your first tab below.</p>
+                </div>
+            </div>
 
-			<div class="tab-form" id="tab-form">
-				<div class="form-header">
-					<h2 id="form-title">Add New Tab</h2>
-				</div>
+            <div class="tab-form" id="tab-form">
+                <div class="form-header">
+                    <h2 id="form-title">Add New Tab</h2>
+                </div>
 
-				<div class="form-group">
-					<label for="tab-name">Tab Name</label>
-					<input type="text" id="tab-name" placeholder="e.g., User Management">
-				</div>
+                <div class="form-group">
+                    <label for="tab-name">Tab Name</label>
+                    <input type="text" id="tab-name" placeholder="e.g., User Management">
+                </div>
 
-				<div class="form-group">
-					<label for="tab-path">Page URL</label>
-					<input type="text" id="tab-path" placeholder="e.g., ManageUsers">
-					<div class="help-text">Just add the page name from the URL.</div>
-				</div>
+                <div class="form-group">
+                    <label for="tab-path">Page URL</label>
+                    <input type="text" id="tab-path" placeholder="e.g., ManageUsers">
+                    <div class="help-text">Just add the page name from the URL.</div>
+                </div>
 
-				<!-- Checkbox for "Open in New Tab" with help text below -->
-<div class="form-group checkbox-group">
-    <label>
-        <input type="checkbox" id="open-in-new-tab">
-        <span>Open in New Tab</span>
-    </label>
-    <div class="help-text">Opens this tab in a new browser window instead of the current one</div>
-</div>
+                <!-- Checkbox for "Open in New Tab" with help text below -->
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="open-in-new-tab">
+                        <span>Open in New Tab</span>
+                    </label>
+                    <div class="help-text">Opens this tab in a new browser window instead of the current one</div>
+                </div>
 
-<!-- Checkbox for "Object" with help text below -->
-<div class="form-group checkbox-group">
-    <label>
-        <input type="checkbox" id="is-object">
-        <span>Object</span>
-    </label>
-    <div class="help-text">Check this if the page is an object page instead of a setup page</div>
-</div>
-				
-				<div class="button-group">
-					<button id="cancel-button" class="secondary-button">Cancel</button>
-					<button id="save-button" class="primary-button">Save</button>
-				</div>
-			</div>
-		</div>
+                <!-- Checkbox for "Object" with help text below -->
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="is-object">
+                        <span>Object</span>
+                    </label>
+                    <div class="help-text">Check this if the page is an object page instead of a setup page</div>
+                </div>
 
-		<!-- Settings Section -->
-		<div id="settings-panel" class="settings-panel">
-			<div class="section-header">
-				<h2>Settings</h2>
-			</div>
-
-			<div class="settings-form">
-				<div class="form-group">
-					<label for="theme-mode">Theme Mode</label>
-					<select id="theme-mode" class="select-input">
-						<option value="light">Light</option>
-						<option value="dark">Dark</option>
-						<option value="system">System (Auto)</option>
-					</select>
+				<!-- Checkbox for "Custom URL" with help text below -->
+				<div class="form-group checkbox-group">
+					<label>
+						<input type="checkbox" id="is-custom-url">
+						<span>Custom URL</span>
+					</label>
+					<div class="help-text">Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)</div>
 				</div>
 
-				<div class="form-group">
-					<label for="panel-height">Panel Height</label>
-					<div class="range-container">
-						<input type="range" id="panel-height" min="500" max="800" step="50" value="500" class="range-input">
-						<span id="panel-height-value">500px</span>
-					</div>
-				</div>
+                <div class="button-group">
+                    <button id="cancel-button" class="secondary-button">Cancel</button>
+                    <button id="save-button" class="primary-button">Save</button>
+                </div>
+            </div>
+        </div>
 
-				<div class="form-group">
-					<div class="import-export-buttons"> <button id="manage-config-button" class="action-button">
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
-								<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-								<polyline points="15 3 21 3 21 9"></polyline>
-								<line x1="10" y1="14" x2="21" y2="3"></line>
-							</svg>
-							<span>Import / Export Settings</span>
-						</button>
-					</div>
-				</div>
+        <!-- Settings Section -->
+        <div id="settings-panel" class="settings-panel">
+            <div class="section-header">
+                <h2>Settings</h2>
+            </div>
 
-				<div class="form-group">
-					<button id="settings-reset-button" class="secondary-button reset-button">Reset to Defaults</button>
-				</div>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="theme-mode">Theme Mode</label>
+                    <select id="theme-mode" class="select-input">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="system">System (Auto)</option>
+                    </select>
+                </div>
 
-			</div>
-		</div>
+                <div class="form-group">
+                    <label for="panel-height">Panel Height</label>
+                    <div class="range-container">
+                        <input type="range" id="panel-height" min="500" max="1000" step="50" value="500" class="range-input">
+                        <span id="panel-height-value">500px</span>
+                    </div>
+                </div>
 
-		<footer>
-			<div class="status-message" id="status-message"></div>
-		</footer>
+                <div class="form-group">
+                    <div class="import-export-buttons"> <button id="manage-config-button" class="action-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            <span>Import / Export Settings</span>
+                        </button>
+                    </div>
+                </div>
 
-		<!-- Confirm Reset Modal -->
-		<div id="confirm-modal" class="modal">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h2>Reset to Default Tabs</h2>
-				</div>
-				<div class="modal-body">
-					<p>Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.</p>
-				</div>
-				<div class="modal-footer">
-					<button id="modal-cancel-button" class="secondary-button">Cancel</button>
-					<button id="modal-confirm-button" class="primary-button">Reset</button>
-				</div>
-			</div>
-		</div>
+                <div class="form-group">
+                    <button id="settings-reset-button" class="secondary-button reset-button">Reset to Defaults</button>
+                </div>
 
-		<!-- Delete Tab Modal -->
-		<div id="delete-confirm-modal" class="modal">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h2>Remove Tab</h2>
-				</div>
-				<div class="modal-body">
-					<p>Are you sure you want to remove this tab?</p>
-				</div>
-				<div class="modal-footer">
-					<button id="delete-modal-cancel-button" class="secondary-button">Cancel</button>
-					<button id="delete-modal-confirm-button" class="primary-button">Remove</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div class="form-group">
+                    <p>v1.1.2</p>
+                </div>
 
-	<script src="popup.js"></script>
+            </div>
+        </div>
+
+        <footer>
+            <div class="status-message" id="status-message"></div>
+        </footer>
+
+        <!-- Confirm Reset Modal -->
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Reset to Default Tabs</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="modal-cancel-button" class="secondary-button">Cancel</button>
+                    <button id="modal-confirm-button" class="primary-button">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Tab Modal -->
+        <div id="delete-confirm-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Remove Tab</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to remove this tab?</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="delete-modal-cancel-button" class="secondary-button">Cancel</button>
+                    <button id="delete-modal-confirm-button" class="primary-button">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
 </body>
 
 </html>
