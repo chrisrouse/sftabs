@@ -711,30 +711,38 @@ function setupDragAndDrop() {
   }
 
 // Create tab list item element
+// Function to create a tab element with improved layout
 function createTabElement(tab) {
+	// Create the tab item container
 	const tabItem = document.createElement('div');
 	tabItem.className = 'tab-item';
 	tabItem.dataset.id = tab.id;
-  
+	
+	// Create the drag handle
 	const dragHandle = document.createElement('div');
 	dragHandle.className = 'drag-handle';
-	dragHandle.innerHTML = '⋮⋮'; // Simple drag handle
+	dragHandle.innerHTML = '⋮⋮';
 	dragHandle.setAttribute('title', 'Drag to reorder');
-  
-	const tabInfo = document.createElement('div');
-	tabInfo.className = 'tab-info';
-  
-	const tabName = document.createElement('div');
-	tabName.className = 'tab-name';
-	tabName.textContent = tab.label;
-  
+	
+	// Create content container for tab text content
+	const contentContainer = document.createElement('div');
+	contentContainer.className = 'tab-info'; // Use existing tab-info class for compatibility
+	contentContainer.style.display = 'flex';
+	contentContainer.style.flexDirection = 'column';
+	contentContainer.style.flex = '1';
+	contentContainer.style.minWidth = '0'; // Important for text overflow
+	
+	// Create tab title
+	const tabTitle = document.createElement('div');
+	tabTitle.className = 'tab-name';
+	tabTitle.textContent = tab.label;
+	
+	// Create tab path container
 	const tabPath = document.createElement('div');
 	tabPath.className = 'tab-path';
 	
-	// Create a badge to show the path type (setup, object, or custom)
+	// Create a badge for path type
 	const pathType = document.createElement('span');
-	
-	// Check tab type properties (with backward compatibility)
 	const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
 	const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
 	
@@ -749,24 +757,28 @@ function createTabElement(tab) {
 	  pathType.textContent = 'Setup';
 	}
 	
-	// Add the path text as a separate text node
-	const pathText = document.createTextNode(' ' + tab.path);
+	// Create path text element
+	const pathTextElement = document.createElement('span');
+	pathTextElement.className = 'path-text';
+	pathTextElement.textContent = tab.path;
 	
-	// Add both to the tab path div
+	// Add elements to tab path in correct order
 	tabPath.appendChild(pathType);
-	tabPath.appendChild(pathText);
-  
-	// Create a container for the toggle and delete button
-	const tabActions = document.createElement('div');
-	tabActions.className = 'tab-actions';
-	tabActions.style.display = 'flex';
-	tabActions.style.alignItems = 'center';
-  
-	// New tab toggle
+	tabPath.appendChild(pathTextElement);
+	
+	// Add title and path to content container
+	contentContainer.appendChild(tabTitle);
+	contentContainer.appendChild(tabPath);
+	
+	// Create container for the toggle and delete buttons
+	const actionsContainer = document.createElement('div');
+	actionsContainer.className = 'tab-actions';
+	
+	// Create toggle for "open in new tab"
 	const newTabToggle = document.createElement('label');
 	newTabToggle.className = 'new-tab-toggle';
 	newTabToggle.setAttribute('title', 'Open in new tab');
-  
+	
 	const toggleInput = document.createElement('input');
 	toggleInput.type = 'checkbox';
 	toggleInput.checked = tab.openInNewTab;
@@ -775,40 +787,37 @@ function createTabElement(tab) {
 	  tab.openInNewTab = toggleInput.checked;
 	  saveTabsToStorage();
 	});
-  
+	
 	const toggleSwitch = document.createElement('span');
 	toggleSwitch.className = 'toggle-switch';
-  
+	
 	newTabToggle.appendChild(toggleInput);
 	newTabToggle.appendChild(toggleSwitch);
-  
-	// Delete button with trash icon
+	
+	// Create delete button
 	const deleteButton = document.createElement('button');
 	deleteButton.className = 'delete-button';
 	deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"></path></svg>';
 	deleteButton.setAttribute('title', 'Remove tab');
 	deleteButton.addEventListener('click', (e) => {
-	  e.stopPropagation(); // Prevent event from bubbling up to tabInfo
+	  e.stopPropagation();
 	  deleteTab(tab.id);
 	});
-  
-	// Edit functionality
-	tabInfo.addEventListener('click', () => {
+	
+	// Add buttons to actions container
+	actionsContainer.appendChild(newTabToggle);
+	actionsContainer.appendChild(deleteButton);
+	
+	// Add click handler for editing
+	contentContainer.addEventListener('click', () => {
 	  editTab(tab.id);
 	});
-  
-	// Assemble the tab item
-	tabInfo.appendChild(tabName);
-	tabInfo.appendChild(tabPath);
-  
-	// Add toggle and delete button to the actions container
-	tabActions.appendChild(newTabToggle);
-	tabActions.appendChild(deleteButton);
-  
+	
+	// Add all elements to the tab item in the correct order
 	tabItem.appendChild(dragHandle);
-	tabItem.appendChild(tabInfo);
-	tabItem.appendChild(tabActions);
-  
+	tabItem.appendChild(contentContainer);
+	tabItem.appendChild(actionsContainer);
+	
 	return tabItem;
   }
 

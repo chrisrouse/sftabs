@@ -312,11 +312,13 @@ h2 {
   .tab-info {
 	flex-grow: 1;
 	flex-shrink: 1;
-	margin-right: 8px;
+	margin-right: 0; /* Remove right margin to allow text to extend further */
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 	word-break: break-word;
-	max-width: calc(100% - 120px); /* Increased from 100px to give more space for tabs */
+	max-width: calc(100% - 90px); /* Increase width to reach the delete button */
+	display: flex;
+	flex-direction: column;
   }
   
   .tab-name {
@@ -325,6 +327,7 @@ h2 {
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 	word-break: break-word;
+	margin-top: 3px;
   }
   
   .tab-path {
@@ -334,8 +337,11 @@ h2 {
 	word-wrap: break-word;
 	word-break: break-word;
 	line-height: 1.3;
-	max-width: 100%; /* Ensure the path doesn't exceed container width */
-	display: block; /* Make it a block element to prevent inline overflow */
+	max-width: 100%;
+	display: flex;
+	flex-direction: column; /* Stack the elements vertically */
+	width: 100%; /* Ensure it takes full width */
+	margin-top: 6px;
   }
 
 /* Tab Actions Styling */
@@ -682,10 +688,25 @@ input[type="text"]:focus {
 	border-radius: 4px;
 	font-size: 10px;
 	font-weight: 600;
-	margin-right: 8px;
+	margin-right: 0; /* Remove right margin */
+	margin-bottom: 4px; /* Add spacing below the badge */
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
+	align-self: flex-start; /* Align to the left */
+	width: fit-content; /* Only take as much width as needed */
   }
+
+  /* Path text styling */
+  .tab-path .path-text {
+	display: block; /* Make it a block to go on its own line */
+	width: 100%; /* Take full width */
+	overflow: hidden;
+	text-overflow: ellipsis;
+	margin-top: 2px;
+	padding-right: 0; /* Remove any right padding to use full width */
+  }
+
+
   
   .tab-path .path-type.setup {
 	background-color: var(--slds-color-info);
