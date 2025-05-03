@@ -230,6 +230,25 @@
 	align-items: flex-start;
   }
 
+  .tab-item.multi-line {
+	min-height: 48px;
+  }
+  
+  /* For very long paths - help with wrapping */
+  .tab-path.long-path {
+	flex-wrap: wrap;
+  }
+  
+  .tab-path.long-path .path-type {
+	margin-bottom: 2px;
+  }
+  
+  .tab-path.long-path .path-text {
+	width: 100%;
+	margin-top: 2px;
+	padding-left: 0;
+  }
+
   /* Top row container for compact mode - ensures badge aligns with first line of text */
 .top-row-container {
 	display: flex;
@@ -240,7 +259,7 @@
   /* Adjust drag handle in compact mode */
 .tab-item.compact-mode .drag-handle {
 	align-self: flex-start;
-	margin-top: 0; /* Match badge alignment */
+	margin-top: 3px; /* Match badge alignment */
   }
 
   /* Ensure tab actions align properly in compact mode */
@@ -301,13 +320,17 @@
 	word-break: break-word;
 	margin-bottom: auto;
   }
+
+  .tab-item.compact-mode .tab-info {
+	padding-top: 3px;
+  }
   
   .tab-name {
 	font-weight: 400;
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 	word-break: break-word;
-	margin: 3px;
+	margin: 3px 0;
 	line-height: 1.3;
   }
   
@@ -320,23 +343,28 @@
 	line-height: 1.3;
 	max-width: 100%;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
+	align-items: center;
 	width: 100%;
-	margin-top: 6px;
+	margin-top: 4px;
   }
+  
   
   /* Regular mode badge */
   .tab-path .path-type {
-	display: inline-block;
-	padding: 3px 6px;
+	display: inline-flex;
+	padding: 2px 8px;
 	border-radius: 4px;
 	font-size: 10px;
 	font-weight: 600;
-	margin-bottom: 4px;
+	margin-right: 8px;
+	margin-bottom: 0;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 	align-self: flex-start;
-	width: fit-content;
+	min-width: 52px;
+	text-align: center;
+	justify-content: center;
 	color: white;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
@@ -383,10 +411,12 @@
   /* Path text styling */
   .tab-path .path-text {
 	display: block;
-	width: 100%;
+	flex: 1;
+	width: calc(100% - 60px);
+	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	margin-top: 2px;
+	margin-top: 0;
 	padding-right: 0;
   }
   
