@@ -1,3 +1,37 @@
+// Reference to utils
+let SFTabsUtils;
+
+// Initialize utils with better error handling and logging
+function initUtils() {
+  console.log("Initializing SF Tabs utils...");
+  
+  // Ensure the global object exists
+  if (!window.SFTabsUtils) {
+    console.warn("SFTabsUtils not found in window object, will retry soon");
+    setTimeout(initUtils, 500);
+    return;
+  }
+  
+  // Verify essential properties exist
+  if (!window.SFTabsUtils.urlHelpers || !window.SFTabsUtils.domHelpers) {
+    console.warn("SFTabsUtils partially loaded, waiting for full initialization");
+    setTimeout(initUtils, 500);
+    return;
+  }
+  
+  // Set local reference
+  SFTabsUtils = window.SFTabsUtils;
+  console.log("Utils initialized successfully");
+  
+  // Start loading tabs after utils are available
+  setTimeout(() => {
+    delayLoadTabs(0);
+  }, 2000);
+}
+
+// Initialize utils after a short delay to ensure DOM is ready
+setTimeout(initUtils, 500);
+
 // Default tabs configuration
 const defaultTabs = [
   {
@@ -5,6 +39,7 @@ const defaultTabs = [
     label: 'Flows',
     path: 'Flows',
     openInNewTab: false,
+    isObject: false,
     position: 0
   },
   {
@@ -12,6 +47,7 @@ const defaultTabs = [
     label: 'Installed Packages',
     path: 'ImportedPackage',
     openInNewTab: false,
+    isObject: false,
     position: 1
   },
   {
@@ -19,6 +55,7 @@ const defaultTabs = [
     label: 'Users',
     path: 'ManageUsers',
     openInNewTab: false,
+    isObject: false,
     position: 2
   },
   {
@@ -26,6 +63,7 @@ const defaultTabs = [
     label: 'Profiles',
     path: 'EnhancedProfiles',
     openInNewTab: false,
+    isObject: false,
     position: 3
   },
   {
@@ -33,91 +71,94 @@ const defaultTabs = [
     label: 'Permission Sets',
     path: 'PermSets',
     openInNewTab: false,
+    isObject: false,
     position: 4
   }
 ];
 
 // Initial attempt counter
 let loadAttempts = 0;
-const maxLoadAttempts = 5;
+const maxLoadAttempts = 8; // Increased max attempts
 
-// Initialize tabs - similar approach to the reference plugin
+// Initialize tabs with improved error handling
 function initTabs(tabContainer) {
   if (!tabContainer) {
-    console.log("No tab container found");
+    console.error("SF Tabs: No tab container found");
     return;
   }
 
-  // Load tabs from storage
-  browser.storage.sync.get('customTabs').then(result => {
-    let tabsToUse = [];
-    
-    if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
-      tabsToUse = result.customTabs;
-    } else {
-      // Use default tabs if none found in storage
-      tabsToUse = defaultTabs;
-      // Save defaults to storage for future use
-      browser.storage.sync.set({ customTabs: defaultTabs });
-    }
-    
-    // Sort tabs by position
-    tabsToUse.sort((a, b) => a.position - b.position);
-    
-    // Remove any existing custom tabs
-    const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
-    existingTabs.forEach(tab => tab.remove());
-    
-    // Add tabs to the container
-    for (const tab of tabsToUse) {
-      const tabElement = createTabElement(tab);
-      tabContainer.appendChild(tabElement);
-    }
-    
-    // Add click event listeners after all tabs are inserted
-    addTabClickListeners(tabsToUse);
-    highlightActiveCustomTab(tabsToUse);
-    
-    console.log("Tabs successfully added to container");
-  }).catch(error => {
-    console.error("Error loading tabs:", error);
-  });
+  console.log("SF Tabs: Found tab container, loading tabs from storage");
+
+  // Direct access to storage for more reliability
+  browser.storage.sync.get('customTabs')
+    .then(result => {
+      let tabsToUse = [];
+      
+      // Log the raw result for debugging
+      console.log("SF Tabs: Raw storage data:", JSON.stringify(result).substring(0, 200) + "...");
+      
+      if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
+        console.log("SF Tabs: Found", result.customTabs.length, "custom tabs in storage");
+        tabsToUse = result.customTabs;
+      } else {
+        console.log("SF Tabs: No custom tabs found in storage, using defaults");
+        // Use default tabs if none found in storage
+        tabsToUse = JSON.parse(JSON.stringify(defaultTabs)); // Deep clone
+        
+        // Save defaults to storage for future use
+        browser.storage.sync.set({ customTabs: tabsToUse })
+          .then(() => console.log("Default tabs saved to storage"))
+          .catch(err => console.error("Error saving default tabs:", err));
+      }
+      
+      // Sort tabs by position
+      tabsToUse.sort((a, b) => a.position - b.position);
+      
+      // Remove any existing custom tabs
+      const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
+      existingTabs.forEach(tab => tab.remove());
+      
+      // Add tabs to the container
+      for (const tab of tabsToUse) {
+        try {
+          // Log each tab for debugging
+          console.log("SF Tabs: Creating tab element for:", tab.label);
+          
+          const tabElement = createTabElement(tab);
+          tabContainer.appendChild(tabElement);
+        } catch (err) {
+          console.error("SF Tabs: Error creating tab element:", err, tab);
+        }
+      }
+      
+      // Add click event listeners after all tabs are inserted
+      addTabClickListeners(tabsToUse);
+      highlightActiveCustomTab(tabsToUse);
+      
+      console.log("SF Tabs: Tabs successfully added to container");
+    })
+    .catch(error => {
+      console.error("SF Tabs: Error loading tabs from storage:", error);
+    });
 }
 
 // Create tab element with appropriate structure and classes
-// Update the createTabElement function to handle custom URLs
-
 function createTabElement(tab) {
+  // Fail fast if SFTabsUtils is not available
+  if (!SFTabsUtils || !SFTabsUtils.urlHelpers) {
+    console.error("SFTabsUtils not available for createTabElement");
+    throw new Error("SFTabsUtils not initialized");
+  }
+
   // Get the base URL for the current org
   const currentUrl = window.location.href;
-  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
-  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
-  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
   
   // Determine the full URL based on tab type
-  let fullUrl = '';
-  const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
-  const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
-  
-  if (isCustomUrl) {
-    // For custom URLs, ensure there's a leading slash
-    let formattedPath = tab.path;
-    
-    if (!formattedPath.startsWith('/')) {
-      formattedPath = '/' + formattedPath;
-    }
-    
-    fullUrl = `${baseUrlRoot}${formattedPath}`;
-  } else if (isObject) {
-    // Object URLs need /home at the end
-    fullUrl = `${baseUrlObject}${tab.path}/home`;
-  } else if (tab.path.includes('ObjectManager/')) {
-    // ObjectManager URLs don't need /home
-    fullUrl = `${baseUrlSetup}${tab.path}`;
-  } else {
-    // Setup URLs need /home at the end
-    fullUrl = `${baseUrlSetup}${tab.path}/home`;
-  }
+  let fullUrl = SFTabsUtils.urlHelpers.buildCompleteURL(
+    tab.path, 
+    tab.hasOwnProperty('isObject') ? tab.isObject : false,
+    tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false
+  );
   
   // Create the tab element
   const li = document.createElement('li');
@@ -162,8 +203,10 @@ function highlightActiveCustomTab(tabs) {
   let matchedTab = null;
 
   for (const tab of tabs) {
-    const baseUrl = window.location.origin;
-    const tabUrl = document.querySelector(`li[data-tab-id="${tab.id}"]`)?.getAttribute('data-url');
+    const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+    if (!tabElement) continue;
+    
+    const tabUrl = tabElement.getAttribute('data-url');
     if (tabUrl && currentUrl.startsWith(tabUrl)) {
       matchedTab = tab;
       break;
@@ -172,7 +215,7 @@ function highlightActiveCustomTab(tabs) {
 
   if (matchedTab) {
     // Only if a custom tab matches the current page
-    console.log(`Highlighting active custom tab: ${matchedTab.label}`);
+    console.log(`SF Tabs: Highlighting active custom tab: ${matchedTab.label}`);
 
     const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
     allTabs.forEach(tabEl => {
@@ -188,14 +231,12 @@ function highlightActiveCustomTab(tabs) {
       if (anchor) anchor.setAttribute('aria-selected', 'true');
     }
   } else {
-    console.log("No custom tab matched. Leaving default active tab styling.");
+    console.log("SF Tabs: No custom tab matched. Leaving default active tab styling.");
   }
 }
 
 // Add click event listeners for tabs
 function addTabClickListeners(tabs) {
-  // We only need to add listeners for tabs that open in new tabs
-  // For other tabs, let the browser handle navigation normally
   tabs.forEach(tab => {
     if (!tab.openInNewTab) return;
     
@@ -209,27 +250,86 @@ function addTabClickListeners(tabs) {
   });
 }
 
+// Improved function to find tab container with multiple selectors
+function findTabContainer() {
+  // Try multiple selectors to find the tab container
+  const selectors = [
+    '.tabBarItems.slds-grid',
+    '.slds-context-bar__secondary .slds-grid',
+    '.oneConsoleTabContainer',
+    '.slds-context-bar__primary',
+    '.navexWorkspaceManager',
+    '.slds-tabs_default ul',
+    'ul.tabBarItems'
+  ];
+  
+  // Try each selector
+  for (const selector of selectors) {
+    const container = document.querySelector(selector);
+    if (container) {
+      console.log("SF Tabs: Found tab container with selector:", selector);
+      return container;
+    }
+  }
+  
+  console.log("SF Tabs: No tab container found with any selector");
+  return null;
+}
+
 // Function to try loading tabs with delay and retries
 function delayLoadTabs(attemptCount) {
-  const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+  // Find the tab container using our improved function
+  const tabContainer = findTabContainer();
   attemptCount++;
   
-  console.log(`Tab loading attempt ${attemptCount}/${maxLoadAttempts}`);
+  console.log(`SF Tabs: Tab loading attempt ${attemptCount}/${maxLoadAttempts}`);
   
   if (attemptCount > maxLoadAttempts) {
-    console.error("SF Tabs - failed to find tab container after max attempts");
+    console.error("SF Tabs: Failed to find tab container after max attempts");
     return;
   }
   
   if (!tabContainer) {
-    // Schedule next attempt
+    // Schedule next attempt with progressive delay
+    const delay = Math.min(2000 + (attemptCount * 500), 5000);
+    console.log(`SF Tabs: No tab container found, retrying in ${delay}ms`);
     setTimeout(() => {
       delayLoadTabs(attemptCount);
-    }, 2000);
+    }, delay);
+  } else {
+    // Found container, initialize tabs with our improved function
+    console.log("SF Tabs: Tab container found - initializing tabs");
+    initTabs(tabContainer);
+    
+    // Add a class to the body to indicate that SF Tabs is loaded
+    document.body.classList.add('sf-tabs-loaded');
+  }
+}
+  
+  // Increment attempt counter
+  attemptCount++;
+  
+  console.log(`SF Tabs: Tab loading attempt ${attemptCount}/${maxLoadAttempts}`);
+  
+  if (attemptCount > maxLoadAttempts) {
+    console.error("SF Tabs: Failed to find tab container after max attempts");
+    return;
+  }
+  
+  if (!tabContainer) {
+    // Schedule next attempt with increasing delay
+    const delay = Math.min(2000 + (attemptCount * 500), 5000);
+    console.log(`SF Tabs: No tab container found, retrying in ${delay}ms`);
+    setTimeout(() => {
+      delayLoadTabs(attemptCount);
+    }, delay);
   } else {
     // Found container, initialize tabs
-    console.log("Tab container found - initializing tabs");
+    console.log("SF Tabs: Tab container found - initializing tabs");
     initTabs(tabContainer);
+    
+    // Add a class to the body to indicate that SF Tabs is loaded
+    document.body.classList.add('sf-tabs-loaded');
   }
 }
 
@@ -239,18 +339,78 @@ setTimeout(() => {
 }, 2000);
 
 // Observe DOM mutations to apply active styling sooner
-const observer = new MutationObserver(() => {
+const observer = new MutationObserver(mutations => {
+  // Check if we find tabs container in these mutations
   const tabContainer = document.querySelector('.tabBarItems.slds-grid');
   if (tabContainer && tabContainer.querySelectorAll('.sf-tabs-custom-tab').length > 0) {
-    // Stop observing once tabs are loaded
-    observer.disconnect();
-
-    // Re-highlight the active tab now that DOM is ready
+    // Refresh tab highlighting
     browser.storage.sync.get('customTabs').then(result => {
       const tabsToUse = result.customTabs || defaultTabs;
       highlightActiveCustomTab(tabsToUse);
+    }).catch(err => {
+      console.error("Error fetching tabs for highlighting:", err);
     });
   }
+  
+  // Check each mutation for newly added tab container
+  for (const mutation of mutations) {
+    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+      // Check if any added node is our target or contains our target
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          // If the node itself is a tab container
+          if (node.classList && 
+             (node.classList.contains('tabBarItems') || 
+              node.classList.contains('oneConsoleTabContainer'))) {
+            delayLoadTabs(0);
+            return;
+          }
+          
+          // If the node contains a tab container
+          const container = node.querySelector('.tabBarItems.slds-grid, .oneConsoleTabContainer');
+          if (container) {
+            delayLoadTabs(0);
+            return;
+          }
+        }
+      }
+    }
+  }
+});
+
+// Special debugging function to test storage access
+function debugStorage() {
+  console.log("SF Tabs: Testing storage access...");
+  browser.storage.sync.get(null)
+    .then(result => {
+      console.log("SF Tabs: All storage data:", result);
+      if (result.customTabs) {
+        console.log("SF Tabs: Found customTabs with", result.customTabs.length, "items");
+      } else {
+        console.log("SF Tabs: No customTabs found in storage");
+      }
+      
+      // Try setting a test value
+      return browser.storage.sync.set({ 'sfTabsTest': Date.now() });
+    })
+    .then(() => {
+      console.log("SF Tabs: Test value successfully saved to storage");
+    })
+    .catch(error => {
+      console.error("SF Tabs: Storage access error:", error);
+    });
+}
+
+// Call our debug function early
+setTimeout(debugStorage, 1000);
+
+// Add a message listener for debugging from popup
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'debug_storage') {
+    debugStorage();
+    sendResponse({ success: true });
+  }
+  return true;
 });
 
 // Start observing early DOM changes
@@ -259,10 +419,20 @@ observer.observe(document.body, { childList: true, subtree: true });
 // Listen for storage changes to refresh tabs
 browser.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.customTabs) {
-    console.log("Tabs changed in storage - refreshing");
-    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    console.log("SF Tabs: Tabs changed in storage - refreshing");
+    console.log("SF Tabs: New value has", 
+      changes.customTabs.newValue ? changes.customTabs.newValue.length : 0, 
+      "tabs");
+    
+    // Find the tab container using our improved function
+    const tabContainer = findTabContainer();
+    
     if (tabContainer) {
       initTabs(tabContainer);
+    } else {
+      console.warn("SF Tabs: Could not find tab container for refresh");
+      // If no container found, initiate a new load attempt
+      delayLoadTabs(0);
     }
   }
 });
@@ -270,33 +440,72 @@ browser.storage.onChanged.addListener((changes, area) => {
 // Handle tab refresh requests from the popup
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'refresh_tabs') {
-    console.log("Received request to refresh tabs");
-    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    console.log("SF Tabs: Received request to refresh tabs");
+    
+    // Try multiple selectors to find the tab container
+    const selectors = [
+      '.tabBarItems.slds-grid',
+      '.slds-context-bar__secondary .slds-grid',
+      '.oneConsoleTabContainer'
+    ];
+    
+    let tabContainer = null;
+    
+    // Try each selector
+    for (const selector of selectors) {
+      const container = document.querySelector(selector);
+      if (container) {
+        tabContainer = container;
+        break;
+      }
+    }
+    
     if (tabContainer) {
       initTabs(tabContainer);
       sendResponse({ success: true });
     } else {
-      console.warn("Could not find tab container for refresh");
+      console.warn("SF Tabs: Could not find tab container for refresh");
       sendResponse({ success: false, error: "Tab container not found" });
+      // If no container found, initiate a new load attempt
+      delayLoadTabs(0);
     }
   }
   return true;
 });
 
-// Also check for URL changes and refresh tabs if needed
+// Check for URL changes and refresh tabs if needed
 let lastUrl = location.href;
 setInterval(() => {
   if (location.href !== lastUrl) {
-    console.log("URL changed - checking for tab container");
+    console.log("SF Tabs: URL changed - checking for tab container");
     lastUrl = location.href;
     
     // Slight delay to let the page structure load
     setTimeout(() => {
-      const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+      // Try multiple selectors to find the tab container
+      const selectors = [
+        '.tabBarItems.slds-grid',
+        '.slds-context-bar__secondary .slds-grid',
+        '.oneConsoleTabContainer'
+      ];
+      
+      let tabContainer = null;
+      
+      // Try each selector
+      for (const selector of selectors) {
+        const container = document.querySelector(selector);
+        if (container) {
+          tabContainer = container;
+          break;
+        }
+      }
+      
       if (tabContainer) {
         initTabs(tabContainer);
+      } else {
+        // If no container found, try again with delayLoadTabs
+        delayLoadTabs(0);
       }
     }, 1000);
   }
 }, 1000);
-

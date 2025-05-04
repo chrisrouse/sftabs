@@ -33,14 +33,15 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "*://*.lightning.force.com/lightning/setup/*",
-        "*://*.salesforce-setup.com/lightning/setup/*",
-        "*://*.my.salesforce-setup.com/lightning/setup/*",
-        "*://*.salesforce.com/lightning/setup/*",
-        "*://*.my.salesforce.com/lightning/setup/*"
-      ],
-      "js": ["content.js"]
+      "matches": ["*://*.force.com/*", "*://*.salesforce.com/*"],
+      "js": ["utils.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["utils.js"],
+      "matches": ["*://*.force.com/*", "*://*.salesforce.com/*"]
     }
   ],
   "icons": {

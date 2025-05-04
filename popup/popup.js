@@ -1,3 +1,6 @@
+// Reference to utils
+let SFTabsUtils; // Will be initialized when available
+
 // DOM Elements - declare variables but don't initialize yet
 let tabList;
 let emptyState;
@@ -29,10 +32,10 @@ let settingsResetButton;
 // State
 let customTabs = [];
 let editingTabId = null;
-userSettings = {
+let userSettings = {  // Changed from const to let to avoid redeclaration
 	themeMode: 'light',
 	compactMode: false
-  };
+};
 let quickAddButton;
 
 
@@ -85,35 +88,22 @@ const defaultTabs = [{
  * @return {string} The formatted, human-readable object name
  */
 function formatObjectNameFromURL(objectNameFromURL) {
-	if (!objectNameFromURL) {
-	  return 'Object';
-	}
-	
-	// First, remove any __c or similar custom object suffix
-	let cleanName = objectNameFromURL.replace(/__c$/g, '');
-	
-	// Replace underscores with spaces
-	cleanName = cleanName.replace(/_/g, ' ');
-	
-	// Insert spaces between camelCase words (ProductTransfer -> Product Transfer)
-	cleanName = cleanName.replace(/([a-z])([A-Z])/g, '$1 $2');
-	
-	// Ensure proper capitalization
-	cleanName = cleanName.replace(/\b\w/g, letter => letter.toUpperCase());
-	
-	return cleanName;
-  }
+	return SFTabsUtils.urlHelpers.formatObjectNameFromURL(objectNameFromURL);
+}
 
 // Default user settings
 const defaultSettings = {
 	themeMode: 'light',
 	compactMode: false
-  };
+};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
 	console.log('DOMContentLoaded event fired');
-
+	
+	// Ensure utils are available
+	SFTabsUtils = window.SFTabsUtils || {};
+  
 	// Initialize all DOM elements after the DOM is fully loaded
 	tabList = document.getElementById('tab-list');
 	emptyState = document.getElementById('empty-state');
@@ -134,36 +124,73 @@ document.addEventListener('DOMContentLoaded', () => {
 	deleteModalConfirmButton = document.getElementById('delete-modal-confirm-button');
 	isObjectCheckbox = document.getElementById('is-object');
 	isCustomUrlCheckbox = document.getElementById('is-custom-url');
-
+  
 	// Settings elements
 	settingsButton = document.getElementById('settings-button');
 	settingsPanel = document.getElementById('settings-panel');
 	mainContent = document.getElementById('main-content');
 	themeMode = document.getElementById('theme-mode');
 	settingsResetButton = document.getElementById('settings-reset-button');
-
+	
+	// Quick add button
+	quickAddButton = document.getElementById('quick-add-button');
+  
 	// Debug: Log all DOM elements
 	console.log('DOM Elements initialized');
-
-	// Apply initial visibility to ensure content shows up
+  
+	// CRITICAL FIX: Always start with main content panel visible, settings panel hidden
 	mainContent.style.display = 'block';
 	mainContent.classList.add('active');
 	settingsPanel.style.display = 'none';
-
-	// Load settings first
-	loadUserSettings().then(() => {
-		// Then load tabs
-		loadTabsFromStorage();
-		setupEventListeners();
-
-		// Show main content by default
-		showMainContent();
-
-		// Apply theme based on settings
+	settingsPanel.classList.remove('active');
+  
+	// Load settings first with direct storage access
+	browser.storage.sync.get('userSettings')
+	  .then(result => {
+		console.log('User settings loaded directly from storage:', result);
+		if (result.userSettings) {
+		  userSettings = result.userSettings;
+		} else {
+		  console.log('No user settings found, using defaults');
+		  userSettings = defaultSettings;
+		}
+		
+		// Update UI elements with loaded settings
+		updateSettingsUI();
+		
+		// Apply theme immediately
 		applyTheme();
-
-	});
-});
+		
+		// Now load tabs with direct storage access
+		return browser.storage.sync.get('customTabs');
+	  })
+	  .then(result => {
+		console.log('Custom tabs loaded directly from storage:', result);
+		if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
+		  customTabs = result.customTabs;
+		  console.log('Found', customTabs.length, 'tabs in storage');
+		} else {
+		  console.log('No custom tabs found, using defaults');
+		  customTabs = JSON.parse(JSON.stringify(defaultTabs));
+		}
+		
+		// Render tabs immediately
+		renderTabList();
+		
+		// Set up event listeners
+		setupEventListeners();
+	  })
+	  .catch(error => {
+		console.error('Error during popup initialization:', error);
+		// Fallback to defaults if storage fails
+		userSettings = defaultSettings;
+		customTabs = JSON.parse(JSON.stringify(defaultTabs));
+		updateSettingsUI();
+		applyTheme();
+		renderTabList();
+		setupEventListeners();
+	  });
+  });
 
 // Initialize the theme selector
 function initThemeSelector() {
@@ -194,10 +221,10 @@ function initThemeSelector() {
 	
 	// Set initial selection based on current theme
 	setSelectedTheme(currentTheme);
-  }
+}
   
-  // Set the selected theme in the UI
-  function setSelectedTheme(theme) {
+// Set the selected theme in the UI
+function setSelectedTheme(theme) {
 	console.log('Setting selected theme in UI:', theme);
 	const themeOptions = document.querySelectorAll('.theme-option');
 	
@@ -214,45 +241,39 @@ function initThemeSelector() {
 	} else {
 	  console.warn('Could not find option for theme:', theme);
 	}
-  }
+}
 
 // Load user settings from storage
 function loadUserSettings() {
 	console.log('Loading user settings from storage');
-	return browser.storage.sync.get('userSettings')
-		.then((result) => {
-			console.log('Settings result:', result);
-			if (result.userSettings) {
-				userSettings = { ...defaultSettings, ...result.userSettings };
-			} else {
-				userSettings = { ...defaultSettings };
-				saveUserSettings();
-			}
-
-			// Update UI to reflect loaded settings
-			updateSettingsUI();
-
-			return userSettings;
-		})
-		.catch((error) => {
-			console.error('Error loading settings from storage:', error);
-			showStatus('Error loading settings: ' + error.message, true);
-			return defaultSettings;
-		});
+	return SFTabsUtils.storageHelpers.loadSettings()
+	  .then((settings) => {
+		userSettings = settings;
+		updateSettingsUI();
+		return userSettings;
+	  })
+	  .catch((error) => {
+		console.error('Error in loadUserSettings:', error);
+		showStatus('Error loading settings', true);
+		return SFTabsUtils.storageHelpers.getDefaultSettings();
+	  });
 }
 
 // Save user settings to storage
 function saveUserSettings() {
-	console.log('Saving user settings to storage:', userSettings);
-	return browser.storage.sync.set({ userSettings })
-		.then(() => {
-			console.log('Settings saved successfully');
-			showStatus('Settings saved', false);
-		})
-		.catch((error) => {
-			console.error('Error saving settings to storage:', error);
-			showStatus('Error saving settings: ' + error.message, true);
-		});
+	console.log('Saving user settings to storage');
+	return SFTabsUtils.storageHelpers.saveSettings(userSettings)
+	  .then((success) => {
+		if (success) {
+		  showStatus('Settings saved', false);
+		} else {
+		  showStatus('Failed to save settings', true);
+		}
+	  })
+	  .catch((error) => {
+		console.error('Error in saveUserSettings:', error);
+		showStatus('Error saving settings', true);
+	  });
 }
 
 // Update settings UI to reflect current settings
@@ -271,7 +292,7 @@ function updateSettingsUI() {
 	if (compactModeCheckbox) {
 	  compactModeCheckbox.checked = userSettings.compactMode;
 	}
-  }
+}
 
 // Reset settings to defaults
 function resetSettings() {
@@ -280,89 +301,67 @@ function resetSettings() {
 	updateSettingsUI();
 	applyTheme();
 	showStatus('Settings reset to defaults', false);
-  }
+}
 
 // Add an event listener for the manage-config button
-const manageConfigButton = document.getElementById('manage-config-button');
-if (manageConfigButton) {
-	manageConfigButton.addEventListener('click', () => {
-		console.log('Opening import/export page');
-		browser.tabs.create({ url: "/popup/import_export.html" }).then(() => {
-			// Close the popup after opening the new tab
-			window.close();
+document.addEventListener('DOMContentLoaded', () => {
+	const manageConfigButton = document.getElementById('manage-config-button');
+	if (manageConfigButton) {
+		manageConfigButton.addEventListener('click', () => {
+			console.log('Opening import/export page');
+			browser.tabs.create({ url: "/popup/import_export.html" }).then(() => {
+				// Close the popup after opening the new tab
+				window.close();
+			});
 		});
-	});
-} else {
-	console.error('Manage config button not found!');
-}
+	} else {
+		console.error('Manage config button not found!');
+	}
+});
 
 // Apply theme based on settings
 function applyTheme() {
-	if (userSettings.themeMode === 'system') {
-		// Check system preference
-		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-			document.documentElement.setAttribute('data-theme', 'dark');
-		} else {
-			document.documentElement.setAttribute('data-theme', 'light');
-		}
-
-		// Listen for changes in system theme
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-			const newTheme = e.matches ? 'dark' : 'light';
-			document.documentElement.setAttribute('data-theme', newTheme);
-		});
-	} else {
-		// Apply user selected theme
-		document.documentElement.setAttribute('data-theme', userSettings.themeMode);
-	}
+	SFTabsUtils.uiHelpers.applyTheme(userSettings.themeMode);
 }
 
 // Load tabs from storage
 function loadTabsFromStorage() {
 	console.log('Loading tabs from storage');
-	browser.storage.sync.get('customTabs')
-		.then((result) => {
-			console.log('Storage result:', result);
-			if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
-				customTabs = result.customTabs;
-				renderTabList();
-			} else {
-				console.log('No tabs found in storage, using defaults');
-				// Initialize with default tabs if no saved tabs
-				resetToDefaults();
-			}
-		})
-		.catch((error) => {
-			console.error('Error loading tabs from storage:', error);
-			showStatus('Error loading tabs: ' + error.message, true);
-		});
+	SFTabsUtils.storageHelpers.loadTabs()
+	  .then((tabs) => {
+		customTabs = tabs;
+		renderTabList();
+	  })
+	  .catch((error) => {
+		console.error('Error in loadTabsFromStorage:', error);
+		showStatus('Error loading tabs', true);
+	  });
 }
 
 // Reset to default tabs
 function resetToDefaults() {
 	console.log('Resetting to default tabs');
-	// Create deep copy of default tabs to avoid reference issues
-	customTabs = JSON.parse(JSON.stringify(defaultTabs));
+	customTabs = JSON.parse(JSON.stringify(SFTabsUtils.storageHelpers.getDefaultTabs()));
 	saveTabsToStorage();
 	showStatus('Reset to default tabs', false);
 }
 
 // Save tabs to storage
 function saveTabsToStorage() {
-	console.log('Saving tabs to storage:', customTabs);
-	// Sort tabs by position before saving
-	customTabs.sort((a, b) => a.position - b.position);
-
-	browser.storage.sync.set({ customTabs })
-		.then(() => {
-			console.log('Tabs saved successfully');
-			renderTabList();
-			showStatus('Settings saved', false);
-		})
-		.catch((error) => {
-			console.error('Error saving tabs to storage:', error);
-			showStatus('Error saving tabs: ' + error.message, true);
-		});
+	console.log('Saving tabs to storage');
+	SFTabsUtils.storageHelpers.saveTabs(customTabs)
+	  .then((success) => {
+		if (success) {
+		  renderTabList();
+		  showStatus('Settings saved', false);
+		} else {
+		  showStatus('Failed to save settings', true);
+		}
+	  })
+	  .catch((error) => {
+		console.error('Error in saveTabsToStorage:', error);
+		showStatus('Error saving tabs', true);
+	  });
 }
 
 /**
@@ -409,102 +408,140 @@ function showModal(modalElement, cancelButton, confirmButton, onConfirm) {
 
 // Show the confirmation modal
 function showConfirmModal(onConfirm) {
-	showModal(
-		confirmModal,
-		modalCancelButton,
-		modalConfirmButton,
-		onConfirm
-	);
+	SFTabsUtils.uiHelpers.showModal(confirmModal, modalCancelButton, modalConfirmButton, onConfirm);
 }
 
 // Show main content panel
 function showMainContent() {
 	console.log('Showing main content');
+	mainContent.style.display = 'block';
 	mainContent.classList.add('active');
-	mainContent.style.display = 'block'; // Add this line
+	settingsPanel.style.display = 'none';
 	settingsPanel.classList.remove('active');
-	settingsPanel.style.display = 'none'; // Add this line
-}
+  }
 
 // Show settings panel
 function showSettingsPanel() {
 	console.log('Showing settings panel');
-	mainContent.classList.remove('active');
-	mainContent.style.display = 'none'; // Add this line
+	settingsPanel.style.display = 'block';
 	settingsPanel.classList.add('active');
-	settingsPanel.style.display = 'block'; // Add this line
-}
-
+	mainContent.style.display = 'none';
+	mainContent.classList.remove('active');
+  }
+  
 // Setup event listeners
 function setupEventListeners() {
 	console.log('Setting up event listeners');
-
+  
 	// Add quick add button
 	quickAddButton = document.getElementById('quick-add-button');
 	quickAddButton.addEventListener('click', () => {
-		console.log('Quick add button clicked');
-		addTabForCurrentPage();
+	  console.log('Quick add button clicked');
+	  addTabForCurrentPage();
 	});
-
+  
 	// Add tab button
 	addTabButton.addEventListener('click', () => {
-		console.log('Add tab button clicked');
-		showTabForm();
+	  console.log('Add tab button clicked');
+	  showTabForm();
 	});
-
+  
 	// Save button
 	saveButton.addEventListener('click', () => {
-		console.log('Save button clicked');
-		saveTabForm();
+	  console.log('Save button clicked');
+	  saveTabForm();
 	});
-
+  
 	// Cancel button
 	cancelButton.addEventListener('click', () => {
-		console.log('Cancel button clicked');
-		hideTabForm();
+	  console.log('Cancel button clicked');
+	  hideTabForm();
 	});
-
-	// Settings button - toggle between panels
+  
+	// FIXED: Settings button - toggle between panels
 	settingsButton.addEventListener('click', () => {
-		console.log('Settings button clicked');
-		if (mainContent.classList.contains('active')) {
-			showSettingsPanel();
-		} else {
-			showMainContent();
-		}
+	  console.log('Settings button clicked');
+	  if (mainContent.classList.contains('active')) {
+		showSettingsPanel();
+	  } else {
+		showMainContent();
+	  }
 	});
-
+  
 	// Settings reset button
 	settingsResetButton.addEventListener('click', () => {
-		console.log('Settings reset button clicked');
-		showConfirmModal(() => {
-			resetToDefaults();
-			resetSettings();
-		});
+	  console.log('Settings reset button clicked');
+	  showConfirmModal(() => {
+		resetToDefaults();
+		resetSettings();
+	  });
 	});
-
+  
 	// Compact mode change
 	const compactModeCheckbox = document.getElementById('compact-mode');
-		compactModeCheckbox.addEventListener('change', () => {
+	if (compactModeCheckbox) {
+	  compactModeCheckbox.addEventListener('change', () => {
 		console.log('Compact mode changed to:', compactModeCheckbox.checked);
 		userSettings.compactMode = compactModeCheckbox.checked;
 		saveUserSettings();
 		renderTabList(); // Re-render tabs with new display mode
-	});
-
+	  });c
+	}
+  
 	// Enter key in form fields
 	tabNameInput.addEventListener('keypress', (e) => {
-		if (e.key === 'Enter') saveTabForm();
+	  if (e.key === 'Enter') saveTabForm();
 	});
-
+  
 	tabPathInput.addEventListener('keypress', (e) => {
-		if (e.key === 'Enter') saveTabForm();
+	  if (e.key === 'Enter') saveTabForm();
 	});
-
+  
+	// Initialize theme selector
 	initThemeSelector();
-
+  
+	// Add click handlers to tab items after rendering
+	addTabItemEventListeners();
+  
 	console.log('Event listeners setup complete');
-}
+  }
+
+  // New function to add event listeners to tab items
+function addTabItemEventListeners() {
+	// Add event listeners for edit actions
+	document.querySelectorAll('[data-action="edit"]').forEach(el => {
+	  el.addEventListener('click', () => {
+		const tabId = el.getAttribute('data-tab-id');
+		if (tabId) {
+		  editTab(tabId);
+		}
+	  });
+	});
+  
+	// Add event listeners for delete actions
+	document.querySelectorAll('[data-action="delete"]').forEach(el => {
+	  el.addEventListener('click', () => {
+		const tabId = el.getAttribute('data-tab-id');
+		if (tabId) {
+		  deleteTab(tabId);
+		}
+	  });
+	});
+  
+	// Add event listeners for toggle inputs
+	document.querySelectorAll('input[data-input-type="openInNewTab"]').forEach(input => {
+	  input.addEventListener('change', () => {
+		const tabId = input.getAttribute('data-tab-id');
+		if (tabId) {
+		  const tab = customTabs.find(t => t.id === tabId);
+		  if (tab) {
+			tab.openInNewTab = input.checked;
+			saveTabsToStorage();
+		  }
+		}
+	  });
+	});
+  }
 
 // Handle Quick Add
 function addTabForCurrentPage() {
@@ -747,32 +784,42 @@ function addTabForCurrentPage() {
 		console.error('Error accessing current tab:', error);
 		showStatus('Error accessing current tab', true);
 	  });
-  }
+}
 
 // Render the tab list
 function renderTabList() {
-	console.log('Rendering tab list');
+	console.log('Rendering tab list with', customTabs.length, 'tabs');
+	
 	// Clear existing list
 	while (tabList.firstChild) {
-		tabList.removeChild(tabList.firstChild);
+	  tabList.removeChild(tabList.firstChild);
 	}
-
+  
 	// Show empty state if no tabs
 	if (customTabs.length === 0) {
-		emptyState.style.display = 'block';
+	  emptyState.style.display = 'block';
 	} else {
-		emptyState.style.display = 'none';
-
-		// Create tab items
-		customTabs.forEach((tab) => {
-			const tabItem = createTabElement(tab);
-			tabList.appendChild(tabItem);
-		});
-
-		// Setup drag and drop
-		setupDragAndDrop();
+	  emptyState.style.display = 'none';
+  
+	  // Create tab items
+	  customTabs.forEach((tab) => {
+		try {
+		  const tabItem = createTabElement(tab);
+		  tabList.appendChild(tabItem);
+		} catch (err) {
+		  console.error('Error creating tab element:', err, tab);
+		}
+	  });
+  
+	  // Setup drag and drop
+	  setupDragAndDrop();
+	  
+	  // Add event listeners for new tab items
+	  addTabItemEventListeners();
 	}
-}
+  }
+  
+
 // Setup drag and drop functionality
 
 function setupDragAndDrop() {
@@ -787,201 +834,17 @@ function setupDragAndDrop() {
 	  const item = tabItems[index];
 	  handle.addEventListener('mousedown', (e) => handleDragStart(e, item, dropIndicator));
 	});
-  }
+}
 
 // Create tab list item element
 // Create tab list item element with proper badge alignment
 function createTabElement(tab) {
-	const tabItem = document.createElement('div');
-	tabItem.className = 'tab-item';
-	tabItem.dataset.id = tab.id;
-	
-	const dragHandle = document.createElement('div');
-	dragHandle.className = 'drag-handle';
-	dragHandle.innerHTML = '⋮⋮';
-	dragHandle.setAttribute('title', 'Drag to reorder');
-	
-	const contentContainer = document.createElement('div');
-	contentContainer.className = 'tab-info';
-	
-	// Determine the tab type - force correct type detection
-	let isObject = false;
-	let isCustomUrl = false;
-	
-	// Check for explicit properties first
-	if (tab.hasOwnProperty('isObject') && tab.isObject === true) {
-	  isObject = true;
-	} else if (tab.hasOwnProperty('isCustomUrl') && tab.isCustomUrl === true) {
-	  isCustomUrl = true;
-	} 
-	// Then check the path if properties aren't set
-	else if (tab.path) {
-	  // Check for ObjectManager paths
-	  if (!tab.path.startsWith('ObjectManager/') && 
-      (tab.path.includes('/o/') || tab.path.endsWith('/view'))) {
-    isObject = true;
-
-	  } 
-	  // Check for custom URL patterns
-	  else if (tab.path.includes('interaction_explorer') || 
-			   tab.path.endsWith('.app') ||
-			   tab.path.includes('apex/')) {
-		isCustomUrl = true;
-	  }
-	}
-	
-	// Set badge type based on detected tab type
-	let badgeText = 'Setup';
-	let badgeClass = 'setup';
-	
-	if (isCustomUrl) {
-	  badgeText = 'Custom';
-	  badgeClass = 'custom';
-	} else if (isObject) {
-	  badgeText = 'Object';
-	  badgeClass = 'object';
-	}
-	
-	// Create tab name
-	const tabName = document.createElement('div');
-	tabName.className = 'tab-name';
-	tabName.textContent = tab.label;
-	
-	// Setup different layout based on compact mode
-	if (userSettings.compactMode) {
-	  // Compact mode specific setup
-	  tabItem.classList.add('compact-mode');
-	  
-	  // In compact mode, badge is a single letter
-	  const badgeShort = badgeText.charAt(0);
-	  
-	  // Create the badge element for compact mode
-	  const pathType = document.createElement('span');
-	  pathType.className = 'path-type-compact ' + badgeClass;
-	  pathType.textContent = badgeShort;
-	  
-	  // Create a wrapper div for proper alignment
-	  const badgeWrapper = document.createElement('div'); 
-	  badgeWrapper.style.display = 'flex';
-	  badgeWrapper.style.alignItems = 'flex-start';
-	  badgeWrapper.style.paddingTop = '3px'; // Align with drag handle
-	  badgeWrapper.appendChild(pathType);
-	  
-	  // Configure content container for compact mode
-	  contentContainer.style.display = 'flex';
-	  contentContainer.style.flexDirection = 'row';
-	  contentContainer.style.flex = '1';
-	  contentContainer.style.minWidth = '0';
-	  contentContainer.style.alignItems = 'flex-start'; // Align items to the top
-	  
-	  // Add badge directly to content container
-	  contentContainer.appendChild(badgeWrapper);
-	  
-	  // Create text container for name that allows wrapping
-	  const textContainer = document.createElement('div');
-	  textContainer.style.marginLeft = '8px';
-	  textContainer.style.flex = '1';
-	  textContainer.style.minWidth = '0';
-	  textContainer.appendChild(tabName);
-	  
-	  // Add text to content container
-	  contentContainer.appendChild(textContainer);
-	  
-	  // Style the tab name for wrapping
-	  tabName.style.wordBreak = 'break-word';
-	  tabName.style.overflow = 'hidden';
-	  tabName.style.paddingTop = '3px'; // Align with badge and drag handle
-	} else {
-	  // Regular mode - keep original structure
-	  contentContainer.style.display = 'flex';
-	  contentContainer.style.flexDirection = 'column';
-	  contentContainer.style.flex = '1';
-	  contentContainer.style.minWidth = '0';
-	  
-	  // Add tab name first
-	  contentContainer.appendChild(tabName);
-	  
-	  // Create tab path container
-	  const tabPath = document.createElement('div');
-	  tabPath.className = 'tab-path';
-	  
-	  // Create the badge element for regular mode
-	  const pathType = document.createElement('span');
-	  pathType.className = 'path-type ' + badgeClass;
-	  pathType.textContent = badgeText;
-	  
-	  // Create path text element
-	  const pathTextElement = document.createElement('span');
-	  pathTextElement.className = 'path-text';
-	  pathTextElement.textContent = tab.path;
-	  
-	  // Add badge and path to tab path container
-	  tabPath.appendChild(pathType);
-	  tabPath.appendChild(pathTextElement);
-	  
-	  // Add tab path to content container
-	  contentContainer.appendChild(tabPath);
-	}
-	
-	// Create actions container
-	const actionsContainer = document.createElement('div');
-	actionsContainer.className = 'tab-actions';
-	
-	// Create toggle for "open in new tab"
-	const newTabToggle = document.createElement('label');
-	newTabToggle.className = 'new-tab-toggle';
-	newTabToggle.setAttribute('title', 'Open in new tab');
-	
-	const toggleInput = document.createElement('input');
-	toggleInput.type = 'checkbox';
-	toggleInput.checked = tab.openInNewTab;
-	toggleInput.style.display = 'none';
-	toggleInput.addEventListener('change', () => {
-	  tab.openInNewTab = toggleInput.checked;
-	  saveTabsToStorage();
-	});
-	
-	const toggleSwitch = document.createElement('span');
-	toggleSwitch.className = 'toggle-switch';
-	
-	newTabToggle.appendChild(toggleInput);
-	newTabToggle.appendChild(toggleSwitch);
-	
-	// Create delete button
-	const deleteButton = document.createElement('button');
-	deleteButton.className = 'delete-button';
-	deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"></path></svg>';
-	deleteButton.setAttribute('title', 'Remove tab');
-	deleteButton.addEventListener('click', (e) => {
-	  e.stopPropagation();
-	  deleteTab(tab.id);
-	});
-	
-	// Add buttons to actions container
-	actionsContainer.appendChild(newTabToggle);
-	actionsContainer.appendChild(deleteButton);
-	
-	// Add click handler for editing
-	contentContainer.addEventListener('click', () => {
-	  editTab(tab.id);
-	});
-	
-	// Assemble final tab layout
-	tabItem.appendChild(dragHandle);
-	tabItem.appendChild(contentContainer);
-	tabItem.appendChild(actionsContainer);
-	
-	// For debugging - log the tab type detection
-	console.log(`Tab "${tab.label}" - isObject: ${isObject}, isCustomUrl: ${isCustomUrl}, badge: ${badgeText}`);
-	
-	return tabItem;
-  }
+	return SFTabsUtils.domHelpers.createTabElement(tab, userSettings.compactMode);
+}
 
 // Create drop indicator element
 function createDropIndicator() {
-	const dropIndicator = document.createElement('div');
-	dropIndicator.className = 'drop-indicator';
-	return dropIndicator;
+	return SFTabsUtils.domHelpers.createDropIndicator();
 }
 
 // Handle the start of dragging
@@ -1015,20 +878,12 @@ function handleDragStart(e, item, dropIndicator) {
 
 // Create a clone of the element being dragged
 function createDragClone(item, width) {
-	const clone = item.cloneNode(true);
-	clone.classList.add('tab-item-clone');
-	clone.style.width = width + 'px'; // This one style might still be needed since it's dynamic
-
-	// Add clone to the DOM
-	document.body.appendChild(clone);
-
-	return clone;
+	return SFTabsUtils.domHelpers.createDragClone(item, width);
 }
 
 // Move an element to specified coordinates
 function moveElement(element, x, y) {
-	element.style.top = y + 'px';
-	element.style.left = x + 'px';
+	SFTabsUtils.domHelpers.moveElement(element, x, y);
 }
 
 // Set up handlers for dragging movement and dropping
@@ -1162,7 +1017,6 @@ function showTabForm(tabId = null) {
 		openInNewTabCheckbox.checked = tab.openInNewTab;
 		isObjectCheckbox.checked = tab.isObject || false;
 		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
-		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
 	  }
   
 	  // Find the tab element
@@ -1199,7 +1053,7 @@ function showTabForm(tabId = null) {
   
 	// Focus on the first field
 	tabNameInput.focus();
-  }
+}
 
 // Function to ensure the form is fully visible
 function ensureFormVisible(tabElement) {
@@ -1320,19 +1174,18 @@ function deleteTab(tabId) {
 
 // Use our custom modal instead of confirm()
 function showDeleteConfirmModal(tabId) {
-	showModal(
-		deleteConfirmModal,
-		deleteModalCancelButton,
-		deleteModalConfirmButton,
-		() => {
-			console.log('Delete confirmed for tab', tabId);
-			// Perform the actual deletion
-			customTabs = customTabs.filter(tab => tab.id !== tabId);
-			saveTabsToStorage();
-		}
+	SFTabsUtils.uiHelpers.showModal(
+	  deleteConfirmModal,
+	  deleteModalCancelButton,
+	  deleteModalConfirmButton,
+	  () => {
+		console.log('Delete confirmed for tab', tabId);
+		// Perform the actual deletion
+		customTabs = customTabs.filter(tab => tab.id !== tabId);
+		saveTabsToStorage();
+	  }
 	);
 }
-
 
 // Edit tab
 function editTab(tabId) {
@@ -1349,25 +1202,10 @@ function editTab(tabId) {
 
 // Generate a unique ID
 function generateId() {
-	return 'tab_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+	return SFTabsUtils.generateId();
 }
 
 // Show status message
 function showStatus(message, isError = false) {
-	console.log('Showing status message', { message, isError });
-	statusMessage.textContent = message;
-
-	// Apply appropriate class
-	statusMessage.classList.remove('success', 'error');
-	if (isError) {
-		statusMessage.classList.add('error');
-	} else if (message) {
-		statusMessage.classList.add('success');
-	}
-
-	// Clear message after a delay
-	setTimeout(() => {
-		statusMessage.textContent = '';
-		statusMessage.classList.remove('success', 'error');
-	}, 3000);
+	SFTabsUtils.uiHelpers.showStatus(message, isError);
 }
