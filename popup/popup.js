@@ -165,6 +165,57 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
+// Initialize the theme selector
+function initThemeSelector() {
+	const themeOptions = document.querySelectorAll('.theme-option');
+	
+	// Get current theme from user settings (which was loaded during initialization)
+	const currentTheme = userSettings.themeMode || 'light';
+	console.log('Current theme from settings:', currentTheme);
+	
+	// Add click handlers to theme options
+	themeOptions.forEach(option => {
+		// Add click handler
+		option.addEventListener('click', () => {
+		const themeValue = option.getAttribute('data-theme-value');
+		console.log('Theme option clicked:', themeValue);
+		
+		// Update userSettings
+		userSettings.themeMode = themeValue;
+		
+		// Save the updated settings
+		saveUserSettings().then(() => {
+			// After saving, apply the theme and update UI
+			applyTheme();
+			setSelectedTheme(themeValue);
+		});
+		});
+	});
+	
+	// Set initial selection based on current theme
+	setSelectedTheme(currentTheme);
+  }
+  
+  // Set the selected theme in the UI
+  function setSelectedTheme(theme) {
+	console.log('Setting selected theme in UI:', theme);
+	const themeOptions = document.querySelectorAll('.theme-option');
+	
+	// First remove selected class from all options
+	themeOptions.forEach(option => {
+	  option.classList.remove('selected');
+	});
+	
+	// Find the option that matches the current theme
+	const selectedOption = document.querySelector(`.theme-option[data-theme-value="${theme}"]`);
+	if (selectedOption) {
+	  selectedOption.classList.add('selected');
+	  console.log('Applied selected class to:', theme);
+	} else {
+	  console.warn('Could not find option for theme:', theme);
+	}
+  }
+
 // Load user settings from storage
 function loadUserSettings() {
 	console.log('Loading user settings from storage');
@@ -206,11 +257,20 @@ function saveUserSettings() {
 
 // Update settings UI to reflect current settings
 function updateSettingsUI() {
-	// Update theme select
-	themeMode.value = userSettings.themeMode;
+	// Set the hidden select value to match current settings
+	const themeSelect = document.getElementById('theme-mode');
+	if (themeSelect) {
+	  themeSelect.value = userSettings.themeMode;
+	  
+	  // Update the visual theme selector
+	  setSelectedTheme(userSettings.themeMode);
+	}
 	
 	// Update compact mode checkbox
-	document.getElementById('compact-mode').checked = userSettings.compactMode;
+	const compactModeCheckbox = document.getElementById('compact-mode');
+	if (compactModeCheckbox) {
+	  compactModeCheckbox.checked = userSettings.compactMode;
+	}
   }
 
 // Reset settings to defaults
@@ -220,7 +280,7 @@ function resetSettings() {
 	updateSettingsUI();
 	applyTheme();
 	showStatus('Settings reset to defaults', false);
-}
+  }
 
 // Add an event listener for the manage-config button
 const manageConfigButton = document.getElementById('manage-config-button');
@@ -423,14 +483,6 @@ function setupEventListeners() {
 		});
 	});
 
-	// Theme mode change
-	themeMode.addEventListener('change', () => {
-		console.log('Theme mode changed to:', themeMode.value);
-		userSettings.themeMode = themeMode.value;
-		saveUserSettings();
-		applyTheme();
-	});
-
 	// Compact mode change
 	const compactModeCheckbox = document.getElementById('compact-mode');
 		compactModeCheckbox.addEventListener('change', () => {
@@ -448,6 +500,8 @@ function setupEventListeners() {
 	tabPathInput.addEventListener('keypress', (e) => {
 		if (e.key === 'Enter') saveTabForm();
 	});
+
+	initThemeSelector();
 
 	console.log('Event listeners setup complete');
 }
