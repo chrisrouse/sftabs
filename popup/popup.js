@@ -461,6 +461,7 @@ function addTabForCurrentPage() {
 		  const currentUrl = tabs[0].url;
 		  const pageTitle = tabs[0].title;
 		  console.log('Current URL:', currentUrl);
+		  console.log('Page title:', pageTitle);
 		  
 		  let isObject = false;
 		  let isCustomUrl = false;
@@ -478,7 +479,7 @@ function addTabForCurrentPage() {
 			  // Special case for ObjectManager: keep the /view suffix
 			  if (fullPath.startsWith('ObjectManager/')) {
 				path = fullPath;
-				isObject = true; // Mark ObjectManager paths as Object type
+				isObject = false; // Mark ObjectManager paths as Setup type
 			  } else {
 				// For other setup pages, remove trailing '/home' or '/view' if present
 				path = fullPath.replace(/\/(home|view)$/, '');
@@ -502,7 +503,7 @@ function addTabForCurrentPage() {
 			  urlBase = '/lightning/o/';
 			}
 		  }
-		  // NEW: Handle custom URLs (any other Salesforce URL pattern)
+		  // Handle custom URLs (any other Salesforce URL pattern)
 		  else if (currentUrl.includes('.lightning.force.com/') || currentUrl.includes('.salesforce.com/')) {
 			isCustomUrl = true;
 			
@@ -513,7 +514,6 @@ function addTabForCurrentPage() {
 			  path = urlParts[1].split('?')[0]; // Remove query parameters
 			  
 			  // Check for specific custom URL patterns 
-			  // (e.g., interaction_explorer, console, visualforce pages, etc.)
 			  console.log('Detected custom URL path:', path);
 			}
 		  }
@@ -559,37 +559,58 @@ function addTabForCurrentPage() {
 			}
 		  } else if (isObject) {
 			// Format the object name from the URL path
-			if (path.startsWith('ObjectManager/')) {
-			  // For ObjectManager paths, create a more descriptive label
-			  const pathSegments = path.split('/').filter(segment => segment.length > 0);
-			  
-			  if (pathSegments.length >= 3) {
-				// Format: "Object - Section"
-				// e.g., "Account - Fields And Relationships"
-				const objectName = formatObjectNameFromURL(pathSegments[1]);
-				const sectionName = pathSegments[2]
-				  .replace(/([A-Z])/g, ' $1') // Add space before uppercase letters
-				  .trim();
-				
-				name = `${objectName} - ${sectionName}`;
-			  } else if (pathSegments.length >= 2) {
-				// Just the object name if there's no section
-				name = formatObjectNameFromURL(pathSegments[1]);
-			  } else {
-				// Fallback to just "Object Manager"
-				name = "Object Manager";
-			  }
+			name = formatObjectNameFromURL(path.split('/')[0]);
+		  } else if (path.startsWith('ObjectManager/')) {
+			// Special handling for ObjectManager paths
+			const pathSegments = path.split('/').filter(segment => segment.length > 0);
+			
+			// Extract object name from path
+			let objectName = "";
+			if (pathSegments.length >= 2) {
+			  objectName = formatObjectNameFromURL(pathSegments[1]);
 			} else {
-			  // Regular object page
-			  name = formatObjectNameFromURL(path.split('/')[0]);
+			  objectName = "Object Manager";
 			}
+			
+			// Extract section from either title or path
+			let sectionName = "";
+			
+			// First try to extract from page title
+			if (pageTitle) {
+			  const titleParts = pageTitle.split(' | ');
+			  
+			  // Page title often has the format: "Section Name | Object Name | Object Manager"
+			  if (titleParts.length >= 2) {
+				// The section name is usually the first part
+				sectionName = titleParts[0];
+			  }
+			}
+			
+			// If no section name from title, extract from path
+			if (!sectionName && pathSegments.length >= 3) {
+			  sectionName = pathSegments[2]
+				.replace(/([A-Z])/g, ' $1') // Add space before uppercase letters
+				.trim();
+			}
+			
+			// Combine object name and section
+			if (sectionName) {
+			  name = `${objectName} - ${sectionName}`;
+			} else {
+			  name = objectName;
+			}
+			
+			console.log('ObjectManager path detected. Object name:', objectName, 'Section:', sectionName);
 		  } else {
 			// Logic for standard setup page naming
 			// Try to extract a better name from the page title if available
 			if (pageTitle) {
 			  // Remove " | Salesforce" or similar suffix from title
-			  let cleanTitle = pageTitle.split(' | ')[0];
-  
+			  let titleParts = pageTitle.split(' | ');
+			  let cleanTitle = titleParts[0];
+			  
+			  console.log('Clean title extracted:', cleanTitle);
+			  
 			  // If the title includes "Setup", try to get a cleaner name
 			  if (cleanTitle.includes('Setup')) {
 				const setupParts = cleanTitle.split('Setup: ');
@@ -604,19 +625,40 @@ function addTabForCurrentPage() {
 			  }
 			}
 			
-			// If we couldn't get a good name from the title, use the last segment of the path
+			// If we couldn't get a good name from the title, use the path
 			if (!name || name.length === 0) {
-			  // Get the last non-empty segment of the path
-			  const pathSegments = path.split('/').filter(segment => segment.length > 0);
-			  if (pathSegments.length > 0) {
-				name = pathSegments[pathSegments.length - 1]
-				  // Add space before uppercase letters
-				  .replace(/([A-Z])/g, ' $1')
-				  // Clean up any leading space and capitalize first letter
-				  .replace(/^./, str => str.toUpperCase())
-				  .trim();
-			  } else {
-				name = path; // Fallback to the full path
+			  console.log('Using path for name. Path:', path);
+			  
+			  // Try to format the path to get a readable name
+			  if (path && path.length > 0) {
+				// Get the last non-empty segment of the path
+				const pathSegments = path.split('/').filter(segment => segment.length > 0);
+				
+				if (pathSegments.length > 0) {
+				  let lastSegment = pathSegments[pathSegments.length - 1];
+				  
+				  // Format the path segment for readability
+				  name = lastSegment
+					// Add space before uppercase letters
+					.replace(/([A-Z])/g, ' $1')
+					// Clean up any leading space and capitalize first letter
+					.replace(/^./, str => str.toUpperCase())
+					.trim();
+				  
+				  // If name is still empty or just spaces, try another approach
+				  if (!name.trim()) {
+					// Try to use the whole path
+					name = path
+					  .replace(/([A-Z])/g, ' $1')
+					  .replace(/^./, str => str.toUpperCase())
+					  .trim();
+				  }
+				}
+			  }
+			  
+			  // Final fallback - use a generic name with the path
+			  if (!name || !name.trim()) {
+				name = 'Setup: ' + path;
 			  }
 			}
 		  }
@@ -721,8 +763,10 @@ function createTabElement(tab) {
 	// Then check the path if properties aren't set
 	else if (tab.path) {
 	  // Check for ObjectManager paths
-	  if (tab.path.startsWith('ObjectManager/')) {
-		isObject = true;
+	  if (!tab.path.startsWith('ObjectManager/') && 
+      (tab.path.includes('/o/') || tab.path.endsWith('/view'))) {
+    isObject = true;
+
 	  } 
 	  // Check for custom URL patterns
 	  else if (tab.path.includes('interaction_explorer') || 
