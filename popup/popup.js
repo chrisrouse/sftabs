@@ -24,8 +24,6 @@ let settingsButton;
 let settingsPanel;
 let mainContent;
 let themeMode;
-let panelHeight;
-let panelHeightValue;
 let settingsResetButton;
 
 // State
@@ -33,7 +31,6 @@ let customTabs = [];
 let editingTabId = null;
 userSettings = {
 	themeMode: 'light',
-	panelHeight: 500,
 	compactMode: false
   };
 let quickAddButton;
@@ -110,7 +107,6 @@ function formatObjectNameFromURL(objectNameFromURL) {
 // Default user settings
 const defaultSettings = {
 	themeMode: 'light',
-	panelHeight: 500,
 	compactMode: false
   };
 
@@ -144,8 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	settingsPanel = document.getElementById('settings-panel');
 	mainContent = document.getElementById('main-content');
 	themeMode = document.getElementById('theme-mode');
-	panelHeight = document.getElementById('panel-height');
-	panelHeightValue = document.getElementById('panel-height-value');
 	settingsResetButton = document.getElementById('settings-reset-button');
 
 	// Debug: Log all DOM elements
@@ -168,8 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Apply theme based on settings
 		applyTheme();
 
-		// Apply panel height
-		applyPanelHeight();
 	});
 });
 
@@ -216,10 +208,6 @@ function saveUserSettings() {
 function updateSettingsUI() {
 	// Update theme select
 	themeMode.value = userSettings.themeMode;
-  
-	// Update panel height slider
-	panelHeight.value = userSettings.panelHeight;
-	panelHeightValue.textContent = `${userSettings.panelHeight}px`;
 	
 	// Update compact mode checkbox
 	document.getElementById('compact-mode').checked = userSettings.compactMode;
@@ -231,7 +219,6 @@ function resetSettings() {
 	saveUserSettings();
 	updateSettingsUI();
 	applyTheme();
-	applyPanelHeight();
 	showStatus('Settings reset to defaults', false);
 }
 
@@ -268,12 +255,6 @@ function applyTheme() {
 		// Apply user selected theme
 		document.documentElement.setAttribute('data-theme', userSettings.themeMode);
 	}
-}
-
-// Apply panel height
-function applyPanelHeight() {
-	const container = document.querySelector('.container');
-	container.style.minHeight = `${userSettings.panelHeight}px`;
 }
 
 // Load tabs from storage
@@ -448,18 +429,6 @@ function setupEventListeners() {
 		userSettings.themeMode = themeMode.value;
 		saveUserSettings();
 		applyTheme();
-	});
-
-	// Panel height change
-	panelHeight.addEventListener('input', () => {
-		panelHeightValue.textContent = `${panelHeight.value}px`;
-	});
-
-	panelHeight.addEventListener('change', () => {
-		console.log('Panel height changed to:', panelHeight.value);
-		userSettings.panelHeight = parseInt(panelHeight.value);
-		saveUserSettings();
-		applyPanelHeight();
 	});
 
 	// Compact mode change
