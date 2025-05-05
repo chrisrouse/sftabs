@@ -85,8 +85,6 @@ function initTabs(tabContainer) {
 }
 
 // Create tab element with appropriate structure and classes
-// Update the createTabElement function to handle custom URLs
-
 function createTabElement(tab) {
   // Get the base URL for the current org
   const currentUrl = window.location.href;
@@ -109,8 +107,8 @@ function createTabElement(tab) {
     
     fullUrl = `${baseUrlRoot}${formattedPath}`;
   } else if (isObject) {
-    // Object URLs need /home at the end
-    fullUrl = `${baseUrlObject}${tab.path}/home`;
+    // Object URLs: don't add /home suffix - use the path as is
+    fullUrl = `${baseUrlObject}${tab.path}`;
   } else if (tab.path.includes('ObjectManager/')) {
     // ObjectManager URLs don't need /home
     fullUrl = `${baseUrlSetup}${tab.path}`;

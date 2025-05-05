@@ -796,6 +796,48 @@
   #delete-modal-confirm-button:hover {
 	background-color: #AA0000;
   }
+
+  /* Enhanced Modal Styles for Dark Mode */
+[data-theme="dark"] .modal {
+	background-color: rgba(0, 0, 0, 0.85); /* Darker, more opaque overlay */
+  }
+  
+  [data-theme="dark"] .modal-content {
+	background-color: #1E2128; /* Darker background */
+	border: 1px solid #444; /* Visible border */
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
+  }
+  
+  [data-theme="dark"] .modal-header {
+	background-color: #0F6BAE; /* Darker blue header */
+	border-bottom: 1px solid #444;
+  }
+  
+  [data-theme="dark"] .modal-body {
+	color: #FFFFFF; /* Brighter text */
+  }
+  
+  [data-theme="dark"] .modal-footer {
+	border-top-color: #444; /* More visible separator */
+  }
+  
+  [data-theme="dark"] #delete-modal-cancel-button {
+	background-color: #2A2C35;
+	color: #FFFFFF;
+	border: 1px solid #444;
+  }
+  
+  [data-theme="dark"] #delete-modal-cancel-button:hover {
+	background-color: #3A3D48;
+  }
+  
+  [data-theme="dark"] #delete-modal-confirm-button {
+	background-color: #FF5252; /* Brighter red for visibility */
+  }
+  
+  [data-theme="dark"] #delete-modal-confirm-button:hover {
+	background-color: #FF6E6E;
+  }
   
   /* Dark Theme Adjustments */
   [data-theme="dark"] .action-button {

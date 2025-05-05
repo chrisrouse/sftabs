@@ -107,7 +107,8 @@ function formatObjectNameFromURL(objectNameFromURL) {
 // Default user settings
 const defaultSettings = {
 	themeMode: 'light',
-	compactMode: false
+	compactMode: false,
+	skipDeleteConfirmation: false
   };
 
 // Initialize
@@ -271,6 +272,12 @@ function updateSettingsUI() {
 	if (compactModeCheckbox) {
 	  compactModeCheckbox.checked = userSettings.compactMode;
 	}
+
+	  // Update skip delete confirmation checkbox
+	  const skipDeleteConfirmationCheckbox = document.getElementById('skip-delete-confirmation');
+	  if (skipDeleteConfirmationCheckbox) {
+		skipDeleteConfirmationCheckbox.checked = userSettings.skipDeleteConfirmation || false;
+	  }
   }
 
 // Reset settings to defaults
@@ -492,6 +499,16 @@ function setupEventListeners() {
 		renderTabList(); // Re-render tabs with new display mode
 	});
 
+	// Skip delete confirmation change
+	const skipDeleteConfirmationCheckbox = document.getElementById('skip-delete-confirmation');
+		if (skipDeleteConfirmationCheckbox) {
+		skipDeleteConfirmationCheckbox.addEventListener('change', () => {
+			console.log('Skip delete confirmation changed to:', skipDeleteConfirmationCheckbox.checked);
+			userSettings.skipDeleteConfirmation = skipDeleteConfirmationCheckbox.checked;
+			saveUserSettings();
+		});
+	}
+
 	// Enter key in form fields
 	tabNameInput.addEventListener('keypress', (e) => {
 		if (e.key === 'Enter') saveTabForm();
@@ -530,7 +547,7 @@ function addTabForCurrentPage() {
 			  // Get everything after /setup/ and before any query parameters
 			  const fullPath = urlParts[1].split('?')[0]; 
 			  
-			  // Special case for ObjectManager: keep the /view suffix
+			  // Special case for ObjectManager: keep the full path
 			  if (fullPath.startsWith('ObjectManager/')) {
 				path = fullPath;
 				isObject = false; // Mark ObjectManager paths as Setup type
@@ -548,12 +565,10 @@ function addTabForCurrentPage() {
 			// Extract the path component (after /o/)
 			const urlParts = currentUrl.split('/lightning/o/');
 			if (urlParts.length > 1) {
-			  // Get everything after /o/ and before any query parameters
+			  // Get everything after /o/ until query parameters
+			  // Don't remove trailing /list, /home, or other valid suffixes for objects
 			  const fullPath = urlParts[1].split('?')[0];
-			  
-			  // Standard object pages (remove trailing suffixes)
-			  path = fullPath.replace(/\/(home|view)$/, '');
-			  
+			  path = fullPath; // Keep the full path
 			  urlBase = '/lightning/o/';
 			}
 		  }
@@ -612,8 +627,21 @@ function addTabForCurrentPage() {
 			  }
 			}
 		  } else if (isObject) {
-			// Format the object name from the URL path
-			name = formatObjectNameFromURL(path.split('/')[0]);
+			// For object pages, extract both the object name and the view type
+			const pathSegments = path.split('/');
+			if (pathSegments.length > 0) {
+			  // Get object name
+			  const objectName = formatObjectNameFromURL(pathSegments[0]);
+			  
+			  // Try to get view type (list, home, etc.)
+			  let viewType = '';
+			  if (pathSegments.length > 1) {
+				viewType = pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1);
+			  }
+			  
+			  // Combine for complete name
+			  name = viewType ? `${objectName} ${viewType}` : objectName;
+			}
 		  } else if (path.startsWith('ObjectManager/')) {
 			// Special handling for ObjectManager paths
 			const pathSegments = path.split('/').filter(segment => segment.length > 0);
@@ -626,23 +654,14 @@ function addTabForCurrentPage() {
 			  objectName = "Object Manager";
 			}
 			
-			// Extract section from either title or path
+			// Extract section name directly from the URL path (third segment)
 			let sectionName = "";
-			
-			// First try to extract from page title
-			if (pageTitle) {
-			  const titleParts = pageTitle.split(' | ');
+			if (pathSegments.length >= 3) {
+			  // Get the section name (e.g., "PageLayouts", "FieldsAndRelationships")
+			  let pathSection = pathSegments[2];
 			  
-			  // Page title often has the format: "Section Name | Object Name | Object Manager"
-			  if (titleParts.length >= 2) {
-				// The section name is usually the first part
-				sectionName = titleParts[0];
-			  }
-			}
-			
-			// If no section name from title, extract from path
-			if (!sectionName && pathSegments.length >= 3) {
-			  sectionName = pathSegments[2]
+			  // Format the section name with spaces
+			  sectionName = pathSection
 				.replace(/([A-Z])/g, ' $1') // Add space before uppercase letters
 				.trim();
 			}
@@ -717,12 +736,6 @@ function addTabForCurrentPage() {
 			}
 		  }
   
-		  // For debugging
-		  console.log('Creating tab with path:', path);
-		  console.log('Is object page:', isObject);
-		  console.log('Is custom URL:', isCustomUrl);
-		  console.log('Tab label will be:', name);
-  
 		  // Create a new tab object
 		  const newTab = {
 			id: generateId(),
@@ -773,8 +786,8 @@ function renderTabList() {
 		setupDragAndDrop();
 	}
 }
-// Setup drag and drop functionality
 
+// Setup drag and drop functionality
 function setupDragAndDrop() {
 	const tabItems = document.querySelectorAll('.tab-item');
 	const dragHandles = document.querySelectorAll('.drag-handle');
@@ -790,7 +803,6 @@ function setupDragAndDrop() {
   }
 
 // Create tab list item element
-// Create tab list item element with proper badge alignment
 function createTabElement(tab) {
 	const tabItem = document.createElement('div');
 	tabItem.className = 'tab-item';
@@ -1313,25 +1325,120 @@ function saveTabForm() {
 }
 
 // Delete tab
+
 function deleteTab(tabId) {
 	console.log('Delete tab requested', { tabId });
-	showDeleteConfirmModal(tabId);
-}
+  
+	// Check if we should skip the confirmation
+	if (userSettings.skipDeleteConfirmation) {
+	  // Directly delete the tab without confirmation
+	  customTabs = customTabs.filter(tab => tab.id !== tabId);
+	  saveTabsToStorage();
+	  showStatus('Tab removed', false);
+	} else {
+	  // Show confirmation dialog
+	  showDeleteConfirmModal(tabId);
+	}
+  }
 
-// Use our custom modal instead of confirm()
-function showDeleteConfirmModal(tabId) {
-	showModal(
-		deleteConfirmModal,
-		deleteModalCancelButton,
-		deleteModalConfirmButton,
-		() => {
-			console.log('Delete confirmed for tab', tabId);
-			// Perform the actual deletion
-			customTabs = customTabs.filter(tab => tab.id !== tabId);
-			saveTabsToStorage();
-		}
-	);
-}
+// Add this function to your code - it's a diagnostic helper
+function diagnoseDeleteModal() {
+	console.log("--- Modal Diagnostic Report ---");
+	
+	// Check if modal elements exist
+	const modal = document.getElementById('delete-confirm-modal');
+	const cancelBtn = document.getElementById('delete-modal-cancel-button');
+	const confirmBtn = document.getElementById('delete-modal-confirm-button');
+	
+	console.log("Elements found:", {
+	  modal: !!modal,
+	  cancelBtn: !!cancelBtn, 
+	  confirmBtn: !!confirmBtn
+	});
+	
+	if (modal) {
+	  // Check current modal styling
+	  const computedStyle = window.getComputedStyle(modal);
+	  console.log("Modal current styles:", {
+		display: computedStyle.display,
+		visibility: computedStyle.visibility,
+		opacity: computedStyle.opacity,
+		zIndex: computedStyle.zIndex,
+		position: computedStyle.position
+	  });
+	  
+	  // Check if modal has show class
+	  console.log("Modal has 'show' class:", modal.classList.contains('show'));
+	  
+	  // Try to force show the modal
+	  modal.style.display = 'flex';
+	  modal.style.zIndex = '9999';
+	  modal.classList.add('show');
+	  console.log("Attempted to force show modal");
+	}
+	
+	console.log("--- End Diagnostic Report ---");
+  }
+  
+  // Replace your showDeleteConfirmModal function with this one
+  function showDeleteConfirmModal(tabId) {
+	console.log('Showing delete confirm modal for tab', tabId);
+	
+	// Get references to modal elements
+	const modal = document.getElementById('delete-confirm-modal');
+	const cancelBtn = document.getElementById('delete-modal-cancel-button');
+	const confirmBtn = document.getElementById('delete-modal-confirm-button');
+	
+	if (!modal) {
+	  console.error('Delete modal element not found');
+	  return;
+	}
+	
+	// Fix for new fixed header layout
+	// 1. Reset any problematic positioning from container
+	modal.style.position = 'fixed';
+	modal.style.zIndex = '2000'; // Higher than header's z-index
+	
+	// 2. Make sure modal is a direct child of body to avoid stacking context issues
+	if (modal.parentElement !== document.body) {
+	  document.body.appendChild(modal);
+	}
+	
+	// Show the modal
+	modal.classList.add('show');
+	
+	// Define action handlers
+	const handleCancel = () => {
+	  modal.classList.remove('show');
+	  cleanupEventListeners();
+	};
+	
+	const handleConfirm = () => {
+	  // Perform deletion
+	  customTabs = customTabs.filter(tab => tab.id !== tabId);
+	  saveTabsToStorage();
+	  modal.classList.remove('show');
+	  cleanupEventListeners();
+	};
+	
+	const handleOutsideClick = (event) => {
+	  if (event.target === modal) {
+		handleCancel();
+	  }
+	};
+	
+	// Clean up function to remove event listeners
+	const cleanupEventListeners = () => {
+	  cancelBtn.removeEventListener('click', handleCancel);
+	  confirmBtn.removeEventListener('click', handleConfirm);
+	  modal.removeEventListener('click', handleOutsideClick);
+	};
+	
+	// Add event listeners
+	cancelBtn.addEventListener('click', handleCancel);
+	confirmBtn.addEventListener('click', handleConfirm);
+	modal.addEventListener('click', handleOutsideClick);
+  }
 
 
 // Edit tab
