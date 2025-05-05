@@ -4,32 +4,42 @@ A browser extension that lets Salesforce administrators customize their setup me
 
 ## Features
 
-- **Quick Tab Creation**: 
-  - Add tabs directly from the current Salesforce setup page
-  - Customize tab names and paths
+### Core Functionality
+- **Custom Tab Management**: 
+  - Add, edit, and remove tabs directly from the Salesforce setup interface
+  - Support for Setup pages, Object pages, and custom URLs
+  - Visual indicators to distinguish between tab types
   - Option to open tabs in a new browser tab
 
-- **Drag-and-Drop Reordering**:
-  - Easily rearrange your custom tabs
-  - Intuitive interface for tab management
+- **Quick Tab Creation**: 
+  - Add a tab for the current page with one click
+  - Intelligent tab name detection based on page context
+  - Support for Object Manager paths
 
+- **Intuitive Organization**:
+  - Drag-and-drop reordering
+  - Compact view option for more efficient tab display
+  - Easily navigable interface
+
+### Appearance & Usability
 - **Theme Support**:
-  - Light and dark modes
-  - System theme detection
-  - Personalized panel height settings
+  - Light mode, Dark mode, and System detection
+  - Compact mode for condensed viewing
+  - Follows Salesforce Lightning Design System visuals
 
-- **Import/Export Configuration**:
-  - Save and restore your custom tab setup
-  - Easily transfer settings between browsers or share with team members
+- **Configuration Management**:
+  - Import/Export settings for backup or sharing
+  - Reset to default tabs when needed
+  - Persistent storage across sessions
 
 ## Installation
 
-Currently requires manual installation.
-
+Search for SF Tabs in Firefox and Chrome extension listing.
 
 ### Supported Browsers
 
 - Firefox
+- Chrome
 
 
 ## Usage
@@ -39,9 +49,6 @@ Currently requires manual installation.
 3. Customize tab labels, paths, and behavior
 4. Drag tabs to reorder
 
-## Screenshots
-
-*(Add screenshots of the extension in action)*
 
 ## Contributing
 

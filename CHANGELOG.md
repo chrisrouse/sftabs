@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.0] - May 4, 2025
+- Updated selectors for light and dark mode. It should automatically use your previous setting, but you may have to reselect the correct mode.
+- Added Compact Mode for more efficient tab display. Makes it easier to see more tabs in the popup.
+- Enhanced tab type detection with visual indicators (Setup, Object, Custom).
+- Better support for Object Manager paths and custom URLs.
+- Improved tab creation from current page with intelligent label detection.
+- Removed panel height selector since the range was limited by browser defaults.
+- Fixed header and improved scrolling in popup
+- Improved active tab handling. Removed the active style from the Setup and Object Manager tabs. This occasionally doesn't work due to issues with how long some Setup pages take to load.
+
 ## [1.1.0] - April 19, 2025
 
 ### Enhancements
