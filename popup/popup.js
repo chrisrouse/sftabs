@@ -24,17 +24,15 @@ let settingsButton;
 let settingsPanel;
 let mainContent;
 let themeMode;
-let panelHeight;
-let panelHeightValue;
 let settingsResetButton;
 
 // State
 let customTabs = [];
 let editingTabId = null;
-let userSettings = {
+userSettings = {
 	themeMode: 'light',
-	panelHeight: 500
-};
+	compactMode: false
+  };
 let quickAddButton;
 
 
@@ -109,8 +107,8 @@ function formatObjectNameFromURL(objectNameFromURL) {
 // Default user settings
 const defaultSettings = {
 	themeMode: 'light',
-	panelHeight: 500
-};
+	compactMode: false
+  };
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -142,8 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	settingsPanel = document.getElementById('settings-panel');
 	mainContent = document.getElementById('main-content');
 	themeMode = document.getElementById('theme-mode');
-	panelHeight = document.getElementById('panel-height');
-	panelHeightValue = document.getElementById('panel-height-value');
 	settingsResetButton = document.getElementById('settings-reset-button');
 
 	// Debug: Log all DOM elements
@@ -166,10 +162,59 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Apply theme based on settings
 		applyTheme();
 
-		// Apply panel height
-		applyPanelHeight();
 	});
 });
+
+// Initialize the theme selector
+function initThemeSelector() {
+	const themeOptions = document.querySelectorAll('.theme-option');
+	
+	// Get current theme from user settings (which was loaded during initialization)
+	const currentTheme = userSettings.themeMode || 'light';
+	console.log('Current theme from settings:', currentTheme);
+	
+	// Add click handlers to theme options
+	themeOptions.forEach(option => {
+		// Add click handler
+		option.addEventListener('click', () => {
+		const themeValue = option.getAttribute('data-theme-value');
+		console.log('Theme option clicked:', themeValue);
+		
+		// Update userSettings
+		userSettings.themeMode = themeValue;
+		
+		// Save the updated settings
+		saveUserSettings().then(() => {
+			// After saving, apply the theme and update UI
+			applyTheme();
+			setSelectedTheme(themeValue);
+		});
+		});
+	});
+	
+	// Set initial selection based on current theme
+	setSelectedTheme(currentTheme);
+  }
+  
+  // Set the selected theme in the UI
+  function setSelectedTheme(theme) {
+	console.log('Setting selected theme in UI:', theme);
+	const themeOptions = document.querySelectorAll('.theme-option');
+	
+	// First remove selected class from all options
+	themeOptions.forEach(option => {
+	  option.classList.remove('selected');
+	});
+	
+	// Find the option that matches the current theme
+	const selectedOption = document.querySelector(`.theme-option[data-theme-value="${theme}"]`);
+	if (selectedOption) {
+	  selectedOption.classList.add('selected');
+	  console.log('Applied selected class to:', theme);
+	} else {
+	  console.warn('Could not find option for theme:', theme);
+	}
+  }
 
 // Load user settings from storage
 function loadUserSettings() {
@@ -212,13 +257,21 @@ function saveUserSettings() {
 
 // Update settings UI to reflect current settings
 function updateSettingsUI() {
-	// Update theme select
-	themeMode.value = userSettings.themeMode;
-
-	// Update panel height slider
-	panelHeight.value = userSettings.panelHeight;
-	panelHeightValue.textContent = `${userSettings.panelHeight}px`;
-}
+	// Set the hidden select value to match current settings
+	const themeSelect = document.getElementById('theme-mode');
+	if (themeSelect) {
+	  themeSelect.value = userSettings.themeMode;
+	  
+	  // Update the visual theme selector
+	  setSelectedTheme(userSettings.themeMode);
+	}
+	
+	// Update compact mode checkbox
+	const compactModeCheckbox = document.getElementById('compact-mode');
+	if (compactModeCheckbox) {
+	  compactModeCheckbox.checked = userSettings.compactMode;
+	}
+  }
 
 // Reset settings to defaults
 function resetSettings() {
@@ -226,9 +279,8 @@ function resetSettings() {
 	saveUserSettings();
 	updateSettingsUI();
 	applyTheme();
-	applyPanelHeight();
 	showStatus('Settings reset to defaults', false);
-}
+  }
 
 // Add an event listener for the manage-config button
 const manageConfigButton = document.getElementById('manage-config-button');
@@ -263,12 +315,6 @@ function applyTheme() {
 		// Apply user selected theme
 		document.documentElement.setAttribute('data-theme', userSettings.themeMode);
 	}
-}
-
-// Apply panel height
-function applyPanelHeight() {
-	const container = document.querySelector('.container');
-	container.style.minHeight = `${userSettings.panelHeight}px`;
 }
 
 // Load tabs from storage
@@ -437,24 +483,13 @@ function setupEventListeners() {
 		});
 	});
 
-	// Theme mode change
-	themeMode.addEventListener('change', () => {
-		console.log('Theme mode changed to:', themeMode.value);
-		userSettings.themeMode = themeMode.value;
+	// Compact mode change
+	const compactModeCheckbox = document.getElementById('compact-mode');
+		compactModeCheckbox.addEventListener('change', () => {
+		console.log('Compact mode changed to:', compactModeCheckbox.checked);
+		userSettings.compactMode = compactModeCheckbox.checked;
 		saveUserSettings();
-		applyTheme();
-	});
-
-	// Panel height change
-	panelHeight.addEventListener('input', () => {
-		panelHeightValue.textContent = `${panelHeight.value}px`;
-	});
-
-	panelHeight.addEventListener('change', () => {
-		console.log('Panel height changed to:', panelHeight.value);
-		userSettings.panelHeight = parseInt(panelHeight.value);
-		saveUserSettings();
-		applyPanelHeight();
+		renderTabList(); // Re-render tabs with new display mode
 	});
 
 	// Enter key in form fields
@@ -465,6 +500,8 @@ function setupEventListeners() {
 	tabPathInput.addEventListener('keypress', (e) => {
 		if (e.key === 'Enter') saveTabForm();
 	});
+
+	initThemeSelector();
 
 	console.log('Event listeners setup complete');
 }
@@ -478,6 +515,7 @@ function addTabForCurrentPage() {
 		  const currentUrl = tabs[0].url;
 		  const pageTitle = tabs[0].title;
 		  console.log('Current URL:', currentUrl);
+		  console.log('Page title:', pageTitle);
 		  
 		  let isObject = false;
 		  let isCustomUrl = false;
@@ -495,6 +533,7 @@ function addTabForCurrentPage() {
 			  // Special case for ObjectManager: keep the /view suffix
 			  if (fullPath.startsWith('ObjectManager/')) {
 				path = fullPath;
+				isObject = false; // Mark ObjectManager paths as Setup type
 			  } else {
 				// For other setup pages, remove trailing '/home' or '/view' if present
 				path = fullPath.replace(/\/(home|view)$/, '');
@@ -518,7 +557,7 @@ function addTabForCurrentPage() {
 			  urlBase = '/lightning/o/';
 			}
 		  }
-		  // NEW: Handle custom URLs (any other Salesforce URL pattern)
+		  // Handle custom URLs (any other Salesforce URL pattern)
 		  else if (currentUrl.includes('.lightning.force.com/') || currentUrl.includes('.salesforce.com/')) {
 			isCustomUrl = true;
 			
@@ -529,7 +568,6 @@ function addTabForCurrentPage() {
 			  path = urlParts[1].split('?')[0]; // Remove query parameters
 			  
 			  // Check for specific custom URL patterns 
-			  // (e.g., interaction_explorer, console, visualforce pages, etc.)
 			  console.log('Detected custom URL path:', path);
 			}
 		  }
@@ -576,64 +614,105 @@ function addTabForCurrentPage() {
 		  } else if (isObject) {
 			// Format the object name from the URL path
 			name = formatObjectNameFromURL(path.split('/')[0]);
-		  } else {
-			// Logic for setup page naming (existing code)
-			if (path.startsWith('ObjectManager/')) {
-			  // For ObjectManager paths, create a more descriptive label
-			  const pathSegments = path.split('/').filter(segment => segment.length > 0);
-			  
-			  if (pathSegments.length >= 3) {
-				// Format: "Object - Section"
-				// e.g., "Account - Fields And Relationships"
-				const objectName = formatObjectNameFromURL(pathSegments[1]);
-				const sectionName = pathSegments[2]
-				  .replace(/([A-Z])/g, ' $1') // Add space before uppercase letters
-				  .trim();
-				
-				name = `${objectName} - ${sectionName}`;
-			  } else if (pathSegments.length >= 2) {
-				// Just the object name if there's no section
-				name = formatObjectNameFromURL(pathSegments[1]);
-			  } else {
-				// Fallback to just "Object Manager"
-				name = "Object Manager";
-			  }
+		  } else if (path.startsWith('ObjectManager/')) {
+			// Special handling for ObjectManager paths
+			const pathSegments = path.split('/').filter(segment => segment.length > 0);
+			
+			// Extract object name from path
+			let objectName = "";
+			if (pathSegments.length >= 2) {
+			  objectName = formatObjectNameFromURL(pathSegments[1]);
 			} else {
-			  // For standard setup pages, extract from the page title or path
+			  objectName = "Object Manager";
+			}
+			
+			// Extract section from either title or path
+			let sectionName = "";
+			
+			// First try to extract from page title
+			if (pageTitle) {
+			  const titleParts = pageTitle.split(' | ');
 			  
-			  // Try to extract a better name from the page title if available
-			  if (pageTitle) {
-				// Remove " | Salesforce" or similar suffix from title
-				let cleanTitle = pageTitle.split(' | ')[0];
-  
-				// If the title includes "Setup", try to get a cleaner name
-				if (cleanTitle.includes('Setup')) {
-				  const setupParts = cleanTitle.split('Setup: ');
-				  if (setupParts.length > 1) {
-					cleanTitle = setupParts[1];
-				  }
-				}
-  
-				// Use the cleaned title if we got something reasonable
-				if (cleanTitle && cleanTitle.length > 0) {
-				  name = cleanTitle;
+			  // Page title often has the format: "Section Name | Object Name | Object Manager"
+			  if (titleParts.length >= 2) {
+				// The section name is usually the first part
+				sectionName = titleParts[0];
+			  }
+			}
+			
+			// If no section name from title, extract from path
+			if (!sectionName && pathSegments.length >= 3) {
+			  sectionName = pathSegments[2]
+				.replace(/([A-Z])/g, ' $1') // Add space before uppercase letters
+				.trim();
+			}
+			
+			// Combine object name and section
+			if (sectionName) {
+			  name = `${objectName} - ${sectionName}`;
+			} else {
+			  name = objectName;
+			}
+			
+			console.log('ObjectManager path detected. Object name:', objectName, 'Section:', sectionName);
+		  } else {
+			// Logic for standard setup page naming
+			// Try to extract a better name from the page title if available
+			if (pageTitle) {
+			  // Remove " | Salesforce" or similar suffix from title
+			  let titleParts = pageTitle.split(' | ');
+			  let cleanTitle = titleParts[0];
+			  
+			  console.log('Clean title extracted:', cleanTitle);
+			  
+			  // If the title includes "Setup", try to get a cleaner name
+			  if (cleanTitle.includes('Setup')) {
+				const setupParts = cleanTitle.split('Setup: ');
+				if (setupParts.length > 1) {
+				  cleanTitle = setupParts[1];
 				}
 			  }
+  
+			  // Use the cleaned title if we got something reasonable
+			  if (cleanTitle && cleanTitle.length > 0) {
+				name = cleanTitle;
+			  }
+			}
+			
+			// If we couldn't get a good name from the title, use the path
+			if (!name || name.length === 0) {
+			  console.log('Using path for name. Path:', path);
 			  
-			  // If we couldn't get a good name from the title, use the last segment of the path
-			  if (!name || name.length === 0) {
+			  // Try to format the path to get a readable name
+			  if (path && path.length > 0) {
 				// Get the last non-empty segment of the path
 				const pathSegments = path.split('/').filter(segment => segment.length > 0);
+				
 				if (pathSegments.length > 0) {
-				  name = pathSegments[pathSegments.length - 1]
+				  let lastSegment = pathSegments[pathSegments.length - 1];
+				  
+				  // Format the path segment for readability
+				  name = lastSegment
 					// Add space before uppercase letters
 					.replace(/([A-Z])/g, ' $1')
 					// Clean up any leading space and capitalize first letter
 					.replace(/^./, str => str.toUpperCase())
 					.trim();
-				} else {
-				  name = path; // Fallback to the full path
+				  
+				  // If name is still empty or just spaces, try another approach
+				  if (!name.trim()) {
+					// Try to use the whole path
+					name = path
+					  .replace(/([A-Z])/g, ' $1')
+					  .replace(/^./, str => str.toUpperCase())
+					  .trim();
+				  }
 				}
+			  }
+			  
+			  // Final fallback - use a generic name with the path
+			  if (!name || !name.trim()) {
+				name = 'Setup: ' + path;
 			  }
 			}
 		  }
@@ -711,62 +790,148 @@ function setupDragAndDrop() {
   }
 
 // Create tab list item element
+// Create tab list item element with proper badge alignment
 function createTabElement(tab) {
 	const tabItem = document.createElement('div');
 	tabItem.className = 'tab-item';
 	tabItem.dataset.id = tab.id;
-  
+	
 	const dragHandle = document.createElement('div');
 	dragHandle.className = 'drag-handle';
-	dragHandle.innerHTML = '⋮⋮'; // Simple drag handle
+	dragHandle.innerHTML = '⋮⋮';
 	dragHandle.setAttribute('title', 'Drag to reorder');
-  
-	const tabInfo = document.createElement('div');
-	tabInfo.className = 'tab-info';
-  
+	
+	const contentContainer = document.createElement('div');
+	contentContainer.className = 'tab-info';
+	
+	// Determine the tab type - force correct type detection
+	let isObject = false;
+	let isCustomUrl = false;
+	
+	// Check for explicit properties first
+	if (tab.hasOwnProperty('isObject') && tab.isObject === true) {
+	  isObject = true;
+	} else if (tab.hasOwnProperty('isCustomUrl') && tab.isCustomUrl === true) {
+	  isCustomUrl = true;
+	} 
+	// Then check the path if properties aren't set
+	else if (tab.path) {
+	  // Check for ObjectManager paths
+	  if (!tab.path.startsWith('ObjectManager/') && 
+      (tab.path.includes('/o/') || tab.path.endsWith('/view'))) {
+    isObject = true;
+
+	  } 
+	  // Check for custom URL patterns
+	  else if (tab.path.includes('interaction_explorer') || 
+			   tab.path.endsWith('.app') ||
+			   tab.path.includes('apex/')) {
+		isCustomUrl = true;
+	  }
+	}
+	
+	// Set badge type based on detected tab type
+	let badgeText = 'Setup';
+	let badgeClass = 'setup';
+	
+	if (isCustomUrl) {
+	  badgeText = 'Custom';
+	  badgeClass = 'custom';
+	} else if (isObject) {
+	  badgeText = 'Object';
+	  badgeClass = 'object';
+	}
+	
+	// Create tab name
 	const tabName = document.createElement('div');
 	tabName.className = 'tab-name';
 	tabName.textContent = tab.label;
-  
-	const tabPath = document.createElement('div');
-	tabPath.className = 'tab-path';
 	
-	// Create a badge to show the path type (setup, object, or custom)
-	const pathType = document.createElement('span');
-	
-	// Check tab type properties (with backward compatibility)
-	const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
-	const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
-	
-	if (isCustomUrl) {
-	  pathType.className = 'path-type custom';
-	  pathType.textContent = 'Custom';
-	} else if (isObject) {
-	  pathType.className = 'path-type object';
-	  pathType.textContent = 'Object';
+	// Setup different layout based on compact mode
+	if (userSettings.compactMode) {
+	  // Compact mode specific setup
+	  tabItem.classList.add('compact-mode');
+	  
+	  // In compact mode, badge is a single letter
+	  const badgeShort = badgeText.charAt(0);
+	  
+	  // Create the badge element for compact mode
+	  const pathType = document.createElement('span');
+	  pathType.className = 'path-type-compact ' + badgeClass;
+	  pathType.textContent = badgeShort;
+	  
+	  // Create a wrapper div for proper alignment
+	  const badgeWrapper = document.createElement('div'); 
+	  badgeWrapper.style.display = 'flex';
+	  badgeWrapper.style.alignItems = 'flex-start';
+	  badgeWrapper.style.paddingTop = '3px'; // Align with drag handle
+	  badgeWrapper.appendChild(pathType);
+	  
+	  // Configure content container for compact mode
+	  contentContainer.style.display = 'flex';
+	  contentContainer.style.flexDirection = 'row';
+	  contentContainer.style.flex = '1';
+	  contentContainer.style.minWidth = '0';
+	  contentContainer.style.alignItems = 'flex-start'; // Align items to the top
+	  
+	  // Add badge directly to content container
+	  contentContainer.appendChild(badgeWrapper);
+	  
+	  // Create text container for name that allows wrapping
+	  const textContainer = document.createElement('div');
+	  textContainer.style.marginLeft = '8px';
+	  textContainer.style.flex = '1';
+	  textContainer.style.minWidth = '0';
+	  textContainer.appendChild(tabName);
+	  
+	  // Add text to content container
+	  contentContainer.appendChild(textContainer);
+	  
+	  // Style the tab name for wrapping
+	  tabName.style.wordBreak = 'break-word';
+	  tabName.style.overflow = 'hidden';
+	  tabName.style.paddingTop = '3px'; // Align with badge and drag handle
 	} else {
-	  pathType.className = 'path-type setup';
-	  pathType.textContent = 'Setup';
+	  // Regular mode - keep original structure
+	  contentContainer.style.display = 'flex';
+	  contentContainer.style.flexDirection = 'column';
+	  contentContainer.style.flex = '1';
+	  contentContainer.style.minWidth = '0';
+	  
+	  // Add tab name first
+	  contentContainer.appendChild(tabName);
+	  
+	  // Create tab path container
+	  const tabPath = document.createElement('div');
+	  tabPath.className = 'tab-path';
+	  
+	  // Create the badge element for regular mode
+	  const pathType = document.createElement('span');
+	  pathType.className = 'path-type ' + badgeClass;
+	  pathType.textContent = badgeText;
+	  
+	  // Create path text element
+	  const pathTextElement = document.createElement('span');
+	  pathTextElement.className = 'path-text';
+	  pathTextElement.textContent = tab.path;
+	  
+	  // Add badge and path to tab path container
+	  tabPath.appendChild(pathType);
+	  tabPath.appendChild(pathTextElement);
+	  
+	  // Add tab path to content container
+	  contentContainer.appendChild(tabPath);
 	}
 	
-	// Add the path text as a separate text node
-	const pathText = document.createTextNode(' ' + tab.path);
+	// Create actions container
+	const actionsContainer = document.createElement('div');
+	actionsContainer.className = 'tab-actions';
 	
-	// Add both to the tab path div
-	tabPath.appendChild(pathType);
-	tabPath.appendChild(pathText);
-  
-	// Create a container for the toggle and delete button
-	const tabActions = document.createElement('div');
-	tabActions.className = 'tab-actions';
-	tabActions.style.display = 'flex';
-	tabActions.style.alignItems = 'center';
-  
-	// New tab toggle
+	// Create toggle for "open in new tab"
 	const newTabToggle = document.createElement('label');
 	newTabToggle.className = 'new-tab-toggle';
 	newTabToggle.setAttribute('title', 'Open in new tab');
-  
+	
 	const toggleInput = document.createElement('input');
 	toggleInput.type = 'checkbox';
 	toggleInput.checked = tab.openInNewTab;
@@ -775,40 +940,40 @@ function createTabElement(tab) {
 	  tab.openInNewTab = toggleInput.checked;
 	  saveTabsToStorage();
 	});
-  
+	
 	const toggleSwitch = document.createElement('span');
 	toggleSwitch.className = 'toggle-switch';
-  
+	
 	newTabToggle.appendChild(toggleInput);
 	newTabToggle.appendChild(toggleSwitch);
-  
-	// Delete button with trash icon
+	
+	// Create delete button
 	const deleteButton = document.createElement('button');
 	deleteButton.className = 'delete-button';
 	deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"></path></svg>';
 	deleteButton.setAttribute('title', 'Remove tab');
 	deleteButton.addEventListener('click', (e) => {
-	  e.stopPropagation(); // Prevent event from bubbling up to tabInfo
+	  e.stopPropagation();
 	  deleteTab(tab.id);
 	});
-  
-	// Edit functionality
-	tabInfo.addEventListener('click', () => {
+	
+	// Add buttons to actions container
+	actionsContainer.appendChild(newTabToggle);
+	actionsContainer.appendChild(deleteButton);
+	
+	// Add click handler for editing
+	contentContainer.addEventListener('click', () => {
 	  editTab(tab.id);
 	});
-  
-	// Assemble the tab item
-	tabInfo.appendChild(tabName);
-	tabInfo.appendChild(tabPath);
-  
-	// Add toggle and delete button to the actions container
-	tabActions.appendChild(newTabToggle);
-	tabActions.appendChild(deleteButton);
-  
+	
+	// Assemble final tab layout
 	tabItem.appendChild(dragHandle);
-	tabItem.appendChild(tabInfo);
-	tabItem.appendChild(tabActions);
-  
+	tabItem.appendChild(contentContainer);
+	tabItem.appendChild(actionsContainer);
+	
+	// For debugging - log the tab type detection
+	console.log(`Tab "${tab.label}" - isObject: ${isObject}, isCustomUrl: ${isCustomUrl}, badge: ${badgeText}`);
+	
 	return tabItem;
   }
 
@@ -1089,57 +1254,63 @@ function hideTabForm() {
 	}
 }
 
-// Save tab form data
 function saveTabForm() {
-	console.log('Saving tab form');
-	const name = tabNameInput.value.trim();
-	const path = tabPathInput.value.trim();
-  
-	if (!name || !path) {
-	  showStatus('Tab name and path are required', true);
-	  return;
-	}
-  
-	const isObject = isObjectCheckbox.checked;
-	const isCustomUrl = isCustomUrlCheckbox.checked;
-  
-	// If both object and custom URL are checked, warn the user
-	if (isObject && isCustomUrl) {
-	  showStatus('Tab cannot be both Object and Custom URL', true);
-	  return;
-	}
-  
-	if (editingTabId) {
-	  // Update existing tab
-	  const tab = customTabs.find(t => t.id === editingTabId);
-	  if (tab) {
-		tab.label = name;
-		tab.path = path;
-		tab.openInNewTab = openInNewTabCheckbox.checked;
-		tab.isObject = isObject;
-		tab.isCustomUrl = isCustomUrl;
-	  }
-	} else {
-	  // Add new tab
-	  const newTab = {
-		id: generateId(),
-		label: name,
-		path: path,
-		openInNewTab: openInNewTabCheckbox.checked,
-		isObject: isObject,
-		isCustomUrl: isCustomUrl,
-		position: customTabs.length
-	  };
-  
-	  // Log the new tab for debugging
-	  console.log('Created new tab:', newTab);
-  
-	  customTabs.push(newTab);
-	}
-  
-	saveTabsToStorage();
-	hideTabForm();
+  console.log('Saving tab form');
+  const name = tabNameInput.value.trim();
+  const path = tabPathInput.value.trim();
+
+  if (!name || !path) {
+    showStatus('Tab name and path are required', true);
+    return;
   }
+
+  // Get the checkbox values for tab type
+  const isObject = isObjectCheckbox.checked;
+  const isCustomUrl = isCustomUrlCheckbox.checked;
+
+  // If both object and custom URL are checked, warn the user
+  if (isObject && isCustomUrl) {
+    showStatus('Tab cannot be both Object and Custom URL', true);
+    return;
+  }
+
+  if (editingTabId) {
+    // Update existing tab
+    const tab = customTabs.find(t => t.id === editingTabId);
+    if (tab) {
+      // Update basic properties
+      tab.label = name;
+      tab.path = path;
+      tab.openInNewTab = openInNewTabCheckbox.checked;
+      
+      // Explicitly set the type properties
+      tab.isObject = isObject;
+      tab.isCustomUrl = isCustomUrl;
+      
+      // Log the updated tab
+      console.log('Updated tab:', tab);
+    }
+  } else {
+    // Add new tab
+    const newTab = {
+      id: generateId(),
+      label: name,
+      path: path,
+      openInNewTab: openInNewTabCheckbox.checked,
+      isObject: isObject,
+      isCustomUrl: isCustomUrl,
+      position: customTabs.length
+    };
+
+    // Log the new tab for debugging
+    console.log('Created new tab:', newTab);
+
+    customTabs.push(newTab);
+  }
+
+  saveTabsToStorage();
+  hideTabForm();
+}
 
 // Delete tab
 function deleteTab(tabId) {

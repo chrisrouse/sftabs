@@ -109,20 +109,61 @@
             <div class="settings-form">
                 <div class="form-group">
                     <label for="theme-mode">Theme Mode</label>
-                    <select id="theme-mode" class="select-input">
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
-                        <option value="system">System (Auto)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="panel-height">Panel Height</label>
-                    <div class="range-container">
-                        <input type="range" id="panel-height" min="500" max="1000" step="50" value="500" class="range-input">
-                        <span id="panel-height-value">500px</span>
+                    
+                    <div class="theme-selector">
+                      <!-- Light Theme Option -->
+                      <div class="theme-option light" data-theme-value="light">
+                        <div class="theme-icon-container">
+                          <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                          </svg>
+                        </div>
+                        <span class="theme-label">Light</span>
+                      </div>
+                      
+                      <!-- Dark Theme Option -->
+                      <div class="theme-option dark" data-theme-value="dark">
+                        <div class="theme-icon-container">
+                          <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                          </svg>
+                        </div>
+                        <span class="theme-label">Dark</span>
+                      </div>
+                      
+                      <!-- System Theme Option -->
+                      <div class="theme-option system" data-theme-value="system">
+                        <div class="theme-icon-container">
+                          <svg class="theme-icon light-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                          </svg>
+                          <svg class="theme-icon dark-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                          </svg>
+                        </div>
+                        <span class="theme-label">System</span>
+                      </div>
                     </div>
-                </div>
+
+                <div class="form-group checkbox-group">
+                    <label>
+                      <input type="checkbox" id="compact-mode">
+                      <span>Compact Mode</span>
+                    </label>
+                    <div class="help-text">Condenses tabs by showing smaller badges and hiding URLs</div>
+                  </div>
 
                 <div class="form-group">
                     <div class="import-export-buttons"> <button id="manage-config-button" class="action-button">
@@ -141,7 +182,7 @@
                 </div>
 
                 <div class="form-group">
-                    <p>v1.1.2</p>
+                    <p>v1.2.0</p>
                 </div>
 
             </div>

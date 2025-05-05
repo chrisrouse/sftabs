@@ -100,14 +100,22 @@ function createTabElement(tab) {
   const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
   
   if (isCustomUrl) {
-    // Handle custom URL paths - use the path directly with the org's base URL
-    // Remove the slash to avoid double slashes in the resulting URL
-    fullUrl = `${baseUrlRoot}${tab.path}`; // Remove the extra "/" between
+    // For custom URLs, ensure there's a leading slash
+    let formattedPath = tab.path;
+    
+    if (!formattedPath.startsWith('/')) {
+      formattedPath = '/' + formattedPath;
+    }
+    
+    fullUrl = `${baseUrlRoot}${formattedPath}`;
   } else if (isObject) {
+    // Object URLs need /home at the end
     fullUrl = `${baseUrlObject}${tab.path}/home`;
   } else if (tab.path.includes('ObjectManager/')) {
+    // ObjectManager URLs don't need /home
     fullUrl = `${baseUrlSetup}${tab.path}`;
   } else {
+    // Setup URLs need /home at the end
     fullUrl = `${baseUrlSetup}${tab.path}/home`;
   }
   
