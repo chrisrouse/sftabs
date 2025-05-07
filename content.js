@@ -37,6 +37,9 @@ const defaultTabs = [
   }
 ];
 
+let flowTabsInitialized = false;
+
+
 // Initial attempt counter
 let loadAttempts = 0;
 const maxLoadAttempts = 5;
@@ -77,6 +80,15 @@ function initTabs(tabContainer) {
     // Add click event listeners after all tabs are inserted
     addTabClickListeners(tabsToUse);
     highlightActiveCustomTab(tabsToUse);
+
+    if (window.location.href.includes('/builder/')) {
+      console.log("Detected Flow Builder interface");
+      addFlowBuilderTabs(tabsToUse);
+      // Delay to allow Flow Builder UI to fully load
+      setTimeout(() => {
+        addFlowBuilderTabs(tabsToUse);
+      }, 2000);
+    }
     
     console.log("Tabs successfully added to container");
   }).catch(error => {
@@ -124,6 +136,7 @@ function createTabElement(tab) {
   li.setAttribute('data-aura-class', 'navexConsoleTabItem');
   li.setAttribute('data-tab-id', tab.id);
   li.setAttribute('data-url', fullUrl);
+  li.setAttribute('data-show-in-flow-builder', tab.showInFlowBuilder || false);
   
   // Create the anchor element
   const a = document.createElement('a');
@@ -153,6 +166,225 @@ function createTabElement(tab) {
   li.appendChild(a);
   
   return li;
+}
+
+// Create and inject tabs into the Flow Builder UI
+function addFlowBuilderTabs(tabs) {
+  console.log("SF Tabs: Adding tabs to Flow Builder");
+  
+  // Filter tabs that should appear in Flow Builder
+  const flowBuilderTabs = tabs.filter(tab => tab.showInFlowBuilder);
+  
+  if (flowBuilderTabs.length === 0) {
+    console.log("SF Tabs: No tabs configured to show in Flow Builder");
+    return;
+  }
+  
+  try {
+    // Find the Flow Builder toolbar
+    const flowToolbar = document.querySelector('builder_platform_interaction-toolbar');
+    if (!flowToolbar) {
+      console.log("SF Tabs: Flow toolbar not found");
+      return;
+    }
+    
+    // Check if we've already added our tabs
+    if (document.querySelector('.sf-flow-tabs-container')) {
+      return;
+    }
+    
+    // First try to find the main toolbar - where all the buttons are in a row
+    const mainToolbarRow = flowToolbar.querySelector('div[role="toolbar"]');
+    
+    // Look for the Auto-Layout button using multiple valid selectors
+    let autoLayoutButton = null;
+    
+    // Try different selectors
+    const autoLayoutSelectors = [
+      'button[title="Auto-Layout"]',
+      'button[class*="Auto-Layout"]',
+      'button:contains("Auto-Layout")',
+      'button[aria-label*="Auto-Layout"]'
+    ];
+    
+    // Use a standard loop to try each selector
+    for (let i = 0; i < autoLayoutSelectors.length; i++) {
+      try {
+        const elements = flowToolbar.querySelectorAll(autoLayoutSelectors[i]);
+        if (elements && elements.length > 0) {
+          autoLayoutButton = elements[0];
+          console.log("SF Tabs: Found Auto-Layout button with selector: " + autoLayoutSelectors[i]);
+          break;
+        }
+      } catch (selectorError) {
+        // Skip invalid selectors silently
+        console.log("SF Tabs: Selector not supported: " + autoLayoutSelectors[i]);
+      }
+    }
+    
+    // If selector approach failed, try text content approach
+    if (!autoLayoutButton) {
+      const allButtons = flowToolbar.querySelectorAll('button');
+      for (let i = 0; i < allButtons.length; i++) {
+        const button = allButtons[i];
+        if (button.textContent && button.textContent.includes('Auto-Layout')) {
+          autoLayoutButton = button;
+          console.log("SF Tabs: Found Auto-Layout button by text content");
+          break;
+        }
+      }
+    }
+    
+    // Find an appropriate target container for our tabs
+    let targetContainer = null;
+    
+    if (autoLayoutButton) {
+      // Get the parent row that contains all the toolbar buttons
+      let currentParent = autoLayoutButton.parentElement;
+      
+      // Traverse up to find a good container (toolbar row)
+      while (currentParent && !targetContainer) {
+        if (currentParent.getAttribute('role') === 'toolbar' || 
+            (currentParent.className && currentParent.className.includes('toolbar'))) {
+          targetContainer = currentParent;
+          console.log("SF Tabs: Found toolbar container from Auto-Layout button");
+        } else if (currentParent === flowToolbar) {
+          // Stop if we reach the toolbar itself
+          break;
+        }
+        currentParent = currentParent.parentElement;
+      }
+    }
+    
+    // Fallbacks if we couldn't find a container from the Auto-Layout button
+    if (!targetContainer && mainToolbarRow) {
+      targetContainer = mainToolbarRow;
+      console.log("SF Tabs: Using main toolbar row as container");
+    }
+    
+    if (!targetContainer) {
+      // Final fallback - find any toolbar-like container
+      const toolbarContainers = flowToolbar.querySelectorAll('div[class*="toolbar"], div[class*="Toolbar"]');
+      if (toolbarContainers && toolbarContainers.length > 0) {
+        // Prefer the one that has buttons
+        for (let i = 0; i < toolbarContainers.length; i++) {
+          if (toolbarContainers[i].querySelectorAll('button').length > 0) {
+            targetContainer = toolbarContainers[i];
+            console.log("SF Tabs: Using toolbar container with buttons");
+            break;
+          }
+        }
+        
+        // If we still don't have a target, use the first toolbar container
+        if (!targetContainer) {
+          targetContainer = toolbarContainers[0];
+          console.log("SF Tabs: Using first toolbar container found");
+        }
+      }
+    }
+    
+    if (!targetContainer) {
+      console.log("SF Tabs: Could not find suitable toolbar container, using top-level toolbar");
+      targetContainer = flowToolbar;
+    }
+    
+    // Create our tabs container with appropriate styling
+    const tabsContainer = document.createElement('div');
+    tabsContainer.className = 'sf-flow-tabs-container';
+    tabsContainer.style.cssText = 'display: inline-flex; align-items: center; vertical-align: middle; margin-left: 8px;';
+    
+    // Create a button group for our tabs
+    const buttonGroup = document.createElement('div');
+    buttonGroup.className = 'slds-button-group sf-flow-tabs-buttons';
+    buttonGroup.setAttribute('role', 'group');
+    buttonGroup.style.cssText = 'display: inline-flex;';
+    
+    // Add each tab as a button
+    flowBuilderTabs.forEach((tab, index) => {
+      const button = createFlowTabButton(tab);
+      buttonGroup.appendChild(button);
+    });
+    
+    // Add the button group to our container
+    tabsContainer.appendChild(buttonGroup);
+    
+    // Add our container to the toolbar row - positioning at the end but still in the same row
+    targetContainer.appendChild(tabsContainer);
+    console.log("SF Tabs: Flow tabs injected into toolbar row");
+    flowTabsInitialized = true;
+  } catch (error) {
+    console.error("SF Tabs: Error injecting flow tabs:", error);
+  }
+}
+
+// Create a button element for a flow tab with native styling
+function createFlowTabButton(tab) {
+  const button = document.createElement('button');
+  
+  // Use the same classes as the native Flow Builder buttons
+  button.className = 'slds-button slds-button_neutral sf-flow-tab-button';
+  button.textContent = tab.label;
+  button.title = tab.label;
+  button.dataset.tabId = tab.id;
+  
+  // Add the same attributes as the native buttons
+  button.setAttribute('type', 'button');
+  
+  // These attributes help match the native Flow Builder styling
+  if (document.querySelector('[part="button"]')) {
+    button.setAttribute('part', 'button');
+  }
+  if (document.querySelector('[kx-scope="button-neutral"]')) {
+    button.setAttribute('kx-scope', 'button-neutral');
+  }
+  if (document.querySelector('[kx-type="ripple"]')) {
+    button.setAttribute('kx-type', 'ripple');
+  }
+  
+  // Get the base URL for the current org
+  const currentUrl = window.location.href;
+  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
+  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
+  
+  // Determine the full URL based on tab type
+  let fullUrl = '';
+  const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+  const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
+  
+  if (isCustomUrl) {
+    // For custom URLs, ensure there's a leading slash
+    let formattedPath = tab.path;
+    
+    if (!formattedPath.startsWith('/')) {
+      formattedPath = '/' + formattedPath;
+    }
+    
+    fullUrl = `${baseUrlRoot}${formattedPath}`;
+  } else if (isObject) {
+    // Object URLs: don't add /home suffix - use the path as is
+    fullUrl = `${baseUrlObject}${tab.path}`;
+  } else if (tab.path.includes('ObjectManager/')) {
+    // ObjectManager URLs don't need /home
+    fullUrl = `${baseUrlSetup}${tab.path}`;
+  } else {
+    // Setup URLs need /home at the end
+    fullUrl = `${baseUrlSetup}${tab.path}/home`;
+  }
+  
+  // Handle click to navigate to the tab's path
+  button.addEventListener('click', function(event) {
+    event.preventDefault();
+    
+    // Open in new tab or same window based on setting
+    if (tab.openInNewTab) {
+      window.open(fullUrl, '_blank');
+    } else {
+      window.location.href = fullUrl;
+    }
+  });
+  
+  return button;
 }
 
 function highlightActiveCustomTab(tabs) {
@@ -293,6 +525,16 @@ setInterval(() => {
       const tabContainer = document.querySelector('.tabBarItems.slds-grid');
       if (tabContainer) {
         initTabs(tabContainer);
+      }
+      
+      // Reset Flow Builder tabs initialization flag on URL change
+      if (location.href.includes('/builder/') && !document.querySelector('.sf-flow-tabs-container')) {
+        flowTabsInitialized = false;
+        // Load tabs from storage then apply
+        browser.storage.sync.get('customTabs').then(result => {
+          const tabsToUse = result.customTabs || defaultTabs;
+          addFlowBuilderTabs(tabsToUse);
+        });
       }
     }, 1000);
   }

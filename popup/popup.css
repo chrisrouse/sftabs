@@ -1029,3 +1029,21 @@
 .theme-option.light .theme-icon {
 	stroke: #555 !important;
   }
+
+  /* Flow Builder Buttons Styling */
+.sf-tabs-flow-buttons {
+	margin-right: 8px;
+  }
+  
+  .sf-tabs-flow-buttons .slds-button {
+	height: 32px;
+	line-height: 30px;
+	padding: 0 12px;
+	font-size: 12px;
+	border-radius: 4px;
+  }
+  
+  /* Add a slight separation between buttons */
+  .sf-tabs-flow-buttons .slds-button + .slds-button {
+	margin-left: 2px;
+  }

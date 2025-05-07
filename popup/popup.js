@@ -18,6 +18,8 @@ let deleteModalCancelButton;
 let deleteModalConfirmButton;
 let isObjectCheckbox;
 let isCustomUrlCheckbox;
+let showInFlowBuilderCheckbox;
+
 
 // Settings Elements
 let settingsButton;
@@ -43,6 +45,7 @@ const defaultTabs = [{
 		path: 'Flows',
 		openInNewTab: false,
 		isObject: false,
+		showInFlowBuilder: true,
 		position: 0
 	},
 	{
@@ -50,6 +53,7 @@ const defaultTabs = [{
 		label: 'Installed Packages',
 		path: 'ImportedPackage',
 		openInNewTab: false,
+		showInFlowBuilder: false,
 		position: 1
 	},
 	{
@@ -57,6 +61,7 @@ const defaultTabs = [{
 		label: 'Users',
 		path: 'ManageUsers',
 		openInNewTab: false,
+		showInFlowBuilder: false,
 		position: 2
 	},
 	{
@@ -64,6 +69,7 @@ const defaultTabs = [{
 		label: 'Profiles',
 		path: 'EnhancedProfiles',
 		openInNewTab: false,
+		showInFlowBuilder: false,
 		position: 3
 	},
 	{
@@ -71,6 +77,7 @@ const defaultTabs = [{
 		label: 'Permission Sets',
 		path: 'PermSets',
 		openInNewTab: false,
+		showInFlowBuilder: false,
 		position: 4
 	}
 ];
@@ -135,6 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	deleteModalConfirmButton = document.getElementById('delete-modal-confirm-button');
 	isObjectCheckbox = document.getElementById('is-object');
 	isCustomUrlCheckbox = document.getElementById('is-custom-url');
+	showInFlowBuilderCheckbox = document.getElementById('show-in-flow-builder');
+
 
 	// Settings elements
 	settingsButton = document.getElementById('settings-button');
@@ -1166,7 +1175,6 @@ function showTabForm(tabId = null) {
 	  editingTabId = tabId;
 	  formTitle.textContent = 'Edit Tab';
   
-	  // Populate form with existing data
 	  const tab = customTabs.find(t => t.id === tabId);
 	  if (tab) {
 		tabNameInput.value = tab.label;
@@ -1174,8 +1182,8 @@ function showTabForm(tabId = null) {
 		openInNewTabCheckbox.checked = tab.openInNewTab;
 		isObjectCheckbox.checked = tab.isObject || false;
 		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
-		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
-	  }
+		showInFlowBuilderCheckbox.checked = tab.showInFlowBuilder || false;
+	}
   
 	  // Find the tab element
 	  const tabElement = document.querySelector(`.tab-item[data-id="${tabId}"]`);
@@ -1267,62 +1275,65 @@ function hideTabForm() {
 }
 
 function saveTabForm() {
-  console.log('Saving tab form');
-  const name = tabNameInput.value.trim();
-  const path = tabPathInput.value.trim();
-
-  if (!name || !path) {
-    showStatus('Tab name and path are required', true);
-    return;
+	console.log('Saving tab form');
+	const name = tabNameInput.value.trim();
+	const path = tabPathInput.value.trim();
+  
+	if (!name || !path) {
+	  showStatus('Tab name and path are required', true);
+	  return;
+	}
+  
+	// Get the checkbox values for tab type
+	const isObject = isObjectCheckbox.checked;
+	const isCustomUrl = isCustomUrlCheckbox.checked;
+	const showInFlowBuilder = showInFlowBuilderCheckbox.checked; // Add this line
+  
+	// If both object and custom URL are checked, warn the user
+	if (isObject && isCustomUrl) {
+	  showStatus('Tab cannot be both Object and Custom URL', true);
+	  return;
+	}
+  
+	if (editingTabId) {
+	  // Update existing tab
+	  const tab = customTabs.find(t => t.id === editingTabId);
+	  if (tab) {
+		// Update basic properties
+		tab.label = name;
+		tab.path = path;
+		tab.openInNewTab = openInNewTabCheckbox.checked;
+		
+		// Explicitly set the type properties
+		tab.isObject = isObject;
+		tab.isCustomUrl = isCustomUrl;
+		tab.showInFlowBuilder = showInFlowBuilder; // Add this line
+		
+		// Log the updated tab
+		console.log('Updated tab:', tab);
+	  }
+	} else {
+	  // Add new tab
+	  const newTab = {
+		id: generateId(),
+		label: name,
+		path: path,
+		openInNewTab: openInNewTabCheckbox.checked,
+		isObject: isObject,
+		isCustomUrl: isCustomUrl,
+		showInFlowBuilder: false, // Add this line
+		position: customTabs.length
+	  };
+  
+	  // Log the new tab for debugging
+	  console.log('Created new tab:', newTab);
+  
+	  customTabs.push(newTab);
+	}
+  
+	saveTabsToStorage();
+	hideTabForm();
   }
-
-  // Get the checkbox values for tab type
-  const isObject = isObjectCheckbox.checked;
-  const isCustomUrl = isCustomUrlCheckbox.checked;
-
-  // If both object and custom URL are checked, warn the user
-  if (isObject && isCustomUrl) {
-    showStatus('Tab cannot be both Object and Custom URL', true);
-    return;
-  }
-
-  if (editingTabId) {
-    // Update existing tab
-    const tab = customTabs.find(t => t.id === editingTabId);
-    if (tab) {
-      // Update basic properties
-      tab.label = name;
-      tab.path = path;
-      tab.openInNewTab = openInNewTabCheckbox.checked;
-      
-      // Explicitly set the type properties
-      tab.isObject = isObject;
-      tab.isCustomUrl = isCustomUrl;
-      
-      // Log the updated tab
-      console.log('Updated tab:', tab);
-    }
-  } else {
-    // Add new tab
-    const newTab = {
-      id: generateId(),
-      label: name,
-      path: path,
-      openInNewTab: openInNewTabCheckbox.checked,
-      isObject: isObject,
-      isCustomUrl: isCustomUrl,
-      position: customTabs.length
-    };
-
-    // Log the new tab for debugging
-    console.log('Created new tab:', newTab);
-
-    customTabs.push(newTab);
-  }
-
-  saveTabsToStorage();
-  hideTabForm();
-}
 
 // Delete tab
 
