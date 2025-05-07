@@ -37,221 +37,263 @@ const defaultTabs = [
   }
 ];
 
-// Load custom tabs from storage
-function loadCustomTabs() {
-  return chrome.storage.sync.get('customTabs')
-    .then((result) => {
-      if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
-        return result.customTabs;
-      } else {
-        // Use default tabs instead of just one
-        
-        // Save them to storage for future use
-        chrome.storage.sync.set({ 
-          customTabs: defaultTabs 
-        });
-        
-        return defaultTabs;
-      }
-    })
-    .catch((error) => {
-      console.error('Error loading custom tabs:', error);
-      return defaultTabs; // Return defaults on error too
-    });
-}
+// Initial attempt counter
+let loadAttempts = 0;
+const maxLoadAttempts = 5;
 
-// Function to add custom tabs to the setup menu
-function addCustomTabs(tabs) {
-  console.log("Attempting to add custom tabs...");
-  
-  // Log all navigation links for debugging
-  const allLinks = document.querySelectorAll('a[href*="/lightning/setup/"]');
-  console.log("Found setup links:", allLinks.length);
-  allLinks.forEach(link => {
-    console.log("Link:", link.href, link.textContent);
+// Initialize tabs - similar approach to the reference plugin
+function initTabs(tabContainer) {
+  if (!tabContainer) {
+    console.log("No tab container found");
+    return;
+  }
+
+  // Load tabs from storage
+  chrome.storage.sync.get('customTabs').then(result => {
+    let tabsToUse = [];
+    
+    if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
+      tabsToUse = result.customTabs;
+    } else {
+      // Use default tabs if none found in storage
+      tabsToUse = defaultTabs;
+      // Save defaults to storage for future use
+      chrome.storage.sync.set({ customTabs: defaultTabs });
+    }
+    
+    // Sort tabs by position
+    tabsToUse.sort((a, b) => a.position - b.position);
+    
+    // Remove any existing custom tabs
+    const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
+    existingTabs.forEach(tab => tab.remove());
+    
+    // Add tabs to the container
+    for (const tab of tabsToUse) {
+      const tabElement = createTabElement(tab);
+      tabContainer.appendChild(tabElement);
+    }
+    
+    // Add click event listeners after all tabs are inserted
+    addTabClickListeners(tabsToUse);
+    highlightActiveCustomTab(tabsToUse);
+    
+    console.log("Tabs successfully added to container");
+  }).catch(error => {
+    console.error("Error loading tabs:", error);
   });
-  
-  // Look for the Object Manager tab which we want to insert our tabs after
-  const objectManagerTab = document.querySelector('a[href*="/lightning/setup/ObjectManager/home"]');
-  
-  if (!objectManagerTab) {
-    console.log("Object Manager tab not found yet, looking for alternative reference points");
-    
-    // Try alternative reference points if Object Manager tab isn't found
-    const homeTab = document.querySelector('a[href*="/lightning/setup/Home/home"]');
-    if (homeTab) {
-      console.log("Found Home tab as alternative reference point");
-      const tabItem = homeTab.closest('li');
-      if (tabItem && tabItem.parentNode) {
-        console.log("Using Home tab as reference point");
-        processTabAddition(tabItem, tabs);
-        return;
-      }
-    }
-    
-    // If we still can't find a reference point, try using any setup tab
-    const anySetupTab = document.querySelector('a[href*="/lightning/setup/"]');
-    if (anySetupTab) {
-      console.log("Found a setup tab as a last resort reference point");
-      const tabItem = anySetupTab.closest('li');
-      if (tabItem && tabItem.parentNode) {
-        console.log("Using a generic setup tab as reference point");
-        processTabAddition(tabItem, tabs);
-        return;
-      }
-    }
-    
-    console.log("No suitable reference points found");
-    return;
-  }
-  
-  // Find the parent <li> element of the Object Manager tab
-  const tabItem = objectManagerTab.closest('li');
-  
-  if (!tabItem || !tabItem.parentNode) {
-    console.log("Parent li element not found or has no parent");
-    return;
-  }
-  
-  console.log("Parent tab container found");
-  
-  processTabAddition(tabItem, tabs);
 }
 
-// Helper function to process tab addition
-function processTabAddition(referenceTabItem, tabs) {
-  // Get the base URL for the current org using the current page URL
+// Create tab element with appropriate structure and classes
+function createTabElement(tab) {
+  // Get the base URL for the current org
   const currentUrl = window.location.href;
-  const baseUrl = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
+  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
   
-  console.log("Using base URL:", baseUrl);
+  // Determine the full URL based on tab type
+  let fullUrl = '';
+  const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+  const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
   
-  // Sort tabs by position
-  const sortedTabs = [...tabs].sort((a, b) => a.position - b.position);
-  
-  // Remove existing custom tabs first to avoid duplicates
-  removeCustomTabs();
-  
-  // Find the reference element classes for styling our new tabs
-  let referenceClassName = referenceTabItem.className;
-    // Remove any active classes from the reference class names
-    referenceClassName = referenceClassName.replace(/\bactive\b|\bslds-is-active\b|\bselected\b/g, '').trim();
-
-  let referenceLinkClassName = '';
-  let referenceContentClassName = '';
-  
-  // Get a reference link to copy styles from
-  const referenceLink = referenceTabItem.querySelector('a');
-  if (referenceLink) {
-	referenceLinkClassName = referenceLink.className;
-	// Remove any active classes from the link class names
-	referenceLinkClassName = referenceLinkClassName.replace(/\bactive\b|\bslds-is-active\b|\bselected\b/g, '').trim();
+  if (isCustomUrl) {
+    // For custom URLs, ensure there's a leading slash
+    let formattedPath = tab.path;
     
-    // Get reference content div if available
-    const referenceContent = referenceLink.firstElementChild;
-    if (referenceContent) {
-      referenceContentClassName = referenceContent.className;
-    }
-  }
-  
-  console.log("Reference classes:", {
-    li: referenceClassName,
-    a: referenceLinkClassName,
-    content: referenceContentClassName
-  });
-  
-  // Add each custom tab in REVERSE order to maintain the same order as in the popup
-  // This way, each tab is inserted at the same position after the reference tab,
-  // which will reverse the visual order in the menu
-  for (let i = sortedTabs.length - 1; i >= 0; i--) {
-    const tab = sortedTabs[i];
-    
-    // Create our new tab
-    const newTabLi = document.createElement('li');
-    newTabLi.className = referenceClassName;
-    newTabLi.dataset.customTabId = tab.id;
-    
-    // Create the link for the new tab
-    const newTabLink = document.createElement('a');
-    newTabLink.href = `${baseUrl}${tab.path}/home`;
-
-    // Important: Set ARIA attributes to prevent active state
-	newTabLink.setAttribute('aria-selected', 'false');
-	newTabLink.setAttribute('role', 'tab');
-    
-    // Handle "open in new tab" setting
-    if (tab.openInNewTab) {
-      newTabLink.target = '_blank';
-      newTabLink.rel = 'noopener noreferrer';
+    if (!formattedPath.startsWith('/')) {
+      formattedPath = '/' + formattedPath;
     }
     
-    newTabLink.className = referenceLinkClassName;
-    
-    // Create the tab content
-    const tabContent = document.createElement('div');
-    tabContent.className = referenceContentClassName;
-    
-    // Set the tab label
-    const tabLabel = document.createElement('span');
-    tabLabel.textContent = tab.label;
-    
-    // Assemble the tab
-    tabContent.appendChild(tabLabel);
-    newTabLink.appendChild(tabContent);
-    newTabLi.appendChild(newTabLink);
-    
-    // Insert our new tab after the reference tab
-    referenceTabItem.parentNode.insertBefore(newTabLi, referenceTabItem.nextSibling);
-    
-    console.log(`Custom tab "${tab.label}" successfully added at ${baseUrl}${tab.path}/home`);
+    fullUrl = `${baseUrlRoot}${formattedPath}`;
+  } else if (isObject) {
+    // Object URLs: don't add /home suffix - use the path as is
+    fullUrl = `${baseUrlObject}${tab.path}`;
+  } else if (tab.path.includes('ObjectManager/')) {
+    // ObjectManager URLs don't need /home
+    fullUrl = `${baseUrlSetup}${tab.path}`;
+  } else {
+    // Setup URLs need /home at the end
+    fullUrl = `${baseUrlSetup}${tab.path}/home`;
   }
-}
-
-// Function to check and add tabs when storage changes
-function onStorageChange(changes, area) {
-  if (area === 'sync' && changes.customTabs) {
-    console.log('Storage changed, updating tabs');
-    // Remove existing custom tabs
-    removeCustomTabs();
-    // Add the updated tabs
-    addCustomTabs(changes.customTabs.newValue);
-  }
-}
-
-// Function to remove all custom tabs
-function removeCustomTabs() {
-  const customTabs = document.querySelectorAll('li[data-custom-tab-id]');
-  customTabs.forEach(tab => tab.remove());
-}
-
-// Setup an interval to try adding the tabs
-let setupMenuCheckAttempts = 0;
-const maxSetupMenuCheckAttempts = 3; // Increased max attempts
-const setupMenuCheckInterval = setInterval(function() {
-  setupMenuCheckAttempts++;
-  console.log(`Setup menu check attempt ${setupMenuCheckAttempts}/${maxSetupMenuCheckAttempts}`);
   
-  // Try to add the tabs
-  loadCustomTabs().then(tabs => {
-    addCustomTabs(tabs);
-  });
+  // Create the tab element
+  const li = document.createElement('li');
+  li.setAttribute('role', 'presentation');
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-custom-tab';
+  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+  li.setAttribute('data-tab-id', tab.id);
+  li.setAttribute('data-url', fullUrl);
   
-  // Stop checking after max attempts
-  if (setupMenuCheckAttempts >= maxSetupMenuCheckAttempts) {
-    console.log("Max check attempts reached, stopping automatic checks");
-    clearInterval(setupMenuCheckInterval);
+  // Create the anchor element
+  const a = document.createElement('a');
+  a.setAttribute('role', 'tab');
+  a.setAttribute('tabindex', '-1');
+  a.setAttribute('title', tab.label);
+  a.setAttribute('aria-selected', 'false');
+  a.setAttribute('href', fullUrl);
+  
+  // Set target based on openInNewTab property
+  if (tab.openInNewTab) {
+    a.setAttribute('target', '_blank');
+  } else {
+    a.setAttribute('target', '_self');
   }
-}, 1500); // Increased interval to give more time for the page to load
+  
+  // Add appropriate classes
+  a.classList.add('tabHeader', 'slds-context-bar__label-action');
+  
+  // Create span for tab title
+  const span = document.createElement('span');
+  span.classList.add('title', 'slds-truncate');
+  span.textContent = tab.label;
+  
+  // Assemble the elements
+  a.appendChild(span);
+  li.appendChild(a);
+  
+  return li;
+}
 
-// Also try when navigation happens
-window.addEventListener('popstate', function() {
-  console.log("Navigation detected (popstate)");
-  // Reset and try again
-  setupMenuCheckAttempts = 0;
-  loadCustomTabs().then(tabs => {
-    addCustomTabs(tabs);
+function highlightActiveCustomTab(tabs) {
+  const currentUrl = window.location.href;
+  let matchedTab = null;
+
+  for (const tab of tabs) {
+    const baseUrl = window.location.origin;
+    const tabUrl = document.querySelector(`li[data-tab-id="${tab.id}"]`)?.getAttribute('data-url');
+    if (tabUrl && currentUrl.startsWith(tabUrl)) {
+      matchedTab = tab;
+      break;
+    }
+  }
+
+  if (matchedTab) {
+    // Only if a custom tab matches the current page
+    console.log(`Highlighting active custom tab: ${matchedTab.label}`);
+
+    const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
+    allTabs.forEach(tabEl => {
+      tabEl.classList.remove('slds-is-active');
+      const anchor = tabEl.querySelector('a');
+      if (anchor) anchor.setAttribute('aria-selected', 'false');
+    });
+
+    const activeEl = document.querySelector(`li[data-tab-id="${matchedTab.id}"]`);
+    if (activeEl) {
+      activeEl.classList.add('slds-is-active');
+      const anchor = activeEl.querySelector('a');
+      if (anchor) anchor.setAttribute('aria-selected', 'true');
+    }
+  } else {
+    console.log("No custom tab matched. Leaving default active tab styling.");
+  }
+}
+
+// Add click event listeners for tabs
+function addTabClickListeners(tabs) {
+  // We only need to add listeners for tabs that open in new tabs
+  // For other tabs, let the chrome handle navigation normally
+  tabs.forEach(tab => {
+    if (!tab.openInNewTab) return;
+    
+    const links = document.querySelectorAll(`li[data-tab-id="${tab.id}"] a`);
+    links.forEach(link => {
+      link.addEventListener('click', event => {
+        event.preventDefault();
+        window.open(link.href, '_blank');
+      });
+    });
   });
+}
+
+// Function to try loading tabs with delay and retries
+function delayLoadTabs(attemptCount) {
+  const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+  attemptCount++;
+  
+  console.log(`Tab loading attempt ${attemptCount}/${maxLoadAttempts}`);
+  
+  if (attemptCount > maxLoadAttempts) {
+    console.error("SF Tabs - failed to find tab container after max attempts");
+    return;
+  }
+  
+  if (!tabContainer) {
+    // Schedule next attempt
+    setTimeout(() => {
+      delayLoadTabs(attemptCount);
+    }, 2000);
+  } else {
+    // Found container, initialize tabs
+    console.log("Tab container found - initializing tabs");
+    initTabs(tabContainer);
+  }
+}
+
+// Start loading tabs after a short delay
+setTimeout(() => {
+  delayLoadTabs(0);
+}, 2000);
+
+// Observe DOM mutations to apply active styling sooner
+const observer = new MutationObserver(() => {
+  const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+  if (tabContainer && tabContainer.querySelectorAll('.sf-tabs-custom-tab').length > 0) {
+    // Stop observing once tabs are loaded
+    observer.disconnect();
+
+    // Re-highlight the active tab now that DOM is ready
+    chrome.storage.sync.get('customTabs').then(result => {
+      const tabsToUse = result.customTabs || defaultTabs;
+      highlightActiveCustomTab(tabsToUse);
+    });
+  }
 });
 
-// Listen for storage changes to update tabs in real-time
-chrome.storage.onChanged.addListener(onStorageChange);
+// Start observing early DOM changes
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Listen for storage changes to refresh tabs
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && changes.customTabs) {
+    console.log("Tabs changed in storage - refreshing");
+    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    if (tabContainer) {
+      initTabs(tabContainer);
+    }
+  }
+});
+
+// Handle tab refresh requests from the popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'refresh_tabs') {
+    console.log("Received request to refresh tabs");
+    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    if (tabContainer) {
+      initTabs(tabContainer);
+      sendResponse({ success: true });
+    } else {
+      console.warn("Could not find tab container for refresh");
+      sendResponse({ success: false, error: "Tab container not found" });
+    }
+  }
+  return true;
+});
+
+// Also check for URL changes and refresh tabs if needed
+let lastUrl = location.href;
+setInterval(() => {
+  if (location.href !== lastUrl) {
+    console.log("URL changed - checking for tab container");
+    lastUrl = location.href;
+    
+    // Slight delay to let the page structure load
+    setTimeout(() => {
+      const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+      if (tabContainer) {
+        initTabs(tabContainer);
+      }
+    }, 1000);
+  }
+}, 1000);
