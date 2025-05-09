@@ -899,6 +899,7 @@
 	border-radius: 6px;
 	transition: all 0.2s ease;
 	border: 2px solid transparent;
+	margin-bottom: 20px;
   }
   
   .theme-option:hover {
