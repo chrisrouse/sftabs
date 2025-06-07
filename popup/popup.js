@@ -520,28 +520,28 @@ function setupEventListeners() {
 const lightningNavigationCheckbox = document.getElementById('lightning-navigation');
 if (lightningNavigationCheckbox) {
   lightningNavigationCheckbox.addEventListener('change', () => {
-	console.log('Lightning Navigation changed to:', lightningNavigationCheckbox.checked);
-	userSettings.lightningNavigation = lightningNavigationCheckbox.checked;
-	
-	// Save to both Chrome storage and localStorage immediately
-	saveUserSettings();
-	localStorage.setItem("lightningNavigation", JSON.stringify(lightningNavigationCheckbox.checked));
-	
-	// Send message to content script to refresh tabs immediately
-	browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	  if (tabs[0]) {
-		browser.tabs.sendMessage(tabs[0].id, {action: 'refresh_tabs'}, function(response) {
-		  if (browser.runtime.lastError) {
-			console.log("Could not send message to content script:", browser.runtime.lastError.message);
-		  } else {
-			console.log("Successfully refreshed tabs after Lightning Navigation change");
-		  }
-		});
-	  }
-	});
-	
-	// Show immediate feedback
-	showStatus(`Lightning Navigation ${lightningNavigationCheckbox.checked ? 'enabled' : 'disabled'}`, false);
+    console.log('Lightning Navigation changed to:', lightningNavigationCheckbox.checked);
+    userSettings.lightningNavigation = lightningNavigationCheckbox.checked;
+    
+    // Save to both browser storage and localStorage immediately
+    saveUserSettings();
+    localStorage.setItem("lightningNavigation", JSON.stringify(lightningNavigationCheckbox.checked));
+    
+    // Send message to content script to refresh tabs immediately
+    browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (tabs[0]) {
+        browser.tabs.sendMessage(tabs[0].id, {action: 'refresh_tabs'}, function(response) {
+          if (browser.runtime.lastError) {
+            console.log("Could not send message to content script:", browser.runtime.lastError.message);
+          } else {
+            console.log("Successfully refreshed tabs after Lightning Navigation change");
+          }
+        });
+      }
+    });
+    
+    // Show immediate feedback
+    showStatus(`Lightning Navigation ${lightningNavigationCheckbox.checked ? 'enabled' : 'disabled'}`, false);
   });
 }
 
@@ -561,7 +561,7 @@ if (lightningNavigationCheckbox) {
 
 // Handle Quick Add
 function addTabForCurrentPage() {
-	// Get the current active tab in the chrome
+	// Get the current active tab in the browser
 	browser.tabs.query({ active: true, currentWindow: true })
 	  .then(tabs => {
 		if (tabs.length > 0) {
@@ -866,8 +866,8 @@ function createTabElement(tab) {
 	else if (tab.path) {
 	  // Check for ObjectManager paths
 	  if (!tab.path.startsWith('ObjectManager/') && 
-	  (tab.path.includes('/o/') || tab.path.endsWith('/view'))) {
-	isObject = true;
+      (tab.path.includes('/o/') || tab.path.endsWith('/view'))) {
+    isObject = true;
 
 	  } 
 	  // Check for custom URL patterns
@@ -1328,8 +1328,8 @@ function saveTabForm() {
   const path = tabPathInput.value.trim();
 
   if (!name || !path) {
-	showStatus('Tab name and path are required', true);
-	return;
+    showStatus('Tab name and path are required', true);
+    return;
   }
 
   // Get the checkbox values for tab type
@@ -1338,42 +1338,42 @@ function saveTabForm() {
 
   // If both object and custom URL are checked, warn the user
   if (isObject && isCustomUrl) {
-	showStatus('Tab cannot be both Object and Custom URL', true);
-	return;
+    showStatus('Tab cannot be both Object and Custom URL', true);
+    return;
   }
 
   if (editingTabId) {
-	// Update existing tab
-	const tab = customTabs.find(t => t.id === editingTabId);
-	if (tab) {
-	  // Update basic properties
-	  tab.label = name;
-	  tab.path = path;
-	  tab.openInNewTab = openInNewTabCheckbox.checked;
-	  
-	  // Explicitly set the type properties
-	  tab.isObject = isObject;
-	  tab.isCustomUrl = isCustomUrl;
-	  
-	  // Log the updated tab
-	  console.log('Updated tab:', tab);
-	}
+    // Update existing tab
+    const tab = customTabs.find(t => t.id === editingTabId);
+    if (tab) {
+      // Update basic properties
+      tab.label = name;
+      tab.path = path;
+      tab.openInNewTab = openInNewTabCheckbox.checked;
+      
+      // Explicitly set the type properties
+      tab.isObject = isObject;
+      tab.isCustomUrl = isCustomUrl;
+      
+      // Log the updated tab
+      console.log('Updated tab:', tab);
+    }
   } else {
-	// Add new tab
-	const newTab = {
-	  id: generateId(),
-	  label: name,
-	  path: path,
-	  openInNewTab: openInNewTabCheckbox.checked,
-	  isObject: isObject,
-	  isCustomUrl: isCustomUrl,
-	  position: customTabs.length
-	};
+    // Add new tab
+    const newTab = {
+      id: generateId(),
+      label: name,
+      path: path,
+      openInNewTab: openInNewTabCheckbox.checked,
+      isObject: isObject,
+      isCustomUrl: isCustomUrl,
+      position: customTabs.length
+    };
 
-	// Log the new tab for debugging
-	console.log('Created new tab:', newTab);
+    // Log the new tab for debugging
+    console.log('Created new tab:', newTab);
 
-	customTabs.push(newTab);
+    customTabs.push(newTab);
   }
 
   saveTabsToStorage();
