@@ -108,7 +108,8 @@ function formatObjectNameFromURL(objectNameFromURL) {
 const defaultSettings = {
 	themeMode: 'light',
 	compactMode: false,
-	skipDeleteConfirmation: false
+	skipDeleteConfirmation: false,
+	lightningNavigation: true
   };
 
 // Initialize
@@ -278,6 +279,12 @@ function updateSettingsUI() {
 	  if (skipDeleteConfirmationCheckbox) {
 		skipDeleteConfirmationCheckbox.checked = userSettings.skipDeleteConfirmation || false;
 	  }
+
+	// Update Lightning Navigation checkbox
+	const lightningNavigationCheckbox = document.getElementById('lightning-navigation');
+	if (lightningNavigationCheckbox) {
+		lightningNavigationCheckbox.checked = userSettings.lightningNavigation !== false; // Default to true
+	}
   }
 
 // Reset settings to defaults
@@ -509,6 +516,35 @@ function setupEventListeners() {
 		});
 	}
 
+// Lightning Navigation change
+const lightningNavigationCheckbox = document.getElementById('lightning-navigation');
+if (lightningNavigationCheckbox) {
+  lightningNavigationCheckbox.addEventListener('change', () => {
+	console.log('Lightning Navigation changed to:', lightningNavigationCheckbox.checked);
+	userSettings.lightningNavigation = lightningNavigationCheckbox.checked;
+	
+	// Save to both Chrome storage and localStorage immediately
+	saveUserSettings();
+	localStorage.setItem("lightningNavigation", JSON.stringify(lightningNavigationCheckbox.checked));
+	
+	// Send message to content script to refresh tabs immediately
+	browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
+	  if (tabs[0]) {
+		browser.tabs.sendMessage(tabs[0].id, {action: 'refresh_tabs'}, function(response) {
+		  if (browser.runtime.lastError) {
+			console.log("Could not send message to content script:", browser.runtime.lastError.message);
+		  } else {
+			console.log("Successfully refreshed tabs after Lightning Navigation change");
+		  }
+		});
+	  }
+	});
+	
+	// Show immediate feedback
+	showStatus(`Lightning Navigation ${lightningNavigationCheckbox.checked ? 'enabled' : 'disabled'}`, false);
+  });
+}
+
 	// Enter key in form fields
 	tabNameInput.addEventListener('keypress', (e) => {
 		if (e.key === 'Enter') saveTabForm();
@@ -525,7 +561,7 @@ function setupEventListeners() {
 
 // Handle Quick Add
 function addTabForCurrentPage() {
-	// Get the current active tab in the browser
+	// Get the current active tab in the chrome
 	browser.tabs.query({ active: true, currentWindow: true })
 	  .then(tabs => {
 		if (tabs.length > 0) {
@@ -830,8 +866,8 @@ function createTabElement(tab) {
 	else if (tab.path) {
 	  // Check for ObjectManager paths
 	  if (!tab.path.startsWith('ObjectManager/') && 
-      (tab.path.includes('/o/') || tab.path.endsWith('/view'))) {
-    isObject = true;
+	  (tab.path.includes('/o/') || tab.path.endsWith('/view'))) {
+	isObject = true;
 
 	  } 
 	  // Check for custom URL patterns
@@ -934,30 +970,50 @@ function createTabElement(tab) {
 	  // Add tab path to content container
 	  contentContainer.appendChild(tabPath);
 	}
-	
+
 	// Create actions container
 	const actionsContainer = document.createElement('div');
 	actionsContainer.className = 'tab-actions';
 	
-	// Create toggle for "open in new tab"
-	const newTabToggle = document.createElement('label');
-	newTabToggle.className = 'new-tab-toggle';
-	newTabToggle.setAttribute('title', 'Open in new tab');
+// Create new tab icon button - simplified with CSS styling
+const newTabButton = document.createElement('button');
+newTabButton.className = 'new-tab-button';
+
+// Set initial state classes
+if (tab.openInNewTab) {
+	newTabButton.classList.add('new-tab-enabled');
+	newTabButton.setAttribute('title', 'Opens in new tab (click to change)');
+} else {
+	newTabButton.classList.add('new-tab-disabled');
+	newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
+}
+
+// Use simplified external-link icon with stroke styling
+newTabButton.innerHTML = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+		<polyline points="15 3 21 3 21 9"></polyline>
+		<line x1="10" y1="14" x2="21" y2="3"></line>
+	</svg>
+`;
+
+newTabButton.addEventListener('click', (e) => {
+	e.stopPropagation();
+	tab.openInNewTab = !tab.openInNewTab;
 	
-	const toggleInput = document.createElement('input');
-	toggleInput.type = 'checkbox';
-	toggleInput.checked = tab.openInNewTab;
-	toggleInput.style.display = 'none';
-	toggleInput.addEventListener('change', () => {
-	  tab.openInNewTab = toggleInput.checked;
-	  saveTabsToStorage();
-	});
+	// Update button appearance by toggling classes
+	if (tab.openInNewTab) {
+		newTabButton.classList.remove('new-tab-disabled');
+		newTabButton.classList.add('new-tab-enabled');
+		newTabButton.setAttribute('title', 'Opens in new tab (click to change)');
+	} else {
+		newTabButton.classList.remove('new-tab-enabled');
+		newTabButton.classList.add('new-tab-disabled');
+		newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
+	}
 	
-	const toggleSwitch = document.createElement('span');
-	toggleSwitch.className = 'toggle-switch';
-	
-	newTabToggle.appendChild(toggleInput);
-	newTabToggle.appendChild(toggleSwitch);
+	saveTabsToStorage();
+});
 	
 	// Create delete button
 	const deleteButton = document.createElement('button');
@@ -970,7 +1026,7 @@ function createTabElement(tab) {
 	});
 	
 	// Add buttons to actions container
-	actionsContainer.appendChild(newTabToggle);
+actionsContainer.appendChild(newTabButton);
 	actionsContainer.appendChild(deleteButton);
 	
 	// Add click handler for editing
@@ -1272,8 +1328,8 @@ function saveTabForm() {
   const path = tabPathInput.value.trim();
 
   if (!name || !path) {
-    showStatus('Tab name and path are required', true);
-    return;
+	showStatus('Tab name and path are required', true);
+	return;
   }
 
   // Get the checkbox values for tab type
@@ -1282,42 +1338,42 @@ function saveTabForm() {
 
   // If both object and custom URL are checked, warn the user
   if (isObject && isCustomUrl) {
-    showStatus('Tab cannot be both Object and Custom URL', true);
-    return;
+	showStatus('Tab cannot be both Object and Custom URL', true);
+	return;
   }
 
   if (editingTabId) {
-    // Update existing tab
-    const tab = customTabs.find(t => t.id === editingTabId);
-    if (tab) {
-      // Update basic properties
-      tab.label = name;
-      tab.path = path;
-      tab.openInNewTab = openInNewTabCheckbox.checked;
-      
-      // Explicitly set the type properties
-      tab.isObject = isObject;
-      tab.isCustomUrl = isCustomUrl;
-      
-      // Log the updated tab
-      console.log('Updated tab:', tab);
-    }
+	// Update existing tab
+	const tab = customTabs.find(t => t.id === editingTabId);
+	if (tab) {
+	  // Update basic properties
+	  tab.label = name;
+	  tab.path = path;
+	  tab.openInNewTab = openInNewTabCheckbox.checked;
+	  
+	  // Explicitly set the type properties
+	  tab.isObject = isObject;
+	  tab.isCustomUrl = isCustomUrl;
+	  
+	  // Log the updated tab
+	  console.log('Updated tab:', tab);
+	}
   } else {
-    // Add new tab
-    const newTab = {
-      id: generateId(),
-      label: name,
-      path: path,
-      openInNewTab: openInNewTabCheckbox.checked,
-      isObject: isObject,
-      isCustomUrl: isCustomUrl,
-      position: customTabs.length
-    };
+	// Add new tab
+	const newTab = {
+	  id: generateId(),
+	  label: name,
+	  path: path,
+	  openInNewTab: openInNewTabCheckbox.checked,
+	  isObject: isObject,
+	  isCustomUrl: isCustomUrl,
+	  position: customTabs.length
+	};
 
-    // Log the new tab for debugging
-    console.log('Created new tab:', newTab);
+	// Log the new tab for debugging
+	console.log('Created new tab:', newTab);
 
-    customTabs.push(newTab);
+	customTabs.push(newTab);
   }
 
   saveTabsToStorage();
