@@ -970,30 +970,50 @@ function createTabElement(tab) {
 	  // Add tab path to content container
 	  contentContainer.appendChild(tabPath);
 	}
-	
+
 	// Create actions container
 	const actionsContainer = document.createElement('div');
 	actionsContainer.className = 'tab-actions';
 	
-	// Create toggle for "open in new tab"
-	const newTabToggle = document.createElement('label');
-	newTabToggle.className = 'new-tab-toggle';
-	newTabToggle.setAttribute('title', 'Open in new tab');
+// Create new tab icon button - simplified with CSS styling
+const newTabButton = document.createElement('button');
+newTabButton.className = 'new-tab-button';
+
+// Set initial state classes
+if (tab.openInNewTab) {
+	newTabButton.classList.add('new-tab-enabled');
+	newTabButton.setAttribute('title', 'Opens in new tab (click to change)');
+} else {
+	newTabButton.classList.add('new-tab-disabled');
+	newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
+}
+
+// Use simplified external-link icon with stroke styling
+newTabButton.innerHTML = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+		<polyline points="15 3 21 3 21 9"></polyline>
+		<line x1="10" y1="14" x2="21" y2="3"></line>
+	</svg>
+`;
+
+newTabButton.addEventListener('click', (e) => {
+	e.stopPropagation();
+	tab.openInNewTab = !tab.openInNewTab;
 	
-	const toggleInput = document.createElement('input');
-	toggleInput.type = 'checkbox';
-	toggleInput.checked = tab.openInNewTab;
-	toggleInput.style.display = 'none';
-	toggleInput.addEventListener('change', () => {
-	  tab.openInNewTab = toggleInput.checked;
-	  saveTabsToStorage();
-	});
+	// Update button appearance by toggling classes
+	if (tab.openInNewTab) {
+		newTabButton.classList.remove('new-tab-disabled');
+		newTabButton.classList.add('new-tab-enabled');
+		newTabButton.setAttribute('title', 'Opens in new tab (click to change)');
+	} else {
+		newTabButton.classList.remove('new-tab-enabled');
+		newTabButton.classList.add('new-tab-disabled');
+		newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
+	}
 	
-	const toggleSwitch = document.createElement('span');
-	toggleSwitch.className = 'toggle-switch';
-	
-	newTabToggle.appendChild(toggleInput);
-	newTabToggle.appendChild(toggleSwitch);
+	saveTabsToStorage();
+});
 	
 	// Create delete button
 	const deleteButton = document.createElement('button');
@@ -1006,7 +1026,7 @@ function createTabElement(tab) {
 	});
 	
 	// Add buttons to actions container
-	actionsContainer.appendChild(newTabToggle);
+actionsContainer.appendChild(newTabButton);
 	actionsContainer.appendChild(deleteButton);
 	
 	// Add click handler for editing
