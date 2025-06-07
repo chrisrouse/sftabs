@@ -1,3 +1,10 @@
+// Inject the Lightning navigation script
+(function() {
+  let script = document.createElement("script");
+  script.src = chrome.runtime.getURL("inject.js");
+  document.body.appendChild(script);
+})();
+
 // Default tabs configuration
 const defaultTabs = [
   {
@@ -40,6 +47,48 @@ const defaultTabs = [
 // Initial attempt counter
 let loadAttempts = 0;
 const maxLoadAttempts = 5;
+
+// Check if Lightning Navigation is enabled
+function isLightningNavigationEnabled() {
+  // Check localStorage first (for immediate response)
+  const localStorageValue = localStorage.getItem("lightningNavigation");
+  if (localStorageValue !== null) {
+    return JSON.parse(localStorageValue);
+  }
+  // Default to true if not set
+  return true;
+}
+
+// Initialize Lightning Navigation setting from Chrome storage
+async function initializeLightningNavigationSetting() {
+  try {
+    const result = await chrome.storage.sync.get('userSettings');
+    if (result.userSettings && result.userSettings.hasOwnProperty('lightningNavigation')) {
+      const enabled = result.userSettings.lightningNavigation;
+      localStorage.setItem("lightningNavigation", JSON.stringify(enabled));
+      console.log('Lightning Navigation setting initialized:', enabled);
+    } else {
+      // Default to true
+      localStorage.setItem("lightningNavigation", JSON.stringify(true));
+      console.log('Lightning Navigation setting defaulted to true');
+    }
+  } catch (error) {
+    console.error('Error loading Lightning Navigation setting:', error);
+    localStorage.setItem("lightningNavigation", JSON.stringify(true));
+  }
+}
+
+// Lightning navigation function
+function lightningNavigate(details, fallbackURL) {
+  if (isLightningNavigationEnabled()) {
+    document.dispatchEvent(new CustomEvent("lightningNavigate", {
+      detail: { ...details, fallbackURL }
+    }));
+  } else {
+    // Use fallback navigation
+    window.open(fallbackURL, "_top");
+  }
+}
 
 // Initialize tabs - similar approach to the reference plugin
 function initTabs(tabContainer) {
@@ -190,18 +239,36 @@ function highlightActiveCustomTab(tabs) {
   }
 }
 
-// Add click event listeners for tabs
+// Add click event listeners for tabs with Lightning navigation support
 function addTabClickListeners(tabs) {
-  // We only need to add listeners for tabs that open in new tabs
-  // For other tabs, let the chrome handle navigation normally
   tabs.forEach(tab => {
-    if (!tab.openInNewTab) return;
-    
     const links = document.querySelectorAll(`li[data-tab-id="${tab.id}"] a`);
     links.forEach(link => {
       link.addEventListener('click', event => {
-        event.preventDefault();
-        window.open(link.href, '_blank');
+        const lightningEnabled = isLightningNavigationEnabled();
+        console.log('Tab clicked:', tab.label, 'Lightning Navigation enabled:', lightningEnabled, 'Open in new tab:', tab.openInNewTab);
+        
+        if (tab.openInNewTab) {
+          // For new tab, always use window.open
+          event.preventDefault();
+          window.open(link.href, '_blank');
+        } else {
+          // For same tab, check if Lightning navigation is enabled
+          if (lightningEnabled) {
+            // Use Lightning navigation
+            console.log('Using Lightning navigation for:', link.href);
+            event.preventDefault();
+            lightningNavigate({
+              navigationType: "url",
+              url: link.href
+            }, link.href);
+          } else {
+            // Lightning navigation is disabled, use regular navigation
+            console.log('Using regular navigation for:', link.href);
+            event.preventDefault();
+            window.location.href = link.href;
+          }
+        }
       });
     });
   });
@@ -233,7 +300,10 @@ function delayLoadTabs(attemptCount) {
 
 // Start loading tabs after a short delay
 setTimeout(() => {
-  delayLoadTabs(0);
+  // Initialize Lightning Navigation setting first
+  initializeLightningNavigationSetting().then(() => {
+    delayLoadTabs(0);
+  });
 }, 2000);
 
 // Observe DOM mutations to apply active styling sooner
@@ -258,6 +328,17 @@ observer.observe(document.body, { childList: true, subtree: true });
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.customTabs) {
     console.log("Tabs changed in storage - refreshing");
+    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    if (tabContainer) {
+      initTabs(tabContainer);
+    }
+  }
+});
+
+// Listen for localStorage changes (for Lightning Navigation setting)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'lightningNavigation') {
+    console.log("Lightning Navigation setting changed - refreshing tabs");
     const tabContainer = document.querySelector('.tabBarItems.slds-grid');
     if (tabContainer) {
       initTabs(tabContainer);

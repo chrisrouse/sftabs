@@ -108,7 +108,8 @@ function formatObjectNameFromURL(objectNameFromURL) {
 const defaultSettings = {
 	themeMode: 'light',
 	compactMode: false,
-	skipDeleteConfirmation: false
+	skipDeleteConfirmation: false,
+	lightningNavigation: true
   };
 
 // Initialize
@@ -278,6 +279,12 @@ function updateSettingsUI() {
 	  if (skipDeleteConfirmationCheckbox) {
 		skipDeleteConfirmationCheckbox.checked = userSettings.skipDeleteConfirmation || false;
 	  }
+
+	// Update Lightning Navigation checkbox
+	const lightningNavigationCheckbox = document.getElementById('lightning-navigation');
+	if (lightningNavigationCheckbox) {
+		lightningNavigationCheckbox.checked = userSettings.lightningNavigation !== false; // Default to true
+	}
   }
 
 // Reset settings to defaults
@@ -508,6 +515,35 @@ function setupEventListeners() {
 			saveUserSettings();
 		});
 	}
+
+// Lightning Navigation change
+const lightningNavigationCheckbox = document.getElementById('lightning-navigation');
+if (lightningNavigationCheckbox) {
+  lightningNavigationCheckbox.addEventListener('change', () => {
+    console.log('Lightning Navigation changed to:', lightningNavigationCheckbox.checked);
+    userSettings.lightningNavigation = lightningNavigationCheckbox.checked;
+    
+    // Save to both Chrome storage and localStorage immediately
+    saveUserSettings();
+    localStorage.setItem("lightningNavigation", JSON.stringify(lightningNavigationCheckbox.checked));
+    
+    // Send message to content script to refresh tabs immediately
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'refresh_tabs'}, function(response) {
+          if (chrome.runtime.lastError) {
+            console.log("Could not send message to content script:", chrome.runtime.lastError.message);
+          } else {
+            console.log("Successfully refreshed tabs after Lightning Navigation change");
+          }
+        });
+      }
+    });
+    
+    // Show immediate feedback
+    showStatus(`Lightning Navigation ${lightningNavigationCheckbox.checked ? 'enabled' : 'disabled'}`, false);
+  });
+}
 
 	// Enter key in form fields
 	tabNameInput.addEventListener('keypress', (e) => {
