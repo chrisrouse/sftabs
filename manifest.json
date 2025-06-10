@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "SF Tabs",
-  "version": "1.1.0",
+  "name": "SF Tabs (Universal)",
+  "version": "1.2.6",
   "description": "Add custom tabs to the Salesforce setup menu.",
   "author": "Chris Rouse",
-  "homepage_url": "https://github.com/chrisrouse/sftabs", 
+  "homepage_url": "https://github.com/chrisrouse/sftabs",
   "browser_specific_settings": {
     "gecko": {
       "id": "sftabs@github.chrisrouse",
-      "strict_min_version": "116.0"
+      "strict_min_version": "109.0"
     }
   },
   "permissions": [
@@ -41,6 +41,18 @@
         "*://*.my.salesforce.com/lightning/setup/*"
       ],
       "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["inject.js"],
+      "matches": [
+        "*://*.lightning.force.com/*",
+        "*://*.salesforce-setup.com/*",
+        "*://*.my.salesforce-setup.com/*",
+        "*://*.salesforce.com/*",
+        "*://*.my.salesforce.com/*"
+      ]
     }
   ],
   "icons": {

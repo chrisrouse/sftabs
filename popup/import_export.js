@@ -1,3 +1,66 @@
+// Browser compatibility layer - add this at the very top of import_export.js
+(function() {
+  'use strict';
+  
+  if (typeof browser === 'undefined' && typeof chrome !== 'undefined' && chrome.runtime) {
+    window.browser = {
+      runtime: {
+        getURL: chrome.runtime.getURL.bind(chrome.runtime)
+      },
+      storage: {
+        sync: {
+          get: function(keys) {
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.get(keys, (result) => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve(result);
+                }
+              });
+            });
+          },
+          set: function(items) {
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.set(items, () => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve();
+                }
+              });
+            });
+          },
+          clear: function() {
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.clear(() => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve();
+                }
+              });
+            });
+          }
+        }
+      },
+      tabs: {
+        create: function(createProperties) {
+          return new Promise((resolve, reject) => {
+            chrome.tabs.create(createProperties, (tab) => {
+              if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+              } else {
+                resolve(tab);
+              }
+            });
+          });
+        }
+      }
+    };
+  }
+})();
+
 // DOM elements
 const exportButton = document.getElementById('export-button');
 const importButton = document.getElementById('import-button');

@@ -1,3 +1,87 @@
+// Inject the Lightning navigation script using DOM manipulation to avoid CSP issues
+(function() {
+  // Instead of inline scripts, we'll use DOM events and window functions
+  // This approach works around Salesforce's CSP restrictions
+  
+  // Create a script element that uses the external inject.js file
+  const script = document.createElement("script");
+  script.src = browser.runtime.getURL("inject.js");
+  script.onload = function() {
+    console.log("inject.js loaded successfully");
+    // Signal that the script is loaded
+    window.postMessage({type: 'SF_TABS_INJECT_LOADED'}, window.location.origin);
+  };
+  script.onerror = function() {
+    console.error("Failed to load inject.js");
+  };
+  
+  // Try different injection points
+  if (document.head) {
+    document.head.appendChild(script);
+  } else if (document.documentElement) {
+    document.documentElement.appendChild(script);
+  } else {
+    // Fallback: wait for DOM and try again
+    document.addEventListener('DOMContentLoaded', function() {
+      (document.head || document.documentElement).appendChild(script);
+    });
+  }
+})();
+
+// Alternative approach: Use window functions instead of postMessage for Lightning navigation
+function setupWindowLightningNavigation() {
+  // Create a global function that the page can access
+  const scriptContent = `
+    if (!window.sfTabsLightningNav) {
+      window.sfTabsLightningNav = function(details) {
+        console.log("Window Lightning navigation called with:", details);
+        
+        try {
+          if (details.navigationType === "url" && details.url) {
+            if (typeof $A !== 'undefined' && $A.get) {
+              const e = $A.get("e.force:navigateToURL");
+              if (e) {
+                e.setParams({ url: details.url });
+                e.fire();
+                console.log("Lightning navigation fired successfully");
+                return true;
+              }
+            }
+          } else if (details.navigationType === "recordId" && details.recordId) {
+            if (typeof $A !== 'undefined' && $A.get) {
+              const e = $A.get("e.force:navigateToSObject");
+              if (e) {
+                e.setParams({ "recordId": details.recordId });
+                e.fire();
+                console.log("Lightning SObject navigation fired successfully");
+                return true;
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Lightning navigation error:", error);
+        }
+        
+        return false;
+      };
+      
+      console.log("Window Lightning navigation function created");
+      window.postMessage({type: 'SF_TABS_WINDOW_NAV_READY'}, window.location.origin);
+    }
+  `;
+  
+  // Use eval in the page context by setting it as a data attribute
+  const script = document.createElement('script');
+  const blob = new Blob([scriptContent], {type: 'application/javascript'});
+  const url = URL.createObjectURL(blob);
+  script.src = url;
+  script.onload = function() {
+    URL.revokeObjectURL(url);
+  };
+  
+  (document.head || document.documentElement).appendChild(script);
+}
+
 // Default tabs configuration
 const defaultTabs = [
   {
@@ -40,6 +124,99 @@ const defaultTabs = [
 // Initial attempt counter
 let loadAttempts = 0;
 const maxLoadAttempts = 5;
+let handlerReady = false;
+let windowNavReady = false;
+
+// Listen for handler ready signals
+window.addEventListener("message", function(event) {
+  if (event.origin === window.location.origin) {
+    if (event.data && event.data.type === 'SF_TABS_INJECT_LOADED') {
+      console.log("inject.js file loaded");
+      handlerReady = true;
+    } else if (event.data && event.data.type === 'SF_TABS_WINDOW_NAV_READY') {
+      console.log("Window navigation function ready");
+      windowNavReady = true;
+    }
+  }
+});
+
+// Check if Lightning Navigation is enabled
+function isLightningNavigationEnabled() {
+  // Check localStorage first (for immediate response)
+  const localStorageValue = localStorage.getItem("lightningNavigation");
+  if (localStorageValue !== null) {
+    return JSON.parse(localStorageValue);
+  }
+  // Default to true if not set
+  return true;
+}
+
+// Initialize Lightning Navigation setting from browser storage
+async function initializeLightningNavigationSetting() {
+  try {
+    const result = await browser.storage.sync.get('userSettings');
+    if (result.userSettings && result.userSettings.hasOwnProperty('lightningNavigation')) {
+      const enabled = result.userSettings.lightningNavigation;
+      localStorage.setItem("lightningNavigation", JSON.stringify(enabled));
+      console.log('Lightning Navigation setting initialized:', enabled);
+    } else {
+      // Default to true
+      localStorage.setItem("lightningNavigation", JSON.stringify(true));
+      console.log('Lightning Navigation setting defaulted to true');
+    }
+  } catch (error) {
+    console.error('Error loading Lightning Navigation setting:', error);
+    localStorage.setItem("lightningNavigation", JSON.stringify(true));
+  }
+}
+
+// Lightning navigation function that tries multiple approaches
+function lightningNavigate(details, fallbackURL) {
+  if (!isLightningNavigationEnabled()) {
+    console.log("Lightning Navigation disabled - using regular navigation");
+    window.location.href = fallbackURL;
+    return;
+  }
+
+  console.log("Attempting Lightning navigation...");
+  
+  // Try window function approach first (most reliable)
+  if (windowNavReady && window.sfTabsLightningNav) {
+    console.log("Using window function approach");
+    const success = window.sfTabsLightningNav({
+      navigationType: details.navigationType || "url",
+      url: details.url || fallbackURL,
+      recordId: details.recordId || null
+    });
+    
+    if (success) {
+      console.log("Lightning navigation initiated successfully");
+      return; // Navigation successful, no fallback needed
+    }
+  }
+  
+  // Try postMessage approach as fallback
+  if (handlerReady) {
+    console.log("Using postMessage approach");
+    const messageData = {
+      type: 'SF_TABS_LIGHTNING_NAVIGATE',
+      navigationType: details.navigationType || "url",
+      url: details.url || fallbackURL,
+      recordId: details.recordId || null,
+      fallbackURL: fallbackURL
+    };
+    
+    window.postMessage(messageData, window.location.origin);
+    
+    // Don't set a timeout for fallback - let Lightning handle it
+    console.log("Lightning navigation message sent - waiting for Lightning to handle");
+    return;
+  }
+  
+  // Final fallback - only if no handlers are available
+  console.log("No Lightning navigation available - using regular navigation");
+  window.location.href = fallbackURL;
+}
 
 // Initialize tabs - similar approach to the reference plugin
 function initTabs(tabContainer) {
@@ -190,18 +367,36 @@ function highlightActiveCustomTab(tabs) {
   }
 }
 
-// Add click event listeners for tabs
+// Add click event listeners for tabs with Lightning navigation support
 function addTabClickListeners(tabs) {
-  // We only need to add listeners for tabs that open in new tabs
-  // For other tabs, let the browser handle navigation normally
   tabs.forEach(tab => {
-    if (!tab.openInNewTab) return;
-    
     const links = document.querySelectorAll(`li[data-tab-id="${tab.id}"] a`);
     links.forEach(link => {
       link.addEventListener('click', event => {
-        event.preventDefault();
-        window.open(link.href, '_blank');
+        const lightningEnabled = isLightningNavigationEnabled();
+        console.log('Tab clicked:', tab.label, 'Lightning Navigation enabled:', lightningEnabled, 'Open in new tab:', tab.openInNewTab);
+        
+        if (tab.openInNewTab) {
+          // For new tab, always use window.open
+          event.preventDefault();
+          window.open(link.href, '_blank');
+        } else {
+          // For same tab, check if Lightning navigation is enabled
+          if (lightningEnabled) {
+            // Use Lightning navigation
+            console.log('Using Lightning navigation for:', link.href);
+            event.preventDefault();
+            lightningNavigate({
+              navigationType: "url",
+              url: link.href
+            }, link.href);
+          } else {
+            // Lightning navigation is disabled, use regular navigation
+            console.log('Using regular navigation for:', link.href);
+            event.preventDefault();
+            window.location.href = link.href;
+          }
+        }
       });
     });
   });
@@ -233,7 +428,12 @@ function delayLoadTabs(attemptCount) {
 
 // Start loading tabs after a short delay
 setTimeout(() => {
-  delayLoadTabs(0);
+  // Initialize Lightning Navigation setting first
+  initializeLightningNavigationSetting().then(() => {
+    // Set up the window navigation function as backup
+    setupWindowLightningNavigation();
+    delayLoadTabs(0);
+  });
 }, 2000);
 
 // Observe DOM mutations to apply active styling sooner
@@ -258,6 +458,17 @@ observer.observe(document.body, { childList: true, subtree: true });
 browser.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes.customTabs) {
     console.log("Tabs changed in storage - refreshing");
+    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    if (tabContainer) {
+      initTabs(tabContainer);
+    }
+  }
+});
+
+// Listen for localStorage changes (for Lightning Navigation setting)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'lightningNavigation') {
+    console.log("Lightning Navigation setting changed - refreshing tabs");
     const tabContainer = document.querySelector('.tabBarItems.slds-grid');
     if (tabContainer) {
       initTabs(tabContainer);
@@ -297,4 +508,3 @@ setInterval(() => {
     }, 1000);
   }
 }, 1000);
-
