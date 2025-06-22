@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0] - June 22, 2025
+- Replace "Open in new tab" toggle with new icon.
+- Initialize default tabs to open in same tab rather than new tab.
+- Add Lightning Navigation support, with option to disable setting.
+- Refactor plugin to be universal for Firefox and Chrome, rather than maintaining two code bases for each browser.
+
+
 ## [1.2.0] - May 4, 2025
 - Updated selectors for light and dark mode. It should automatically use your previous setting, but you may have to reselect the correct mode.
 - Added Compact Mode for more efficient tab display. Makes it easier to see more tabs in the popup.
