@@ -1,3 +1,45 @@
+// Browser compatibility layer - add this at the very top of content.js
+(function() {
+  'use strict';
+  
+  if (typeof browser === 'undefined' && typeof chrome !== 'undefined' && chrome.runtime) {
+    window.browser = {
+      runtime: {
+        getURL: chrome.runtime.getURL.bind(chrome.runtime),
+        onMessage: chrome.runtime.onMessage
+      },
+      storage: {
+        onChanged: chrome.storage.onChanged,
+        sync: {
+          get: function(keys) {
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.get(keys, (result) => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve(result);
+                }
+              });
+            });
+          },
+          set: function(items) {
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.set(items, () => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve();
+                }
+              });
+            });
+          }
+        }
+      }
+    };
+    console.log('SF Tabs: Chrome compatibility layer loaded in content script');
+  }
+})();
+
 // Inject the Lightning navigation script using DOM manipulation to avoid CSP issues
 (function() {
   // Instead of inline scripts, we'll use DOM events and window functions
@@ -27,60 +69,6 @@
     });
   }
 })();
-
-// Alternative approach: Use window functions instead of postMessage for Lightning navigation
-function setupWindowLightningNavigation() {
-  // Create a global function that the page can access
-  const scriptContent = `
-    if (!window.sfTabsLightningNav) {
-      window.sfTabsLightningNav = function(details) {
-        console.log("Window Lightning navigation called with:", details);
-        
-        try {
-          if (details.navigationType === "url" && details.url) {
-            if (typeof $A !== 'undefined' && $A.get) {
-              const e = $A.get("e.force:navigateToURL");
-              if (e) {
-                e.setParams({ url: details.url });
-                e.fire();
-                console.log("Lightning navigation fired successfully");
-                return true;
-              }
-            }
-          } else if (details.navigationType === "recordId" && details.recordId) {
-            if (typeof $A !== 'undefined' && $A.get) {
-              const e = $A.get("e.force:navigateToSObject");
-              if (e) {
-                e.setParams({ "recordId": details.recordId });
-                e.fire();
-                console.log("Lightning SObject navigation fired successfully");
-                return true;
-              }
-            }
-          }
-        } catch (error) {
-          console.error("Lightning navigation error:", error);
-        }
-        
-        return false;
-      };
-      
-      console.log("Window Lightning navigation function created");
-      window.postMessage({type: 'SF_TABS_WINDOW_NAV_READY'}, window.location.origin);
-    }
-  `;
-  
-  // Use eval in the page context by setting it as a data attribute
-  const script = document.createElement('script');
-  const blob = new Blob([scriptContent], {type: 'application/javascript'});
-  const url = URL.createObjectURL(blob);
-  script.src = url;
-  script.onload = function() {
-    URL.revokeObjectURL(url);
-  };
-  
-  (document.head || document.documentElement).appendChild(script);
-}
 
 // Default tabs configuration
 const defaultTabs = [
@@ -125,7 +113,6 @@ const defaultTabs = [
 let loadAttempts = 0;
 const maxLoadAttempts = 5;
 let handlerReady = false;
-let windowNavReady = false;
 
 // Listen for handler ready signals
 window.addEventListener("message", function(event) {
@@ -133,10 +120,10 @@ window.addEventListener("message", function(event) {
     if (event.data && event.data.type === 'SF_TABS_INJECT_LOADED') {
       console.log("inject.js file loaded");
       handlerReady = true;
-    } else if (event.data && event.data.type === 'SF_TABS_WINDOW_NAV_READY') {
-      console.log("Window navigation function ready");
-      windowNavReady = true;
-    }
+      } else if (event.data && event.data.type === 'SF_TABS_WINDOW_NAV_READY') {
+        console.log("Window navigation function ready (from inject.js)");
+        // windowNavReady variable no longer needed since inject.js handles this
+      }
   }
 });
 
@@ -180,20 +167,20 @@ function lightningNavigate(details, fallbackURL) {
 
   console.log("Attempting Lightning navigation...");
   
-  // Try window function approach first (most reliable)
-  if (windowNavReady && window.sfTabsLightningNav) {
-    console.log("Using window function approach");
-    const success = window.sfTabsLightningNav({
-      navigationType: details.navigationType || "url",
-      url: details.url || fallbackURL,
-      recordId: details.recordId || null
-    });
-    
-    if (success) {
-      console.log("Lightning navigation initiated successfully");
-      return; // Navigation successful, no fallback needed
-    }
+// Try inject.js window function approach first (most reliable)
+if (window.sfTabsLightningNav) {
+  console.log("Using inject.js window function approach");
+  const success = window.sfTabsLightningNav({
+    navigationType: details.navigationType || "url",
+    url: details.url || fallbackURL,
+    recordId: details.recordId || null
+  });
+  
+  if (success) {
+    console.log("Lightning navigation initiated successfully");
+    return; // Navigation successful, no fallback needed
   }
+}
   
   // Try postMessage approach as fallback
   if (handlerReady) {
@@ -430,8 +417,8 @@ function delayLoadTabs(attemptCount) {
 setTimeout(() => {
   // Initialize Lightning Navigation setting first
   initializeLightningNavigationSetting().then(() => {
-    // Set up the window navigation function as backup
-    setupWindowLightningNavigation();
+    // Lightning navigation is handled by inject.js (CSP-compliant approach)
+    console.log("Lightning navigation will be handled by inject.js");
     delayLoadTabs(0);
   });
 }, 2000);

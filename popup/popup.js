@@ -639,6 +639,21 @@ function setupEventListeners() {
 			userSettings.skipDeleteConfirmation = skipDeleteConfirmationCheckbox.checked;
 			saveUserSettings();
 		});
+
+		// Changelog link
+	const changelogLink = document.getElementById('changelog-link');
+	if (changelogLink) {
+		changelogLink.addEventListener('click', (e) => {
+			e.preventDefault();
+			browser.tabs.create({ 
+				url: 'https://github.com/chrisrouse/sftabs/blob/main/CHANGELOG.md' 
+			}).then(() => {
+				// Close the popup after opening the link
+				window.close();
+			});
+		});
+	}
+	
 	}
 
 // Lightning Navigation change
