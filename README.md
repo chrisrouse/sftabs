@@ -2,6 +2,8 @@
 
 A browser extension that lets Salesforce administrators customize their setup menu by adding, editing, and managing quick-access tabs.
 
+Test
+
 ## Features
 
 ### Core Functionality
