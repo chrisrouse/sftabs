@@ -1,1035 +1,1069 @@
 /* Salesforce Lightning Design System Colors - Only used variables */
 :root {
-	/* Core colors used in the UI */
-	--slds-brand-primary: #0070D2; /* Used for primary buttons, active states */
-	--slds-brand-secondary: #005FB2; /* Used for hover states */
-	--slds-gray-1: #FFFFFF; /* White backgrounds */
-	--slds-gray-2: #F3F3F3; /* Light backgrounds */
-	--slds-gray-3: #E5E5E5; /* Borders */
-	--slds-gray-4: #D3D3D3; /* Toggle background */
-	--slds-gray-5: #A8A8A8; /* Icon fills */
-	--slds-gray-6: #747474; /* Secondary text */
-	--slds-gray-7: #444444; /* Primary text */
-	
-	/* Functional colors that are actually used */
-	--slds-color-error: #C23934; /* Used for error states and delete buttons */
-	--slds-color-success: #04844B; /* Used for object badges */
-	--slds-color-custom: #9061F9; /* Used for custom URL badges */
-	
-	/* Theme variables that are actually referenced in the code */
-	--color-background: var(--slds-gray-2);
-	--color-text: var(--slds-gray-7);
-	--color-text-weak: var(--slds-gray-6);
-	--color-border: var(--slds-gray-3);
-	--color-input-background: var(--slds-gray-2);
-	--color-header: var(--slds-brand-primary);
-	--color-header-text: var(--slds-gray-1);
-	--color-section-header: var(--slds-gray-3);
-	--color-item-background: var(--slds-gray-1);
-	--color-toggle-background: var(--slds-gray-4);
-	--color-modal-overlay: rgba(0, 0, 0, 0.7);
-	--color-icon-fill: var(--slds-gray-5);
-  }
-  
-  /* Dark Theme - Only needed overrides */
-  [data-theme="dark"] {
-	--color-background: #1A1C21;
-	--color-text: #FFFFFF;
-	--color-text-weak: #CCCCCC;
-	--color-border: #444444;
-	--color-input-background: #2A2C35;
-	--color-header: #0F6BAE;
-	--color-header-text: #FFFFFF;
-	--color-section-header: #2A2C35;
-	--color-item-background: #2A2C35;
-	--color-toggle-background: #555555;
-	--color-icon-fill: #AAAAAA;
-	
-	/* Functional color overrides used in dark mode */
-	--slds-color-success: #45C65A;
-	--slds-color-error: #FF5252;
-  }
-  
-  /* Global styles */
-  * {
-	box-sizing: border-box;
-  }
-  
-  body {
-	width: 410px;
-	margin: 0;
-	padding: 0;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-	font-size: 14px;
-	color: var(--color-text);
-	background-color: var(--color-background);
-  }
-  
-  /* Layout */
-  .container {
-	display: flex;
-	flex-direction: column;
-	height: auto;
-	min-height: 300px;
-	max-height: 600px;
-	width: 410px;
-	overflow: hidden;
-	background-color: var(--color-background);
-	position: relative;
-  }
-  
-  /* Header */
-  header {
-	background-color: var(--color-header);
-	color: var(--color-header-text);
-	padding: 12px 16px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 10;
-	width: 410px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  footer {
-	margin-top: auto;
-	padding: 8px;
-	background-color: var(--color-background);
-	border-radius: 0 0 4px 4px;
-	position: relative;
-	z-index: 5;
-  }
-  
-  /* Typography */
-  h1 {
-	font-size: 16px;
-	font-weight: 600;
-	margin: 0;
-  }
-  
-  h2 {
-	font-size: 14px;
-	font-weight: 600;
-	margin: 0;
-  }
-  
-  /* Header Actions */
-  .header-actions {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-  }
-  
-  .icon-button {
-	background: transparent;
-	border: none;
-	color: var(--color-header-text);
-	cursor: pointer;
-	width: 32px;
-	height: 32px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 4px;
-	padding: 0;
-	transition: background-color 0.2s;
-	position: relative;
-  }
-  
-  .icon-button:hover {
-	background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .icon-button svg {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 16px;
-	height: 16px;
-	stroke: var(--color-header-text);
-	stroke-width: 2px;
-	fill: none;
-  }
-  
-  /* Panel Visibility */
-  #main-content,
-  #settings-panel {
-	flex: 1;
-	overflow-y: auto;
-	overflow-x: hidden;
-	position: relative;
-	background-color: var(--color-background);
-	margin-top: 56px;
-	height: calc(100% - 56px);
-  }
-  
-  #main-content.active,
-  #settings-panel.active {
-	display: block;
+  /* Core colors used in the UI */
+  --slds-brand-primary: #0070D2;
+  /* Used for primary buttons, active states */
+  --slds-brand-secondary: #005FB2;
+  /* Used for hover states */
+  --slds-gray-1: #FFFFFF;
+  /* White backgrounds */
+  --slds-gray-2: #F3F3F3;
+  /* Light backgrounds */
+  --slds-gray-3: #E5E5E5;
+  /* Borders */
+  --slds-gray-4: #D3D3D3;
+  /* Toggle background */
+  --slds-gray-5: #A8A8A8;
+  /* Icon fills */
+  --slds-gray-6: #747474;
+  /* Secondary text */
+  --slds-gray-7: #444444;
+  /* Primary text */
+
+  /* Functional colors that are actually used */
+  --slds-color-error: #C23934;
+  /* Used for error states and delete buttons */
+  --slds-color-success: #04844B;
+  /* Used for object badges */
+  --slds-color-custom: #9061F9;
+  /* Used for custom URL badges */
+
+  /* Theme variables that are actually referenced in the code */
+  --color-background: var(--slds-gray-2);
+  --color-text: var(--slds-gray-7);
+  --color-text-weak: var(--slds-gray-6);
+  --color-border: var(--slds-gray-3);
+  --color-input-background: var(--slds-gray-2);
+  --color-header: var(--slds-brand-primary);
+  --color-header-text: var(--slds-gray-1);
+  --color-section-header: var(--slds-gray-3);
+  --color-item-background: var(--slds-gray-1);
+  --color-toggle-background: var(--slds-gray-4);
+  --color-modal-overlay: rgba(0, 0, 0, 0.7);
+  --color-icon-fill: var(--slds-gray-5);
+}
+
+/* Dark Theme - Only needed overrides */
+[data-theme="dark"] {
+  --color-background: #1A1C21;
+  --color-text: #FFFFFF;
+  --color-text-weak: #CCCCCC;
+  --color-border: #444444;
+  --color-input-background: #2A2C35;
+  --color-header: #0F6BAE;
+  --color-header-text: #FFFFFF;
+  --color-section-header: #2A2C35;
+  --color-item-background: #2A2C35;
+  --color-toggle-background: #555555;
+  --color-icon-fill: #AAAAAA;
+
+  /* Functional color overrides used in dark mode */
+  --slds-color-success: #45C65A;
+  --slds-color-error: #FF5252;
+}
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 410px;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+/* Layout */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 300px;
+  max-height: 600px;
+  width: 410px;
+  overflow: hidden;
+  background-color: var(--color-background);
+  position: relative;
+}
+
+/* Header */
+header {
+  background-color: var(--color-header);
+  color: var(--color-header-text);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 410px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+  margin-top: auto;
+  padding: 8px;
+  background-color: var(--color-background);
+  border-radius: 0 0 4px 4px;
+  position: relative;
+  z-index: 5;
+}
+
+/* Typography */
+h1 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+h2 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  color: var(--color-header-text);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.icon-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.icon-button svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  stroke: var(--color-header-text);
+  stroke-width: 2px;
+  fill: none;
+}
+
+/* Panel Visibility */
+#main-content,
+#settings-panel {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  background-color: var(--color-background);
+  margin-top: 56px;
+  height: calc(100% - 56px);
+}
+
+#main-content.active,
+#settings-panel.active {
+  display: block;
+}
+
+#settings-panel .section-header {
+  margin-left: 8px;
+  margin-top: 8px;
+}
+
+.settings-panel {
+  padding: 0;
+  background-color: var(--color-background);
+}
+
+/* Tab List */
+.tab-list {
+  height: auto;
+  min-height: 150px;
+  overflow-y: auto;
+  background-color: var(--color-background);
+  padding: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: var(--color-text-weak);
+  font-weight: 500;
+}
+
+/* Tab Items */
+.tab-item {
+  display: flex;
+  background-color: var(--color-item-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  position: relative;
+  min-height: 36px;
+  align-items: flex-start;
+}
+
+.tab-item.multi-line {
+  min-height: 48px;
+}
+
+/* For very long paths - help with wrapping */
+.tab-path.long-path {
+  flex-wrap: wrap;
+}
+
+.tab-path.long-path .path-type {
+  margin-bottom: 2px;
+}
+
+.tab-path.long-path .path-text {
+  width: 100%;
+  margin-top: 2px;
+  padding-left: 0;
+}
+
+/* Top row container for compact mode */
+.top-row-container {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* Compact mode adjustments */
+.tab-item.compact-mode .drag-handle {
+  align-self: flex-start;
+  margin-top: 3px;
+}
+
+.tab-item.compact-mode .tab-actions {
+  align-self: flex-start;
+  margin-top: 1px;
+  padding-top: 1px;
+}
+
+.tab-item.compact-mode {
+  align-items: center;
+}
+
+/* Drag and drop */
+.tab-item-clone {
+  position: absolute;
+  z-index: 1000;
+  opacity: 0.7;
+}
+
+.tab-item.dragging {
+  opacity: 0.5;
+  border: 2px dashed var(--slds-brand-primary);
+}
+
+.tab-item.drag-over {
+  border: 2px dashed var(--slds-brand-primary);
+  transform: translateY(4px);
+}
+
+.tab-item.being-dragged {
+  opacity: 0.3;
+}
+
+.drag-handle {
+  background-color: var(--color-border);
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.tab-info {
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 90px);
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: auto;
+}
+
+.tab-item.compact-mode .tab-info {
+  padding-top: 3px;
+}
+
+.tab-name {
+  font-weight: 400;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  margin: 3px 0;
+  line-height: 1.3;
+}
+
+.tab-path {
+  font-size: 12px;
+  color: var(--color-text-weak);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.3;
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* Badge styles */
+.tab-path .path-type {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-right: 8px;
+  margin-bottom: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+  min-width: 52px;
+  text-align: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Compact mode badge */
+.path-type-compact {
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.tab-item.compact-mode .tab-name {
+  padding-top: 0 !important;
+}
+
+/* Badge colors */
+.path-type.setup,
+.path-type-compact.setup {
+  background-color: var(--slds-color-info, var(--slds-brand-primary));
+}
+
+.path-type.object,
+.path-type-compact.object {
+  background-color: var(--slds-color-success);
+}
+
+.path-type.custom,
+.path-type-compact.custom {
+  background-color: var(--slds-color-custom);
+}
+
+/* Path text styling */
+.tab-path .path-text {
+  display: block;
+  flex: 1;
+  width: calc(100% - 60px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0;
+  padding-right: 0;
+}
+
+/* Tab Actions Styling */
+.tab-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+  min-width: 30px;
+  align-self: flex-start;
+}
+
+/* Drop indicator */
+.drop-indicator {
+  height: 2px;
+  background-color: var(--slds-brand-primary);
+  margin-bottom: 8px;
+  display: none;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
   }
 
-  #settings-panel .section-header {
-	margin-left: 8px;
-  	margin-top: 8px;
-	}
-  
-  .settings-panel {
-	padding: 0;
-	background-color: var(--color-background);
-  }
-  
-  /* Tab List */
-  .tab-list {
-	height: auto;
-	min-height: 150px;
-	overflow-y: auto;
-	background-color: var(--color-background);
-	padding: 8px;
-	width: 100%;
-	box-sizing: border-box;
-  }
-  
-  .empty-state {
-	text-align: center;
-	padding: 20px;
-	color: var(--color-text-weak);
-	font-weight: 500;
-  }
-  
-  /* Tab Items */
-  .tab-item {
-	display: flex;
-	background-color: var(--color-item-background);
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	padding: 8px 12px;
-	margin-bottom: 8px;
-	cursor: pointer;
-	position: relative;
-	min-height: 36px;
-	align-items: flex-start;
-  }
-  
-  .tab-item.multi-line {
-	min-height: 48px;
-  }
-  
-  /* For very long paths - help with wrapping */
-  .tab-path.long-path {
-	flex-wrap: wrap;
-  }
-  
-  .tab-path.long-path .path-type {
-	margin-bottom: 2px;
-  }
-  
-  .tab-path.long-path .path-text {
-	width: 100%;
-	margin-top: 2px;
-	padding-left: 0;
-  }
-  
-  /* Top row container for compact mode */
-  .top-row-container {
-	display: flex;
-	align-items: flex-start;
-	width: 100%;
-  }
-  
-  /* Compact mode adjustments */
-  .tab-item.compact-mode .drag-handle {
-	align-self: flex-start;
-	margin-top: 3px;
-  }
-  
-  .tab-item.compact-mode .tab-actions {
-	align-self: flex-start;
-	margin-top: 1px;
-	padding-top: 1px;
-  }
-  
-  .tab-item.compact-mode {
-	align-items: center;
-  }
-  
-  /* Drag and drop */
-  .tab-item-clone {
-	position: absolute;
-	z-index: 1000;
-	opacity: 0.7;
-  }
-  
-  .tab-item.dragging {
-	opacity: 0.5;
-	border: 2px dashed var(--slds-brand-primary);
-  }
-  
-  .tab-item.drag-over {
-	border: 2px dashed var(--slds-brand-primary);
-	transform: translateY(4px);
-  }
-  
-  .tab-item.being-dragged {
-	opacity: 0.3;
-  }
-  
-  .drag-handle {
-	background-color: var(--color-border);
-	border-radius: 4px;
-	width: 24px;
-	height: 24px;
-	min-width: 24px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-right: 8px;
-	cursor: grab;
-	flex-shrink: 0;
-  }
-  
-  .tab-info {
-	flex: 1;
-	min-width: 0;
-	max-width: calc(100% - 90px);
-	display: flex;
-	flex-direction: column;
-	overflow-wrap: break-word;
-	word-wrap: break-word;
-	word-break: break-word;
-	margin-bottom: auto;
-  }
-  
-  .tab-item.compact-mode .tab-info {
-	padding-top: 3px;
-  }
-  
-  .tab-name {
-	font-weight: 400;
-	overflow-wrap: break-word;
-	word-wrap: break-word;
-	word-break: break-word;
-	margin: 3px 0;
-	line-height: 1.3;
-  }
-  
-  .tab-path {
-	font-size: 12px;
-	color: var(--color-text-weak);
-	overflow-wrap: break-word;
-	word-wrap: break-word;
-	word-break: break-word;
-	line-height: 1.3;
-	max-width: 100%;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	width: 100%;
-	margin-top: 4px;
-  }
-  
-  /* Badge styles */
-  .tab-path .path-type {
-	display: inline-flex;
-	padding: 2px 8px;
-	border-radius: 4px;
-	font-size: 10px;
-	font-weight: 600;
-	margin-right: 8px;
-	margin-bottom: 0;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	align-self: flex-start;
-	min-width: 52px;
-	text-align: center;
-	justify-content: center;
-	color: white;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Compact mode badge */
-  .path-type-compact {
-	font-size: 10px;
-	width: 18px;
-	height: 18px;
-	min-width: 18px;
-	min-height: 18px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 4px;
-	font-weight: bold;
-	color: white;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	flex-shrink: 0;
-	margin-top: 0;
-  }
-  
-  .tab-item.compact-mode .tab-name {
-	padding-top: 0 !important;
-  }
-  
-  /* Badge colors */
-  .path-type.setup,
-  .path-type-compact.setup {
-	background-color: var(--slds-color-info, var(--slds-brand-primary));
-  }
-  
-  .path-type.object,
-  .path-type-compact.object {
-	background-color: var(--slds-color-success);
-  }
-  
-  .path-type.custom,
-  .path-type-compact.custom {
-	background-color: var(--slds-color-custom);
-  }
-  
-  /* Path text styling */
-  .tab-path .path-text {
-	display: block;
-	flex: 1;
-	width: calc(100% - 60px);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	margin-top: 0;
-	padding-right: 0;
-  }
-  
-  /* Tab Actions Styling */
-  .tab-actions {
-	display: flex;
-	gap: 4px;
-	flex-shrink: 0;
-	margin-left: auto;
-	min-width: 30px;
-	align-self: flex-start;
-  }
-  
-  /* Drop indicator */
-  .drop-indicator {
-	height: 2px;
-	background-color: var(--slds-brand-primary);
-	margin-bottom: 8px;
-	display: none;
-	animation: pulse 1.5s infinite;
-  }
-  
-  @keyframes pulse {
-	0% { opacity: 0.4; }
-	50% { opacity: 1; }
-	100% { opacity: 0.4; }
-  }
-  
-  /* Toggle Switch */
-  .new-tab-toggle {
-	display: inline-block;
-	position: relative;
-	width: 40px;
-	height: 20px;
-	margin-right: 0;
-	flex-shrink: 0;
-  }
-  
-  .toggle-switch {
-	position: absolute;
-	cursor: pointer;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: var(--color-toggle-background);
-	border-radius: 10px;
-	transition: .4s;
-  }
-  
-  .toggle-switch:before {
-	position: absolute;
-	content: "";
-	height: 16px;
-	width: 16px;
-	left: 2px;
-	bottom: 2px;
-	background-color: var(--slds-gray-1);
-	border-radius: 50%;
-	transition: .4s;
-  }
-  
-  input:checked+.toggle-switch {
-	background-color: var(--slds-brand-primary);
-  }
-  
-  input:checked+.toggle-switch:before {
-	transform: translateX(20px);
-  }
-  
-  /* Delete Button */
-  .delete-button {
-	flex-shrink: 0;
-	background-color: transparent;
-	border: none;
-	border-radius: 4px;
-	width: 24px;
-	height: 24px;
-	min-width: 24px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	transition: all 0.2s;
-	padding: 0;
-	margin: 0 0 0 4px;
-  }
-  
-  .delete-button:hover {
-	background-color: var(--color-border);
-  }
-  
-  .delete-button svg {
-	fill: var(--color-icon-fill);
-	width: 21px;
-	height: 21px;
-  }
-  
-  .delete-button:hover svg path {
-	fill: var(--slds-color-error);
-  }
-  
-  /* Forms */
-  .tab-form {
-	background-color: var(--color-item-background);
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	margin: 0 8px 8px 8px;
-	padding: 12px;
-	display: none;
-	transition: all 0.3s ease;
-  }
-  
-  .tab-form[style*="display: block"] {
-	animation: formSlideDown 0.3s ease;
-  }
-  
-  @keyframes formSlideDown {
-	from {
-	  opacity: 0;
-	  transform: translateY(-10px);
-	}
-	to {
-	  opacity: 1;
-	  transform: translateY(0);
-	}
-  }
-  
-  .form-header {
-	margin-bottom: 12px;
-  }
-  
-  .form-group {
-	margin-bottom: 16px;
-  }
-  
-  .settings-form {
-	margin: 8px;
-	background-color: var(--color-item-background);
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	padding: 16px;
-  }
-  
-  .settings-form .form-group {
-	margin-bottom: 24px;
-  }
-  
-  .settings-form .form-group:last-child {
-	margin-bottom: 0;
-  }
-  
-  /* Form Elements */
-  label {
-	display: block;
-	font-size: 12px;
-	color: var(--color-text-weak);
-	margin-bottom: 4px;
-	font-weight: 500;
-  }
-  
-  input[type="text"] {
-	width: 100%;
-	padding: 8px;
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	background-color: var(--color-input-background);
-	color: var(--color-text);
-	font-size: 14px;
-  }
-  
-  input[type="text"]:focus {
-	outline: none;
-	border-color: var(--slds-brand-primary);
-	box-shadow: 0 0 0 1px var(--slds-brand-primary);
-  }
-  
-  .select-input {
-	width: 100%;
-	padding: 8px;
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	background-color: var(--color-input-background);
-	color: var(--color-text);
-	font-size: 14px;
-	appearance: none;
-	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-	background-repeat: no-repeat;
-	background-position: right 8px center;
-	background-size: 16px;
-  }
-  
-  .select-input:focus {
-	outline: none;
-	border-color: var(--slds-brand-primary);
-	box-shadow: 0 0 0 1px var(--slds-brand-primary);
-  }
-  
-  .help-text {
-	font-size: 11px;
-	color: var(--color-text-weak);
-	margin-top: 2px;
-	line-height: 1.4;
-  }
-  
-  .checkbox-group {
-	display: block;
-	margin-bottom: 16px;
-  }
-  
-  .checkbox-group label {
-	display: flex;
-	align-items: center;
-	margin: 0;
-	color: var(--color-text);
-	font-size: 14px;
-  }
-  
-  .checkbox-group .help-text {
-	margin-left: 0;
-	margin-top: 4px;
-	display: block;
-	padding-left: 28px;
-	font-size: 11px;
-	color: var(--color-text-weak);
-	line-height: 1.4;
-  }
-  
-  .checkbox-group input[type="checkbox"] {
-	margin-right: 8px;
-  }
-  
-  /* Buttons */
-  .button-group {
-	display: flex;
-	justify-content: flex-end;
-	margin-top: 16px;
-  }
-  
-  .primary-button {
-	background-color: var(--slds-brand-primary);
-	color: white;
-	border: none;
-	border-radius: 4px;
-	padding: 8px 16px;
-	font-size: 14px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: background-color 0.2s;
-  }
-  
-  .primary-button:hover {
-	background-color: var(--slds-brand-secondary);
-  }
-  
-  .secondary-button {
-	background-color: transparent;
-	color: var(--color-text);
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	padding: 8px 16px;
-	font-size: 14px;
-	font-weight: 500;
-	margin-right: 8px;
-	cursor: pointer;
-	transition: background-color 0.2s;
-  }
-  
-  .secondary-button:hover {
-	background-color: var(--color-border);
-  }
-  
-  .reset-button {
-	color: var(--color-text);
-	width: 100%;
-	margin: 0;
-  }
-  
-  .reset-button:hover {
-	color: var(--slds-color-error);
-	border-color: var(--slds-color-error);
-  }
-  
-  /* Action buttons */
-  .action-button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	background-color: var(--color-background);
-	color: var(--color-text);
-	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	padding: 8px 12px;
-	font-size: 14px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: background-color 0.2s;
-	flex: 1;
-	min-width: 0;
-  }
-  
-  .action-button:hover {
-	background-color: var(--color-border);
-  }
-  
-  .action-button svg {
-	stroke: var(--color-text);
-  }
-  
-  /* Status Message */
-  .status-message {
-	text-align: center;
-	font-size: 12px;
-	color: var(--color-text-weak);
-	min-height: 24px;
-	font-weight: 500;
-  }
-  
-  .status-message.success {
-	color: var(--slds-color-success);
-  }
-  
-  .status-message.error {
-	color: var(--slds-color-error);
-  }
-  
-  /* Modal Styles */
-  .modal {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: var(--color-modal-overlay);
-	z-index: 1000;
-	justify-content: center;
-	align-items: center;
-  }
-  
-  .modal.show {
-	display: flex;
-  }
-  
-  .modal-content {
-	background-color: var(--color-background);
-	border-radius: 8px;
-	max-width: 90%;
-	width: 300px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	animation: modalFadeIn 0.3s;
-  }
-  
-  @keyframes modalFadeIn {
-	from {
-	  opacity: 0;
-	  transform: translateY(-20px);
-	}
-	to {
-	  opacity: 1;
-	  transform: translateY(0);
-	}
-  }
-  
-  .modal-header {
-	background-color: var(--color-header);
-	color: var(--color-header-text);
-	padding: 12px 16px;
-	border-radius: 8px 8px 0 0;
-  }
-  
-  .modal-body {
-	padding: 16px;
-	color: var(--color-text);
-  }
-  
-  .modal-body p {
-	margin: 0;
-	line-height: 1.5;
-  }
-  
-  .modal-footer {
-	padding: 12px 16px;
-	display: flex;
-	justify-content: flex-end;
-	border-top: 1px solid var(--color-border);
-	border-radius: 0 0 8px 8px;
-  }
-  
-  #modal-confirm-button,
-  #delete-modal-confirm-button {
-	background-color: var(--slds-color-error);
-  }
-  
-  #modal-confirm-button:hover,
-  #delete-modal-confirm-button:hover {
-	background-color: #AA0000;
+  50% {
+    opacity: 1;
   }
 
-  /* Enhanced Modal Styles for Dark Mode */
+  100% {
+    opacity: 0.4;
+  }
+}
+
+/* Toggle Switch */
+.new-tab-toggle {
+  display: inline-block;
+  position: relative;
+  width: 40px;
+  height: 20px;
+  margin-right: 0;
+  flex-shrink: 0;
+}
+
+.toggle-switch {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-toggle-background);
+  border-radius: 10px;
+  transition: .4s;
+}
+
+.toggle-switch:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--slds-gray-1);
+  border-radius: 50%;
+  transition: .4s;
+}
+
+input:checked+.toggle-switch {
+  background-color: var(--slds-brand-primary);
+}
+
+input:checked+.toggle-switch:before {
+  transform: translateX(20px);
+}
+
+/* Delete Button */
+.delete-button {
+  flex-shrink: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  margin: 0 0 0 4px;
+}
+
+.delete-button:hover {
+  background-color: var(--color-border);
+}
+
+.delete-button svg {
+  fill: var(--color-icon-fill);
+  width: 21px;
+  height: 21px;
+}
+
+.delete-button:hover svg path {
+  fill: var(--slds-color-error);
+}
+
+/* Forms */
+.tab-form {
+  background-color: var(--color-item-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  margin: 0 8px 8px 8px;
+  padding: 12px;
+  display: none;
+  transition: all 0.3s ease;
+}
+
+.tab-form[style*="display: block"] {
+  animation: formSlideDown 0.3s ease;
+}
+
+@keyframes formSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-header {
+  margin-bottom: 12px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.settings-form {
+  margin: 8px;
+  background-color: var(--color-item-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.settings-form .form-group {
+  margin-bottom: 24px;
+}
+
+.settings-form .form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Form Elements */
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-weak);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-input-background);
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--slds-brand-primary);
+  box-shadow: 0 0 0 1px var(--slds-brand-primary);
+}
+
+.select-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-input-background);
+  color: var(--color-text);
+  font-size: 14px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+
+.select-input:focus {
+  outline: none;
+  border-color: var(--slds-brand-primary);
+  box-shadow: 0 0 0 1px var(--slds-brand-primary);
+}
+
+.help-text {
+  font-size: 11px;
+  color: var(--color-text-weak);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.checkbox-group {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.checkbox-group .help-text {
+  margin-left: 0;
+  margin-top: 4px;
+  display: block;
+  padding-left: 28px;
+  font-size: 11px;
+  color: var(--color-text-weak);
+  line-height: 1.4;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Buttons */
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.primary-button {
+  background-color: var(--slds-brand-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primary-button:hover {
+  background-color: var(--slds-brand-secondary);
+}
+
+.secondary-button {
+  background-color: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.secondary-button:hover {
+  background-color: var(--color-border);
+}
+
+.reset-button {
+  color: var(--color-text);
+  width: 100%;
+  margin: 0;
+}
+
+.reset-button:hover {
+  color: var(--slds-color-error);
+  border-color: var(--slds-color-error);
+}
+
+/* Action buttons */
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex: 1;
+  min-width: 0;
+}
+
+.action-button:hover {
+  background-color: var(--color-border);
+}
+
+.action-button svg {
+  stroke: var(--color-text);
+}
+
+/* Status Message */
+.status-message {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-weak);
+  min-height: 24px;
+  font-weight: 500;
+}
+
+.status-message.success {
+  color: var(--slds-color-success);
+}
+
+.status-message.error {
+  color: var(--slds-color-error);
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-modal-overlay);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background-color: var(--color-background);
+  border-radius: 8px;
+  max-width: 90%;
+  width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  background-color: var(--color-header);
+  color: var(--color-header-text);
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-body {
+  padding: 16px;
+  color: var(--color-text);
+}
+
+.modal-body p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--color-border);
+  border-radius: 0 0 8px 8px;
+}
+
+#modal-confirm-button,
+#delete-modal-confirm-button {
+  background-color: var(--slds-color-error);
+}
+
+#modal-confirm-button:hover,
+#delete-modal-confirm-button:hover {
+  background-color: #AA0000;
+}
+
+/* Enhanced Modal Styles for Dark Mode */
 [data-theme="dark"] .modal {
-	background-color: rgba(0, 0, 0, 0.85); /* Darker, more opaque overlay */
-  }
-  
-  [data-theme="dark"] .modal-content {
-	background-color: #1E2128; /* Darker background */
-	border: 1px solid #444; /* Visible border */
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
-  }
-  
-  [data-theme="dark"] .modal-header {
-	background-color: #0F6BAE; /* Darker blue header */
-	border-bottom: 1px solid #444;
-  }
-  
-  [data-theme="dark"] .modal-body {
-	color: #FFFFFF; /* Brighter text */
-  }
-  
-  [data-theme="dark"] .modal-footer {
-	border-top-color: #444; /* More visible separator */
-  }
-  
-  [data-theme="dark"] #delete-modal-cancel-button {
-	background-color: #2A2C35;
-	color: #FFFFFF;
-	border: 1px solid #444;
-  }
-  
-  [data-theme="dark"] #delete-modal-cancel-button:hover {
-	background-color: #3A3D48;
-  }
-  
-  [data-theme="dark"] #delete-modal-confirm-button {
-	background-color: #FF5252; /* Brighter red for visibility */
-  }
-  
-  [data-theme="dark"] #delete-modal-confirm-button:hover {
-	background-color: #FF6E6E;
-  }
-  
-  /* Dark Theme Adjustments */
-  [data-theme="dark"] .action-button {
-	background-color: #2A2C35;
-	border-color: #444444;
-  }
-  
-  [data-theme="dark"] .action-button:hover {
-	background-color: #3A3D48;
-  }
-  
-  /* Import/Export buttons */
-  .import-export-buttons {
-	display: flex;
-	gap: 8px;
-	width: 100%;
-  }
+  background-color: rgba(0, 0, 0, 0.85);
+  /* Darker, more opaque overlay */
+}
 
-  /* Import/Export buttons */
+[data-theme="dark"] .modal-content {
+  background-color: #1E2128;
+  /* Darker background */
+  border: 1px solid #444;
+  /* Visible border */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  /* Enhanced shadow for depth */
+}
+
+[data-theme="dark"] .modal-header {
+  background-color: #0F6BAE;
+  /* Darker blue header */
+  border-bottom: 1px solid #444;
+}
+
+[data-theme="dark"] .modal-body {
+  color: #FFFFFF;
+  /* Brighter text */
+}
+
+[data-theme="dark"] .modal-footer {
+  border-top-color: #444;
+  /* More visible separator */
+}
+
+[data-theme="dark"] #delete-modal-cancel-button {
+  background-color: #2A2C35;
+  color: #FFFFFF;
+  border: 1px solid #444;
+}
+
+[data-theme="dark"] #delete-modal-cancel-button:hover {
+  background-color: #3A3D48;
+}
+
+[data-theme="dark"] #delete-modal-confirm-button {
+  background-color: #FF5252;
+  /* Brighter red for visibility */
+}
+
+[data-theme="dark"] #delete-modal-confirm-button:hover {
+  background-color: #FF6E6E;
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .action-button {
+  background-color: #2A2C35;
+  border-color: #444444;
+}
+
+[data-theme="dark"] .action-button:hover {
+  background-color: #3A3D48;
+}
+
+/* Import/Export buttons */
+.import-export-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Import/Export buttons */
 /* Import/Export Page Styles */
 .import-export-page {
-	padding: 20px;
-	width: auto;
-	max-width: 600px;
-	margin: 0 auto;
-  }
-  
-  .config-section {
-	margin-bottom: 20px;
-  }
-  
-  .section-divider {
-	border: none;
-	border-top: 1px solid var(--color-border);
-	margin: 20px 0;
-  }
-  
-  .import-export-buttons {
-	display: flex;
-	gap: 8px;
-	width: 100%;
-  }
+  padding: 20px;
+  width: auto;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.config-section {
+  margin-bottom: 20px;
+}
+
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 20px 0;
+}
+
+.import-export-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
 
 /* Theme Selector Styles */
 .theme-selector {
-	display: flex;
-	justify-content: space-between;
-	gap: 8px;
-	margin: 8px 0 12px 0;
-  }
-  
-  .theme-option {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	cursor: pointer;
-	padding: 8px 4px;
-	border-radius: 6px;
-	transition: all 0.2s ease;
-	border: 2px solid transparent;
-	margin-bottom: 20px;
-  }
-  
-  .theme-option:hover {
-	background-color: rgba(0, 0, 0, 0.05);
-  }
-  
-  [data-theme="dark"] .theme-option:hover {
-	background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  /* Make the selected state more prominent */
-  .theme-option.selected {
-	background-color: rgba(0, 0, 0, 0.05);
-	border: 2px solid var(--slds-brand-primary);
-}
-  
-  [data-theme="dark"] .theme-option.selected {
-	background-color: rgba(255, 255, 255, 0.1);
-	border: 2px solid var(--slds-brand-primary);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 12px 0;
 }
 
-  /* Darker border for light theme in light mode */
+.theme-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  margin-bottom: 20px;
+}
+
+.theme-option:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .theme-option:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Make the selected state more prominent */
+.theme-option.selected {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--slds-brand-primary);
+}
+
+[data-theme="dark"] .theme-option.selected {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--slds-brand-primary);
+}
+
+/* Darker border for light theme in light mode */
 [data-theme="light"] .theme-option.light .theme-icon-container {
-	border-color: #D3D3D3; /* Slightly darker border for better contrast */
-  }
-  
-  /* Make dark theme container border visible in dark mode */
-  [data-theme="dark"] .theme-option.dark .theme-icon-container {
-	border-color: #444444; /* Visible border in dark mode */
-  }
-  
-  .theme-icon-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	height: 36px;
-	background-color: var(--slds-gray-1);
-	border-radius: 4px;
-	margin-bottom: 4px;
-	border: 1px solid var(--color-border); /* Add border to all containers */
-  }
-  
-  .theme-option.dark .theme-icon-container {
-	background-color: #121212;
-  }
-  
-  .theme-option.system .theme-icon-container {
-	position: relative;
-	overflow: hidden;
-  }
-  
-  .theme-option.system .theme-icon-container::before {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 50%;
-	height: 100%;
-	background-color: var(--slds-gray-1);
-	border-right: 1px solid var(--color-border); /* Add divider between light/dark sides */
+  border-color: #D3D3D3;
+  /* Slightly darker border for better contrast */
+}
 
-  }
-  
-  .theme-option.system .theme-icon-container::after {
-	content: "";
-	position: absolute;
-	right: 0;
-	top: 0;
-	width: 50%;
-	height: 100%;
-	background-color: #121212;
-  }
-  
-  .theme-icon {
-	width: 18px;
-	height: 18px;
-	stroke: #555;
-	fill: none;
-	stroke-width: 2;
-	stroke-linecap: round;
-	stroke-linejoin: round;
-	z-index: 1;
-  }
-  
-  /* Improved icon visibility in dark mode */
-  [data-theme="dark"] .theme-option .theme-icon {
-	stroke: #f0f0f0;
-  }
-  
-  .theme-option.dark .theme-icon {
-	stroke: #f0f0f0;
-  }
-  
-  .theme-label {
-	font-size: 12px;
-	margin-top: 2px;
-	color: var(--color-text);
-  }
-  
-  /* System mode icon positioning */
-  .theme-option.system .light-icon {
-	position: absolute;
-	left: 25%;
-	transform: translateX(-50%);
-	stroke: #555 !important;
-  }
-  
-  .theme-option.system .dark-icon {
-	position: absolute;
-	right: 25%;
-	transform: translateX(50%);
-	stroke: #f0f0f0 !important;
-  }
-  
-  
-  /* Add a hidden select for compatibility */
-  #theme-mode {
-	display: none !important;
-  }
+/* Make dark theme container border visible in dark mode */
+[data-theme="dark"] .theme-option.dark .theme-icon-container {
+  border-color: #444444;
+  /* Visible border in dark mode */
+}
 
-  /* In dark mode, adjust all icons except those in specific containers */
+.theme-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 36px;
+  background-color: var(--slds-gray-1);
+  border-radius: 4px;
+  margin-bottom: 4px;
+  border: 1px solid var(--color-border);
+  /* Add border to all containers */
+}
+
+.theme-option.dark .theme-icon-container {
+  background-color: #121212;
+}
+
+.theme-option.system .theme-icon-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-option.system .theme-icon-container::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background-color: var(--slds-gray-1);
+  border-right: 1px solid var(--color-border);
+  /* Add divider between light/dark sides */
+
+}
+
+.theme-option.system .theme-icon-container::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #121212;
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
+  stroke: #555;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  z-index: 1;
+}
+
+/* Improved icon visibility in dark mode */
+[data-theme="dark"] .theme-option .theme-icon {
+  stroke: #f0f0f0;
+}
+
+.theme-option.dark .theme-icon {
+  stroke: #f0f0f0;
+}
+
+.theme-label {
+  font-size: 12px;
+  margin-top: 2px;
+  color: var(--color-text);
+}
+
+/* System mode icon positioning */
+.theme-option.system .light-icon {
+  position: absolute;
+  left: 25%;
+  transform: translateX(-50%);
+  stroke: #555 !important;
+}
+
+.theme-option.system .dark-icon {
+  position: absolute;
+  right: 25%;
+  transform: translateX(50%);
+  stroke: #f0f0f0 !important;
+}
+
+
+/* Add a hidden select for compatibility */
+#theme-mode {
+  display: none !important;
+}
+
+/* In dark mode, adjust all icons except those in specific containers */
 [data-theme="dark"] .theme-option:not(.light):not(.system) .theme-icon {
-	stroke: #f0f0f0;
-  }
+  stroke: #f0f0f0;
+}
 
-  /* Make sure the sun icon remains visible in all modes */
+/* Make sure the sun icon remains visible in all modes */
 .theme-option.light .theme-icon {
-	stroke: #555 !important;
-  }
+  stroke: #555 !important;
+}
 
 /* New Tab Button - Updated to match Delete button styling */
 .new-tab-button {
@@ -1085,4 +1119,585 @@
 
 .new-tab-button.new-tab-disabled:hover {
   background-color: var(--color-border);
+}
+
+/* Add these styles to your existing popup.css file */
+
+/* Tab Content Wrapper for dropdown tabs */
+.tab-content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+/* Dropdown Arrow Button */
+.dropdown-arrow {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.dropdown-arrow:hover {
+  background-color: var(--color-border);
+}
+
+.dropdown-arrow svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--color-text-weak);
+  transition: transform 0.2s;
+  fill: none;
+}
+
+.dropdown-arrow.open svg {
+  transform: rotate(180deg);
+}
+
+/* Enhanced Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-item-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+  margin-top: 4px;
+}
+
+.dropdown-menu.show {
+  display: block;
+  animation: dropdownSlideDown 0.2s ease;
+}
+
+/* Dropdown Items */
+.dropdown-item {
+  display: block;
+  padding: 8px 12px;
+  color: var(--color-text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-section-header);
+}
+
+.dropdown-item.active {
+  background-color: var(--slds-brand-primary);
+  color: white;
+}
+
+.dropdown-item.active:hover {
+  background-color: var(--slds-brand-secondary);
+}
+
+.dropdown-item.placeholder {
+  color: var(--color-text-weak);
+  font-style: italic;
+  cursor: default;
+}
+
+.dropdown-item.placeholder:hover {
+  background-color: transparent;
+}
+
+.dropdown-item.child-tab::before {
+  content: "→ ";
+  color: var(--color-text-weak);
+  margin-right: 4px;
+}
+
+/* Dropdown Separator */
+.dropdown-separator {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 4px 0;
+}
+
+/* Enhanced Tab Item Styling for Dropdowns */
+.tab-item.has-dropdown {
+  position: relative;
+}
+
+.tab-item.has-dropdown .tab-name {
+  cursor: pointer;
+}
+
+.tab-item.has-dropdown .tab-content-wrapper {
+  cursor: pointer;
+}
+
+.tab-item.has-dropdown .tab-content-wrapper:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 3px;
+}
+
+[data-theme="dark"] .tab-item.has-dropdown .tab-content-wrapper:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Compact mode adjustments for dropdown */
+.tab-item.compact-mode.has-dropdown .tab-content-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.tab-item.compact-mode.has-dropdown .dropdown-arrow {
+  margin-left: 4px;
+  width: 16px;
+  height: 16px;
+}
+
+.tab-item.compact-mode.has-dropdown .dropdown-arrow svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Dark theme dropdown adjustments */
+[data-theme="dark"] .dropdown-menu {
+  background-color: var(--color-item-background);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: var(--color-text);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: var(--color-section-header);
+}
+
+[data-theme="dark"] .dropdown-separator {
+  background-color: var(--color-border);
+}
+
+/* Animations */
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Form Section Transitions for new dropdown controls */
+.auto-setup-dropdown-group {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.refresh-nav-group {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Refresh Navigation Button Styling */
+#refresh-nav-button {
+  background-color: var(--color-background);
+  border: 1px solid var(--slds-brand-primary);
+  color: var(--slds-brand-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#refresh-nav-button:hover {
+  background-color: var(--slds-brand-primary);
+  color: white;
+}
+
+#refresh-nav-button svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Enhanced Dropdown Functionality CSS */
+/* Add these styles to your existing popup.css file */
+
+/* Main Item in Dropdown */
+.dropdown-item.main-item {
+  font-weight: 600;
+  background-color: color-mix(in srgb, var(--slds-brand-primary) 10%, transparent);
+  border-bottom: 2px solid var(--slds-brand-primary); /* Instead of hardcoded blue */
+}
+
+[data-theme="dark"] .dropdown-item.main-item {
+  background-color: color-mix(in srgb, var(--sf-tabs-brand-primary) 20%, transparent);
+}
+
+.dropdown-item.main-item:hover {
+  background-color: color-mix(in srgb, var(--slds-brand-primary) 20%, transparent);
+}
+
+[data-theme="dark"] .dropdown-item.main-item:hover {
+  background-color: color-mix(in srgb, var(--sf-tabs-brand-primary) 30%, transparent);
+}
+
+/* Navigation Items */
+.dropdown-item.nav-item {
+  padding-left: 16px;
+  border-left: 3px solid transparent;
+}
+
+.dropdown-item.nav-item:hover {
+  border-left-color: var(--slds-brand-primary);
+}
+
+.dropdown-item.nav-item.active {
+  background-color: var(--slds-brand-primary);
+  color: white;
+  border-left-color: white;
+}
+
+.dropdown-item.nav-item.active:hover {
+  background-color: var(--sf-tabs-brand-secondary);
+}
+
+/* Refresh Item */
+.dropdown-item.refresh-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text-weak);
+  font-style: italic;
+}
+
+.dropdown-item.refresh-item:hover {
+  color: var(--slds-brand-primary);
+}
+
+.dropdown-item.refresh-item svg {
+  stroke: currentColor;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.dropdown-item.refresh-item:hover svg {
+  animation-duration: 1s;
+}
+
+/* Loading State */
+.dropdown-item.placeholder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-weak);
+  font-style: italic;
+}
+
+.dropdown-item.placeholder svg {
+  stroke: currentColor;
+  animation: spin 1s linear infinite;
+}
+
+/* Enhanced Dropdown Menu Positioning */
+.dropdown-menu {
+  min-width: 200px;
+  max-width: 350px;
+  white-space: nowrap;
+}
+
+.dropdown-menu .dropdown-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Better visual hierarchy */
+.tab-item.has-dropdown .tab-name {
+  font-weight: 500;
+}
+
+.tab-item.has-dropdown .dropdown-arrow {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.tab-item.has-dropdown:hover .dropdown-arrow {
+  opacity: 1;
+}
+
+.tab-item.has-dropdown .dropdown-arrow.open {
+  opacity: 1;
+  background-color: var(--slds-brand-primary);
+}
+
+.tab-item.has-dropdown .dropdown-arrow.open svg {
+  stroke: white;
+}
+
+/* Compact mode adjustments for dropdowns */
+.tab-item.compact-mode.has-dropdown .dropdown-arrow {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+}
+
+.tab-item.compact-mode.has-dropdown .dropdown-arrow svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* Enhanced loading animation */
+@keyframes pulse-loading {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.dropdown-item.placeholder {
+  animation: pulse-loading 1.5s infinite;
+}
+
+/* Better spacing for dropdown items */
+.dropdown-item {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-separator {
+  margin: 2px 0;
+}
+
+/* Navigation item count indicator */
+.tab-item.has-dropdown::after {
+  content: attr(data-nav-count);
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: var(--slds-brand-primary);
+  color: white;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 8px;
+  line-height: 1;
+  font-weight: 600;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.tab-item.has-dropdown[data-nav-count="0"]::after,
+.tab-item.has-dropdown:not([data-nav-count])::after {
+  display: none;
+}
+
+/* Dark theme adjustments for the counter */
+[data-theme="dark"] .tab-item.has-dropdown::after {
+  background-color: var(--slds-brand-primary);
+}
+
+/* Responsive dropdown width */
+@media (max-width: 450px) {
+  .dropdown-menu {
+    min-width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+  }
+}
+
+/* Enhanced dropdown arrow styling */
+.dropdown-arrow {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.dropdown-arrow:hover {
+  background-color: var(--color-border);
+}
+
+.dropdown-arrow svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--color-text-weak);
+  transition: transform 0.2s;
+  fill: none;
+}
+
+.dropdown-arrow.open svg {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu base styles */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-item-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+  margin-top: 4px;
+}
+
+.dropdown-menu.show {
+  display: block;
+  animation: dropdownSlideDown 0.2s ease;
+}
+
+/* Dark theme dropdown adjustments */
+[data-theme="dark"] .dropdown-menu {
+  background-color: var(--color-item-background);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: var(--color-text);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: var(--color-section-header);
+}
+
+[data-theme="dark"] .dropdown-separator {
+  background-color: var(--color-border);
+}
+
+/* Animation for dropdown appearance */
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tab content wrapper for dropdown functionality */
+.tab-content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+/* Enhanced tab item styling for dropdowns */
+.tab-item.has-dropdown {
+  position: relative;
+}
+
+.tab-item.has-dropdown .tab-name {
+  cursor: pointer;
+}
+
+.tab-item.has-dropdown .tab-content-wrapper {
+  cursor: pointer;
+}
+
+.tab-item.has-dropdown .tab-content-wrapper:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 3px;
+}
+
+[data-theme="dark"] .tab-item.has-dropdown .tab-content-wrapper:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Compact mode adjustments for dropdown */
+.tab-item.compact-mode.has-dropdown .tab-content-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.tab-item.compact-mode.has-dropdown .dropdown-arrow {
+  margin-left: 4px;
+  width: 16px;
+  height: 16px;
+}
+
+.tab-item.compact-mode.has-dropdown .dropdown-arrow svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Loading spinner for nav items */
+.nav-loading-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  border-top-color: var(--slds-brand-primary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+/* Success indicator for cached navigation */
+.nav-cache-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--slds-color-success);
+  border-radius: 50%;
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+/* Error state for failed navigation fetch */
+.nav-error-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--slds-color-error);
+  border-radius: 50%;
+  margin-left: 4px;
+  opacity: 0.7;
 }
