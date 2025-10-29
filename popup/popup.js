@@ -1947,6 +1947,7 @@ function showDropdownPreview(items) {
 		labelSpan.style.flex = '1';
 
 		const deleteButton = document.createElement('button');
+		deleteButton.type = 'button'; // Prevent form submission
 		deleteButton.textContent = '×';
 		deleteButton.style.background = 'none';
 		deleteButton.style.border = 'none';
@@ -1957,7 +1958,9 @@ function showDropdownPreview(items) {
 		deleteButton.style.lineHeight = '1';
 		deleteButton.title = 'Remove this item';
 
-		deleteButton.addEventListener('click', () => {
+		deleteButton.addEventListener('click', (e) => {
+			e.preventDefault();
+			e.stopPropagation();
 			removeDropdownItem(index);
 		});
 
@@ -1985,8 +1988,8 @@ function removeDropdownItem(index) {
 	// Update the preview
 	showDropdownPreview(tab.dropdownItems);
 
-	// Save to storage
-	saveTabsToStorage();
+	// Don't save immediately - let the user click Save button to commit changes
+	// This allows removing multiple items before saving
 }
 
 // Show status message
