@@ -458,7 +458,7 @@ function createDropdownMenu(tab) {
   menu.style.top = '100%';
   menu.style.right = '0'; // Align to the right edge of the dropdown container
   menu.style.zIndex = '9999';
-  menu.style.marginTop = '2px';
+  menu.style.marginTop = '8px';
   menu.style.minWidth = '220px';
   menu.style.maxHeight = '400px';
   menu.style.overflowY = 'auto';
@@ -466,6 +466,21 @@ function createDropdownMenu(tab) {
   menu.style.border = '1px solid #d8dde6';
   menu.style.borderRadius = '4px';
   menu.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
+
+  // Create the nubbin (triangle pointer)
+  const nubbin = document.createElement('div');
+  nubbin.className = 'dropdown-nubbin';
+  nubbin.style.position = 'absolute';
+  nubbin.style.top = '-8px';
+  nubbin.style.right = '8px';
+  nubbin.style.width = '0';
+  nubbin.style.height = '0';
+  nubbin.style.borderLeft = '8px solid transparent';
+  nubbin.style.borderRight = '8px solid transparent';
+  nubbin.style.borderBottom = '8px solid white';
+  nubbin.style.filter = 'drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.1))';
+
+  menu.appendChild(nubbin);
 
   const menuInner = document.createElement('div');
   menuInner.setAttribute('role', 'menu');
