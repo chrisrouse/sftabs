@@ -17,43 +17,47 @@
         onChanged: chrome.storage.onChanged,
         local: {
           get: function(keys) {
-            console.log('SF Tabs: Chrome storage.get called with:', keys);
             return new Promise((resolve, reject) => {
               chrome.storage.local.get(keys, (result) => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage get error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
-                  console.log('SF Tabs: Storage get result:', result);
                   resolve(result);
                 }
               });
             });
           },
           set: function(items) {
-            console.log('SF Tabs: Chrome storage.set called with:', items);
             return new Promise((resolve, reject) => {
               chrome.storage.local.set(items, () => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage set error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
-                  console.log('SF Tabs: Storage set success');
                   resolve();
                 }
               });
             });
           },
           clear: function() {
-            console.log('SF Tabs: Chrome storage.clear called');
             return new Promise((resolve, reject) => {
               chrome.storage.local.clear(() => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage clear error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
-                  console.log('SF Tabs: Storage clear success');
                   resolve();
+                }
+              });
+            });
+          }
+        },
+        sync: {
+          get: function(keys) {
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.get(keys, (result) => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve(result);
                 }
               });
             });
@@ -478,9 +482,65 @@ function applyTheme() {
 	}
 }
 
+// Migrate data from storage.sync to storage.local (one-time migration)
+async function migrateFromSyncToLocal() {
+	console.log('🔄 Checking for data migration from sync to local...');
+
+	try {
+		// Check if we already have data in local storage
+		const localData = await browser.storage.local.get(['customTabs', 'userSettings', 'migrated']);
+
+		// If already migrated or has data in local, skip migration
+		if (localData.migrated || (localData.customTabs && localData.customTabs.length > 0)) {
+			console.log('✅ Already using local storage or already migrated');
+			return;
+		}
+
+		console.log('📦 Migrating data from storage.sync to storage.local...');
+
+		// Get data from sync storage
+		const syncData = await browser.storage.sync.get(['customTabs', 'userSettings']);
+
+		if (syncData.customTabs || syncData.userSettings) {
+			console.log('📋 Found data to migrate:', {
+				tabs: syncData.customTabs?.length || 0,
+				hasSettings: !!syncData.userSettings
+			});
+
+			// Copy to local storage
+			const dataToMigrate = {
+				migrated: true,
+				migrationDate: new Date().toISOString()
+			};
+
+			if (syncData.customTabs) {
+				dataToMigrate.customTabs = syncData.customTabs;
+			}
+
+			if (syncData.userSettings) {
+				dataToMigrate.userSettings = syncData.userSettings;
+			}
+
+			await browser.storage.local.set(dataToMigrate);
+			console.log('✅ Migration complete! Data copied to local storage');
+		} else {
+			console.log('ℹ️ No data to migrate from sync storage');
+			// Mark as migrated so we don't check again
+			await browser.storage.local.set({ migrated: true, migrationDate: new Date().toISOString() });
+		}
+	} catch (error) {
+		console.error('❌ Error during migration:', error);
+		// Don't block the app if migration fails
+	}
+}
+
 // Load tabs from storage
-function loadTabsFromStorage() {
+async function loadTabsFromStorage() {
 	console.log('Loading tabs from storage');
+
+	// First, attempt migration from sync to local
+	await migrateFromSyncToLocal();
+
 	browser.storage.local.get('customTabs')
 		.then((result) => {
 			console.log('Storage result:', result);
