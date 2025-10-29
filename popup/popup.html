@@ -103,8 +103,13 @@
 
 					<!-- Dropdown Items Preview -->
 					<div id="dropdown-items-preview" style="display: none; margin-top: 10px;">
-						<div style="font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #706e6b;">
-							Dropdown Items (<span id="dropdown-count">0</span>):
+						<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+							<div style="font-size: 12px; font-weight: 600; color: #706e6b;">
+								Dropdown Items (<span id="dropdown-count">0</span>):
+							</div>
+							<button type="button" id="refresh-dropdown-button" class="secondary-button" style="padding: 4px 8px; font-size: 11px;">
+								Refresh List
+							</button>
 						</div>
 						<div id="dropdown-items-list" style="max-height: 150px; overflow-y: auto; padding: 8px; background: #f3f2f2; border-radius: 4px; font-size: 12px;">
 							<!-- Items will be inserted here -->

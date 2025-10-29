@@ -703,6 +703,15 @@ function setupEventListeners() {
 		await setupObjectDropdown();
 	});
 
+	// Refresh Dropdown button
+	const refreshDropdownButton = document.getElementById('refresh-dropdown-button');
+	if (refreshDropdownButton) {
+		refreshDropdownButton.addEventListener('click', async () => {
+			console.log('Refresh Dropdown button clicked');
+			await setupObjectDropdown();
+		});
+	}
+
 	// Settings button - toggle between panels
 	settingsButton.addEventListener('click', () => {
 		console.log('Settings button clicked');
@@ -1924,17 +1933,60 @@ function showDropdownPreview(items) {
 	// Clear existing items
 	dropdownItemsList.innerHTML = '';
 
-	// Add items
+	// Add items with delete buttons
 	items.forEach((item, index) => {
 		const itemDiv = document.createElement('div');
 		itemDiv.style.padding = '4px 0';
 		itemDiv.style.borderBottom = index < items.length - 1 ? '1px solid #dddbda' : 'none';
-		itemDiv.textContent = `${index + 1}. ${item.label}`;
+		itemDiv.style.display = 'flex';
+		itemDiv.style.justifyContent = 'space-between';
+		itemDiv.style.alignItems = 'center';
+
+		const labelSpan = document.createElement('span');
+		labelSpan.textContent = `${index + 1}. ${item.label}`;
+		labelSpan.style.flex = '1';
+
+		const deleteButton = document.createElement('button');
+		deleteButton.textContent = '×';
+		deleteButton.style.background = 'none';
+		deleteButton.style.border = 'none';
+		deleteButton.style.color = '#c23934';
+		deleteButton.style.fontSize = '18px';
+		deleteButton.style.cursor = 'pointer';
+		deleteButton.style.padding = '0 4px';
+		deleteButton.style.lineHeight = '1';
+		deleteButton.title = 'Remove this item';
+
+		deleteButton.addEventListener('click', () => {
+			removeDropdownItem(index);
+		});
+
+		itemDiv.appendChild(labelSpan);
+		itemDiv.appendChild(deleteButton);
 		dropdownItemsList.appendChild(itemDiv);
 	});
 
 	// Show preview
 	dropdownItemsPreview.style.display = 'block';
+}
+
+/**
+ * Remove a dropdown item by index
+ */
+function removeDropdownItem(index) {
+	if (!editingTabId) return;
+
+	const tab = customTabs.find(t => t.id === editingTabId);
+	if (!tab || !tab.dropdownItems) return;
+
+	// Remove the item
+	tab.dropdownItems.splice(index, 1);
+
+	// Update the preview
+	showDropdownPreview(tab.dropdownItems);
+
+	// Save to storage
+	saveTabsToStorage();
 }
 
 // Show status message
