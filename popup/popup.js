@@ -1664,13 +1664,30 @@ function saveTabForm() {
 
 function deleteTab(tabId) {
 	console.log('Delete tab requested', { tabId });
-  
+
 	// Check if we should skip the confirmation
 	if (userSettings.skipDeleteConfirmation) {
 	  // Directly delete the tab without confirmation
 	  customTabs = customTabs.filter(tab => tab.id !== tabId);
 	  saveTabsToStorage();
 	  showStatus('Tab removed', false);
+
+	  // Send message to refresh tabs in the Salesforce page
+	  browser.tabs.query({ active: true, currentWindow: true })
+		.then(tabs => {
+		  if (tabs.length > 0) {
+			browser.tabs.sendMessage(tabs[0].id, { action: 'refresh_tabs' })
+			  .then(() => {
+				console.log('✅ Tab refresh message sent after delete');
+			  })
+			  .catch(err => {
+				console.log('ℹ️ Could not send refresh message:', err.message);
+			  });
+		  }
+		})
+		.catch(err => {
+		  console.log('ℹ️ Could not query tabs:', err.message);
+		});
 	} else {
 	  // Show confirmation dialog
 	  showDeleteConfirmModal(tabId);
@@ -1755,6 +1772,23 @@ function diagnoseDeleteModal() {
 	  saveTabsToStorage();
 	  modal.classList.remove('show');
 	  cleanupEventListeners();
+
+	  // Send message to refresh tabs in the Salesforce page
+	  browser.tabs.query({ active: true, currentWindow: true })
+		.then(tabs => {
+		  if (tabs.length > 0) {
+			browser.tabs.sendMessage(tabs[0].id, { action: 'refresh_tabs' })
+			  .then(() => {
+				console.log('✅ Tab refresh message sent after delete confirmation');
+			  })
+			  .catch(err => {
+				console.log('ℹ️ Could not send refresh message:', err.message);
+			  });
+		  }
+		})
+		.catch(err => {
+		  console.log('ℹ️ Could not query tabs:', err.message);
+		});
 	};
 	
 	const handleOutsideClick = (event) => {
