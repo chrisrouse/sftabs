@@ -476,7 +476,7 @@ window.addEventListener('storage', (e) => {
   }
 });
 
-// Handle tab refresh requests from the popup
+// Handle messages from the popup
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'refresh_tabs') {
     console.log("Received request to refresh tabs");
@@ -488,6 +488,21 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       console.warn("Could not find tab container for refresh");
       sendResponse({ success: false, error: "Tab container not found" });
     }
+  } else if (message.action === 'parse_navigation') {
+    console.log("Received request to parse Object Manager navigation");
+
+    // Use the navigation parser with retry logic
+    parseObjectManagerNavigationWithRetry(3, 1000)
+      .then(items => {
+        console.log("Navigation parsed successfully:", items);
+        sendResponse({ success: true, items: items });
+      })
+      .catch(error => {
+        console.error("Failed to parse navigation:", error);
+        sendResponse({ success: false, error: error.message });
+      });
+
+    return true; // Keep the message channel open for async response
   }
   return true;
 });

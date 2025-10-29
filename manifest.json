@@ -40,7 +40,7 @@
         "*://*.salesforce.com/lightning/setup/*",
         "*://*.my.salesforce.com/lightning/setup/*"
       ],
-      "js": ["content.js"]
+      "js": ["navigation-parser.js", "content.js"]
     }
   ],
   "web_accessible_resources": [

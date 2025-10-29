@@ -168,35 +168,45 @@ const defaultTabs = [{
 		path: 'Flows',
 		openInNewTab: false,
 		isObject: false,
-		position: 0
+		position: 0,
+		hasDropdown: false,
+		dropdownItems: []
 	},
 	{
 		id: 'default_tab_packages',
 		label: 'Installed Packages',
 		path: 'ImportedPackage',
 		openInNewTab: false,
-		position: 1
+		position: 1,
+		hasDropdown: false,
+		dropdownItems: []
 	},
 	{
 		id: 'default_tab_users',
 		label: 'Users',
 		path: 'ManageUsers',
 		openInNewTab: false,
-		position: 2
+		position: 2,
+		hasDropdown: false,
+		dropdownItems: []
 	},
 	{
 		id: 'default_tab_profiles',
 		label: 'Profiles',
 		path: 'EnhancedProfiles',
 		openInNewTab: false,
-		position: 3
+		position: 3,
+		hasDropdown: false,
+		dropdownItems: []
 	},
 	{
 		id: 'default_tab_permsets',
 		label: 'Permission Sets',
 		path: 'PermSets',
 		openInNewTab: false,
-		position: 4
+		position: 4,
+		hasDropdown: false,
+		dropdownItems: []
 	}
 ];
 
@@ -905,7 +915,9 @@ function addTabForCurrentPage() {
 			openInNewTab: false,
 			isObject: isObject,
 			isCustomUrl: isCustomUrl,
-			position: customTabs.length
+			position: customTabs.length,
+			hasDropdown: false,
+			dropdownItems: []
 		  };
   
 		  // Add the new tab
@@ -1492,7 +1504,9 @@ function saveTabForm() {
       openInNewTab: openInNewTabCheckbox.checked,
       isObject: isObject,
       isCustomUrl: isCustomUrl,
-      position: customTabs.length
+      position: customTabs.length,
+      hasDropdown: false,
+      dropdownItems: []
     };
 
     // Log the new tab for debugging
