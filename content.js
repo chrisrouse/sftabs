@@ -263,25 +263,35 @@ function initTabs(tabContainer) {
 
 // Create tab element with appropriate structure and classes
 function createTabElement(tab) {
+  // Check if this tab has a dropdown menu
+  if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
+    return createTabElementWithDropdown(tab);
+  } else {
+    return createSimpleTabElement(tab);
+  }
+}
+
+// Create a simple tab element without dropdown
+function createSimpleTabElement(tab) {
   // Get the base URL for the current org
   const currentUrl = window.location.href;
   const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
   const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
   const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
-  
+
   // Determine the full URL based on tab type
   let fullUrl = '';
   const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
   const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
-  
+
   if (isCustomUrl) {
     // For custom URLs, ensure there's a leading slash
     let formattedPath = tab.path;
-    
+
     if (!formattedPath.startsWith('/')) {
       formattedPath = '/' + formattedPath;
     }
-    
+
     fullUrl = `${baseUrlRoot}${formattedPath}`;
   } else if (isObject) {
     // Object URLs: don't add /home suffix - use the path as is
@@ -293,7 +303,7 @@ function createTabElement(tab) {
     // Setup URLs need /home at the end
     fullUrl = `${baseUrlSetup}${tab.path}/home`;
   }
-  
+
   // Create the tab element
   const li = document.createElement('li');
   li.setAttribute('role', 'presentation');
@@ -301,7 +311,7 @@ function createTabElement(tab) {
   li.setAttribute('data-aura-class', 'navexConsoleTabItem');
   li.setAttribute('data-tab-id', tab.id);
   li.setAttribute('data-url', fullUrl);
-  
+
   // Create the anchor element
   const a = document.createElement('a');
   a.setAttribute('role', 'tab');
@@ -309,28 +319,231 @@ function createTabElement(tab) {
   a.setAttribute('title', tab.label);
   a.setAttribute('aria-selected', 'false');
   a.setAttribute('href', fullUrl);
-  
+
   // Set target based on openInNewTab property
   if (tab.openInNewTab) {
     a.setAttribute('target', '_blank');
   } else {
     a.setAttribute('target', '_self');
   }
-  
+
   // Add appropriate classes
   a.classList.add('tabHeader', 'slds-context-bar__label-action');
-  
+
   // Create span for tab title
   const span = document.createElement('span');
   span.classList.add('title', 'slds-truncate');
   span.textContent = tab.label;
-  
+
   // Assemble the elements
   a.appendChild(span);
   li.appendChild(a);
-  
+
   return li;
 }
+
+// Create a tab element with dropdown menu
+function createTabElementWithDropdown(tab) {
+  // Get base URL
+  const currentUrl = window.location.href;
+  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
+  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
+
+  // Determine the full URL for the main tab
+  let fullUrl = '';
+  const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+  const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
+
+  if (isCustomUrl) {
+    let formattedPath = tab.path;
+    if (!formattedPath.startsWith('/')) {
+      formattedPath = '/' + formattedPath;
+    }
+    fullUrl = `${baseUrlRoot}${formattedPath}`;
+  } else if (isObject) {
+    fullUrl = `${baseUrlObject}${tab.path}`;
+  } else if (tab.path.includes('ObjectManager/')) {
+    fullUrl = `${baseUrlSetup}${tab.path}`;
+  } else {
+    fullUrl = `${baseUrlSetup}${tab.path}/home`;
+  }
+
+  // Create the list item container
+  const li = document.createElement('li');
+  li.setAttribute('role', 'presentation');
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-custom-tab sf-tabs-has-dropdown';
+  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+  li.setAttribute('data-tab-id', tab.id);
+  li.setAttribute('data-url', fullUrl);
+
+  // Create the main tab link
+  const a = document.createElement('a');
+  a.setAttribute('role', 'tab');
+  a.setAttribute('tabindex', '-1');
+  a.setAttribute('title', tab.label);
+  a.setAttribute('aria-selected', 'false');
+  a.setAttribute('href', fullUrl);
+  a.setAttribute('target', tab.openInNewTab ? '_blank' : '_self');
+  a.classList.add('tabHeader', 'slds-context-bar__label-action');
+
+  const span = document.createElement('span');
+  span.classList.add('title', 'slds-truncate');
+  span.textContent = tab.label;
+
+  a.appendChild(span);
+  li.appendChild(a);
+
+  // Create the dropdown trigger button
+  const dropdownContainer = document.createElement('div');
+  dropdownContainer.className = 'slds-context-bar__label-action slds-p-left--none';
+  dropdownContainer.setAttribute('data-dropdown-for', tab.id);
+
+  const triggerButton = document.createElement('a');
+  triggerButton.setAttribute('role', 'button');
+  triggerButton.setAttribute('tabindex', '0');
+  triggerButton.setAttribute('aria-expanded', 'false');
+  triggerButton.setAttribute('aria-haspopup', 'true');
+  triggerButton.className = 'slds-button slds-button--icon sf-tabs-dropdown-trigger';
+  triggerButton.setAttribute('href', 'javascript:void(0);');
+  triggerButton.setAttribute('title', tab.label + ' List');
+
+  // Create chevron down icon (SVG)
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('class', 'slds-icon slds-icon_xx-small slds-button__icon slds-button__icon--hint');
+  icon.setAttribute('viewBox', '0 0 520 520');
+  icon.setAttribute('aria-hidden', 'true');
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21z');
+  icon.appendChild(path);
+
+  triggerButton.appendChild(icon);
+  dropdownContainer.appendChild(triggerButton);
+
+  // Create the dropdown menu
+  const dropdownMenu = createDropdownMenu(tab);
+  dropdownContainer.appendChild(dropdownMenu);
+
+  li.appendChild(dropdownContainer);
+
+  // Add click event for dropdown toggle
+  triggerButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleDropdown(tab.id);
+  });
+
+  return li;
+}
+
+// Create the dropdown menu structure
+function createDropdownMenu(tab) {
+  const menu = document.createElement('div');
+  menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default';
+  menu.setAttribute('id', `dropdown-menu-${tab.id}`);
+  menu.setAttribute('data-tab-id', tab.id);
+  menu.style.display = 'none'; // Hidden by default
+  menu.style.position = 'absolute';
+  menu.style.top = '100%';
+  menu.style.left = '0';
+  menu.style.zIndex = '9999';
+
+  const menuInner = document.createElement('div');
+  menuInner.setAttribute('role', 'menu');
+
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+
+  // Add dropdown items
+  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
+    tab.dropdownItems.forEach(item => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'presentation');
+      li.className = 'uiMenuItem';
+
+      const link = document.createElement('a');
+      link.setAttribute('role', 'menuitem');
+      link.setAttribute('href', item.url);
+      link.setAttribute('title', item.label);
+      link.textContent = item.label;
+
+      // Add click handler
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (tab.openInNewTab) {
+          window.open(item.url, '_blank');
+        } else {
+          const lightningEnabled = isLightningNavigationEnabled();
+          if (lightningEnabled) {
+            lightningNavigate({ navigationType: "url", url: item.url }, item.url);
+          } else {
+            window.location.href = item.url;
+          }
+        }
+
+        // Close dropdown
+        toggleDropdown(tab.id);
+      });
+
+      li.appendChild(link);
+      ul.appendChild(li);
+    });
+  }
+
+  menuInner.appendChild(ul);
+  menu.appendChild(menuInner);
+
+  return menu;
+}
+
+// Toggle dropdown visibility
+function toggleDropdown(tabId) {
+  const menu = document.getElementById(`dropdown-menu-${tabId}`);
+  const trigger = document.querySelector(`[data-dropdown-for="${tabId}"] .sf-tabs-dropdown-trigger`);
+
+  if (!menu || !trigger) return;
+
+  const isVisible = menu.style.display !== 'none';
+
+  // Close all other dropdowns first
+  document.querySelectorAll('[id^="dropdown-menu-"]').forEach(m => {
+    if (m !== menu) {
+      m.style.display = 'none';
+      const otherId = m.getAttribute('data-tab-id');
+      const otherTrigger = document.querySelector(`[data-dropdown-for="${otherId}"] .sf-tabs-dropdown-trigger`);
+      if (otherTrigger) {
+        otherTrigger.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  // Toggle this dropdown
+  if (isVisible) {
+    menu.style.display = 'none';
+    trigger.setAttribute('aria-expanded', 'false');
+  } else {
+    menu.style.display = 'block';
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.sf-tabs-dropdown-trigger') && !e.target.closest('[id^="dropdown-menu-"]')) {
+    document.querySelectorAll('[id^="dropdown-menu-"]').forEach(menu => {
+      menu.style.display = 'none';
+      const tabId = menu.getAttribute('data-tab-id');
+      const trigger = document.querySelector(`[data-dropdown-for="${tabId}"] .sf-tabs-dropdown-trigger`);
+      if (trigger) {
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+});
 
 function highlightActiveCustomTab(tabs) {
   const currentUrl = window.location.href;
