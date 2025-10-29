@@ -202,7 +202,27 @@ function handleFileSelect(event) {
 				})
 				.then(() => {
 					console.log('Configuration imported successfully');
-					showStatus('Configuration imported successfully. Changes will take effect when you reopen the extension.', false);
+
+					// Send refresh message to all Salesforce tabs
+					browser.tabs.query({})
+						.then(tabs => {
+							tabs.forEach(tab => {
+								if (tab.url && (tab.url.includes('lightning.force.com') || tab.url.includes('salesforce.com'))) {
+									browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
+										.then(() => {
+											console.log('✅ Tab refresh message sent to tab:', tab.id);
+										})
+										.catch(err => {
+											console.log('ℹ️ Could not send refresh to tab:', tab.id, err.message);
+										});
+								}
+							});
+						})
+						.catch(err => {
+							console.log('ℹ️ Could not query tabs:', err.message);
+						});
+
+					showStatus('Configuration imported successfully. Tabs will update in all open Salesforce pages.', false);
 				})
 				.catch(error => {
 					console.error('Error saving configuration:', error);
