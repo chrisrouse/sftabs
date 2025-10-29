@@ -679,7 +679,7 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 // Listen for storage changes to refresh tabs
 browser.storage.onChanged.addListener((changes, area) => {
-  if (area === 'sync' && changes.customTabs) {
+  if (area === 'local' && changes.customTabs) {
     console.log("Tabs changed in storage - refreshing");
     const tabContainer = document.querySelector('.tabBarItems.slds-grid');
     if (tabContainer) {
