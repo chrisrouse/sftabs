@@ -8,10 +8,10 @@
         getURL: chrome.runtime.getURL.bind(chrome.runtime)
       },
       storage: {
-        sync: {
+        local: {
           get: function(keys) {
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.get(keys, (result) => {
+              chrome.storage.local.get(keys, (result) => {
                 if (chrome.runtime.lastError) {
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
@@ -22,7 +22,7 @@
           },
           set: function(items) {
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.set(items, () => {
+              chrome.storage.local.set(items, () => {
                 if (chrome.runtime.lastError) {
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
@@ -33,7 +33,7 @@
           },
           clear: function() {
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.clear(() => {
+              chrome.storage.local.clear(() => {
                 if (chrome.runtime.lastError) {
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Apply theme based on saved user settings
 function applyThemeFromStorage() {
-	browser.storage.sync.get('userSettings')
+	browser.storage.local.get('userSettings')
 		.then((result) => {
 			if (result.userSettings && result.userSettings.themeMode) {
 				const themeMode = result.userSettings.themeMode;
@@ -109,7 +109,7 @@ function applyThemeFromStorage() {
 function exportSettings() {
 	console.log('Exporting settings');
 
-	browser.storage.sync.get(['customTabs', 'userSettings'])
+	browser.storage.local.get(['customTabs', 'userSettings'])
 		.then((result) => {
 			// Create a configuration object containing all settings
 			const config = {
@@ -192,12 +192,12 @@ function handleFileSelect(event) {
 			}
 
 			// First clear existing storage
-			browser.storage.sync.clear()
+			browser.storage.local.clear()
 				.then(() => {
 					// Then save the imported configuration
 					return Promise.all([
-						browser.storage.sync.set({ customTabs: config.customTabs }),
-						browser.storage.sync.set({ userSettings: config.userSettings || {} })
+						browser.storage.local.set({ customTabs: config.customTabs }),
+						browser.storage.local.set({ userSettings: config.userSettings || {} })
 					]);
 				})
 				.then(() => {
