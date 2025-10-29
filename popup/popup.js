@@ -1013,7 +1013,16 @@ function addTabForCurrentPage() {
 		  // Add the new tab
 		  customTabs.push(newTab);
 		  saveTabsToStorage();
-  
+
+		  // Send message to content script to refresh tabs immediately
+		  browser.tabs.sendMessage(tabs[0].id, { action: 'refresh_tabs' })
+			.then(() => {
+			  console.log('✅ Tab refresh message sent to content script');
+			})
+			.catch(err => {
+			  console.log('ℹ️ Could not send refresh message (page might not have tabs):', err.message);
+			});
+
 		  // Show success message with the type of page
 		  let pageType = isObject ? 'object' : (isCustomUrl ? 'custom' : 'setup');
 		  showStatus(`Added ${pageType} tab for "${name}"`, false);
@@ -1632,6 +1641,23 @@ function saveTabForm() {
 
   saveTabsToStorage();
   hideTabForm();
+
+  // Send message to refresh tabs in the Salesforce page
+  browser.tabs.query({ active: true, currentWindow: true })
+    .then(tabs => {
+      if (tabs.length > 0) {
+        browser.tabs.sendMessage(tabs[0].id, { action: 'refresh_tabs' })
+          .then(() => {
+            console.log('✅ Tab refresh message sent to content script');
+          })
+          .catch(err => {
+            console.log('ℹ️ Could not send refresh message:', err.message);
+          });
+      }
+    })
+    .catch(err => {
+      console.log('ℹ️ Could not query tabs:', err.message);
+    });
 }
 
 // Delete tab
