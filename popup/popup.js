@@ -510,18 +510,30 @@ function resetToDefaults() {
 
 // Save tabs to storage
 function saveTabsToStorage() {
-	console.log('Saving tabs to storage:', customTabs);
+	console.log('💾 Saving tabs to storage...');
+
+	// Log dropdown status for debugging
+	const tabsWithDropdowns = customTabs.filter(t => t.hasDropdown);
+	if (tabsWithDropdowns.length > 0) {
+		console.log('📋 Tabs with dropdowns:', tabsWithDropdowns.map(t => ({
+			id: t.id,
+			label: t.label,
+			hasDropdown: t.hasDropdown,
+			itemCount: t.dropdownItems?.length || 0
+		})));
+	}
+
 	// Sort tabs by position before saving
 	customTabs.sort((a, b) => a.position - b.position);
 
 	browser.storage.sync.set({ customTabs })
 		.then(() => {
-			console.log('Tabs saved successfully');
+			console.log('✅ Tabs saved successfully to storage');
 			renderTabList();
 			showStatus('Settings saved', false);
 		})
 		.catch((error) => {
-			console.error('Error saving tabs to storage:', error);
+			console.error('❌ Error saving tabs to storage:', error);
 			showStatus('Error saving tabs: ' + error.message, true);
 		});
 }
@@ -1512,17 +1524,31 @@ function saveTabForm() {
     // Update existing tab
     const tab = customTabs.find(t => t.id === editingTabId);
     if (tab) {
+      console.log('📝 Updating tab before save:', {
+        id: tab.id,
+        hasDropdown: tab.hasDropdown,
+        dropdownItemsCount: tab.dropdownItems?.length || 0
+      });
+
       // Update basic properties
       tab.label = name;
       tab.path = path;
       tab.openInNewTab = openInNewTabCheckbox.checked;
-      
+
       // Explicitly set the type properties
       tab.isObject = isObject;
       tab.isCustomUrl = isCustomUrl;
-      
+
+      // NOTE: hasDropdown and dropdownItems are NOT modified here
+      // They should be preserved from when setupObjectDropdown() was called
+
       // Log the updated tab
-      console.log('Updated tab:', tab);
+      console.log('✅ Tab updated, dropdown preserved:', {
+        id: tab.id,
+        label: tab.label,
+        hasDropdown: tab.hasDropdown,
+        dropdownItemsCount: tab.dropdownItems?.length || 0
+      });
     }
   } else {
     // Add new tab
@@ -1715,9 +1741,26 @@ async function setupObjectDropdown() {
 			if (editingTabId) {
 				const tab = customTabs.find(t => t.id === editingTabId);
 				if (tab) {
+					// Clean up old dropdown properties from previous implementation
+					delete tab.autoSetupDropdown;
+					delete tab.children;
+					delete tab.parentId;
+					delete tab.isExpanded;
+					delete tab.cachedNavigation;
+					delete tab.navigationLastUpdated;
+					delete tab.needsNavigationRefresh;
+
+					// Set new dropdown properties
 					tab.hasDropdown = true;
 					tab.dropdownItems = response.items;
-					console.log('Updated tab with dropdown items:', tab);
+
+					console.log('✅ Dropdown setup complete!', {
+						tabId: tab.id,
+						label: tab.label,
+						hasDropdown: tab.hasDropdown,
+						itemCount: tab.dropdownItems.length,
+						firstItem: tab.dropdownItems[0]?.label
+					});
 
 					// Show preview
 					showDropdownPreview(response.items);
@@ -1726,7 +1769,11 @@ async function setupObjectDropdown() {
 					await saveTabsToStorage();
 
 					showStatus('Dropdown menu created successfully!');
+				} else {
+					console.error('❌ Tab not found in customTabs array:', editingTabId);
 				}
+			} else {
+				console.error('❌ No editingTabId set');
 			}
 		} else {
 			throw new Error(response?.error || 'Failed to parse navigation');

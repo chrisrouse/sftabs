@@ -263,10 +263,20 @@ function initTabs(tabContainer) {
 
 // Create tab element with appropriate structure and classes
 function createTabElement(tab) {
+  // Log tab info for debugging
+  console.log('🔨 Creating tab element:', {
+    label: tab.label,
+    hasDropdown: tab.hasDropdown,
+    dropdownItemsLength: tab.dropdownItems?.length || 0,
+    willCreateDropdown: !!(tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0)
+  });
+
   // Check if this tab has a dropdown menu
   if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
+    console.log('✅ Creating dropdown tab for:', tab.label);
     return createTabElementWithDropdown(tab);
   } else {
+    console.log('➡️ Creating simple tab for:', tab.label);
     return createSimpleTabElement(tab);
   }
 }
