@@ -15,11 +15,11 @@
       },
       storage: {
         onChanged: chrome.storage.onChanged,
-        sync: {
+        local: {
           get: function(keys) {
             console.log('SF Tabs: Chrome storage.get called with:', keys);
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.get(keys, (result) => {
+              chrome.storage.local.get(keys, (result) => {
                 if (chrome.runtime.lastError) {
                   console.error('SF Tabs: Storage get error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
@@ -33,7 +33,7 @@
           set: function(items) {
             console.log('SF Tabs: Chrome storage.set called with:', items);
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.set(items, () => {
+              chrome.storage.local.set(items, () => {
                 if (chrome.runtime.lastError) {
                   console.error('SF Tabs: Storage set error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
@@ -47,7 +47,7 @@
           clear: function() {
             console.log('SF Tabs: Chrome storage.clear called');
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.clear(() => {
+              chrome.storage.local.clear(() => {
                 if (chrome.runtime.lastError) {
                   console.error('SF Tabs: Storage clear error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
@@ -368,7 +368,7 @@ function initThemeSelector() {
 // Load user settings from storage
 function loadUserSettings() {
 	console.log('Loading user settings from storage');
-	return browser.storage.sync.get('userSettings')
+	return browser.storage.local.get('userSettings')
 		.then((result) => {
 			console.log('Settings result:', result);
 			if (result.userSettings) {
@@ -393,7 +393,7 @@ function loadUserSettings() {
 // Save user settings to storage
 function saveUserSettings() {
 	console.log('Saving user settings to storage:', userSettings);
-	return browser.storage.sync.set({ userSettings })
+	return browser.storage.local.set({ userSettings })
 		.then(() => {
 			console.log('Settings saved successfully');
 			showStatus('Settings saved', false);
@@ -481,7 +481,7 @@ function applyTheme() {
 // Load tabs from storage
 function loadTabsFromStorage() {
 	console.log('Loading tabs from storage');
-	browser.storage.sync.get('customTabs')
+	browser.storage.local.get('customTabs')
 		.then((result) => {
 			console.log('Storage result:', result);
 			if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
@@ -526,7 +526,7 @@ function saveTabsToStorage() {
 	// Sort tabs by position before saving
 	customTabs.sort((a, b) => a.position - b.position);
 
-	browser.storage.sync.set({ customTabs })
+	browser.storage.local.set({ customTabs })
 		.then(() => {
 			console.log('✅ Tabs saved successfully to storage');
 			renderTabList();

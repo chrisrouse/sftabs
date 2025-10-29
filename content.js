@@ -154,7 +154,7 @@ function isLightningNavigationEnabled() {
 // Initialize Lightning Navigation setting from browser storage
 async function initializeLightningNavigationSetting() {
   try {
-    const result = await browser.storage.sync.get('userSettings');
+    const result = await browser.storage.local.get('userSettings');
     if (result.userSettings && result.userSettings.hasOwnProperty('lightningNavigation')) {
       const enabled = result.userSettings.lightningNavigation;
       localStorage.setItem("lightningNavigation", JSON.stringify(enabled));
@@ -226,7 +226,7 @@ function initTabs(tabContainer) {
   }
 
   // Load tabs from storage
-  browser.storage.sync.get('customTabs').then(result => {
+  browser.storage.local.get('customTabs').then(result => {
     let tabsToUse = [];
     
     if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
@@ -235,7 +235,7 @@ function initTabs(tabContainer) {
       // Use default tabs if none found in storage
       tabsToUse = defaultTabs;
       // Save defaults to storage for future use
-      browser.storage.sync.set({ customTabs: defaultTabs });
+      browser.storage.local.set({ customTabs: defaultTabs });
     }
     
     // Sort tabs by position
@@ -667,7 +667,7 @@ const observer = new MutationObserver(() => {
     observer.disconnect();
 
     // Re-highlight the active tab now that DOM is ready
-    browser.storage.sync.get('customTabs').then(result => {
+    browser.storage.local.get('customTabs').then(result => {
       const tabsToUse = result.customTabs || defaultTabs;
       highlightActiveCustomTab(tabsToUse);
     });
