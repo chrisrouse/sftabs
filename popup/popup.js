@@ -143,6 +143,11 @@ let deleteModalCancelButton;
 let deleteModalConfirmButton;
 let isObjectCheckbox;
 let isCustomUrlCheckbox;
+let objectDropdownSection;
+let setupDropdownButton;
+let dropdownItemsPreview;
+let dropdownItemsList;
+let dropdownCount;
 
 // Settings Elements
 let settingsButton;
@@ -271,6 +276,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	deleteModalConfirmButton = document.getElementById('delete-modal-confirm-button');
 	isObjectCheckbox = document.getElementById('is-object');
 	isCustomUrlCheckbox = document.getElementById('is-custom-url');
+
+	// Object dropdown elements
+	objectDropdownSection = document.getElementById('object-dropdown-section');
+	setupDropdownButton = document.getElementById('setup-dropdown-button');
+	dropdownItemsPreview = document.getElementById('dropdown-items-preview');
+	dropdownItemsList = document.getElementById('dropdown-items-list');
+	dropdownCount = document.getElementById('dropdown-count');
 
 	// Settings elements
 	settingsButton = document.getElementById('settings-button');
@@ -611,6 +623,12 @@ function setupEventListeners() {
 	cancelButton.addEventListener('click', () => {
 		console.log('Cancel button clicked');
 		hideTabForm();
+	});
+
+	// Setup Dropdown button
+	setupDropdownButton.addEventListener('click', async () => {
+		console.log('Setup Dropdown button clicked');
+		await setupObjectDropdown();
 	});
 
 	// Settings button - toggle between panels
@@ -1358,7 +1376,7 @@ function showTabForm(tabId = null) {
 	  // Edit mode
 	  editingTabId = tabId;
 	  formTitle.textContent = 'Edit Tab';
-  
+
 	  // Populate form with existing data
 	  const tab = customTabs.find(t => t.id === tabId);
 	  if (tab) {
@@ -1368,6 +1386,14 @@ function showTabForm(tabId = null) {
 		isObjectCheckbox.checked = tab.isObject || false;
 		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
 		isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
+
+		// Show dropdown section if editing and show preview if tab has dropdown items
+		objectDropdownSection.style.display = 'block';
+		if (tab.dropdownItems && tab.dropdownItems.length > 0) {
+			showDropdownPreview(tab.dropdownItems);
+		} else {
+			dropdownItemsPreview.style.display = 'none';
+		}
 	  }
   
 	  // Find the tab element
@@ -1390,7 +1416,10 @@ function showTabForm(tabId = null) {
 	  // Add mode
 	  editingTabId = null;
 	  formTitle.textContent = 'Add New Tab';
-  
+
+	  // Hide dropdown section when adding new tab
+	  objectDropdownSection.style.display = 'none';
+
 	  // Show form at the default position (at the end)
 	  tabList.after(tabForm);
 	  tabForm.style.display = 'block';
@@ -1652,6 +1681,93 @@ function editTab(tabId) {
 // Generate a unique ID
 function generateId() {
 	return 'tab_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+}
+
+/**
+ * Setup Object Dropdown - Parse navigation from current page
+ */
+async function setupObjectDropdown() {
+	console.log('Setting up object dropdown...');
+
+	// Show loading state
+	setupDropdownButton.disabled = true;
+	setupDropdownButton.textContent = 'Loading...';
+
+	try {
+		// Get the active tab (the Salesforce page)
+		const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+
+		if (tabs.length === 0) {
+			throw new Error('No active tab found');
+		}
+
+		const activeTab = tabs[0];
+
+		// Send message to content script to parse navigation
+		const response = await browser.tabs.sendMessage(activeTab.id, {
+			action: 'parse_navigation'
+		});
+
+		console.log('Navigation parse response:', response);
+
+		if (response && response.success && response.items) {
+			// Update the current tab being edited with dropdown items
+			if (editingTabId) {
+				const tab = customTabs.find(t => t.id === editingTabId);
+				if (tab) {
+					tab.hasDropdown = true;
+					tab.dropdownItems = response.items;
+					console.log('Updated tab with dropdown items:', tab);
+
+					// Show preview
+					showDropdownPreview(response.items);
+
+					// Save to storage
+					await saveTabsToStorage();
+
+					showStatus('Dropdown menu created successfully!');
+				}
+			}
+		} else {
+			throw new Error(response?.error || 'Failed to parse navigation');
+		}
+
+	} catch (error) {
+		console.error('Error setting up dropdown:', error);
+		showStatus('Failed to create dropdown: ' + error.message, true);
+	} finally {
+		// Reset button state
+		setupDropdownButton.disabled = false;
+		setupDropdownButton.textContent = 'Setup as Object Dropdown';
+	}
+}
+
+/**
+ * Show dropdown items preview
+ */
+function showDropdownPreview(items) {
+	if (!items || items.length === 0) {
+		dropdownItemsPreview.style.display = 'none';
+		return;
+	}
+
+	// Update count
+	dropdownCount.textContent = items.length;
+
+	// Clear existing items
+	dropdownItemsList.innerHTML = '';
+
+	// Add items
+	items.forEach((item, index) => {
+		const itemDiv = document.createElement('div');
+		itemDiv.style.padding = '4px 0';
+		itemDiv.style.borderBottom = index < items.length - 1 ? '1px solid #dddbda' : 'none';
+		itemDiv.textContent = `${index + 1}. ${item.label}`;
+		dropdownItemsList.appendChild(itemDiv);
+	});
+
+	// Show preview
+	dropdownItemsPreview.style.display = 'block';
 }
 
 // Show status message
