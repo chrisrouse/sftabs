@@ -456,8 +456,16 @@ function createDropdownMenu(tab) {
   menu.style.display = 'none'; // Hidden by default
   menu.style.position = 'absolute';
   menu.style.top = '100%';
-  menu.style.left = '0';
+  menu.style.right = '0'; // Align to the right edge of the dropdown container
   menu.style.zIndex = '9999';
+  menu.style.marginTop = '2px';
+  menu.style.minWidth = '220px';
+  menu.style.maxHeight = '400px';
+  menu.style.overflowY = 'auto';
+  menu.style.backgroundColor = 'white';
+  menu.style.border = '1px solid #d8dde6';
+  menu.style.borderRadius = '4px';
+  menu.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
 
   const menuInner = document.createElement('div');
   menuInner.setAttribute('role', 'menu');
@@ -478,6 +486,22 @@ function createDropdownMenu(tab) {
       link.setAttribute('href', item.url);
       link.setAttribute('title', item.label);
       link.textContent = item.label;
+
+      // Style the link
+      link.style.display = 'block';
+      link.style.padding = '8px 12px';
+      link.style.color = '#080707';
+      link.style.textDecoration = 'none';
+      link.style.fontSize = '13px';
+      link.style.whiteSpace = 'nowrap';
+
+      // Add hover effect
+      link.addEventListener('mouseenter', () => {
+        link.style.backgroundColor = '#f3f2f2';
+      });
+      link.addEventListener('mouseleave', () => {
+        link.style.backgroundColor = 'transparent';
+      });
 
       // Add click handler
       link.addEventListener('click', (e) => {
