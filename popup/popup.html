@@ -39,10 +39,6 @@
 
         <!-- Main Section -->
         <div id="main-content">
-            <!-- <div class="section-header">
-                <h2>Custom Tabs</h2>
-            </div> -->
-
             <div class="tab-list" id="tab-list">
                 <!-- Tab items will be added here via JavaScript -->
                 <div class="empty-state" id="empty-state">
@@ -177,6 +173,7 @@
                         <span class="theme-label">System</span>
                       </div>
                     </div>
+                </div>
 
                 <div class="form-group checkbox-group">
                     <label>
@@ -219,7 +216,7 @@
                 </div>
 
                 <div class="form-group">
-                    <p>v1.2.6</p>
+                    <p>v1.4.0 | <a href="#" id="changelog-link">Changelog</a></p>
                 </div>
 
             </div>
@@ -263,7 +260,20 @@
         </div>
     </div>
 
-    <script src="popup.js"></script>
+    <!-- Load shared modules first -->
+    <script src="js/shared/browser-compat.js"></script>
+    <script src="js/shared/constants.js"></script>
+    <script src="js/shared/utils.js"></script>
+
+    <!-- Load feature modules next -->
+    <script src="js/popup-storage.js"></script>
+    <script src="js/popup-settings.js"></script>
+    <script src="js/popup-dropdowns.js"></script>
+    <script src="js/popup-tabs.js"></script>
+    <script src="js/popup-ui.js"></script>
+
+    <!-- Load main entry point LAST -->
+    <script src="js/popup-main.js"></script>
 
 </body>
 
