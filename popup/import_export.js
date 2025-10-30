@@ -131,15 +131,12 @@ function handleFileSelect(event) {
 				throw new Error('Invalid configuration format: missing customTabs array');
 			}
 
-			// First clear existing storage
-			browser.storage.local.clear()
-				.then(() => {
-					// Then save the imported configuration
-					return Promise.all([
-						browser.storage.local.set({ customTabs: config.customTabs }),
-						browser.storage.local.set({ userSettings: config.userSettings || {} })
-					]);
-				})
+			// Save imported configuration in a single atomic operation
+			// This ensures storage.onChanged fires properly
+			browser.storage.local.set({
+				customTabs: config.customTabs,
+				userSettings: config.userSettings || {}
+			})
 				.then(() => {
 					console.log('Configuration imported successfully');
 
