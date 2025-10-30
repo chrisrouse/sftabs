@@ -162,7 +162,13 @@ function handleFileSelect(event) {
 							console.log('ℹ️ Could not query tabs:', err.message);
 						});
 
-					showStatus('Configuration imported successfully. Tabs will update in all open Salesforce pages.', false);
+					// Send message to popup to reload if it's open
+					browser.runtime.sendMessage({ action: 'reload_popup' })
+						.catch(err => {
+							console.log('ℹ️ No popup to reload:', err.message);
+						});
+
+					showStatus('Configuration imported successfully. Please reopen the popup to see your tabs.', false);
 				})
 				.catch(error => {
 					console.error('Error saving configuration:', error);

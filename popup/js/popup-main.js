@@ -50,6 +50,31 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error during popup initialization:', error);
       showStatus('Error initializing popup: ' + error.message, true);
     });
+
+  // Listen for reload messages from import/export
+  browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'reload_popup') {
+      console.log('Reload popup message received - reloading tabs');
+      loadUserSettings()
+        .then(() => loadTabsFromStorage())
+        .then(() => {
+          if (SFTabs.settings && SFTabs.settings.updateSettingsUI) {
+            SFTabs.settings.updateSettingsUI();
+          }
+          if (SFTabs.settings && SFTabs.settings.applyTheme) {
+            SFTabs.settings.applyTheme();
+          }
+          if (SFTabs.ui && SFTabs.ui.renderTabList) {
+            SFTabs.ui.renderTabList();
+          }
+          console.log('Popup reloaded with imported configuration');
+        })
+        .catch(error => {
+          console.error('Error reloading popup:', error);
+        });
+      return true;
+    }
+  });
 });
 
 /**
