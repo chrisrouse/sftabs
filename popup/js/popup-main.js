@@ -198,24 +198,27 @@ function loadTabsFromStorage() {
   console.log('Loading tabs from storage');
   return SFTabs.storage.getTabs()
     .then((loadedTabs) => {
+      console.log('📦 Loaded tabs from storage:', loadedTabs ? loadedTabs.length : 0, 'tabs');
       if (loadedTabs && loadedTabs.length > 0) {
+        console.log('First tab:', loadedTabs[0]);
         // Migrate tabs to new structure if needed
         customTabs = migrateTabsToNewStructure(loadedTabs);
-        
+
         // Save migrated structure if changes were made
         const originalLength = JSON.stringify(loadedTabs).length;
         const migratedLength = JSON.stringify(customTabs).length;
-        
+
         if (migratedLength !== originalLength) {
           console.log('Tabs migrated to new structure');
           return SFTabs.storage.saveTabs(customTabs);
         }
       } else {
-        console.log('No tabs found in storage, using defaults');
+        console.log('⚠️ No tabs found in storage, using defaults');
         customTabs = [...SFTabs.constants.DEFAULT_TABS];
         return SFTabs.storage.saveTabs(customTabs);
       }
-      
+
+      console.log('✅ Final customTabs:', customTabs.length, 'tabs');
       return customTabs;
     })
     .catch((error) => {
