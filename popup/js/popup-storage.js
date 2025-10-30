@@ -169,25 +169,31 @@ async function importConfiguration(configData) {
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener((changes, area) => {
+      console.log('🔔 Storage changed:', { area, changes: Object.keys(changes) });
+
       if (area === 'local') {
         if (changes.customTabs) {
-          console.log('Tabs changed in storage - updating UI');
+          console.log('✅ Tabs changed in storage - updating UI', changes.customTabs);
           const newTabs = changes.customTabs.newValue || [];
           SFTabs.main.setTabs(newTabs);
           SFTabs.ui.renderTabList();
         }
 
         if (changes.userSettings) {
-          console.log('Settings changed in storage - updating UI');
+          console.log('✅ Settings changed in storage - updating UI', changes.userSettings);
           const newSettings = changes.userSettings.newValue || SFTabs.constants.DEFAULT_SETTINGS;
           SFTabs.main.setUserSettings(newSettings);
           SFTabs.settings.updateSettingsUI();
           SFTabs.settings.applyTheme();
         }
+      } else {
+        console.log('ℹ️ Storage change ignored - area is not local:', area);
       }
     });
-    
+
     console.log('Storage change listeners setup complete');
+  } else {
+    console.warn('⚠️ browser.storage.onChanged not available');
   }
 }
 
