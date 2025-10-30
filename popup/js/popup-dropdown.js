@@ -101,43 +101,34 @@ async function setupObjectDropdown() {
 			}
 
 			if (currentTab) {
-				const tab = tabs.find(t => t.id === currentTab.id);
-				if (tab) {
-					// Clean up old dropdown properties from previous implementation
-					delete tab.autoSetupDropdown;
-					delete tab.children;
-					delete tab.parentId;
-					delete tab.isExpanded;
-					delete tab.cachedNavigation;
-					delete tab.navigationLastUpdated;
-					delete tab.needsNavigationRefresh;
+				// Store the parsed navigation items temporarily (not saved until user clicks Save)
+				// We'll use the currentActionPanelTab reference to hold this temporarily
+				console.log('✅ Navigation parsed successfully!', {
+					tabId: currentTab.id,
+					label: currentTab.label,
+					itemCount: navigationItems.length,
+					firstItem: navigationItems[0]?.label
+				});
 
-					// Set new dropdown properties
-					tab.hasDropdown = true;
-					tab.dropdownItems = navigationItems;
+				// Show preview with the parsed items
+				showDropdownPreview(navigationItems);
 
-					console.log('✅ Dropdown setup complete!', {
-						tabId: tab.id,
-						label: tab.label,
-						hasDropdown: tab.hasDropdown,
-						itemCount: tab.dropdownItems.length,
-						firstItem: tab.dropdownItems[0]?.label
-					});
-
-					// Show preview
-					showDropdownPreview(navigationItems);
-
-					// Save to storage
-					await SFTabs.storage.saveTabs(tabs);
-
-					// Update the current action panel tab reference
-					SFTabs.main.setCurrentActionPanelTab(tab);
-
-					SFTabs.main.showStatus('Dropdown menu created successfully!');
-				} else {
-					console.error('❌ Tab not found in customTabs array:', currentTab.id);
-					throw new Error('Tab not found in storage');
+				// Store the pending dropdown items in a temporary property on the current tab reference
+				// This will be saved when the user clicks Save in the action panel
+				if (SFTabs.main && SFTabs.main.currentActionPanelTab) {
+					SFTabs.main.currentActionPanelTab.pendingDropdownItems = navigationItems;
+					console.log('Stored pending dropdown items on currentActionPanelTab');
 				}
+
+				// Scroll the dropdown preview into view so user can see it immediately
+				const dropdownPreview = document.getElementById('dropdown-items-preview');
+				if (dropdownPreview) {
+					setTimeout(() => {
+						dropdownPreview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+					}, 100);
+				}
+
+				SFTabs.main.showStatus('Navigation items loaded. Click Save to apply changes.');
 			} else {
 				console.error('❌ No matching tab found for this Object Manager page');
 				const objectName = response.objectName || 'Unknown';
@@ -226,15 +217,23 @@ function removeDropdownItem(index) {
 	const currentTab = SFTabs.main.currentActionPanelTab;
 	if (!currentTab) return;
 
-	const tabs = SFTabs.main.customTabs;
-	const tab = tabs.find(t => t.id === currentTab.id);
-	if (!tab || !tab.dropdownItems) return;
+	// Check if we have pending dropdown items (not yet saved)
+	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
+		// Remove from pending items
+		currentTab.pendingDropdownItems.splice(index, 1);
+		showDropdownPreview(currentTab.pendingDropdownItems);
+	} else {
+		// Remove from saved dropdown items
+		const tabs = SFTabs.main.customTabs;
+		const tab = tabs.find(t => t.id === currentTab.id);
+		if (!tab || !tab.dropdownItems) return;
 
-	// Remove the item
-	tab.dropdownItems.splice(index, 1);
+		// Remove the item
+		tab.dropdownItems.splice(index, 1);
 
-	// Update the preview
-	showDropdownPreview(tab.dropdownItems);
+		// Update the preview
+		showDropdownPreview(tab.dropdownItems);
+	}
 
 	// Don't save immediately - let the user click Save button to commit changes
 	// This allows removing multiple items before saving

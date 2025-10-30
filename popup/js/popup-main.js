@@ -352,9 +352,15 @@ function updateActionPanelContent(tab) {
     domElements.actionIsCustomUrlCheckbox.checked = tab.isCustomUrl || false;
   }
 
-  // Show dropdown items if they exist
-  if (tab.dropdownItems && tab.dropdownItems.length > 0 && SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
-    SFTabs.dropdowns.showDropdownPreview(tab.dropdownItems);
+  // Show dropdown items if they exist (either pending or saved)
+  if (SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
+    if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
+      // Show pending dropdown items (not yet saved)
+      SFTabs.dropdowns.showDropdownPreview(tab.pendingDropdownItems);
+    } else if (tab.dropdownItems && tab.dropdownItems.length > 0) {
+      // Show saved dropdown items
+      SFTabs.dropdowns.showDropdownPreview(tab.dropdownItems);
+    }
   }
 }
 
@@ -400,10 +406,32 @@ function saveActionPanelChanges() {
     isCustomUrl: isCustomUrl
   };
 
+  // Check if there are pending dropdown items to save
+  if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
+    console.log('Applying pending dropdown items:', tab.pendingDropdownItems.length);
+    tabData.hasDropdown = true;
+    tabData.dropdownItems = tab.pendingDropdownItems;
+
+    // Clean up old dropdown properties from previous implementation
+    tabData.autoSetupDropdown = undefined;
+    tabData.children = undefined;
+    tabData.parentId = undefined;
+    tabData.isExpanded = undefined;
+    tabData.cachedNavigation = undefined;
+    tabData.navigationLastUpdated = undefined;
+    tabData.needsNavigationRefresh = undefined;
+  }
+
   // Update the tab using the tabs module
   if (SFTabs.tabs && SFTabs.tabs.updateTab) {
     SFTabs.tabs.updateTab(tab.id, tabData).then(() => {
       console.log('Tab updated successfully from action panel');
+
+      // Clear pending dropdown items after successful save
+      if (tab.pendingDropdownItems) {
+        delete tab.pendingDropdownItems;
+        console.log('Cleared pending dropdown items');
+      }
 
       // Reload tabs from storage to ensure we have the latest data
       return loadTabsFromStorage();
