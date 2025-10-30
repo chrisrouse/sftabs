@@ -165,8 +165,9 @@
 	background-color: var(--color-background);
 	margin-top: 56px;
 	height: calc(100% - 56px);
+	display: none;
   }
-  
+
   #main-content.active,
   #settings-panel.active {
 	display: block;
@@ -176,7 +177,7 @@
 	margin-left: 8px;
   	margin-top: 8px;
 	}
-  
+
   .settings-panel {
 	padding: 0;
 	background-color: var(--color-background);
@@ -498,7 +499,39 @@
   .delete-button:hover svg path {
 	fill: var(--slds-color-error);
   }
-  
+
+  /* Edit Button */
+  .edit-button {
+	flex-shrink: 0;
+	background-color: transparent;
+	border: none;
+	border-radius: 4px;
+	width: 24px;
+	height: 24px;
+	min-width: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.2s;
+	padding: 0;
+	margin: 0 0 0 4px;
+  }
+
+  .edit-button:hover {
+	background-color: var(--color-border);
+  }
+
+  .edit-button svg {
+	stroke: var(--color-text);
+	width: 16px;
+	height: 16px;
+  }
+
+  .edit-button:hover svg {
+	stroke: var(--slds-brand-primary);
+  }
+
   /* Forms */
   .tab-form {
 	background-color: var(--color-item-background);

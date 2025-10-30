@@ -654,18 +654,18 @@ function showConfirmModal(onConfirm) {
 function showMainContent() {
 	console.log('Showing main content');
 	mainContent.classList.add('active');
-	mainContent.style.display = 'block'; // Add this line
+	mainContent.style.display = 'block';
 	settingsPanel.classList.remove('active');
-	settingsPanel.style.display = 'none'; // Add this line
+	settingsPanel.style.display = 'none';
 }
 
 // Show settings panel
 function showSettingsPanel() {
 	console.log('Showing settings panel');
 	mainContent.classList.remove('active');
-	mainContent.style.display = 'none'; // Add this line
+	mainContent.style.display = 'none';
 	settingsPanel.classList.add('active');
-	settingsPanel.style.display = 'block'; // Add this line
+	settingsPanel.style.display = 'block';
 }
 
 // Setup event listeners
@@ -1219,7 +1219,7 @@ function createTabElement(tab) {
 	// Create actions container
 	const actionsContainer = document.createElement('div');
 	actionsContainer.className = 'tab-actions';
-	
+
 // Create new tab icon button - simplified with CSS styling
 const newTabButton = document.createElement('button');
 newTabButton.className = 'new-tab-button';
@@ -1269,16 +1269,16 @@ newTabButton.addEventListener('click', (e) => {
 	  e.stopPropagation();
 	  deleteTab(tab.id);
 	});
-	
+
 	// Add buttons to actions container
-actionsContainer.appendChild(newTabButton);
+	actionsContainer.appendChild(newTabButton);
 	actionsContainer.appendChild(deleteButton);
-	
-	// Add click handler for editing
+
+	// Add click handler for editing (clicking on tab content)
 	contentContainer.addEventListener('click', () => {
-	  editTab(tab.id);
+		showTabForm(tab.id);
 	});
-	
+
 	// Assemble final tab layout
 	tabItem.appendChild(dragHandle);
 	tabItem.appendChild(contentContainer);
@@ -1465,7 +1465,6 @@ function showTabForm(tabId = null) {
 	if (tabId) {
 	  // Edit mode
 	  editingTabId = tabId;
-	  formTitle.textContent = 'Edit Tab';
 
 	  // Populate form with existing data
 	  const tab = customTabs.find(t => t.id === tabId);
@@ -1505,7 +1504,6 @@ function showTabForm(tabId = null) {
 	} else {
 	  // Add mode
 	  editingTabId = null;
-	  formTitle.textContent = 'Add New Tab';
 
 	  // Hide dropdown section when adding new tab
 	  objectDropdownSection.style.display = 'none';
