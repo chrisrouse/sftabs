@@ -133,11 +133,21 @@ function handleFileSelect(event) {
 
 			// Save imported configuration in a single atomic operation
 			// This ensures storage.onChanged fires properly
+			console.log('📥 Importing config with', config.customTabs.length, 'tabs');
+			console.log('First imported tab:', config.customTabs[0]);
+
 			browser.storage.local.set({
 				customTabs: config.customTabs,
 				userSettings: config.userSettings || {}
 			})
 				.then(() => {
+					console.log('✅ Configuration saved to storage');
+
+					// Verify it was saved
+					return browser.storage.local.get(['customTabs']);
+				})
+				.then((result) => {
+					console.log('✅ Verified storage contains', result.customTabs?.length || 0, 'tabs');
 					console.log('Configuration imported successfully');
 
 					// Send refresh message to all Salesforce tabs
