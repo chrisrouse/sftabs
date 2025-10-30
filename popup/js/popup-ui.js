@@ -41,10 +41,8 @@ function createTabElement(tab) {
   tabItem.className = 'tab-item';
   tabItem.dataset.id = tab.id;
   
-  // Check if this tab should have a dropdown
-  const allTabs = SFTabs.main.getTabs();
-  const childTabs = allTabs.filter(t => t.parentId === tab.id);
-  const hasAnyDropdown = tab.hasDropdown || tab.autoSetupDropdown || childTabs.length > 0;
+  // Check if this tab should have a dropdown (using dropdownItems for object-dropdowns implementation)
+  const hasAnyDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
   
   if (hasAnyDropdown) {
     tabItem.classList.add('has-dropdown');
@@ -67,11 +65,8 @@ function createTabElement(tab) {
   tabItem.appendChild(contentContainer);
   tabItem.appendChild(actionsContainer);
   
-  // Add dropdown menu if needed
-  if (hasAnyDropdown && SFTabs.dropdowns) {
-    const dropdownMenu = SFTabs.dropdowns.createEnhancedDropdownMenu(tab);
-    tabItem.appendChild(dropdownMenu);
-  }
+  // Note: Dropdown functionality is handled in the content script on the Salesforce page,
+  // not in the popup UI for the object-dropdowns implementation
   
   return tabItem;
 }
@@ -130,24 +125,13 @@ function createCompactTabContent(container, tab, tabName, badgeInfo, hasDropdown
   container.style.alignItems = 'flex-start';
   
   container.appendChild(badgeWrapper);
-  
+
   const textContainer = document.createElement('div');
   textContainer.style.marginLeft = '8px';
   textContainer.style.flex = '1';
   textContainer.style.minWidth = '0';
-  
-  if (hasDropdown && SFTabs.dropdowns) {
-    const contentWrapper = document.createElement('div');
-    contentWrapper.className = 'tab-content-wrapper';
-    contentWrapper.appendChild(tabName);
-    
-    const dropdownArrow = SFTabs.dropdowns.createDropdownArrow();
-    contentWrapper.appendChild(dropdownArrow);
-    textContainer.appendChild(contentWrapper);
-  } else {
-    textContainer.appendChild(tabName);
-  }
-  
+  textContainer.appendChild(tabName);
+
   container.appendChild(textContainer);
   
   tabName.style.wordBreak = 'break-word';
@@ -163,18 +147,7 @@ function createRegularTabContent(container, tab, tabName, badgeInfo, hasDropdown
   container.style.flexDirection = 'column';
   container.style.flex = '1';
   container.style.minWidth = '0';
-  
-  if (hasDropdown && SFTabs.dropdowns) {
-    const contentWrapper = document.createElement('div');
-    contentWrapper.className = 'tab-content-wrapper';
-    contentWrapper.appendChild(tabName);
-    
-    const dropdownArrow = SFTabs.dropdowns.createDropdownArrow();
-    contentWrapper.appendChild(dropdownArrow);
-    container.appendChild(contentWrapper);
-  } else {
-    container.appendChild(tabName);
-  }
+  container.appendChild(tabName);
   
   // Add path display
   const tabPath = document.createElement('div');
@@ -197,49 +170,19 @@ function createRegularTabContent(container, tab, tabName, badgeInfo, hasDropdown
  * Add click handlers to tab content
  */
 function addTabContentClickHandlers(tab, contentContainer, tabName, hasDropdown) {
-  if (hasDropdown) {
-    // For dropdown tabs, only the tab name should be clickable for editing
-    tabName.addEventListener('click', (e) => {
-      e.stopPropagation();
-      editTab(tab.id);
-    });
-    
-    // Add dropdown toggle handler to the dropdown arrow
-    const dropdownArrow = contentContainer.querySelector('.dropdown-arrow');
-    if (dropdownArrow && SFTabs.dropdowns) {
-      dropdownArrow.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const tabItem = e.target.closest('.tab-item');
-        const dropdownMenu = tabItem.querySelector('.dropdown-menu');
-        SFTabs.dropdowns.toggleDropdown(tabItem, dropdownArrow, dropdownMenu);
-      });
-    }
-    
-    // Main tab navigation on content wrapper click (avoiding arrow)
-    const contentWrapper = contentContainer.querySelector('.tab-content-wrapper');
-    if (contentWrapper) {
-      contentWrapper.addEventListener('click', (e) => {
-        // Only navigate if not clicking on dropdown arrow
-        if (!e.target.closest('.dropdown-arrow')) {
-          navigateToTab(tab);
-        }
-      });
-    }
-  } else {
-    // For regular tabs: 
-    // - Single click opens edit form
-    // - Double click navigates to the tab
-    contentContainer.addEventListener('click', (e) => {
-      e.stopPropagation();
-      editTab(tab.id);
-    });
-    
-    // Double click for navigation
-    contentContainer.addEventListener('dblclick', (e) => {
-      e.stopPropagation();
-      navigateToTab(tab);
-    });
-  }
+  // For all tabs:
+  // - Single click opens edit form
+  // - Double click navigates to the tab
+  contentContainer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editTab(tab.id);
+  });
+
+  // Double click for navigation
+  contentContainer.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    navigateToTab(tab);
+  });
 }
 
 /**
