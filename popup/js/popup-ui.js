@@ -395,11 +395,15 @@ function showTabForm(tabId = null) {
   } else {
     // Add mode
     SFTabs.main.setEditingTabId(null);
-    domElements.formTitle.textContent = 'Add New Tab';
-    
+
+    // Set form title if it exists (optional element)
+    if (domElements.formTitle) {
+      domElements.formTitle.textContent = 'Add New Tab';
+    }
+
     // Auto-detect current page for setup objects
     autoDetectCurrentPage();
-    
+
     domElements.tabList.after(domElements.tabForm);
   }
 
@@ -441,7 +445,11 @@ function populateFormForEdit(tabId) {
   }
 
   SFTabs.main.setEditingTabId(tabId);
-  domElements.formTitle.textContent = 'Edit Tab';
+
+  // Set form title if it exists (optional element)
+  if (domElements.formTitle) {
+    domElements.formTitle.textContent = 'Edit Tab';
+  }
 
   // Populate form fields
   domElements.tabNameInput.value = tab.label;
