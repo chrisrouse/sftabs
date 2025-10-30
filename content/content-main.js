@@ -747,8 +747,11 @@ function handleParseNavigation(sendResponse) {
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener((changes, area) => {
-      if (area === 'sync' && changes.customTabs) {
-        console.log("Tabs changed in storage - refreshing");
+      console.log('Storage changed:', { area, changes: Object.keys(changes) });
+
+      // Check for both 'local' and 'sync' areas since we use storage.local
+      if ((area === 'local' || area === 'sync') && changes.customTabs) {
+        console.log("Tabs changed in storage - refreshing tabs on page");
         const tabContainer = document.querySelector('.tabBarItems.slds-grid');
         if (tabContainer) {
           if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
@@ -758,8 +761,8 @@ function setupStorageListeners() {
           }
         }
       }
-      
-      if (area === 'sync' && changes.userSettings) {
+
+      if ((area === 'local' || area === 'sync') && changes.userSettings) {
         console.log("Settings changed in storage - updating Lightning Navigation");
         const newSettings = changes.userSettings.newValue;
         if (newSettings && newSettings.hasOwnProperty('lightningNavigation')) {

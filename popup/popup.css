@@ -157,7 +157,8 @@
   
   /* Panel Visibility */
   #main-content,
-  #settings-panel {
+  #settings-panel,
+  #action-panel {
 	flex: 1;
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -169,7 +170,8 @@
   }
 
   #main-content.active,
-  #settings-panel.active {
+  #settings-panel.active,
+  #action-panel.active {
 	display: block;
   }
 
@@ -181,6 +183,29 @@
   .settings-panel {
 	padding: 0;
 	background-color: var(--color-background);
+  }
+
+  /* Action Panel */
+  #action-panel .section-header {
+	margin-left: 8px;
+	margin-top: 8px;
+  }
+
+  .action-panel {
+	padding: 0;
+	background-color: var(--color-background);
+  }
+
+  .action-panel-content {
+	margin: 8px;
+	background-color: var(--color-item-background);
+	border: 1px solid var(--color-border);
+	border-radius: 4px;
+	padding: 16px;
+  }
+
+  .action-panel-content p {
+	margin: 8px 0;
   }
   
   /* Tab List */
@@ -1118,4 +1143,37 @@
 
 .new-tab-button.new-tab-disabled:hover {
   background-color: var(--color-border);
+}
+
+/* Action Panel Button */
+.action-panel-button {
+  flex-shrink: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  margin: 0 4px 0 0;
+}
+
+.action-panel-button:hover {
+  background-color: var(--slds-brand-primary);
+}
+
+.action-panel-button svg {
+  stroke: var(--color-icon-fill);
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.action-panel-button:hover svg {
+  stroke: white;
 }

@@ -136,6 +136,41 @@ function setupEventListeners() {
     });
   }
 
+  // Action panel close button
+  if (domElements.actionPanelCloseButton) {
+    domElements.actionPanelCloseButton.addEventListener('click', () => {
+      console.log('Action panel close button clicked');
+      SFTabs.main.showMainContent();
+    });
+  }
+
+  // Action panel save button
+  if (domElements.actionPanelSaveButton) {
+    domElements.actionPanelSaveButton.addEventListener('click', () => {
+      console.log('Action panel save button clicked');
+      if (SFTabs.main && SFTabs.main.saveActionPanelChanges) {
+        SFTabs.main.saveActionPanelChanges();
+      }
+    });
+  }
+
+  // Enter key in action panel input fields
+  if (domElements.actionTabNameInput) {
+    domElements.actionTabNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && SFTabs.main && SFTabs.main.saveActionPanelChanges) {
+        SFTabs.main.saveActionPanelChanges();
+      }
+    });
+  }
+
+  if (domElements.actionTabPathInput) {
+    domElements.actionTabPathInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && SFTabs.main && SFTabs.main.saveActionPanelChanges) {
+        SFTabs.main.saveActionPanelChanges();
+      }
+    });
+  }
+
   // Settings reset button
   if (domElements.settingsResetButton) {
     domElements.settingsResetButton.addEventListener('click', () => {

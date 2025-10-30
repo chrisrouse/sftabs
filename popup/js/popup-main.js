@@ -4,6 +4,7 @@
 // Global state
 let customTabs = [];
 let editingTabId = null;
+let currentActionPanelTab = null;
 let userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 
 // DOM elements - will be initialized in DOMContentLoaded
@@ -87,6 +88,7 @@ function initializeDOMElements() {
   domElements.tabForm = document.querySelector('#tab-form');
   domElements.mainContent = document.querySelector('#main-content');
   domElements.settingsPanel = document.querySelector('#settings-panel');
+  domElements.actionPanel = document.querySelector('#action-panel');
   
   // Form elements
   domElements.formTitle = document.querySelector('#form-title');
@@ -117,6 +119,16 @@ function initializeDOMElements() {
   domElements.skipDeleteConfirmationCheckbox = document.querySelector('#skip-delete-confirmation');
   domElements.lightningNavigationCheckbox = document.querySelector('#lightning-navigation');
   domElements.settingsResetButton = document.querySelector('#settings-reset-button');
+
+  // Action panel elements
+  domElements.actionPanelCloseButton = document.querySelector('#action-panel-close-button');
+  domElements.actionPanelSaveButton = document.querySelector('#action-panel-save-button');
+  domElements.actionTabNameInput = document.querySelector('#action-tab-name');
+  domElements.actionTabPathInput = document.querySelector('#action-tab-path');
+  domElements.actionPanelTabNameDisplay = document.querySelector('#action-panel-tab-name-display');
+  domElements.actionOpenInNewTabCheckbox = document.querySelector('#action-open-in-new-tab');
+  domElements.actionIsObjectCheckbox = document.querySelector('#action-is-object');
+  domElements.actionIsCustomUrlCheckbox = document.querySelector('#action-is-custom-url');
   
   // Form groups
   domElements.hasDropdownGroup = document.querySelector('.has-dropdown-group');
@@ -256,6 +268,8 @@ function showMainContent() {
   domElements.mainContent.style.display = 'block';
   domElements.settingsPanel.classList.remove('active');
   domElements.settingsPanel.style.display = 'none';
+  domElements.actionPanel.classList.remove('active');
+  domElements.actionPanel.style.display = 'none';
 }
 
 /**
@@ -267,6 +281,146 @@ function showSettingsPanel() {
   domElements.mainContent.style.display = 'none';
   domElements.settingsPanel.classList.add('active');
   domElements.settingsPanel.style.display = 'block';
+  domElements.actionPanel.classList.remove('active');
+  domElements.actionPanel.style.display = 'none';
+}
+
+/**
+ * Show action panel for a specific tab
+ */
+function showActionPanel(tab) {
+  console.log('Showing action panel for tab:', tab);
+
+  // Store the current tab context
+  currentActionPanelTab = tab;
+
+  // Update the panel content with tab information
+  updateActionPanelContent(tab);
+
+  // Show the panel
+  domElements.mainContent.classList.remove('active');
+  domElements.mainContent.style.display = 'none';
+  domElements.settingsPanel.classList.remove('active');
+  domElements.settingsPanel.style.display = 'none';
+  domElements.actionPanel.classList.add('active');
+  domElements.actionPanel.style.display = 'block';
+}
+
+/**
+ * Update action panel content with tab data
+ */
+function updateActionPanelContent(tab) {
+  if (!tab) {
+    console.warn('No tab provided to updateActionPanelContent');
+    return;
+  }
+
+  console.log('Updating action panel content for tab:', tab);
+
+  // Update tab name display at the top
+  if (domElements.actionPanelTabNameDisplay) {
+    domElements.actionPanelTabNameDisplay.textContent = tab.label;
+  }
+
+  // Populate the input fields with current tab data
+  if (domElements.actionTabNameInput) {
+    domElements.actionTabNameInput.value = tab.label || '';
+  }
+
+  if (domElements.actionTabPathInput) {
+    domElements.actionTabPathInput.value = tab.path || '';
+  }
+
+  // Populate checkbox fields
+  if (domElements.actionOpenInNewTabCheckbox) {
+    domElements.actionOpenInNewTabCheckbox.checked = tab.openInNewTab || false;
+  }
+
+  if (domElements.actionIsObjectCheckbox) {
+    domElements.actionIsObjectCheckbox.checked = tab.isObject || false;
+  }
+
+  if (domElements.actionIsCustomUrlCheckbox) {
+    domElements.actionIsCustomUrlCheckbox.checked = tab.isCustomUrl || false;
+  }
+}
+
+/**
+ * Save action panel changes
+ */
+function saveActionPanelChanges() {
+  console.log('Saving action panel changes');
+
+  const tab = currentActionPanelTab;
+  if (!tab) {
+    showStatus('No tab selected', true);
+    return;
+  }
+
+  // Get values from inputs
+  const name = domElements.actionTabNameInput.value.trim();
+  const path = domElements.actionTabPathInput.value.trim();
+
+  // Validation
+  if (!name || !path) {
+    showStatus('Tab name and path are required', true);
+    return;
+  }
+
+  // Get checkbox values
+  const openInNewTab = domElements.actionOpenInNewTabCheckbox ? domElements.actionOpenInNewTabCheckbox.checked : tab.openInNewTab;
+  const isObject = domElements.actionIsObjectCheckbox ? domElements.actionIsObjectCheckbox.checked : tab.isObject;
+  const isCustomUrl = domElements.actionIsCustomUrlCheckbox ? domElements.actionIsCustomUrlCheckbox.checked : tab.isCustomUrl;
+
+  // Validation for conflicting options
+  if (isObject && isCustomUrl) {
+    showStatus('Tab cannot be both Object and Custom URL', true);
+    return;
+  }
+
+  // Prepare update data
+  const tabData = {
+    label: name,
+    path: path,
+    openInNewTab: openInNewTab,
+    isObject: isObject,
+    isCustomUrl: isCustomUrl
+  };
+
+  // Update the tab using the tabs module
+  if (SFTabs.tabs && SFTabs.tabs.updateTab) {
+    SFTabs.tabs.updateTab(tab.id, tabData).then(() => {
+      console.log('Tab updated successfully from action panel');
+
+      // Reload tabs from storage to ensure we have the latest data
+      return loadTabsFromStorage();
+    }).then(() => {
+      // Update the current tab reference
+      currentActionPanelTab = { ...tab, ...tabData };
+
+      // Update the display header
+      if (domElements.actionPanelTabNameDisplay) {
+        domElements.actionPanelTabNameDisplay.textContent = name;
+      }
+
+      // Explicitly re-render the tab list to show updated name
+      if (SFTabs.ui && SFTabs.ui.renderTabList) {
+        console.log('Re-rendering tab list after action panel save');
+        SFTabs.ui.renderTabList();
+      }
+
+      // Close panel and return to main content
+      setTimeout(() => {
+        showMainContent();
+      }, 800);
+    }).catch(error => {
+      console.error('Error updating tab:', error);
+      showStatus('Error updating tab: ' + error.message, true);
+    });
+  } else {
+    console.error('SFTabs.tabs.updateTab not available');
+    showStatus('Error: Update function not available', true);
+  }
 }
 
 /**
@@ -355,31 +509,39 @@ window.SFTabs.main = {
   // State
   get customTabs() { return customTabs; },
   get editingTabId() { return editingTabId; },
+  get currentActionPanelTab() { return currentActionPanelTab; },
   get userSettings() { return userSettings; },
   get domElements() { return domElements; },
-  
+
   // Functions
   showMainContent,
   showSettingsPanel,
+  showActionPanel,
+  updateActionPanelContent,
+  saveActionPanelChanges,
   showStatus,
   showModal,
   loadUserSettings,
   loadTabsFromStorage,
-  
+
   // Controlled state setters
-  setTabs: (tabs) => { 
-    customTabs = tabs; 
+  setTabs: (tabs) => {
+    customTabs = tabs;
   },
-  setEditingTabId: (id) => { 
-    editingTabId = id; 
+  setEditingTabId: (id) => {
+    editingTabId = id;
   },
-  setUserSettings: (settings) => { 
-    userSettings = settings; 
+  setCurrentActionPanelTab: (tab) => {
+    currentActionPanelTab = tab;
   },
-  
+  setUserSettings: (settings) => {
+    userSettings = settings;
+  },
+
   // Getters for backward compatibility
   getTabs: () => customTabs,
   getEditingTabId: () => editingTabId,
+  getCurrentActionPanelTab: () => currentActionPanelTab,
   getUserSettings: () => userSettings,
   getDOMElements: () => domElements
 };

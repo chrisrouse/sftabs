@@ -281,16 +281,35 @@ function buildFullUrlFallback(tab) {
 }
 
 /**
- * Create tab actions (new tab toggle and delete button)
+ * Create tab actions (action panel button, new tab toggle and delete button)
  */
 function createTabActions(tab) {
   const actionsContainer = document.createElement('div');
   actionsContainer.className = 'tab-actions';
-  
+
+  // Create action panel button (new + icon button)
+  const actionPanelButton = document.createElement('button');
+  actionPanelButton.className = 'action-panel-button';
+  actionPanelButton.setAttribute('title', 'Tab actions');
+  actionPanelButton.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  `;
+
+  actionPanelButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (SFTabs.main && SFTabs.main.showActionPanel) {
+      // Pass the tab object to the action panel
+      SFTabs.main.showActionPanel(tab);
+    }
+  });
+
   // Create new tab toggle button
   const newTabButton = document.createElement('button');
   newTabButton.className = 'new-tab-button';
-  
+
   // Set initial state classes
   if (tab.openInNewTab) {
     newTabButton.classList.add('new-tab-enabled');
@@ -299,7 +318,7 @@ function createTabActions(tab) {
     newTabButton.classList.add('new-tab-disabled');
     newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
   }
-  
+
   newTabButton.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -307,12 +326,12 @@ function createTabActions(tab) {
       <line x1="10" y1="14" x2="21" y2="3"></line>
     </svg>
   `;
-  
+
   newTabButton.addEventListener('click', (e) => {
     e.stopPropagation();
-    
+
     const newOpenInNewTab = !tab.openInNewTab;
-    
+
     // Update button appearance
     if (newOpenInNewTab) {
       newTabButton.classList.remove('new-tab-disabled');
@@ -323,11 +342,11 @@ function createTabActions(tab) {
       newTabButton.classList.add('new-tab-disabled');
       newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
     }
-    
+
     // Update tab and save
     SFTabs.tabs.updateTab(tab.id, { openInNewTab: newOpenInNewTab });
   });
-  
+
   // Create delete button
   const deleteButton = document.createElement('button');
   deleteButton.className = 'delete-button';
@@ -341,11 +360,12 @@ function createTabActions(tab) {
     e.stopPropagation();
     SFTabs.tabs.deleteTab(tab.id);
   });
-  
+
   // Add buttons to actions container
+  actionsContainer.appendChild(actionPanelButton);
   actionsContainer.appendChild(newTabButton);
   actionsContainer.appendChild(deleteButton);
-  
+
   return actionsContainer;
 }
 
@@ -410,22 +430,17 @@ function showTabForm(tabId = null) {
   // Update dropdown control visibility and show form
   updateDropdownControlVisibility();
   domElements.tabForm.style.display = 'block';
-  domElements.tabNameInput.focus();
+
+  // No need to focus since all main fields are now in action panel
+  // Dropdown form is for advanced settings only
 }
 
 /**
  * Reset the tab form to initial state
  */
 function resetTabForm() {
-  const domElements = SFTabs.main.getDOMElements();
-
-  domElements.tabNameInput.value = '';
-  domElements.tabPathInput.value = '';
-  domElements.openInNewTabCheckbox.checked = false;
-  domElements.isObjectCheckbox.checked = false;
-  domElements.isCustomUrlCheckbox.checked = false;
-
-  // Hide dropdown preview
+  // All form fields have been moved to action panel
+  // Only need to hide dropdown preview
   const dropdownItemsPreview = document.getElementById('dropdown-items-preview');
   if (dropdownItemsPreview) {
     dropdownItemsPreview.style.display = 'none';
@@ -451,12 +466,8 @@ function populateFormForEdit(tabId) {
     domElements.formTitle.textContent = 'Edit Tab';
   }
 
-  // Populate form fields
-  domElements.tabNameInput.value = tab.label;
-  domElements.tabPathInput.value = tab.path;
-  domElements.openInNewTabCheckbox.checked = tab.openInNewTab;
-  domElements.isObjectCheckbox.checked = tab.isObject || false;
-  domElements.isCustomUrlCheckbox.checked = tab.isCustomUrl || false;
+  // All form fields have been moved to action panel
+  // Nothing to populate in the dropdown form anymore
 }
 
 /**
@@ -512,64 +523,42 @@ function hideTabForm() {
 function saveTabForm() {
   const domElements = SFTabs.main.getDOMElements();
   console.log('Saving tab form');
-  
-  const name = domElements.tabNameInput.value.trim();
-  const path = domElements.tabPathInput.value.trim();
 
-  if (!name || !path) {
-    SFTabs.main.showStatus('Tab name and path are required', true);
+  const editingTabId = SFTabs.main.getEditingTabId();
+
+  // All editable fields have been moved to action panel
+  // The dropdown form now only handles Object Dropdown settings
+  if (!editingTabId) {
+    SFTabs.main.showStatus('No tab selected for editing', true);
     return;
   }
 
-  // Get checkbox values
-  const isObject = domElements.isObjectCheckbox.checked;
-  const isCustomUrl = domElements.isCustomUrlCheckbox.checked;
-  const isSetupObject = domElements.isSetupObjectCheckbox.checked;
+  // Get dropdown-related checkbox values (if they exist)
+  const isSetupObject = domElements.isSetupObjectCheckbox?.checked || false;
   const hasDropdown = domElements.hasDropdownCheckbox?.checked || false;
   const autoSetupDropdown = domElements.autoSetupDropdownCheckbox?.checked || false;
 
-  // Validation
-  if (isSetupObject && (isObject || isCustomUrl)) {
-    SFTabs.main.showStatus('Setup Object cannot be combined with Object or Custom URL', true);
-    return;
-  }
-
-  if (isObject && isCustomUrl) {
-    SFTabs.main.showStatus('Tab cannot be both Object and Custom URL', true);
-    return;
-  }
-
+  // Validation for dropdown settings
   if (autoSetupDropdown && !isSetupObject) {
     SFTabs.main.showStatus('Auto Setup Dropdown requires Setup Object to be enabled', true);
     return;
   }
 
+  // Only update dropdown-related fields
   const tabData = {
-    label: name,
-    path: path,
-    openInNewTab: domElements.openInNewTabCheckbox.checked,
-    isObject: isObject,
-    isCustomUrl: isCustomUrl,
     isSetupObject: isSetupObject,
     hasDropdown: hasDropdown,
     autoSetupDropdown: autoSetupDropdown
   };
 
-  const editingTabId = SFTabs.main.getEditingTabId();
-  
-  if (editingTabId) {
-    // Update existing tab
-    SFTabs.tabs.updateTab(editingTabId, tabData).then(() => {
-      console.log('Tab updated successfully');
-      hideTabForm();
-    });
-  } else {
-    // Create new tab
-    SFTabs.tabs.createTab(tabData).then(() => {
-      console.log('Tab created successfully');
-      hideTabForm();
-    });
-  }
+  // Update existing tab
+  SFTabs.tabs.updateTab(editingTabId, tabData).then(() => {
+    console.log('Tab updated successfully');
+    hideTabForm();
+  }).catch(error => {
+    console.error('Error updating tab:', error);
+    SFTabs.main.showStatus('Error updating tab: ' + error.message, true);
+  });
 }
 
 /**

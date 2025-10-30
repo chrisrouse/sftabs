@@ -48,44 +48,6 @@
 
             <!-- Inline Tab Form -->
             <div class="tab-form" id="tab-form" style="display: none;">
-                <div class="form-group">
-                    <label for="tab-name">Tab Name</label>
-                    <input type="text" id="tab-name" placeholder="e.g., User Management">
-                </div>
-
-                <div class="form-group">
-                    <label for="tab-path">Page URL</label>
-                    <input type="text" id="tab-path" placeholder="e.g., ManageUsers">
-                    <div class="help-text">Just add the page name from the URL.</div>
-                </div>
-
-                <!-- Checkbox for "Open in New Tab" with help text below -->
-                <div class="form-group checkbox-group">
-                    <label>
-                        <input type="checkbox" id="open-in-new-tab">
-                        <span>Open in New Tab</span>
-                    </label>
-                    <div class="help-text">Opens this tab in a new browser window instead of the current one</div>
-                </div>
-
-                <!-- Checkbox for "Object" with help text below -->
-                <div class="form-group checkbox-group">
-                    <label>
-                        <input type="checkbox" id="is-object">
-                        <span>Object</span>
-                    </label>
-                    <div class="help-text">Check this if the page is an object page instead of a setup page</div>
-                </div>
-
-                <!-- Checkbox for "Custom URL" with help text below -->
-                <div class="form-group checkbox-group">
-                    <label>
-                        <input type="checkbox" id="is-custom-url">
-                        <span>Custom URL</span>
-                    </label>
-                    <div class="help-text">Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)</div>
-                </div>
-
                 <!-- Object Dropdown Section -->
                 <div class="form-group" id="object-dropdown-section" style="display: none;">
                     <label>Object Manager Dropdown</label>
@@ -219,6 +181,62 @@
                     <p>v1.4.0 | <a href="#" id="changelog-link">Changelog</a></p>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- New Action Panel -->
+        <div id="action-panel" class="action-panel">
+            <div class="section-header">
+                <h2>Tab Settings</h2>
+            </div>
+
+            <div class="action-panel-content">
+                <div class="form-group">
+                    <h3 id="action-panel-tab-name-display" style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Tab Name</h3>
+                </div>
+
+                <div class="form-group">
+                    <label for="action-tab-name">Tab Name</label>
+                    <input type="text" id="action-tab-name" placeholder="e.g., User Management">
+                </div>
+
+                <div class="form-group">
+                    <label for="action-tab-path">Page URL</label>
+                    <input type="text" id="action-tab-path" placeholder="e.g., ManageUsers">
+                    <div class="help-text">Just add the page name from the URL.</div>
+                </div>
+
+                <!-- Checkbox for "Open in New Tab" -->
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="action-open-in-new-tab">
+                        <span>Open in New Tab</span>
+                    </label>
+                    <div class="help-text">Opens this tab in a new browser window instead of the current one</div>
+                </div>
+
+                <!-- Checkbox for "Object" -->
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="action-is-object">
+                        <span>Object</span>
+                    </label>
+                    <div class="help-text">Check this if the page is an object page instead of a setup page</div>
+                </div>
+
+                <!-- Checkbox for "Custom URL" -->
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="action-is-custom-url">
+                        <span>Custom URL</span>
+                    </label>
+                    <div class="help-text">Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)</div>
+                </div>
+
+                <div class="form-group">
+                    <button id="action-panel-save-button" class="primary-button">Save Changes</button>
+                    <button id="action-panel-close-button" class="secondary-button">Close</button>
+                </div>
             </div>
         </div>
 
