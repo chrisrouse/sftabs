@@ -310,7 +310,8 @@ function handleNavigationMessage(request, sender, sendResponse) {
           
           sendResponse({
             success: true,
-            navigation: navigation,
+            items: navigation,  // Changed from 'navigation' to 'items' for backward compatibility
+            navigation: navigation,  // Keep both for compatibility
             objectName: objectName,
             currentUrl: window.location.href
           });

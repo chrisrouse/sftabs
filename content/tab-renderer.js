@@ -164,8 +164,10 @@ function createTabElementWithDropdown(tab) {
   
   // Add dropdown arrow if tab has dropdown functionality
   if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
+    // Create dropdown arrow with ID for positioning reference
     const dropdownArrow = document.createElement('span');
     dropdownArrow.className = 'dropdown-arrow-inline';
+    dropdownArrow.setAttribute('id', `dropdown-arrow-${tab.id}`);
     dropdownArrow.innerHTML = `
     <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small" style="width: 12px; height: 12px; fill: currentColor;">
       <path d="M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21z"></path>
@@ -190,7 +192,7 @@ function createTabElementWithDropdown(tab) {
     dropdownArrow.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      toggleInlineDropdown(dropdown);
+      toggleInlineDropdown(dropdown, dropdownArrow);
     });
   }
   
@@ -202,103 +204,112 @@ function createTabElementWithDropdown(tab) {
 }
 
 /**
- * Create inline dropdown menu with pure Salesforce styling
+ * Create inline dropdown menu with SLDS native styling
  */
 function createInlineDropdownMenu(tab) {
-  const dropdown = document.createElement('div');
-  dropdown.className = 'sf-tabs-inline-dropdown slds-dropdown slds-dropdown_left';
-  dropdown.style.cssText = `
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    min-width: 200px;
-    max-width: 350px;
-    display: none;
-    max-height: 300px;
-    overflow-y: auto;
-  `;
+  // Main container with SLDS classes (hidden by default - will use 'visible' class to show)
+  const menu = document.createElement('div');
+  menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default positioned sftabs-custom-dropdown';
+  menu.setAttribute('id', `dropdown-menu-${tab.id}`);
+  menu.setAttribute('data-tab-id', tab.id);
+  menu.setAttribute('data-aura-rendered-by', 'sftabs-dropdown');
+  menu.setAttribute('data-aura-class', 'uiPopupTarget uiMenuList uiMenuList--default');
 
-    dropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-  
-  // Create dropdown list using Salesforce classes
-  const dropdownList = document.createElement('ul');
-  dropdownList.className = 'slds-dropdown__list';
-  dropdownList.setAttribute('role', 'menu');
-  
-  // Add main tab link first - using Salesforce dropdown item classes
-  const mainItemLi = document.createElement('li');
-  mainItemLi.className = 'slds-dropdown__item';
-  mainItemLi.setAttribute('role', 'presentation');
-  
-  const mainItem = document.createElement('a');
-  mainItem.href = '#';
-  mainItem.className = 'slds-dropdown__link';
-  mainItem.setAttribute('role', 'menuitem');
-  mainItem.textContent = tab.label;
-  mainItem.style.fontWeight = '600';
-  
-  mainItem.addEventListener('click', (e) => {
-    e.preventDefault();
-    navigateToMainTab(tab);
-    dropdown.style.display = 'none';
-  });
-  
-  mainItemLi.appendChild(mainItem);
-  dropdownList.appendChild(mainItemLi);
-  
-  // Add separator
-  const separator = document.createElement('li');
-  separator.className = 'slds-has-divider_top-space';
-  separator.setAttribute('role', 'separator');
-  dropdownList.appendChild(separator);
-  
-  // Add navigation items using Salesforce dropdown classes
+  // Add explicit display control (hidden by default, shown with 'visible' class)
+  menu.style.display = 'none';
+  menu.style.position = 'absolute';
+  menu.style.zIndex = '9999';
+  menu.style.width = '240px'; // Match Object Manager dropdown width
+
+  // Inner menu wrapper
+  const menuInner = document.createElement('div');
+  menuInner.setAttribute('role', 'menu');
+  menuInner.setAttribute('data-aura-rendered-by', 'sftabs-dropdown-inner');
+
+  // Scrollable list container
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.setAttribute('data-aura-rendered-by', 'sftabs-dropdown-list');
+
+  // Add navigation items
   const navigationItems = tab.dropdownItems || [];
-  navigationItems.forEach(navItem => {
+  navigationItems.forEach((navItem, index) => {
     const itemLi = document.createElement('li');
-    itemLi.className = 'slds-dropdown__item';
     itemLi.setAttribute('role', 'presentation');
+    itemLi.className = 'uiMenuItem';
+    itemLi.setAttribute('data-aura-rendered-by', `sftabs-item-${index}`);
+    itemLi.setAttribute('data-aura-class', 'uiMenuItem');
 
-    const item = document.createElement('a');
-    item.href = '#';
-    item.className = 'slds-dropdown__link';
-    item.setAttribute('role', 'menuitem');
-    item.textContent = navItem.label;
+    const link = document.createElement('a');
+    link.setAttribute('role', 'menuitem');
+    link.setAttribute('href', 'javascript:void(0)');
+    link.setAttribute('title', navItem.label);
+    link.setAttribute('data-aura-rendered-by', `sftabs-link-${index}`);
 
-    if (navItem.isActive) {
-      item.classList.add('slds-is-selected');
-    }
+    // Create text node for label
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'uiOutputText';
+    labelSpan.setAttribute('data-aura-rendered-by', `sftabs-text-${index}`);
+    labelSpan.setAttribute('data-aura-class', 'uiOutputText');
+    labelSpan.textContent = navItem.label;
 
-    item.addEventListener('click', (e) => {
+    link.appendChild(labelSpan);
+
+    // Add click handler
+    link.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       navigateToNavigationItem(navItem, tab);
-      dropdown.style.display = 'none';
+      menu.classList.remove('visible');
     });
 
-    itemLi.appendChild(item);
-    dropdownList.appendChild(itemLi);
+    itemLi.appendChild(link);
+    ul.appendChild(itemLi);
   });
-  
-  dropdown.appendChild(dropdownList);
-  return dropdown;
+
+  menuInner.appendChild(ul);
+  menu.appendChild(menuInner);
+  return menu;
 }
 
 /**
- * Toggle inline dropdown visibility
+ * Toggle inline dropdown visibility using SLDS visible class
  */
-function toggleInlineDropdown(dropdown) {
-  // Close all other dropdowns first
-  document.querySelectorAll('.sf-tabs-inline-dropdown').forEach(d => {
+function toggleInlineDropdown(dropdown, dropdownArrow) {
+  // Close all other SF Tabs custom dropdowns first (not native Salesforce dropdowns)
+  document.querySelectorAll('.sftabs-custom-dropdown').forEach(d => {
     if (d !== dropdown) {
+      d.classList.remove('visible');
       d.style.display = 'none';
     }
   });
-  
-  // Toggle this dropdown
-  dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+
+  const isCurrentlyVisible = dropdown.classList.contains('visible');
+
+  // Position the dropdown relative to the arrow before showing
+  if (!isCurrentlyVisible && dropdownArrow) {
+    // Get the arrow's position relative to the page
+    const arrowRect = dropdownArrow.getBoundingClientRect();
+    const parentLi = dropdown.parentElement;
+    const parentRect = parentLi.getBoundingClientRect();
+
+    // Calculate center of arrow relative to parent li
+    const topOffset = arrowRect.bottom - parentRect.top + 4; // 4px gap below arrow
+    const arrowCenterX = arrowRect.left + (arrowRect.width / 2) - parentRect.left;
+
+    // Position dropdown with center aligned to arrow center (nubbin will align with arrow)
+    dropdown.style.position = 'absolute';
+    dropdown.style.top = `${topOffset}px`;
+    dropdown.style.left = `${arrowCenterX}px`;
+    dropdown.style.right = 'auto';
+    dropdown.style.transform = 'translateX(-50%)'; // Center the dropdown under the arrow
+    dropdown.style.display = 'block';
+    dropdown.classList.add('visible');
+  } else {
+    dropdown.style.display = 'none';
+    dropdown.classList.remove('visible');
+  }
 }
 
 /**
@@ -396,9 +407,9 @@ function addTabClickListeners(tabs) {
         if (event.target.closest('.dropdown-arrow-inline')) {
           return;
         }
-        
+
         // If clicking within the dropdown menu, don't navigate
-        if (event.target.closest('.sf-tabs-inline-dropdown')) {
+        if (event.target.closest('.sftabs-custom-dropdown')) {
           return;
         }
         
@@ -654,8 +665,10 @@ function forceRefreshTabs() {
 
 // Setup global dropdown event handlers
 document.addEventListener('click', (e) => {
+  // Only close our custom dropdowns when clicking outside, not Salesforce native dropdowns
   if (!e.target.closest('.sf-tabs-custom-tab')) {
-    document.querySelectorAll('.sf-tabs-inline-dropdown').forEach(dropdown => {
+    document.querySelectorAll('.sftabs-custom-dropdown').forEach(dropdown => {
+      dropdown.classList.remove('visible');
       dropdown.style.display = 'none';
     });
   }

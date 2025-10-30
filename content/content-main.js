@@ -363,35 +363,37 @@ function createTabElementWithLightningAndDropdown(tab) {
   span.textContent = tab.label;
   
   // Add dropdown arrow if tab has dropdown functionality
-if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cachedNavigation.length > 0)) {
-  const dropdownArrow = document.createElement('span');
-  dropdownArrow.className = 'dropdown-arrow-inline';
-  dropdownArrow.innerHTML = `
+if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cachedNavigation.length > 0) || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
+    // Create dropdown arrow with ID for positioning reference
+    const dropdownArrow = document.createElement('span');
+    dropdownArrow.className = 'dropdown-arrow-inline';
+    dropdownArrow.setAttribute('id', `dropdown-arrow-${tab.id}`);
+    dropdownArrow.innerHTML = `
     <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small" style="width: 12px; height: 12px; fill: currentColor;">
       <path d="M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21z"></path>
     </svg>
-  `;
-  dropdownArrow.style.cssText = `
-    opacity: 0.7;
-    margin-left: 4px;
-    cursor: pointer;
-    user-select: none;
-    display: inline-flex;
-    align-items: center;
-  `;
-    
+    `;
+    dropdownArrow.style.cssText = `
+      opacity: 0.7;
+      margin-left: 4px;
+      cursor: pointer;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+    `;
+
     span.appendChild(dropdownArrow);
-    
+
     // Create dropdown menu if navigation data exists
-    if (tab.cachedNavigation && tab.cachedNavigation.length > 0) {
+    if ((tab.cachedNavigation && tab.cachedNavigation.length > 0) || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
       const dropdown = createInlineDropdownMenu(tab);
       li.appendChild(dropdown);
-      
+
       // Add dropdown toggle handler
       dropdownArrow.addEventListener('click', (e) => {
-        e.stopPropagation(); // Make sure this is here
+        e.stopPropagation();
         e.preventDefault();
-        toggleInlineDropdown(dropdown);
+        toggleInlineDropdown(dropdown, dropdownArrow);
       });
     }
   }
@@ -407,7 +409,7 @@ if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cac
     }
 
       // NEW: If clicking within the dropdown menu, don't navigate
-    if (event.target.closest('.sf-tabs-inline-dropdown')) {
+    if (event.target.closest('.sftabs-custom-dropdown')) {
       return;
     }
     
@@ -441,107 +443,134 @@ if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cac
 }
 
 /**
- * Create inline dropdown menu using Salesforce's CSS variables
+ * DUPLICATE FUNCTION - Commented out to use version from tab-renderer.js
+ * Create inline dropdown menu with SLDS native styling
  */
+/*
 function createInlineDropdownMenu(tab) {
-  const dropdown = document.createElement('div');
-  dropdown.className = 'sf-tabs-inline-dropdown';
-  dropdown.style.cssText = `
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #d8dde6;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    z-index: 1000;
-    min-width: 200px;
-    max-width: 350px;
-    display: none;
-    max-height: 300px;
-    overflow-y: auto;
-  `;
+  // Main container with SLDS classes (hidden by default - will use 'visible' class to show)
+  const menu = document.createElement('div');
+  menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default positioned sftabs-custom-dropdown';
+  menu.setAttribute('id', `dropdown-menu-${tab.id}`);
+  menu.setAttribute('data-tab-id', tab.id);
+  menu.setAttribute('data-aura-rendered-by', 'sftabs-dropdown');
+  menu.setAttribute('data-aura-class', 'uiPopupTarget uiMenuList uiMenuList--default');
 
-    dropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-  
-  // Add navigation items
-  tab.cachedNavigation.forEach(navItem => {
-    const item = document.createElement('a');
-    item.href = '#';
-    item.textContent = navItem.label;
-    item.style.cssText = `
-      display: block;
-      padding: 8px 12px 8px 16px;
-      color: #333;
-      text-decoration: none;
-      border-bottom: 1px solid #eee;
-      border-left: 3px solid transparent;
-      font-size: 13px;
-    `;
-    
-    if (navItem.isActive) {
-      item.style.backgroundColor = 'var(--lwc-brandPrimary)';
-      item.style.color = 'white';
-      item.style.borderLeftColor = 'white';
-    }
-    
-    item.addEventListener('mouseover', () => {
-      if (!navItem.isActive) {
-        item.style.backgroundColor = '#f5f5f5';
-        item.style.borderLeftColor = 'var(--lwc-brandPrimary)';
-      }
+  // Add explicit display control (hidden by default, shown with 'visible' class)
+  menu.style.display = 'none';
+  menu.style.position = 'absolute';
+  menu.style.zIndex = '9999';
+  menu.style.width = '240px'; // Match Object Manager dropdown width
+
+  // Inner menu wrapper
+  const menuInner = document.createElement('div');
+  menuInner.setAttribute('role', 'menu');
+  menuInner.setAttribute('data-aura-rendered-by', 'sftabs-dropdown-inner');
+
+  // Scrollable list container
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.setAttribute('data-aura-rendered-by', 'sftabs-dropdown-list');
+
+  // Add navigation items (support both cachedNavigation and dropdownItems)
+  const navigationItems = tab.dropdownItems || tab.cachedNavigation || [];
+  navigationItems.forEach((navItem, index) => {
+    const itemLi = document.createElement('li');
+    itemLi.setAttribute('role', 'presentation');
+    itemLi.className = 'uiMenuItem';
+    itemLi.setAttribute('data-aura-rendered-by', `sftabs-item-${index}`);
+    itemLi.setAttribute('data-aura-class', 'uiMenuItem');
+
+    const link = document.createElement('a');
+    link.setAttribute('role', 'menuitem');
+    link.setAttribute('href', 'javascript:void(0)');
+    link.setAttribute('title', navItem.label);
+    link.setAttribute('data-aura-rendered-by', `sftabs-link-${index}`);
+
+    // Create text node for label
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'uiOutputText';
+    labelSpan.setAttribute('data-aura-rendered-by', `sftabs-text-${index}`);
+    labelSpan.setAttribute('data-aura-class', 'uiOutputText');
+    labelSpan.textContent = navItem.label;
+
+    link.appendChild(labelSpan);
+
+    // Add click handler
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateToNavigationItem(navItem, tab);
+      menu.classList.remove('visible');
     });
-    
-    item.addEventListener('mouseout', () => {
-      if (!navItem.isActive) {
-        item.style.backgroundColor = 'white';
-        item.style.borderLeftColor = 'transparent';
-      }
-    });
-    
-  item.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation(); // Add this line
-    navigateToNavigationItem(navItem, tab);
-    dropdown.style.display = 'none';
+
+    itemLi.appendChild(link);
+    ul.appendChild(itemLi);
   });
 
-    
-    dropdown.appendChild(item);
-  });
-  
-  return dropdown;
+  menuInner.appendChild(ul);
+  menu.appendChild(menuInner);
+  return menu;
 }
+*/
 /**
- * Toggle inline dropdown visibility
+ * DUPLICATE FUNCTION - Commented out to use version from tab-renderer.js
+ * Toggle inline dropdown visibility using SLDS visible class
  */
-function toggleInlineDropdown(dropdown) {
-  // Close all other dropdowns first
-  document.querySelectorAll('.sf-tabs-inline-dropdown').forEach(d => {
+/*
+function toggleInlineDropdown(dropdown, dropdownArrow) {
+  // Close all other SF Tabs custom dropdowns first (not native Salesforce dropdowns)
+  document.querySelectorAll('.sftabs-custom-dropdown').forEach(d => {
     if (d !== dropdown) {
+      d.classList.remove('visible');
       d.style.display = 'none';
     }
   });
-  
-  // Toggle this dropdown
-  dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+
+  const isCurrentlyVisible = dropdown.classList.contains('visible');
+
+  // Position the dropdown relative to the arrow before showing
+  if (!isCurrentlyVisible && dropdownArrow) {
+    // Get the arrow's position relative to the page
+    const arrowRect = dropdownArrow.getBoundingClientRect();
+    const parentLi = dropdown.parentElement;
+    const parentRect = parentLi.getBoundingClientRect();
+
+    // Calculate center of arrow relative to parent li
+    const topOffset = arrowRect.bottom - parentRect.top + 4; // 4px gap below arrow
+    const arrowCenterX = arrowRect.left + (arrowRect.width / 2) - parentRect.left;
+
+    // Position dropdown with center aligned to arrow center (nubbin will align with arrow)
+    dropdown.style.position = 'absolute';
+    dropdown.style.top = `${topOffset}px`;
+    dropdown.style.left = `${arrowCenterX}px`;
+    dropdown.style.right = 'auto';
+    dropdown.style.transform = 'translateX(-50%)'; // Center the dropdown under the arrow
+    dropdown.style.display = 'block';
+    dropdown.classList.add('visible');
+  } else {
+    dropdown.style.display = 'none';
+    dropdown.classList.remove('visible');
+  }
 }
+*/
 
 /**
+ * DUPLICATE FUNCTION - Commented out to use version from tab-renderer.js
  * Navigate to main tab
  */
+/*
 function navigateToMainTab(tab) {
   console.log('SF Tabs: Navigating to main tab:', tab.label);
-  
+
   const currentUrl = window.location.href;
   const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
   const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
   const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
-  
+
   let fullUrl = '';
-  
+
   if (tab.isCustomUrl) {
     let formattedPath = tab.path;
     if (!formattedPath.startsWith('/')) {
@@ -555,7 +584,7 @@ function navigateToMainTab(tab) {
   } else {
     fullUrl = `${baseUrlSetup}${tab.path}/home`;
   }
-  
+
   if (tab.openInNewTab) {
     window.open(fullUrl, '_blank');
   } else {
@@ -570,6 +599,7 @@ function navigateToMainTab(tab) {
     }
   }
 }
+*/
 
 /**
  * Navigate to a navigation item from dropdown
@@ -612,8 +642,10 @@ function navigateToNavigationItem(navItem, parentTab) {
 function setupDropdownEventHandlers() {
   // Close dropdowns when clicking outside
   document.addEventListener('click', (e) => {
+    // Only close our custom dropdowns when clicking outside, not Salesforce native dropdowns
     if (!e.target.closest('.sf-tabs-custom-tab')) {
-      document.querySelectorAll('.sf-tabs-inline-dropdown').forEach(dropdown => {
+      document.querySelectorAll('.sftabs-custom-dropdown').forEach(dropdown => {
+        dropdown.classList.remove('visible');
         dropdown.style.display = 'none';
       });
     }
@@ -873,7 +905,7 @@ window.SFTabsContent.main = {
   handleParseNavigation,
   lightningNavigate,
   isLightningNavigationEnabled,
-  navigateToNavigationItem,
-  navigateToMainTab,
-  toggleInlineDropdown
+  navigateToNavigationItem
+  // navigateToMainTab - removed, use window.SFTabsContent.tabRenderer.navigateToMainTab instead
+  // toggleInlineDropdown - removed, internal function only
 };

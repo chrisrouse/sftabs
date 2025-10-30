@@ -72,7 +72,8 @@ function enhancedAddTabForCurrentPage() {
         console.log('Page title:', pageTitle);
         
         // Check if this is a Salesforce page we can work with
-        if (!currentUrl.includes('.salesforce.com') && !currentUrl.includes('.force.com')) {
+        const isSalesforcePage = currentUrl.includes('salesforce') || currentUrl.includes('.force.com');
+        if (!isSalesforcePage) {
           SFTabs.main.showStatus('Not a Salesforce page', true);
           return;
         }

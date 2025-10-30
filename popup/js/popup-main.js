@@ -137,8 +137,8 @@ function initializeDOMElements() {
   
   // Validate critical elements
   const criticalElements = [
-    'tabList', 'emptyState', 'tabForm', 'mainContent', 'settingsPanel',
-    'tabNameInput', 'tabPathInput', 'addTabButton', 'quickAddButton'
+    'tabList', 'emptyState', 'mainContent', 'settingsPanel', 'actionPanel',
+    'addTabButton', 'quickAddButton', 'actionTabNameInput', 'actionTabPathInput'
   ];
   
   let missingElements = 0;
@@ -291,8 +291,14 @@ function showSettingsPanel() {
 function showActionPanel(tab) {
   console.log('Showing action panel for tab:', tab);
 
+  if (!tab) {
+    console.error('showActionPanel called with no tab!');
+    return;
+  }
+
   // Store the current tab context
   currentActionPanelTab = tab;
+  console.log('✓ currentActionPanelTab set to:', currentActionPanelTab);
 
   // Update the panel content with tab information
   updateActionPanelContent(tab);
@@ -304,6 +310,8 @@ function showActionPanel(tab) {
   domElements.settingsPanel.style.display = 'none';
   domElements.actionPanel.classList.add('active');
   domElements.actionPanel.style.display = 'block';
+
+  console.log('Action panel is now visible');
 }
 
 /**
@@ -342,6 +350,11 @@ function updateActionPanelContent(tab) {
 
   if (domElements.actionIsCustomUrlCheckbox) {
     domElements.actionIsCustomUrlCheckbox.checked = tab.isCustomUrl || false;
+  }
+
+  // Show dropdown items if they exist
+  if (tab.dropdownItems && tab.dropdownItems.length > 0 && SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
+    SFTabs.dropdowns.showDropdownPreview(tab.dropdownItems);
   }
 }
 

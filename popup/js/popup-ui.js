@@ -300,9 +300,13 @@ function createTabActions(tab) {
 
   actionPanelButton.addEventListener('click', (e) => {
     e.stopPropagation();
+    console.log('Action panel button clicked for tab:', tab);
     if (SFTabs.main && SFTabs.main.showActionPanel) {
       // Pass the tab object to the action panel
+      console.log('Calling showActionPanel with tab:', tab);
       SFTabs.main.showActionPanel(tab);
+    } else {
+      console.error('SFTabs.main.showActionPanel not available!');
     }
   });
 

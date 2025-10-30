@@ -6,6 +6,8 @@
  */
 async function setupObjectDropdown() {
 	console.log('Setting up object dropdown...');
+	console.log('Editing tab ID:', SFTabs.main.editingTabId);
+	console.log('Current action panel tab:', SFTabs.main.currentActionPanelTab);
 
 	// Get UI elements
 	const setupDropdownButton = document.getElementById('setup-dropdown-button');
@@ -30,11 +32,76 @@ async function setupObjectDropdown() {
 		});
 
 		console.log('Navigation parse response:', response);
+		console.log('Response structure:', {
+			success: response.success,
+			navigationCount: response.navigation?.length,
+			objectName: response.objectName,
+			pageInfo: response.pageInfo,
+			currentUrl: response.currentUrl
+		});
 
-		if (response && response.success && response.items) {
-			// Update the current tab being edited with dropdown items
+		// Accept both 'items' and 'navigation' response formats
+		const navigationItems = response.items || response.navigation;
+
+		if (response && response.success && navigationItems && navigationItems.length > 0) {
+			// Get all tabs
+			const tabs = SFTabs.main.getTabs();
+
+			console.log('Available tabs:', tabs.length);
+			console.log('Response:', response);
+			console.log('Response object name:', response.objectName);
+			console.log('Response current URL:', response.currentUrl);
+
+			// Find the tab being edited
+			const editingTabId = SFTabs.main.editingTabId || SFTabs.main.getEditingTabId();
+			let currentTab = null;
+
+			// Primary approach: Use editingTabId (set when clicking on a tab to edit it inline)
 			if (editingTabId) {
-				const tab = customTabs.find(t => t.id === editingTabId);
+				currentTab = tabs.find(t => t.id === editingTabId);
+				if (currentTab) {
+					console.log('✓ Using editingTabId:', currentTab.label);
+				}
+			}
+
+			// Fallback: Try other approaches if editingTabId not set
+			if (!currentTab) {
+				// Try currentActionPanelTab (for action panel workflow)
+				currentTab = SFTabs.main.currentActionPanelTab || SFTabs.main.getCurrentActionPanelTab();
+				if (currentTab) {
+					console.log('✓ Using currentActionPanelTab:', currentTab.label);
+				}
+			}
+
+			// Last resort: Match by URL or objectName
+			if (!currentTab && response.objectName) {
+				const objectManagerPath = `ObjectManager/${response.objectName}`;
+				currentTab = tabs.find(t => t.path && t.path.includes(objectManagerPath));
+				if (currentTab) {
+					console.log('✓ Found tab by objectName:', currentTab.label, currentTab.path);
+				}
+			}
+
+			if (!currentTab && response.currentUrl) {
+				const urlMatch = response.currentUrl.match(/\/lightning\/setup\/(.+?)(\?|$)/);
+				if (urlMatch) {
+					const urlPath = urlMatch[1];
+					console.log('Extracted URL path:', urlPath);
+					currentTab = tabs.find(t => t.path && urlPath.startsWith(t.path));
+					if (currentTab) {
+						console.log('✓ Found tab by URL match:', currentTab.label, currentTab.path);
+					}
+				}
+			}
+
+			if (!currentTab) {
+				console.log('✗ No matching tab found');
+				console.log('editingTabId:', editingTabId);
+				console.log('Available tabs:', tabs.map(t => ({ id: t.id, label: t.label, path: t.path })));
+			}
+
+			if (currentTab) {
+				const tab = tabs.find(t => t.id === currentTab.id);
 				if (tab) {
 					// Clean up old dropdown properties from previous implementation
 					delete tab.autoSetupDropdown;
@@ -47,7 +114,7 @@ async function setupObjectDropdown() {
 
 					// Set new dropdown properties
 					tab.hasDropdown = true;
-					tab.dropdownItems = response.items;
+					tab.dropdownItems = navigationItems;
 
 					console.log('✅ Dropdown setup complete!', {
 						tabId: tab.id,
@@ -58,25 +125,34 @@ async function setupObjectDropdown() {
 					});
 
 					// Show preview
-					showDropdownPreview(response.items);
+					showDropdownPreview(navigationItems);
 
 					// Save to storage
-					await saveTabsToStorage();
+					await SFTabs.storage.saveTabs(tabs);
 
-					showStatus('Dropdown menu created successfully!');
+					// Update the current action panel tab reference
+					SFTabs.main.setCurrentActionPanelTab(tab);
+
+					SFTabs.main.showStatus('Dropdown menu created successfully!');
 				} else {
-					console.error('❌ Tab not found in customTabs array:', editingTabId);
+					console.error('❌ Tab not found in customTabs array:', currentTab.id);
+					throw new Error('Tab not found in storage');
 				}
 			} else {
-				console.error('❌ No editingTabId set');
+				console.error('❌ No matching tab found for this Object Manager page');
+				const objectName = response.objectName || 'Unknown';
+				throw new Error(`No tab found for ${objectName}. Please create a tab for this page first using the Quick Add (⚡) button.`);
 			}
 		} else {
-			throw new Error(response?.error || 'Failed to parse navigation');
+			throw new Error(response?.error || 'Failed to parse navigation - no items found');
 		}
 
 	} catch (error) {
 		console.error('Error setting up dropdown:', error);
-		showStatus('Failed to create dropdown: ' + error.message, true);
+		const errorMessage = error.message.includes('settings panel')
+			? error.message
+			: 'Failed to create dropdown: ' + error.message;
+		SFTabs.main.showStatus(errorMessage, true);
 	} finally {
 		// Reset button state
 		setupDropdownButton.disabled = false;
@@ -147,9 +223,11 @@ function showDropdownPreview(items) {
  * Remove a dropdown item by index
  */
 function removeDropdownItem(index) {
-	if (!editingTabId) return;
+	const currentTab = SFTabs.main.currentActionPanelTab;
+	if (!currentTab) return;
 
-	const tab = customTabs.find(t => t.id === editingTabId);
+	const tabs = SFTabs.main.customTabs;
+	const tab = tabs.find(t => t.id === currentTab.id);
 	if (!tab || !tab.dropdownItems) return;
 
 	// Remove the item
