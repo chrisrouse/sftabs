@@ -6,7 +6,7 @@
  */
 async function getTabs() {
   try {
-    const result = await browser.storage.sync.get('customTabs');
+    const result = await browser.storage.local.get('customTabs');
     return result.customTabs || [];
   } catch (error) {
     console.error('Error getting tabs from storage:', error);
@@ -21,8 +21,8 @@ async function saveTabs(tabs) {
   try {
     // Sort tabs by position before saving
     const sortedTabs = [...tabs].sort((a, b) => a.position - b.position);
-    
-    await browser.storage.sync.set({ customTabs: sortedTabs });
+
+    await browser.storage.local.set({ customTabs: sortedTabs });
     console.log('Tabs saved successfully to storage');
     
     // Update the main state
@@ -47,7 +47,7 @@ async function saveTabs(tabs) {
  */
 async function getUserSettings() {
   try {
-    const result = await browser.storage.sync.get('userSettings');
+    const result = await browser.storage.local.get('userSettings');
     
     if (result.userSettings) {
       // Merge with defaults to ensure all properties exist
@@ -68,7 +68,7 @@ async function getUserSettings() {
  */
 async function saveUserSettings(settings) {
   try {
-    await browser.storage.sync.set({ userSettings: settings });
+    await browser.storage.local.set({ userSettings: settings });
     console.log('User settings saved successfully to storage');
     
     // Update the main state
@@ -93,7 +93,7 @@ async function saveUserSettings(settings) {
  */
 async function clearAllStorage() {
   try {
-    await browser.storage.sync.clear();
+    await browser.storage.local.clear();
     console.log('All storage cleared successfully');
     
     // Reset main state

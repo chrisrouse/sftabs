@@ -10,7 +10,7 @@ function initTabs(tabContainer) {
     return;
   }
 
-  browser.storage.sync.get(['customTabs', 'userSettings']).then(result => {
+  browser.storage.local.get(['customTabs', 'userSettings']).then(result => {
     let tabsToUse = [];
     
     if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
@@ -74,7 +74,7 @@ function initTabs(tabContainer) {
           }
         ];
       }
-      browser.storage.sync.set({ customTabs: tabsToUse });
+      browser.storage.local.set({ customTabs: tabsToUse });
     }
     
     // Sort tabs by position (only top-level tabs)
@@ -480,7 +480,7 @@ function lightningNavigate(details, fallbackURL) {
 function highlightActiveTab() {
   const currentUrl = window.location.href;
   
-  browser.storage.sync.get('customTabs').then(result => {
+  browser.storage.local.get('customTabs').then(result => {
     const tabs = result.customTabs || [];
     const topLevelTabs = getTopLevelTabs(tabs);
     let matchedTab = null;
@@ -565,7 +565,7 @@ function refreshNavigationForCurrentPage() {
     return;
   }
   
-  browser.storage.sync.get('customTabs').then(result => {
+  browser.storage.local.get('customTabs').then(result => {
     const tabs = result.customTabs || [];
     
     // Find tabs that match the current page and need navigation refresh
@@ -587,7 +587,7 @@ function refreshNavigationForCurrentPage() {
     });
     
     if (updatedCount > 0) {
-      browser.storage.sync.set({ customTabs: tabs });
+      browser.storage.local.set({ customTabs: tabs });
       console.log(`Refreshed navigation for ${updatedCount} tabs`);
     }
   }).catch(error => {
@@ -622,7 +622,7 @@ function removeCustomTabs(tabContainer) {
  */
 async function getTabById(tabId) {
   try {
-    const result = await browser.storage.sync.get('customTabs');
+    const result = await browser.storage.local.get('customTabs');
     const tabs = result.customTabs || [];
     return tabs.find(tab => tab.id === tabId);
   } catch (error) {

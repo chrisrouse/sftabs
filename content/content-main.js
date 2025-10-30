@@ -17,7 +17,7 @@
         sync: {
           get: function(keys) {
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.get(keys, (result) => {
+              chrome.storage.local.get(keys, (result) => {
                 if (chrome.runtime.lastError) {
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
@@ -28,7 +28,7 @@
           },
           set: function(items) {
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.set(items, () => {
+              chrome.storage.local.set(items, () => {
                 if (chrome.runtime.lastError) {
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
@@ -168,7 +168,7 @@ function lightningNavigate(details, fallbackURL) {
  */
 async function initializeLightningNavigationSetting() {
   try {
-    const result = await browser.storage.sync.get('userSettings');
+    const result = await browser.storage.local.get('userSettings');
     if (result.userSettings && result.userSettings.hasOwnProperty('lightningNavigation')) {
       const enabled = result.userSettings.lightningNavigation;
       localStorage.setItem("lightningNavigation", JSON.stringify(enabled));
@@ -262,7 +262,7 @@ function delayLoadTabs(attemptCount) {
 function initTabsWithLightningNavigation(tabContainer) {
   console.log('Using fallback tab initialization with Lightning Navigation and Dropdown Support');
   
-  browser.storage.sync.get(['customTabs', 'userSettings']).then(result => {
+  browser.storage.local.get(['customTabs', 'userSettings']).then(result => {
     let tabsToUse = [];
     
     if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
@@ -278,7 +278,7 @@ function initTabsWithLightningNavigation(tabContainer) {
           { id: 'default_tab_users', label: 'Users', path: 'ManageUsers', openInNewTab: false, position: 1 }
         ];
       }
-      browser.storage.sync.set({ customTabs: tabsToUse });
+      browser.storage.local.set({ customTabs: tabsToUse });
     }
     
     // Remove existing custom tabs
