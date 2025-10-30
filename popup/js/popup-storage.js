@@ -169,14 +169,14 @@ async function importConfiguration(configData) {
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener((changes, area) => {
-      if (area === 'sync') {
+      if (area === 'local') {
         if (changes.customTabs) {
           console.log('Tabs changed in storage - updating UI');
           const newTabs = changes.customTabs.newValue || [];
           SFTabs.main.setTabs(newTabs);
           SFTabs.ui.renderTabList();
         }
-        
+
         if (changes.userSettings) {
           console.log('Settings changed in storage - updating UI');
           const newSettings = changes.userSettings.newValue || SFTabs.constants.DEFAULT_SETTINGS;
