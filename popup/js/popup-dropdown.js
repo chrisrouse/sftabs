@@ -44,6 +44,11 @@ async function setupObjectDropdown() {
 		const navigationItems = response.items || response.navigation;
 
 		if (response && response.success && navigationItems && navigationItems.length > 0) {
+			// Check if the current page is an ObjectManager page
+			if (!response.pageInfo || response.pageInfo.type !== 'objectManager') {
+				throw new Error('Current page is not an Object Manager page. Please navigate to an Object Manager page before setting up the dropdown.');
+			}
+
 			// Get all tabs
 			const tabs = SFTabs.main.getTabs();
 
@@ -100,6 +105,22 @@ async function setupObjectDropdown() {
 			}
 
 			if (currentTab) {
+				// Validate that the current page matches the tab being edited
+				// Extract object name from the current page
+				const currentObjectName = response.pageInfo?.objectName;
+
+				// Check if the tab's path matches the current Object Manager page
+				let tabMatchesCurrentPage = false;
+				if (currentTab.path && currentTab.path.includes('ObjectManager/')) {
+					const tabObjectName = currentTab.path.split('ObjectManager/')[1]?.split('/')[0];
+					tabMatchesCurrentPage = tabObjectName === currentObjectName;
+					console.log('Tab object:', tabObjectName, 'Current page object:', currentObjectName, 'Match:', tabMatchesCurrentPage);
+				}
+
+				if (!tabMatchesCurrentPage) {
+					throw new Error(`This tab is for "${currentTab.label}" but you're viewing the "${currentObjectName}" Object Manager page. Please navigate to the correct Object Manager page for this tab before setting up the dropdown.`);
+				}
+
 				// Store the parsed navigation items temporarily (not saved until user clicks Save)
 				// We'll use the currentActionPanelTab reference to hold this temporarily
 				console.log('✅ Navigation parsed successfully!', {
