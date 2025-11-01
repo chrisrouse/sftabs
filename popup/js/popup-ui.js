@@ -83,6 +83,25 @@ function createTabContent(tab, hasDropdown) {
   tabName.className = 'tab-name';
   tabName.textContent = tab.label;
 
+  // Add dropdown indicator icon if tab has dropdown items
+  if (hasDropdown) {
+    const indicator = document.createElement('span');
+    indicator.className = 'dropdown-indicator';
+
+    // Use folder icon for tabs without path, chevron for tabs with path
+    const isFolder = !tab.path || !tab.path.trim();
+
+    if (isFolder) {
+      // Folder icon for folder-style tabs (no path)
+      indicator.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
+    } else {
+      // Chevron-down icon for tabs with path + dropdown
+      indicator.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    }
+
+    tabName.appendChild(indicator);
+  }
+
   const settings = SFTabs.main.getUserSettings();
 
   if (settings.compactMode) {
@@ -274,7 +293,7 @@ function createTabActions(tab) {
   // Create action panel button (edit/pencil icon button)
   const actionPanelButton = document.createElement('button');
   actionPanelButton.className = 'action-panel-button';
-  actionPanelButton.setAttribute('title', 'Tab actions');
+  actionPanelButton.setAttribute('title', 'Edit tab');
   actionPanelButton.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2">
       <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>

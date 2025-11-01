@@ -373,7 +373,29 @@
 	margin-top: 0;
 	padding-right: 0;
   }
-  
+
+  /* Dropdown indicator icon styling */
+  .dropdown-indicator {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 6px;
+	opacity: 0.6;
+	vertical-align: middle;
+  }
+
+  .dropdown-indicator svg {
+	width: 14px;
+	height: 14px;
+	stroke: currentColor;
+	fill: none;
+  }
+
+  /* Slightly smaller in compact mode */
+  .tab-item.compact-mode .dropdown-indicator svg {
+	width: 12px;
+	height: 12px;
+  }
+
   /* Tab Actions Styling */
   .tab-actions {
 	display: flex;
