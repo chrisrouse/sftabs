@@ -371,6 +371,10 @@ function saveActionPanelChanges() {
   console.log('Saving action panel changes');
 
   const tab = currentActionPanelTab;
+  console.log('Current tab:', tab);
+  console.log('Tab has pendingDropdownItems?', !!tab?.pendingDropdownItems);
+  console.log('pendingDropdownItems:', tab?.pendingDropdownItems);
+
   if (!tab) {
     showStatus('No tab selected', true);
     return;
@@ -408,9 +412,11 @@ function saveActionPanelChanges() {
 
   // Check if there are pending dropdown items to save
   if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
-    console.log('Applying pending dropdown items:', tab.pendingDropdownItems.length);
+    console.log('✅ Applying pending dropdown items:', tab.pendingDropdownItems.length);
+    console.log('First item:', tab.pendingDropdownItems[0]);
     tabData.hasDropdown = true;
     tabData.dropdownItems = tab.pendingDropdownItems;
+    console.log('tabData now has:', { hasDropdown: tabData.hasDropdown, itemCount: tabData.dropdownItems.length });
 
     // Clean up old dropdown properties from previous implementation
     tabData.autoSetupDropdown = undefined;
@@ -420,6 +426,8 @@ function saveActionPanelChanges() {
     tabData.cachedNavigation = undefined;
     tabData.navigationLastUpdated = undefined;
     tabData.needsNavigationRefresh = undefined;
+  } else {
+    console.log('❌ No pending dropdown items found on tab');
   }
 
   // Update the tab using the tabs module

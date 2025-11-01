@@ -465,6 +465,11 @@ function populateFormForEdit(tabId) {
 
   SFTabs.main.setEditingTabId(tabId);
 
+  // Set the tab as currentActionPanelTab so dropdown operations work
+  // This is needed for removing dropdown items in the old form
+  SFTabs.main.setCurrentActionPanelTab(tab);
+  console.log('Set currentActionPanelTab for old form edit:', tab.id);
+
   // Set form title if it exists (optional element)
   if (domElements.formTitle) {
     domElements.formTitle.textContent = 'Edit Tab';
@@ -555,9 +560,33 @@ function saveTabForm() {
     autoSetupDropdown: autoSetupDropdown
   };
 
+  // Check if there are pending dropdown items to save
+  const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
+  if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
+    console.log('✅ Applying pending dropdown items from old form:', currentActionPanelTab.pendingDropdownItems.length);
+    tabData.hasDropdown = true;
+    tabData.dropdownItems = currentActionPanelTab.pendingDropdownItems;
+
+    // Clean up old dropdown properties from previous implementation
+    tabData.autoSetupDropdown = undefined;
+    tabData.children = undefined;
+    tabData.parentId = undefined;
+    tabData.isExpanded = undefined;
+    tabData.cachedNavigation = undefined;
+    tabData.navigationLastUpdated = undefined;
+    tabData.needsNavigationRefresh = undefined;
+  }
+
   // Update existing tab
   SFTabs.tabs.updateTab(editingTabId, tabData).then(() => {
     console.log('Tab updated successfully');
+
+    // Clear pending dropdown items after successful save
+    if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems) {
+      delete currentActionPanelTab.pendingDropdownItems;
+      console.log('Cleared pending dropdown items from old form');
+    }
+
     hideTabForm();
   }).catch(error => {
     console.error('Error updating tab:', error);

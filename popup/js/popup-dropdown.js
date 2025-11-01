@@ -56,20 +56,19 @@ async function setupObjectDropdown() {
 			const editingTabId = SFTabs.main.editingTabId || SFTabs.main.getEditingTabId();
 			let currentTab = null;
 
-			// Primary approach: Use editingTabId (set when clicking on a tab to edit it inline)
-			if (editingTabId) {
+			// Primary approach: Use currentActionPanelTab (for action panel workflow)
+			currentTab = SFTabs.main.getCurrentActionPanelTab();
+			if (currentTab) {
+				console.log('✓ Using currentActionPanelTab:', currentTab.label);
+			}
+
+			// Fallback: Use editingTabId (set when clicking on a tab to edit it in old form)
+			if (!currentTab && editingTabId) {
 				currentTab = tabs.find(t => t.id === editingTabId);
 				if (currentTab) {
 					console.log('✓ Using editingTabId:', currentTab.label);
-				}
-			}
-
-			// Fallback: Try other approaches if editingTabId not set
-			if (!currentTab) {
-				// Try currentActionPanelTab (for action panel workflow)
-				currentTab = SFTabs.main.currentActionPanelTab || SFTabs.main.getCurrentActionPanelTab();
-				if (currentTab) {
-					console.log('✓ Using currentActionPanelTab:', currentTab.label);
+					// Store this as the current action panel tab so we can save to it later
+					SFTabs.main.setCurrentActionPanelTab(currentTab);
 				}
 			}
 
@@ -115,9 +114,12 @@ async function setupObjectDropdown() {
 
 				// Store the pending dropdown items in a temporary property on the current tab reference
 				// This will be saved when the user clicks Save in the action panel
-				if (SFTabs.main && SFTabs.main.currentActionPanelTab) {
-					SFTabs.main.currentActionPanelTab.pendingDropdownItems = navigationItems;
-					console.log('Stored pending dropdown items on currentActionPanelTab');
+				const actionPanelTab = SFTabs.main.getCurrentActionPanelTab();
+				if (actionPanelTab) {
+					actionPanelTab.pendingDropdownItems = navigationItems;
+					console.log('Stored pending dropdown items on currentActionPanelTab:', actionPanelTab.id);
+				} else {
+					console.warn('No currentActionPanelTab available to store pending items');
 				}
 
 				// Scroll the dropdown preview into view so user can see it immediately
@@ -214,27 +216,43 @@ function showDropdownPreview(items) {
  * Remove a dropdown item by index
  */
 function removeDropdownItem(index) {
-	const currentTab = SFTabs.main.currentActionPanelTab;
-	if (!currentTab) return;
+	console.log('removeDropdownItem called with index:', index);
+
+	const currentTab = SFTabs.main.getCurrentActionPanelTab();
+	console.log('currentTab:', currentTab);
+
+	if (!currentTab) {
+		console.warn('No currentActionPanelTab found, cannot remove item');
+		return;
+	}
 
 	// Check if we have pending dropdown items (not yet saved)
 	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
+		console.log('Removing from pending items. Current count:', currentTab.pendingDropdownItems.length);
 		// Remove from pending items
 		currentTab.pendingDropdownItems.splice(index, 1);
+		console.log('New count:', currentTab.pendingDropdownItems.length);
 		showDropdownPreview(currentTab.pendingDropdownItems);
 	} else {
+		console.log('No pending items, removing from saved dropdown items');
 		// Remove from saved dropdown items
 		const tabs = SFTabs.main.customTabs;
 		const tab = tabs.find(t => t.id === currentTab.id);
-		if (!tab || !tab.dropdownItems) return;
+		if (!tab || !tab.dropdownItems) {
+			console.warn('Tab or dropdownItems not found');
+			return;
+		}
 
+		console.log('Removing from saved items. Current count:', tab.dropdownItems.length);
 		// Remove the item
 		tab.dropdownItems.splice(index, 1);
+		console.log('New count:', tab.dropdownItems.length);
 
 		// Update the preview
 		showDropdownPreview(tab.dropdownItems);
 	}
 
+	console.log('Item removed successfully');
 	// Don't save immediately - let the user click Save button to commit changes
 	// This allows removing multiple items before saving
 }
