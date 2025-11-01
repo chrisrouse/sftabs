@@ -79,24 +79,31 @@ function initTabs(tabContainer) {
     
     // Sort tabs by position (only top-level tabs)
     const topLevelTabs = getTopLevelTabs(tabsToUse);
-    
-    // Remove any existing custom tabs
+
+    // Remove any existing custom tabs and overflow button
     const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
     existingTabs.forEach(tab => tab.remove());
-    
+    const existingOverflow = tabContainer.querySelector('.sf-tabs-overflow-button');
+    if (existingOverflow) existingOverflow.remove();
+
     // Add tabs to the container
     for (const tab of topLevelTabs) {
       const tabElement = createTabElementWithDropdown(tab);
       tabContainer.appendChild(tabElement);
     }
-    
+
     // Add click event listeners
     addTabClickListeners(topLevelTabs);
     highlightActiveTab();
-    
+
     // Try to refresh navigation for setup object tabs on current page
     refreshNavigationForCurrentPage();
-    
+
+    // Check for overflow and handle it (use longer timeout for accurate measurement)
+    setTimeout(() => {
+      handleTabOverflow(tabContainer, topLevelTabs);
+    }, 200);
+
     console.log("Enhanced tabs successfully added to container");
   }).catch(error => {
     console.error("Error loading tabs:", error);
@@ -692,15 +699,254 @@ function forceRefreshTabs() {
   }
 }
 
+/**
+ * Handle tab overflow - show/hide tabs and display overflow button if needed
+ * Uses two-pass approach: first check if overflow is needed, then calculate which tabs to hide
+ */
+function handleTabOverflow(tabContainer, topLevelTabs) {
+  if (!tabContainer) return;
+
+  // Remove existing overflow button if any
+  const existingOverflow = tabContainer.querySelector('.sf-tabs-overflow-button');
+  if (existingOverflow) existingOverflow.remove();
+
+  // Get all custom tab elements
+  const customTabElements = Array.from(tabContainer.querySelectorAll('.sf-tabs-custom-tab'));
+  if (customTabElements.length === 0) return;
+
+  // Show all tabs to measure properly
+  customTabElements.forEach(tab => {
+    tab.style.display = '';
+  });
+
+  // Force layout recalculation
+  tabContainer.offsetHeight;
+
+  // Get container dimensions
+  const containerRect = tabContainer.getBoundingClientRect();
+  const containerHeight = containerRect.height;
+
+  // Use the parent element's width (the visible viewport area) instead of the fixed container width
+  // The tabBarItems container has a fixed width, but we need to know the visible viewport width
+  const tabBarParent = tabContainer.parentElement;
+  let viewportWidth = tabBarParent ? tabBarParent.getBoundingClientRect().width : window.innerWidth - 100;
+
+  // Account for the left navbar (App Launcher + Setup label)
+  const leftNav = document.querySelector('.slds-context-bar__primary.navLeft');
+  if (leftNav) {
+    const leftNavWidth = leftNav.getBoundingClientRect().width;
+    viewportWidth -= leftNavWidth;
+  }
+
+  // Add buffer for right side margin/padding
+  const rightBuffer = 100;
+  viewportWidth -= rightBuffer;
+
+  // Calculate space used by native Salesforce tabs
+  const nativeTabs = Array.from(tabContainer.querySelectorAll('.tabItem:not(.sf-tabs-custom-tab):not(.sf-tabs-overflow-button)'));
+  const nativeTabsWidth = nativeTabs.reduce((sum, tab) => {
+    const width = tab.getBoundingClientRect().width;
+    return sum + width;
+  }, 0);
+
+  // PASS 1: Check if all tabs fit WITHOUT overflow button
+  const availableWidthWithoutOverflow = viewportWidth - nativeTabsWidth;
+
+  // Measure total width of all custom tabs
+  let totalTabsWidth = 0;
+  customTabElements.forEach(tabElement => {
+    totalTabsWidth += tabElement.getBoundingClientRect().width;
+  });
+
+  console.log('Overflow check - Viewport:', viewportWidth, 'x', containerHeight, 'Native tabs:', nativeTabsWidth, 'Available:', availableWidthWithoutOverflow, 'Custom tabs total:', totalTabsWidth);
+
+  // Check if tabs have wrapped by checking container height
+  // A single row of tabs is typically 36-40px tall, wrapped tabs will be taller
+  const hasWrapped = containerHeight > 45;
+
+  // If all tabs fit (width check AND no wrapping), we're done!
+  if (totalTabsWidth <= availableWidthWithoutOverflow && !hasWrapped) {
+    console.log('All tabs fit - no overflow needed');
+    return; // No overflow needed
+  }
+
+  if (hasWrapped) {
+    console.log('Tabs have wrapped to multiple rows - overflow needed');
+  }
+
+  console.log('Tabs overflow detected - need More button');
+
+  // PASS 2: Tabs don't all fit - need overflow button
+  const overflowButtonWidth = 60;
+  const buffer = 5; // Small buffer for Pass 2 calculations
+  const availableWidth = viewportWidth - nativeTabsWidth - overflowButtonWidth - buffer;
+
+  // Determine which tabs fit and which should be hidden
+  let usedWidth = 0;
+  const visibleTabs = [];
+  const hiddenTabs = [];
+
+  customTabElements.forEach((tabElement, index) => {
+    const tabWidth = tabElement.getBoundingClientRect().width;
+
+    if (usedWidth + tabWidth <= availableWidth) {
+      usedWidth += tabWidth;
+      visibleTabs.push({ element: tabElement, tab: topLevelTabs[index] });
+    } else {
+      hiddenTabs.push({ element: tabElement, tab: topLevelTabs[index] });
+    }
+  });
+
+  // Hide overflow tabs
+  hiddenTabs.forEach(({ element }) => {
+    element.style.display = 'none';
+  });
+
+  // Create and add overflow button
+  const overflowButton = createOverflowButton(hiddenTabs.map(h => h.tab));
+  tabContainer.appendChild(overflowButton);
+}
+
+/**
+ * Create overflow button (chevron) for hidden tabs
+ */
+function createOverflowButton(hiddenTabs) {
+  const li = document.createElement('li');
+  li.setAttribute('role', 'presentation');
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-overflow-button';
+  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+
+  const a = document.createElement('a');
+  a.setAttribute('role', 'tab');
+  a.setAttribute('tabindex', '-1');
+  a.setAttribute('title', `${hiddenTabs.length} more tab${hiddenTabs.length > 1 ? 's' : ''}`);
+  a.setAttribute('aria-selected', 'false');
+  a.setAttribute('href', 'javascript:void(0)');
+  a.classList.add('tabHeader', 'slds-context-bar__label-action');
+
+  const span = document.createElement('span');
+  span.classList.add('title', 'slds-truncate');
+  span.innerHTML = `
+    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" style="width: 16px; height: 16px; fill: currentColor;">
+      <path d="M260 320c-11 0-21-4-29-12l-120-120c-8-8-8-21 0-29s21-8 29 0l120 120 120-120c8-8 21-8 29 0s8 21 0 29l-120 120c-8 8-18 12-29 12z" transform="rotate(270 260 260)"></path>
+    </svg>
+  `;
+
+  // Create overflow dropdown menu
+  const dropdown = createOverflowDropdown(hiddenTabs);
+  li.appendChild(dropdown);
+
+  // Add click handler
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleInlineDropdown(dropdown, span);
+  });
+
+  a.appendChild(span);
+  li.appendChild(a);
+
+  return li;
+}
+
+/**
+ * Create overflow dropdown menu showing hidden tabs
+ */
+function createOverflowDropdown(hiddenTabs) {
+  const menu = document.createElement('div');
+  menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default positioned sftabs-custom-dropdown sftabs-overflow-dropdown';
+  menu.setAttribute('id', 'sftabs-overflow-dropdown');
+  menu.setAttribute('data-aura-rendered-by', 'sftabs-overflow');
+  menu.setAttribute('data-aura-class', 'uiPopupTarget uiMenuList uiMenuList--default');
+
+  menu.style.display = 'none';
+  menu.style.position = 'absolute';
+  menu.style.zIndex = '9999';
+  menu.style.width = '240px';
+
+  const menuInner = document.createElement('div');
+  menuInner.setAttribute('role', 'menu');
+  menuInner.setAttribute('data-aura-rendered-by', 'sftabs-overflow-inner');
+
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.setAttribute('data-aura-rendered-by', 'sftabs-overflow-list');
+
+  // Add each hidden tab to the dropdown
+  hiddenTabs.forEach((tab, index) => {
+    const itemLi = document.createElement('li');
+    itemLi.setAttribute('role', 'presentation');
+    itemLi.className = 'uiMenuItem';
+    itemLi.setAttribute('data-aura-rendered-by', `sftabs-overflow-item-${index}`);
+    itemLi.setAttribute('data-aura-class', 'uiMenuItem');
+
+    const link = document.createElement('a');
+    link.setAttribute('role', 'menuitem');
+    link.setAttribute('href', 'javascript:void(0)');
+    link.setAttribute('title', tab.label);
+    link.setAttribute('data-aura-rendered-by', `sftabs-overflow-link-${index}`);
+
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'uiOutputText';
+    labelSpan.setAttribute('data-aura-rendered-by', `sftabs-overflow-text-${index}`);
+    labelSpan.setAttribute('data-aura-class', 'uiOutputText');
+    labelSpan.textContent = tab.label;
+
+    link.appendChild(labelSpan);
+
+    // Add click handler to navigate to tab
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateToMainTab(tab);
+      menu.classList.remove('visible');
+      menu.style.display = 'none';
+    });
+
+    itemLi.appendChild(link);
+    ul.appendChild(itemLi);
+  });
+
+  menuInner.appendChild(ul);
+  menu.appendChild(menuInner);
+  return menu;
+}
+
 // Setup global dropdown event handlers
 document.addEventListener('click', (e) => {
-  // Only close our custom dropdowns when clicking outside, not Salesforce native dropdowns
-  if (!e.target.closest('.sf-tabs-custom-tab')) {
+  // Only close our custom dropdowns when clicking outside, not Salesforce native dropdowns or overflow button
+  if (!e.target.closest('.sf-tabs-custom-tab') && !e.target.closest('.sf-tabs-overflow-button')) {
     document.querySelectorAll('.sftabs-custom-dropdown').forEach(dropdown => {
       dropdown.classList.remove('visible');
       dropdown.style.display = 'none';
     });
   }
+});
+
+// Setup window resize handler for overflow recalculation
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  console.log('Window resize detected');
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    const tabsLoaded = areTabsLoaded();
+    console.log('Resize handler: tabContainer found?', !!tabContainer, 'tabs loaded?', tabsLoaded);
+
+    if (tabContainer && tabsLoaded) {
+      console.log('Recalculating overflow after resize');
+      browser.storage.local.get('customTabs').then(result => {
+        const tabs = result.customTabs || [];
+        const topLevelTabs = getTopLevelTabs(tabs);
+        handleTabOverflow(tabContainer, topLevelTabs);
+      }).catch(error => {
+        console.error('Error recalculating overflow on resize:', error);
+      });
+    } else {
+      console.log('Resize handler: conditions not met for overflow recalculation');
+    }
+  }, 250); // Debounce resize events
 });
 
 // Export tab renderer functions
@@ -723,5 +969,6 @@ window.SFTabsContent.tabRenderer = {
   forceRefreshTabs,
   navigateToMainTab,
   navigateToNavigationItem,
-  toggleInlineDropdown
+  toggleInlineDropdown,
+  handleTabOverflow
 };
