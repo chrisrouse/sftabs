@@ -78,90 +78,69 @@ function createTabElement(tab) {
 function createTabContent(tab, hasDropdown) {
   const contentContainer = document.createElement('div');
   contentContainer.className = 'tab-info';
-  
+
   const tabName = document.createElement('div');
   tabName.className = 'tab-name';
   tabName.textContent = tab.label;
-  
-  const badgeInfo = getTabBadgeInfo(tab);
+
   const settings = SFTabs.main.getUserSettings();
-  
+
   if (settings.compactMode) {
-    createCompactTabContent(contentContainer, tab, tabName, badgeInfo, hasDropdown);
+    createCompactTabContent(contentContainer, tab, tabName, hasDropdown);
   } else {
-    createRegularTabContent(contentContainer, tab, tabName, badgeInfo, hasDropdown);
+    createRegularTabContent(contentContainer, tab, tabName, hasDropdown);
   }
 
   // Add click handlers
   addTabContentClickHandlers(tab, contentContainer, tabName, hasDropdown);
-  
+
   return contentContainer;
 }
 
 /**
  * Create compact mode tab content
  */
-function createCompactTabContent(container, tab, tabName, badgeInfo, hasDropdown) {
+function createCompactTabContent(container, tab, tabName, hasDropdown) {
   const tabItem = container.closest('.tab-item');
   if (tabItem) {
     tabItem.classList.add('compact-mode');
   }
-  
-  const badgeShort = badgeInfo.text.charAt(0);
-  const pathType = document.createElement('span');
-  pathType.className = 'path-type-compact ' + badgeInfo.class;
-  pathType.textContent = badgeShort;
-  
-  const badgeWrapper = document.createElement('div');
-  badgeWrapper.style.display = 'flex';
-  badgeWrapper.style.alignItems = 'flex-start';
-  badgeWrapper.style.paddingTop = '3px';
-  badgeWrapper.appendChild(pathType);
-  
+
   container.style.display = 'flex';
   container.style.flexDirection = 'row';
   container.style.flex = '1';
   container.style.minWidth = '0';
   container.style.alignItems = 'flex-start';
-  
-  container.appendChild(badgeWrapper);
 
   const textContainer = document.createElement('div');
-  textContainer.style.marginLeft = '8px';
   textContainer.style.flex = '1';
   textContainer.style.minWidth = '0';
   textContainer.appendChild(tabName);
 
   container.appendChild(textContainer);
-  
+
   tabName.style.wordBreak = 'break-word';
   tabName.style.overflow = 'hidden';
-  tabName.style.paddingTop = '3px';
 }
 
 /**
  * Create regular mode tab content
  */
-function createRegularTabContent(container, tab, tabName, badgeInfo, hasDropdown) {
+function createRegularTabContent(container, tab, tabName, hasDropdown) {
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
   container.style.flex = '1';
   container.style.minWidth = '0';
   container.appendChild(tabName);
-  
-  // Add path display
+
+  // Add path display (without badge)
   const tabPath = document.createElement('div');
   tabPath.className = 'tab-path';
-  
-  const pathType = document.createElement('span');
-  pathType.className = 'path-type ' + badgeInfo.class;
-  pathType.textContent = badgeInfo.text;
-  
+
   const pathTextElement = document.createElement('span');
   pathTextElement.className = 'path-text';
   pathTextElement.textContent = tab.path;
-  
-  tabPath.appendChild(pathType);
+
   tabPath.appendChild(pathTextElement);
   container.appendChild(tabPath);
 }
@@ -292,14 +271,13 @@ function createTabActions(tab) {
   const actionsContainer = document.createElement('div');
   actionsContainer.className = 'tab-actions';
 
-  // Create action panel button (new + icon button)
+  // Create action panel button (edit/pencil icon button)
   const actionPanelButton = document.createElement('button');
   actionPanelButton.className = 'action-panel-button';
   actionPanelButton.setAttribute('title', 'Tab actions');
   actionPanelButton.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <line x1="12" y1="5" x2="12" y2="19"></line>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2">
+      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
     </svg>
   `;
 
@@ -376,27 +354,6 @@ function createTabActions(tab) {
   actionsContainer.appendChild(deleteButton);
 
   return actionsContainer;
-}
-
-/**
- * Get badge information for a tab
- */
-function getTabBadgeInfo(tab) {
-  let badgeText = 'Setup';
-  let badgeClass = 'setup';
-  
-  if (tab.isCustomUrl) {
-    badgeText = 'Custom';
-    badgeClass = 'custom';
-  } else if (tab.isObject) {
-    badgeText = 'Object';
-    badgeClass = 'object';
-  } else if (tab.isSetupObject) {
-    badgeText = 'Setup';
-    badgeClass = 'setup';
-  }
-  
-  return { text: badgeText, class: badgeClass };
 }
 
 /**

@@ -362,68 +362,6 @@
 	margin-top: 4px;
   }
   
-  /* Badge styles */
-  .tab-path .path-type {
-	display: inline-flex;
-	padding: 2px 8px;
-	border-radius: 4px;
-	font-size: 10px;
-	font-weight: 600;
-	margin-right: 8px;
-	margin-bottom: 0;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	align-self: flex-start;
-	min-width: 52px;
-	text-align: center;
-	justify-content: center;
-	color: white;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Compact mode badge */
-  .path-type-compact {
-	font-size: 10px;
-	width: 18px;
-	height: 18px;
-	min-width: 18px;
-	min-height: 18px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 4px;
-	font-weight: bold;
-	color: white;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	flex-shrink: 0;
-	margin-top: 0;
-  }
-  
-  .tab-item.compact-mode .tab-name {
-	padding-top: 0 !important;
-  }
-  
-  /* Badge colors */
-  .path-type.setup,
-  .path-type-compact.setup {
-	background-color: var(--slds-color-info, var(--slds-brand-primary));
-  }
-  
-  .path-type.object,
-  .path-type-compact.object {
-	background-color: var(--slds-color-success);
-  }
-  
-  .path-type.custom,
-  .path-type-compact.custom {
-	background-color: var(--slds-color-custom);
-  }
-
-  .path-type.folder,
-  .path-type-compact.folder {
-	background-color: #706e6b; /* Gray for folder-style tabs */
-  }
-
   /* Path text styling */
   .tab-path .path-text {
 	display: block;

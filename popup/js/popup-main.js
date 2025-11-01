@@ -126,7 +126,6 @@ function initializeDOMElements() {
   domElements.actionTabNameInput = document.querySelector('#action-tab-name');
   domElements.actionTabPathInput = document.querySelector('#action-tab-path');
   domElements.actionPanelTabNameDisplay = document.querySelector('#action-panel-tab-name-display');
-  domElements.actionOpenInNewTabCheckbox = document.querySelector('#action-open-in-new-tab');
   domElements.actionIsObjectCheckbox = document.querySelector('#action-is-object');
   domElements.actionIsCustomUrlCheckbox = document.querySelector('#action-is-custom-url');
   domElements.actionObjectDropdownSection = document.querySelector('#action-object-dropdown-section');
@@ -362,10 +361,6 @@ function updateActionPanelContent(tab) {
   }
 
   // Populate checkbox fields
-  if (domElements.actionOpenInNewTabCheckbox) {
-    domElements.actionOpenInNewTabCheckbox.checked = tab.openInNewTab || false;
-  }
-
   if (domElements.actionIsObjectCheckbox) {
     domElements.actionIsObjectCheckbox.checked = tab.isObject || false;
   }
@@ -516,7 +511,6 @@ function saveActionPanelChanges() {
   }
 
   // Get checkbox values
-  const openInNewTab = domElements.actionOpenInNewTabCheckbox ? domElements.actionOpenInNewTabCheckbox.checked : tab.openInNewTab;
   const isObject = domElements.actionIsObjectCheckbox ? domElements.actionIsObjectCheckbox.checked : tab.isObject;
   const isCustomUrl = domElements.actionIsCustomUrlCheckbox ? domElements.actionIsCustomUrlCheckbox.checked : tab.isCustomUrl;
 
@@ -530,7 +524,7 @@ function saveActionPanelChanges() {
   const tabData = {
     label: name,
     path: path,
-    openInNewTab: openInNewTab,
+    openInNewTab: tab.openInNewTab || false, // Preserve existing value from tab
     isObject: isObject,
     isCustomUrl: isCustomUrl
   };

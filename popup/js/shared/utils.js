@@ -195,31 +195,6 @@ function isCurrentPageMatchingTab(tab) {
 }
 
 /**
- * Get badge information for a tab
- */
-function getTabBadgeInfo(tab) {
-  let badgeText = 'Setup';
-  let badgeClass = 'setup';
-
-  // Check if this is a folder-style tab (no path)
-  if (!tab.path || !tab.path.trim()) {
-    badgeText = 'Folder';
-    badgeClass = 'folder';
-  } else if (tab.isCustomUrl) {
-    badgeText = 'Custom';
-    badgeClass = 'custom';
-  } else if (tab.isObject) {
-    badgeText = 'Object';
-    badgeClass = 'object';
-  } else if (tab.isSetupObject) {
-    badgeText = 'Setup';
-    badgeClass = 'setup';
-  }
-
-  return { text: badgeText, class: badgeClass };
-}
-
-/**
  * Check if Lightning Navigation is enabled
  */
 function isLightningNavigationEnabled() {
@@ -269,7 +244,6 @@ if (typeof module !== 'undefined' && module.exports) {
     canHaveAutoSetupDropdown,
     migrateTabsToNewStructure,
     isCurrentPageMatchingTab,
-    getTabBadgeInfo,
     isLightningNavigationEnabled,
     debounce,
     deepClone
@@ -290,7 +264,6 @@ if (typeof module !== 'undefined' && module.exports) {
     canHaveAutoSetupDropdown,
     migrateTabsToNewStructure,
     isCurrentPageMatchingTab,
-    getTabBadgeInfo,
     isLightningNavigationEnabled,
     debounce,
     deepClone
