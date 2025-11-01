@@ -556,24 +556,29 @@ function saveActionPanelChanges() {
   if (isDropdownItemEdit) {
     // Handle dropdown item edit
     const parentTabId = tab._parentTabId;
-    const itemIndex = tab._dropdownItemIndex;
+    const itemPath = tab._dropdownItemPath || [tab._dropdownItemIndex]; // Support both new path and old index formats
 
     const tabs = SFTabs.main.getTabs();
     const parentTab = tabs.find(t => t.id === parentTabId);
 
-    if (!parentTab || !parentTab.dropdownItems || !parentTab.dropdownItems[itemIndex]) {
+    if (!parentTab || !parentTab.dropdownItems) {
+      showStatus('Parent tab not found', true);
+      return;
+    }
+
+    // Navigate to the item using the path
+    const item = SFTabs.ui.getItemByPath(parentTab.dropdownItems, itemPath);
+    if (!item) {
       showStatus('Dropdown item not found', true);
       return;
     }
 
-    // Update the dropdown item
-    parentTab.dropdownItems[itemIndex] = {
-      label: name,
-      path: path,
-      url: isCustomUrl ? path : null,
-      isObject: isObject,
-      isCustomUrl: isCustomUrl
-    };
+    // Update the dropdown item in place (preserving any nested dropdownItems)
+    item.label = name;
+    item.path = path;
+    item.url = isCustomUrl ? path : null;
+    item.isObject = isObject;
+    item.isCustomUrl = isCustomUrl;
 
     // Save and refresh
     SFTabs.storage.saveTabs(tabs).then(() => {

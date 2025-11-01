@@ -1088,97 +1088,394 @@ function showManageDropdownPanelItems(tab) {
     instructionsDiv.style.display = 'none';
   }
 
-  // Update count
-  domElements.manageDropdownCount.textContent = items.length;
+  // Count total items (including nested)
+  const totalCount = countAllDropdownItems(items);
+  domElements.manageDropdownCount.textContent = totalCount;
 
   // Clear existing items
   domElements.manageDropdownList.innerHTML = '';
 
-  // Add items with action buttons
-  items.forEach((item, index) => {
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'dropdown-item-draggable';
-    itemDiv.dataset.index = index;
-    itemDiv.style.padding = '4px 0';
-    itemDiv.style.borderBottom = index < items.length - 1 ? '1px solid #dddbda' : 'none';
-    itemDiv.style.display = 'flex';
-    itemDiv.style.justifyContent = 'space-between';
-    itemDiv.style.alignItems = 'center';
-    itemDiv.style.cursor = 'grab';
-
-    // Drag handle
-    const dragHandle = document.createElement('span');
-    dragHandle.textContent = '⋮⋮';
-    dragHandle.style.marginRight = '8px';
-    dragHandle.style.color = '#706e6b';
-    dragHandle.style.cursor = 'grab';
-    dragHandle.style.fontSize = '14px';
-
-    const labelSpan = document.createElement('span');
-    labelSpan.textContent = `${index + 1}. ${item.label}`;
-    labelSpan.style.flex = '1';
-
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.style.display = 'flex';
-    buttonsContainer.style.gap = '4px';
-
-    // Edit button
-    const editButton = document.createElement('button');
-    editButton.type = 'button';
-    editButton.textContent = 'Edit';
-    editButton.style.fontSize = '11px';
-    editButton.style.padding = '2px 6px';
-    editButton.style.background = '#0176d3';
-    editButton.style.color = 'white';
-    editButton.style.border = 'none';
-    editButton.style.borderRadius = '3px';
-    editButton.style.cursor = 'pointer';
-    editButton.title = 'Edit this dropdown item';
-    editButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      editDropdownItem(tab, index);
-    });
-
-    // Promote button
-    const promoteButton = document.createElement('button');
-    promoteButton.type = 'button';
-    promoteButton.textContent = '↑';
-    promoteButton.style.fontSize = '14px';
-    promoteButton.style.padding = '2px 6px';
-    promoteButton.style.background = '#0c9';
-    promoteButton.style.color = 'white';
-    promoteButton.style.border = 'none';
-    promoteButton.style.borderRadius = '3px';
-    promoteButton.style.cursor = 'pointer';
-    promoteButton.title = 'Promote to main tab list';
-    promoteButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      promoteDropdownItem(tab, index);
-    });
-
-    buttonsContainer.appendChild(editButton);
-    buttonsContainer.appendChild(promoteButton);
-
-    itemDiv.appendChild(dragHandle);
-    itemDiv.appendChild(labelSpan);
-    itemDiv.appendChild(buttonsContainer);
-    domElements.manageDropdownList.appendChild(itemDiv);
-
-    // Add drag-and-drop support
-    setupDropdownItemDragHandlers(itemDiv, tab);
-  });
+  // Render items recursively
+  renderDropdownItems(items, domElements.manageDropdownList, tab, 0);
 
   // Show preview
   domElements.manageDropdownPreview.style.display = 'block';
 }
 
 /**
- * Setup drag-and-drop handlers for dropdown items
+ * Count all dropdown items including nested ones
+ */
+function countAllDropdownItems(items) {
+  let count = 0;
+  items.forEach(item => {
+    count++; // Count the item itself
+    if (item.dropdownItems && item.dropdownItems.length > 0) {
+      count += countAllDropdownItems(item.dropdownItems); // Count nested items
+    }
+  });
+  return count;
+}
+
+/**
+ * Render dropdown items recursively with nesting support
+ * @param {Array} items - The dropdown items to render
+ * @param {HTMLElement} container - The container to append items to
+ * @param {Object} tab - The parent tab
+ * @param {number} level - The nesting level (0 = top level, 1 = nested)
+ * @param {Array} indexPath - Array of indices representing the path to this item
+ */
+function renderDropdownItems(items, container, tab, level = 0, indexPath = []) {
+  items.forEach((item, index) => {
+    const currentPath = [...indexPath, index];
+    const itemDiv = createDropdownItemRow(item, index, tab, level, currentPath);
+    container.appendChild(itemDiv);
+
+    // If item has nested items and is expanded, render them
+    if (item._expanded && item.dropdownItems && item.dropdownItems.length > 0) {
+      const subContainer = document.createElement('div');
+      subContainer.className = 'sub-items-container';
+      subContainer.style.paddingLeft = '24px'; // Indent nested items
+      renderDropdownItems(item.dropdownItems, subContainer, tab, level + 1, currentPath);
+      container.appendChild(subContainer);
+    }
+  });
+}
+
+/**
+ * Create a single dropdown item row
+ */
+function createDropdownItemRow(item, index, tab, level, indexPath) {
+  const itemDiv = document.createElement('div');
+  itemDiv.className = 'dropdown-item-draggable';
+  itemDiv.dataset.index = index;
+  itemDiv.dataset.level = level;
+  itemDiv.dataset.indexPath = JSON.stringify(indexPath);
+  itemDiv.style.padding = '4px 0';
+  itemDiv.style.borderBottom = '1px solid #dddbda';
+  itemDiv.style.display = 'flex';
+  itemDiv.style.justifyContent = 'space-between';
+  itemDiv.style.alignItems = 'center';
+  itemDiv.style.cursor = 'grab';
+
+  const leftSection = document.createElement('div');
+  leftSection.style.display = 'flex';
+  leftSection.style.alignItems = 'center';
+  leftSection.style.flex = '1';
+  leftSection.style.gap = '4px';
+
+  // Expand/collapse button for items with children
+  if (item.dropdownItems && item.dropdownItems.length > 0) {
+    const expandButton = document.createElement('button');
+    expandButton.type = 'button';
+    expandButton.textContent = item._expanded ? '▼' : '▶';
+    expandButton.style.fontSize = '10px';
+    expandButton.style.padding = '2px 4px';
+    expandButton.style.background = 'transparent';
+    expandButton.style.border = 'none';
+    expandButton.style.cursor = 'pointer';
+    expandButton.style.color = '#706e6b';
+    expandButton.title = item._expanded ? 'Collapse' : 'Expand';
+    expandButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleItemExpansion(item, tab);
+    });
+    leftSection.appendChild(expandButton);
+  } else {
+    // Add spacing placeholder for items without children to maintain alignment
+    const spacer = document.createElement('span');
+    spacer.style.width = '18px';
+    spacer.style.display = 'inline-block';
+    leftSection.appendChild(spacer);
+  }
+
+  // Drag handle
+  const dragHandle = document.createElement('span');
+  dragHandle.textContent = '⋮⋮';
+  dragHandle.style.marginRight = '8px';
+  dragHandle.style.color = '#706e6b';
+  dragHandle.style.cursor = 'grab';
+  dragHandle.style.fontSize = '14px';
+  leftSection.appendChild(dragHandle);
+
+  // Label with sub-item count badge
+  const labelSpan = document.createElement('span');
+  labelSpan.style.flex = '1';
+
+  const number = indexPath.map(i => i + 1).join('.');
+  let labelText = `${number}. ${item.label}`;
+
+  // Add sub-item count badge if has children
+  if (item.dropdownItems && item.dropdownItems.length > 0) {
+    labelText += ` (${item.dropdownItems.length})`;
+    labelSpan.style.fontWeight = '600'; // Make parent items bold
+  }
+
+  labelSpan.textContent = labelText;
+  leftSection.appendChild(labelSpan);
+
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.style.display = 'flex';
+  buttonsContainer.style.gap = '4px';
+
+  // Edit button
+  const editButton = document.createElement('button');
+  editButton.type = 'button';
+  editButton.textContent = 'Edit';
+  editButton.style.fontSize = '11px';
+  editButton.style.padding = '2px 6px';
+  editButton.style.background = '#0176d3';
+  editButton.style.color = 'white';
+  editButton.style.border = 'none';
+  editButton.style.borderRadius = '3px';
+  editButton.style.cursor = 'pointer';
+  editButton.title = 'Edit this dropdown item';
+  editButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    editDropdownItemByPath(tab, indexPath);
+  });
+
+  // Promote button
+  const promoteButton = document.createElement('button');
+  promoteButton.type = 'button';
+  promoteButton.textContent = '↑';
+  promoteButton.style.fontSize = '14px';
+  promoteButton.style.padding = '2px 6px';
+  promoteButton.style.background = '#0c9';
+  promoteButton.style.color = 'white';
+  promoteButton.style.border = 'none';
+  promoteButton.style.borderRadius = '3px';
+  promoteButton.style.cursor = 'pointer';
+  promoteButton.title = 'Promote to main tab list';
+  promoteButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    promoteDropdownItemByPath(tab, indexPath);
+  });
+
+  // Add Sub-Item button (only for level 0 items)
+  if (level === 0) {
+    const addSubItemButton = document.createElement('button');
+    addSubItemButton.type = 'button';
+    addSubItemButton.textContent = '+';
+    addSubItemButton.style.fontSize = '14px';
+    addSubItemButton.style.padding = '2px 6px';
+    addSubItemButton.style.background = '#16325c';
+    addSubItemButton.style.color = 'white';
+    addSubItemButton.style.border = 'none';
+    addSubItemButton.style.borderRadius = '3px';
+    addSubItemButton.style.cursor = 'pointer';
+    addSubItemButton.title = 'Add sub-item';
+    addSubItemButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      addSubItemToItem(tab, indexPath);
+    });
+    buttonsContainer.appendChild(addSubItemButton);
+  }
+
+  buttonsContainer.appendChild(editButton);
+  buttonsContainer.appendChild(promoteButton);
+
+  itemDiv.appendChild(leftSection);
+  itemDiv.appendChild(buttonsContainer);
+
+  // Add drag-and-drop support
+  setupDropdownItemDragHandlers(itemDiv, tab);
+
+  return itemDiv;
+}
+
+/**
+ * Toggle expansion state of a dropdown item
+ */
+function toggleItemExpansion(item, tab) {
+  item._expanded = !item._expanded;
+  showManageDropdownPanelItems(tab); // Re-render to show/hide children
+}
+
+/**
+ * Get an item by its index path
+ * @param {Array} items - The array of items to search
+ * @param {Array} indexPath - Array of indices [0, 2, 1] means items[0].dropdownItems[2].dropdownItems[1]
+ * @returns {Object} The item at the path, or null if not found
+ */
+function getItemByPath(items, indexPath) {
+  if (!items || indexPath.length === 0) return null;
+
+  let current = items[indexPath[0]];
+  for (let i = 1; i < indexPath.length; i++) {
+    if (!current || !current.dropdownItems) return null;
+    current = current.dropdownItems[indexPath[i]];
+  }
+  return current;
+}
+
+/**
+ * Remove an item by its index path
+ * @param {Array} items - The root array of items
+ * @param {Array} indexPath - Array of indices
+ */
+function removeItemByPath(items, indexPath) {
+  if (indexPath.length === 1) {
+    // Top level item
+    items.splice(indexPath[0], 1);
+  } else {
+    // Nested item - navigate to parent and remove from its children
+    const parentPath = indexPath.slice(0, -1);
+    const parent = getItemByPath(items, parentPath);
+    if (parent && parent.dropdownItems) {
+      parent.dropdownItems.splice(indexPath[indexPath.length - 1], 1);
+
+      // If parent has no more children, remove the dropdownItems array
+      if (parent.dropdownItems.length === 0) {
+        delete parent.dropdownItems;
+      }
+    }
+  }
+}
+
+/**
+ * Edit dropdown item by path
+ */
+function editDropdownItemByPath(parentTab, indexPath) {
+  console.log('Editing dropdown item by path:', indexPath, 'from parent tab:', parentTab.label);
+
+  const dropdownItem = getItemByPath(parentTab.dropdownItems, indexPath);
+  if (!dropdownItem) {
+    SFTabs.main.showStatus('Dropdown item not found', true);
+    return;
+  }
+
+  // Create a temporary tab object for editing
+  const tempTab = {
+    id: `dropdown-${parentTab.id}-${indexPath.join('-')}`, // Special ID to identify this as a dropdown item edit
+    label: dropdownItem.label,
+    path: dropdownItem.path || '',
+    openInNewTab: false,
+    isObject: dropdownItem.isObject || false,
+    isCustomUrl: dropdownItem.isCustomUrl || false,
+    isSetupObject: false,
+    _isDropdownItemEdit: true, // Flag to indicate this is editing a dropdown item
+    _parentTabId: parentTab.id,
+    _dropdownItemPath: indexPath // Store the full path instead of just index
+  };
+
+  // Open the action panel with this temp tab
+  if (SFTabs.main && SFTabs.main.showActionPanel) {
+    SFTabs.main.showActionPanel(tempTab);
+  }
+}
+
+/**
+ * Promote dropdown item to main tab list by path
+ */
+function promoteDropdownItemByPath(parentTab, indexPath) {
+  console.log('Promoting dropdown item by path:', indexPath, 'from parent tab:', parentTab.label);
+
+  const tabs = SFTabs.main.getTabs();
+  const parentTabIndex = tabs.findIndex(t => t.id === parentTab.id);
+
+  if (parentTabIndex === -1) {
+    SFTabs.main.showStatus('Parent tab not found', true);
+    return;
+  }
+
+  const dropdownItem = getItemByPath(parentTab.dropdownItems, indexPath);
+  if (!dropdownItem) {
+    SFTabs.main.showStatus('Dropdown item not found', true);
+    return;
+  }
+
+  // Create a new main tab from the dropdown item
+  const newTab = {
+    id: generateId(),
+    label: dropdownItem.label,
+    path: dropdownItem.path || '',
+    openInNewTab: false,
+    isObject: dropdownItem.isObject || false,
+    isCustomUrl: dropdownItem.isCustomUrl || false,
+    isSetupObject: false,
+    hasDropdown: false,
+    dropdownItems: dropdownItem.dropdownItems || [], // Preserve nested items if any
+    position: tabs.length
+  };
+
+  // Remove the item from the parent's dropdown
+  removeItemByPath(parentTab.dropdownItems, indexPath);
+
+  // If no more dropdown items at top level, remove hasDropdown flag
+  if (parentTab.dropdownItems.length === 0) {
+    parentTab.hasDropdown = false;
+  }
+
+  // Add the new tab to the main list
+  tabs.push(newTab);
+
+  // Save and refresh
+  SFTabs.storage.saveTabs(tabs).then(() => {
+    console.log('Dropdown item promoted successfully');
+    SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" to main tab list`);
+    renderTabList();
+
+    // Refresh the dropdown preview
+    if (parentTab.dropdownItems.length > 0) {
+      showManageDropdownPanelItems(parentTab);
+    } else {
+      // Hide the inline form if no more dropdown items
+      hideTabForm();
+    }
+  }).catch(error => {
+    console.error('Error promoting dropdown item:', error);
+    SFTabs.main.showStatus('Error promoting item: ' + error.message, true);
+  });
+}
+
+/**
+ * Add a sub-item to an existing dropdown item
+ */
+function addSubItemToItem(parentTab, indexPath) {
+  console.log('Adding sub-item to item at path:', indexPath);
+
+  const item = getItemByPath(parentTab.dropdownItems, indexPath);
+  if (!item) {
+    SFTabs.main.showStatus('Parent item not found', true);
+    return;
+  }
+
+  // Initialize dropdownItems array if it doesn't exist
+  if (!item.dropdownItems) {
+    item.dropdownItems = [];
+  }
+
+  // Create a new sub-item with placeholder data
+  const newSubItem = {
+    label: 'New Sub-Item',
+    path: '',
+    isObject: false,
+    isCustomUrl: false
+  };
+
+  item.dropdownItems.push(newSubItem);
+
+  // Expand the parent item to show the new sub-item
+  item._expanded = true;
+
+  // Refresh the display
+  showManageDropdownPanelItems(parentTab);
+
+  // Automatically open edit panel for the new sub-item
+  const newSubItemPath = [...indexPath, item.dropdownItems.length - 1];
+  editDropdownItemByPath(parentTab, newSubItemPath);
+}
+
+/**
+ * Setup drag-and-drop handlers for dropdown items with nesting support
  */
 function setupDropdownItemDragHandlers(itemDiv, parentTab) {
-  let draggedItem = null;
+  let draggedPath = null;
+  let dropIndicator = null;
 
   itemDiv.addEventListener('mousedown', (e) => {
     // Don't start drag if clicking on buttons
@@ -1189,27 +1486,104 @@ function setupDropdownItemDragHandlers(itemDiv, parentTab) {
     // Prevent text selection during drag
     e.preventDefault();
 
-    draggedItem = itemDiv;
+    draggedPath = JSON.parse(itemDiv.dataset.indexPath);
+    const draggedLevel = parseInt(itemDiv.dataset.level);
+
     itemDiv.style.cursor = 'grabbing';
     itemDiv.style.opacity = '0.5';
     itemDiv.style.userSelect = 'none';
 
-    const container = itemDiv.parentElement;
-    const items = Array.from(container.querySelectorAll('.dropdown-item-draggable'));
+    // Create drop indicator if it doesn't exist
+    if (!dropIndicator) {
+      dropIndicator = document.createElement('div');
+      dropIndicator.style.position = 'absolute';
+      dropIndicator.style.left = '0';
+      dropIndicator.style.right = '0';
+      dropIndicator.style.height = '2px';
+      dropIndicator.style.pointerEvents = 'none';
+      dropIndicator.style.display = 'none';
+      dropIndicator.style.zIndex = '1000';
+      document.body.appendChild(dropIndicator);
+    }
 
     // Disable text selection on the document during drag
     document.body.style.userSelect = 'none';
 
+    let currentDropZone = null;
+    let currentTargetPath = null;
+
     function onMouseMove(event) {
       event.preventDefault();
 
-      // Find which item we're hovering over
-      const afterElement = getDragAfterElement(container, event.clientY);
+      // Find all dropdown item divs
+      const allItems = Array.from(document.querySelectorAll('.dropdown-item-draggable'));
 
-      if (afterElement == null) {
-        container.appendChild(draggedItem);
+      // Find which item we're hovering over
+      let targetItem = null;
+      for (const item of allItems) {
+        if (item === itemDiv) continue; // Skip the dragged item
+
+        const rect = item.getBoundingClientRect();
+        if (event.clientY >= rect.top && event.clientY <= rect.bottom &&
+            event.clientX >= rect.left && event.clientX <= rect.right) {
+          targetItem = item;
+          break;
+        }
+      }
+
+      if (!targetItem) {
+        dropIndicator.style.display = 'none';
+        return;
+      }
+
+      const targetRect = targetItem.getBoundingClientRect();
+      const targetLevel = parseInt(targetItem.dataset.level);
+      const targetPath = JSON.parse(targetItem.dataset.indexPath);
+      const y = event.clientY - targetRect.top;
+      const height = targetRect.height;
+
+      // Determine drop zone based on vertical position
+      let dropZone;
+      if (y < height * 0.25) {
+        dropZone = 'before';
+      } else if (y > height * 0.75) {
+        dropZone = 'after';
       } else {
-        container.insertBefore(draggedItem, afterElement);
+        // Center zone - check if nesting is allowed
+        const canNest = targetLevel === 0 && !isDescendantOf(targetPath, draggedPath);
+        dropZone = canNest ? 'nest' : 'after';
+      }
+
+      currentDropZone = dropZone;
+      currentTargetPath = targetPath;
+
+      // Show visual feedback
+      dropIndicator.style.display = 'block';
+
+      if (dropZone === 'nest') {
+        // Green highlight for nesting
+        dropIndicator.style.backgroundColor = '#2e844a';
+        dropIndicator.style.height = '100%';
+        dropIndicator.style.top = `${targetRect.top}px`;
+        dropIndicator.style.left = `${targetRect.left}px`;
+        dropIndicator.style.width = `${targetRect.width}px`;
+        dropIndicator.style.opacity = '0.2';
+      } else if (dropZone === 'before') {
+        // Blue line for insert before
+        dropIndicator.style.backgroundColor = '#0176d3';
+        dropIndicator.style.height = '2px';
+        dropIndicator.style.top = `${targetRect.top - 1}px`;
+        dropIndicator.style.left = `${targetRect.left}px`;
+        dropIndicator.style.width = `${targetRect.width}px`;
+        dropIndicator.style.opacity = '1';
+      } else {
+        // Blue line for insert after
+        dropIndicator.style.backgroundColor = '#0176d3';
+        dropIndicator.style.height = '2px';
+        dropIndicator.style.top = `${targetRect.bottom - 1}px`;
+        dropIndicator.style.left = `${targetRect.left}px`;
+        dropIndicator.style.width = `${targetRect.width}px`;
+        dropIndicator.style.opacity = '1';
       }
     }
 
@@ -1218,14 +1592,24 @@ function setupDropdownItemDragHandlers(itemDiv, parentTab) {
       itemDiv.style.opacity = '1';
       itemDiv.style.userSelect = '';
 
+      // Hide drop indicator
+      if (dropIndicator) {
+        dropIndicator.style.display = 'none';
+      }
+
       // Re-enable text selection
       document.body.style.userSelect = '';
 
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
 
-      // Save the new order
-      saveDropdownItemOrder(container, parentTab);
+      // Perform the drop operation
+      if (currentDropZone && currentTargetPath) {
+        performDropOperation(parentTab, draggedPath, currentTargetPath, currentDropZone);
+      }
+
+      currentDropZone = null;
+      currentTargetPath = null;
     }
 
     document.addEventListener('mousemove', onMouseMove);
@@ -1234,41 +1618,86 @@ function setupDropdownItemDragHandlers(itemDiv, parentTab) {
 }
 
 /**
- * Get the element to insert before during drag
+ * Check if targetPath is a descendant of sourcePath
  */
-function getDragAfterElement(container, y) {
-  const draggableElements = [...container.querySelectorAll('.dropdown-item-draggable:not([style*="opacity: 0.5"])')]
-    .filter(el => el.style.opacity !== '0.5');
-
-  return draggableElements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-
-    if (offset < 0 && offset > closest.offset) {
-      return { offset: offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
+function isDescendantOf(targetPath, sourcePath) {
+  if (sourcePath.length >= targetPath.length) return false;
+  for (let i = 0; i < sourcePath.length; i++) {
+    if (targetPath[i] !== sourcePath[i]) return false;
+  }
+  return true;
 }
 
 /**
- * Save the new dropdown item order after drag-and-drop
+ * Perform the drop operation
  */
-function saveDropdownItemOrder(container, parentTab) {
-  const items = Array.from(container.querySelectorAll('.dropdown-item-draggable'));
-  const newOrder = items.map(item => parseInt(item.dataset.index));
+function performDropOperation(parentTab, sourcePath, targetPath, dropZone) {
+  console.log('Drop:', sourcePath, 'onto', targetPath, 'zone:', dropZone);
 
-  // Reorder the dropdown items array based on the new visual order
-  const reorderedItems = newOrder.map(oldIndex => parentTab.dropdownItems[oldIndex]);
-  parentTab.dropdownItems = reorderedItems;
+  // Get the dragged item
+  const draggedItem = getItemByPath(parentTab.dropdownItems, sourcePath);
+  if (!draggedItem) {
+    console.error('Dragged item not found');
+    return;
+  }
 
-  // Don't save to storage immediately - just update the in-memory array
-  // The changes will be saved when the user clicks the Save button on the inline form
-  console.log('Dropdown item order updated (not saved yet)');
+  // Make a copy of the dragged item
+  const itemCopy = JSON.parse(JSON.stringify(draggedItem));
 
-  // Refresh the display to update the numbering
+  // Remove from source location
+  removeItemByPath(parentTab.dropdownItems, sourcePath);
+
+  // Adjust target path if necessary (if source was before target in same parent)
+  let adjustedTargetPath = [...targetPath];
+  if (sourcePath.length === targetPath.length) {
+    const sameParent = sourcePath.slice(0, -1).every((val, idx) => val === targetPath[idx]);
+    if (sameParent && sourcePath[sourcePath.length - 1] < targetPath[targetPath.length - 1]) {
+      adjustedTargetPath[adjustedTargetPath.length - 1]--;
+    }
+  }
+
+  // Insert at new location
+  if (dropZone === 'nest') {
+    // Add as child of target
+    const targetItem = getItemByPath(parentTab.dropdownItems, adjustedTargetPath);
+    if (!targetItem.dropdownItems) {
+      targetItem.dropdownItems = [];
+    }
+    targetItem.dropdownItems.push(itemCopy);
+    targetItem._expanded = true; // Auto-expand to show the new item
+  } else if (dropZone === 'before') {
+    // Insert before target
+    insertItemAt(parentTab.dropdownItems, adjustedTargetPath, itemCopy, true);
+  } else {
+    // Insert after target
+    insertItemAt(parentTab.dropdownItems, adjustedTargetPath, itemCopy, false);
+  }
+
+  // Refresh the display
   showManageDropdownPanelItems(parentTab);
+}
+
+/**
+ * Insert item at a specific path
+ * @param {Array} items - Root items array
+ * @param {Array} targetPath - Path to target item
+ * @param {Object} newItem - Item to insert
+ * @param {boolean} before - Insert before (true) or after (false) the target
+ */
+function insertItemAt(items, targetPath, newItem, before) {
+  if (targetPath.length === 1) {
+    // Top level insertion
+    const index = before ? targetPath[0] : targetPath[0] + 1;
+    items.splice(index, 0, newItem);
+  } else {
+    // Nested insertion - navigate to parent
+    const parentPath = targetPath.slice(0, -1);
+    const parent = getItemByPath(items, parentPath);
+    if (parent && parent.dropdownItems) {
+      const index = before ? targetPath[targetPath.length - 1] : targetPath[targetPath.length - 1] + 1;
+      parent.dropdownItems.splice(index, 0, newItem);
+    }
+  }
 }
 
 /**
@@ -1386,5 +1815,7 @@ window.SFTabs.ui = {
   navigateToTab,
   promoteDropdownItem,
   editDropdownItem,
-  setupEventListeners
+  setupEventListeners,
+  getItemByPath,
+  removeItemByPath
 };
