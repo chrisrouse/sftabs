@@ -726,7 +726,8 @@ function moveElement(element, x, y) {
  */
 function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWidth) {
   const domElements = SFTabs.main.getDOMElements();
-  
+  let dropTarget = null; // Track the target tab for dropdown creation
+
   // Define mousemove handler
   function onMouseMove(event) {
     moveElement(clone, event.pageX - shiftX, event.pageY - shiftY);
@@ -739,10 +740,32 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
     // Reset drop indicator visibility
     dropIndicator.style.display = 'none';
 
+    // Remove previous dropdown target highlight
+    document.querySelectorAll('.tab-item.drop-target-dropdown').forEach(el => {
+      el.classList.remove('drop-target-dropdown');
+    });
+    dropTarget = null;
+
     if (!elemBelow) return;
 
-    // Handle drop indicator positioning
-    updateDropIndicator(elemBelow, item, event, dropIndicator, tabItemWidth);
+    // Check if we're over another tab item
+    const droppableItem = elemBelow.closest('.tab-item');
+
+    if (droppableItem && droppableItem !== item) {
+      const rect = droppableItem.getBoundingClientRect();
+      const middle = rect.top + rect.height / 2;
+      const distanceFromMiddle = Math.abs(event.clientY - middle);
+      const threshold = rect.height * 0.25; // 25% of tab height for center zone
+
+      // If we're in the center zone, highlight for dropdown creation
+      if (distanceFromMiddle < threshold) {
+        droppableItem.classList.add('drop-target-dropdown');
+        dropTarget = droppableItem;
+      } else {
+        // Otherwise, show reorder indicator
+        updateDropIndicator(elemBelow, item, event, dropIndicator, tabItemWidth);
+      }
+    }
   }
 
   // Define mouseup/drop handler
@@ -760,11 +783,20 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
       dropIndicator.parentNode.removeChild(dropIndicator);
     }
 
-    // Handle final positioning
-    finalizeDrop(event, item);
+    // Remove dropdown target highlight
+    document.querySelectorAll('.tab-item.drop-target-dropdown').forEach(el => {
+      el.classList.remove('drop-target-dropdown');
+    });
 
-    // Update the tab positions in storage
-    updateTabPositions();
+    // Check if we're dropping onto a tab for dropdown creation
+    if (dropTarget) {
+      handleDropdownCreation(item, dropTarget);
+    } else {
+      // Handle final positioning for reordering
+      finalizeDrop(event, item);
+      // Update the tab positions in storage
+      updateTabPositions();
+    }
   }
 
   // Add the event listeners
@@ -820,6 +852,53 @@ function finalizeDrop(event, draggedItem) {
       }
     }
   }
+}
+
+/**
+ * Handle dropdown creation by dropping one tab onto another
+ */
+function handleDropdownCreation(draggedItem, targetItem) {
+  console.log('Creating dropdown: dragging', draggedItem.dataset.id, 'onto', targetItem.dataset.id);
+
+  const tabs = SFTabs.main.getTabs();
+  const draggedTab = tabs.find(t => t.id === draggedItem.dataset.id);
+  const targetTab = tabs.find(t => t.id === targetItem.dataset.id);
+
+  if (!draggedTab || !targetTab) {
+    console.error('Could not find tabs for dropdown creation');
+    return;
+  }
+
+  // Initialize dropdownItems array if it doesn't exist
+  if (!targetTab.dropdownItems) {
+    targetTab.dropdownItems = [];
+  }
+
+  // Create a dropdown item from the dragged tab
+  const dropdownItem = {
+    label: draggedTab.label,
+    path: draggedTab.path,
+    url: draggedTab.isCustomUrl ? draggedTab.path : null,
+    isObject: draggedTab.isObject || false,
+    isCustomUrl: draggedTab.isCustomUrl || false
+  };
+
+  // Add to dropdown items
+  targetTab.dropdownItems.push(dropdownItem);
+  targetTab.hasDropdown = true;
+
+  // Remove the dragged tab from the main list
+  const draggedIndex = tabs.findIndex(t => t.id === draggedTab.id);
+  if (draggedIndex > -1) {
+    tabs.splice(draggedIndex, 1);
+  }
+
+  // Save and refresh
+  SFTabs.storage.saveTabs(tabs).then(() => {
+    console.log('Dropdown created successfully');
+    SFTabs.main.showStatus(`Added "${draggedTab.label}" as dropdown item to "${targetTab.label}"`);
+    renderTabList();
+  });
 }
 
 /**

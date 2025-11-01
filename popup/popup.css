@@ -302,6 +302,11 @@
   .tab-item.being-dragged {
 	opacity: 0.3;
   }
+
+  .tab-item.drop-target-dropdown {
+	border: 2px dashed var(--slds-brand-primary);
+	background-color: var(--slds-brand-primary-transparent, rgba(0, 112, 210, 0.1));
+  }
   
   .drag-handle {
 	background-color: var(--color-border);
