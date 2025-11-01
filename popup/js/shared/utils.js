@@ -200,8 +200,12 @@ function isCurrentPageMatchingTab(tab) {
 function getTabBadgeInfo(tab) {
   let badgeText = 'Setup';
   let badgeClass = 'setup';
-  
-  if (tab.isCustomUrl) {
+
+  // Check if this is a folder-style tab (no path)
+  if (!tab.path || !tab.path.trim()) {
+    badgeText = 'Folder';
+    badgeClass = 'folder';
+  } else if (tab.isCustomUrl) {
     badgeText = 'Custom';
     badgeClass = 'custom';
   } else if (tab.isObject) {
@@ -211,7 +215,7 @@ function getTabBadgeInfo(tab) {
     badgeText = 'Setup';
     badgeClass = 'setup';
   }
-  
+
   return { text: badgeText, class: badgeClass };
 }
 

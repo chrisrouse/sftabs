@@ -334,16 +334,17 @@ function generateId() {
  */
 function createTab(tabData) {
   const tabs = SFTabs.main.getTabs();
-  
+
   const newTab = {
     id: generateId(),
     label: tabData.label || '',
-    path: tabData.path || '',
+    path: tabData.path || '', // Empty path is allowed for folder-style tabs
     openInNewTab: tabData.openInNewTab || false,
     isObject: tabData.isObject || false,
     isCustomUrl: tabData.isCustomUrl || false,
     isSetupObject: tabData.isSetupObject || false,
     hasDropdown: tabData.hasDropdown || false,
+    dropdownItems: tabData.dropdownItems || [], // Support dropdown items on creation
     autoSetupDropdown: tabData.autoSetupDropdown || false,
     children: [],
     parentId: tabData.parentId || null,
@@ -353,7 +354,7 @@ function createTab(tabData) {
     navigationLastUpdated: null,
     needsNavigationRefresh: tabData.isSetupObject && tabData.autoSetupDropdown
   };
-  
+
   tabs.push(newTab);
   return SFTabs.storage.saveTabs(tabs);
 }
@@ -532,12 +533,24 @@ function setupEventListeners() {
     });
   }
   
-  // Add tab button
+  // Add tab button - opens action panel for new tab creation
   if (domElements.addTabButton) {
     domElements.addTabButton.addEventListener('click', () => {
       console.log('Add tab button clicked');
-      if (SFTabs.ui && SFTabs.ui.showTabForm) {
-        SFTabs.ui.showTabForm();
+      // Create a temporary new tab object for the action panel
+      const newTab = {
+        id: null, // null ID indicates this is a new tab, not an edit
+        label: '',
+        path: '',
+        openInNewTab: false,
+        isObject: false,
+        isCustomUrl: false,
+        isSetupObject: false
+      };
+
+      // Open the action panel with the new tab
+      if (SFTabs.main && SFTabs.main.showActionPanel) {
+        SFTabs.main.showActionPanel(newTab);
       }
     });
   }

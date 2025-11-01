@@ -418,7 +418,12 @@
   .path-type-compact.custom {
 	background-color: var(--slds-color-custom);
   }
-  
+
+  .path-type.folder,
+  .path-type-compact.folder {
+	background-color: #706e6b; /* Gray for folder-style tabs */
+  }
+
   /* Path text styling */
   .tab-path .path-text {
 	display: block;

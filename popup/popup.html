@@ -48,7 +48,7 @@
 
             <!-- Inline Tab Form -->
             <div class="tab-form" id="tab-form" style="display: none;">
-                <!-- Object Dropdown Section -->
+                <!-- Object Dropdown Section (for ObjectManager tabs) -->
                 <div class="form-group" id="object-dropdown-section" style="display: none;">
                     <label>Object Manager Dropdown</label>
                     <button type="button" id="setup-dropdown-button" class="secondary-button" style="width: 100%;">
@@ -67,6 +67,24 @@
                             </button>
                         </div>
                         <div id="dropdown-items-list" style="max-height: 150px; overflow-y: auto; padding: 8px; background: #f3f2f2; border-radius: 4px; font-size: 12px;">
+                            <!-- Items will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Dropdown Section (for non-ObjectManager tabs) -->
+                <div class="form-group" id="manual-dropdown-section" style="display: none;">
+                    <label id="manual-dropdown-label">Create Dropdown Menu</label>
+                    <div class="help-text" id="manual-dropdown-help-text" style="margin-top: 8px;">
+                        <strong>To create a dropdown menu:</strong> Drag another tab from the list and drop it onto this tab. The dragged tab will become a dropdown item under this tab.
+                    </div>
+
+                    <!-- Show existing dropdown items if any -->
+                    <div id="manage-dropdown-preview" style="display: none; margin-top: 10px;">
+                        <div style="font-size: 12px; font-weight: 600; color: #706e6b; margin-bottom: 5px;">
+                            Dropdown Items (<span id="manage-dropdown-count">0</span>):
+                        </div>
+                        <div id="manage-dropdown-list" style="max-height: 150px; overflow-y: auto; padding: 8px; background: #f3f2f2; border-radius: 4px; font-size: 12px;">
                             <!-- Items will be inserted here -->
                         </div>
                     </div>
@@ -201,9 +219,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="action-tab-path">Page URL</label>
+                    <label for="action-tab-path">Page URL (Optional)</label>
                     <input type="text" id="action-tab-path" placeholder="e.g., ManageUsers">
-                    <div class="help-text">Just add the page name from the URL.</div>
+                    <div class="help-text">Just add the page name from the URL. Leave blank to create a folder-style tab that acts as a menu container.</div>
                 </div>
 
                 <!-- Checkbox for "Open in New Tab" -->
@@ -233,8 +251,8 @@
                     <div class="help-text">Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)</div>
                 </div>
 
-                <!-- Object Dropdown Section for Action Panel -->
-                <div class="form-group" id="action-object-dropdown-section">
+                <!-- Object Dropdown Section for Action Panel (only for ObjectManager tabs) -->
+                <div class="form-group" id="action-object-dropdown-section" style="display: none;">
                     <label>Object Manager Dropdown</label>
                     <button type="button" id="setup-dropdown-button" class="secondary-button" style="width: 100%;">
                         Setup as Object Dropdown
@@ -252,6 +270,24 @@
                             </button>
                         </div>
                         <div id="dropdown-items-list" style="max-height: 150px; overflow-y: auto; padding: 8px; background: #f3f2f2; border-radius: 4px; font-size: 12px;">
+                            <!-- Items will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Dropdown Section (for non-ObjectManager tabs) -->
+                <div class="form-group" id="action-manual-dropdown-section" style="display: none;">
+                    <label>Create Dropdown Menu</label>
+                    <div class="help-text" style="margin-top: 8px;">
+                        <strong>To create a dropdown menu:</strong> Drag another tab from the list and drop it onto this tab. The dragged tab will become a dropdown item under this tab.
+                    </div>
+
+                    <!-- Show existing dropdown items if any -->
+                    <div id="manual-dropdown-items-preview" style="display: none; margin-top: 10px;">
+                        <div style="font-size: 12px; font-weight: 600; color: #706e6b; margin-bottom: 5px;">
+                            Dropdown Items (<span id="manual-dropdown-count">0</span>):
+                        </div>
+                        <div id="manual-dropdown-items-list" style="max-height: 150px; overflow-y: auto; padding: 8px; background: #f3f2f2; border-radius: 4px; font-size: 12px;">
                             <!-- Items will be inserted here -->
                         </div>
                     </div>

@@ -181,7 +181,12 @@ function addTabContentClickHandlers(tab, contentContainer, tabName, hasDropdown)
   // Double click for navigation
   contentContainer.addEventListener('dblclick', (e) => {
     e.stopPropagation();
-    navigateToTab(tab);
+    // Only navigate if tab has a path (skip folder-style tabs without URLs)
+    if (tab.path && tab.path.trim()) {
+      navigateToTab(tab);
+    } else {
+      console.log('Skipping navigation - folder-style tab without path:', tab.label);
+    }
   });
 }
 
@@ -475,8 +480,85 @@ function populateFormForEdit(tabId) {
     domElements.formTitle.textContent = 'Edit Tab';
   }
 
-  // All form fields have been moved to action panel
-  // Nothing to populate in the dropdown form anymore
+  // Show/hide appropriate dropdown section based on tab type
+  const isObjectManagerTab = tab.path && tab.path.includes('ObjectManager/');
+  console.log('Manage dropdown panel - Tab path:', tab.path, '-> isObjectManagerTab:', isObjectManagerTab);
+  console.log('Manage dropdown panel - DOM elements:', {
+    objectDropdownSection: !!domElements.objectDropdownSection,
+    manualDropdownSection: !!domElements.manualDropdownSection
+  });
+
+  if (domElements.objectDropdownSection && domElements.manualDropdownSection) {
+    console.log('Both dropdown sections found, toggling display...');
+    if (isObjectManagerTab) {
+      console.log('Showing Object Dropdown section');
+      // Show Object Dropdown section for ObjectManager tabs
+      // Force hide the Manual Dropdown section first
+      domElements.manualDropdownSection.style.display = 'none';
+      domElements.manualDropdownSection.style.visibility = 'hidden';
+      domElements.manualDropdownSection.style.height = '0';
+      domElements.manualDropdownSection.style.margin = '0';
+      domElements.manualDropdownSection.style.padding = '0';
+      domElements.manualDropdownSection.style.overflow = 'hidden';
+
+      // Then show the Object Dropdown section
+      domElements.objectDropdownSection.style.display = 'block';
+      domElements.objectDropdownSection.style.visibility = 'visible';
+      domElements.objectDropdownSection.style.height = '';
+      domElements.objectDropdownSection.style.margin = '';
+      domElements.objectDropdownSection.style.padding = '';
+      domElements.objectDropdownSection.style.overflow = '';
+
+      console.log('Display set:', {
+        objectDropdownSection: domElements.objectDropdownSection.style.display,
+        manualDropdownSection: domElements.manualDropdownSection.style.display,
+        objectVisibility: domElements.objectDropdownSection.style.visibility,
+        manualVisibility: domElements.manualDropdownSection.style.visibility
+      });
+
+      // Show dropdown items if they exist
+      if (SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
+        if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
+          SFTabs.dropdowns.showDropdownPreview(tab.pendingDropdownItems);
+        } else if (tab.dropdownItems && tab.dropdownItems.length > 0) {
+          SFTabs.dropdowns.showDropdownPreview(tab.dropdownItems);
+        }
+      }
+    } else {
+      console.log('Showing Manual Dropdown section');
+      // Show Manual Dropdown section for non-ObjectManager tabs
+      // Force hide the Object Dropdown section first
+      domElements.objectDropdownSection.style.display = 'none';
+      domElements.objectDropdownSection.style.visibility = 'hidden';
+      domElements.objectDropdownSection.style.height = '0';
+      domElements.objectDropdownSection.style.margin = '0';
+      domElements.objectDropdownSection.style.padding = '0';
+      domElements.objectDropdownSection.style.overflow = 'hidden';
+
+      // Then show the Manual Dropdown section
+      domElements.manualDropdownSection.style.display = 'block';
+      domElements.manualDropdownSection.style.visibility = 'visible';
+      domElements.manualDropdownSection.style.height = '';
+      domElements.manualDropdownSection.style.margin = '';
+      domElements.manualDropdownSection.style.padding = '';
+      domElements.manualDropdownSection.style.overflow = '';
+
+      console.log('Display set:', {
+        objectDropdownSection: domElements.objectDropdownSection.style.display,
+        manualDropdownSection: domElements.manualDropdownSection.style.display,
+        objectVisibility: domElements.objectDropdownSection.style.visibility,
+        manualVisibility: domElements.manualDropdownSection.style.visibility
+      });
+
+      // Show existing dropdown items in the manage dropdown panel
+      showManageDropdownPanelItems(tab);
+    }
+  } else {
+    console.error('Manage dropdown panel sections not found!', {
+      objectDropdownSection: domElements.objectDropdownSection,
+      manualDropdownSection: domElements.manualDropdownSection
+    });
+  }
 }
 
 /**
@@ -575,6 +657,16 @@ function saveTabForm() {
     tabData.cachedNavigation = undefined;
     tabData.navigationLastUpdated = undefined;
     tabData.needsNavigationRefresh = undefined;
+  } else {
+    // Also save any reordered dropdown items from manual dropdowns
+    // The currentActionPanelTab holds the in-memory changes from drag-and-drop
+    const tabs = SFTabs.main.getTabs();
+    const tab = tabs.find(t => t.id === editingTabId);
+    if (tab && tab.dropdownItems && tab.dropdownItems.length > 0) {
+      console.log('✅ Saving reordered dropdown items:', tab.dropdownItems.length);
+      tabData.hasDropdown = true;
+      tabData.dropdownItems = tab.dropdownItems;
+    }
   }
 
   // Update existing tab
@@ -982,6 +1074,330 @@ function setupEventListeners() {
   console.log('UI event listeners setup complete');
 }
 
+/**
+ * Show manual dropdown items in the manage dropdown panel
+ */
+function showManageDropdownPanelItems(tab) {
+  const domElements = SFTabs.main.getDOMElements();
+
+  if (!domElements.manageDropdownPreview || !domElements.manageDropdownList || !domElements.manageDropdownCount) {
+    console.warn('Manage dropdown panel elements not found');
+    return;
+  }
+
+  // Check if there are any dropdown items
+  const items = tab.dropdownItems || [];
+
+  // Get the label and instructions elements
+  const labelElement = document.getElementById('manual-dropdown-label');
+  const instructionsDiv = document.getElementById('manual-dropdown-help-text');
+
+  if (items.length === 0) {
+    domElements.manageDropdownPreview.style.display = 'none';
+    // Show label and instructions when no items exist
+    if (labelElement) {
+      labelElement.style.display = 'block';
+    }
+    if (instructionsDiv) {
+      instructionsDiv.style.display = 'block';
+    }
+    return;
+  }
+
+  // Hide the label and instructions when items exist
+  if (labelElement) {
+    labelElement.style.display = 'none';
+  }
+  if (instructionsDiv) {
+    instructionsDiv.style.display = 'none';
+  }
+
+  // Update count
+  domElements.manageDropdownCount.textContent = items.length;
+
+  // Clear existing items
+  domElements.manageDropdownList.innerHTML = '';
+
+  // Add items with action buttons
+  items.forEach((item, index) => {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'dropdown-item-draggable';
+    itemDiv.dataset.index = index;
+    itemDiv.style.padding = '4px 0';
+    itemDiv.style.borderBottom = index < items.length - 1 ? '1px solid #dddbda' : 'none';
+    itemDiv.style.display = 'flex';
+    itemDiv.style.justifyContent = 'space-between';
+    itemDiv.style.alignItems = 'center';
+    itemDiv.style.cursor = 'grab';
+
+    // Drag handle
+    const dragHandle = document.createElement('span');
+    dragHandle.textContent = '⋮⋮';
+    dragHandle.style.marginRight = '8px';
+    dragHandle.style.color = '#706e6b';
+    dragHandle.style.cursor = 'grab';
+    dragHandle.style.fontSize = '14px';
+
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = `${index + 1}. ${item.label}`;
+    labelSpan.style.flex = '1';
+
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.display = 'flex';
+    buttonsContainer.style.gap = '4px';
+
+    // Edit button
+    const editButton = document.createElement('button');
+    editButton.type = 'button';
+    editButton.textContent = 'Edit';
+    editButton.style.fontSize = '11px';
+    editButton.style.padding = '2px 6px';
+    editButton.style.background = '#0176d3';
+    editButton.style.color = 'white';
+    editButton.style.border = 'none';
+    editButton.style.borderRadius = '3px';
+    editButton.style.cursor = 'pointer';
+    editButton.title = 'Edit this dropdown item';
+    editButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      editDropdownItem(tab, index);
+    });
+
+    // Promote button
+    const promoteButton = document.createElement('button');
+    promoteButton.type = 'button';
+    promoteButton.textContent = '↑';
+    promoteButton.style.fontSize = '14px';
+    promoteButton.style.padding = '2px 6px';
+    promoteButton.style.background = '#0c9';
+    promoteButton.style.color = 'white';
+    promoteButton.style.border = 'none';
+    promoteButton.style.borderRadius = '3px';
+    promoteButton.style.cursor = 'pointer';
+    promoteButton.title = 'Promote to main tab list';
+    promoteButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      promoteDropdownItem(tab, index);
+    });
+
+    buttonsContainer.appendChild(editButton);
+    buttonsContainer.appendChild(promoteButton);
+
+    itemDiv.appendChild(dragHandle);
+    itemDiv.appendChild(labelSpan);
+    itemDiv.appendChild(buttonsContainer);
+    domElements.manageDropdownList.appendChild(itemDiv);
+
+    // Add drag-and-drop support
+    setupDropdownItemDragHandlers(itemDiv, tab);
+  });
+
+  // Show preview
+  domElements.manageDropdownPreview.style.display = 'block';
+}
+
+/**
+ * Setup drag-and-drop handlers for dropdown items
+ */
+function setupDropdownItemDragHandlers(itemDiv, parentTab) {
+  let draggedItem = null;
+
+  itemDiv.addEventListener('mousedown', (e) => {
+    // Don't start drag if clicking on buttons
+    if (e.target.closest('button')) {
+      return;
+    }
+
+    // Prevent text selection during drag
+    e.preventDefault();
+
+    draggedItem = itemDiv;
+    itemDiv.style.cursor = 'grabbing';
+    itemDiv.style.opacity = '0.5';
+    itemDiv.style.userSelect = 'none';
+
+    const container = itemDiv.parentElement;
+    const items = Array.from(container.querySelectorAll('.dropdown-item-draggable'));
+
+    // Disable text selection on the document during drag
+    document.body.style.userSelect = 'none';
+
+    function onMouseMove(event) {
+      event.preventDefault();
+
+      // Find which item we're hovering over
+      const afterElement = getDragAfterElement(container, event.clientY);
+
+      if (afterElement == null) {
+        container.appendChild(draggedItem);
+      } else {
+        container.insertBefore(draggedItem, afterElement);
+      }
+    }
+
+    function onMouseUp() {
+      itemDiv.style.cursor = 'grab';
+      itemDiv.style.opacity = '1';
+      itemDiv.style.userSelect = '';
+
+      // Re-enable text selection
+      document.body.style.userSelect = '';
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      // Save the new order
+      saveDropdownItemOrder(container, parentTab);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+}
+
+/**
+ * Get the element to insert before during drag
+ */
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.dropdown-item-draggable:not([style*="opacity: 0.5"])')]
+    .filter(el => el.style.opacity !== '0.5');
+
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+/**
+ * Save the new dropdown item order after drag-and-drop
+ */
+function saveDropdownItemOrder(container, parentTab) {
+  const items = Array.from(container.querySelectorAll('.dropdown-item-draggable'));
+  const newOrder = items.map(item => parseInt(item.dataset.index));
+
+  // Reorder the dropdown items array based on the new visual order
+  const reorderedItems = newOrder.map(oldIndex => parentTab.dropdownItems[oldIndex]);
+  parentTab.dropdownItems = reorderedItems;
+
+  // Don't save to storage immediately - just update the in-memory array
+  // The changes will be saved when the user clicks the Save button on the inline form
+  console.log('Dropdown item order updated (not saved yet)');
+
+  // Refresh the display to update the numbering
+  showManageDropdownPanelItems(parentTab);
+}
+
+/**
+ * Promote a dropdown item to main tab list
+ */
+function promoteDropdownItem(parentTab, itemIndex) {
+  console.log('Promoting dropdown item:', itemIndex, 'from parent tab:', parentTab.label);
+
+  const tabs = SFTabs.main.getTabs();
+  const parentTabIndex = tabs.findIndex(t => t.id === parentTab.id);
+
+  if (parentTabIndex === -1) {
+    SFTabs.main.showStatus('Parent tab not found', true);
+    return;
+  }
+
+  const dropdownItem = parentTab.dropdownItems[itemIndex];
+  if (!dropdownItem) {
+    SFTabs.main.showStatus('Dropdown item not found', true);
+    return;
+  }
+
+  // Create a new main tab from the dropdown item
+  const newTab = {
+    id: generateId(),
+    label: dropdownItem.label,
+    path: dropdownItem.path || '',
+    openInNewTab: false,
+    isObject: dropdownItem.isObject || false,
+    isCustomUrl: dropdownItem.isCustomUrl || false,
+    isSetupObject: false,
+    hasDropdown: false,
+    dropdownItems: [],
+    position: tabs.length
+  };
+
+  // Remove the item from the parent's dropdown
+  parentTab.dropdownItems.splice(itemIndex, 1);
+
+  // If no more dropdown items, remove hasDropdown flag
+  if (parentTab.dropdownItems.length === 0) {
+    parentTab.hasDropdown = false;
+  }
+
+  // Add the new tab to the main list
+  tabs.push(newTab);
+
+  // Save and refresh
+  SFTabs.storage.saveTabs(tabs).then(() => {
+    console.log('Dropdown item promoted successfully');
+    SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" to main tab list`);
+    renderTabList();
+
+    // Refresh the dropdown preview
+    if (parentTab.dropdownItems.length > 0) {
+      showManageDropdownPanelItems(parentTab);
+    } else {
+      // Hide the inline form if no more dropdown items
+      hideTabForm();
+    }
+  }).catch(error => {
+    console.error('Error promoting dropdown item:', error);
+    SFTabs.main.showStatus('Error promoting item: ' + error.message, true);
+  });
+}
+
+/**
+ * Edit a dropdown item - opens action panel with the item's data
+ */
+function editDropdownItem(parentTab, itemIndex) {
+  console.log('Editing dropdown item:', itemIndex, 'from parent tab:', parentTab.label);
+
+  const dropdownItem = parentTab.dropdownItems[itemIndex];
+  if (!dropdownItem) {
+    SFTabs.main.showStatus('Dropdown item not found', true);
+    return;
+  }
+
+  // Create a temporary tab object for editing
+  const tempTab = {
+    id: `dropdown-${parentTab.id}-${itemIndex}`, // Special ID to identify this as a dropdown item edit
+    label: dropdownItem.label,
+    path: dropdownItem.path || '',
+    openInNewTab: false,
+    isObject: dropdownItem.isObject || false,
+    isCustomUrl: dropdownItem.isCustomUrl || false,
+    isSetupObject: false,
+    _isDropdownItemEdit: true, // Flag to indicate this is editing a dropdown item
+    _parentTabId: parentTab.id,
+    _dropdownItemIndex: itemIndex
+  };
+
+  // Open the action panel with this temp tab
+  if (SFTabs.main && SFTabs.main.showActionPanel) {
+    SFTabs.main.showActionPanel(tempTab);
+  }
+}
+
+/**
+ * Generate a unique ID for tabs
+ */
+function generateId() {
+  return 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
 // Export UI functions
 window.SFTabs = window.SFTabs || {};
 window.SFTabs.ui = {
@@ -992,5 +1408,7 @@ window.SFTabs.ui = {
   saveTabForm,
   editTab,
   navigateToTab,
+  promoteDropdownItem,
+  editDropdownItem,
   setupEventListeners
 };

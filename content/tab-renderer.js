@@ -368,18 +368,24 @@ function navigateToNavigationItem(navItem, parentTab) {
  * Build full URL from tab configuration
  */
 function buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject) {
+  // Check if this is a folder-style tab (no path)
+  if (!tab.path || !tab.path.trim()) {
+    // For folder tabs, return a javascript:void(0) to prevent navigation
+    return 'javascript:void(0)';
+  }
+
   let fullUrl = '';
   const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
   const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
-  
+
   if (isCustomUrl) {
     // For custom URLs, ensure there's a leading slash
     let formattedPath = tab.path;
-    
+
     if (!formattedPath.startsWith('/')) {
       formattedPath = '/' + formattedPath;
     }
-    
+
     fullUrl = `${baseUrlRoot}${formattedPath}`;
   } else if (isObject) {
     // Object URLs: don't add /home suffix - use the path as is
@@ -391,7 +397,7 @@ function buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject) {
     // Setup URLs need /home at the end
     fullUrl = `${baseUrlSetup}${tab.path}/home`;
   }
-  
+
   return fullUrl;
 }
 
@@ -412,10 +418,33 @@ function addTabClickListeners(tabs) {
         if (event.target.closest('.sftabs-custom-dropdown')) {
           return;
         }
-        
+
+        // Check if this is a folder-style tab (no path/URL)
+        const hasPath = tab.path && tab.path.trim();
+        const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+
+        if (!hasPath) {
+          // Folder-style tab without URL
+          event.preventDefault();
+          console.log('Folder-style tab clicked:', tab.label, 'Has dropdown:', hasDropdown);
+
+          // If it has a dropdown, open it
+          if (hasDropdown) {
+            const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+            const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
+            const dropdownArrow = tabElement?.querySelector('.dropdown-arrow-inline');
+
+            if (dropdown && dropdownArrow) {
+              toggleInlineDropdown(dropdown, dropdownArrow);
+            }
+          }
+          // If no dropdown and no path, just do nothing (it's a folder/placeholder)
+          return;
+        }
+
         const lightningEnabled = isLightningNavigationEnabled();
         console.log('Tab clicked:', tab.label, 'Lightning Navigation enabled:', lightningEnabled, 'Open in new tab:', tab.openInNewTab);
-        
+
         if (tab.openInNewTab) {
           // For new tab, always use window.open
           event.preventDefault();

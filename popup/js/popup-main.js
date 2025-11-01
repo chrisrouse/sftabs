@@ -129,7 +129,19 @@ function initializeDOMElements() {
   domElements.actionOpenInNewTabCheckbox = document.querySelector('#action-open-in-new-tab');
   domElements.actionIsObjectCheckbox = document.querySelector('#action-is-object');
   domElements.actionIsCustomUrlCheckbox = document.querySelector('#action-is-custom-url');
-  
+  domElements.actionObjectDropdownSection = document.querySelector('#action-object-dropdown-section');
+  domElements.actionManualDropdownSection = document.querySelector('#action-manual-dropdown-section');
+  domElements.manualDropdownItemsPreview = document.querySelector('#manual-dropdown-items-preview');
+  domElements.manualDropdownItemsList = document.querySelector('#manual-dropdown-items-list');
+  domElements.manualDropdownCount = document.querySelector('#manual-dropdown-count');
+
+  // Manage dropdown panel sections
+  domElements.objectDropdownSection = document.querySelector('#object-dropdown-section');
+  domElements.manualDropdownSection = document.querySelector('#manual-dropdown-section');
+  domElements.manageDropdownPreview = document.querySelector('#manage-dropdown-preview');
+  domElements.manageDropdownList = document.querySelector('#manage-dropdown-list');
+  domElements.manageDropdownCount = document.querySelector('#manage-dropdown-count');
+
   // Form groups
   domElements.hasDropdownGroup = document.querySelector('.has-dropdown-group');
   domElements.autoSetupDropdownGroup = document.querySelector('.auto-setup-dropdown-group');
@@ -325,9 +337,19 @@ function updateActionPanelContent(tab) {
 
   console.log('Updating action panel content for tab:', tab);
 
+  // Check if this is a new tab, dropdown item edit, or existing tab edit
+  const isNewTab = !tab.id;
+  const isDropdownItemEdit = tab._isDropdownItemEdit;
+
   // Update tab name display at the top
   if (domElements.actionPanelTabNameDisplay) {
-    domElements.actionPanelTabNameDisplay.textContent = tab.label;
+    if (isDropdownItemEdit) {
+      domElements.actionPanelTabNameDisplay.textContent = 'Edit Dropdown Item';
+    } else if (isNewTab) {
+      domElements.actionPanelTabNameDisplay.textContent = 'New Tab';
+    } else {
+      domElements.actionPanelTabNameDisplay.textContent = tab.label;
+    }
   }
 
   // Populate the input fields with current tab data
@@ -352,16 +374,119 @@ function updateActionPanelContent(tab) {
     domElements.actionIsCustomUrlCheckbox.checked = tab.isCustomUrl || false;
   }
 
-  // Show dropdown items if they exist (either pending or saved)
-  if (SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
-    if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
-      // Show pending dropdown items (not yet saved)
-      SFTabs.dropdowns.showDropdownPreview(tab.pendingDropdownItems);
-    } else if (tab.dropdownItems && tab.dropdownItems.length > 0) {
-      // Show saved dropdown items
-      SFTabs.dropdowns.showDropdownPreview(tab.dropdownItems);
-    }
+  // Hide both dropdown sections in the action panel (+ button panel)
+  // Users should manage dropdowns through drag-and-drop or the inline form (clicking tab name)
+  console.log('Action panel - Hiding dropdown sections');
+
+  if (domElements.actionObjectDropdownSection) {
+    domElements.actionObjectDropdownSection.style.display = 'none';
+    domElements.actionObjectDropdownSection.style.visibility = 'hidden';
+    domElements.actionObjectDropdownSection.style.height = '0';
+    domElements.actionObjectDropdownSection.style.margin = '0';
+    domElements.actionObjectDropdownSection.style.padding = '0';
+    domElements.actionObjectDropdownSection.style.overflow = 'hidden';
   }
+
+  if (domElements.actionManualDropdownSection) {
+    domElements.actionManualDropdownSection.style.display = 'none';
+    domElements.actionManualDropdownSection.style.visibility = 'hidden';
+    domElements.actionManualDropdownSection.style.height = '0';
+    domElements.actionManualDropdownSection.style.margin = '0';
+    domElements.actionManualDropdownSection.style.padding = '0';
+    domElements.actionManualDropdownSection.style.overflow = 'hidden';
+  }
+}
+
+/**
+ * Show manual dropdown items in the action panel
+ */
+function showManualDropdownItems(tab) {
+  if (!domElements.manualDropdownItemsPreview || !domElements.manualDropdownItemsList || !domElements.manualDropdownCount) {
+    console.warn('Manual dropdown preview elements not found');
+    return;
+  }
+
+  // Check if there are any dropdown items
+  const items = tab.dropdownItems || [];
+
+  if (items.length === 0) {
+    domElements.manualDropdownItemsPreview.style.display = 'none';
+    return;
+  }
+
+  // Update count
+  domElements.manualDropdownCount.textContent = items.length;
+
+  // Clear existing items
+  domElements.manualDropdownItemsList.innerHTML = '';
+
+  // Add items with action buttons
+  items.forEach((item, index) => {
+    const itemDiv = document.createElement('div');
+    itemDiv.style.padding = '4px 0';
+    itemDiv.style.borderBottom = index < items.length - 1 ? '1px solid #dddbda' : 'none';
+    itemDiv.style.display = 'flex';
+    itemDiv.style.justifyContent = 'space-between';
+    itemDiv.style.alignItems = 'center';
+
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = `${index + 1}. ${item.label}`;
+    labelSpan.style.flex = '1';
+
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.display = 'flex';
+    buttonsContainer.style.gap = '4px';
+
+    // Edit button
+    const editButton = document.createElement('button');
+    editButton.type = 'button';
+    editButton.textContent = 'Edit';
+    editButton.style.fontSize = '11px';
+    editButton.style.padding = '2px 6px';
+    editButton.style.background = '#0176d3';
+    editButton.style.color = 'white';
+    editButton.style.border = 'none';
+    editButton.style.borderRadius = '3px';
+    editButton.style.cursor = 'pointer';
+    editButton.title = 'Edit this dropdown item';
+    editButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (SFTabs.ui && SFTabs.ui.editDropdownItem) {
+        SFTabs.ui.editDropdownItem(tab, index);
+      }
+    });
+
+    // Promote button
+    const promoteButton = document.createElement('button');
+    promoteButton.type = 'button';
+    promoteButton.textContent = '↑';
+    promoteButton.style.fontSize = '14px';
+    promoteButton.style.padding = '2px 6px';
+    promoteButton.style.background = '#0c9';
+    promoteButton.style.color = 'white';
+    promoteButton.style.border = 'none';
+    promoteButton.style.borderRadius = '3px';
+    promoteButton.style.cursor = 'pointer';
+    promoteButton.title = 'Promote to main tab list';
+    promoteButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (SFTabs.ui && SFTabs.ui.promoteDropdownItem) {
+        SFTabs.ui.promoteDropdownItem(tab, index);
+      }
+    });
+
+    buttonsContainer.appendChild(editButton);
+    buttonsContainer.appendChild(promoteButton);
+
+    itemDiv.appendChild(labelSpan);
+    itemDiv.appendChild(buttonsContainer);
+    domElements.manualDropdownItemsList.appendChild(itemDiv);
+  });
+
+  // Show preview
+  domElements.manualDropdownItemsPreview.style.display = 'block';
 }
 
 /**
@@ -384,9 +509,9 @@ function saveActionPanelChanges() {
   const name = domElements.actionTabNameInput.value.trim();
   const path = domElements.actionTabPathInput.value.trim();
 
-  // Validation
-  if (!name || !path) {
-    showStatus('Tab name and path are required', true);
+  // Validation - name is required, but path is optional (for folder-style tabs)
+  if (!name) {
+    showStatus('Tab name is required', true);
     return;
   }
 
@@ -401,7 +526,7 @@ function saveActionPanelChanges() {
     return;
   }
 
-  // Prepare update data
+  // Prepare tab data
   const tabData = {
     label: name,
     path: path,
@@ -430,31 +555,42 @@ function saveActionPanelChanges() {
     console.log('❌ No pending dropdown items found on tab');
   }
 
-  // Update the tab using the tabs module
-  if (SFTabs.tabs && SFTabs.tabs.updateTab) {
-    SFTabs.tabs.updateTab(tab.id, tabData).then(() => {
-      console.log('Tab updated successfully from action panel');
+  // Check if this is editing a dropdown item
+  const isDropdownItemEdit = tab._isDropdownItemEdit;
+  console.log('Is dropdown item edit?', isDropdownItemEdit);
 
-      // Clear pending dropdown items after successful save
-      if (tab.pendingDropdownItems) {
-        delete tab.pendingDropdownItems;
-        console.log('Cleared pending dropdown items');
-      }
+  if (isDropdownItemEdit) {
+    // Handle dropdown item edit
+    const parentTabId = tab._parentTabId;
+    const itemIndex = tab._dropdownItemIndex;
 
-      // Reload tabs from storage to ensure we have the latest data
+    const tabs = SFTabs.main.getTabs();
+    const parentTab = tabs.find(t => t.id === parentTabId);
+
+    if (!parentTab || !parentTab.dropdownItems || !parentTab.dropdownItems[itemIndex]) {
+      showStatus('Dropdown item not found', true);
+      return;
+    }
+
+    // Update the dropdown item
+    parentTab.dropdownItems[itemIndex] = {
+      label: name,
+      path: path,
+      url: isCustomUrl ? path : null,
+      isObject: isObject,
+      isCustomUrl: isCustomUrl
+    };
+
+    // Save and refresh
+    SFTabs.storage.saveTabs(tabs).then(() => {
+      console.log('Dropdown item updated successfully');
+      showStatus('Dropdown item updated successfully', false);
+
+      // Reload tabs from storage
       return loadTabsFromStorage();
     }).then(() => {
-      // Update the current tab reference
-      currentActionPanelTab = { ...tab, ...tabData };
-
-      // Update the display header
-      if (domElements.actionPanelTabNameDisplay) {
-        domElements.actionPanelTabNameDisplay.textContent = name;
-      }
-
-      // Explicitly re-render the tab list to show updated name
+      // Re-render the tab list
       if (SFTabs.ui && SFTabs.ui.renderTabList) {
-        console.log('Re-rendering tab list after action panel save');
         SFTabs.ui.renderTabList();
       }
 
@@ -463,12 +599,89 @@ function saveActionPanelChanges() {
         showMainContent();
       }, 800);
     }).catch(error => {
-      console.error('Error updating tab:', error);
-      showStatus('Error updating tab: ' + error.message, true);
+      console.error('Error updating dropdown item:', error);
+      showStatus('Error updating dropdown item: ' + error.message, true);
     });
+
+    return;
+  }
+
+  // Check if this is a new tab (id is null) or an existing tab update
+  const isNewTab = !tab.id;
+  console.log('Is new tab?', isNewTab);
+
+  if (isNewTab) {
+    // Create new tab
+    if (SFTabs.tabs && SFTabs.tabs.createTab) {
+      SFTabs.tabs.createTab(tabData).then(() => {
+        console.log('New tab created successfully from action panel');
+
+        // Reload tabs from storage to ensure we have the latest data
+        return loadTabsFromStorage();
+      }).then(() => {
+        // Explicitly re-render the tab list
+        if (SFTabs.ui && SFTabs.ui.renderTabList) {
+          console.log('Re-rendering tab list after new tab creation');
+          SFTabs.ui.renderTabList();
+        }
+
+        showStatus('Tab created successfully', false);
+
+        // Close panel and return to main content
+        setTimeout(() => {
+          showMainContent();
+        }, 800);
+      }).catch(error => {
+        console.error('Error creating tab:', error);
+        showStatus('Error creating tab: ' + error.message, true);
+      });
+    } else {
+      console.error('SFTabs.tabs.createTab not available');
+      showStatus('Error: Create function not available', true);
+    }
   } else {
-    console.error('SFTabs.tabs.updateTab not available');
-    showStatus('Error: Update function not available', true);
+    // Update existing tab
+    if (SFTabs.tabs && SFTabs.tabs.updateTab) {
+      SFTabs.tabs.updateTab(tab.id, tabData).then(() => {
+        console.log('Tab updated successfully from action panel');
+
+        // Clear pending dropdown items after successful save
+        if (tab.pendingDropdownItems) {
+          delete tab.pendingDropdownItems;
+          console.log('Cleared pending dropdown items');
+        }
+
+        // Reload tabs from storage to ensure we have the latest data
+        return loadTabsFromStorage();
+      }).then(() => {
+        // Update the current tab reference
+        currentActionPanelTab = { ...tab, ...tabData };
+
+        // Update the display header
+        if (domElements.actionPanelTabNameDisplay) {
+          domElements.actionPanelTabNameDisplay.textContent = name;
+        }
+
+        // Explicitly re-render the tab list to show updated name
+        if (SFTabs.ui && SFTabs.ui.renderTabList) {
+          console.log('Re-rendering tab list after action panel save');
+          SFTabs.ui.renderTabList();
+        }
+
+        showStatus('Tab updated successfully', false);
+
+        // Close panel and return to main content
+        setTimeout(() => {
+          showMainContent();
+        }, 800);
+      }).catch(error => {
+        console.error('Error updating tab:', error);
+        showStatus('Error updating tab: ' + error.message, true);
+      });
+    } else {
+      console.error('SFTabs.tabs.updateTab not available');
+      showStatus('Error: Update function not available', true);
+    }
   }
 }
 

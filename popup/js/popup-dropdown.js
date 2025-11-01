@@ -196,11 +196,22 @@ function showDropdownPreview(items) {
 	// Add items with delete buttons
 	items.forEach((item, index) => {
 		const itemDiv = document.createElement('div');
+		itemDiv.className = 'dropdown-item-draggable';
+		itemDiv.dataset.index = index;
 		itemDiv.style.padding = '4px 0';
 		itemDiv.style.borderBottom = index < items.length - 1 ? '1px solid #dddbda' : 'none';
 		itemDiv.style.display = 'flex';
 		itemDiv.style.justifyContent = 'space-between';
 		itemDiv.style.alignItems = 'center';
+		itemDiv.style.cursor = 'grab';
+
+		// Drag handle
+		const dragHandle = document.createElement('span');
+		dragHandle.textContent = '⋮⋮';
+		dragHandle.style.marginRight = '8px';
+		dragHandle.style.color = '#706e6b';
+		dragHandle.style.cursor = 'grab';
+		dragHandle.style.fontSize = '14px';
 
 		const labelSpan = document.createElement('span');
 		labelSpan.textContent = `${index + 1}. ${item.label}`;
@@ -224,9 +235,13 @@ function showDropdownPreview(items) {
 			removeDropdownItem(index);
 		});
 
+		itemDiv.appendChild(dragHandle);
 		itemDiv.appendChild(labelSpan);
 		itemDiv.appendChild(deleteButton);
 		dropdownItemsList.appendChild(itemDiv);
+
+		// Add drag-and-drop support
+		setupObjectDropdownItemDragHandlers(itemDiv);
 	});
 
 	// Show preview
@@ -276,6 +291,120 @@ function removeDropdownItem(index) {
 	console.log('Item removed successfully');
 	// Don't save immediately - let the user click Save button to commit changes
 	// This allows removing multiple items before saving
+}
+
+/**
+ * Setup drag-and-drop handlers for object dropdown items
+ */
+function setupObjectDropdownItemDragHandlers(itemDiv) {
+	let draggedItem = null;
+
+	itemDiv.addEventListener('mousedown', (e) => {
+		// Don't start drag if clicking on buttons
+		if (e.target.closest('button')) {
+			return;
+		}
+
+		// Prevent text selection during drag
+		e.preventDefault();
+
+		draggedItem = itemDiv;
+		itemDiv.style.cursor = 'grabbing';
+		itemDiv.style.opacity = '0.5';
+		itemDiv.style.userSelect = 'none';
+
+		const container = itemDiv.parentElement;
+
+		// Disable text selection on the document during drag
+		document.body.style.userSelect = 'none';
+
+		function onMouseMove(event) {
+			event.preventDefault();
+
+			// Find which item we're hovering over
+			const afterElement = getObjectDropdownDragAfterElement(container, event.clientY);
+
+			if (afterElement == null) {
+				container.appendChild(draggedItem);
+			} else {
+				container.insertBefore(draggedItem, afterElement);
+			}
+		}
+
+		function onMouseUp() {
+			itemDiv.style.cursor = 'grab';
+			itemDiv.style.opacity = '1';
+			itemDiv.style.userSelect = '';
+
+			// Re-enable text selection
+			document.body.style.userSelect = '';
+
+			document.removeEventListener('mousemove', onMouseMove);
+			document.removeEventListener('mouseup', onMouseUp);
+
+			// Save the new order
+			saveObjectDropdownItemOrder(container);
+		}
+
+		document.addEventListener('mousemove', onMouseMove);
+		document.addEventListener('mouseup', onMouseUp);
+	});
+}
+
+/**
+ * Get the element to insert before during drag
+ */
+function getObjectDropdownDragAfterElement(container, y) {
+	const draggableElements = [...container.querySelectorAll('.dropdown-item-draggable:not([style*="opacity: 0.5"])')]
+		.filter(el => el.style.opacity !== '0.5');
+
+	return draggableElements.reduce((closest, child) => {
+		const box = child.getBoundingClientRect();
+		const offset = y - box.top - box.height / 2;
+
+		if (offset < 0 && offset > closest.offset) {
+			return { offset: offset, element: child };
+		} else {
+			return closest;
+		}
+	}, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+/**
+ * Save the new object dropdown item order after drag-and-drop
+ */
+function saveObjectDropdownItemOrder(container) {
+	const items = Array.from(container.querySelectorAll('.dropdown-item-draggable'));
+	const newOrder = items.map(item => parseInt(item.dataset.index));
+
+	// Get current tab
+	const currentTab = SFTabs.main.getCurrentActionPanelTab();
+	if (!currentTab) {
+		console.warn('No currentActionPanelTab found');
+		return;
+	}
+
+	// Check if we have pending dropdown items (not yet saved)
+	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
+		// Reorder pending items
+		const reorderedItems = newOrder.map(oldIndex => currentTab.pendingDropdownItems[oldIndex]);
+		currentTab.pendingDropdownItems = reorderedItems;
+		console.log('Reordered pending dropdown items');
+		// Refresh the display
+		showDropdownPreview(currentTab.pendingDropdownItems);
+	} else if (currentTab.dropdownItems && currentTab.dropdownItems.length > 0) {
+		// Reorder saved items
+		const reorderedItems = newOrder.map(oldIndex => currentTab.dropdownItems[oldIndex]);
+		currentTab.dropdownItems = reorderedItems;
+
+		// Save to storage
+		const tabs = SFTabs.main.getTabs();
+		SFTabs.storage.saveTabs(tabs).then(() => {
+			console.log('Object dropdown item order saved');
+			// Refresh the display
+			showDropdownPreview(currentTab.dropdownItems);
+		});
+	}
 }
 
 /**
