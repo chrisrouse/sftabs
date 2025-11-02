@@ -238,11 +238,6 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     link.setAttribute('title', navItem.label);
     link.setAttribute('data-aura-rendered-by', `sftabs-link-${level}-${index}`);
 
-    // Add indentation for nested items
-    if (level > 0) {
-      link.style.paddingLeft = `${16 + (level * 16)}px`;
-    }
-
     // Check if this item has nested children
     const hasNestedItems = navItem.dropdownItems && navItem.dropdownItems.length > 0;
 
@@ -284,24 +279,8 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     // Add click/hover handlers
     if (hasNestedItems) {
       // Items with children: show submenu on hover, navigate on click if item has URL
-      link.addEventListener('mouseenter', () => {
-        // Close other submenus at the same level
-        const siblings = container.querySelectorAll(':scope > li');
-        siblings.forEach(sibling => {
-          if (sibling !== itemLi) {
-            const siblingSubmenu = sibling.querySelector('.submenu-container');
-            if (siblingSubmenu) {
-              siblingSubmenu.style.display = 'none';
-            }
-          }
-        });
-
-        // Show this submenu
-        const submenu = itemLi.querySelector('.submenu-container');
-        if (submenu) {
-          submenu.style.display = 'block';
-        }
-      });
+      // Note: The actual mouseenter handler will be set up after submenu is created below
+      itemLi.needsSubmenuHandler = true;
 
       // If parent item has a URL, allow clicking to navigate
       if (navItem.path || navItem.url) {
@@ -311,6 +290,12 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
           navigateToNavigationItem(navItem, parentTab);
           menu.classList.remove('visible');
           menu.style.display = 'none';
+        });
+      } else {
+        // Prevent default click behavior for parent items without URLs
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
         });
       }
     } else {
@@ -330,14 +315,19 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     // Recursively render nested items as flyout submenu if they exist
     if (hasNestedItems && level < 1) { // Only support 2 levels (0 and 1)
       const submenuContainer = document.createElement('div');
-      submenuContainer.className = 'submenu-container popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default positioned';
+      submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
       submenuContainer.style.display = 'none'; // Hidden by default
-      submenuContainer.style.position = 'absolute';
-      submenuContainer.style.left = '100%'; // Position to the right of parent menu
-      submenuContainer.style.top = '0';
-      submenuContainer.style.marginLeft = '-1px'; // Overlap border slightly
+      submenuContainer.style.position = 'fixed'; // Use fixed positioning relative to viewport
       submenuContainer.style.minWidth = '200px';
+      submenuContainer.style.width = '240px';
       submenuContainer.style.zIndex = '10000'; // Higher than parent menu
+      submenuContainer.style.backgroundColor = 'rgb(255, 255, 255)';
+      submenuContainer.style.border = '1px solid rgb(221, 219, 218)';
+      submenuContainer.style.borderRadius = '0.25rem';
+      submenuContainer.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
+      submenuContainer.style.padding = '0.5rem 0';
+      submenuContainer.style.transform = 'none'; // Prevent any transforms
+      submenuContainer.style.margin = '0'; // Prevent any margins
 
       // Create nested menu inner wrapper
       const submenuInner = document.createElement('div');
@@ -356,14 +346,84 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       submenuInner.appendChild(nestedUl);
       submenuContainer.appendChild(submenuInner);
 
-      // Position submenu relative to the parent item
-      itemLi.style.position = 'relative';
-      itemLi.appendChild(submenuContainer);
+      // Clean up any existing submenu for this item before creating new one
+      if (itemLi.submenuElement) {
+        itemLi.submenuElement.remove();
+      }
+
+      // Append submenu to document body to avoid overflow clipping
+      document.body.appendChild(submenuContainer);
+
+      // Store reference to submenu on the item for cleanup
+      itemLi.submenuElement = submenuContainer;
+
+      // Function to position submenu next to parent item
+      const positionSubmenu = () => {
+        const itemRect = itemLi.getBoundingClientRect();
+
+        // Get the parent menu's bounding box (the actual dropdown menu, not just the ul)
+        const parentMenu = menu;
+        const parentMenuRect = parentMenu.getBoundingClientRect();
+
+        console.log('Positioning submenu:', {
+          itemRect,
+          parentMenuRect,
+          calculatedLeft: parentMenuRect.right,
+          calculatedTop: itemRect.top
+        });
+
+        // Position submenu to the right of the parent menu, aligned with the hovered item
+        // Add small gap (2px) between parent menu and submenu
+        // Use setProperty with !important to override any Salesforce styles
+        submenuContainer.style.setProperty('left', `${parentMenuRect.right + 2}px`, 'important');
+        submenuContainer.style.setProperty('top', `${itemRect.top}px`, 'important');
+        submenuContainer.style.setProperty('right', 'auto', 'important');
+        submenuContainer.style.setProperty('bottom', 'auto', 'important');
+      };
+
+      // Add hover delay management
+      let hideTimeout;
+
+      // Set up mouseenter handler to show and position submenu
+      itemLi.addEventListener('mouseenter', () => {
+        // Close other submenus at the same level
+        const siblings = container.querySelectorAll(':scope > li');
+        siblings.forEach(sibling => {
+          if (sibling !== itemLi && sibling.submenuElement) {
+            sibling.submenuElement.style.display = 'none';
+          }
+        });
+
+        // Position and show this submenu
+        positionSubmenu();
+        submenuContainer.style.display = 'block';
+      });
 
       // Hide submenu when mouse leaves the parent item
       itemLi.addEventListener('mouseleave', () => {
+        // Only hide if not moving to the submenu
+        hideTimeout = setTimeout(() => {
+          submenuContainer.style.display = 'none';
+        }, 100);
+      });
+
+      // Keep submenu visible when hovering over it
+      submenuContainer.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
+      });
+
+      // Hide submenu when leaving the submenu
+      submenuContainer.addEventListener('mouseleave', () => {
         submenuContainer.style.display = 'none';
       });
+
+      // Clean up submenu when menu is hidden
+      const observer = new MutationObserver(() => {
+        if (menu.style.display === 'none') {
+          submenuContainer.style.display = 'none';
+        }
+      });
+      observer.observe(menu, { attributes: true, attributeFilter: ['style'] });
     }
   });
 }
