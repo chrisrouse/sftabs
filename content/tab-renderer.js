@@ -360,7 +360,7 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       // Store reference to submenu on the item for cleanup
       itemLi.submenuElement = submenuContainer;
 
-      // Function to position submenu next to parent item
+      // Function to position submenu next to parent item with smart positioning
       const positionSubmenu = () => {
         const itemRect = itemLi.getBoundingClientRect();
 
@@ -368,18 +368,48 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
         const parentMenu = menu;
         const parentMenuRect = parentMenu.getBoundingClientRect();
 
-        console.log('Positioning submenu:', {
-          itemRect,
-          parentMenuRect,
-          calculatedLeft: parentMenuRect.right,
-          calculatedTop: itemRect.top
-        });
+        const submenuWidth = 240;
+        const gap = 2;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
 
-        // Position submenu to the right of the parent menu, aligned with the hovered item
-        // Add small gap (2px) between parent menu and submenu
-        // Use setProperty with !important to override any Salesforce styles
-        submenuContainer.style.setProperty('left', `${parentMenuRect.right + 2}px`, 'important');
-        submenuContainer.style.setProperty('top', `${itemRect.top}px`, 'important');
+        // Try positioning to the right first (preferred for regular menus)
+        let left = parentMenuRect.right + gap;
+        let openRight = true;
+
+        // Check if it would go off the right edge
+        if (left + submenuWidth > viewportWidth) {
+          // Flip to the left side instead
+          left = parentMenuRect.left - submenuWidth - gap;
+          openRight = false;
+        }
+
+        // Check if opening left would go off the left edge
+        if (!openRight && left < 0) {
+          // Force right positioning even if it clips slightly
+          left = Math.min(viewportWidth - submenuWidth, parentMenuRect.right + gap);
+          openRight = true;
+        }
+
+        // Calculate top position aligned with hovered item
+        let top = itemRect.top;
+
+        // Check if menu would go off bottom of viewport
+        // Temporarily show to get actual height
+        submenuContainer.style.display = 'block';
+        submenuContainer.style.visibility = 'hidden';
+        const submenuHeight = submenuContainer.offsetHeight;
+        submenuContainer.style.display = 'none';
+        submenuContainer.style.visibility = 'visible';
+
+        // Adjust top if would go off bottom
+        if (top + submenuHeight > viewportHeight) {
+          top = Math.max(0, viewportHeight - submenuHeight - 10);
+        }
+
+        // Apply positioning
+        submenuContainer.style.setProperty('left', `${left}px`, 'important');
+        submenuContainer.style.setProperty('top', `${top}px`, 'important');
         submenuContainer.style.setProperty('right', 'auto', 'important');
         submenuContainer.style.setProperty('bottom', 'auto', 'important');
       };
@@ -960,8 +990,8 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
     viewportWidth -= leftNavWidth;
   }
 
-  // Add buffer for right side margin/padding
-  const rightBuffer = 100;
+  // Add buffer for right side margin/padding (increased to keep overflow menu away from edge)
+  const rightBuffer = 120; 
   viewportWidth -= rightBuffer;
 
   // Calculate space used by native Salesforce tabs
@@ -1072,6 +1102,145 @@ function createOverflowButton(hiddenTabs) {
 }
 
 /**
+ * Create flyout submenu for overflow menu item (opens to the left)
+ */
+function createOverflowSubmenu(itemLi, tab, parentMenu) {
+  const submenuContainer = document.createElement('div');
+  submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
+  submenuContainer.style.display = 'none';
+  submenuContainer.style.position = 'fixed';
+  submenuContainer.style.minWidth = '200px';
+  submenuContainer.style.width = '240px';
+  submenuContainer.style.zIndex = '10001'; // Higher than overflow menu
+  submenuContainer.style.backgroundColor = 'rgb(255, 255, 255)';
+  submenuContainer.style.border = '1px solid rgb(221, 219, 218)';
+  submenuContainer.style.borderRadius = '0.25rem';
+  submenuContainer.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
+  submenuContainer.style.padding = '0.5rem 0';
+  submenuContainer.style.transform = 'none';
+  submenuContainer.style.margin = '0';
+
+  // Create submenu inner wrapper
+  const submenuInner = document.createElement('div');
+  submenuInner.setAttribute('role', 'menu');
+
+  // Create ul
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.style.listStyle = 'none';
+  ul.style.margin = '0';
+  ul.style.padding = '0';
+
+  // Render dropdown items using the existing recursive renderer
+  renderDropdownItemsRecursive(tab.dropdownItems, ul, tab, parentMenu, 0);
+
+  submenuInner.appendChild(ul);
+  submenuContainer.appendChild(submenuInner);
+
+  // Append to body
+  document.body.appendChild(submenuContainer);
+
+  // Store reference for cleanup
+  itemLi.submenuElement = submenuContainer;
+
+  // Position submenu with smart positioning (flip sides if needed)
+  const positionSubmenu = () => {
+    const itemRect = itemLi.getBoundingClientRect();
+    const parentMenuRect = parentMenu.getBoundingClientRect();
+
+    // Use the fixed width we set (240px) since offsetWidth may be 0 before display
+    const submenuWidth = 240;
+    const gap = 2;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Try positioning to the left first (preferred for overflow menu)
+    let left = parentMenuRect.left - submenuWidth - gap;
+    let openLeft = true;
+
+    // Check if it would go off the left edge
+    if (left < 0) {
+      // Flip to the right side instead
+      left = parentMenuRect.right + gap;
+      openLeft = false;
+    }
+
+    // Check if opening right would go off the right edge
+    if (!openLeft && (left + submenuWidth) > viewportWidth) {
+      // Force left positioning even if it clips slightly
+      left = Math.max(0, parentMenuRect.left - submenuWidth - gap);
+      openLeft = true;
+    }
+
+    // Calculate top position aligned with hovered item
+    let top = itemRect.top;
+
+    // Check if menu would go off bottom of viewport
+    // Temporarily show to get actual height
+    submenuContainer.style.display = 'block';
+    submenuContainer.style.visibility = 'hidden';
+    const submenuHeight = submenuContainer.offsetHeight;
+    submenuContainer.style.display = 'none';
+    submenuContainer.style.visibility = 'visible';
+
+    // Adjust top if would go off bottom
+    if (top + submenuHeight > viewportHeight) {
+      top = Math.max(0, viewportHeight - submenuHeight - 10);
+    }
+
+    // Apply positioning
+    submenuContainer.style.setProperty('left', `${left}px`, 'important');
+    submenuContainer.style.setProperty('top', `${top}px`, 'important');
+    submenuContainer.style.setProperty('right', 'auto', 'important');
+    submenuContainer.style.setProperty('bottom', 'auto', 'important');
+  };
+
+  // Hover delay management
+  let hideTimeout;
+
+  // Show submenu on hover
+  itemLi.addEventListener('mouseenter', () => {
+    // Close other submenus
+    const siblings = itemLi.parentElement.querySelectorAll(':scope > li');
+    siblings.forEach(sibling => {
+      if (sibling !== itemLi && sibling.submenuElement) {
+        sibling.submenuElement.style.display = 'none';
+      }
+    });
+
+    // Position and show this submenu
+    positionSubmenu();
+    submenuContainer.style.display = 'block';
+  });
+
+  // Hide submenu when leaving item
+  itemLi.addEventListener('mouseleave', () => {
+    hideTimeout = setTimeout(() => {
+      submenuContainer.style.display = 'none';
+    }, 100);
+  });
+
+  // Keep submenu visible when hovering over it
+  submenuContainer.addEventListener('mouseenter', () => {
+    clearTimeout(hideTimeout);
+  });
+
+  // Hide when leaving submenu
+  submenuContainer.addEventListener('mouseleave', () => {
+    submenuContainer.style.display = 'none';
+  });
+
+  // Clean up when parent menu closes
+  const observer = new MutationObserver(() => {
+    if (parentMenu.style.display === 'none') {
+      submenuContainer.style.display = 'none';
+    }
+  });
+  observer.observe(parentMenu, { attributes: true, attributeFilter: ['style'] });
+}
+
+/**
  * Create overflow dropdown menu showing hidden tabs
  */
 function createOverflowDropdown(hiddenTabs) {
@@ -1109,25 +1278,61 @@ function createOverflowDropdown(hiddenTabs) {
     link.setAttribute('title', tab.label);
     link.setAttribute('data-aura-rendered-by', `sftabs-overflow-link-${index}`);
 
+    // Check if this tab has dropdown items
+    const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+
+    // Create label container
+    const labelContainer = document.createElement('span');
+    labelContainer.style.display = 'flex';
+    labelContainer.style.alignItems = 'center';
+    labelContainer.style.justifyContent = 'space-between';
+    labelContainer.style.width = '100%';
+
     const labelSpan = document.createElement('span');
     labelSpan.className = 'uiOutputText';
     labelSpan.setAttribute('data-aura-rendered-by', `sftabs-overflow-text-${index}`);
     labelSpan.setAttribute('data-aura-class', 'uiOutputText');
     labelSpan.textContent = tab.label;
 
-    link.appendChild(labelSpan);
+    labelContainer.appendChild(labelSpan);
 
-    // Add click handler to navigate to tab
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      navigateToMainTab(tab);
-      menu.classList.remove('visible');
-      menu.style.display = 'none';
-    });
+    // Add caret if has dropdown (pointing right like normal nested menus)
+    if (hasDropdown) {
+      const caretIcon = document.createElement('span');
+      caretIcon.className = 'submenu-caret';
+      caretIcon.style.fontSize = '10px';
+      caretIcon.style.color = '#706e6b';
+      caretIcon.style.marginLeft = 'auto';
+      caretIcon.textContent = '▶'; // Right-pointing caret (submenu opens left or right based on space)
+      labelContainer.appendChild(caretIcon);
+    }
+
+    link.appendChild(labelContainer);
+
+    // Add click handler to navigate to tab (if tab has a path)
+    if (tab.path && tab.path.trim()) {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateToMainTab(tab);
+        menu.classList.remove('visible');
+        menu.style.display = 'none';
+      });
+    } else if (!hasDropdown) {
+      // No path and no dropdown - prevent default
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
 
     itemLi.appendChild(link);
     ul.appendChild(itemLi);
+
+    // Add flyout submenu if tab has dropdown items
+    if (hasDropdown) {
+      createOverflowSubmenu(itemLi, tab, menu);
+    }
   });
 
   menuInner.appendChild(ul);
