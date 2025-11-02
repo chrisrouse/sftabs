@@ -246,23 +246,12 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     // Check if this item has nested children
     const hasNestedItems = navItem.dropdownItems && navItem.dropdownItems.length > 0;
 
-    // Create label with optional expand icon for items with children
+    // Create label container
     const labelContainer = document.createElement('span');
     labelContainer.style.display = 'flex';
     labelContainer.style.alignItems = 'center';
+    labelContainer.style.justifyContent = 'space-between';
     labelContainer.style.width = '100%';
-
-    if (hasNestedItems) {
-      // Add expand/collapse icon
-      const expandIcon = document.createElement('span');
-      expandIcon.className = 'nested-expand-icon';
-      expandIcon.style.marginRight = '6px';
-      expandIcon.style.fontSize = '10px';
-      expandIcon.style.transition = 'transform 0.2s';
-      expandIcon.textContent = '▶';
-      expandIcon.setAttribute('data-expanded', 'false');
-      labelContainer.appendChild(expandIcon);
-    }
 
     // Create text node for label
     const labelSpan = document.createElement('span');
@@ -278,33 +267,52 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     }
 
     labelContainer.appendChild(labelSpan);
+
+    if (hasNestedItems) {
+      // Add right-pointing caret for items with submenus
+      const caretIcon = document.createElement('span');
+      caretIcon.className = 'submenu-caret';
+      caretIcon.style.fontSize = '10px';
+      caretIcon.style.color = '#706e6b';
+      caretIcon.style.marginLeft = 'auto';
+      caretIcon.textContent = '▶';
+      labelContainer.appendChild(caretIcon);
+    }
+
     link.appendChild(labelContainer);
 
-    // Add click handler
+    // Add click/hover handlers
     if (hasNestedItems) {
-      // Items with children: toggle expand/collapse
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const expandIcon = link.querySelector('.nested-expand-icon');
-        const isExpanded = expandIcon.getAttribute('data-expanded') === 'true';
-        const nestedContainer = itemLi.querySelector('.nested-items-container');
-
-        if (nestedContainer) {
-          if (isExpanded) {
-            // Collapse
-            nestedContainer.style.display = 'none';
-            expandIcon.style.transform = 'rotate(0deg)';
-            expandIcon.setAttribute('data-expanded', 'false');
-          } else {
-            // Expand
-            nestedContainer.style.display = 'block';
-            expandIcon.style.transform = 'rotate(90deg)';
-            expandIcon.setAttribute('data-expanded', 'true');
+      // Items with children: show submenu on hover, navigate on click if item has URL
+      link.addEventListener('mouseenter', () => {
+        // Close other submenus at the same level
+        const siblings = container.querySelectorAll(':scope > li');
+        siblings.forEach(sibling => {
+          if (sibling !== itemLi) {
+            const siblingSubmenu = sibling.querySelector('.submenu-container');
+            if (siblingSubmenu) {
+              siblingSubmenu.style.display = 'none';
+            }
           }
+        });
+
+        // Show this submenu
+        const submenu = itemLi.querySelector('.submenu-container');
+        if (submenu) {
+          submenu.style.display = 'block';
         }
       });
+
+      // If parent item has a URL, allow clicking to navigate
+      if (navItem.path || navItem.url) {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          navigateToNavigationItem(navItem, parentTab);
+          menu.classList.remove('visible');
+          menu.style.display = 'none';
+        });
+      }
     } else {
       // Items without children: navigate on click
       link.addEventListener('click', (e) => {
@@ -319,11 +327,21 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     itemLi.appendChild(link);
     container.appendChild(itemLi);
 
-    // Recursively render nested items if they exist
+    // Recursively render nested items as flyout submenu if they exist
     if (hasNestedItems && level < 1) { // Only support 2 levels (0 and 1)
-      const nestedContainer = document.createElement('div');
-      nestedContainer.className = 'nested-items-container';
-      nestedContainer.style.display = 'none'; // Hidden by default
+      const submenuContainer = document.createElement('div');
+      submenuContainer.className = 'submenu-container popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default positioned';
+      submenuContainer.style.display = 'none'; // Hidden by default
+      submenuContainer.style.position = 'absolute';
+      submenuContainer.style.left = '100%'; // Position to the right of parent menu
+      submenuContainer.style.top = '0';
+      submenuContainer.style.marginLeft = '-1px'; // Overlap border slightly
+      submenuContainer.style.minWidth = '200px';
+      submenuContainer.style.zIndex = '10000'; // Higher than parent menu
+
+      // Create nested menu inner wrapper
+      const submenuInner = document.createElement('div');
+      submenuInner.setAttribute('role', 'menu');
 
       // Create nested ul
       const nestedUl = document.createElement('ul');
@@ -335,8 +353,17 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
 
       renderDropdownItemsRecursive(navItem.dropdownItems, nestedUl, parentTab, menu, level + 1);
 
-      nestedContainer.appendChild(nestedUl);
-      itemLi.appendChild(nestedContainer);
+      submenuInner.appendChild(nestedUl);
+      submenuContainer.appendChild(submenuInner);
+
+      // Position submenu relative to the parent item
+      itemLi.style.position = 'relative';
+      itemLi.appendChild(submenuContainer);
+
+      // Hide submenu when mouse leaves the parent item
+      itemLi.addEventListener('mouseleave', () => {
+        submenuContainer.style.display = 'none';
+      });
     }
   });
 }
