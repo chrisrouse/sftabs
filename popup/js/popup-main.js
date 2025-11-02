@@ -218,56 +218,197 @@ function loadUserSettings() {
  * Load tabs from storage
  */
 function loadTabsFromStorage() {
-  console.log('Loading tabs from storage');
+  console.log('🔵 SF Tabs: Loading tabs from storage...');
   return SFTabs.storage.getTabs()
     .then((loadedTabs) => {
-      console.log('📦 Loaded tabs from storage:', loadedTabs ? loadedTabs.length : 0, 'tabs');
+      console.log('🔵 SF Tabs: Loaded', loadedTabs ? loadedTabs.length : 0, 'tabs from storage');
+
       if (loadedTabs && loadedTabs.length > 0) {
-        console.log('First tab:', loadedTabs[0]);
+        console.log('🔵 SF Tabs: Found existing tabs, checking for migration...');
+        console.log('🔵 SF Tabs: First tab sample:', JSON.stringify(loadedTabs[0], null, 2));
+
         // Migrate tabs to new structure if needed
         customTabs = migrateTabsToNewStructure(loadedTabs);
 
-        // Save migrated structure if changes were made
-        const originalLength = JSON.stringify(loadedTabs).length;
-        const migratedLength = JSON.stringify(customTabs).length;
+        // Check if migration actually changed anything by comparing structures
+        const needsSave = hasStructuralChanges(loadedTabs, customTabs);
 
-        if (migratedLength !== originalLength) {
-          console.log('Tabs migrated to new structure');
+        if (needsSave) {
+          console.log('✅ SF Tabs: Migration added new fields - saving to storage');
           return SFTabs.storage.saveTabs(customTabs);
+        } else {
+          console.log('✅ SF Tabs: Tabs already in current format - no save needed');
         }
       } else {
-        console.log('⚠️ No tabs found in storage, using defaults');
-        customTabs = [...SFTabs.constants.DEFAULT_TABS];
-        return SFTabs.storage.saveTabs(customTabs);
+        console.log('⚠️  SF Tabs: No tabs found in storage - checking if first-time install...');
+
+        // Only use defaults for truly first-time users
+        // Check if this is a first-time install or an upgrade issue
+        return browser.storage.local.get('extensionVersion').then(result => {
+          if (result.extensionVersion) {
+            // Extension was previously installed - this is likely a storage issue
+            console.error('❌ SF Tabs: Extension was previously installed (version: ' + result.extensionVersion + ') but tabs are missing!');
+            console.error('❌ SF Tabs: This indicates a storage migration issue or data loss');
+            console.error('❌ SF Tabs: NOT resetting to defaults - please import your backup');
+
+            // Don't overwrite with defaults - keep empty and let user know
+            customTabs = [];
+            showStatus('Warning: Tab configuration appears to be empty. Please check your settings or import a backup.', true);
+          } else {
+            // First-time install - use defaults
+            console.log('✅ SF Tabs: First-time install detected - initializing with default tabs');
+            customTabs = [...SFTabs.constants.DEFAULT_TABS];
+
+            // Mark as installed
+            browser.storage.local.set({ extensionVersion: '1.4.0' });
+            return SFTabs.storage.saveTabs(customTabs);
+          }
+        });
       }
 
-      console.log('✅ Final customTabs:', customTabs.length, 'tabs');
+      console.log('✅ SF Tabs: Final tab count:', customTabs.length);
+      if (customTabs.length > 0) {
+        const customCount = customTabs.filter(t => !t.id.startsWith('default_tab_')).length;
+        console.log('✅ SF Tabs: Custom tabs preserved:', customCount);
+      }
       return customTabs;
     })
     .catch((error) => {
-      console.error('Error loading tabs from storage:', error);
+      console.error('❌ SF Tabs: Error loading tabs from storage:', error);
       showStatus('Error loading tabs: ' + error.message, true);
-      // Fallback to default tabs
-      customTabs = [...SFTabs.constants.DEFAULT_TABS];
+
+      // Don't automatically use defaults on error - might overwrite user data
+      customTabs = [];
       return customTabs;
     });
 }
 
 /**
+ * Check if migration made structural changes (not just adding default fields)
+ */
+function hasStructuralChanges(original, migrated) {
+  if (original.length !== migrated.length) return true;
+
+  for (let i = 0; i < original.length; i++) {
+    const orig = original[i];
+    const mig = migrated[i];
+
+    // Check if core properties are different
+    if (orig.id !== mig.id ||
+        orig.label !== mig.label ||
+        orig.path !== mig.path ||
+        orig.position !== mig.position) {
+      return true;
+    }
+
+    // Check if any new required fields were added
+    if (mig.hasDropdown !== undefined && orig.hasDropdown === undefined) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Migrate tabs to new structure if needed
+ * This function ensures backward compatibility when upgrading from older versions
  */
 function migrateTabsToNewStructure(existingTabs) {
-  return existingTabs.map(tab => ({
-    ...tab,
-    hasDropdown: tab.hasDropdown || tab.isSetupObject || false,
-    autoSetupDropdown: tab.autoSetupDropdown || tab.isSetupObject || false,
-    children: tab.children || [],
-    parentId: tab.parentId || null,
-    isExpanded: tab.isExpanded || false,
-    cachedNavigation: tab.cachedNavigation || [],
-    navigationLastUpdated: tab.navigationLastUpdated || null,
-    needsNavigationRefresh: tab.needsNavigationRefresh || false
-  }));
+  console.log('🔄 SF Tabs: Starting migration for', existingTabs.length, 'tabs');
+
+  const migratedTabs = existingTabs.map((tab, index) => {
+    // Start with all existing properties
+    const migratedTab = { ...tab };
+    const addedFields = [];
+
+    // Ensure required fields exist with proper defaults
+    if (migratedTab.isObject === undefined) {
+      migratedTab.isObject = false;
+      addedFields.push('isObject');
+    }
+
+    if (migratedTab.isCustomUrl === undefined) {
+      migratedTab.isCustomUrl = false;
+      addedFields.push('isCustomUrl');
+    }
+
+    if (migratedTab.isSetupObject === undefined) {
+      migratedTab.isSetupObject = false;
+      addedFields.push('isSetupObject');
+    }
+
+    if (migratedTab.openInNewTab === undefined) {
+      migratedTab.openInNewTab = false;
+      addedFields.push('openInNewTab');
+    }
+
+    // Handle dropdown-related fields
+    // If tab has dropdownItems (new format), preserve them
+    if (tab.dropdownItems && Array.isArray(tab.dropdownItems)) {
+      migratedTab.hasDropdown = true;
+      migratedTab.dropdownItems = tab.dropdownItems;
+    } else if (tab.hasDropdown === undefined) {
+      migratedTab.hasDropdown = tab.isSetupObject || false;
+      addedFields.push('hasDropdown');
+    }
+
+    // Legacy dropdown fields (from old object-dropdown implementation)
+    // Only set these if they don't exist and we're not using the new dropdownItems format
+    if (!migratedTab.dropdownItems) {
+      if (migratedTab.autoSetupDropdown === undefined) {
+        migratedTab.autoSetupDropdown = tab.isSetupObject || false;
+        addedFields.push('autoSetupDropdown');
+      }
+
+      if (migratedTab.children === undefined) {
+        migratedTab.children = [];
+        addedFields.push('children');
+      }
+
+      if (migratedTab.parentId === undefined) {
+        migratedTab.parentId = null;
+        addedFields.push('parentId');
+      }
+
+      if (migratedTab.isExpanded === undefined) {
+        migratedTab.isExpanded = false;
+        addedFields.push('isExpanded');
+      }
+
+      if (migratedTab.cachedNavigation === undefined) {
+        migratedTab.cachedNavigation = [];
+        addedFields.push('cachedNavigation');
+      }
+
+      if (migratedTab.navigationLastUpdated === undefined) {
+        migratedTab.navigationLastUpdated = null;
+        addedFields.push('navigationLastUpdated');
+      }
+
+      if (migratedTab.needsNavigationRefresh === undefined) {
+        migratedTab.needsNavigationRefresh = false;
+        addedFields.push('needsNavigationRefresh');
+      }
+    }
+
+    // Ensure position is set
+    if (migratedTab.position === undefined) {
+      migratedTab.position = index;
+      addedFields.push('position');
+    }
+
+    if (addedFields.length > 0) {
+      console.log(`  ✅ Tab ${index + 1}/${existingTabs.length}: "${migratedTab.label}" - added fields: ${addedFields.join(', ')}`);
+    } else {
+      console.log(`  ✓ Tab ${index + 1}/${existingTabs.length}: "${migratedTab.label}" - already current`);
+    }
+
+    return migratedTab;
+  });
+
+  console.log('✅ SF Tabs: Migration complete');
+  return migratedTabs;
 }
 
 /**

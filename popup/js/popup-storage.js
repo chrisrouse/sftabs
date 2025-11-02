@@ -3,11 +3,29 @@
 
 /**
  * Get tabs from browser storage
+ * Reads from local storage (migration from sync is handled automatically by background script)
  */
 async function getTabs() {
   try {
-    const result = await browser.storage.local.get('customTabs');
-    return result.customTabs || [];
+    // Simply read from local storage - migration is handled by background script
+    const localResult = await browser.storage.local.get(['customTabs', 'extensionVersion']);
+
+    console.log('📦 Local storage query result:', {
+      hasCustomTabs: !!localResult.customTabs,
+      tabCount: localResult.customTabs?.length || 0,
+      extensionVersion: localResult.extensionVersion || 'none'
+    });
+
+    // Return tabs from local storage (background script ensures migration is complete)
+    if (localResult.customTabs && localResult.customTabs.length > 0) {
+      const customCount = localResult.customTabs.filter(t => !t.id?.startsWith('default_tab_')).length;
+      console.log('✅ Found', localResult.customTabs.length, 'tabs in local storage (', customCount, 'custom)');
+      return localResult.customTabs;
+    }
+
+    // No tabs found
+    console.log('⚠️  No tabs found in local storage');
+    return [];
   } catch (error) {
     console.error('Error getting tabs from storage:', error);
     throw error;
@@ -22,18 +40,22 @@ async function saveTabs(tabs) {
     // Sort tabs by position before saving
     const sortedTabs = [...tabs].sort((a, b) => a.position - b.position);
 
-    await browser.storage.local.set({ customTabs: sortedTabs });
+    // Save tabs and update extension version marker
+    await browser.storage.local.set({
+      customTabs: sortedTabs,
+      extensionVersion: '1.4.0'
+    });
     console.log('Tabs saved successfully to storage');
-    
+
     // Update the main state
     SFTabs.main.setTabs(sortedTabs);
-    
+
     // Re-render the UI
     SFTabs.ui.renderTabList();
-    
+
     // Show success message
     SFTabs.main.showStatus('Settings saved', false);
-    
+
     return sortedTabs;
   } catch (error) {
     console.error('Error saving tabs to storage:', error);
@@ -133,28 +155,33 @@ async function importConfiguration(configData) {
     if (!configData.customTabs || !Array.isArray(configData.customTabs)) {
       throw new Error('Invalid configuration format: missing customTabs array');
     }
-    
+
+    console.log('📥 Importing configuration with', configData.customTabs.length, 'tabs');
+
     // Clear existing data
     await clearAllStorage();
-    
-    // Import tabs
+
+    // Import tabs (saveTabs will handle migration internally)
     if (configData.customTabs.length > 0) {
       await saveTabs(configData.customTabs);
+    } else {
+      // Even with no tabs, mark as installed so we don't reset to defaults
+      await browser.storage.local.set({ extensionVersion: '1.4.0' });
     }
-    
+
     // Import settings
     if (configData.userSettings) {
       await saveUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS, ...configData.userSettings });
     }
-    
-    console.log('Configuration imported successfully');
+
+    console.log('✅ Configuration imported successfully');
     SFTabs.main.showStatus('Configuration imported successfully. Extension will reload.', false);
-    
+
     // Reload the popup to reflect changes
     setTimeout(() => {
       window.location.reload();
     }, 1500);
-    
+
     return true;
   } catch (error) {
     console.error('Error importing configuration:', error);

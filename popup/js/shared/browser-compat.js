@@ -15,53 +15,105 @@
         onMessage: chrome.runtime.onMessage,
         lastError: chrome.runtime.lastError
       },
-      storage: {
-        onChanged: chrome.storage.onChanged,
-        sync: {
+      storage: (function() {
+        // Create local storage methods
+        const localStorageMethods = {
           get: function(keys) {
-            console.log('SF Tabs: Chrome storage.get called with:', keys);
+            console.log('SF Tabs: Chrome storage.local.get called with:', keys);
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.get(keys, (result) => {
+              chrome.storage.local.get(keys, (result) => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage get error:', chrome.runtime.lastError);
+                  console.error('SF Tabs: Storage local get error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
-                  console.log('SF Tabs: Storage get result:', result);
+                  console.log('SF Tabs: Storage local get result:', result);
                   resolve(result);
                 }
               });
             });
           },
           set: function(items) {
-            console.log('SF Tabs: Chrome storage.set called with:', items);
+            console.log('SF Tabs: Chrome storage.local.set called with:', items);
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.set(items, () => {
+              chrome.storage.local.set(items, () => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage set error:', chrome.runtime.lastError);
+                  console.error('SF Tabs: Storage local set error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
-                  console.log('SF Tabs: Storage set success');
+                  console.log('SF Tabs: Storage local set success');
                   resolve();
                 }
               });
             });
           },
           clear: function() {
-            console.log('SF Tabs: Chrome storage.clear called');
+            console.log('SF Tabs: Chrome storage.local.clear called');
             return new Promise((resolve, reject) => {
-              chrome.storage.sync.clear(() => {
+              chrome.storage.local.clear(() => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage clear error:', chrome.runtime.lastError);
+                  console.error('SF Tabs: Storage local clear error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
-                  console.log('SF Tabs: Storage clear success');
+                  console.log('SF Tabs: Storage local clear success');
                   resolve();
                 }
               });
             });
           }
-        }
-      },
+        };
+
+        // Create sync storage methods (separate from local)
+        const syncStorageMethods = {
+          get: function(keys) {
+            console.log('SF Tabs: Chrome storage.sync.get called with:', keys);
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.get(keys, (result) => {
+                if (chrome.runtime.lastError) {
+                  console.error('SF Tabs: Storage sync get error:', chrome.runtime.lastError);
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  console.log('SF Tabs: Storage sync get result:', result);
+                  resolve(result);
+                }
+              });
+            });
+          },
+          set: function(items) {
+            console.log('SF Tabs: Chrome storage.sync.set called with:', items);
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.set(items, () => {
+                if (chrome.runtime.lastError) {
+                  console.error('SF Tabs: Storage sync set error:', chrome.runtime.lastError);
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  console.log('SF Tabs: Storage sync set success');
+                  resolve();
+                }
+              });
+            });
+          },
+          clear: function() {
+            console.log('SF Tabs: Chrome storage.sync.clear called');
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.clear(() => {
+                if (chrome.runtime.lastError) {
+                  console.error('SF Tabs: Storage sync clear error:', chrome.runtime.lastError);
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  console.log('SF Tabs: Storage sync clear success');
+                  resolve();
+                }
+              });
+            });
+          }
+        };
+
+        return {
+          onChanged: chrome.storage.onChanged,
+          local: localStorageMethods,
+          sync: syncStorageMethods  // Now properly separate
+        };
+      })(),
       tabs: {
         query: function(queryInfo) {
           console.log('SF Tabs: Chrome tabs.query called with:', queryInfo);
