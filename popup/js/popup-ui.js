@@ -7,7 +7,15 @@
 function renderTabList() {
   const domElements = SFTabs.main.getDOMElements();
   console.log('Rendering enhanced tab list');
-  
+
+  // Check if action panel is currently open - if so, we'll preserve it
+  const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
+  const isActionPanelOpen = currentActionPanelTab !== null;
+
+  if (isActionPanelOpen) {
+    console.log('Action panel is open for tab:', currentActionPanelTab.label, '- preserving panel state');
+  }
+
   // Clear existing list
   while (domElements.tabList.firstChild) {
     domElements.tabList.removeChild(domElements.tabList.firstChild);
@@ -31,6 +39,10 @@ function renderTabList() {
     // Setup drag and drop functionality
     setupDragAndDrop();
   }
+
+  // Note: We no longer need to preserve action panel state here because
+  // delete/promote operations now stage changes instead of saving immediately.
+  // The form stays open naturally since storage isn't updated until Save is clicked.
 }
 
 /**
@@ -446,6 +458,15 @@ function populateFormForEdit(tabId) {
 
   SFTabs.main.setEditingTabId(tabId);
 
+  // Create a staged copy of dropdown items for editing
+  // Changes will only be saved when user clicks Save button
+  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
+    tab.stagedDropdownItems = JSON.parse(JSON.stringify(tab.dropdownItems));
+    console.log('Created staged copy of', tab.dropdownItems.length, 'dropdown items for editing');
+  } else {
+    tab.stagedDropdownItems = [];
+  }
+
   // Set the tab as currentActionPanelTab so dropdown operations work
   // This is needed for removing dropdown items in the old form
   SFTabs.main.setCurrentActionPanelTab(tab);
@@ -574,7 +595,17 @@ function updateDropdownControlVisibility() {
 function hideTabForm() {
   const domElements = SFTabs.main.getDOMElements();
   console.log('Hiding tab form');
-  
+
+  // Clear any staged changes when canceling
+  const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
+  if (currentActionPanelTab) {
+    if (currentActionPanelTab.stagedDropdownItems || currentActionPanelTab.stagedPromotions) {
+      console.log('Discarding staged changes (Cancel clicked)');
+      delete currentActionPanelTab.stagedDropdownItems;
+      delete currentActionPanelTab.stagedPromotions;
+    }
+  }
+
   domElements.tabForm.style.display = 'none';
   SFTabs.main.setEditingTabId(null);
 
@@ -618,8 +649,49 @@ function saveTabForm() {
     autoSetupDropdown: autoSetupDropdown
   };
 
-  // Check if there are pending dropdown items to save
+  // Get the tab being edited
+  const tabs = SFTabs.main.getTabs();
+  const tab = tabs.find(t => t.id === editingTabId);
+
+  if (!tab) {
+    SFTabs.main.showStatus('Tab not found', true);
+    return;
+  }
+
+  // Check if there are staged changes to apply
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
+
+  // Apply staged dropdown items (from delete operations)
+  if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems) {
+    console.log('✅ Applying staged dropdown items:', currentActionPanelTab.stagedDropdownItems.length);
+    tabData.dropdownItems = currentActionPanelTab.stagedDropdownItems;
+    tabData.hasDropdown = currentActionPanelTab.stagedDropdownItems.length > 0;
+  }
+
+  // Apply staged promotions (create new main tabs from promoted items)
+  if (currentActionPanelTab && currentActionPanelTab.stagedPromotions && currentActionPanelTab.stagedPromotions.length > 0) {
+    console.log('✅ Applying', currentActionPanelTab.stagedPromotions.length, 'staged promotions');
+
+    // Create new main tabs for each promoted item
+    currentActionPanelTab.stagedPromotions.forEach(promotedItem => {
+      const newTab = {
+        id: generateId(),
+        label: promotedItem.label,
+        path: promotedItem.path || '',
+        openInNewTab: false,
+        isObject: promotedItem.isObject || false,
+        isCustomUrl: promotedItem.isCustomUrl || false,
+        isSetupObject: false,
+        hasDropdown: (promotedItem.dropdownItems && promotedItem.dropdownItems.length > 0),
+        dropdownItems: promotedItem.dropdownItems || [],
+        position: tabs.length
+      };
+      tabs.push(newTab);
+      console.log('Created new main tab from promotion:', newTab.label);
+    });
+  }
+
+  // Check if there are pending dropdown items to save (from Object Dropdown setup)
   if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
     console.log('✅ Applying pending dropdown items from old form:', currentActionPanelTab.pendingDropdownItems.length);
     tabData.hasDropdown = true;
@@ -633,26 +705,23 @@ function saveTabForm() {
     tabData.cachedNavigation = undefined;
     tabData.navigationLastUpdated = undefined;
     tabData.needsNavigationRefresh = undefined;
-  } else {
-    // Also save any reordered dropdown items from manual dropdowns
-    // The currentActionPanelTab holds the in-memory changes from drag-and-drop
-    const tabs = SFTabs.main.getTabs();
-    const tab = tabs.find(t => t.id === editingTabId);
-    if (tab && tab.dropdownItems && tab.dropdownItems.length > 0) {
-      console.log('✅ Saving reordered dropdown items:', tab.dropdownItems.length);
-      tabData.hasDropdown = true;
-      tabData.dropdownItems = tab.dropdownItems;
-    }
   }
 
-  // Update existing tab
+  // Update existing tab and save all tabs (in case we added promoted tabs)
   SFTabs.tabs.updateTab(editingTabId, tabData).then(() => {
+    // If we have promotions, we need to save the entire tabs array
+    if (currentActionPanelTab && currentActionPanelTab.stagedPromotions && currentActionPanelTab.stagedPromotions.length > 0) {
+      return SFTabs.storage.saveTabs(tabs);
+    }
+  }).then(() => {
     console.log('Tab updated successfully');
 
-    // Clear pending dropdown items after successful save
-    if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems) {
+    // Clear all staged data after successful save
+    if (currentActionPanelTab) {
+      delete currentActionPanelTab.stagedDropdownItems;
+      delete currentActionPanelTab.stagedPromotions;
       delete currentActionPanelTab.pendingDropdownItems;
-      console.log('Cleared pending dropdown items from old form');
+      console.log('Cleared all staged changes');
     }
 
     hideTabForm();
@@ -943,6 +1012,7 @@ function handleDropdownCreation(draggedItem, targetItem) {
   }
 
   // Create a dropdown item from the dragged tab
+  // IMPORTANT: Preserve nested dropdownItems if the dragged tab has them
   const dropdownItem = {
     label: draggedTab.label,
     path: draggedTab.path,
@@ -950,6 +1020,12 @@ function handleDropdownCreation(draggedItem, targetItem) {
     isObject: draggedTab.isObject || false,
     isCustomUrl: draggedTab.isCustomUrl || false
   };
+
+  // Preserve nested dropdown items if they exist
+  if (draggedTab.dropdownItems && draggedTab.dropdownItems.length > 0) {
+    dropdownItem.dropdownItems = JSON.parse(JSON.stringify(draggedTab.dropdownItems));
+    console.log(`Preserved ${draggedTab.dropdownItems.length} nested items from dragged tab`);
+  }
 
   // Add to dropdown items
   targetTab.dropdownItems.push(dropdownItem);
@@ -1061,8 +1137,9 @@ function showManageDropdownPanelItems(tab) {
     return;
   }
 
-  // Check if there are any dropdown items
-  const items = tab.dropdownItems || [];
+  // Use staged items if available (during editing), otherwise use actual items
+  const items = tab.stagedDropdownItems || tab.dropdownItems || [];
+  console.log('Showing dropdown items:', items.length, '(using staged:', !!tab.stagedDropdownItems, ')');
 
   // Get the label and instructions elements
   const labelElement = document.getElementById('manual-dropdown-label');
@@ -1254,29 +1331,28 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
     promoteDropdownItemByPath(tab, indexPath);
   });
 
-  // Add Sub-Item button (only for level 0 items)
-  if (level === 0) {
-    const addSubItemButton = document.createElement('button');
-    addSubItemButton.type = 'button';
-    addSubItemButton.textContent = '+';
-    addSubItemButton.style.fontSize = '14px';
-    addSubItemButton.style.padding = '2px 6px';
-    addSubItemButton.style.background = '#16325c';
-    addSubItemButton.style.color = 'white';
-    addSubItemButton.style.border = 'none';
-    addSubItemButton.style.borderRadius = '3px';
-    addSubItemButton.style.cursor = 'pointer';
-    addSubItemButton.title = 'Add sub-item';
-    addSubItemButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      addSubItemToItem(tab, indexPath);
-    });
-    buttonsContainer.appendChild(addSubItemButton);
-  }
+  // Delete button
+  const deleteButton = document.createElement('button');
+  deleteButton.type = 'button';
+  deleteButton.textContent = '×';
+  deleteButton.style.fontSize = '16px';
+  deleteButton.style.padding = '2px 6px';
+  deleteButton.style.background = '#c23934';
+  deleteButton.style.color = 'white';
+  deleteButton.style.border = 'none';
+  deleteButton.style.borderRadius = '3px';
+  deleteButton.style.cursor = 'pointer';
+  deleteButton.style.lineHeight = '1';
+  deleteButton.title = 'Delete this item';
+  deleteButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    deleteDropdownItemByPath(tab, indexPath);
+  });
 
   buttonsContainer.appendChild(editButton);
   buttonsContainer.appendChild(promoteButton);
+  buttonsContainer.appendChild(deleteButton);
 
   itemDiv.appendChild(leftSection);
   itemDiv.appendChild(buttonsContainer);
@@ -1374,100 +1450,93 @@ function editDropdownItemByPath(parentTab, indexPath) {
 function promoteDropdownItemByPath(parentTab, indexPath) {
   console.log('Promoting dropdown item by path:', indexPath, 'from parent tab:', parentTab.label);
 
-  const tabs = SFTabs.main.getTabs();
-  const parentTabIndex = tabs.findIndex(t => t.id === parentTab.id);
+  // Work with staged items only - don't save yet
+  const stagedItems = parentTab.stagedDropdownItems || [];
+  const dropdownItem = getItemByPath(stagedItems, indexPath);
 
-  if (parentTabIndex === -1) {
-    SFTabs.main.showStatus('Parent tab not found', true);
-    return;
-  }
-
-  const dropdownItem = getItemByPath(parentTab.dropdownItems, indexPath);
   if (!dropdownItem) {
     SFTabs.main.showStatus('Dropdown item not found', true);
     return;
   }
 
-  // Create a new main tab from the dropdown item
-  const newTab = {
-    id: generateId(),
-    label: dropdownItem.label,
-    path: dropdownItem.path || '',
-    openInNewTab: false,
-    isObject: dropdownItem.isObject || false,
-    isCustomUrl: dropdownItem.isCustomUrl || false,
-    isSetupObject: false,
-    hasDropdown: false,
-    dropdownItems: dropdownItem.dropdownItems || [], // Preserve nested items if any
-    position: tabs.length
-  };
-
-  // Remove the item from the parent's dropdown
-  removeItemByPath(parentTab.dropdownItems, indexPath);
-
-  // If no more dropdown items at top level, remove hasDropdown flag
-  if (parentTab.dropdownItems.length === 0) {
-    parentTab.hasDropdown = false;
+  // Preserve nested items if they exist
+  const preservedDropdownItems = dropdownItem.dropdownItems || [];
+  if (preservedDropdownItems.length > 0) {
+    console.log('Preserving', preservedDropdownItems.length, 'nested items from promoted item');
   }
 
-  // Add the new tab to the main list
-  tabs.push(newTab);
+  // Remove the item from the staged dropdown items
+  removeItemByPath(stagedItems, indexPath);
 
-  // Save and refresh
-  SFTabs.storage.saveTabs(tabs).then(() => {
-    console.log('Dropdown item promoted successfully');
-    SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" to main tab list`);
-    renderTabList();
+  // Update the staged items array
+  parentTab.stagedDropdownItems = stagedItems;
 
-    // Refresh the dropdown preview
-    if (parentTab.dropdownItems.length > 0) {
-      showManageDropdownPanelItems(parentTab);
-    } else {
-      // Hide the inline form if no more dropdown items
-      hideTabForm();
-    }
-  }).catch(error => {
-    console.error('Error promoting dropdown item:', error);
-    SFTabs.main.showStatus('Error promoting item: ' + error.message, true);
+  // Show status - but don't save yet
+  if (preservedDropdownItems.length > 0) {
+    SFTabs.main.showStatus(`"${dropdownItem.label}" with ${preservedDropdownItems.length} nested items will be promoted when you click Save`);
+  } else {
+    SFTabs.main.showStatus(`"${dropdownItem.label}" will be promoted when you click Save`);
+  }
+
+  // Store the promoted item temporarily so we can apply it on Save
+  if (!parentTab.stagedPromotions) {
+    parentTab.stagedPromotions = [];
+  }
+  parentTab.stagedPromotions.push({
+    label: dropdownItem.label,
+    path: dropdownItem.path || '',
+    isObject: dropdownItem.isObject || false,
+    isCustomUrl: dropdownItem.isCustomUrl || false,
+    dropdownItems: preservedDropdownItems
   });
+
+  console.log('Staged promotion for:', dropdownItem.label, '- will be applied on Save');
+
+  // Refresh the dropdown preview with staged items (no storage save)
+  showManageDropdownPanelItems(parentTab);
 }
 
 /**
- * Add a sub-item to an existing dropdown item
+ * Delete dropdown item by path
  */
-function addSubItemToItem(parentTab, indexPath) {
-  console.log('Adding sub-item to item at path:', indexPath);
+function deleteDropdownItemByPath(parentTab, indexPath) {
+  console.log('Deleting dropdown item by path:', indexPath, 'from parent tab:', parentTab.label);
 
-  const item = getItemByPath(parentTab.dropdownItems, indexPath);
+  // Work with staged items only - don't save yet
+  const stagedItems = parentTab.stagedDropdownItems || [];
+  const item = getItemByPath(stagedItems, indexPath);
+
   if (!item) {
-    SFTabs.main.showStatus('Parent item not found', true);
+    SFTabs.main.showStatus('Dropdown item not found', true);
     return;
   }
 
-  // Initialize dropdownItems array if it doesn't exist
-  if (!item.dropdownItems) {
-    item.dropdownItems = [];
-  }
+  // Check if user wants to skip confirmation
+  const userSettings = SFTabs.main.getUserSettings ? SFTabs.main.getUserSettings() : {};
+  const skipConfirmation = userSettings.skipDeleteConfirmation;
 
-  // Create a new sub-item with placeholder data
-  const newSubItem = {
-    label: 'New Sub-Item',
-    path: '',
-    isObject: false,
-    isCustomUrl: false
+  const performDelete = () => {
+    // Remove the item from staged items
+    removeItemByPath(stagedItems, indexPath);
+
+    // Update the staged items array
+    parentTab.stagedDropdownItems = stagedItems;
+
+    console.log('Staged deletion for:', item.label, '- will be applied on Save');
+    SFTabs.main.showStatus(`"${item.label}" will be deleted when you click Save`);
+
+    // Refresh the dropdown preview with staged items (no storage save)
+    showManageDropdownPanelItems(parentTab);
   };
 
-  item.dropdownItems.push(newSubItem);
-
-  // Expand the parent item to show the new sub-item
-  item._expanded = true;
-
-  // Refresh the display
-  showManageDropdownPanelItems(parentTab);
-
-  // Automatically open edit panel for the new sub-item
-  const newSubItemPath = [...indexPath, item.dropdownItems.length - 1];
-  editDropdownItemByPath(parentTab, newSubItemPath);
+  if (skipConfirmation) {
+    performDelete();
+  } else {
+    // Show confirmation dialog
+    if (confirm(`Delete "${item.label}"?`)) {
+      performDelete();
+    }
+  }
 }
 
 /**
@@ -1641,8 +1710,12 @@ function performDropOperation(parentTab, sourcePath, targetPath, dropZone) {
     return;
   }
 
-  // Make a copy of the dragged item
+  console.log('Dragged item:', draggedItem);
+  console.log('Has nested items?', draggedItem.dropdownItems ? draggedItem.dropdownItems.length : 0);
+
+  // Make a copy of the dragged item (this preserves nested dropdownItems)
   const itemCopy = JSON.parse(JSON.stringify(draggedItem));
+  console.log('Item copy has nested items?', itemCopy.dropdownItems ? itemCopy.dropdownItems.length : 0);
 
   // Remove from source location
   removeItemByPath(parentTab.dropdownItems, sourcePath);
@@ -1665,16 +1738,30 @@ function performDropOperation(parentTab, sourcePath, targetPath, dropZone) {
     }
     targetItem.dropdownItems.push(itemCopy);
     targetItem._expanded = true; // Auto-expand to show the new item
+    console.log('After nesting, target item:', targetItem);
+    console.log('Target now has children:', targetItem.dropdownItems.length);
   } else if (dropZone === 'before') {
     // Insert before target
     insertItemAt(parentTab.dropdownItems, adjustedTargetPath, itemCopy, true);
+    console.log('Inserted before target');
   } else {
     // Insert after target
     insertItemAt(parentTab.dropdownItems, adjustedTargetPath, itemCopy, false);
+    console.log('Inserted after target');
   }
 
-  // Refresh the display
-  showManageDropdownPanelItems(parentTab);
+  console.log('After drop operation, parentTab.dropdownItems:', JSON.stringify(parentTab.dropdownItems, null, 2));
+
+  // Save the changes to storage
+  const tabs = SFTabs.main.getTabs();
+  SFTabs.storage.saveTabs(tabs).then(() => {
+    console.log('Tabs saved successfully after drag-and-drop');
+    // Refresh the display
+    showManageDropdownPanelItems(parentTab);
+  }).catch(error => {
+    console.error('Error saving tabs after drag-and-drop:', error);
+    SFTabs.main.showStatus('Error saving changes: ' + error.message, true);
+  });
 }
 
 /**
@@ -1720,7 +1807,8 @@ function promoteDropdownItem(parentTab, itemIndex) {
     return;
   }
 
-  // Create a new main tab from the dropdown item
+  // Create a new main tab from the dropdown item (preserve nested items if any)
+  const preservedDropdownItems = dropdownItem.dropdownItems || [];
   const newTab = {
     id: generateId(),
     label: dropdownItem.label,
@@ -1729,8 +1817,8 @@ function promoteDropdownItem(parentTab, itemIndex) {
     isObject: dropdownItem.isObject || false,
     isCustomUrl: dropdownItem.isCustomUrl || false,
     isSetupObject: false,
-    hasDropdown: false,
-    dropdownItems: [],
+    hasDropdown: preservedDropdownItems.length > 0,
+    dropdownItems: preservedDropdownItems,
     position: tabs.length
   };
 
@@ -1748,16 +1836,24 @@ function promoteDropdownItem(parentTab, itemIndex) {
   // Save and refresh
   SFTabs.storage.saveTabs(tabs).then(() => {
     console.log('Dropdown item promoted successfully');
-    SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" to main tab list`);
-    renderTabList();
+    if (preservedDropdownItems.length > 0) {
+      SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" with ${preservedDropdownItems.length} nested items to main tab list`);
+    } else {
+      SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" to main tab list`);
+    }
 
-    // Refresh the dropdown preview
+    // Refresh the dropdown preview (but keep action panel open for multiple edits)
     if (parentTab.dropdownItems.length > 0) {
       showManageDropdownPanelItems(parentTab);
     } else {
-      // Hide the inline form if no more dropdown items
-      hideTabForm();
+      // If no more items, hide the manage panel but keep action panel open
+      const domElements = SFTabs.main.getDOMElements();
+      if (domElements.manageDropdownPreview) {
+        domElements.manageDropdownPreview.style.display = 'none';
+      }
     }
+
+    // Don't call renderTabList() or hideTabForm() - keep action panel open for multiple edits
   }).catch(error => {
     console.error('Error promoting dropdown item:', error);
     SFTabs.main.showStatus('Error promoting item: ' + error.message, true);

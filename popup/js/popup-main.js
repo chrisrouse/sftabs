@@ -274,7 +274,10 @@ function migrateTabsToNewStructure(existingTabs) {
  * Show main content panel
  */
 function showMainContent() {
-  console.log('Showing main content');
+  console.log('🔙 Showing main content - closing action panel');
+  console.trace('showMainContent called from:');
+  // Clear the action panel tab reference since we're closing it
+  currentActionPanelTab = null;
   domElements.mainContent.classList.add('active');
   domElements.mainContent.style.display = 'block';
   domElements.settingsPanel.classList.remove('active');
