@@ -176,4 +176,62 @@ browser.runtime.onStartup.addListener(async () => {
   await migrateStorage();
 });
 
+/**
+ * Handle keyboard shortcuts
+ */
+browser.commands.onCommand.addListener(async (command) => {
+  console.log('SF Tabs: Keyboard command received:', command);
+
+  if (command.startsWith('open-tab-')) {
+    try {
+      // Extract position number from command (1-based)
+      const position = parseInt(command.split('-')[2]) - 1;
+
+      // Get custom tabs from storage
+      const result = await browser.storage.local.get('customTabs');
+      const tabs = result.customTabs || [];
+
+      // Filter to only top-level tabs that have a path (not folder-style tabs)
+      const eligibleTabs = tabs
+        .filter(tab => !tab.parentId && tab.path)
+        .sort((a, b) => a.position - b.position);
+
+      console.log('SF Tabs: Found', eligibleTabs.length, 'eligible tabs for shortcuts');
+
+      // Check if we have a tab at this position
+      if (eligibleTabs[position]) {
+        const targetTab = eligibleTabs[position];
+        console.log('SF Tabs: Navigating to tab:', targetTab.label, 'at position', position + 1);
+
+        // Get the active Salesforce tab
+        const [activeTab] = await browser.tabs.query({
+          active: true,
+          currentWindow: true
+        });
+
+        // Check if we're on a Salesforce page
+        if (activeTab && activeTab.url &&
+            (activeTab.url.includes('lightning.force.com') ||
+             activeTab.url.includes('salesforce.com') ||
+             activeTab.url.includes('salesforce-setup.com'))) {
+
+          // Send message to content script to navigate
+          await browser.tabs.sendMessage(activeTab.id, {
+            action: 'navigate_to_tab',
+            tab: targetTab
+          });
+
+          console.log('SF Tabs: Navigation message sent to content script');
+        } else {
+          console.warn('SF Tabs: Not on a Salesforce page, keyboard shortcut ignored');
+        }
+      } else {
+        console.warn('SF Tabs: No eligible tab at position', position + 1);
+      }
+    } catch (error) {
+      console.error('SF Tabs: Error handling keyboard command:', error);
+    }
+  }
+});
+
 console.log('SF Tabs: Background script initialized');

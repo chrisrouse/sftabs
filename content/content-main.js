@@ -542,19 +542,23 @@ function setupMessageListeners() {
         case 'refresh_tabs':
           handleRefreshTabs(sendResponse);
           break;
-          
+
         case 'navigate_to_url':
           handleNavigateToUrl(message, sendResponse);
           break;
-          
+
         case 'lightning_navigate':
           handleLightningNavigate(message, sendResponse);
           break;
-          
+
         case 'parse_navigation':
           handleParseNavigation(sendResponse);
           break;
-          
+
+        case 'navigate_to_tab':
+          handleNavigateToTab(message, sendResponse);
+          break;
+
         default:
           console.log('Unknown message action:', message.action);
           sendResponse({ success: false, error: 'Unknown action' });
@@ -622,17 +626,78 @@ function handleLightningNavigate(message, sendResponse) {
  */
 function handleParseNavigation(sendResponse) {
   console.log('Parsing navigation from content script');
-  
+
   if (window.SFTabsContent && window.SFTabsContent.navigationParser) {
     const navigation = window.SFTabsContent.navigationParser.parseCurrentObjectManagerNavigation();
-    sendResponse({ 
-      success: true, 
+    sendResponse({
+      success: true,
       navigation: navigation,
       count: navigation.length,
       pageInfo: window.SFTabsContent.navigationParser.getCurrentPageInfo()
     });
   } else {
     sendResponse({ success: false, error: 'Navigation parser not available' });
+  }
+}
+
+/**
+ * Handle navigate to tab request (from keyboard shortcut)
+ */
+function handleNavigateToTab(message, sendResponse) {
+  const { tab } = message;
+
+  if (!tab) {
+    console.error('SF Tabs: No tab provided to navigate to');
+    sendResponse({ success: false, error: 'No tab provided' });
+    return;
+  }
+
+  console.log('SF Tabs: Navigating to tab via keyboard shortcut:', tab.label);
+
+  // Build the full URL for the tab
+  const currentUrl = window.location.href;
+  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
+  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
+
+  let fullUrl = '';
+  const isObject = tab.isObject || false;
+  const isCustomUrl = tab.isCustomUrl || false;
+
+  if (isCustomUrl) {
+    let formattedPath = tab.path;
+    if (!formattedPath.startsWith('/')) {
+      formattedPath = '/' + formattedPath;
+    }
+    fullUrl = `${baseUrlRoot}${formattedPath}`;
+  } else if (isObject) {
+    fullUrl = `${baseUrlObject}${tab.path}`;
+  } else if (tab.path.includes('ObjectManager/')) {
+    fullUrl = `${baseUrlSetup}${tab.path}`;
+  } else {
+    fullUrl = `${baseUrlSetup}${tab.path}/home`;
+  }
+
+  console.log('SF Tabs: Keyboard shortcut navigating to URL:', fullUrl);
+
+  // Navigate based on tab settings
+  if (tab.openInNewTab) {
+    window.open(fullUrl, '_blank');
+    sendResponse({ success: true, method: 'new_tab' });
+  } else {
+    const lightningEnabled = isLightningNavigationEnabled();
+    if (lightningEnabled) {
+      console.log('SF Tabs: Using Lightning navigation for keyboard shortcut');
+      lightningNavigate({
+        navigationType: "url",
+        url: fullUrl
+      }, fullUrl);
+      sendResponse({ success: true, method: 'lightning' });
+    } else {
+      console.log('SF Tabs: Using regular navigation for keyboard shortcut');
+      window.location.href = fullUrl;
+      sendResponse({ success: true, method: 'regular' });
+    }
   }
 }
 

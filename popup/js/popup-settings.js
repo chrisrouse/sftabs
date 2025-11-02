@@ -258,6 +258,15 @@ function setupEventListeners() {
     });
   }
 
+  // Keyboard shortcuts button
+  const keyboardShortcutsButton = document.getElementById('keyboard-shortcuts-button');
+  if (keyboardShortcutsButton) {
+    keyboardShortcutsButton.addEventListener('click', () => {
+      console.log('Opening keyboard shortcuts page');
+      openKeyboardShortcutsPage();
+    });
+  }
+
   // Manage config button
   const manageConfigButton = document.getElementById('manage-config-button');
   if (manageConfigButton) {
@@ -271,6 +280,37 @@ function setupEventListeners() {
   }
 
   console.log('Settings event listeners setup complete');
+}
+
+/**
+ * Open the browser's keyboard shortcuts configuration page
+ */
+function openKeyboardShortcutsPage() {
+  // Detect browser and open appropriate shortcuts page
+  const isFirefox = typeof browser !== 'undefined' && browser.runtime && browser.runtime.getBrowserInfo;
+  const isChrome = typeof chrome !== 'undefined' && chrome.runtime && !isFirefox;
+
+  if (isFirefox) {
+    // Firefox: Open the addons page
+    // Note: Firefox doesn't have a direct link to shortcuts, so we open the main addons page
+    browser.tabs.create({ url: 'about:addons' }).then(() => {
+      window.close();
+    }).catch(err => {
+      console.error('Error opening Firefox addons page:', err);
+      SFTabs.main.showStatus('Could not open shortcuts page', true);
+    });
+  } else if (isChrome) {
+    // Chrome/Edge: Open the extensions shortcuts page
+    browser.tabs.create({ url: 'chrome://extensions/shortcuts' }).then(() => {
+      window.close();
+    }).catch(err => {
+      console.error('Error opening Chrome shortcuts page:', err);
+      SFTabs.main.showStatus('Could not open shortcuts page', true);
+    });
+  } else {
+    console.warn('Unknown browser, cannot open shortcuts page');
+    SFTabs.main.showStatus('Could not detect browser type', true);
+  }
 }
 
 /**

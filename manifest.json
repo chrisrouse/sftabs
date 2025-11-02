@@ -12,6 +12,7 @@
     }
   },
   "background": {
+    "service_worker": "background.js",
     "scripts": ["background.js"]
   },
   "permissions": [
@@ -70,5 +71,37 @@
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
+  },
+  "commands": {
+    "open-tab-1": {
+      "description": "Tab 1"
+    },
+    "open-tab-2": {
+      "description": "Tab 2"
+    },
+    "open-tab-3": {
+      "description": "Tab 3"
+    },
+    "open-tab-4": {
+      "description": "Tab 4"
+    },
+    "open-tab-5": {
+      "description": "Tab 5"
+    },
+    "open-tab-6": {
+      "description": "Tab 6"
+    },
+    "open-tab-7": {
+      "description": "Tab 7"
+    },
+    "open-tab-8": {
+      "description": "Tab 8"
+    },
+    "open-tab-9": {
+      "description": "Tab 9"
+    },
+    "open-tab-10": {
+      "description": "Tab 10"
+    }
   }
 }
