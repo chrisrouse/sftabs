@@ -285,6 +285,7 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       // If parent item has a URL, allow clicking to navigate
       if (navItem.path || navItem.url) {
         link.addEventListener('click', (e) => {
+          console.log('SF Tabs: Click handler called for nested item with URL:', navItem.label);
           e.preventDefault();
           e.stopPropagation();
           navigateToNavigationItem(navItem, parentTab);
@@ -294,6 +295,7 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       } else {
         // Prevent default click behavior for parent items without URLs
         link.addEventListener('click', (e) => {
+          console.log('SF Tabs: Click handler called for nested item without URL:', navItem.label);
           e.preventDefault();
           e.stopPropagation();
         });
@@ -301,6 +303,7 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     } else {
       // Items without children: navigate on click
       link.addEventListener('click', (e) => {
+        console.log('SF Tabs: Click handler called for regular item:', navItem.label);
         e.preventDefault();
         e.stopPropagation();
         navigateToNavigationItem(navItem, parentTab);
@@ -538,10 +541,43 @@ function navigateToMainTab(tab) {
  */
 function navigateToNavigationItem(navItem, parentTab) {
   console.log('SF Tabs: Navigating to navigation item:', navItem.label);
-  
+  console.log('SF Tabs: navItem details:', {
+    path: navItem.path,
+    url: navItem.url,
+    isObject: navItem.isObject,
+    isCustomUrl: navItem.isCustomUrl
+  });
+
   const baseUrl = window.location.origin;
-  const fullUrl = `${baseUrl}${navItem.path || navItem.url}`;
-  
+  console.log('SF Tabs: baseUrl (origin):', baseUrl);
+
+  let fullUrl = '';
+  let path = navItem.path || navItem.url || '';
+
+  // Check if path already includes full Lightning URL (nested navigation items)
+  if (path.startsWith('/lightning/')) {
+    // Path already has full Lightning path, just add origin
+    fullUrl = `${baseUrl}${path}`;
+    console.log('SF Tabs: Using full Lightning path');
+  } else if (navItem.isObject) {
+    // Object paths: /lightning/o/{objectName}/list or /lightning/o/{objectName}/view/{recordId}
+    fullUrl = `${baseUrl}/lightning/o/${path}`;
+    console.log('SF Tabs: Using object path');
+  } else if (navItem.isCustomUrl) {
+    // Custom URLs: ensure leading slash
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    fullUrl = `${baseUrl}${path}`;
+    console.log('SF Tabs: Using custom URL path');
+  } else {
+    // Setup paths: /lightning/setup/{setupPath}
+    fullUrl = `${baseUrl}/lightning/setup/${path}`;
+    console.log('SF Tabs: Using setup path');
+  }
+
+  console.log('SF Tabs: Final URL:', fullUrl);
+
   if (parentTab.openInNewTab) {
     window.open(fullUrl, '_blank');
   } else {

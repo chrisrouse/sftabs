@@ -452,19 +452,36 @@ if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cac
  */
 function navigateToNavigationItem(navItem, parentTab) {
   console.log('SF Tabs: Navigating to navigation item:', navItem.label);
-    console.log('SF Tabs: Navigation item data:', navItem);
-  console.log('SF Tabs: navItem.path:', navItem.path);
-  console.log('SF Tabs: navItem.url:', navItem.url);
+  console.log('SF Tabs: Navigation item data:', navItem);
 
   const baseUrl = window.location.origin;
-  let fullUrl = `${baseUrl}${navItem.path || navItem.url}`;
-  
-  // Convert old /one/one.app#/setup/ URLs to Lightning format
-  if (fullUrl.includes('/one/one.app#/setup/')) {
-    fullUrl = fullUrl.replace('/one/one.app#/setup/', '/lightning/setup/');
-    console.log('SF Tabs: Converted URL to Lightning format:', fullUrl);
+  let fullUrl = '';
+  let path = navItem.path || navItem.url || '';
+
+  // Check if path already includes full Lightning URL (nested navigation items)
+  if (path.startsWith('/lightning/')) {
+    // Path already has full Lightning path, just add origin
+    fullUrl = `${baseUrl}${path}`;
+    console.log('SF Tabs: Using full Lightning path');
+  } else if (navItem.isObject) {
+    // Object paths: /lightning/o/{objectName}/list or /lightning/o/{objectName}/view/{recordId}
+    fullUrl = `${baseUrl}/lightning/o/${path}`;
+    console.log('SF Tabs: Using object path');
+  } else if (navItem.isCustomUrl) {
+    // Custom URLs: ensure leading slash
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    fullUrl = `${baseUrl}${path}`;
+    console.log('SF Tabs: Using custom URL path');
+  } else {
+    // Setup paths: /lightning/setup/{setupPath}
+    fullUrl = `${baseUrl}/lightning/setup/${path}`;
+    console.log('SF Tabs: Using setup path');
   }
-  
+
+  console.log('SF Tabs: Final URL:', fullUrl);
+
   if (parentTab.openInNewTab) {
     window.open(fullUrl, '_blank');
   } else {
