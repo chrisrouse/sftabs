@@ -211,6 +211,137 @@ function createTabElementWithDropdown(tab) {
 }
 
 /**
+ * Recursively render dropdown items with nesting support
+ * @param {Array} items - Dropdown items to render
+ * @param {HTMLElement} container - Container to append items to
+ * @param {Object} parentTab - The parent tab object
+ * @param {HTMLElement} menu - The menu element (for closing after navigation)
+ * @param {number} level - Nesting level (0 = top level, 1 = nested)
+ */
+function renderDropdownItemsRecursive(items, container, parentTab, menu, level) {
+  items.forEach((navItem, index) => {
+    const itemLi = document.createElement('li');
+    itemLi.setAttribute('role', 'presentation');
+    itemLi.className = 'uiMenuItem';
+
+    // Add nesting level class for styling
+    if (level > 0) {
+      itemLi.classList.add(`nested-level-${level}`);
+    }
+
+    itemLi.setAttribute('data-aura-rendered-by', `sftabs-item-${level}-${index}`);
+    itemLi.setAttribute('data-aura-class', 'uiMenuItem');
+
+    const link = document.createElement('a');
+    link.setAttribute('role', 'menuitem');
+    link.setAttribute('href', 'javascript:void(0)');
+    link.setAttribute('title', navItem.label);
+    link.setAttribute('data-aura-rendered-by', `sftabs-link-${level}-${index}`);
+
+    // Add indentation for nested items
+    if (level > 0) {
+      link.style.paddingLeft = `${16 + (level * 16)}px`;
+    }
+
+    // Check if this item has nested children
+    const hasNestedItems = navItem.dropdownItems && navItem.dropdownItems.length > 0;
+
+    // Create label with optional expand icon for items with children
+    const labelContainer = document.createElement('span');
+    labelContainer.style.display = 'flex';
+    labelContainer.style.alignItems = 'center';
+    labelContainer.style.width = '100%';
+
+    if (hasNestedItems) {
+      // Add expand/collapse icon
+      const expandIcon = document.createElement('span');
+      expandIcon.className = 'nested-expand-icon';
+      expandIcon.style.marginRight = '6px';
+      expandIcon.style.fontSize = '10px';
+      expandIcon.style.transition = 'transform 0.2s';
+      expandIcon.textContent = '▶';
+      expandIcon.setAttribute('data-expanded', 'false');
+      labelContainer.appendChild(expandIcon);
+    }
+
+    // Create text node for label
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'uiOutputText';
+    labelSpan.setAttribute('data-aura-rendered-by', `sftabs-text-${level}-${index}`);
+    labelSpan.setAttribute('data-aura-class', 'uiOutputText');
+    labelSpan.textContent = navItem.label;
+
+    // Style nested item labels
+    if (level > 0) {
+      labelSpan.style.fontSize = '13px';
+      labelSpan.style.color = '#706e6b';
+    }
+
+    labelContainer.appendChild(labelSpan);
+    link.appendChild(labelContainer);
+
+    // Add click handler
+    if (hasNestedItems) {
+      // Items with children: toggle expand/collapse
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const expandIcon = link.querySelector('.nested-expand-icon');
+        const isExpanded = expandIcon.getAttribute('data-expanded') === 'true';
+        const nestedContainer = itemLi.querySelector('.nested-items-container');
+
+        if (nestedContainer) {
+          if (isExpanded) {
+            // Collapse
+            nestedContainer.style.display = 'none';
+            expandIcon.style.transform = 'rotate(0deg)';
+            expandIcon.setAttribute('data-expanded', 'false');
+          } else {
+            // Expand
+            nestedContainer.style.display = 'block';
+            expandIcon.style.transform = 'rotate(90deg)';
+            expandIcon.setAttribute('data-expanded', 'true');
+          }
+        }
+      });
+    } else {
+      // Items without children: navigate on click
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateToNavigationItem(navItem, parentTab);
+        menu.classList.remove('visible');
+        menu.style.display = 'none';
+      });
+    }
+
+    itemLi.appendChild(link);
+    container.appendChild(itemLi);
+
+    // Recursively render nested items if they exist
+    if (hasNestedItems && level < 1) { // Only support 2 levels (0 and 1)
+      const nestedContainer = document.createElement('div');
+      nestedContainer.className = 'nested-items-container';
+      nestedContainer.style.display = 'none'; // Hidden by default
+
+      // Create nested ul
+      const nestedUl = document.createElement('ul');
+      nestedUl.setAttribute('role', 'presentation');
+      nestedUl.className = 'scrollable';
+      nestedUl.style.listStyle = 'none';
+      nestedUl.style.margin = '0';
+      nestedUl.style.padding = '0';
+
+      renderDropdownItemsRecursive(navItem.dropdownItems, nestedUl, parentTab, menu, level + 1);
+
+      nestedContainer.appendChild(nestedUl);
+      itemLi.appendChild(nestedContainer);
+    }
+  });
+}
+
+/**
  * Create inline dropdown menu with SLDS native styling
  */
 function createInlineDropdownMenu(tab) {
@@ -239,41 +370,9 @@ function createInlineDropdownMenu(tab) {
   ul.className = 'scrollable';
   ul.setAttribute('data-aura-rendered-by', 'sftabs-dropdown-list');
 
-  // Add navigation items
+  // Add navigation items recursively (supports nested dropdownItems)
   const navigationItems = tab.dropdownItems || [];
-  navigationItems.forEach((navItem, index) => {
-    const itemLi = document.createElement('li');
-    itemLi.setAttribute('role', 'presentation');
-    itemLi.className = 'uiMenuItem';
-    itemLi.setAttribute('data-aura-rendered-by', `sftabs-item-${index}`);
-    itemLi.setAttribute('data-aura-class', 'uiMenuItem');
-
-    const link = document.createElement('a');
-    link.setAttribute('role', 'menuitem');
-    link.setAttribute('href', 'javascript:void(0)');
-    link.setAttribute('title', navItem.label);
-    link.setAttribute('data-aura-rendered-by', `sftabs-link-${index}`);
-
-    // Create text node for label
-    const labelSpan = document.createElement('span');
-    labelSpan.className = 'uiOutputText';
-    labelSpan.setAttribute('data-aura-rendered-by', `sftabs-text-${index}`);
-    labelSpan.setAttribute('data-aura-class', 'uiOutputText');
-    labelSpan.textContent = navItem.label;
-
-    link.appendChild(labelSpan);
-
-    // Add click handler
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      navigateToNavigationItem(navItem, tab);
-      menu.classList.remove('visible');
-    });
-
-    itemLi.appendChild(link);
-    ul.appendChild(itemLi);
-  });
+  renderDropdownItemsRecursive(navigationItems, ul, tab, menu, 0);
 
   menuInner.appendChild(ul);
   menu.appendChild(menuInner);
