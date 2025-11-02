@@ -821,36 +821,6 @@ function highlightActiveTab() {
 }
 
 /**
- * Add visual indicator showing current section
- */
-function addActiveIndicatorToTab(tab, currentNavItem) {
-  const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
-  if (!tabElement) return;
-  
-  // Remove existing indicator
-  const existingIndicator = tabElement.querySelector('.active-section-indicator');
-  if (existingIndicator) {
-    existingIndicator.remove();
-  }
-  
-  // Add new indicator
-  const indicator = document.createElement('div');
-  indicator.className = 'active-section-indicator';
-  indicator.style.cssText = `
-    font-size: 10px;
-    color: var(--lwc-brandPrimary);
-    margin-top: 2px;
-    text-align: center;
-    font-weight: 500;
-    line-height: 1;
-  `;
-  indicator.textContent = currentNavItem.label;
-  
-  const span = tabElement.querySelector('.title').parentNode;
-  span.appendChild(indicator);
-}
-
-/**
  * Refresh navigation for tabs matching the current page
  */
 function refreshNavigationForCurrentPage() {
@@ -1387,7 +1357,6 @@ window.SFTabsContent.tabRenderer = {
   isLightningNavigationEnabled,
   lightningNavigate,
   highlightActiveTab,
-  addActiveIndicatorToTab,
   refreshNavigationForCurrentPage,
   isCurrentPageMatchingTab,
   removeCustomTabs,

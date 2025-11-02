@@ -271,31 +271,6 @@ function navigateToTab(tab) {
 }
 
 /**
- * Fallback URL builder if utils not available
- */
-function buildFullUrlFallback(tab) {
-  const baseUrl = window.location.origin;
-  
-  if (tab.isCustomUrl) {
-    let formattedPath = tab.path;
-    if (!formattedPath.startsWith('/')) {
-      formattedPath = '/' + formattedPath;
-    }
-    return `${baseUrl}${formattedPath}`;
-  } else if (tab.isObject) {
-    return `${baseUrl}/lightning/o/${tab.path}`;
-  } else {
-    let fullPath;
-    if (tab.path.includes('ObjectManager/')) {
-      fullPath = tab.path;
-    } else {
-      fullPath = `${tab.path}/home`;
-    }
-    return `${baseUrl}/lightning/setup/${fullPath}`;
-  }
-}
-
-/**
  * Create tab actions (action panel button, new tab toggle and delete button)
  */
 function createTabActions(tab) {
@@ -1103,10 +1078,8 @@ function setupEventListeners() {
   // Refresh Navigation button
   if (domElements.refreshNavButton) {
     domElements.refreshNavButton.addEventListener('click', () => {
-      const editingTabId = SFTabs.main.getEditingTabId();
-      if (editingTabId && SFTabs.dropdowns) {
-        SFTabs.dropdowns.manualRefreshTabNavigation(editingTabId);
-      }
+      console.log('Manual navigation refresh requested - feature not yet implemented');
+      // TODO: Implement manual navigation refresh functionality
     });
   }
   
