@@ -182,9 +182,28 @@ function showDropdownPreview(items) {
 	const dropdownItemsList = document.getElementById('dropdown-items-list');
 	const dropdownCount = document.getElementById('dropdown-count');
 
+	// Get the setup button and help text elements
+	const setupButton = document.getElementById('setup-dropdown-button');
+	const helpText = document.querySelector('#object-dropdown-section .help-text');
+
 	if (!items || items.length === 0) {
 		dropdownItemsPreview.style.display = 'none';
+		// Show button and help text when no items exist
+		if (setupButton) {
+			setupButton.style.display = 'block';
+		}
+		if (helpText) {
+			helpText.style.display = 'block';
+		}
 		return;
+	}
+
+	// Hide the setup button and help text when items exist
+	if (setupButton) {
+		setupButton.style.display = 'none';
+	}
+	if (helpText) {
+		helpText.style.display = 'none';
 	}
 
 	// Update count
