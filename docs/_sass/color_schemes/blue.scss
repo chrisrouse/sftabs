@@ -1,0 +1,12 @@
+// Blue color scheme for SF Tabs
+// Uses blue color palette instead of default purple
+
+// Override link colors to use blue
+$link-color: $blue-300;
+$btn-primary-color: $blue-300;
+
+// Override focus colors
+$focus-color: $blue-200;
+
+// Override feedback colors to use blue
+$feedback-color: $blue-300;
