@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.2] - June 23, 2025
+- Fixed universal configuration that caused an issue with v1.3 not loading tabs in Chrome.
+- Added a link to the Changelog in Settings.
+
 ## [1.3.0] - June 22, 2025
 - Replace "Open in new tab" toggle with new icon.
 - Initialize default tabs to open in same tab rather than new tab.

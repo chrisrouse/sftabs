@@ -1,65 +1,5 @@
-// Browser compatibility layer - add this at the very top of import_export.js
-(function() {
-  'use strict';
-  
-  if (typeof browser === 'undefined' && typeof chrome !== 'undefined' && chrome.runtime) {
-    window.browser = {
-      runtime: {
-        getURL: chrome.runtime.getURL.bind(chrome.runtime)
-      },
-      storage: {
-        sync: {
-          get: function(keys) {
-            return new Promise((resolve, reject) => {
-              chrome.storage.sync.get(keys, (result) => {
-                if (chrome.runtime.lastError) {
-                  reject(new Error(chrome.runtime.lastError.message));
-                } else {
-                  resolve(result);
-                }
-              });
-            });
-          },
-          set: function(items) {
-            return new Promise((resolve, reject) => {
-              chrome.storage.sync.set(items, () => {
-                if (chrome.runtime.lastError) {
-                  reject(new Error(chrome.runtime.lastError.message));
-                } else {
-                  resolve();
-                }
-              });
-            });
-          },
-          clear: function() {
-            return new Promise((resolve, reject) => {
-              chrome.storage.sync.clear(() => {
-                if (chrome.runtime.lastError) {
-                  reject(new Error(chrome.runtime.lastError.message));
-                } else {
-                  resolve();
-                }
-              });
-            });
-          }
-        }
-      },
-      tabs: {
-        create: function(createProperties) {
-          return new Promise((resolve, reject) => {
-            chrome.tabs.create(createProperties, (tab) => {
-              if (chrome.runtime.lastError) {
-                reject(new Error(chrome.runtime.lastError.message));
-              } else {
-                resolve(tab);
-              }
-            });
-          });
-        }
-      }
-    };
-  }
-})();
+// Import/Export functionality for SF Tabs
+// Browser compatibility is handled by js/shared/browser-compat.js
 
 // DOM elements
 const exportButton = document.getElementById('export-button');
@@ -82,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Apply theme based on saved user settings
 function applyThemeFromStorage() {
-	browser.storage.sync.get('userSettings')
+	browser.storage.local.get('userSettings')
 		.then((result) => {
 			if (result.userSettings && result.userSettings.themeMode) {
 				const themeMode = result.userSettings.themeMode;
@@ -109,7 +49,7 @@ function applyThemeFromStorage() {
 function exportSettings() {
 	console.log('Exporting settings');
 
-	browser.storage.sync.get(['customTabs', 'userSettings'])
+	browser.storage.local.get(['customTabs', 'userSettings'])
 		.then((result) => {
 			// Create a configuration object containing all settings
 			const config = {
@@ -191,18 +131,51 @@ function handleFileSelect(event) {
 				throw new Error('Invalid configuration format: missing customTabs array');
 			}
 
-			// First clear existing storage
-			browser.storage.sync.clear()
+			// Save imported configuration in a single atomic operation
+			// This ensures storage.onChanged fires properly
+			console.log('📥 Importing config with', config.customTabs.length, 'tabs');
+			console.log('First imported tab:', config.customTabs[0]);
+
+			browser.storage.local.set({
+				customTabs: config.customTabs,
+				userSettings: config.userSettings || {}
+			})
 				.then(() => {
-					// Then save the imported configuration
-					return Promise.all([
-						browser.storage.sync.set({ customTabs: config.customTabs }),
-						browser.storage.sync.set({ userSettings: config.userSettings || {} })
-					]);
+					console.log('✅ Configuration saved to storage');
+
+					// Verify it was saved
+					return browser.storage.local.get(['customTabs']);
 				})
-				.then(() => {
+				.then((result) => {
+					console.log('✅ Verified storage contains', result.customTabs?.length || 0, 'tabs');
 					console.log('Configuration imported successfully');
-					showStatus('Configuration imported successfully. Changes will take effect when you reopen the extension.', false);
+
+					// Send refresh message to all Salesforce tabs
+					browser.tabs.query({})
+						.then(tabs => {
+							tabs.forEach(tab => {
+								if (tab.url && (tab.url.includes('lightning.force.com') || tab.url.includes('salesforce.com'))) {
+									browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
+										.then(() => {
+											console.log('✅ Tab refresh message sent to tab:', tab.id);
+										})
+										.catch(err => {
+											console.log('ℹ️ Could not send refresh to tab:', tab.id, err.message);
+										});
+								}
+							});
+						})
+						.catch(err => {
+							console.log('ℹ️ Could not query tabs:', err.message);
+						});
+
+					// Send message to popup to reload if it's open
+					browser.runtime.sendMessage({ action: 'reload_popup' })
+						.catch(err => {
+							console.log('ℹ️ No popup to reload:', err.message);
+						});
+
+					showStatus('Configuration imported successfully. Please reopen the popup to see your tabs.', false);
 				})
 				.catch(error => {
 					console.error('Error saving configuration:', error);

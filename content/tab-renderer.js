@@ -1,0 +1,1370 @@
+// content/tab-renderer.js
+// Tab rendering in Salesforce pages
+
+/**
+ * Initialize tabs in the given container
+ */
+function initTabs(tabContainer) {
+  if (!tabContainer) {
+    console.log("No tab container found");
+    return;
+  }
+
+  browser.storage.local.get(['customTabs', 'userSettings']).then(result => {
+    let tabsToUse = [];
+    
+    if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
+      tabsToUse = result.customTabs;
+    } else {
+      // Get default tabs from constants if available, otherwise use fallback
+      if (window.SFTabs && window.SFTabs.constants && window.SFTabs.constants.DEFAULT_TABS) {
+        tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
+      } else {
+        // Fallback default tabs
+        tabsToUse = [
+          {
+            id: 'default_tab_flows',
+            label: 'Flows',
+            path: 'Flows',
+            openInNewTab: false,
+            isObject: false,
+            isCustomUrl: false,
+            isSetupObject: false,
+            position: 0
+          },
+          {
+            id: 'default_tab_packages',
+            label: 'Installed Packages',
+            path: 'ImportedPackage',
+            openInNewTab: false,
+            isObject: false,
+            isCustomUrl: false,
+            isSetupObject: false,
+            position: 1
+          },
+          {
+            id: 'default_tab_users',
+            label: 'Users',
+            path: 'ManageUsers',
+            openInNewTab: false,
+            isObject: false,
+            isCustomUrl: false,
+            isSetupObject: false,
+            position: 2
+          },
+          {
+            id: 'default_tab_profiles',
+            label: 'Profiles',
+            path: 'EnhancedProfiles',
+            openInNewTab: false,
+            isObject: false,
+            isCustomUrl: false,
+            isSetupObject: false,
+            position: 3
+          },
+          {
+            id: 'default_tab_permsets',
+            label: 'Permission Sets',
+            path: 'PermSets',
+            openInNewTab: false,
+            isObject: false,
+            isCustomUrl: false,
+            isSetupObject: false,
+            position: 4
+          }
+        ];
+      }
+      browser.storage.local.set({ customTabs: tabsToUse });
+    }
+    
+    // Sort tabs by position (only top-level tabs)
+    const topLevelTabs = getTopLevelTabs(tabsToUse);
+
+    // Remove any existing custom tabs and overflow button
+    const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
+    existingTabs.forEach(tab => tab.remove());
+    const existingOverflow = tabContainer.querySelector('.sf-tabs-overflow-button');
+    if (existingOverflow) existingOverflow.remove();
+
+    // Add tabs to the container
+    for (const tab of topLevelTabs) {
+      const tabElement = createTabElementWithDropdown(tab);
+      tabContainer.appendChild(tabElement);
+    }
+
+    // Add click event listeners
+    addTabClickListeners(topLevelTabs);
+    highlightActiveTab();
+
+    // Try to refresh navigation for setup object tabs on current page
+    refreshNavigationForCurrentPage();
+
+    // Check for overflow and handle it (use longer timeout for accurate measurement)
+    setTimeout(() => {
+      handleTabOverflow(tabContainer, topLevelTabs);
+    }, 200);
+
+    console.log("Enhanced tabs successfully added to container");
+  }).catch(error => {
+    console.error("Error loading tabs:", error);
+  });
+}
+
+/**
+ * Get top-level tabs only (no parents)
+ */
+function getTopLevelTabs(allTabs) {
+  return allTabs.filter(tab => !tab.parentId).sort((a, b) => a.position - b.position);
+}
+
+/**
+ * Create tab element with dropdown functionality
+ */
+function createTabElementWithDropdown(tab) {
+  // Get the base URL for the current org
+  const currentUrl = window.location.href;
+  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
+  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
+  
+  // Determine the full URL based on tab type
+  const fullUrl = buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
+  
+  // Create the tab element
+  const li = document.createElement('li');
+  li.setAttribute('role', 'presentation');
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-custom-tab';
+  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+  li.setAttribute('data-tab-id', tab.id);
+  li.setAttribute('data-url', fullUrl);
+  
+  // Add dropdown indicator classes if tab has dropdown functionality
+  if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
+    li.classList.add('has-dropdown');
+
+    // Add navigation count
+    li.setAttribute('data-nav-count', tab.dropdownItems.length);
+  }
+  
+  // Create the anchor element
+  const a = document.createElement('a');
+  a.setAttribute('role', 'tab');
+  a.setAttribute('tabindex', '-1');
+  a.setAttribute('title', tab.label);
+  a.setAttribute('aria-selected', 'false');
+  a.setAttribute('href', fullUrl);
+  
+  // Set target based on openInNewTab property
+  if (tab.openInNewTab) {
+    a.setAttribute('target', '_blank');
+  } else {
+    a.setAttribute('target', '_self');
+  }
+  
+  // Add appropriate classes
+  a.classList.add('tabHeader', 'slds-context-bar__label-action');
+  
+  // Create span for tab title
+  const span = document.createElement('span');
+  span.classList.add('title', 'slds-truncate');
+  span.textContent = tab.label;
+  
+  // Add dropdown arrow if tab has dropdown functionality
+  if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
+    // Create dropdown arrow with ID for positioning reference
+    const dropdownArrow = document.createElement('span');
+    dropdownArrow.className = 'dropdown-arrow-inline';
+    dropdownArrow.setAttribute('id', `dropdown-arrow-${tab.id}`);
+    dropdownArrow.innerHTML = `
+    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small" style="width: 12px; height: 12px; fill: currentColor;">
+      <path d="M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21z"></path>
+    </svg>
+    `;
+    dropdownArrow.style.cssText = `
+      opacity: 0.7;
+      margin-left: 4px;
+      cursor: pointer;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+    `;
+
+    span.appendChild(dropdownArrow);
+
+    // Create dropdown menu using dropdownItems
+    const dropdown = createInlineDropdownMenu(tab);
+    li.appendChild(dropdown);
+
+    // Add dropdown toggle handler
+    dropdownArrow.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      toggleInlineDropdown(dropdown, dropdownArrow);
+    });
+  }
+  
+  // Assemble the elements
+  a.appendChild(span);
+  li.appendChild(a);
+  
+  return li;
+}
+
+/**
+ * Recursively render dropdown items with nesting support
+ * @param {Array} items - Dropdown items to render
+ * @param {HTMLElement} container - Container to append items to
+ * @param {Object} parentTab - The parent tab object
+ * @param {HTMLElement} menu - The menu element (for closing after navigation)
+ * @param {number} level - Nesting level (0 = top level, 1 = nested)
+ */
+function renderDropdownItemsRecursive(items, container, parentTab, menu, level) {
+  items.forEach((navItem, index) => {
+    const itemLi = document.createElement('li');
+    itemLi.setAttribute('role', 'presentation');
+    itemLi.className = 'uiMenuItem';
+
+    // Add nesting level class for styling
+    if (level > 0) {
+      itemLi.classList.add(`nested-level-${level}`);
+    }
+
+    itemLi.setAttribute('data-aura-rendered-by', `sftabs-item-${level}-${index}`);
+    itemLi.setAttribute('data-aura-class', 'uiMenuItem');
+
+    const link = document.createElement('a');
+    link.setAttribute('role', 'menuitem');
+    link.setAttribute('href', 'javascript:void(0)');
+    link.setAttribute('title', navItem.label);
+    link.setAttribute('data-aura-rendered-by', `sftabs-link-${level}-${index}`);
+
+    // Check if this item has nested children
+    const hasNestedItems = navItem.dropdownItems && navItem.dropdownItems.length > 0;
+
+    // Create label container
+    const labelContainer = document.createElement('span');
+    labelContainer.style.display = 'flex';
+    labelContainer.style.alignItems = 'center';
+    labelContainer.style.justifyContent = 'space-between';
+    labelContainer.style.width = '100%';
+
+    // Create text node for label
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'uiOutputText';
+    labelSpan.setAttribute('data-aura-rendered-by', `sftabs-text-${level}-${index}`);
+    labelSpan.setAttribute('data-aura-class', 'uiOutputText');
+    labelSpan.textContent = navItem.label;
+
+    // Style nested item labels
+    if (level > 0) {
+      labelSpan.style.fontSize = '13px';
+      labelSpan.style.color = '#706e6b';
+    }
+
+    labelContainer.appendChild(labelSpan);
+
+    if (hasNestedItems) {
+      // Add right-pointing caret for items with submenus
+      const caretIcon = document.createElement('span');
+      caretIcon.className = 'submenu-caret';
+      caretIcon.style.fontSize = '10px';
+      caretIcon.style.color = '#706e6b';
+      caretIcon.style.marginLeft = 'auto';
+      caretIcon.textContent = '▶';
+      labelContainer.appendChild(caretIcon);
+    }
+
+    link.appendChild(labelContainer);
+
+    // Add click/hover handlers
+    if (hasNestedItems) {
+      // Items with children: show submenu on hover, navigate on click if item has URL
+      // Note: The actual mouseenter handler will be set up after submenu is created below
+      itemLi.needsSubmenuHandler = true;
+
+      // If parent item has a URL, allow clicking to navigate
+      if (navItem.path || navItem.url) {
+        link.addEventListener('click', (e) => {
+          console.log('SF Tabs: Click handler called for nested item with URL:', navItem.label);
+          e.preventDefault();
+          e.stopPropagation();
+          navigateToNavigationItem(navItem, parentTab);
+          menu.classList.remove('visible');
+          menu.style.display = 'none';
+        });
+      } else {
+        // Prevent default click behavior for parent items without URLs
+        link.addEventListener('click', (e) => {
+          console.log('SF Tabs: Click handler called for nested item without URL:', navItem.label);
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      }
+    } else {
+      // Items without children: navigate on click
+      link.addEventListener('click', (e) => {
+        console.log('SF Tabs: Click handler called for regular item:', navItem.label);
+        e.preventDefault();
+        e.stopPropagation();
+        navigateToNavigationItem(navItem, parentTab);
+        menu.classList.remove('visible');
+        menu.style.display = 'none';
+      });
+    }
+
+    itemLi.appendChild(link);
+    container.appendChild(itemLi);
+
+    // Recursively render nested items as flyout submenu if they exist
+    if (hasNestedItems && level < 1) { // Only support 2 levels (0 and 1)
+      const submenuContainer = document.createElement('div');
+      submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
+      submenuContainer.style.display = 'none'; // Hidden by default
+      submenuContainer.style.position = 'fixed'; // Use fixed positioning relative to viewport
+      submenuContainer.style.minWidth = '200px';
+      submenuContainer.style.width = '240px';
+      submenuContainer.style.zIndex = '10000'; // Higher than parent menu
+      submenuContainer.style.backgroundColor = 'rgb(255, 255, 255)';
+      submenuContainer.style.border = '1px solid rgb(221, 219, 218)';
+      submenuContainer.style.borderRadius = '0.25rem';
+      submenuContainer.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
+      submenuContainer.style.padding = '0.5rem 0';
+      submenuContainer.style.transform = 'none'; // Prevent any transforms
+      submenuContainer.style.margin = '0'; // Prevent any margins
+
+      // Create nested menu inner wrapper
+      const submenuInner = document.createElement('div');
+      submenuInner.setAttribute('role', 'menu');
+
+      // Create nested ul
+      const nestedUl = document.createElement('ul');
+      nestedUl.setAttribute('role', 'presentation');
+      nestedUl.className = 'scrollable';
+      nestedUl.style.listStyle = 'none';
+      nestedUl.style.margin = '0';
+      nestedUl.style.padding = '0';
+
+      renderDropdownItemsRecursive(navItem.dropdownItems, nestedUl, parentTab, menu, level + 1);
+
+      submenuInner.appendChild(nestedUl);
+      submenuContainer.appendChild(submenuInner);
+
+      // Clean up any existing submenu for this item before creating new one
+      if (itemLi.submenuElement) {
+        itemLi.submenuElement.remove();
+      }
+
+      // Append submenu to document body to avoid overflow clipping
+      document.body.appendChild(submenuContainer);
+
+      // Store reference to submenu on the item for cleanup
+      itemLi.submenuElement = submenuContainer;
+
+      // Function to position submenu next to parent item with smart positioning
+      const positionSubmenu = () => {
+        const itemRect = itemLi.getBoundingClientRect();
+
+        // Get the parent menu's bounding box (the actual dropdown menu, not just the ul)
+        const parentMenu = menu;
+        const parentMenuRect = parentMenu.getBoundingClientRect();
+
+        const submenuWidth = 240;
+        const gap = 2;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // Try positioning to the right first (preferred for regular menus)
+        let left = parentMenuRect.right + gap;
+        let openRight = true;
+
+        // Check if it would go off the right edge
+        if (left + submenuWidth > viewportWidth) {
+          // Flip to the left side instead
+          left = parentMenuRect.left - submenuWidth - gap;
+          openRight = false;
+        }
+
+        // Check if opening left would go off the left edge
+        if (!openRight && left < 0) {
+          // Force right positioning even if it clips slightly
+          left = Math.min(viewportWidth - submenuWidth, parentMenuRect.right + gap);
+          openRight = true;
+        }
+
+        // Calculate top position aligned with hovered item
+        let top = itemRect.top;
+
+        // Check if menu would go off bottom of viewport
+        // Temporarily show to get actual height
+        submenuContainer.style.display = 'block';
+        submenuContainer.style.visibility = 'hidden';
+        const submenuHeight = submenuContainer.offsetHeight;
+        submenuContainer.style.display = 'none';
+        submenuContainer.style.visibility = 'visible';
+
+        // Adjust top if would go off bottom
+        if (top + submenuHeight > viewportHeight) {
+          top = Math.max(0, viewportHeight - submenuHeight - 10);
+        }
+
+        // Apply positioning
+        submenuContainer.style.setProperty('left', `${left}px`, 'important');
+        submenuContainer.style.setProperty('top', `${top}px`, 'important');
+        submenuContainer.style.setProperty('right', 'auto', 'important');
+        submenuContainer.style.setProperty('bottom', 'auto', 'important');
+      };
+
+      // Add hover delay management
+      let hideTimeout;
+
+      // Set up mouseenter handler to show and position submenu
+      itemLi.addEventListener('mouseenter', () => {
+        // Close other submenus at the same level
+        const siblings = container.querySelectorAll(':scope > li');
+        siblings.forEach(sibling => {
+          if (sibling !== itemLi && sibling.submenuElement) {
+            sibling.submenuElement.style.display = 'none';
+          }
+        });
+
+        // Position and show this submenu
+        positionSubmenu();
+        submenuContainer.style.display = 'block';
+      });
+
+      // Hide submenu when mouse leaves the parent item
+      itemLi.addEventListener('mouseleave', () => {
+        // Only hide if not moving to the submenu
+        hideTimeout = setTimeout(() => {
+          submenuContainer.style.display = 'none';
+        }, 100);
+      });
+
+      // Keep submenu visible when hovering over it
+      submenuContainer.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
+      });
+
+      // Hide submenu when leaving the submenu
+      submenuContainer.addEventListener('mouseleave', () => {
+        submenuContainer.style.display = 'none';
+      });
+
+      // Clean up submenu when menu is hidden
+      const observer = new MutationObserver(() => {
+        if (menu.style.display === 'none') {
+          submenuContainer.style.display = 'none';
+        }
+      });
+      observer.observe(menu, { attributes: true, attributeFilter: ['style'] });
+    }
+  });
+}
+
+/**
+ * Create inline dropdown menu with SLDS native styling
+ */
+function createInlineDropdownMenu(tab) {
+  // Main container with SLDS classes (hidden by default - will use 'visible' class to show)
+  const menu = document.createElement('div');
+  menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default positioned sftabs-custom-dropdown';
+  menu.setAttribute('id', `dropdown-menu-${tab.id}`);
+  menu.setAttribute('data-tab-id', tab.id);
+  menu.setAttribute('data-aura-rendered-by', 'sftabs-dropdown');
+  menu.setAttribute('data-aura-class', 'uiPopupTarget uiMenuList uiMenuList--default');
+
+  // Add explicit display control (hidden by default, shown with 'visible' class)
+  menu.style.display = 'none';
+  menu.style.position = 'absolute';
+  menu.style.zIndex = '9999';
+  menu.style.width = '240px'; // Match Object Manager dropdown width
+
+  // Inner menu wrapper
+  const menuInner = document.createElement('div');
+  menuInner.setAttribute('role', 'menu');
+  menuInner.setAttribute('data-aura-rendered-by', 'sftabs-dropdown-inner');
+
+  // Scrollable list container
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.setAttribute('data-aura-rendered-by', 'sftabs-dropdown-list');
+
+  // Add navigation items recursively (supports nested dropdownItems)
+  const navigationItems = tab.dropdownItems || [];
+  renderDropdownItemsRecursive(navigationItems, ul, tab, menu, 0);
+
+  menuInner.appendChild(ul);
+  menu.appendChild(menuInner);
+  return menu;
+}
+
+/**
+ * Toggle inline dropdown visibility using SLDS visible class
+ */
+function toggleInlineDropdown(dropdown, dropdownArrow) {
+  // Close all other SF Tabs custom dropdowns first (not native Salesforce dropdowns)
+  document.querySelectorAll('.sftabs-custom-dropdown').forEach(d => {
+    if (d !== dropdown) {
+      d.classList.remove('visible');
+      d.style.display = 'none';
+    }
+  });
+
+  const isCurrentlyVisible = dropdown.classList.contains('visible');
+
+  // Position the dropdown relative to the arrow before showing
+  if (!isCurrentlyVisible && dropdownArrow) {
+    // Get the arrow's position relative to the page
+    const arrowRect = dropdownArrow.getBoundingClientRect();
+    const parentLi = dropdown.parentElement;
+    const parentRect = parentLi.getBoundingClientRect();
+
+    // Calculate center of arrow relative to parent li
+    const topOffset = arrowRect.bottom - parentRect.top + 4; // 4px gap below arrow
+    const arrowCenterX = arrowRect.left + (arrowRect.width / 2) - parentRect.left;
+
+    // Position dropdown with center aligned to arrow center (nubbin will align with arrow)
+    dropdown.style.position = 'absolute';
+    dropdown.style.top = `${topOffset}px`;
+    dropdown.style.left = `${arrowCenterX}px`;
+    dropdown.style.right = 'auto';
+    dropdown.style.transform = 'translateX(-50%)'; // Center the dropdown under the arrow
+    dropdown.style.display = 'block';
+    dropdown.classList.add('visible');
+  } else {
+    dropdown.style.display = 'none';
+    dropdown.classList.remove('visible');
+  }
+}
+
+/**
+ * Navigate to main tab
+ */
+function navigateToMainTab(tab) {
+  console.log('SF Tabs: Navigating to main tab:', tab.label);
+  
+  const currentUrl = window.location.href;
+  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
+  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
+  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
+  
+  const fullUrl = buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
+  
+  if (tab.openInNewTab) {
+    window.open(fullUrl, '_blank');
+  } else {
+    const lightningEnabled = isLightningNavigationEnabled();
+    if (lightningEnabled) {
+      lightningNavigate({
+        navigationType: "url",
+        url: fullUrl
+      }, fullUrl);
+    } else {
+      window.location.href = fullUrl;
+    }
+  }
+}
+
+/**
+ * Navigate to a navigation item from dropdown
+ */
+function navigateToNavigationItem(navItem, parentTab) {
+  console.log('SF Tabs: Navigating to navigation item:', navItem.label);
+  console.log('SF Tabs: navItem details:', {
+    path: navItem.path,
+    url: navItem.url,
+    isObject: navItem.isObject,
+    isCustomUrl: navItem.isCustomUrl
+  });
+
+  const baseUrl = window.location.origin;
+  console.log('SF Tabs: baseUrl (origin):', baseUrl);
+
+  let fullUrl = '';
+  let path = navItem.path || navItem.url || '';
+
+  // Check if path already includes full Lightning URL (nested navigation items)
+  if (path.startsWith('/lightning/')) {
+    // Path already has full Lightning path, just add origin
+    fullUrl = `${baseUrl}${path}`;
+    console.log('SF Tabs: Using full Lightning path');
+  } else if (navItem.isObject) {
+    // Object paths: /lightning/o/{objectName}/list or /lightning/o/{objectName}/view/{recordId}
+    fullUrl = `${baseUrl}/lightning/o/${path}`;
+    console.log('SF Tabs: Using object path');
+  } else if (navItem.isCustomUrl) {
+    // Custom URLs: ensure leading slash
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    fullUrl = `${baseUrl}${path}`;
+    console.log('SF Tabs: Using custom URL path');
+  } else {
+    // Setup paths: /lightning/setup/{setupPath}
+    fullUrl = `${baseUrl}/lightning/setup/${path}`;
+    console.log('SF Tabs: Using setup path');
+  }
+
+  console.log('SF Tabs: Final URL:', fullUrl);
+
+  if (parentTab.openInNewTab) {
+    window.open(fullUrl, '_blank');
+  } else {
+    const lightningEnabled = isLightningNavigationEnabled();
+    if (lightningEnabled) {
+      lightningNavigate({
+        navigationType: "url",
+        url: fullUrl
+      }, fullUrl);
+    } else {
+      window.location.href = fullUrl;
+    }
+  }
+}
+
+/**
+ * Build full URL from tab configuration
+ */
+function buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject) {
+  // Check if this is a folder-style tab (no path)
+  if (!tab.path || !tab.path.trim()) {
+    // For folder tabs, return a javascript:void(0) to prevent navigation
+    return 'javascript:void(0)';
+  }
+
+  let fullUrl = '';
+  const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
+  const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
+
+  if (isCustomUrl) {
+    // For custom URLs, ensure there's a leading slash
+    let formattedPath = tab.path;
+
+    if (!formattedPath.startsWith('/')) {
+      formattedPath = '/' + formattedPath;
+    }
+
+    fullUrl = `${baseUrlRoot}${formattedPath}`;
+  } else if (isObject) {
+    // Object URLs: don't add /home suffix - use the path as is
+    fullUrl = `${baseUrlObject}${tab.path}`;
+  } else if (tab.path.includes('ObjectManager/')) {
+    // ObjectManager URLs don't need /home
+    fullUrl = `${baseUrlSetup}${tab.path}`;
+  } else {
+    // Setup URLs need /home at the end
+    fullUrl = `${baseUrlSetup}${tab.path}/home`;
+  }
+
+  return fullUrl;
+}
+
+/**
+ * Add click event listeners for tabs with Lightning navigation support
+ */
+function addTabClickListeners(tabs) {
+  tabs.forEach(tab => {
+    const links = document.querySelectorAll(`li[data-tab-id="${tab.id}"] a`);
+    links.forEach(link => {
+      link.addEventListener('click', event => {
+        // If clicking on dropdown arrow, don't navigate
+        if (event.target.closest('.dropdown-arrow-inline')) {
+          return;
+        }
+
+        // If clicking within the dropdown menu, don't navigate
+        if (event.target.closest('.sftabs-custom-dropdown')) {
+          return;
+        }
+
+        // Check if this is a folder-style tab (no path/URL)
+        const hasPath = tab.path && tab.path.trim();
+        const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+
+        if (!hasPath) {
+          // Folder-style tab without URL
+          event.preventDefault();
+          console.log('Folder-style tab clicked:', tab.label, 'Has dropdown:', hasDropdown);
+
+          // If it has a dropdown, open it
+          if (hasDropdown) {
+            const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+            const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
+            const dropdownArrow = tabElement?.querySelector('.dropdown-arrow-inline');
+
+            if (dropdown && dropdownArrow) {
+              toggleInlineDropdown(dropdown, dropdownArrow);
+            }
+          }
+          // If no dropdown and no path, just do nothing (it's a folder/placeholder)
+          return;
+        }
+
+        const lightningEnabled = isLightningNavigationEnabled();
+        console.log('Tab clicked:', tab.label, 'Lightning Navigation enabled:', lightningEnabled, 'Open in new tab:', tab.openInNewTab);
+
+        if (tab.openInNewTab) {
+          // For new tab, always use window.open
+          event.preventDefault();
+          window.open(link.href, '_blank');
+        } else {
+          // For same tab, check if Lightning navigation is enabled
+          if (lightningEnabled) {
+            // Use Lightning navigation
+            console.log('Using Lightning navigation for:', link.href);
+            event.preventDefault();
+            lightningNavigate({
+              navigationType: "url",
+              url: link.href
+            }, link.href);
+          } else {
+            // Lightning navigation is disabled, use regular navigation
+            console.log('Using regular navigation for:', link.href);
+            event.preventDefault();
+            window.location.href = link.href;
+          }
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Check if Lightning Navigation is enabled
+ */
+function isLightningNavigationEnabled() {
+  const localStorageValue = localStorage.getItem("lightningNavigation");
+  if (localStorageValue !== null) {
+    return JSON.parse(localStorageValue);
+  }
+  return true; // Default to true
+}
+
+/**
+ * Lightning navigation function
+ */
+function lightningNavigate(details, fallbackURL) {
+  if (!isLightningNavigationEnabled()) {
+    console.log("Lightning Navigation disabled - using regular navigation");
+    window.location.href = fallbackURL;
+    return;
+  }
+
+  console.log("Attempting Lightning navigation...");
+  
+  // Try inject.js window function approach first
+  if (window.sfTabsLightningNav) {
+    console.log("Using inject.js window function approach");
+    const success = window.sfTabsLightningNav({
+      navigationType: details.navigationType || "url",
+      url: details.url || fallbackURL,
+      recordId: details.recordId || null
+    });
+    
+    if (success) {
+      console.log("Lightning navigation initiated successfully");
+      return;
+    }
+  }
+  
+  // Final fallback
+  console.log("No Lightning navigation available - using regular navigation");
+  window.location.href = fallbackURL;
+}
+
+/**
+ * Highlight active custom tab and show current section
+ */
+function highlightActiveTab() {
+  const currentUrl = window.location.href;
+  
+  browser.storage.local.get('customTabs').then(result => {
+    const tabs = result.customTabs || [];
+    const topLevelTabs = getTopLevelTabs(tabs);
+    let matchedTab = null;
+
+    for (const tab of topLevelTabs) {
+      const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+      if (tabElement) {
+        const tabUrl = tabElement.getAttribute('data-url');
+        if (tabUrl && currentUrl.startsWith(tabUrl.split('/Details')[0])) { // Match base ObjectManager URL
+          matchedTab = tab;
+          break;
+        }
+      }
+    }
+
+    if (matchedTab) {
+      console.log(`Highlighting active custom tab: ${matchedTab.label}`);
+
+      // Remove active state from all tabs
+      const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
+      allTabs.forEach(tabEl => {
+        tabEl.classList.remove('slds-is-active');
+        const anchor = tabEl.querySelector('a');
+        if (anchor) anchor.setAttribute('aria-selected', 'false');
+      });
+
+      // Add active state to matched tab
+      const activeEl = document.querySelector(`li[data-tab-id="${matchedTab.id}"]`);
+      if (activeEl) {
+        activeEl.classList.add('slds-is-active');
+        const anchor = activeEl.querySelector('a');
+        if (anchor) anchor.setAttribute('aria-selected', 'true');
+      }
+      
+    }
+  }).catch(error => {
+    console.error("Error highlighting active tab:", error);
+  });
+}
+
+/**
+ * Refresh navigation for tabs matching the current page
+ */
+function refreshNavigationForCurrentPage() {
+  if (!window.SFTabsContent || !window.SFTabsContent.navigationParser) {
+    console.log("Navigation parser not available");
+    return;
+  }
+  
+  const currentPageInfo = window.SFTabsContent.navigationParser.getCurrentPageInfo();
+  if (!currentPageInfo || currentPageInfo.type !== 'objectManager') {
+    return;
+  }
+  
+  browser.storage.local.get('customTabs').then(result => {
+    const tabs = result.customTabs || [];
+    
+    // Find tabs that match the current page and need navigation refresh
+    const matchingTabs = tabs.filter(tab => 
+      tab.isSetupObject && 
+      isCurrentPageMatchingTab(tab, currentPageInfo) && 
+      (tab.needsNavigationRefresh || !tab.cachedNavigation || tab.cachedNavigation.length === 0)
+    );
+    
+    let updatedCount = 0;
+    matchingTabs.forEach(tab => {
+      const navigation = window.SFTabsContent.navigationParser.parseCurrentObjectManagerNavigation();
+      if (navigation.length > 0) {
+        tab.cachedNavigation = navigation;
+        tab.navigationLastUpdated = Date.now();
+        tab.needsNavigationRefresh = false;
+        updatedCount++;
+      }
+    });
+    
+    if (updatedCount > 0) {
+      browser.storage.local.set({ customTabs: tabs });
+      console.log(`Refreshed navigation for ${updatedCount} tabs`);
+    }
+  }).catch(error => {
+    console.error("Error refreshing navigation:", error);
+  });
+}
+
+/**
+ * Check if current page matches a tab's path
+ */
+function isCurrentPageMatchingTab(tab, currentPageInfo) {
+  if (tab.isSetupObject && currentPageInfo.type === 'objectManager') {
+    if (tab.path.startsWith('ObjectManager/')) {
+      const tabObjectName = tab.path.split('/')[1];
+      return tabObjectName === currentPageInfo.objectName;
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Remove all custom tabs from the container
+ */
+function removeCustomTabs(tabContainer) {
+  const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
+  existingTabs.forEach(tab => tab.remove());
+}
+
+/**
+ * Get tab by ID from storage
+ */
+async function getTabById(tabId) {
+  try {
+    const result = await browser.storage.local.get('customTabs');
+    const tabs = result.customTabs || [];
+    return tabs.find(tab => tab.id === tabId);
+  } catch (error) {
+    console.error("Error getting tab by ID:", error);
+    return null;
+  }
+}
+
+/**
+ * Check if tabs are currently visible/loaded
+ */
+function areTabsLoaded() {
+  const customTabs = document.querySelectorAll('.sf-tabs-custom-tab');
+  return customTabs.length > 0;
+}
+
+/**
+ * Force refresh all tabs (useful for debugging)
+ */
+function forceRefreshTabs() {
+  const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+  if (tabContainer) {
+    console.log("Force refreshing all tabs");
+    initTabs(tabContainer);
+  } else {
+    console.warn("No tab container found for force refresh");
+  }
+}
+
+/**
+ * Handle tab overflow - show/hide tabs and display overflow button if needed
+ * Uses two-pass approach: first check if overflow is needed, then calculate which tabs to hide
+ */
+function handleTabOverflow(tabContainer, topLevelTabs) {
+  if (!tabContainer) return;
+
+  // Remove existing overflow button if any
+  const existingOverflow = tabContainer.querySelector('.sf-tabs-overflow-button');
+  if (existingOverflow) existingOverflow.remove();
+
+  // Get all custom tab elements
+  const customTabElements = Array.from(tabContainer.querySelectorAll('.sf-tabs-custom-tab'));
+  if (customTabElements.length === 0) return;
+
+  // Show all tabs to measure properly
+  customTabElements.forEach(tab => {
+    tab.style.display = '';
+  });
+
+  // Force layout recalculation
+  tabContainer.offsetHeight;
+
+  // Get container dimensions
+  const containerRect = tabContainer.getBoundingClientRect();
+  const containerHeight = containerRect.height;
+
+  // Use the parent element's width (the visible viewport area) instead of the fixed container width
+  // The tabBarItems container has a fixed width, but we need to know the visible viewport width
+  const tabBarParent = tabContainer.parentElement;
+  let viewportWidth = tabBarParent ? tabBarParent.getBoundingClientRect().width : window.innerWidth - 100;
+
+  // Account for the left navbar (App Launcher + Setup label)
+  const leftNav = document.querySelector('.slds-context-bar__primary.navLeft');
+  if (leftNav) {
+    const leftNavWidth = leftNav.getBoundingClientRect().width;
+    viewportWidth -= leftNavWidth;
+  }
+
+  // Add buffer for right side margin/padding (increased to keep overflow menu away from edge)
+  const rightBuffer = 120; 
+  viewportWidth -= rightBuffer;
+
+  // Calculate space used by native Salesforce tabs
+  const nativeTabs = Array.from(tabContainer.querySelectorAll('.tabItem:not(.sf-tabs-custom-tab):not(.sf-tabs-overflow-button)'));
+  const nativeTabsWidth = nativeTabs.reduce((sum, tab) => {
+    const width = tab.getBoundingClientRect().width;
+    return sum + width;
+  }, 0);
+
+  // PASS 1: Check if all tabs fit WITHOUT overflow button
+  const availableWidthWithoutOverflow = viewportWidth - nativeTabsWidth;
+
+  // Measure total width of all custom tabs
+  let totalTabsWidth = 0;
+  customTabElements.forEach(tabElement => {
+    totalTabsWidth += tabElement.getBoundingClientRect().width;
+  });
+
+  console.log('Overflow check - Viewport:', viewportWidth, 'x', containerHeight, 'Native tabs:', nativeTabsWidth, 'Available:', availableWidthWithoutOverflow, 'Custom tabs total:', totalTabsWidth);
+
+  // Check if tabs have wrapped by checking container height
+  // A single row of tabs is typically 36-40px tall, wrapped tabs will be taller
+  const hasWrapped = containerHeight > 45;
+
+  // If all tabs fit (width check AND no wrapping), we're done!
+  if (totalTabsWidth <= availableWidthWithoutOverflow && !hasWrapped) {
+    console.log('All tabs fit - no overflow needed');
+    return; // No overflow needed
+  }
+
+  if (hasWrapped) {
+    console.log('Tabs have wrapped to multiple rows - overflow needed');
+  }
+
+  console.log('Tabs overflow detected - need More button');
+
+  // PASS 2: Tabs don't all fit - need overflow button
+  const overflowButtonWidth = 60;
+  const buffer = 5; // Small buffer for Pass 2 calculations
+  const availableWidth = viewportWidth - nativeTabsWidth - overflowButtonWidth - buffer;
+
+  // Determine which tabs fit and which should be hidden
+  let usedWidth = 0;
+  const visibleTabs = [];
+  const hiddenTabs = [];
+
+  customTabElements.forEach((tabElement, index) => {
+    const tabWidth = tabElement.getBoundingClientRect().width;
+
+    if (usedWidth + tabWidth <= availableWidth) {
+      usedWidth += tabWidth;
+      visibleTabs.push({ element: tabElement, tab: topLevelTabs[index] });
+    } else {
+      hiddenTabs.push({ element: tabElement, tab: topLevelTabs[index] });
+    }
+  });
+
+  // Hide overflow tabs
+  hiddenTabs.forEach(({ element }) => {
+    element.style.display = 'none';
+  });
+
+  // Create and add overflow button
+  const overflowButton = createOverflowButton(hiddenTabs.map(h => h.tab));
+  tabContainer.appendChild(overflowButton);
+}
+
+/**
+ * Create overflow button (chevron) for hidden tabs
+ */
+function createOverflowButton(hiddenTabs) {
+  const li = document.createElement('li');
+  li.setAttribute('role', 'presentation');
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-overflow-button';
+  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+
+  const a = document.createElement('a');
+  a.setAttribute('role', 'tab');
+  a.setAttribute('tabindex', '-1');
+  a.setAttribute('title', `${hiddenTabs.length} more tab${hiddenTabs.length > 1 ? 's' : ''}`);
+  a.setAttribute('aria-selected', 'false');
+  a.setAttribute('href', 'javascript:void(0)');
+  a.classList.add('tabHeader', 'slds-context-bar__label-action');
+
+  const span = document.createElement('span');
+  span.classList.add('title', 'slds-truncate');
+  span.innerHTML = `
+    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" style="width: 16px; height: 16px; fill: currentColor;">
+      <path d="M260 320c-11 0-21-4-29-12l-120-120c-8-8-8-21 0-29s21-8 29 0l120 120 120-120c8-8 21-8 29 0s8 21 0 29l-120 120c-8 8-18 12-29 12z" transform="rotate(270 260 260)"></path>
+    </svg>
+  `;
+
+  // Create overflow dropdown menu
+  const dropdown = createOverflowDropdown(hiddenTabs);
+  li.appendChild(dropdown);
+
+  // Add click handler
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleInlineDropdown(dropdown, span);
+  });
+
+  a.appendChild(span);
+  li.appendChild(a);
+
+  return li;
+}
+
+/**
+ * Create flyout submenu for overflow menu item (opens to the left)
+ */
+function createOverflowSubmenu(itemLi, tab, parentMenu) {
+  const submenuContainer = document.createElement('div');
+  submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
+  submenuContainer.style.display = 'none';
+  submenuContainer.style.position = 'fixed';
+  submenuContainer.style.minWidth = '200px';
+  submenuContainer.style.width = '240px';
+  submenuContainer.style.zIndex = '10001'; // Higher than overflow menu
+  submenuContainer.style.backgroundColor = 'rgb(255, 255, 255)';
+  submenuContainer.style.border = '1px solid rgb(221, 219, 218)';
+  submenuContainer.style.borderRadius = '0.25rem';
+  submenuContainer.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
+  submenuContainer.style.padding = '0.5rem 0';
+  submenuContainer.style.transform = 'none';
+  submenuContainer.style.margin = '0';
+
+  // Create submenu inner wrapper
+  const submenuInner = document.createElement('div');
+  submenuInner.setAttribute('role', 'menu');
+
+  // Create ul
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.style.listStyle = 'none';
+  ul.style.margin = '0';
+  ul.style.padding = '0';
+
+  // Render dropdown items using the existing recursive renderer
+  renderDropdownItemsRecursive(tab.dropdownItems, ul, tab, parentMenu, 0);
+
+  submenuInner.appendChild(ul);
+  submenuContainer.appendChild(submenuInner);
+
+  // Append to body
+  document.body.appendChild(submenuContainer);
+
+  // Store reference for cleanup
+  itemLi.submenuElement = submenuContainer;
+
+  // Position submenu with smart positioning (flip sides if needed)
+  const positionSubmenu = () => {
+    const itemRect = itemLi.getBoundingClientRect();
+    const parentMenuRect = parentMenu.getBoundingClientRect();
+
+    // Use the fixed width we set (240px) since offsetWidth may be 0 before display
+    const submenuWidth = 240;
+    const gap = 2;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Try positioning to the left first (preferred for overflow menu)
+    let left = parentMenuRect.left - submenuWidth - gap;
+    let openLeft = true;
+
+    // Check if it would go off the left edge
+    if (left < 0) {
+      // Flip to the right side instead
+      left = parentMenuRect.right + gap;
+      openLeft = false;
+    }
+
+    // Check if opening right would go off the right edge
+    if (!openLeft && (left + submenuWidth) > viewportWidth) {
+      // Force left positioning even if it clips slightly
+      left = Math.max(0, parentMenuRect.left - submenuWidth - gap);
+      openLeft = true;
+    }
+
+    // Calculate top position aligned with hovered item
+    let top = itemRect.top;
+
+    // Check if menu would go off bottom of viewport
+    // Temporarily show to get actual height
+    submenuContainer.style.display = 'block';
+    submenuContainer.style.visibility = 'hidden';
+    const submenuHeight = submenuContainer.offsetHeight;
+    submenuContainer.style.display = 'none';
+    submenuContainer.style.visibility = 'visible';
+
+    // Adjust top if would go off bottom
+    if (top + submenuHeight > viewportHeight) {
+      top = Math.max(0, viewportHeight - submenuHeight - 10);
+    }
+
+    // Apply positioning
+    submenuContainer.style.setProperty('left', `${left}px`, 'important');
+    submenuContainer.style.setProperty('top', `${top}px`, 'important');
+    submenuContainer.style.setProperty('right', 'auto', 'important');
+    submenuContainer.style.setProperty('bottom', 'auto', 'important');
+  };
+
+  // Hover delay management
+  let hideTimeout;
+
+  // Show submenu on hover
+  itemLi.addEventListener('mouseenter', () => {
+    // Close other submenus
+    const siblings = itemLi.parentElement.querySelectorAll(':scope > li');
+    siblings.forEach(sibling => {
+      if (sibling !== itemLi && sibling.submenuElement) {
+        sibling.submenuElement.style.display = 'none';
+      }
+    });
+
+    // Position and show this submenu
+    positionSubmenu();
+    submenuContainer.style.display = 'block';
+  });
+
+  // Hide submenu when leaving item
+  itemLi.addEventListener('mouseleave', () => {
+    hideTimeout = setTimeout(() => {
+      submenuContainer.style.display = 'none';
+    }, 100);
+  });
+
+  // Keep submenu visible when hovering over it
+  submenuContainer.addEventListener('mouseenter', () => {
+    clearTimeout(hideTimeout);
+  });
+
+  // Hide when leaving submenu
+  submenuContainer.addEventListener('mouseleave', () => {
+    submenuContainer.style.display = 'none';
+  });
+
+  // Clean up when parent menu closes
+  const observer = new MutationObserver(() => {
+    if (parentMenu.style.display === 'none') {
+      submenuContainer.style.display = 'none';
+    }
+  });
+  observer.observe(parentMenu, { attributes: true, attributeFilter: ['style'] });
+}
+
+/**
+ * Create overflow dropdown menu showing hidden tabs
+ */
+function createOverflowDropdown(hiddenTabs) {
+  const menu = document.createElement('div');
+  menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget uiMenuList uiMenuList--default positioned sftabs-custom-dropdown sftabs-overflow-dropdown';
+  menu.setAttribute('id', 'sftabs-overflow-dropdown');
+  menu.setAttribute('data-aura-rendered-by', 'sftabs-overflow');
+  menu.setAttribute('data-aura-class', 'uiPopupTarget uiMenuList uiMenuList--default');
+
+  menu.style.display = 'none';
+  menu.style.position = 'absolute';
+  menu.style.zIndex = '9999';
+  menu.style.width = '240px';
+
+  const menuInner = document.createElement('div');
+  menuInner.setAttribute('role', 'menu');
+  menuInner.setAttribute('data-aura-rendered-by', 'sftabs-overflow-inner');
+
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.setAttribute('data-aura-rendered-by', 'sftabs-overflow-list');
+
+  // Add each hidden tab to the dropdown
+  hiddenTabs.forEach((tab, index) => {
+    const itemLi = document.createElement('li');
+    itemLi.setAttribute('role', 'presentation');
+    itemLi.className = 'uiMenuItem';
+    itemLi.setAttribute('data-aura-rendered-by', `sftabs-overflow-item-${index}`);
+    itemLi.setAttribute('data-aura-class', 'uiMenuItem');
+
+    const link = document.createElement('a');
+    link.setAttribute('role', 'menuitem');
+    link.setAttribute('href', 'javascript:void(0)');
+    link.setAttribute('title', tab.label);
+    link.setAttribute('data-aura-rendered-by', `sftabs-overflow-link-${index}`);
+
+    // Check if this tab has dropdown items
+    const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+
+    // Create label container
+    const labelContainer = document.createElement('span');
+    labelContainer.style.display = 'flex';
+    labelContainer.style.alignItems = 'center';
+    labelContainer.style.justifyContent = 'space-between';
+    labelContainer.style.width = '100%';
+
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'uiOutputText';
+    labelSpan.setAttribute('data-aura-rendered-by', `sftabs-overflow-text-${index}`);
+    labelSpan.setAttribute('data-aura-class', 'uiOutputText');
+    labelSpan.textContent = tab.label;
+
+    labelContainer.appendChild(labelSpan);
+
+    // Add caret if has dropdown (pointing right like normal nested menus)
+    if (hasDropdown) {
+      const caretIcon = document.createElement('span');
+      caretIcon.className = 'submenu-caret';
+      caretIcon.style.fontSize = '10px';
+      caretIcon.style.color = '#706e6b';
+      caretIcon.style.marginLeft = 'auto';
+      caretIcon.textContent = '▶'; // Right-pointing caret (submenu opens left or right based on space)
+      labelContainer.appendChild(caretIcon);
+    }
+
+    link.appendChild(labelContainer);
+
+    // Add click handler to navigate to tab (if tab has a path)
+    if (tab.path && tab.path.trim()) {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateToMainTab(tab);
+        menu.classList.remove('visible');
+        menu.style.display = 'none';
+      });
+    } else if (!hasDropdown) {
+      // No path and no dropdown - prevent default
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
+
+    itemLi.appendChild(link);
+    ul.appendChild(itemLi);
+
+    // Add flyout submenu if tab has dropdown items
+    if (hasDropdown) {
+      createOverflowSubmenu(itemLi, tab, menu);
+    }
+  });
+
+  menuInner.appendChild(ul);
+  menu.appendChild(menuInner);
+  return menu;
+}
+
+// Setup global dropdown event handlers
+document.addEventListener('click', (e) => {
+  // Only close our custom dropdowns when clicking outside, not Salesforce native dropdowns or overflow button
+  if (!e.target.closest('.sf-tabs-custom-tab') && !e.target.closest('.sf-tabs-overflow-button')) {
+    document.querySelectorAll('.sftabs-custom-dropdown').forEach(dropdown => {
+      dropdown.classList.remove('visible');
+      dropdown.style.display = 'none';
+    });
+  }
+});
+
+// Setup window resize handler for overflow recalculation
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  console.log('Window resize detected');
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    const tabsLoaded = areTabsLoaded();
+    console.log('Resize handler: tabContainer found?', !!tabContainer, 'tabs loaded?', tabsLoaded);
+
+    if (tabContainer && tabsLoaded) {
+      console.log('Recalculating overflow after resize');
+      browser.storage.local.get('customTabs').then(result => {
+        const tabs = result.customTabs || [];
+        const topLevelTabs = getTopLevelTabs(tabs);
+        handleTabOverflow(tabContainer, topLevelTabs);
+      }).catch(error => {
+        console.error('Error recalculating overflow on resize:', error);
+      });
+    } else {
+      console.log('Resize handler: conditions not met for overflow recalculation');
+    }
+  }, 250); // Debounce resize events
+});
+
+// Export tab renderer functions
+window.SFTabsContent = window.SFTabsContent || {};
+window.SFTabsContent.tabRenderer = {
+  initTabs,
+  getTopLevelTabs,
+  createTabElement: createTabElementWithDropdown,
+  buildFullUrl,
+  addTabClickListeners,
+  isLightningNavigationEnabled,
+  lightningNavigate,
+  highlightActiveTab,
+  refreshNavigationForCurrentPage,
+  isCurrentPageMatchingTab,
+  removeCustomTabs,
+  getTabById,
+  areTabsLoaded,
+  forceRefreshTabs,
+  navigateToMainTab,
+  navigateToNavigationItem,
+  toggleInlineDropdown,
+  handleTabOverflow
+};

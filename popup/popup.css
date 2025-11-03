@@ -157,7 +157,8 @@
   
   /* Panel Visibility */
   #main-content,
-  #settings-panel {
+  #settings-panel,
+  #action-panel {
 	flex: 1;
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -165,10 +166,12 @@
 	background-color: var(--color-background);
 	margin-top: 56px;
 	height: calc(100% - 56px);
+	display: none;
   }
-  
+
   #main-content.active,
-  #settings-panel.active {
+  #settings-panel.active,
+  #action-panel.active {
 	display: block;
   }
 
@@ -176,10 +179,33 @@
 	margin-left: 8px;
   	margin-top: 8px;
 	}
-  
+
   .settings-panel {
 	padding: 0;
 	background-color: var(--color-background);
+  }
+
+  /* Action Panel */
+  #action-panel .section-header {
+	margin-left: 8px;
+	margin-top: 8px;
+  }
+
+  .action-panel {
+	padding: 0;
+	background-color: var(--color-background);
+  }
+
+  .action-panel-content {
+	margin: 8px;
+	background-color: var(--color-item-background);
+	border: 1px solid var(--color-border);
+	border-radius: 4px;
+	padding: 16px;
+  }
+
+  .action-panel-content p {
+	margin: 8px 0;
   }
   
   /* Tab List */
@@ -276,6 +302,11 @@
   .tab-item.being-dragged {
 	opacity: 0.3;
   }
+
+  .tab-item.drop-target-dropdown {
+	border: 2px dashed var(--slds-brand-primary);
+	background-color: var(--slds-brand-primary-transparent, rgba(0, 112, 210, 0.1));
+  }
   
   .drag-handle {
 	background-color: var(--color-border);
@@ -331,63 +362,6 @@
 	margin-top: 4px;
   }
   
-  /* Badge styles */
-  .tab-path .path-type {
-	display: inline-flex;
-	padding: 2px 8px;
-	border-radius: 4px;
-	font-size: 10px;
-	font-weight: 600;
-	margin-right: 8px;
-	margin-bottom: 0;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	align-self: flex-start;
-	min-width: 52px;
-	text-align: center;
-	justify-content: center;
-	color: white;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Compact mode badge */
-  .path-type-compact {
-	font-size: 10px;
-	width: 18px;
-	height: 18px;
-	min-width: 18px;
-	min-height: 18px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 4px;
-	font-weight: bold;
-	color: white;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	flex-shrink: 0;
-	margin-top: 0;
-  }
-  
-  .tab-item.compact-mode .tab-name {
-	padding-top: 0 !important;
-  }
-  
-  /* Badge colors */
-  .path-type.setup,
-  .path-type-compact.setup {
-	background-color: var(--slds-color-info, var(--slds-brand-primary));
-  }
-  
-  .path-type.object,
-  .path-type-compact.object {
-	background-color: var(--slds-color-success);
-  }
-  
-  .path-type.custom,
-  .path-type-compact.custom {
-	background-color: var(--slds-color-custom);
-  }
-  
   /* Path text styling */
   .tab-path .path-text {
 	display: block;
@@ -399,7 +373,29 @@
 	margin-top: 0;
 	padding-right: 0;
   }
-  
+
+  /* Dropdown indicator icon styling */
+  .dropdown-indicator {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 6px;
+	opacity: 0.6;
+	vertical-align: middle;
+  }
+
+  .dropdown-indicator svg {
+	width: 14px;
+	height: 14px;
+	stroke: currentColor;
+	fill: none;
+  }
+
+  /* Slightly smaller in compact mode */
+  .tab-item.compact-mode .dropdown-indicator svg {
+	width: 12px;
+	height: 12px;
+  }
+
   /* Tab Actions Styling */
   .tab-actions {
 	display: flex;
@@ -498,7 +494,39 @@
   .delete-button:hover svg path {
 	fill: var(--slds-color-error);
   }
-  
+
+  /* Edit Button */
+  .edit-button {
+	flex-shrink: 0;
+	background-color: transparent;
+	border: none;
+	border-radius: 4px;
+	width: 24px;
+	height: 24px;
+	min-width: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.2s;
+	padding: 0;
+	margin: 0 0 0 4px;
+  }
+
+  .edit-button:hover {
+	background-color: var(--color-border);
+  }
+
+  .edit-button svg {
+	stroke: var(--color-text);
+	width: 16px;
+	height: 16px;
+  }
+
+  .edit-button:hover svg {
+	stroke: var(--slds-brand-primary);
+  }
+
   /* Forms */
   .tab-form {
 	background-color: var(--color-item-background);
@@ -1085,4 +1113,37 @@
 
 .new-tab-button.new-tab-disabled:hover {
   background-color: var(--color-border);
+}
+
+/* Action Panel Button */
+.action-panel-button {
+  flex-shrink: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  margin: 0 4px 0 0;
+}
+
+.action-panel-button:hover {
+  background-color: var(--slds-brand-primary);
+}
+
+.action-panel-button svg {
+  stroke: var(--color-icon-fill);
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.action-panel-button:hover svg {
+  stroke: white;
 }

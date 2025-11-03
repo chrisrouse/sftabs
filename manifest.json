@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SF Tabs",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Add custom tabs to the Salesforce setup menu.",
   "author": "Chris Rouse",
   "homepage_url": "https://github.com/chrisrouse/sftabs",
@@ -10,6 +10,10 @@
       "id": "sftabs@github.chrisrouse",
       "strict_min_version": "109.0"
     }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
   },
   "permissions": [
     "activeTab",
@@ -40,12 +44,20 @@
         "*://*.salesforce.com/lightning/setup/*",
         "*://*.my.salesforce.com/lightning/setup/*"
       ],
-      "js": ["content.js"]
+      "js": [
+        "popup/js/shared/browser-compat.js",
+        "popup/js/shared/constants.js",
+        "popup/js/shared/utils.js",
+        "content/navigation-parser.js",
+        "content/tab-renderer.js",
+        "content/content-main.js"
+      ],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["inject.js"],
+      "resources": ["content/inject.js"],
       "matches": [
         "*://*.lightning.force.com/*",
         "*://*.salesforce-setup.com/*",
@@ -59,5 +71,37 @@
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
+  },
+  "commands": {
+    "open-tab-1": {
+      "description": "Tab 1"
+    },
+    "open-tab-2": {
+      "description": "Tab 2"
+    },
+    "open-tab-3": {
+      "description": "Tab 3"
+    },
+    "open-tab-4": {
+      "description": "Tab 4"
+    },
+    "open-tab-5": {
+      "description": "Tab 5"
+    },
+    "open-tab-6": {
+      "description": "Tab 6"
+    },
+    "open-tab-7": {
+      "description": "Tab 7"
+    },
+    "open-tab-8": {
+      "description": "Tab 8"
+    },
+    "open-tab-9": {
+      "description": "Tab 9"
+    },
+    "open-tab-10": {
+      "description": "Tab 10"
+    }
   }
 }
