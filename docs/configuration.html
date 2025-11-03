@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Reference - SF Tabs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">SF Tabs</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="user-guide.html">User Guide</a></li>
+                <li><a href="shortcuts.html">Shortcuts</a></li>
+                <li><a href="configuration.html" class="active">Configuration</a></li>
+                <li><a href="https://github.com/chrisrouse/sftabs" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section>
+            <h2>Configuration Reference</h2>
+            <p>This page documents the SF Tabs configuration file format, which is used when importing and exporting settings.</p>
+        </section>
+
+        <section>
+            <h2>Configuration File Structure</h2>
+            <p>The configuration file is a JSON file with two main sections:</p>
+            <ul>
+                <li><code>customTabs</code> - Array of tab definitions</li>
+                <li><code>userSettings</code> - Global user preferences</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Custom Tabs</h2>
+            <p>Each tab in the <code>customTabs</code> array has the following properties:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>id</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Unique identifier for the tab. Format: <code>default_tab_*</code> or <code>tab_[timestamp]_[random]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>label</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Display name of the tab</td>
+                    </tr>
+                    <tr>
+                        <td><code>path</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>URL path or Setup page name</td>
+                    </tr>
+                    <tr>
+                        <td><code>openInNewTab</code></td>
+                        <td>boolean</td>
+                        <td>Yes</td>
+                        <td>Whether to open the tab in a new browser tab</td>
+                    </tr>
+                    <tr>
+                        <td><code>isObject</code></td>
+                        <td>boolean</td>
+                        <td>No</td>
+                        <td>Whether this is an Object Manager tab</td>
+                    </tr>
+                    <tr>
+                        <td><code>isCustomUrl</code></td>
+                        <td>boolean</td>
+                        <td>No</td>
+                        <td>Whether this uses a custom Lightning URL path</td>
+                    </tr>
+                    <tr>
+                        <td><code>position</code></td>
+                        <td>number</td>
+                        <td>Yes</td>
+                        <td>Display order of the tab (0-indexed)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Tab Definitions</h3>
+
+            <h4>Setup Page Tab</h4>
+            <pre><code>{
+  "id": "default_tab_flows",
+  "label": "Flows",
+  "path": "Flows",
+  "openInNewTab": true,
+  "isObject": false,
+  "position": 0
+}</code></pre>
+
+            <h4>Object Manager Tab</h4>
+            <pre><code>{
+  "id": "tab_1755611450913_671",
+  "label": "Copado User Story List",
+  "path": "copado__User_Story__c/list",
+  "openInNewTab": true,
+  "isObject": true,
+  "isCustomUrl": false,
+  "position": 9
+}</code></pre>
+
+            <h4>Custom URL Tab</h4>
+            <pre><code>{
+  "id": "tab_1752504693080_749",
+  "label": "DigExp",
+  "path": "lightning/cms/home",
+  "openInNewTab": true,
+  "isObject": false,
+  "isCustomUrl": true,
+  "position": 8
+}</code></pre>
+        </section>
+
+        <section>
+            <h2>User Settings</h2>
+            <p>The <code>userSettings</code> object contains global preferences:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Type</th>
+                        <th>Options</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>themeMode</code></td>
+                        <td>string</td>
+                        <td>"light", "dark", "system"</td>
+                        <td>Visual theme for the extension popup</td>
+                    </tr>
+                    <tr>
+                        <td><code>compactMode</code></td>
+                        <td>boolean</td>
+                        <td>true, false</td>
+                        <td>Whether to use compact display mode</td>
+                    </tr>
+                    <tr>
+                        <td><code>skipDeleteConfirmation</code></td>
+                        <td>boolean</td>
+                        <td>true, false</td>
+                        <td>Whether to skip confirmation when deleting tabs</td>
+                    </tr>
+                    <tr>
+                        <td><code>lightningNavigation</code></td>
+                        <td>boolean</td>
+                        <td>true, false</td>
+                        <td>Whether to use Lightning navigation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example User Settings</h3>
+            <pre><code>{
+  "themeMode": "light",
+  "compactMode": true,
+  "skipDeleteConfirmation": true,
+  "lightningNavigation": true
+}</code></pre>
+        </section>
+
+        <section>
+            <h2>Complete Configuration Example</h2>
+            <p>Here's a complete configuration file example:</p>
+            <pre><code>{
+  "customTabs": [
+    {
+      "id": "default_tab_flows",
+      "label": "Flows",
+      "path": "Flows",
+      "openInNewTab": true,
+      "isObject": false,
+      "position": 0
+    },
+    {
+      "id": "default_tab_users",
+      "label": "Users",
+      "path": "ManageUsers",
+      "openInNewTab": true,
+      "position": 1,
+      "isObject": false,
+      "isCustomUrl": false
+    },
+    {
+      "id": "tab_1752504693080_749",
+      "label": "Digital Experience",
+      "path": "lightning/cms/home",
+      "openInNewTab": true,
+      "isObject": false,
+      "isCustomUrl": true,
+      "position": 2
+    }
+  ],
+  "userSettings": {
+    "themeMode": "light",
+    "compactMode": true,
+    "skipDeleteConfirmation": true,
+    "lightningNavigation": true
+  }
+}</code></pre>
+        </section>
+
+        <section>
+            <h2>Common Setup Page Paths</h2>
+            <p>Here are some commonly used Setup page paths:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Setup Page</th>
+                        <th>Path Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Flows</td>
+                        <td><code>Flows</code></td>
+                    </tr>
+                    <tr>
+                        <td>Users</td>
+                        <td><code>ManageUsers</code></td>
+                    </tr>
+                    <tr>
+                        <td>Profiles</td>
+                        <td><code>EnhancedProfiles</code></td>
+                    </tr>
+                    <tr>
+                        <td>Permission Sets</td>
+                        <td><code>PermSets</code></td>
+                    </tr>
+                    <tr>
+                        <td>Installed Packages</td>
+                        <td><code>ImportedPackage</code></td>
+                    </tr>
+                    <tr>
+                        <td>Custom Metadata Types</td>
+                        <td><code>CustomMetadata</code></td>
+                    </tr>
+                    <tr>
+                        <td>Sites</td>
+                        <td><code>SetupNetworks</code></td>
+                    </tr>
+                    <tr>
+                        <td>Paused Flows</td>
+                        <td><code>Pausedflows</code></td>
+                    </tr>
+                    <tr>
+                        <td>Process Builder</td>
+                        <td><code>ProcessAutomation</code></td>
+                    </tr>
+                    <tr>
+                        <td>Apex Classes</td>
+                        <td><code>ApexClasses</code></td>
+                    </tr>
+                    <tr>
+                        <td>Apex Triggers</td>
+                        <td><code>ApexTriggers</code></td>
+                    </tr>
+                    <tr>
+                        <td>Lightning Components</td>
+                        <td><code>LightningComponentBundles</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Sharing Configurations</h2>
+            <p>Configuration files can be shared with team members to standardize Setup tabs across your organization.</p>
+
+            <h3>Best Practices</h3>
+            <ul>
+                <li>Use descriptive labels that are clear to all team members</li>
+                <li>Order tabs by frequency of use</li>
+                <li>Include only tabs that are relevant to your team</li>
+                <li>Document any custom URLs or paths that might not be obvious</li>
+                <li>Test the configuration in a sandbox before sharing</li>
+            </ul>
+
+            <h3>Version Control</h3>
+            <p>Consider storing your team's configuration file in version control (e.g., Git) to track changes over time.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SF Tabs by Chris Rouse | <a href="https://github.com/chrisrouse/sftabs" target="_blank">GitHub Repository</a></p>
+            <p class="acknowledgement">Based on the original work of Warren Walter and the <a href="https://github.com/walters954/why-salesforce" target="_blank">Why Salesforce</a> plugin</p>
+        </div>
+    </footer>
+</body>
+</html>

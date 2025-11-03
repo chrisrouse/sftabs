@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide - SF Tabs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">SF Tabs</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="user-guide.html" class="active">User Guide</a></li>
+                <li><a href="shortcuts.html">Shortcuts</a></li>
+                <li><a href="configuration.html">Configuration</a></li>
+                <li><a href="https://github.com/chrisrouse/sftabs" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section>
+            <h2>User Guide</h2>
+            <p>Learn how to use SF Tabs to customize your Salesforce Setup experience.</p>
+        </section>
+
+        <section>
+            <h2>Opening the Extension</h2>
+            <p>There are two ways to access SF Tabs:</p>
+            <ol>
+                <li><strong>Click the extension icon</strong> in your browser toolbar</li>
+                <li><strong>Look for your tabs</strong> in the Salesforce Setup menu (they appear automatically when you're on a Setup page)</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Adding a New Tab</h2>
+            <h3>Method 1: Quick Add from Current Page</h3>
+            <ol class="steps">
+                <li>
+                    <strong>Navigate to a Salesforce Setup page</strong>
+                    <p>Go to the page you want to create a tab for (e.g., Flows, Users, Profiles)</p>
+                </li>
+                <li>
+                    <strong>Click the SF Tabs extension icon</strong>
+                    <p>The extension will detect the current page</p>
+                </li>
+                <li>
+                    <strong>Click "Add Current Page"</strong>
+                    <p>A new tab will be created with the page name and URL automatically filled in</p>
+                </li>
+            </ol>
+
+            <h3>Method 2: Manual Tab Creation</h3>
+            <ol class="steps">
+                <li>
+                    <strong>Open the extension popup</strong>
+                    <p>Click the SF Tabs icon in your browser toolbar</p>
+                </li>
+                <li>
+                    <strong>Click the "+" button</strong>
+                    <p>A new tab form will appear</p>
+                </li>
+                <li>
+                    <strong>Fill in the tab details</strong>
+                    <p>Enter a label and path for your tab (see Tab Types below)</p>
+                </li>
+                <li>
+                    <strong>Save your tab</strong>
+                    <p>Click Save and your tab will appear in the Setup menu</p>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Tab Types</h2>
+            <p>SF Tabs supports three types of tabs:</p>
+
+            <h3>Setup Pages</h3>
+            <p>Links to standard Salesforce Setup pages. Use the Setup page name as the path.</p>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li><code>Flows</code> - Links to Flow Builder</li>
+                <li><code>ManageUsers</code> - Links to Users page</li>
+                <li><code>EnhancedProfiles</code> - Links to Profiles page</li>
+                <li><code>PermSets</code> - Links to Permission Sets</li>
+            </ul>
+
+            <h3>Object Pages</h3>
+            <p>Links to Object Manager pages for standard or custom objects.</p>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li><code>Account/object</code> - Account Object Manager</li>
+                <li><code>Contact/object</code> - Contact Object Manager</li>
+                <li><code>Custom_Object__c/object</code> - Custom Object Manager</li>
+            </ul>
+
+            <h3>Custom URLs</h3>
+            <p>Links to any Lightning URL path within Salesforce.</p>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li><code>lightning/cms/home</code> - CMS/Digital Experience home</li>
+                <li><code>lightning/o/Account/list</code> - Account list view</li>
+                <li><code>copado__User_Story__c/list</code> - Custom object list view</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Editing Tabs</h2>
+            <ol class="steps">
+                <li>
+                    <strong>Open the extension popup</strong>
+                    <p>Click the SF Tabs icon</p>
+                </li>
+                <li>
+                    <strong>Click the edit icon (✏️) next to a tab</strong>
+                    <p>The tab details will appear in an editable form</p>
+                </li>
+                <li>
+                    <strong>Make your changes</strong>
+                    <p>Update the label, path, or other settings</p>
+                </li>
+                <li>
+                    <strong>Save your changes</strong>
+                    <p>Click Save to apply the updates</p>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Reordering Tabs</h2>
+            <p>You can easily reorder your tabs using drag and drop:</p>
+            <ol class="steps">
+                <li>
+                    <strong>Open the extension popup</strong>
+                    <p>Click the SF Tabs icon</p>
+                </li>
+                <li>
+                    <strong>Click and hold on a tab</strong>
+                    <p>The cursor will change to indicate you can drag</p>
+                </li>
+                <li>
+                    <strong>Drag the tab to its new position</strong>
+                    <p>Other tabs will move to make room</p>
+                </li>
+                <li>
+                    <strong>Release to drop</strong>
+                    <p>The new order is saved automatically</p>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Deleting Tabs</h2>
+            <ol class="steps">
+                <li>
+                    <strong>Open the extension popup</strong>
+                    <p>Click the SF Tabs icon</p>
+                </li>
+                <li>
+                    <strong>Click the delete icon (🗑️) next to a tab</strong>
+                    <p>A confirmation dialog will appear (unless you've disabled confirmations in settings)</p>
+                </li>
+                <li>
+                    <strong>Confirm deletion</strong>
+                    <p>Click OK to permanently remove the tab</p>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Keyboard Shortcuts</h2>
+            <p>SF Tabs supports keyboard shortcuts for quick access to your first 10 tabs.</p>
+
+            <h3>Default Shortcuts</h3>
+            <p>The extension provides keyboard shortcut commands for tabs 1-10, but you need to configure the key combinations in your browser:</p>
+
+            <h4>Firefox</h4>
+            <ol>
+                <li>Navigate to <code>about:addons</code></li>
+                <li>Click the gear icon and select "Manage Extension Shortcuts"</li>
+                <li>Find SF Tabs and set shortcuts for "Tab 1" through "Tab 10"</li>
+            </ol>
+
+            <h4>Chrome</h4>
+            <ol>
+                <li>Navigate to <code>chrome://extensions/shortcuts</code></li>
+                <li>Find SF Tabs in the list</li>
+                <li>Click the pencil icon to set shortcuts for "Tab 1" through "Tab 10"</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Settings</h2>
+            <p>Access settings by clicking the gear icon (⚙️) in the extension popup.</p>
+
+            <h3>Theme Mode</h3>
+            <ul>
+                <li><strong>Light:</strong> Light color scheme</li>
+                <li><strong>Dark:</strong> Dark color scheme</li>
+                <li><strong>System:</strong> Automatically match your system theme</li>
+            </ul>
+
+            <h3>Compact Mode</h3>
+            <p>Enable compact mode to display more tabs in less space. This reduces padding and font sizes.</p>
+
+            <h3>Skip Delete Confirmation</h3>
+            <p>When enabled, tabs will be deleted immediately without a confirmation dialog.</p>
+
+            <h3>Lightning Navigation</h3>
+            <p>Controls whether tabs use Lightning navigation. This is typically enabled by default.</p>
+        </section>
+
+        <section>
+            <h2>Import/Export Configuration</h2>
+            <p>You can backup your configuration or share it with team members.</p>
+
+            <h3>Export Configuration</h3>
+            <ol class="steps">
+                <li>
+                    <strong>Open settings</strong>
+                    <p>Click the gear icon in the extension popup</p>
+                </li>
+                <li>
+                    <strong>Click "Export Settings"</strong>
+                    <p>A JSON file will be downloaded to your computer</p>
+                </li>
+                <li>
+                    <strong>Save the file</strong>
+                    <p>Store it in a safe location for backup or sharing</p>
+                </li>
+            </ol>
+
+            <h3>Import Configuration</h3>
+            <ol class="steps">
+                <li>
+                    <strong>Open settings</strong>
+                    <p>Click the gear icon in the extension popup</p>
+                </li>
+                <li>
+                    <strong>Click "Import Settings"</strong>
+                    <p>A file picker will appear</p>
+                </li>
+                <li>
+                    <strong>Select your JSON file</strong>
+                    <p>Choose the configuration file you want to import</p>
+                </li>
+                <li>
+                    <strong>Confirm import</strong>
+                    <p>Your current settings will be replaced with the imported configuration</p>
+                </li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Troubleshooting</h2>
+
+            <h3>Tabs not appearing in Salesforce</h3>
+            <ul>
+                <li>Make sure you're on a Salesforce Setup page (URL should contain <code>/lightning/setup/</code>)</li>
+                <li>Try refreshing the page</li>
+                <li>Check that the extension is enabled in your browser</li>
+            </ul>
+
+            <h3>Tab links not working</h3>
+            <ul>
+                <li>Verify the path is correct for your org</li>
+                <li>Make sure you have permission to access that Setup page</li>
+                <li>Try using a different path format (Setup page name vs. Lightning URL)</li>
+            </ul>
+
+            <h3>Settings not saving</h3>
+            <ul>
+                <li>Check that the extension has storage permissions</li>
+                <li>Try disabling and re-enabling the extension</li>
+                <li>Clear browser cache and restart</li>
+            </ul>
+
+            <h3>Still having issues?</h3>
+            <p>Visit the <a href="https://github.com/chrisrouse/sftabs/issues" target="_blank">GitHub Issues</a> page to report bugs or ask for help.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SF Tabs by Chris Rouse | <a href="https://github.com/chrisrouse/sftabs" target="_blank">GitHub Repository</a></p>
+            <p class="acknowledgement">Based on the original work of Warren Walter and the <a href="https://github.com/walters954/why-salesforce" target="_blank">Why Salesforce</a> plugin</p>
+        </div>
+    </footer>
+</body>
+</html>
