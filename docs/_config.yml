@@ -4,7 +4,7 @@ baseurl: "/sftabs"
 url: "https://chrisrouse.github.io"
 
 # Theme settings
-theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs@v0.10.0
 color_scheme: blue
 
 # Logo and branding
