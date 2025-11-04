@@ -318,13 +318,8 @@ function createTabElementWithLightningAndDropdown(tab) {
   li.setAttribute('data-url', fullUrl);
   
   // Add dropdown indicator classes if tab has dropdown functionality
-  if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cachedNavigation.length > 0)) {
+  if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
     li.classList.add('has-dropdown');
-    
-    // Add navigation count if available
-    if (tab.cachedNavigation && tab.cachedNavigation.length > 0) {
-      li.setAttribute('data-nav-count', tab.cachedNavigation.length);
-    }
   }
   
   const a = document.createElement('a');
@@ -347,7 +342,7 @@ function createTabElementWithLightningAndDropdown(tab) {
   span.textContent = tab.label;
   
   // Add dropdown arrow if tab has dropdown functionality
-if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cachedNavigation.length > 0) || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
+if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
     // Create dropdown arrow with ID for positioning reference
     const dropdownArrow = document.createElement('span');
     dropdownArrow.className = 'dropdown-arrow-inline';
@@ -368,8 +363,8 @@ if (tab.hasDropdown || tab.autoSetupDropdown || (tab.cachedNavigation && tab.cac
 
     span.appendChild(dropdownArrow);
 
-    // Create dropdown menu if navigation data exists
-    if ((tab.cachedNavigation && tab.cachedNavigation.length > 0) || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
+    // Create dropdown menu if dropdown items exist
+    if (tab.dropdownItems && tab.dropdownItems.length > 0) {
       const dropdown = createInlineDropdownMenu(tab);
       li.appendChild(dropdown);
 

@@ -99,7 +99,6 @@ function initializeDOMElements() {
   domElements.isCustomUrlCheckbox = document.querySelector('#is-custom-url');
   domElements.isSetupObjectCheckbox = document.querySelector('#is-setup-object');
   domElements.hasDropdownCheckbox = document.querySelector('#has-dropdown');
-  domElements.autoSetupDropdownCheckbox = document.querySelector('#auto-setup-dropdown');
   
   // Buttons
   domElements.addTabButton = document.querySelector('#add-tab-button');
@@ -142,7 +141,6 @@ function initializeDOMElements() {
 
   // Form groups
   domElements.hasDropdownGroup = document.querySelector('.has-dropdown-group');
-  domElements.autoSetupDropdownGroup = document.querySelector('.auto-setup-dropdown-group');
   domElements.refreshNavGroup = document.querySelector('.refresh-nav-group');
   
   // Validate critical elements
@@ -352,44 +350,7 @@ function migrateTabsToNewStructure(existingTabs) {
       addedFields.push('hasDropdown');
     }
 
-    // Legacy dropdown fields (from old object-dropdown implementation)
-    // Only set these if they don't exist and we're not using the new dropdownItems format
-    if (!migratedTab.dropdownItems) {
-      if (migratedTab.autoSetupDropdown === undefined) {
-        migratedTab.autoSetupDropdown = tab.isSetupObject || false;
-        addedFields.push('autoSetupDropdown');
-      }
-
-      if (migratedTab.children === undefined) {
-        migratedTab.children = [];
-        addedFields.push('children');
-      }
-
-      if (migratedTab.parentId === undefined) {
-        migratedTab.parentId = null;
-        addedFields.push('parentId');
-      }
-
-      if (migratedTab.isExpanded === undefined) {
-        migratedTab.isExpanded = false;
-        addedFields.push('isExpanded');
-      }
-
-      if (migratedTab.cachedNavigation === undefined) {
-        migratedTab.cachedNavigation = [];
-        addedFields.push('cachedNavigation');
-      }
-
-      if (migratedTab.navigationLastUpdated === undefined) {
-        migratedTab.navigationLastUpdated = null;
-        addedFields.push('navigationLastUpdated');
-      }
-
-      if (migratedTab.needsNavigationRefresh === undefined) {
-        migratedTab.needsNavigationRefresh = false;
-        addedFields.push('needsNavigationRefresh');
-      }
-    }
+    // Legacy dropdown fields are no longer migrated - they will be stripped on save
 
     // Ensure position is set
     if (migratedTab.position === undefined) {
@@ -680,14 +641,7 @@ function saveActionPanelChanges() {
     tabData.dropdownItems = tab.pendingDropdownItems;
     console.log('tabData now has:', { hasDropdown: tabData.hasDropdown, itemCount: tabData.dropdownItems.length });
 
-    // Clean up old dropdown properties from previous implementation
-    tabData.autoSetupDropdown = undefined;
-    tabData.children = undefined;
-    tabData.parentId = undefined;
-    tabData.isExpanded = undefined;
-    tabData.cachedNavigation = undefined;
-    tabData.navigationLastUpdated = undefined;
-    tabData.needsNavigationRefresh = undefined;
+    // Legacy dropdown properties will be stripped by cleanTabForStorage()
   } else {
     console.log('❌ No pending dropdown items found on tab');
   }

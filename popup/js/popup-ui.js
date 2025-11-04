@@ -21,17 +21,17 @@ function renderTabList() {
     domElements.tabList.removeChild(domElements.tabList.firstChild);
   }
 
-  // Get only top-level tabs
-  const topLevelTabs = SFTabs.utils.getTopLevelTabs(SFTabs.main.getTabs());
+  // Get all tabs (sorted by position)
+  const allTabs = SFTabs.main.getTabs().sort((a, b) => a.position - b.position);
 
   // Show empty state if no tabs
-  if (topLevelTabs.length === 0) {
+  if (allTabs.length === 0) {
     domElements.emptyState.style.display = 'block';
   } else {
     domElements.emptyState.style.display = 'none';
 
     // Create tab items (including their dropdown functionality)
-    topLevelTabs.forEach((tab) => {
+    allTabs.forEach((tab) => {
       const tabItem = createTabElement(tab);
       domElements.tabList.appendChild(tabItem);
     });
@@ -602,19 +602,11 @@ function saveTabForm() {
   // Get dropdown-related checkbox values (if they exist)
   const isSetupObject = domElements.isSetupObjectCheckbox?.checked || false;
   const hasDropdown = domElements.hasDropdownCheckbox?.checked || false;
-  const autoSetupDropdown = domElements.autoSetupDropdownCheckbox?.checked || false;
-
-  // Validation for dropdown settings
-  if (autoSetupDropdown && !isSetupObject) {
-    SFTabs.main.showStatus('Auto Setup Dropdown requires Setup Object to be enabled', true);
-    return;
-  }
 
   // Only update dropdown-related fields
   const tabData = {
     isSetupObject: isSetupObject,
-    hasDropdown: hasDropdown,
-    autoSetupDropdown: autoSetupDropdown
+    hasDropdown: hasDropdown
   };
 
   // Get the tab being edited
@@ -664,15 +656,7 @@ function saveTabForm() {
     console.log('✅ Applying pending dropdown items from old form:', currentActionPanelTab.pendingDropdownItems.length);
     tabData.hasDropdown = true;
     tabData.dropdownItems = currentActionPanelTab.pendingDropdownItems;
-
-    // Clean up old dropdown properties from previous implementation
-    tabData.autoSetupDropdown = undefined;
-    tabData.children = undefined;
-    tabData.parentId = undefined;
-    tabData.isExpanded = undefined;
-    tabData.cachedNavigation = undefined;
-    tabData.navigationLastUpdated = undefined;
-    tabData.needsNavigationRefresh = undefined;
+    // Legacy dropdown properties will be stripped by cleanTabForStorage()
   }
 
   // Update existing tab and save all tabs (in case we added promoted tabs)
@@ -1051,18 +1035,16 @@ function setupEventListeners() {
   if (domElements.isSetupObjectCheckbox) {
     domElements.isSetupObjectCheckbox.addEventListener('change', () => {
       updateDropdownControlVisibility();
-      
+
       // Auto-enable dropdown options when Setup Object is checked
       if (domElements.isSetupObjectCheckbox.checked) {
         if (domElements.hasDropdownCheckbox) domElements.hasDropdownCheckbox.checked = true;
-        if (domElements.autoSetupDropdownCheckbox) domElements.autoSetupDropdownCheckbox.checked = true;
       }
     });
   }
-  
+
   // Other checkboxes that affect visibility
-  [domElements.hasDropdownCheckbox, domElements.autoSetupDropdownCheckbox, 
-   domElements.isObjectCheckbox, domElements.isCustomUrlCheckbox].forEach(checkbox => {
+  [domElements.hasDropdownCheckbox, domElements.isObjectCheckbox, domElements.isCustomUrlCheckbox].forEach(checkbox => {
     if (checkbox) {
       checkbox.addEventListener('change', updateDropdownControlVisibility);
     }

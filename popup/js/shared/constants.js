@@ -11,14 +11,8 @@ const TAB_STRUCTURE = {
   isCustomUrl: false,
   isSetupObject: false,
   hasDropdown: false,
-  autoSetupDropdown: false,
-  children: [],
-  parentId: null,
-  position: 0,
-  isExpanded: false,
-  cachedNavigation: [],
-  navigationLastUpdated: null,
-  needsNavigationRefresh: false
+  dropdownItems: [],
+  position: 0
 };
 
 // Default tabs configuration
@@ -32,14 +26,7 @@ const DEFAULT_TABS = [
     isCustomUrl: false,
     isSetupObject: false,
     hasDropdown: false,
-    autoSetupDropdown: false,
-    children: [],
-    parentId: null,
-    position: 0,
-    isExpanded: false,
-    cachedNavigation: [],
-    navigationLastUpdated: null,
-    needsNavigationRefresh: false
+    position: 0
   },
   {
     id: 'default_tab_packages',
@@ -50,14 +37,7 @@ const DEFAULT_TABS = [
     isCustomUrl: false,
     isSetupObject: false,
     hasDropdown: false,
-    autoSetupDropdown: false,
-    children: [],
-    parentId: null,
-    position: 1,
-    isExpanded: false,
-    cachedNavigation: [],
-    navigationLastUpdated: null,
-    needsNavigationRefresh: false
+    position: 1
   },
   {
     id: 'default_tab_users',
@@ -68,14 +48,7 @@ const DEFAULT_TABS = [
     isCustomUrl: false,
     isSetupObject: false,
     hasDropdown: false,
-    autoSetupDropdown: false,
-    children: [],
-    parentId: null,
-    position: 2,
-    isExpanded: false,
-    cachedNavigation: [],
-    navigationLastUpdated: null,
-    needsNavigationRefresh: false
+    position: 2
   },
   {
     id: 'default_tab_profiles',
@@ -86,14 +59,7 @@ const DEFAULT_TABS = [
     isCustomUrl: false,
     isSetupObject: false,
     hasDropdown: false,
-    autoSetupDropdown: false,
-    children: [],
-    parentId: null,
-    position: 3,
-    isExpanded: false,
-    cachedNavigation: [],
-    navigationLastUpdated: null,
-    needsNavigationRefresh: false
+    position: 3
   },
   {
     id: 'default_tab_permsets',
@@ -104,14 +70,7 @@ const DEFAULT_TABS = [
     isCustomUrl: false,
     isSetupObject: false,
     hasDropdown: false,
-    autoSetupDropdown: false,
-    children: [],
-    parentId: null,
-    position: 4,
-    isExpanded: false,
-    cachedNavigation: [],
-    navigationLastUpdated: null,
-    needsNavigationRefresh: false
+    position: 4
   }
 ];
 
@@ -140,7 +99,6 @@ const SELECTORS = {
   isCustomUrlCheckbox: '#is-custom-url',
   isSetupObjectCheckbox: '#is-setup-object',
   hasDropdownCheckbox: '#has-dropdown',
-  autoSetupDropdownCheckbox: '#auto-setup-dropdown',
   
   // Buttons
   addTabButton: '#add-tab-button',
@@ -162,7 +120,6 @@ const SELECTORS = {
   
   // Form groups
   hasDropdownGroup: '.has-dropdown-group',
-  autoSetupDropdownGroup: '.auto-setup-dropdown-group',
   refreshNavGroup: '.refresh-nav-group'
 };
 

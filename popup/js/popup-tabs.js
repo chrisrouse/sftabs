@@ -143,14 +143,7 @@ function enhancedAddTabForCurrentPage() {
           isCustomUrl: isCustomUrl,
           isSetupObject: isSetupObject,
           hasDropdown: isSetupObject, // Auto-enable dropdown for setup objects
-          autoSetupDropdown: isSetupObject,
-          children: [],
-          parentId: null,
-          position: existingTabs.length,
-          isExpanded: false,
-          cachedNavigation: [],
-          navigationLastUpdated: null,
-          needsNavigationRefresh: false
+          position: existingTabs.length
         };
 
         // Add the tab and save immediately
@@ -159,32 +152,6 @@ function enhancedAddTabForCurrentPage() {
         
         let pageType = isObject ? 'object' : (isCustomUrl ? 'custom' : 'setup');
         SFTabs.main.showStatus(`Added ${pageType} tab for "${name}"`, false);
-
-        // If it's a setup object, try to get navigation from content script (async)
-        if (isSetupObject) {
-          ensureBrowserAPI()
-            .then(browserAPI => browserAPI.tabs.sendMessage(tabs[0].id, {action: 'parse_navigation'}))
-            .then(response => {
-              if (response && response.success && response.navigation && response.navigation.length > 0) {
-                newTab.cachedNavigation = response.navigation;
-                newTab.navigationLastUpdated = Date.now();
-                console.log('Cached navigation data:', response.navigation);
-                
-                // Update the tab with navigation data
-                const updatedTabs = SFTabs.main.getTabs();
-                const tabIndex = updatedTabs.findIndex(t => t.id === newTab.id);
-                if (tabIndex >= 0) {
-                  updatedTabs[tabIndex] = newTab;
-                  SFTabs.storage.saveTabs(updatedTabs);
-                }
-                
-                SFTabs.main.showStatus(`Added setup object tab "${name}" with ${response.navigation.length} navigation items`, false);
-              }
-            })
-            .catch(error => {
-              console.log('Could not get navigation data:', error);
-            });
-        }
       }
     })
     .catch(error => {
@@ -345,14 +312,7 @@ function createTab(tabData) {
     isSetupObject: tabData.isSetupObject || false,
     hasDropdown: tabData.hasDropdown || false,
     dropdownItems: tabData.dropdownItems || [], // Support dropdown items on creation
-    autoSetupDropdown: tabData.autoSetupDropdown || false,
-    children: [],
-    parentId: tabData.parentId || null,
-    position: tabs.length,
-    isExpanded: false,
-    cachedNavigation: [],
-    navigationLastUpdated: null,
-    needsNavigationRefresh: tabData.isSetupObject && tabData.autoSetupDropdown
+    position: tabs.length
   };
 
   tabs.push(newTab);
@@ -373,12 +333,7 @@ function updateTab(tabId, updates) {
   // Apply updates
   const tab = tabs[tabIndex];
   Object.assign(tab, updates);
-  
-  // If setup object settings changed, mark for navigation refresh
-  if (updates.isSetupObject && updates.autoSetupDropdown && !tab.cachedNavigation.length) {
-    tab.needsNavigationRefresh = true;
-  }
-  
+
   return SFTabs.storage.saveTabs(tabs);
 }
 
@@ -493,11 +448,7 @@ function duplicateTab(tabId) {
     ...originalTab,
     id: generateId(),
     label: `${originalTab.label} (Copy)`,
-    position: tabs.length,
-    children: [], // Don't duplicate children
-    parentId: null, // Reset parent relationship
-    cachedNavigation: [...(originalTab.cachedNavigation || [])], // Copy navigation if present
-    needsNavigationRefresh: originalTab.isSetupObject && originalTab.autoSetupDropdown
+    position: tabs.length
   };
   
   tabs.push(duplicatedTab);

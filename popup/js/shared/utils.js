@@ -131,49 +131,11 @@ function buildFullUrl(tab, subPath = '') {
 }
 
 /**
- * Get top-level tabs only (no parents)
- */
-function getTopLevelTabs(allTabs) {
-  return allTabs.filter(tab => !tab.parentId).sort((a, b) => a.position - b.position);
-}
-
-/**
- * Get children of a specific tab
- */
-function getChildTabs(allTabs, parentId) {
-  return allTabs.filter(tab => tab.parentId === parentId).sort((a, b) => a.position - b.position);
-}
-
-/**
  * Check if tab can have dropdown
  */
 function canHaveDropdown(tab) {
   // Any tab can have manual dropdowns
   return true;
-}
-
-/**
- * Check if tab can have auto setup dropdown
- */
-function canHaveAutoSetupDropdown(tab) {
-  return tab.isSetupObject || (tab.path && tab.path.startsWith('ObjectManager/'));
-}
-
-/**
- * Migrate existing tabs to new structure
- */
-function migrateTabsToNewStructure(existingTabs) {
-  return existingTabs.map(tab => ({
-    ...tab,
-    hasDropdown: tab.isSetupObject || false,
-    autoSetupDropdown: tab.isSetupObject || false,
-    children: tab.children || [],
-    parentId: tab.parentId || null,
-    isExpanded: tab.isExpanded || false,
-    cachedNavigation: tab.cachedNavigation || [],
-    navigationLastUpdated: tab.navigationLastUpdated || null,
-    needsNavigationRefresh: tab.needsNavigationRefresh || false
-  }));
 }
 
 /**
@@ -233,11 +195,7 @@ if (typeof module !== 'undefined' && module.exports) {
     formatPathToName,
     getCurrentPageInfo,
     buildFullUrl,
-    getTopLevelTabs,
-    getChildTabs,
     canHaveDropdown,
-    canHaveAutoSetupDropdown,
-    migrateTabsToNewStructure,
     isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
     debounce,
@@ -253,11 +211,7 @@ if (typeof module !== 'undefined' && module.exports) {
     formatPathToName,
     getCurrentPageInfo,
     buildFullUrl,
-    getTopLevelTabs,
-    getChildTabs,
     canHaveDropdown,
-    canHaveAutoSetupDropdown,
-    migrateTabsToNewStructure,
     isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
     debounce,

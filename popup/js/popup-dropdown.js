@@ -236,15 +236,61 @@ function showDropdownPreview(items) {
 		labelSpan.textContent = `${index + 1}. ${item.label}`;
 		labelSpan.style.flex = '1';
 
+		// Button container
+		const buttonContainer = document.createElement('div');
+		buttonContainer.style.display = 'flex';
+		buttonContainer.style.gap = '4px';
+		buttonContainer.style.alignItems = 'center';
+
+		// Edit button
+		const editButton = document.createElement('button');
+		editButton.type = 'button';
+		editButton.textContent = 'Edit';
+		editButton.style.fontSize = '11px';
+		editButton.style.padding = '2px 6px';
+		editButton.style.background = '#0176d3';
+		editButton.style.color = 'white';
+		editButton.style.border = 'none';
+		editButton.style.borderRadius = '3px';
+		editButton.style.cursor = 'pointer';
+		editButton.title = 'Edit this item';
+
+		editButton.addEventListener('click', (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+			editObjectDropdownItem(index);
+		});
+
+		// Promote button
+		const promoteButton = document.createElement('button');
+		promoteButton.type = 'button';
+		promoteButton.textContent = '↑';
+		promoteButton.style.fontSize = '14px';
+		promoteButton.style.padding = '2px 6px';
+		promoteButton.style.background = '#0c9';
+		promoteButton.style.color = 'white';
+		promoteButton.style.border = 'none';
+		promoteButton.style.borderRadius = '3px';
+		promoteButton.style.cursor = 'pointer';
+		promoteButton.title = 'Promote to main tab';
+
+		promoteButton.addEventListener('click', (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+			promoteObjectDropdownItem(index);
+		});
+
+		// Delete button
 		const deleteButton = document.createElement('button');
-		deleteButton.type = 'button'; // Prevent form submission
+		deleteButton.type = 'button';
 		deleteButton.textContent = '×';
-		deleteButton.style.background = 'none';
+		deleteButton.style.fontSize = '16px';
+		deleteButton.style.padding = '2px 6px';
+		deleteButton.style.background = '#c23934';
+		deleteButton.style.color = 'white';
 		deleteButton.style.border = 'none';
-		deleteButton.style.color = '#c23934';
-		deleteButton.style.fontSize = '18px';
+		deleteButton.style.borderRadius = '3px';
 		deleteButton.style.cursor = 'pointer';
-		deleteButton.style.padding = '0 4px';
 		deleteButton.style.lineHeight = '1';
 		deleteButton.title = 'Remove this item';
 
@@ -254,9 +300,13 @@ function showDropdownPreview(items) {
 			removeDropdownItem(index);
 		});
 
+		buttonContainer.appendChild(editButton);
+		buttonContainer.appendChild(promoteButton);
+		buttonContainer.appendChild(deleteButton);
+
 		itemDiv.appendChild(dragHandle);
 		itemDiv.appendChild(labelSpan);
-		itemDiv.appendChild(deleteButton);
+		itemDiv.appendChild(buttonContainer);
 		dropdownItemsList.appendChild(itemDiv);
 
 		// Add drag-and-drop support
@@ -310,6 +360,115 @@ function removeDropdownItem(index) {
 	console.log('Item removed successfully');
 	// Don't save immediately - let the user click Save button to commit changes
 	// This allows removing multiple items before saving
+}
+
+/**
+ * Edit an object dropdown item by index
+ */
+function editObjectDropdownItem(index) {
+	console.log('editObjectDropdownItem called with index:', index);
+
+	const currentTab = SFTabs.main.getCurrentActionPanelTab();
+	if (!currentTab) {
+		console.warn('No currentActionPanelTab found, cannot edit item');
+		return;
+	}
+
+	// Get the item from either pending or saved dropdown items
+	let dropdownItem;
+	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
+		dropdownItem = currentTab.pendingDropdownItems[index];
+	} else {
+		const tabs = SFTabs.main.customTabs;
+		const tab = tabs.find(t => t.id === currentTab.id);
+		if (tab && tab.dropdownItems) {
+			dropdownItem = tab.dropdownItems[index];
+		}
+	}
+
+	if (!dropdownItem) {
+		SFTabs.main.showStatus('Dropdown item not found', true);
+		return;
+	}
+
+	// Create a temporary tab object for editing
+	const tempTab = {
+		id: `dropdown-${currentTab.id}-${index}`,
+		label: dropdownItem.label,
+		path: dropdownItem.path || '',
+		openInNewTab: false,
+		isObject: dropdownItem.isObject || false,
+		isCustomUrl: dropdownItem.isCustomUrl || false,
+		isSetupObject: false,
+		_isDropdownItemEdit: true,
+		_parentTabId: currentTab.id,
+		_dropdownItemIndex: index
+	};
+
+	// Open the action panel with this temp tab
+	if (SFTabs.main && SFTabs.main.showActionPanel) {
+		SFTabs.main.showActionPanel(tempTab);
+	}
+}
+
+/**
+ * Promote an object dropdown item to main tab by index
+ */
+function promoteObjectDropdownItem(index) {
+	console.log('promoteObjectDropdownItem called with index:', index);
+
+	const currentTab = SFTabs.main.getCurrentActionPanelTab();
+	if (!currentTab) {
+		console.warn('No currentActionPanelTab found, cannot promote item');
+		return;
+	}
+
+	// Get the item from either pending or saved dropdown items
+	let dropdownItems;
+	let dropdownItem;
+	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
+		dropdownItems = currentTab.pendingDropdownItems;
+		dropdownItem = dropdownItems[index];
+	} else {
+		const tabs = SFTabs.main.customTabs;
+		const tab = tabs.find(t => t.id === currentTab.id);
+		if (tab && tab.dropdownItems) {
+			dropdownItems = tab.dropdownItems;
+			dropdownItem = dropdownItems[index];
+		}
+	}
+
+	if (!dropdownItem) {
+		SFTabs.main.showStatus('Dropdown item not found', true);
+		return;
+	}
+
+	// Initialize stagedDropdownItems if needed
+	if (!currentTab.stagedDropdownItems) {
+		currentTab.stagedDropdownItems = dropdownItems ? [...dropdownItems] : [];
+	}
+
+	// Remove the item from staged dropdown items
+	currentTab.stagedDropdownItems.splice(index, 1);
+
+	// Store the promoted item temporarily so we can apply it on Save
+	if (!currentTab.stagedPromotions) {
+		currentTab.stagedPromotions = [];
+	}
+	currentTab.stagedPromotions.push({
+		label: dropdownItem.label,
+		path: dropdownItem.path || '',
+		isObject: dropdownItem.isObject || false,
+		isCustomUrl: dropdownItem.isCustomUrl || false,
+		dropdownItems: dropdownItem.dropdownItems || []
+	});
+
+	// Show status message
+	SFTabs.main.showStatus(`"${dropdownItem.label}" will be promoted when you click Save`);
+	console.log('Staged promotion for:', dropdownItem.label);
+
+	// Refresh the preview with staged items
+	showDropdownPreview(currentTab.stagedDropdownItems);
 }
 
 /**

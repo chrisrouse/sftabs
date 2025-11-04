@@ -967,50 +967,6 @@ function highlightActiveTab() {
 }
 
 /**
- * Refresh navigation for tabs matching the current page
- */
-function refreshNavigationForCurrentPage() {
-  if (!window.SFTabsContent || !window.SFTabsContent.navigationParser) {
-    console.log("Navigation parser not available");
-    return;
-  }
-  
-  const currentPageInfo = window.SFTabsContent.navigationParser.getCurrentPageInfo();
-  if (!currentPageInfo || currentPageInfo.type !== 'objectManager') {
-    return;
-  }
-  
-  browser.storage.local.get('customTabs').then(result => {
-    const tabs = result.customTabs || [];
-    
-    // Find tabs that match the current page and need navigation refresh
-    const matchingTabs = tabs.filter(tab => 
-      tab.isSetupObject && 
-      isCurrentPageMatchingTab(tab, currentPageInfo) && 
-      (tab.needsNavigationRefresh || !tab.cachedNavigation || tab.cachedNavigation.length === 0)
-    );
-    
-    let updatedCount = 0;
-    matchingTabs.forEach(tab => {
-      const navigation = window.SFTabsContent.navigationParser.parseCurrentObjectManagerNavigation();
-      if (navigation.length > 0) {
-        tab.cachedNavigation = navigation;
-        tab.navigationLastUpdated = Date.now();
-        tab.needsNavigationRefresh = false;
-        updatedCount++;
-      }
-    });
-    
-    if (updatedCount > 0) {
-      browser.storage.local.set({ customTabs: tabs });
-      console.log(`Refreshed navigation for ${updatedCount} tabs`);
-    }
-  }).catch(error => {
-    console.error("Error refreshing navigation:", error);
-  });
-}
-
-/**
  * Check if current page matches a tab's path
  */
 function isCurrentPageMatchingTab(tab, currentPageInfo) {

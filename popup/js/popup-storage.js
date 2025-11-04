@@ -33,6 +33,49 @@ async function getTabs() {
 }
 
 /**
+ * Clean temporary UI state fields from a tab before saving
+ * Removes fields that should not be persisted to storage
+ */
+function cleanTabForStorage(tab) {
+  const cleanedTab = { ...tab };
+
+  // Remove temporary staging fields (used only during edit sessions)
+  delete cleanedTab.stagedDropdownItems;
+  delete cleanedTab.stagedPromotions;
+  delete cleanedTab.pendingDropdownItems;
+
+  // Remove legacy fields from old dropdown implementation
+  delete cleanedTab.autoSetupDropdown;
+  delete cleanedTab.children;
+  delete cleanedTab.parentId;
+  delete cleanedTab.isExpanded;
+  delete cleanedTab.cachedNavigation;
+  delete cleanedTab.navigationLastUpdated;
+  delete cleanedTab.needsNavigationRefresh;
+
+  // Clean nested dropdown items (remove _expanded UI state)
+  if (cleanedTab.dropdownItems && Array.isArray(cleanedTab.dropdownItems)) {
+    cleanedTab.dropdownItems = cleanedTab.dropdownItems.map(item => {
+      const cleanedItem = { ...item };
+      delete cleanedItem._expanded;
+
+      // Recursively clean nested dropdown items
+      if (cleanedItem.dropdownItems && Array.isArray(cleanedItem.dropdownItems)) {
+        cleanedItem.dropdownItems = cleanedItem.dropdownItems.map(nestedItem => {
+          const cleanedNested = { ...nestedItem };
+          delete cleanedNested._expanded;
+          return cleanedNested;
+        });
+      }
+
+      return cleanedItem;
+    });
+  }
+
+  return cleanedTab;
+}
+
+/**
  * Save tabs to browser storage
  */
 async function saveTabs(tabs) {
@@ -40,15 +83,18 @@ async function saveTabs(tabs) {
     // Sort tabs by position before saving
     const sortedTabs = [...tabs].sort((a, b) => a.position - b.position);
 
+    // Clean temporary fields from each tab before saving
+    const cleanedTabs = sortedTabs.map(tab => cleanTabForStorage(tab));
+
     // Save tabs and update extension version marker
     await browser.storage.local.set({
-      customTabs: sortedTabs,
+      customTabs: cleanedTabs,
       extensionVersion: '1.4.0'
     });
-    console.log('Tabs saved successfully to storage');
+    console.log('Tabs saved successfully to storage (cleaned', cleanedTabs.length, 'tabs)');
 
-    // Update the main state
-    SFTabs.main.setTabs(sortedTabs);
+    // Update the main state with cleaned tabs
+    SFTabs.main.setTabs(cleanedTabs);
 
     // Re-render the UI
     SFTabs.ui.renderTabList();
@@ -135,14 +181,17 @@ async function clearAllStorage() {
 function exportConfiguration() {
   const tabs = SFTabs.main.getTabs();
   const settings = SFTabs.main.getUserSettings();
-  
+
+  // Clean temporary fields from tabs before export
+  const cleanedTabs = tabs.map(tab => cleanTabForStorage(tab));
+
   const config = {
-    customTabs: tabs,
+    customTabs: cleanedTabs,
     userSettings: settings,
     exportedAt: new Date().toISOString(),
     version: '1.4.0'
   };
-  
+
   return config;
 }
 
