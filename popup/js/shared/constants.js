@@ -119,8 +119,7 @@ const DEFAULT_TABS = [
 const DEFAULT_SETTINGS = {
   themeMode: 'light',
   compactMode: false,
-  skipDeleteConfirmation: false,
-  lightningNavigation: true
+  skipDeleteConfirmation: false
 };
 
 // UI selectors
@@ -159,7 +158,6 @@ const SELECTORS = {
   // Settings
   compactModeCheckbox: '#compact-mode',
   skipDeleteConfirmationCheckbox: '#skip-delete-confirmation',
-  lightningNavigationCheckbox: '#lightning-navigation',
   settingsResetButton: '#settings-reset-button',
   
   // Form groups

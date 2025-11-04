@@ -241,29 +241,22 @@ function navigateToTab(tab) {
   if (tab.openInNewTab) {
     window.open(fullUrl, '_blank');
   } else {
-    // Check Lightning Navigation setting
-    const lightningEnabled = SFTabs.main.getUserSettings().lightningNavigation;
-    
-    if (lightningEnabled) {
-      // For same-tab navigation, send message to content script
-      browser.tabs.query({ active: true, currentWindow: true })
-        .then(tabs => {
-          if (tabs[0]) {
-            browser.tabs.sendMessage(tabs[0].id, {
-              action: 'navigate_to_url',
-              url: fullUrl,
-              useLightning: true
-            });
-          }
-        })
-        .catch(() => {
-          // Fallback: direct navigation
-          window.location.href = fullUrl;
-        });
-    } else {
-      // Regular navigation
-      window.location.href = fullUrl;
-    }
+    // Lightning Navigation is always enabled
+    // For same-tab navigation, send message to content script
+    browser.tabs.query({ active: true, currentWindow: true })
+      .then(tabs => {
+        if (tabs[0]) {
+          browser.tabs.sendMessage(tabs[0].id, {
+            action: 'navigate_to_url',
+            url: fullUrl,
+            useLightning: true
+          });
+        }
+      })
+      .catch(() => {
+        // Fallback: direct navigation
+        window.location.href = fullUrl;
+      });
   }
   
   // Close popup

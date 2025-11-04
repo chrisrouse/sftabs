@@ -285,7 +285,6 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       // If parent item has a URL, allow clicking to navigate
       if (navItem.path || navItem.url) {
         link.addEventListener('click', (e) => {
-          console.log('SF Tabs: Click handler called for nested item with URL:', navItem.label);
           e.preventDefault();
           e.stopPropagation();
           navigateToNavigationItem(navItem, parentTab);
@@ -295,7 +294,6 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       } else {
         // Prevent default click behavior for parent items without URLs
         link.addEventListener('click', (e) => {
-          console.log('SF Tabs: Click handler called for nested item without URL:', navItem.label);
           e.preventDefault();
           e.stopPropagation();
         });
@@ -303,7 +301,6 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     } else {
       // Items without children: navigate on click
       link.addEventListener('click', (e) => {
-        console.log('SF Tabs: Click handler called for regular item:', navItem.label);
         e.preventDefault();
         e.stopPropagation();
         navigateToNavigationItem(navItem, parentTab);
@@ -319,18 +316,20 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     if (hasNestedItems && level < 1) { // Only support 2 levels (0 and 1)
       const submenuContainer = document.createElement('div');
       submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
-      submenuContainer.style.display = 'none'; // Hidden by default
-      submenuContainer.style.position = 'fixed'; // Use fixed positioning relative to viewport
-      submenuContainer.style.minWidth = '200px';
-      submenuContainer.style.width = '240px';
-      submenuContainer.style.zIndex = '10000'; // Higher than parent menu
-      submenuContainer.style.backgroundColor = 'rgb(255, 255, 255)';
-      submenuContainer.style.border = '1px solid rgb(221, 219, 218)';
-      submenuContainer.style.borderRadius = '0.25rem';
-      submenuContainer.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
-      submenuContainer.style.padding = '0.5rem 0';
-      submenuContainer.style.transform = 'none'; // Prevent any transforms
-      submenuContainer.style.margin = '0'; // Prevent any margins
+      submenuContainer.style.cssText = `
+        display: none !important;
+        position: fixed !important;
+        min-width: 200px !important;
+        width: 240px !important;
+        z-index: 10000 !important;
+        background-color: rgb(255, 255, 255) !important;
+        border: 1px solid rgb(221, 219, 218) !important;
+        border-radius: 0.25rem !important;
+        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16) !important;
+        padding: 0.5rem 0 !important;
+        transform: none !important;
+        margin: 0 !important;
+      `;
 
       // Create nested menu inner wrapper
       const submenuInner = document.createElement('div');
@@ -357,8 +356,21 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       // Append submenu to document body to avoid overflow clipping
       document.body.appendChild(submenuContainer);
 
-      // Store reference to submenu on the item for cleanup
+      // Create invisible bridge element between parent item and submenu
+      const bridge = document.createElement('div');
+      bridge.className = 'submenu-bridge';
+      bridge.style.cssText = `
+        position: fixed !important;
+        background: transparent !important;
+        pointer-events: auto !important;
+        z-index: 9999 !important;
+        display: none !important;
+      `;
+      document.body.appendChild(bridge);
+
+      // Store references for cleanup
       itemLi.submenuElement = submenuContainer;
+      itemLi.bridgeElement = bridge;
 
       // Function to position submenu next to parent item with smart positioning
       const positionSubmenu = () => {
@@ -373,22 +385,34 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
-        // Try positioning to the right first (preferred for regular menus)
-        let left = parentMenuRect.right + gap;
-        let openRight = true;
+        // Check if parent menu has a preferred direction (stored from its own positioning)
+        const parentDirection = parentMenu.dataset.openDirection; // 'left' or 'right'
 
-        // Check if it would go off the right edge
-        if (left + submenuWidth > viewportWidth) {
-          // Flip to the left side instead
+        let left;
+        let openRight;
+
+        if (parentDirection === 'left') {
+          // Parent opened to the left, so continue opening to the left
           left = parentMenuRect.left - submenuWidth - gap;
           openRight = false;
-        }
-
-        // Check if opening left would go off the left edge
-        if (!openRight && left < 0) {
-          // Force right positioning even if it clips slightly
-          left = Math.min(viewportWidth - submenuWidth, parentMenuRect.right + gap);
+        } else {
+          // Default: try positioning to the right first (preferred for regular menus)
+          left = parentMenuRect.right + gap;
           openRight = true;
+
+          // Check if it would go off the right edge
+          if (left + submenuWidth > viewportWidth) {
+            // Flip to the left side instead
+            left = parentMenuRect.left - submenuWidth - gap;
+            openRight = false;
+          }
+
+          // Check if opening left would go off the left edge
+          if (!openRight && left < 0) {
+            // Force right positioning even if it clips slightly
+            left = Math.min(viewportWidth - submenuWidth, parentMenuRect.right + gap);
+            openRight = true;
+          }
         }
 
         // Calculate top position aligned with hovered item
@@ -396,22 +420,47 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
 
         // Check if menu would go off bottom of viewport
         // Temporarily show to get actual height
-        submenuContainer.style.display = 'block';
-        submenuContainer.style.visibility = 'hidden';
+        submenuContainer.style.setProperty('display', 'block', 'important');
+        submenuContainer.style.setProperty('visibility', 'hidden', 'important');
         const submenuHeight = submenuContainer.offsetHeight;
-        submenuContainer.style.display = 'none';
-        submenuContainer.style.visibility = 'visible';
+        submenuContainer.style.setProperty('display', 'none', 'important');
+        submenuContainer.style.setProperty('visibility', 'visible', 'important');
 
         // Adjust top if would go off bottom
         if (top + submenuHeight > viewportHeight) {
           top = Math.max(0, viewportHeight - submenuHeight - 10);
         }
 
+        // Store the direction this submenu opened for child submenus
+        submenuContainer.dataset.openDirection = openRight ? 'right' : 'left';
+
         // Apply positioning
         submenuContainer.style.setProperty('left', `${left}px`, 'important');
         submenuContainer.style.setProperty('top', `${top}px`, 'important');
         submenuContainer.style.setProperty('right', 'auto', 'important');
         submenuContainer.style.setProperty('bottom', 'auto', 'important');
+
+        // Position the bridge between parent item and submenu
+        // Make it taller to cover the area between parent menu and submenu
+        const bridgeTop = Math.min(itemRect.top, top);
+        const bridgeBottom = Math.max(itemRect.bottom, top + submenuHeight);
+        const bridgeHeight = bridgeBottom - bridgeTop;
+        let bridgeLeft, bridgeWidth;
+
+        if (openRight) {
+          // Bridge from parent right edge to submenu left edge
+          bridgeLeft = parentMenuRect.right;
+          bridgeWidth = left - parentMenuRect.right;
+        } else {
+          // Bridge from submenu right edge to parent left edge
+          bridgeLeft = left + submenuWidth;
+          bridgeWidth = parentMenuRect.left - (left + submenuWidth);
+        }
+
+        bridge.style.setProperty('left', `${bridgeLeft}px`, 'important');
+        bridge.style.setProperty('top', `${bridgeTop}px`, 'important');
+        bridge.style.setProperty('width', `${bridgeWidth}px`, 'important');
+        bridge.style.setProperty('height', `${bridgeHeight}px`, 'important');
       };
 
       // Add hover delay management
@@ -419,41 +468,84 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
 
       // Set up mouseenter handler to show and position submenu
       itemLi.addEventListener('mouseenter', () => {
+        // Clear any pending hide timeout
+        clearTimeout(hideTimeout);
+
         // Close other submenus at the same level
         const siblings = container.querySelectorAll(':scope > li');
         siblings.forEach(sibling => {
           if (sibling !== itemLi && sibling.submenuElement) {
-            sibling.submenuElement.style.display = 'none';
+            sibling.submenuElement.style.setProperty('display', 'none', 'important');
+            if (sibling.bridgeElement) {
+              sibling.bridgeElement.style.setProperty('display', 'none', 'important');
+            }
           }
         });
 
-        // Position and show this submenu
+        // Position and show this submenu and bridge
         positionSubmenu();
-        submenuContainer.style.display = 'block';
+        submenuContainer.style.setProperty('display', 'block', 'important');
+        bridge.style.setProperty('display', 'block', 'important');
       });
 
       // Hide submenu when mouse leaves the parent item
       itemLi.addEventListener('mouseleave', () => {
-        // Only hide if not moving to the submenu
+        // Only hide if not moving to the submenu or bridge
         hideTimeout = setTimeout(() => {
-          submenuContainer.style.display = 'none';
-        }, 100);
+          submenuContainer.style.setProperty('display', 'none', 'important');
+          bridge.style.setProperty('display', 'none', 'important');
+        }, 300);
       });
 
-      // Keep submenu visible when hovering over it
+      // Keep submenu visible when hovering over it or the bridge
       submenuContainer.addEventListener('mouseenter', () => {
         clearTimeout(hideTimeout);
       });
 
-      // Hide submenu when leaving the submenu
-      submenuContainer.addEventListener('mouseleave', () => {
-        submenuContainer.style.display = 'none';
+      bridge.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
       });
 
-      // Clean up submenu when menu is hidden
+      // Hide submenu when leaving the submenu (with delay)
+      submenuContainer.addEventListener('mouseleave', (e) => {
+        // Check if we're moving to a child submenu
+        const relatedTarget = e.relatedTarget;
+        if (relatedTarget) {
+          // Check if the target is a child submenu or its bridge
+          const isChildSubmenu = relatedTarget.classList?.contains('submenu-container') ||
+                                 relatedTarget.classList?.contains('submenu-bridge');
+          const isInsideThisMenu = submenuContainer.contains(relatedTarget);
+
+          if (isChildSubmenu || isInsideThisMenu) {
+            // Moving to child or staying inside, don't hide
+            return;
+          }
+        }
+
+        hideTimeout = setTimeout(() => {
+          submenuContainer.style.setProperty('display', 'none', 'important');
+          bridge.style.setProperty('display', 'none', 'important');
+        }, 300);
+      });
+
+      bridge.addEventListener('mouseleave', (e) => {
+        // Check if we're not entering the submenu
+        const clientX = e.clientX;
+        const clientY = e.clientY;
+        setTimeout(() => {
+          const hoveredElement = document.elementFromPoint(clientX, clientY);
+          if (!submenuContainer.contains(hoveredElement) && !itemLi.contains(hoveredElement)) {
+            submenuContainer.style.setProperty('display', 'none', 'important');
+            bridge.style.setProperty('display', 'none', 'important');
+          }
+        }, 50);
+      });
+
+      // Clean up submenu and bridge when menu is hidden
       const observer = new MutationObserver(() => {
         if (menu.style.display === 'none') {
-          submenuContainer.style.display = 'none';
+          submenuContainer.style.setProperty('display', 'none', 'important');
+          bridge.style.setProperty('display', 'none', 'important');
         }
       });
       observer.observe(menu, { attributes: true, attributeFilter: ['style'] });
@@ -570,16 +662,7 @@ function navigateToMainTab(tab) {
  * Navigate to a navigation item from dropdown
  */
 function navigateToNavigationItem(navItem, parentTab) {
-  console.log('SF Tabs: Navigating to navigation item:', navItem.label);
-  console.log('SF Tabs: navItem details:', {
-    path: navItem.path,
-    url: navItem.url,
-    isObject: navItem.isObject,
-    isCustomUrl: navItem.isCustomUrl
-  });
-
   const baseUrl = window.location.origin;
-  console.log('SF Tabs: baseUrl (origin):', baseUrl);
 
   let fullUrl = '';
   let path = navItem.path || navItem.url || '';
@@ -588,25 +671,19 @@ function navigateToNavigationItem(navItem, parentTab) {
   if (path.startsWith('/lightning/')) {
     // Path already has full Lightning path, just add origin
     fullUrl = `${baseUrl}${path}`;
-    console.log('SF Tabs: Using full Lightning path');
   } else if (navItem.isObject) {
     // Object paths: /lightning/o/{objectName}/list or /lightning/o/{objectName}/view/{recordId}
     fullUrl = `${baseUrl}/lightning/o/${path}`;
-    console.log('SF Tabs: Using object path');
   } else if (navItem.isCustomUrl) {
     // Custom URLs: ensure leading slash
     if (!path.startsWith('/')) {
       path = '/' + path;
     }
     fullUrl = `${baseUrl}${path}`;
-    console.log('SF Tabs: Using custom URL path');
   } else {
     // Setup paths: /lightning/setup/{setupPath}
     fullUrl = `${baseUrl}/lightning/setup/${path}`;
-    console.log('SF Tabs: Using setup path');
   }
-
-  console.log('SF Tabs: Final URL:', fullUrl);
 
   if (parentTab.openInNewTab) {
     window.open(fullUrl, '_blank');
@@ -732,13 +809,10 @@ function addTabClickListeners(tabs) {
 
 /**
  * Check if Lightning Navigation is enabled
+ * Always returns true as Lightning Navigation is now standard
  */
 function isLightningNavigationEnabled() {
-  const localStorageValue = localStorage.getItem("lightningNavigation");
-  if (localStorageValue !== null) {
-    return JSON.parse(localStorageValue);
-  }
-  return true; // Default to true
+  return true;
 }
 
 /**
@@ -961,7 +1035,7 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
   }
 
   // Add buffer for right side margin/padding (increased to keep overflow menu away from edge)
-  const rightBuffer = 120; 
+  const rightBuffer = 140; 
   viewportWidth -= rightBuffer;
 
   // Calculate space used by native Salesforce tabs
@@ -1077,18 +1151,20 @@ function createOverflowButton(hiddenTabs) {
 function createOverflowSubmenu(itemLi, tab, parentMenu) {
   const submenuContainer = document.createElement('div');
   submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
-  submenuContainer.style.display = 'none';
-  submenuContainer.style.position = 'fixed';
-  submenuContainer.style.minWidth = '200px';
-  submenuContainer.style.width = '240px';
-  submenuContainer.style.zIndex = '10001'; // Higher than overflow menu
-  submenuContainer.style.backgroundColor = 'rgb(255, 255, 255)';
-  submenuContainer.style.border = '1px solid rgb(221, 219, 218)';
-  submenuContainer.style.borderRadius = '0.25rem';
-  submenuContainer.style.boxShadow = '0 2px 3px 0 rgba(0, 0, 0, 0.16)';
-  submenuContainer.style.padding = '0.5rem 0';
-  submenuContainer.style.transform = 'none';
-  submenuContainer.style.margin = '0';
+  submenuContainer.style.cssText = `
+    display: none !important;
+    position: fixed !important;
+    min-width: 200px !important;
+    width: 240px !important;
+    z-index: 10001 !important;
+    background-color: rgb(255, 255, 255) !important;
+    border: 1px solid rgb(221, 219, 218) !important;
+    border-radius: 0.25rem !important;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16) !important;
+    padding: 0.5rem 0 !important;
+    transform: none !important;
+    margin: 0 !important;
+  `;
 
   // Create submenu inner wrapper
   const submenuInner = document.createElement('div');
@@ -1103,7 +1179,8 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
   ul.style.padding = '0';
 
   // Render dropdown items using the existing recursive renderer
-  renderDropdownItemsRecursive(tab.dropdownItems, ul, tab, parentMenu, 0);
+  // Pass submenuContainer as the menu so nested items position relative to this submenu
+  renderDropdownItemsRecursive(tab.dropdownItems, ul, tab, submenuContainer, 0);
 
   submenuInner.appendChild(ul);
   submenuContainer.appendChild(submenuInner);
@@ -1111,8 +1188,21 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
   // Append to body
   document.body.appendChild(submenuContainer);
 
-  // Store reference for cleanup
+  // Create invisible bridge element between parent item and submenu
+  const bridge = document.createElement('div');
+  bridge.className = 'submenu-bridge';
+  bridge.style.cssText = `
+    position: fixed !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+    z-index: 10000 !important;
+    display: none !important;
+  `;
+  document.body.appendChild(bridge);
+
+  // Store references for cleanup
   itemLi.submenuElement = submenuContainer;
+  itemLi.bridgeElement = bridge;
 
   // Position submenu with smart positioning (flip sides if needed)
   const positionSubmenu = () => {
@@ -1148,22 +1238,47 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
 
     // Check if menu would go off bottom of viewport
     // Temporarily show to get actual height
-    submenuContainer.style.display = 'block';
-    submenuContainer.style.visibility = 'hidden';
+    submenuContainer.style.setProperty('display', 'block', 'important');
+    submenuContainer.style.setProperty('visibility', 'hidden', 'important');
     const submenuHeight = submenuContainer.offsetHeight;
-    submenuContainer.style.display = 'none';
-    submenuContainer.style.visibility = 'visible';
+    submenuContainer.style.setProperty('display', 'none', 'important');
+    submenuContainer.style.setProperty('visibility', 'visible', 'important');
 
     // Adjust top if would go off bottom
     if (top + submenuHeight > viewportHeight) {
       top = Math.max(0, viewportHeight - submenuHeight - 10);
     }
 
+    // Store the direction this submenu opened for child submenus
+    submenuContainer.dataset.openDirection = openLeft ? 'left' : 'right';
+
     // Apply positioning
     submenuContainer.style.setProperty('left', `${left}px`, 'important');
     submenuContainer.style.setProperty('top', `${top}px`, 'important');
     submenuContainer.style.setProperty('right', 'auto', 'important');
     submenuContainer.style.setProperty('bottom', 'auto', 'important');
+
+    // Position the bridge between parent item and submenu
+    // Make it taller to cover the area between parent menu and submenu
+    const bridgeTop = Math.min(itemRect.top, top);
+    const bridgeBottom = Math.max(itemRect.bottom, top + submenuHeight);
+    const bridgeHeight = bridgeBottom - bridgeTop;
+    let bridgeLeft, bridgeWidth;
+
+    if (openLeft) {
+      // Bridge from submenu right edge to parent left edge
+      bridgeLeft = left + submenuWidth;
+      bridgeWidth = parentMenuRect.left - (left + submenuWidth);
+    } else {
+      // Bridge from parent right edge to submenu left edge
+      bridgeLeft = parentMenuRect.right;
+      bridgeWidth = left - parentMenuRect.right;
+    }
+
+    bridge.style.setProperty('left', `${bridgeLeft}px`, 'important');
+    bridge.style.setProperty('top', `${bridgeTop}px`, 'important');
+    bridge.style.setProperty('width', `${bridgeWidth}px`, 'important');
+    bridge.style.setProperty('height', `${bridgeHeight}px`, 'important');
   };
 
   // Hover delay management
@@ -1175,36 +1290,75 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
     const siblings = itemLi.parentElement.querySelectorAll(':scope > li');
     siblings.forEach(sibling => {
       if (sibling !== itemLi && sibling.submenuElement) {
-        sibling.submenuElement.style.display = 'none';
+        sibling.submenuElement.style.setProperty('display', 'none', 'important');
+        if (sibling.bridgeElement) {
+          sibling.bridgeElement.style.setProperty('display', 'none', 'important');
+        }
       }
     });
 
-    // Position and show this submenu
+    // Position and show this submenu and bridge
     positionSubmenu();
-    submenuContainer.style.display = 'block';
+    submenuContainer.style.setProperty('display', 'block', 'important');
+    bridge.style.setProperty('display', 'block', 'important');
   });
 
   // Hide submenu when leaving item
   itemLi.addEventListener('mouseleave', () => {
     hideTimeout = setTimeout(() => {
-      submenuContainer.style.display = 'none';
-    }, 100);
+      submenuContainer.style.setProperty('display', 'none', 'important');
+      bridge.style.setProperty('display', 'none', 'important');
+    }, 300);
   });
 
-  // Keep submenu visible when hovering over it
+  // Keep submenu visible when hovering over it or the bridge
   submenuContainer.addEventListener('mouseenter', () => {
     clearTimeout(hideTimeout);
   });
 
-  // Hide when leaving submenu
-  submenuContainer.addEventListener('mouseleave', () => {
-    submenuContainer.style.display = 'none';
+  bridge.addEventListener('mouseenter', () => {
+    clearTimeout(hideTimeout);
+  });
+
+  // Hide when leaving submenu (with delay)
+  submenuContainer.addEventListener('mouseleave', (e) => {
+    // Check if we're moving to a child submenu
+    const relatedTarget = e.relatedTarget;
+    if (relatedTarget) {
+      // Check if the target is a child submenu or its bridge
+      const isChildSubmenu = relatedTarget.classList?.contains('submenu-container') ||
+                             relatedTarget.classList?.contains('submenu-bridge');
+      const isInsideThisMenu = submenuContainer.contains(relatedTarget);
+
+      if (isChildSubmenu || isInsideThisMenu) {
+        // Moving to child or staying inside, don't hide
+        return;
+      }
+    }
+
+    hideTimeout = setTimeout(() => {
+      submenuContainer.style.setProperty('display', 'none', 'important');
+      bridge.style.setProperty('display', 'none', 'important');
+    }, 300);
+  });
+
+  bridge.addEventListener('mouseleave', (e) => {
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    setTimeout(() => {
+      const hoveredElement = document.elementFromPoint(clientX, clientY);
+      if (!submenuContainer.contains(hoveredElement) && !itemLi.contains(hoveredElement)) {
+        submenuContainer.style.setProperty('display', 'none', 'important');
+        bridge.style.setProperty('display', 'none', 'important');
+      }
+    }, 50);
   });
 
   // Clean up when parent menu closes
   const observer = new MutationObserver(() => {
     if (parentMenu.style.display === 'none') {
-      submenuContainer.style.display = 'none';
+      submenuContainer.style.setProperty('display', 'none', 'important');
+      bridge.style.setProperty('display', 'none', 'important');
     }
   });
   observer.observe(parentMenu, { attributes: true, attributeFilter: ['style'] });

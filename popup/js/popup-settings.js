@@ -99,11 +99,6 @@ function updateSettingsUI() {
   if (domElements.skipDeleteConfirmationCheckbox) {
     domElements.skipDeleteConfirmationCheckbox.checked = settings.skipDeleteConfirmation || false;
   }
-
-  // Update Lightning Navigation checkbox
-  if (domElements.lightningNavigationCheckbox) {
-    domElements.lightningNavigationCheckbox.checked = settings.lightningNavigation !== false; // Default to true
-  }
 }
 
 /**
@@ -212,35 +207,6 @@ function setupEventListeners() {
       const settings = SFTabs.main.getUserSettings();
       settings.skipDeleteConfirmation = domElements.skipDeleteConfirmationCheckbox.checked;
       SFTabs.storage.saveUserSettings(settings);
-    });
-  }
-
-  // Lightning Navigation change
-  if (domElements.lightningNavigationCheckbox) {
-    domElements.lightningNavigationCheckbox.addEventListener('change', () => {
-      console.log('Lightning Navigation changed to:', domElements.lightningNavigationCheckbox.checked);
-      const settings = SFTabs.main.getUserSettings();
-      settings.lightningNavigation = domElements.lightningNavigationCheckbox.checked;
-      
-      // Save to both browser storage and localStorage immediately
-      SFTabs.storage.saveUserSettings(settings);
-      localStorage.setItem("lightningNavigation", JSON.stringify(domElements.lightningNavigationCheckbox.checked));
-      
-      // Send message to content script to refresh tabs immediately
-      browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        if (tabs[0]) {
-          browser.tabs.sendMessage(tabs[0].id, {action: 'refresh_tabs'}, function(response) {
-            if (browser.runtime.lastError) {
-              console.log("Could not send message to content script:", browser.runtime.lastError.message);
-            } else {
-              console.log("Successfully refreshed tabs after Lightning Navigation change");
-            }
-          });
-        }
-      });
-      
-      // Show immediate feedback
-      SFTabs.main.showStatus(`Lightning Navigation ${domElements.lightningNavigationCheckbox.checked ? 'enabled' : 'disabled'}`, false);
     });
   }
 

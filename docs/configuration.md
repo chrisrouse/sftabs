@@ -97,7 +97,6 @@ The `userSettings` object contains global preferences:
 | `themeMode` | string | "light", "dark", "system" | Visual theme for the extension popup |
 | `compactMode` | boolean | true, false | Whether to use compact display mode |
 | `skipDeleteConfirmation` | boolean | true, false | Whether to skip confirmation when deleting tabs |
-| `lightningNavigation` | boolean | true, false | Whether to use Lightning navigation |
 
 ### Example User Settings
 
@@ -105,8 +104,7 @@ The `userSettings` object contains global preferences:
 {
   "themeMode": "light",
   "compactMode": true,
-  "skipDeleteConfirmation": true,
-  "lightningNavigation": true
+  "skipDeleteConfirmation": true
 }
 ```
 
@@ -149,8 +147,7 @@ Here's a complete configuration file example:
   "userSettings": {
     "themeMode": "light",
     "compactMode": true,
-    "skipDeleteConfirmation": true,
-    "lightningNavigation": true
+    "skipDeleteConfirmation": true
   }
 }
 ```

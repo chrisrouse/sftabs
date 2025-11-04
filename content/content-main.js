@@ -105,12 +105,9 @@ let handlerReady = false;
 
 /**
  * Check if Lightning Navigation is enabled
+ * Always returns true as Lightning Navigation is now standard
  */
 function isLightningNavigationEnabled() {
-  const localStorageValue = localStorage.getItem("lightningNavigation");
-  if (localStorageValue !== null) {
-    return JSON.parse(localStorageValue);
-  }
   return true;
 }
 
@@ -164,34 +161,12 @@ function lightningNavigate(details, fallbackURL) {
 }
 
 /**
- * Initialize Lightning Navigation setting from browser storage
- */
-async function initializeLightningNavigationSetting() {
-  try {
-    const result = await browser.storage.local.get('userSettings');
-    if (result.userSettings && result.userSettings.hasOwnProperty('lightningNavigation')) {
-      const enabled = result.userSettings.lightningNavigation;
-      localStorage.setItem("lightningNavigation", JSON.stringify(enabled));
-      console.log('Lightning Navigation setting initialized:', enabled);
-    } else {
-      localStorage.setItem("lightningNavigation", JSON.stringify(true));
-      console.log('Lightning Navigation setting defaulted to true');
-    }
-  } catch (error) {
-    console.error('Error loading Lightning Navigation setting:', error);
-    localStorage.setItem("lightningNavigation", JSON.stringify(true));
-  }
-}
-
-/**
  * Main initialization function
  */
 async function initializeContentScript() {
   console.log('SF Tabs content script initializing...');
-  
+
   try {
-    // Initialize Lightning Navigation setting first
-    await initializeLightningNavigationSetting();
     
     // Wait for other modules to be available
     if (typeof SFTabsContent === 'undefined') {
@@ -723,29 +698,11 @@ function setupStorageListeners() {
       }
 
       if ((area === 'local' || area === 'sync') && changes.userSettings) {
-        console.log("Settings changed in storage - updating Lightning Navigation");
-        const newSettings = changes.userSettings.newValue;
-        if (newSettings && newSettings.hasOwnProperty('lightningNavigation')) {
-          localStorage.setItem("lightningNavigation", JSON.stringify(newSettings.lightningNavigation));
-        }
+        console.log("Settings changed in storage");
+        // Settings changed - could trigger a refresh if needed in the future
       }
     });
   }
-  
-  // Listen for localStorage changes
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'lightningNavigation') {
-      console.log("Lightning Navigation setting changed - refreshing tabs");
-      const tabContainer = document.querySelector('.tabBarItems.slds-grid');
-      if (tabContainer) {
-        if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-          window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-        } else {
-          initTabsWithLightningNavigation(tabContainer);
-        }
-      }
-    }
-  });
   
   console.log('Storage listeners setup complete');
 }

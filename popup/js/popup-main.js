@@ -117,7 +117,6 @@ function initializeDOMElements() {
   // Settings elements
   domElements.compactModeCheckbox = document.querySelector('#compact-mode');
   domElements.skipDeleteConfirmationCheckbox = document.querySelector('#skip-delete-confirmation');
-  domElements.lightningNavigationCheckbox = document.querySelector('#lightning-navigation');
   domElements.settingsResetButton = document.querySelector('#settings-reset-button');
 
   // Action panel elements

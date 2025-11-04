@@ -196,14 +196,9 @@ function isCurrentPageMatchingTab(tab) {
 
 /**
  * Check if Lightning Navigation is enabled
+ * Always returns true as Lightning Navigation is now standard
  */
 function isLightningNavigationEnabled() {
-  // Check localStorage first (for immediate response)
-  const localStorageValue = localStorage.getItem("lightningNavigation");
-  if (localStorageValue !== null) {
-    return JSON.parse(localStorageValue);
-  }
-  // Default to true if not set
   return true;
 }
 
