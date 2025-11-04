@@ -5,9 +5,86 @@
 let isRenderingTabs = false;
 
 /**
+ * Get storage preference from settings
+ * @returns {Promise<boolean>} true for sync storage, false for local
+ */
+async function getStoragePreference() {
+  try {
+    const result = await browser.storage.sync.get('userSettings');
+    if (result.userSettings && typeof result.userSettings.useSyncStorage === 'boolean') {
+      return result.userSettings.useSyncStorage;
+    }
+    return true; // Default to sync
+  } catch (error) {
+    console.warn('Could not read storage preference, defaulting to sync:', error);
+    return true;
+  }
+}
+
+/**
+ * Read tabs from chunked sync storage
+ */
+async function readChunkedSync(baseKey) {
+  try {
+    const metadataKey = `${baseKey}_metadata`;
+    const metadataResult = await browser.storage.sync.get(metadataKey);
+    const metadata = metadataResult[metadataKey];
+
+    if (!metadata || !metadata.chunked) {
+      const directResult = await browser.storage.sync.get(baseKey);
+      return directResult[baseKey] || null;
+    }
+
+    const chunkCount = metadata.chunkCount;
+    const chunkKeys = [];
+    for (let i = 0; i < chunkCount; i++) {
+      chunkKeys.push(`${baseKey}_chunk_${i}`);
+    }
+
+    const chunksResult = await browser.storage.sync.get(chunkKeys);
+    const chunks = [];
+    for (let i = 0; i < chunkCount; i++) {
+      const chunkKey = `${baseKey}_chunk_${i}`;
+      if (!chunksResult[chunkKey]) {
+        throw new Error(`Missing chunk ${i} of ${chunkCount}`);
+      }
+      chunks.push(chunksResult[chunkKey]);
+    }
+
+    const jsonString = chunks.join('');
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Error reading chunked sync:', error);
+    return null;
+  }
+}
+
+/**
+ * Get tabs from storage (sync or local based on preference)
+ */
+async function getTabsFromStorage() {
+  try {
+    const useSyncStorage = await getStoragePreference();
+
+    if (useSyncStorage) {
+      console.log('[tab-renderer] Reading tabs from sync storage');
+      const tabs = await readChunkedSync('customTabs');
+      return tabs || [];
+    } else {
+      console.log('[tab-renderer] Reading tabs from local storage');
+      const result = await browser.storage.local.get('customTabs');
+      return result.customTabs || [];
+    }
+  } catch (error) {
+    console.error('[tab-renderer] Error getting tabs from storage:', error);
+    return [];
+  }
+}
+
+/**
  * Initialize tabs in the given container
  */
-function initTabs(tabContainer) {
+async function initTabs(tabContainer) {
   if (!tabContainer) {
     console.log("No tab container found");
     return;
@@ -22,12 +99,10 @@ function initTabs(tabContainer) {
   isRenderingTabs = true;
   console.log("Starting tab render...");
 
-  browser.storage.local.get(['customTabs', 'userSettings']).then(result => {
-    let tabsToUse = [];
-    
-    if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
-      tabsToUse = result.customTabs;
-    } else {
+  try {
+    let tabsToUse = await getTabsFromStorage();
+
+    if (!tabsToUse || tabsToUse.length === 0) {
       // Get default tabs from constants if available, otherwise use fallback
       if (window.SFTabs && window.SFTabs.constants && window.SFTabs.constants.DEFAULT_TABS) {
         tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
@@ -86,7 +161,6 @@ function initTabs(tabContainer) {
           }
         ];
       }
-      browser.storage.local.set({ customTabs: tabsToUse });
     }
     
     // Sort tabs by position (only top-level tabs)
@@ -120,11 +194,11 @@ function initTabs(tabContainer) {
     }, 200);
 
     console.log("Enhanced tabs successfully added to container");
-  }).catch(error => {
+  } catch (error) {
     console.error("Error loading tabs:", error);
     // Reset flag on error
     isRenderingTabs = false;
-  });
+  }
 }
 
 /**
@@ -922,11 +996,11 @@ function lightningNavigate(details, fallbackURL) {
 /**
  * Highlight active custom tab and show current section
  */
-function highlightActiveTab() {
+async function highlightActiveTab() {
   const currentUrl = window.location.href;
-  
-  browser.storage.local.get('customTabs').then(result => {
-    const tabs = result.customTabs || [];
+
+  try {
+    const tabs = await getTabsFromStorage();
     const topLevelTabs = getTopLevelTabs(tabs);
     let matchedTab = null;
 
@@ -959,11 +1033,11 @@ function highlightActiveTab() {
         const anchor = activeEl.querySelector('a');
         if (anchor) anchor.setAttribute('aria-selected', 'true');
       }
-      
+
     }
-  }).catch(error => {
+  } catch (error) {
     console.error("Error highlighting active tab:", error);
-  });
+  }
 }
 
 /**
@@ -1536,8 +1610,7 @@ window.addEventListener('resize', () => {
 
     if (tabContainer && tabsLoaded) {
       console.log('Recalculating overflow after resize');
-      browser.storage.local.get('customTabs').then(result => {
-        const tabs = result.customTabs || [];
+      getTabsFromStorage().then(tabs => {
         const topLevelTabs = getTopLevelTabs(tabs);
         handleTabOverflow(tabContainer, topLevelTabs);
       }).catch(error => {

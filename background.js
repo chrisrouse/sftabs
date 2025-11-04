@@ -67,83 +67,219 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
 console.log('SF Tabs: Background script loaded');
 
 /**
- * Perform storage migration from sync to local storage
+ * Chunked storage utilities for background script
+ */
+const CHUNK_SIZE = 7000;
+
+async function readChunkedSync(baseKey) {
+  try {
+    const metadataKey = `${baseKey}_metadata`;
+    const metadataResult = await browser.storage.sync.get(metadataKey);
+    const metadata = metadataResult[metadataKey];
+
+    if (!metadata || !metadata.chunked) {
+      const directResult = await browser.storage.sync.get(baseKey);
+      return directResult[baseKey] || null;
+    }
+
+    const chunkCount = metadata.chunkCount;
+    const chunkKeys = [];
+    for (let i = 0; i < chunkCount; i++) {
+      chunkKeys.push(`${baseKey}_chunk_${i}`);
+    }
+
+    const chunksResult = await browser.storage.sync.get(chunkKeys);
+    const chunks = [];
+    for (let i = 0; i < chunkCount; i++) {
+      const chunkKey = `${baseKey}_chunk_${i}`;
+      if (!chunksResult[chunkKey]) {
+        throw new Error(`Missing chunk ${i} of ${chunkCount}`);
+      }
+      chunks.push(chunksResult[chunkKey]);
+    }
+
+    const jsonString = chunks.join('');
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Error reading chunked sync:', error);
+    return null;
+  }
+}
+
+async function saveChunkedSync(baseKey, data) {
+  try {
+    const jsonString = JSON.stringify(data);
+    const byteSize = new Blob([jsonString]).size;
+
+    // Clear existing chunks first
+    const metadataKey = `${baseKey}_metadata`;
+    const metadataResult = await browser.storage.sync.get(metadataKey);
+    const metadata = metadataResult[metadataKey];
+
+    const keysToRemove = [baseKey, metadataKey];
+    if (metadata && metadata.chunked && metadata.chunkCount) {
+      for (let i = 0; i < metadata.chunkCount; i++) {
+        keysToRemove.push(`${baseKey}_chunk_${i}`);
+      }
+    }
+    await browser.storage.sync.remove(keysToRemove);
+
+    if (byteSize <= CHUNK_SIZE) {
+      // Save directly
+      const storageObj = {};
+      storageObj[baseKey] = data;
+      storageObj[`${baseKey}_metadata`] = {
+        chunked: false,
+        byteSize: byteSize,
+        savedAt: new Date().toISOString()
+      };
+      await browser.storage.sync.set(storageObj);
+      return { success: true, chunked: false };
+    }
+
+    // Chunk the data
+    const chunks = [];
+    let offset = 0;
+    while (offset < jsonString.length) {
+      chunks.push(jsonString.slice(offset, offset + CHUNK_SIZE));
+      offset += CHUNK_SIZE;
+    }
+
+    const storageObj = {};
+    chunks.forEach((chunk, index) => {
+      storageObj[`${baseKey}_chunk_${index}`] = chunk;
+    });
+    storageObj[`${baseKey}_metadata`] = {
+      chunked: true,
+      chunkCount: chunks.length,
+      byteSize: byteSize,
+      savedAt: new Date().toISOString()
+    };
+
+    await browser.storage.sync.set(storageObj);
+    return { success: true, chunked: true, chunkCount: chunks.length };
+  } catch (error) {
+    console.error('Error saving chunked sync:', error);
+    throw error;
+  }
+}
+
+/**
+ * Detect storage format and location for migration
+ */
+async function detectStorageFormat() {
+  try {
+    // Check user settings to see what format they prefer
+    const syncSettings = await browser.storage.sync.get('userSettings');
+    const preferSync = syncSettings.userSettings?.useSyncStorage !== false; // Default true
+
+    // Check for chunked sync storage
+    const syncMetadata = await browser.storage.sync.get('customTabs_metadata');
+    const hasChunkedSync = !!syncMetadata.customTabs_metadata;
+
+    // Check for non-chunked sync storage
+    const syncDirect = await browser.storage.sync.get('customTabs');
+    const hasDirectSync = !!syncDirect.customTabs;
+
+    // Check for local storage
+    const localData = await browser.storage.local.get('customTabs');
+    const hasLocal = !!localData.customTabs;
+
+    return {
+      preferSync,
+      hasChunkedSync,
+      hasDirectSync,
+      hasLocal,
+      syncTabs: hasChunkedSync ? await readChunkedSync('customTabs') : (syncDirect.customTabs || null),
+      localTabs: localData.customTabs || null
+    };
+  } catch (error) {
+    console.error('Error detecting storage format:', error);
+    return { preferSync: true, hasChunkedSync: false, hasDirectSync: false, hasLocal: false };
+  }
+}
+
+/**
+ * Perform storage migration - handles v1.3 (sync), v1.4 (local), and v1.5 (chunked sync)
  * This runs automatically on install/update before user opens popup
  */
 async function migrateStorage() {
-  console.log('🔄 SF Tabs Background: Starting storage migration check...');
+  console.log('🔄 SF Tabs Background: Starting storage migration check for v1.5.0...');
 
   try {
-    // Check both storage locations
-    const [localResult, syncResult] = await Promise.all([
-      browser.storage.local.get(['customTabs', 'extensionVersion']),
-      browser.storage.sync.get(['customTabs', 'userSettings'])
-    ]);
+    const format = await detectStorageFormat();
 
-    const localTabs = localResult.customTabs || [];
-    const syncTabs = syncResult.customTabs || [];
-
-    // Count custom (non-default) tabs in each location
-    const localCustomCount = localTabs.filter(t => !t.id?.startsWith('default_tab_')).length;
-    const syncCustomCount = syncTabs.filter(t => !t.id?.startsWith('default_tab_')).length;
-
-    console.log('📊 SF Tabs Background: Storage analysis:', {
-      local: { total: localTabs.length, custom: localCustomCount },
-      sync: { total: syncTabs.length, custom: syncCustomCount },
-      hasVersion: !!localResult.extensionVersion
+    console.log('📊 SF Tabs Background: Storage format detected:', {
+      preferSync: format.preferSync,
+      hasChunkedSync: format.hasChunkedSync,
+      hasDirectSync: format.hasDirectSync,
+      hasLocal: format.hasLocal,
+      syncTabCount: format.syncTabs?.length || 0,
+      localTabCount: format.localTabs?.length || 0
     });
 
-    // Determine if migration is needed
-    let needsMigration = false;
-    let migrationReason = '';
+    // Determine what needs to be migrated
+    const syncTabCount = format.syncTabs?.length || 0;
+    const localTabCount = format.localTabs?.length || 0;
+    const syncCustomCount = (format.syncTabs || []).filter(t => !t.id?.startsWith('default_tab_')).length;
+    const localCustomCount = (format.localTabs || []).filter(t => !t.id?.startsWith('default_tab_')).length;
 
-    if (syncCustomCount > localCustomCount) {
-      // Sync has more custom tabs - migrate from sync to local
-      needsMigration = true;
-      migrationReason = `Sync has ${syncCustomCount} custom tabs vs local's ${localCustomCount}`;
-    } else if (syncTabs.length > 0 && localTabs.length === 0) {
-      // Sync has tabs but local is empty - migrate
-      needsMigration = true;
-      migrationReason = 'Sync has tabs but local is empty';
-    }
-
-    if (needsMigration) {
-      console.log('🔄 SF Tabs Background: Migration needed -', migrationReason);
-      console.log('🔄 SF Tabs Background: Migrating', syncTabs.length, 'tabs from sync to local storage');
-
-      // Perform migration
-      await browser.storage.local.set({
-        customTabs: syncTabs,
-        extensionVersion: '1.4.0'
-      });
-
-      // Migrate user settings if they exist
-      if (syncResult.userSettings) {
-        console.log('🔄 SF Tabs Background: Migrating user settings');
-        await browser.storage.local.set({
-          userSettings: syncResult.userSettings
-        });
-      }
-
-      console.log('✅ SF Tabs Background: Migration to local storage complete');
-
-      // Clear sync storage after successful migration
-      try {
-        await browser.storage.sync.clear();
-        console.log('✅ SF Tabs Background: Sync storage cleared');
-      } catch (e) {
-        console.warn('⚠️ SF Tabs Background: Could not clear sync storage:', e);
-      }
-    } else if (localTabs.length > 0) {
-      console.log('✅ SF Tabs Background: Local storage already has', localCustomCount, 'custom tabs - no migration needed');
-
-      // Ensure version marker is set
-      if (!localResult.extensionVersion) {
-        await browser.storage.local.set({ extensionVersion: '1.4.0' });
-        console.log('✅ SF Tabs Background: Added version marker to local storage');
+    // Migration logic based on user preference and existing data
+    if (format.preferSync) {
+      // User prefers sync storage
+      if (syncTabCount > 0 && !format.hasChunkedSync) {
+        // Old sync format (v1.3) - migrate to chunked sync
+        console.log('🔄 SF Tabs Background: Migrating v1.3 (non-chunked sync) → v1.5 (chunked sync)');
+        await saveChunkedSync('customTabs', format.syncTabs);
+        await browser.storage.local.remove(['customTabs', 'extensionVersion']);
+        console.log('✅ SF Tabs Background: Migration complete - using chunked sync storage');
+      } else if (localTabCount > 0 && syncTabCount === 0) {
+        // Local storage exists but no sync - migrate local to chunked sync
+        console.log('🔄 SF Tabs Background: Migrating v1.4 (local) → v1.5 (chunked sync)');
+        await saveChunkedSync('customTabs', format.localTabs);
+        await browser.storage.local.remove(['customTabs', 'extensionVersion']);
+        console.log('✅ SF Tabs Background: Migration complete - using chunked sync storage');
+      } else if (localCustomCount > syncCustomCount) {
+        // Local has more custom tabs - migrate to sync
+        console.log('🔄 SF Tabs Background: Local has more custom tabs - migrating to chunked sync');
+        await saveChunkedSync('customTabs', format.localTabs);
+        await browser.storage.local.remove(['customTabs', 'extensionVersion']);
+        console.log('✅ SF Tabs Background: Migration complete - using chunked sync storage');
+      } else if (syncTabCount > 0) {
+        console.log('✅ SF Tabs Background: Already using sync storage - no migration needed');
+      } else {
+        console.log('ℹ️ SF Tabs Background: No tabs found - first-time install (will use sync)');
       }
     } else {
-      console.log('ℹ️ SF Tabs Background: No tabs found in either storage - first-time install');
+      // User prefers local storage
+      if (syncTabCount > 0 && localTabCount === 0) {
+        // Sync exists but no local - migrate to local
+        console.log('🔄 SF Tabs Background: Migrating sync → local (user preference)');
+        await browser.storage.local.set({
+          customTabs: format.syncTabs,
+          extensionVersion: '1.5.0'
+        });
+        // Clear sync storage
+        const keysToRemove = ['customTabs', 'customTabs_metadata'];
+        for (let i = 0; i < 50; i++) {
+          keysToRemove.push(`customTabs_chunk_${i}`);
+        }
+        await browser.storage.sync.remove(keysToRemove);
+        console.log('✅ SF Tabs Background: Migration complete - using local storage');
+      } else if (localTabCount > 0) {
+        console.log('✅ SF Tabs Background: Already using local storage - no migration needed');
+        await browser.storage.local.set({ extensionVersion: '1.5.0' });
+      } else {
+        console.log('ℹ️ SF Tabs Background: No tabs found - first-time install (will use local)');
+      }
+    }
+
+    // Ensure user settings are in sync storage (they should always be there)
+    const localSettings = await browser.storage.local.get('userSettings');
+    if (localSettings.userSettings) {
+      console.log('🔄 SF Tabs Background: Moving userSettings to sync storage');
+      await browser.storage.sync.set({ userSettings: localSettings.userSettings });
+      await browser.storage.local.remove('userSettings');
     }
 
     return true;

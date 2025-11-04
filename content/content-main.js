@@ -104,6 +104,83 @@ let tabsInitialized = false;
 let handlerReady = false;
 
 /**
+ * Get storage preference from settings
+ * @returns {Promise<boolean>} true for sync storage, false for local
+ */
+async function getStoragePreference() {
+  try {
+    const result = await browser.storage.sync.get('userSettings');
+    if (result.userSettings && typeof result.userSettings.useSyncStorage === 'boolean') {
+      return result.userSettings.useSyncStorage;
+    }
+    return true; // Default to sync
+  } catch (error) {
+    console.warn('Could not read storage preference, defaulting to sync:', error);
+    return true;
+  }
+}
+
+/**
+ * Read tabs from chunked sync storage
+ */
+async function readChunkedSync(baseKey) {
+  try {
+    const metadataKey = `${baseKey}_metadata`;
+    const metadataResult = await browser.storage.sync.get(metadataKey);
+    const metadata = metadataResult[metadataKey];
+
+    if (!metadata || !metadata.chunked) {
+      const directResult = await browser.storage.sync.get(baseKey);
+      return directResult[baseKey] || null;
+    }
+
+    const chunkCount = metadata.chunkCount;
+    const chunkKeys = [];
+    for (let i = 0; i < chunkCount; i++) {
+      chunkKeys.push(`${baseKey}_chunk_${i}`);
+    }
+
+    const chunksResult = await browser.storage.sync.get(chunkKeys);
+    const chunks = [];
+    for (let i = 0; i < chunkCount; i++) {
+      const chunkKey = `${baseKey}_chunk_${i}`;
+      if (!chunksResult[chunkKey]) {
+        throw new Error(`Missing chunk ${i} of ${chunkCount}`);
+      }
+      chunks.push(chunksResult[chunkKey]);
+    }
+
+    const jsonString = chunks.join('');
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Error reading chunked sync:', error);
+    return null;
+  }
+}
+
+/**
+ * Get tabs from storage (sync or local based on preference)
+ */
+async function getTabsFromStorage() {
+  try {
+    const useSyncStorage = await getStoragePreference();
+
+    if (useSyncStorage) {
+      console.log('Reading tabs from sync storage');
+      const tabs = await readChunkedSync('customTabs');
+      return tabs || [];
+    } else {
+      console.log('Reading tabs from local storage');
+      const result = await browser.storage.local.get('customTabs');
+      return result.customTabs || [];
+    }
+  } catch (error) {
+    console.error('Error getting tabs from storage:', error);
+    return [];
+  }
+}
+
+/**
  * Check if Lightning Navigation is enabled
  * Always returns true as Lightning Navigation is now standard
  */
@@ -243,15 +320,13 @@ function delayLoadTabs(attemptCount) {
 /**
  * Fallback tab initialization WITH Lightning Navigation AND Dropdown Support
  */
-function initTabsWithLightningNavigation(tabContainer) {
+async function initTabsWithLightningNavigation(tabContainer) {
   console.log('Using fallback tab initialization with Lightning Navigation and Dropdown Support');
-  
-  browser.storage.local.get(['customTabs', 'userSettings']).then(result => {
-    let tabsToUse = [];
-    
-    if (result.customTabs && Array.isArray(result.customTabs) && result.customTabs.length > 0) {
-      tabsToUse = result.customTabs;
-    } else {
+
+  try {
+    let tabsToUse = await getTabsFromStorage();
+
+    if (!tabsToUse || tabsToUse.length === 0) {
       // Use default tabs from constants if available
       if (window.SFTabs && window.SFTabs.constants) {
         tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
@@ -262,25 +337,24 @@ function initTabsWithLightningNavigation(tabContainer) {
           { id: 'default_tab_users', label: 'Users', path: 'ManageUsers', openInNewTab: false, position: 1 }
         ];
       }
-      browser.storage.local.set({ customTabs: tabsToUse });
     }
-    
+
     // Remove existing custom tabs
     const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
     existingTabs.forEach(tab => tab.remove());
-    
+
     // Sort and add tabs
     const topLevelTabs = tabsToUse.filter(tab => !tab.parentId).sort((a, b) => a.position - b.position);
-    
+
     for (const tab of topLevelTabs) {
       const tabElement = createTabElementWithLightningAndDropdown(tab);
       tabContainer.appendChild(tabElement);
     }
-    
+
     console.log("Fallback tabs with Lightning Navigation and Dropdown Support successfully added to container");
-  }).catch(error => {
+  } catch (error) {
     console.error("Error in fallback tab initialization:", error);
-  });
+  }
 }
 
 /**

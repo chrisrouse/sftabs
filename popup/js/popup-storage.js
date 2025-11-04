@@ -2,30 +2,59 @@
 // Storage operations for tabs and settings
 
 /**
+ * Get storage preference from user settings
+ * @returns {Promise<boolean>} true for sync storage, false for local
+ */
+async function getStoragePreference() {
+  try {
+    // Settings are always in sync storage (they're small)
+    const result = await browser.storage.sync.get('userSettings');
+    if (result.userSettings && typeof result.userSettings.useSyncStorage === 'boolean') {
+      return result.userSettings.useSyncStorage;
+    }
+    // Default to sync storage
+    return true;
+  } catch (error) {
+    console.warn('⚠️ Could not read storage preference, defaulting to sync:', error);
+    return true;
+  }
+}
+
+/**
  * Get tabs from browser storage
- * Reads from local storage (migration from sync is handled automatically by background script)
+ * Reads from sync (with chunking) or local storage based on user preference
  */
 async function getTabs() {
   try {
-    // Simply read from local storage - migration is handled by background script
-    const localResult = await browser.storage.local.get(['customTabs', 'extensionVersion']);
+    const useSyncStorage = await getStoragePreference();
 
-    console.log('📦 Local storage query result:', {
-      hasCustomTabs: !!localResult.customTabs,
-      tabCount: localResult.customTabs?.length || 0,
-      extensionVersion: localResult.extensionVersion || 'none'
-    });
+    if (useSyncStorage) {
+      // Read from sync storage with chunking support
+      console.log('📦 Reading tabs from sync storage (with chunking)');
+      const tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
 
-    // Return tabs from local storage (background script ensures migration is complete)
-    if (localResult.customTabs && localResult.customTabs.length > 0) {
-      const customCount = localResult.customTabs.filter(t => !t.id?.startsWith('default_tab_')).length;
-      console.log('✅ Found', localResult.customTabs.length, 'tabs in local storage (', customCount, 'custom)');
-      return localResult.customTabs;
+      if (tabs && tabs.length > 0) {
+        const customCount = tabs.filter(t => !t.id?.startsWith('default_tab_')).length;
+        console.log('✅ Found', tabs.length, 'tabs in sync storage (', customCount, 'custom)');
+        return tabs;
+      }
+
+      console.log('⚠️ No tabs found in sync storage');
+      return [];
+    } else {
+      // Read from local storage
+      console.log('📦 Reading tabs from local storage');
+      const localResult = await browser.storage.local.get('customTabs');
+
+      if (localResult.customTabs && localResult.customTabs.length > 0) {
+        const customCount = localResult.customTabs.filter(t => !t.id?.startsWith('default_tab_')).length;
+        console.log('✅ Found', localResult.customTabs.length, 'tabs in local storage (', customCount, 'custom)');
+        return localResult.customTabs;
+      }
+
+      console.log('⚠️ No tabs found in local storage');
+      return [];
     }
-
-    // No tabs found
-    console.log('⚠️  No tabs found in local storage');
-    return [];
   } catch (error) {
     console.error('Error getting tabs from storage:', error);
     throw error;
@@ -77,6 +106,7 @@ function cleanTabForStorage(tab) {
 
 /**
  * Save tabs to browser storage
+ * Saves to sync (with chunking) or local storage based on user preference
  */
 async function saveTabs(tabs) {
   try {
@@ -86,12 +116,22 @@ async function saveTabs(tabs) {
     // Clean temporary fields from each tab before saving
     const cleanedTabs = sortedTabs.map(tab => cleanTabForStorage(tab));
 
-    // Save tabs and update extension version marker
-    await browser.storage.local.set({
-      customTabs: cleanedTabs,
-      extensionVersion: '1.4.0'
-    });
-    console.log('Tabs saved successfully to storage (cleaned', cleanedTabs.length, 'tabs)');
+    const useSyncStorage = await getStoragePreference();
+
+    if (useSyncStorage) {
+      // Save to sync storage with chunking support
+      console.log('💾 Saving tabs to sync storage (with chunking)');
+      await SFTabs.storageChunking.saveChunkedSync('customTabs', cleanedTabs);
+      console.log('✅ Tabs saved successfully to sync storage (cleaned', cleanedTabs.length, 'tabs)');
+    } else {
+      // Save to local storage
+      console.log('💾 Saving tabs to local storage');
+      await browser.storage.local.set({
+        customTabs: cleanedTabs,
+        extensionVersion: '1.5.0'
+      });
+      console.log('✅ Tabs saved successfully to local storage (cleaned', cleanedTabs.length, 'tabs)');
+    }
 
     // Update the main state with cleaned tabs
     SFTabs.main.setTabs(cleanedTabs);
@@ -112,11 +152,13 @@ async function saveTabs(tabs) {
 
 /**
  * Get user settings from browser storage
+ * Settings are always stored in sync storage (they're small and benefit from cross-device sync)
  */
 async function getUserSettings() {
   try {
-    const result = await browser.storage.local.get('userSettings');
-    
+    // Settings are always in sync storage (small, no chunking needed)
+    const result = await browser.storage.sync.get('userSettings');
+
     if (result.userSettings) {
       // Merge with defaults to ensure all properties exist
       return { ...SFTabs.constants.DEFAULT_SETTINGS, ...result.userSettings };
@@ -133,21 +175,33 @@ async function getUserSettings() {
 
 /**
  * Save user settings to browser storage
+ * Settings are always stored in sync storage (they're small and benefit from cross-device sync)
  */
-async function saveUserSettings(settings) {
+async function saveUserSettings(settings, skipMigration = false) {
   try {
-    await browser.storage.local.set({ userSettings: settings });
-    console.log('User settings saved successfully to storage');
-    
+    // Check if useSyncStorage preference changed and migration is needed
+    if (!skipMigration && SFTabs.main && SFTabs.main.getUserSettings) {
+      const currentSettings = SFTabs.main.getUserSettings();
+      if (currentSettings.useSyncStorage !== settings.useSyncStorage) {
+        // Storage preference changed - migrate tabs
+        console.log('🔄 Storage preference changed, migrating tabs...');
+        await migrateBetweenStorageTypes(currentSettings.useSyncStorage, settings.useSyncStorage);
+      }
+    }
+
+    // Settings are always in sync storage (small, no chunking needed)
+    await browser.storage.sync.set({ userSettings: settings });
+    console.log('✅ User settings saved successfully to sync storage');
+
     // Update the main state
     SFTabs.main.setUserSettings(settings);
-    
+
     // Apply theme changes immediately
     SFTabs.settings.applyTheme();
-    
+
     // Show success message
     SFTabs.main.showStatus('Settings saved', false);
-    
+
     return settings;
   } catch (error) {
     console.error('Error saving user settings to storage:', error);
@@ -189,7 +243,7 @@ function exportConfiguration() {
     customTabs: cleanedTabs,
     userSettings: settings,
     exportedAt: new Date().toISOString(),
-    version: '1.4.0'
+    version: '1.5.0'
   };
 
   return config;
@@ -210,12 +264,15 @@ async function importConfiguration(configData) {
     // Clear existing data
     await clearAllStorage();
 
-    // Import tabs (saveTabs will handle migration internally)
+    // Import tabs (saveTabs will handle routing to correct storage)
     if (configData.customTabs.length > 0) {
       await saveTabs(configData.customTabs);
     } else {
       // Even with no tabs, mark as installed so we don't reset to defaults
-      await browser.storage.local.set({ extensionVersion: '1.4.0' });
+      const useSyncStorage = await getStoragePreference();
+      if (!useSyncStorage) {
+        await browser.storage.local.set({ extensionVersion: '1.5.0' });
+      }
     }
 
     // Import settings
@@ -240,6 +297,62 @@ async function importConfiguration(configData) {
 }
 
 /**
+ * Migrate tabs between storage types when user changes preference
+ * @param {boolean} fromSync - true if migrating from sync, false if from local
+ * @param {boolean} toSync - true if migrating to sync, false if to local
+ */
+async function migrateBetweenStorageTypes(fromSync, toSync) {
+  try {
+    console.log(`🔄 Starting migration: ${fromSync ? 'sync' : 'local'} → ${toSync ? 'sync' : 'local'}`);
+
+    // Read tabs from source storage
+    let tabs = [];
+    if (fromSync) {
+      // Read from sync storage
+      tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
+    } else {
+      // Read from local storage
+      const localResult = await browser.storage.local.get('customTabs');
+      tabs = localResult.customTabs || [];
+    }
+
+    console.log(`📦 Found ${tabs.length} tabs to migrate`);
+
+    if (tabs.length === 0) {
+      console.log('ℹ️ No tabs to migrate');
+      return;
+    }
+
+    // Save tabs to destination storage
+    if (toSync) {
+      // Save to sync storage with chunking
+      await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
+      console.log('✅ Tabs migrated to sync storage');
+
+      // Clear old local storage
+      await browser.storage.local.remove(['customTabs', 'extensionVersion']);
+      console.log('🗑️ Cleared old local storage');
+    } else {
+      // Save to local storage
+      await browser.storage.local.set({
+        customTabs: tabs,
+        extensionVersion: '1.5.0'
+      });
+      console.log('✅ Tabs migrated to local storage');
+
+      // Clear old sync storage
+      await SFTabs.storageChunking.clearChunkedSync('customTabs');
+      console.log('🗑️ Cleared old sync storage');
+    }
+
+    console.log('✅ Migration complete');
+  } catch (error) {
+    console.error('❌ Error during migration:', error);
+    throw new Error(`Failed to migrate tabs: ${error.message}`);
+  }
+}
+
+/**
  * Listen for storage changes from other parts of the extension
  */
 function setupStorageListeners() {
@@ -249,21 +362,34 @@ function setupStorageListeners() {
 
       if (area === 'local') {
         if (changes.customTabs) {
-          console.log('✅ Tabs changed in storage - updating UI', changes.customTabs);
+          console.log('✅ Tabs changed in local storage - updating UI');
           const newTabs = changes.customTabs.newValue || [];
           SFTabs.main.setTabs(newTabs);
           SFTabs.ui.renderTabList();
         }
-
+      } else if (area === 'sync') {
+        // Handle sync storage changes
         if (changes.userSettings) {
-          console.log('✅ Settings changed in storage - updating UI', changes.userSettings);
+          console.log('✅ Settings changed in sync storage - updating UI');
           const newSettings = changes.userSettings.newValue || SFTabs.constants.DEFAULT_SETTINGS;
           SFTabs.main.setUserSettings(newSettings);
           SFTabs.settings.updateSettingsUI();
           SFTabs.settings.applyTheme();
         }
-      } else {
-        console.log('ℹ️ Storage change ignored - area is not local:', area);
+
+        // Handle chunked tabs changes (check for metadata changes)
+        if (changes.customTabs_metadata || changes.customTabs) {
+          console.log('✅ Tabs changed in sync storage - updating UI');
+          // Re-read tabs from sync storage
+          SFTabs.storageChunking.readChunkedSync('customTabs').then(tabs => {
+            if (tabs) {
+              SFTabs.main.setTabs(tabs);
+              SFTabs.ui.renderTabList();
+            }
+          }).catch(err => {
+            console.error('Error re-reading tabs after sync change:', err);
+          });
+        }
       }
     });
 
@@ -279,6 +405,7 @@ setupStorageListeners();
 // Export functions for use by other modules
 window.SFTabs = window.SFTabs || {};
 window.SFTabs.storage = {
+  getStoragePreference,
   getTabs,
   saveTabs,
   getUserSettings,
@@ -286,5 +413,6 @@ window.SFTabs.storage = {
   clearAllStorage,
   exportConfiguration,
   importConfiguration,
+  migrateBetweenStorageTypes,
   setupStorageListeners
 };

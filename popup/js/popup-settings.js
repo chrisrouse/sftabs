@@ -86,10 +86,10 @@ function setSelectedTheme(theme) {
 function updateSettingsUI() {
   const settings = SFTabs.main.getUserSettings();
   const domElements = SFTabs.main.getDOMElements();
-  
+
   // Update theme selector
   setSelectedTheme(settings.themeMode);
-  
+
   // Update compact mode checkbox
   if (domElements.compactModeCheckbox) {
     domElements.compactModeCheckbox.checked = settings.compactMode;
@@ -98,6 +98,11 @@ function updateSettingsUI() {
   // Update skip delete confirmation checkbox
   if (domElements.skipDeleteConfirmationCheckbox) {
     domElements.skipDeleteConfirmationCheckbox.checked = settings.skipDeleteConfirmation || false;
+  }
+
+  // Update use sync storage checkbox
+  if (domElements.useSyncStorageCheckbox) {
+    domElements.useSyncStorageCheckbox.checked = settings.useSyncStorage !== false; // Default to true
   }
 }
 
@@ -207,6 +212,43 @@ function setupEventListeners() {
       const settings = SFTabs.main.getUserSettings();
       settings.skipDeleteConfirmation = domElements.skipDeleteConfirmationCheckbox.checked;
       SFTabs.storage.saveUserSettings(settings);
+    });
+  }
+
+  // Use sync storage checkbox change
+  if (domElements.useSyncStorageCheckbox) {
+    domElements.useSyncStorageCheckbox.addEventListener('change', async () => {
+      const newValue = domElements.useSyncStorageCheckbox.checked;
+      console.log('Sync storage preference changed to:', newValue);
+
+      // Show confirmation dialog
+      const confirmed = confirm(
+        newValue
+          ? 'Enable cross-device sync?\n\nYour tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you\'re signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.'
+          : 'Disable cross-device sync?\n\nYour tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.'
+      );
+
+      if (confirmed) {
+        const settings = SFTabs.main.getUserSettings();
+        settings.useSyncStorage = newValue;
+
+        try {
+          // saveUserSettings will handle the migration automatically
+          await SFTabs.storage.saveUserSettings(settings);
+          SFTabs.main.showStatus(
+            newValue ? 'Sync enabled - tabs will now sync across devices' : 'Sync disabled - tabs stored locally only',
+            false
+          );
+        } catch (error) {
+          console.error('Error changing sync preference:', error);
+          SFTabs.main.showStatus('Error: ' + error.message, true);
+          // Revert checkbox state on error
+          domElements.useSyncStorageCheckbox.checked = !newValue;
+        }
+      } else {
+        // User cancelled - revert checkbox state
+        domElements.useSyncStorageCheckbox.checked = !newValue;
+      }
     });
   }
 
