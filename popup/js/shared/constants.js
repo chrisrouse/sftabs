@@ -74,11 +74,19 @@ const DEFAULT_TABS = [
   }
 ];
 
+// Storage configuration
+const STORAGE_VERSION = '1.5.0';
+const CHUNK_SIZE = 7000; // bytes - leave 1KB buffer under 8KB limit
+const CHUNK_KEY_PREFIX = 'customTabs_chunk_';
+const SETTINGS_CHUNK_KEY_PREFIX = 'userSettings_chunk_';
+const STORAGE_METADATA_KEY = 'storageMetadata';
+
 // Default user settings
 const DEFAULT_SETTINGS = {
   themeMode: 'light',
   compactMode: false,
-  skipDeleteConfirmation: false
+  skipDeleteConfirmation: false,
+  useSyncStorage: true // Enable cross-device sync by default
 };
 
 // UI selectors
@@ -116,8 +124,9 @@ const SELECTORS = {
   // Settings
   compactModeCheckbox: '#compact-mode',
   skipDeleteConfirmationCheckbox: '#skip-delete-confirmation',
+  useSyncStorageCheckbox: '#use-sync-storage',
   settingsResetButton: '#settings-reset-button',
-  
+
   // Form groups
   hasDropdownGroup: '.has-dropdown-group',
   refreshNavGroup: '.refresh-nav-group'
@@ -143,7 +152,12 @@ if (typeof module !== 'undefined' && module.exports) {
     SELECTORS,
     NAVIGATION_SELECTORS,
     TAB_CONTAINER_SELECTOR,
-    CUSTOM_TAB_CLASS
+    CUSTOM_TAB_CLASS,
+    STORAGE_VERSION,
+    CHUNK_SIZE,
+    CHUNK_KEY_PREFIX,
+    SETTINGS_CHUNK_KEY_PREFIX,
+    STORAGE_METADATA_KEY
   };
 } else {
   // Browser environment
@@ -155,6 +169,11 @@ if (typeof module !== 'undefined' && module.exports) {
     SELECTORS,
     NAVIGATION_SELECTORS,
     TAB_CONTAINER_SELECTOR,
-    CUSTOM_TAB_CLASS
+    CUSTOM_TAB_CLASS,
+    STORAGE_VERSION,
+    CHUNK_SIZE,
+    CHUNK_KEY_PREFIX,
+    SETTINGS_CHUNK_KEY_PREFIX,
+    STORAGE_METADATA_KEY
   };
 }
