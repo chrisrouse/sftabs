@@ -204,22 +204,32 @@ async function initializeContentScript() {
  * Function to try loading tabs with delay and retries
  */
 function delayLoadTabs(attemptCount) {
+  // Check if tabs are already initialized
+  console.log(`delayLoadTabs called - tabsInitialized: ${tabsInitialized}`);
+  if (tabsInitialized) {
+    console.log("Tabs already initialized - skipping retry attempt");
+    return;
+  }
+
   const tabContainer = document.querySelector('.tabBarItems.slds-grid');
   attemptCount++;
-  
+
   console.log(`Tab loading attempt ${attemptCount}/${maxLoadAttempts}`);
-  
+
   if (attemptCount > maxLoadAttempts) {
     console.error("SF Tabs - failed to find tab container after max attempts");
     return;
   }
-  
+
   if (!tabContainer) {
     setTimeout(() => {
       delayLoadTabs(attemptCount);
     }, 2000);
   } else {
     console.log("Tab container found - initializing tabs");
+    // Set flag immediately to prevent race conditions
+    tabsInitialized = true;
+    console.log(`delayLoadTabs - set tabsInitialized to: ${tabsInitialized}`);
     // Use the tab renderer if available, otherwise fall back to direct initialization
     if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
       window.SFTabsContent.tabRenderer.initTabs(tabContainer);
@@ -227,7 +237,6 @@ function delayLoadTabs(attemptCount) {
       // Fallback initialization if modules aren't loaded
       initTabsWithLightningNavigation(tabContainer);
     }
-    tabsInitialized = true;
   }
 }
 
@@ -480,15 +489,27 @@ function navigateToNavigationItem(navItem, parentTab) {
 function setupDropdownEventHandlers() {
   // Close dropdowns when clicking outside
   document.addEventListener('click', (e) => {
-    // Only close our custom dropdowns when clicking outside, not Salesforce native dropdowns
-    if (!e.target.closest('.sf-tabs-custom-tab')) {
+    // Only close our custom dropdowns when clicking outside
+    // Don't close if clicking inside:
+    // - .sf-tabs-custom-tab (the tab itself)
+    // - .sftabs-custom-dropdown (main dropdown menu)
+    // - .submenu-container (nested submenus)
+    // - .submenu-bridge (invisible bridge between menu and submenu)
+    if (!e.target.closest('.sf-tabs-custom-tab') &&
+        !e.target.closest('.sftabs-custom-dropdown') &&
+        !e.target.closest('.submenu-container') &&
+        !e.target.closest('.submenu-bridge')) {
       document.querySelectorAll('.sftabs-custom-dropdown').forEach(dropdown => {
         dropdown.classList.remove('visible');
         dropdown.style.display = 'none';
       });
+      // Also close any open submenus
+      document.querySelectorAll('.submenu-container').forEach(submenu => {
+        submenu.style.display = 'none';
+      });
     }
   });
-  
+
   console.log('Dropdown event handlers setup complete');
 }
 
@@ -681,20 +702,25 @@ function handleNavigateToTab(message, sendResponse) {
  */
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
+    // Debounced handler for tab refresh to prevent rapid successive calls
+    const debouncedRefreshTabs = debounce(() => {
+      console.log("Tabs changed in storage - refreshing tabs on page");
+      const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+      if (tabContainer) {
+        if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
+          window.SFTabsContent.tabRenderer.initTabs(tabContainer);
+        } else {
+          initTabsWithLightningNavigation(tabContainer);
+        }
+      }
+    }, 500);
+
     browser.storage.onChanged.addListener((changes, area) => {
       console.log('Storage changed:', { area, changes: Object.keys(changes) });
 
       // Check for both 'local' and 'sync' areas since we use storage.local
       if ((area === 'local' || area === 'sync') && changes.customTabs) {
-        console.log("Tabs changed in storage - refreshing tabs on page");
-        const tabContainer = document.querySelector('.tabBarItems.slds-grid');
-        if (tabContainer) {
-          if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-            window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-          } else {
-            initTabsWithLightningNavigation(tabContainer);
-          }
-        }
+        debouncedRefreshTabs();
       }
 
       if ((area === 'local' || area === 'sync') && changes.userSettings) {
@@ -703,35 +729,81 @@ function setupStorageListeners() {
       }
     });
   }
-  
+
   console.log('Storage listeners setup complete');
 }
 
 /**
- * Setup URL change detection
+ * Debounce helper function
+ */
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Handle URL changes and refresh tabs
+ */
+function handleUrlChange() {
+  console.log("URL changed - checking for tab container");
+
+  setTimeout(() => {
+    const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+    if (tabContainer) {
+      if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
+        window.SFTabsContent.tabRenderer.initTabs(tabContainer);
+      } else {
+        initTabsWithLightningNavigation(tabContainer);
+      }
+    }
+  }, 500);
+}
+
+/**
+ * Setup URL change detection using modern event-based approach
  */
 function setupUrlChangeDetection() {
   let lastUrl = location.href;
-  
-  setInterval(() => {
+
+  // Debounced handler to prevent rapid successive calls
+  const debouncedHandleUrlChange = debounce(handleUrlChange, 300);
+
+  // Listen for browser navigation events (back/forward buttons)
+  window.addEventListener('popstate', () => {
     if (location.href !== lastUrl) {
-      console.log("URL changed - checking for tab container");
       lastUrl = location.href;
-      
-      setTimeout(() => {
-        const tabContainer = document.querySelector('.tabBarItems.slds-grid');
-        if (tabContainer) {
-          if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-            window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-          } else {
-            initTabsWithLightningNavigation(tabContainer);
-          }
-        }
-      }, 1000);
+      debouncedHandleUrlChange();
     }
-  }, 1000);
-  
-  console.log('URL change detection setup complete');
+  });
+
+  // Listen for Salesforce Lightning navigation events via mutation observer
+  // This catches SPA navigation that doesn't trigger popstate
+  const urlObserver = new MutationObserver(() => {
+    if (location.href !== lastUrl) {
+      lastUrl = location.href;
+      debouncedHandleUrlChange();
+    }
+  });
+
+  // Observe changes to the document title and body (Lightning updates these during navigation)
+  if (document.querySelector('title')) {
+    urlObserver.observe(document.querySelector('title'), { childList: true, subtree: true });
+  }
+
+  // Also observe the main content area for Lightning navigation
+  const mainContent = document.querySelector('div.oneAlohaPage, div.slds-template__container');
+  if (mainContent) {
+    urlObserver.observe(mainContent, { childList: true, subtree: true });
+  }
+
+  console.log('URL change detection setup complete (event-based)');
 }
 
 /**
@@ -743,14 +815,16 @@ function setupMutationObserver() {
     
     if (tabContainer && !tabsInitialized) {
       observer.disconnect();
-      
+
       console.log("Tab container found via mutation observer");
+      // Set flag immediately to prevent race conditions
+      tabsInitialized = true;
+      console.log(`Mutation observer - set tabsInitialized to: ${tabsInitialized}`);
       if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
         window.SFTabsContent.tabRenderer.initTabs(tabContainer);
       } else {
         initTabsWithLightningNavigation(tabContainer);
       }
-      tabsInitialized = true;
       
       // Re-highlight the active tab
       setTimeout(() => {

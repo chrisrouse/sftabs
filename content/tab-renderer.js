@@ -1,6 +1,9 @@
 // content/tab-renderer.js
 // Tab rendering in Salesforce pages
 
+// Flag to prevent concurrent renders
+let isRenderingTabs = false;
+
 /**
  * Initialize tabs in the given container
  */
@@ -9,6 +12,15 @@ function initTabs(tabContainer) {
     console.log("No tab container found");
     return;
   }
+
+  // Prevent concurrent renders
+  if (isRenderingTabs) {
+    console.log("Tab render already in progress - skipping duplicate call");
+    return;
+  }
+
+  isRenderingTabs = true;
+  console.log("Starting tab render...");
 
   browser.storage.local.get(['customTabs', 'userSettings']).then(result => {
     let tabsToUse = [];
@@ -102,11 +114,16 @@ function initTabs(tabContainer) {
     // Check for overflow and handle it (use longer timeout for accurate measurement)
     setTimeout(() => {
       handleTabOverflow(tabContainer, topLevelTabs);
+      // Reset flag after overflow handling completes
+      isRenderingTabs = false;
+      console.log("Tab render complete");
     }, 200);
 
     console.log("Enhanced tabs successfully added to container");
   }).catch(error => {
     console.error("Error loading tabs:", error);
+    // Reset flag on error
+    isRenderingTabs = false;
   });
 }
 
@@ -353,6 +370,12 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
         itemLi.submenuElement.remove();
       }
 
+      // Store parent-child relationship for hover logic
+      // The menu parameter is the parent submenu container
+      const parentSubmenuId = menu?.dataset?.submenuId || 'root';
+      submenuContainer.dataset.parentSubmenu = parentSubmenuId;
+      submenuContainer.dataset.submenuId = `submenu-${Date.now()}-${Math.random()}`;
+
       // Append submenu to document body to avoid overflow clipping
       document.body.appendChild(submenuContainer);
 
@@ -464,12 +487,23 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       };
 
       // Add hover delay management
+      // Store timeout on submenu element so children can access it
       let hideTimeout;
 
       // Set up mouseenter handler to show and position submenu
       itemLi.addEventListener('mouseenter', () => {
-        // Clear any pending hide timeout
+        // Clear any pending hide timeout for this submenu
         clearTimeout(hideTimeout);
+        clearTimeout(submenuContainer.hideTimeout);
+
+        // Also clear parent's hide timeout to prevent parent from closing
+        const parentSubmenuId = submenuContainer.dataset.parentSubmenu;
+        if (parentSubmenuId && parentSubmenuId !== 'root') {
+          const parentSubmenu = document.querySelector(`.submenu-container[data-submenu-id="${parentSubmenuId}"]`);
+          if (parentSubmenu && parentSubmenu.hideTimeout) {
+            clearTimeout(parentSubmenu.hideTimeout);
+          }
+        }
 
         // Close other submenus at the same level
         const siblings = container.querySelectorAll(':scope > li');
@@ -500,10 +534,30 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       // Keep submenu visible when hovering over it or the bridge
       submenuContainer.addEventListener('mouseenter', () => {
         clearTimeout(hideTimeout);
+        clearTimeout(submenuContainer.hideTimeout);
+
+        // Also clear parent's hide timeout
+        const parentSubmenuId = submenuContainer.dataset.parentSubmenu;
+        if (parentSubmenuId && parentSubmenuId !== 'root') {
+          const parentSubmenu = document.querySelector(`.submenu-container[data-submenu-id="${parentSubmenuId}"]`);
+          if (parentSubmenu && parentSubmenu.hideTimeout) {
+            clearTimeout(parentSubmenu.hideTimeout);
+          }
+        }
       });
 
       bridge.addEventListener('mouseenter', () => {
         clearTimeout(hideTimeout);
+        clearTimeout(submenuContainer.hideTimeout);
+
+        // Also clear parent's hide timeout
+        const parentSubmenuId = submenuContainer.dataset.parentSubmenu;
+        if (parentSubmenuId && parentSubmenuId !== 'root') {
+          const parentSubmenu = document.querySelector(`.submenu-container[data-submenu-id="${parentSubmenuId}"]`);
+          if (parentSubmenu && parentSubmenu.hideTimeout) {
+            clearTimeout(parentSubmenu.hideTimeout);
+          }
+        }
       });
 
       // Hide submenu when leaving the submenu (with delay)
@@ -511,13 +565,28 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
         // Check if we're moving to a child submenu
         const relatedTarget = e.relatedTarget;
         if (relatedTarget) {
-          // Check if the target is a child submenu or its bridge
-          const isChildSubmenu = relatedTarget.classList?.contains('submenu-container') ||
-                                 relatedTarget.classList?.contains('submenu-bridge');
+          // Check if the target is inside this menu (including nested children)
           const isInsideThisMenu = submenuContainer.contains(relatedTarget);
 
-          if (isChildSubmenu || isInsideThisMenu) {
-            // Moving to child or staying inside, don't hide
+          // Check if we're moving to the parent item
+          const isParentItem = itemLi.contains(relatedTarget);
+
+          // Check if we're moving to a child submenu (by checking parent relationship)
+          let isMovingToChildSubmenu = false;
+          const targetSubmenu = relatedTarget.closest?.('.submenu-container');
+          if (targetSubmenu) {
+            // Check if this target submenu is a logical child of the current submenu
+            const currentSubmenuId = submenuContainer.dataset.submenuId;
+            if (targetSubmenu.dataset.parentSubmenu === currentSubmenuId) {
+              isMovingToChildSubmenu = true;
+            }
+          }
+
+          // Check if we're moving to a bridge
+          const isMovingToBridge = relatedTarget.closest?.('.submenu-bridge');
+
+          if (isInsideThisMenu || isParentItem || isMovingToChildSubmenu || isMovingToBridge) {
+            // Moving to child, staying inside, back to parent, or to bridge - don't hide
             return;
           }
         }
@@ -526,6 +595,9 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
           submenuContainer.style.setProperty('display', 'none', 'important');
           bridge.style.setProperty('display', 'none', 'important');
         }, 300);
+
+        // Store timeout on submenu element so children can cancel it
+        submenuContainer.hideTimeout = hideTimeout;
       });
 
       bridge.addEventListener('mouseleave', (e) => {
@@ -1178,6 +1250,10 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
   ul.style.margin = '0';
   ul.style.padding = '0';
 
+  // Store parent-child relationship for hover logic (needed for nested items to find parent)
+  submenuContainer.dataset.parentSubmenu = 'root'; // This is a top-level overflow submenu
+  submenuContainer.dataset.submenuId = `overflow-submenu-${Date.now()}-${Math.random()}`;
+
   // Render dropdown items using the existing recursive renderer
   // Pass submenuContainer as the menu so nested items position relative to this submenu
   renderDropdownItemsRecursive(tab.dropdownItems, ul, tab, submenuContainer, 0);
@@ -1286,6 +1362,10 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
 
   // Show submenu on hover
   itemLi.addEventListener('mouseenter', () => {
+    // Clear any pending hide timeout for this submenu
+    clearTimeout(hideTimeout);
+    clearTimeout(submenuContainer.hideTimeout);
+
     // Close other submenus
     const siblings = itemLi.parentElement.querySelectorAll(':scope > li');
     siblings.forEach(sibling => {
@@ -1314,24 +1394,42 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
   // Keep submenu visible when hovering over it or the bridge
   submenuContainer.addEventListener('mouseenter', () => {
     clearTimeout(hideTimeout);
+    clearTimeout(submenuContainer.hideTimeout);
   });
 
   bridge.addEventListener('mouseenter', () => {
     clearTimeout(hideTimeout);
+    clearTimeout(submenuContainer.hideTimeout);
   });
 
   // Hide when leaving submenu (with delay)
   submenuContainer.addEventListener('mouseleave', (e) => {
-    // Check if we're moving to a child submenu
     const relatedTarget = e.relatedTarget;
+
+    // Check if we're moving to a child submenu
     if (relatedTarget) {
-      // Check if the target is a child submenu or its bridge
-      const isChildSubmenu = relatedTarget.classList?.contains('submenu-container') ||
-                             relatedTarget.classList?.contains('submenu-bridge');
+      // Check if the target is inside this menu (including nested children)
       const isInsideThisMenu = submenuContainer.contains(relatedTarget);
 
-      if (isChildSubmenu || isInsideThisMenu) {
-        // Moving to child or staying inside, don't hide
+      // Check if we're moving back to the parent item
+      const isParentItem = itemLi.contains(relatedTarget);
+
+      // Check if we're moving to a child submenu (by checking if target is inside any submenu that's a child of this one)
+      let isMovingToChildSubmenu = false;
+      const targetSubmenu = relatedTarget.closest?.('.submenu-container');
+      if (targetSubmenu) {
+        // Check if this target submenu is a logical child of the current submenu
+        const currentSubmenuId = submenuContainer.dataset.submenuId;
+        if (targetSubmenu.dataset.parentSubmenu === currentSubmenuId) {
+          isMovingToChildSubmenu = true;
+        }
+      }
+
+      // Check if we're moving to a bridge
+      const isMovingToBridge = relatedTarget.closest?.('.submenu-bridge');
+
+      if (isInsideThisMenu || isParentItem || isMovingToChildSubmenu || isMovingToBridge) {
+        // Moving to child, staying inside, back to parent, or to bridge - don't hide
         return;
       }
     }
@@ -1340,6 +1438,9 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
       submenuContainer.style.setProperty('display', 'none', 'important');
       bridge.style.setProperty('display', 'none', 'important');
     }, 300);
+
+    // Store timeout on submenu element so children can cancel it
+    submenuContainer.hideTimeout = hideTimeout;
   });
 
   bridge.addEventListener('mouseleave', (e) => {
@@ -1464,16 +1565,8 @@ function createOverflowDropdown(hiddenTabs) {
   return menu;
 }
 
-// Setup global dropdown event handlers
-document.addEventListener('click', (e) => {
-  // Only close our custom dropdowns when clicking outside, not Salesforce native dropdowns or overflow button
-  if (!e.target.closest('.sf-tabs-custom-tab') && !e.target.closest('.sf-tabs-overflow-button')) {
-    document.querySelectorAll('.sftabs-custom-dropdown').forEach(dropdown => {
-      dropdown.classList.remove('visible');
-      dropdown.style.display = 'none';
-    });
-  }
-});
+// Note: Global click handler for closing dropdowns is now in content-main.js
+// to avoid duplicate event listeners when tabs re-render
 
 // Setup window resize handler for overflow recalculation
 let resizeTimeout;

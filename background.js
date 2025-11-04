@@ -58,7 +58,9 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
           });
         })
       }
-    }
+    },
+    commands: chrome.commands,
+    tabs: chrome.tabs
   };
 }
 

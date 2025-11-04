@@ -163,7 +163,7 @@ window.addEventListener("message", function(event) {
  * Check Lightning framework availability
  */
 function checkLightningAvailability() {
-  const isAvailable = typeof $A !== 'undefined' && $A.get;
+  const isAvailable = typeof $A !== 'undefined' && typeof $A.get === 'function';
   console.log("Lightning framework availability:", isAvailable);
   
   if (isAvailable) {
