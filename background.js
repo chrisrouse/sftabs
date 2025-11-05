@@ -27,6 +27,15 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
               resolve();
             }
           });
+        }),
+        remove: (keys) => new Promise((resolve, reject) => {
+          chrome.storage.local.remove(keys, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
         })
       },
       sync: {
@@ -41,6 +50,15 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
         }),
         set: (items) => new Promise((resolve, reject) => {
           chrome.storage.sync.set(items, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
+        }),
+        remove: (keys) => new Promise((resolve, reject) => {
+          chrome.storage.sync.remove(keys, () => {
             if (chrome.runtime.lastError) {
               reject(chrome.runtime.lastError);
             } else {
