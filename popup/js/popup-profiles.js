@@ -1,39 +1,59 @@
 // popup/js/popup-profiles.js
 // Profile management functionality
 
-// Mock profile data for UI preview
-const mockProfiles = [
-  {
-    id: 'profile_1',
-    name: 'Default',
-    tabCount: 5,
-    urlPatterns: []
-  },
-  {
-    id: 'profile_2',
-    name: 'Work - SmartBot',
-    tabCount: 8,
-    urlPatterns: ['smartbottechnology-dev-ed', 'smartbot']
-  },
-  {
-    id: 'profile_3',
-    name: 'Dev - Amplify',
-    tabCount: 6,
-    urlPatterns: ['amplify--dev', 'amplify--uat']
+// In-memory cache of profiles (loaded from storage)
+let profilesCache = [];
+
+// Track the profile being edited
+let editingProfile = null;
+
+/**
+ * Load profiles from storage into cache
+ */
+async function loadProfiles() {
+  try {
+    profilesCache = await SFTabs.storage.getProfiles();
+    console.log('Loaded', profilesCache.length, 'profiles from storage');
+  } catch (error) {
+    console.error('Error loading profiles:', error);
+    profilesCache = [];
   }
-];
+}
 
-// Track the active profile
-let activeProfileId = 'profile_1';
+/**
+ * Generate a unique profile ID
+ */
+function generateProfileId() {
+  return 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
 
-// Track the default profile
-let defaultProfileId = 'profile_1';
+/**
+ * Get active profile ID from settings
+ */
+async function getActiveProfileId() {
+  const settings = await SFTabs.storage.getUserSettings();
+  return settings.activeProfileId;
+}
+
+/**
+ * Get default profile ID from settings
+ */
+async function getDefaultProfileId() {
+  const settings = await SFTabs.storage.getUserSettings();
+  return settings.defaultProfileId;
+}
 
 /**
  * Initialize profiles functionality
  */
-function initProfiles() {
+async function initProfiles() {
   console.log('Initializing profiles UI');
+
+  // Load profiles from storage
+  await loadProfiles();
+
+  // Load settings to check if profiles are enabled
+  const settings = await SFTabs.storage.getUserSettings();
 
   // Get DOM elements
   const profilesButton = document.querySelector('#profiles-button');
@@ -44,20 +64,40 @@ function initProfiles() {
   const profileNameInput = document.querySelector('#profile-name');
   const profileNameCounter = document.querySelector('#profile-name-counter');
 
+  // Set initial checkbox states from settings
+  if (enableProfilesCheckbox) {
+    enableProfilesCheckbox.checked = settings.profilesEnabled || false;
+  }
+  if (autoSwitchCheckbox) {
+    autoSwitchCheckbox.checked = settings.autoSwitchProfiles || false;
+  }
+
+  // Show/hide UI based on settings
+  toggleProfilesEnabled(settings.profilesEnabled || false);
+  toggleUrlPatternsSection(settings.autoSwitchProfiles || false);
+
   // Setup event listeners
   if (profilesButton) {
     profilesButton.addEventListener('click', showProfileList);
   }
 
   if (enableProfilesCheckbox) {
-    enableProfilesCheckbox.addEventListener('change', function() {
-      toggleProfilesEnabled(this.checked);
+    enableProfilesCheckbox.addEventListener('change', async function() {
+      const enabled = this.checked;
+      const settings = await SFTabs.storage.getUserSettings();
+      settings.profilesEnabled = enabled;
+      await SFTabs.storage.saveUserSettings(settings);
+      toggleProfilesEnabled(enabled);
     });
   }
 
   if (autoSwitchCheckbox) {
-    autoSwitchCheckbox.addEventListener('change', function() {
-      toggleUrlPatternsSection(this.checked);
+    autoSwitchCheckbox.addEventListener('change', async function() {
+      const enabled = this.checked;
+      const settings = await SFTabs.storage.getUserSettings();
+      settings.autoSwitchProfiles = enabled;
+      await SFTabs.storage.saveUserSettings(settings);
+      toggleUrlPatternsSection(enabled);
     });
   }
 
@@ -181,13 +221,14 @@ function updateCharacterCounter(length) {
 /**
  * Update active profile banner
  */
-function updateActiveProfileBanner() {
+async function updateActiveProfileBanner() {
   const banner = document.querySelector('#active-profile-banner');
   const profileName = document.querySelector('#active-profile-name');
 
   if (!banner || !profileName) return;
 
-  const activeProfile = mockProfiles.find(p => p.id === activeProfileId);
+  const activeProfileId = await getActiveProfileId();
+  const activeProfile = profilesCache.find(p => p.id === activeProfileId);
 
   if (activeProfile) {
     profileName.textContent = activeProfile.name;
@@ -197,31 +238,54 @@ function updateActiveProfileBanner() {
 /**
  * Switch active profile
  */
-function switchActiveProfile(profileId) {
+async function switchActiveProfile(profileId) {
   console.log('Switching to profile:', profileId);
 
   if (!profileId) return;
 
-  activeProfileId = profileId;
+  try {
+    // Save active profile to settings
+    const settings = await SFTabs.storage.getUserSettings();
+    settings.activeProfileId = profileId;
+    await SFTabs.storage.saveUserSettings(settings);
 
-  // Update banner
-  updateActiveProfileBanner();
+    // Update profile's last active timestamp
+    const profile = profilesCache.find(p => p.id === profileId);
+    if (profile) {
+      profile.lastActive = new Date().toISOString();
+      await SFTabs.storage.saveProfiles(profilesCache);
+    }
 
-  // Update active profile selector
-  const activeProfileSelector = document.querySelector('#active-profile-selector');
-  if (activeProfileSelector) {
-    activeProfileSelector.value = profileId;
-  }
+    // Update banner
+    await updateActiveProfileBanner();
 
-  // In real implementation, this would:
-  // 1. Load tabs for the selected profile
-  // 2. Update the tab list display
-  // 3. Save active profile to storage
+    // Update active profile selector
+    const activeProfileSelector = document.querySelector('#active-profile-selector');
+    if (activeProfileSelector) {
+      activeProfileSelector.value = profileId;
+    }
 
-  if (window.SFTabs && window.SFTabs.main) {
-    const activeProfile = mockProfiles.find(p => p.id === profileId);
-    if (activeProfile) {
-      window.SFTabs.main.showStatus(`Switched to profile: ${activeProfile.name}`, false);
+    // Load tabs for the selected profile
+    const profileTabs = await SFTabs.storage.getProfileTabs(profileId);
+
+    // Update the main tabs state
+    if (window.SFTabs && window.SFTabs.main) {
+      SFTabs.main.setTabs(profileTabs);
+
+      // Re-render the tab list
+      if (SFTabs.ui && SFTabs.ui.renderTabList) {
+        SFTabs.ui.renderTabList();
+      }
+
+      const activeProfile = profilesCache.find(p => p.id === profileId);
+      if (activeProfile) {
+        SFTabs.main.showStatus(`Switched to profile: ${activeProfile.name}`, false);
+      }
+    }
+  } catch (error) {
+    console.error('Error switching profile:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      SFTabs.main.showStatus('Error switching profile: ' + error.message, true);
     }
   }
 }
@@ -229,15 +293,15 @@ function switchActiveProfile(profileId) {
 /**
  * Populate active profile selector
  */
-function populateActiveProfileSelector() {
+async function populateActiveProfileSelector() {
   const selector = document.querySelector('#active-profile-selector');
   if (!selector) return;
 
   // Clear existing options except the first one
   selector.innerHTML = '<option value="">Select a profile...</option>';
 
-  // Add mock profiles
-  mockProfiles.forEach(profile => {
+  // Add profiles from cache
+  profilesCache.forEach(profile => {
     const option = document.createElement('option');
     option.value = profile.id;
     option.textContent = profile.name;
@@ -245,14 +309,18 @@ function populateActiveProfileSelector() {
   });
 
   // Set current active profile
-  selector.value = activeProfileId;
+  const activeProfileId = await getActiveProfileId();
+  selector.value = activeProfileId || '';
 }
 
 /**
  * Show profile list
  */
-function showProfileList() {
+async function showProfileList() {
   console.log('Showing profile list');
+
+  // Reload profiles from storage
+  await loadProfiles();
 
   // Hide other action panel content
   const tabSettingsContent = document.querySelector('#tab-settings-content');
@@ -266,10 +334,10 @@ function showProfileList() {
   if (actionPanelTitle) actionPanelTitle.textContent = 'Profiles';
 
   // Populate active profile selector
-  populateActiveProfileSelector();
+  await populateActiveProfileSelector();
 
-  // Render profile list with mock data
-  renderProfileList();
+  // Render profile list
+  await renderProfileList();
 
   // Show action panel
   if (window.SFTabs && window.SFTabs.main) {
@@ -291,7 +359,7 @@ function showProfileList() {
 /**
  * Render profile list
  */
-function renderProfileList() {
+async function renderProfileList() {
   const profileList = document.querySelector('#profile-list');
   const profileCount = document.querySelector('#profile-count');
 
@@ -299,15 +367,18 @@ function renderProfileList() {
 
   // Update count
   if (profileCount) {
-    profileCount.textContent = mockProfiles.length;
+    profileCount.textContent = profilesCache.length;
   }
 
   // Clear existing items
   profileList.innerHTML = '';
 
+  // Get default profile ID
+  const defaultProfileId = await getDefaultProfileId();
+
   // Add profile items
-  mockProfiles.forEach((profile, index) => {
-    const profileItem = createProfileListItem(profile, index);
+  profilesCache.forEach((profile, index) => {
+    const profileItem = createProfileListItem(profile, index, defaultProfileId);
     profileList.appendChild(profileItem);
   });
 }
@@ -315,7 +386,7 @@ function renderProfileList() {
 /**
  * Create a profile list item - matches dropdown menu style
  */
-function createProfileListItem(profile, index) {
+function createProfileListItem(profile, index, defaultProfileId) {
   const div = document.createElement('div');
   div.className = 'profile-item';
 
@@ -419,23 +490,39 @@ function createProfileListItem(profile, index) {
 /**
  * Set default profile
  */
-function setDefaultProfile(profileId) {
+async function setDefaultProfile(profileId) {
   console.log('Setting default profile:', profileId);
 
-  defaultProfileId = profileId;
+  try {
+    // Update all profiles' isDefault flag
+    profilesCache.forEach(p => {
+      p.isDefault = (p.id === profileId);
+    });
 
-  // Re-render the profile list to update button states
-  renderProfileList();
+    // Save to storage
+    await SFTabs.storage.saveProfiles(profilesCache);
 
-  // Show status message
-  if (window.SFTabs && window.SFTabs.main) {
-    const profile = mockProfiles.find(p => p.id === profileId);
-    if (profile) {
-      window.SFTabs.main.showStatus(`"${profile.name}" set as default profile`, false);
+    // Update settings
+    const settings = await SFTabs.storage.getUserSettings();
+    settings.defaultProfileId = profileId;
+    await SFTabs.storage.saveUserSettings(settings);
+
+    // Re-render the profile list to update button states
+    await renderProfileList();
+
+    // Show status message
+    if (window.SFTabs && window.SFTabs.main) {
+      const profile = profilesCache.find(p => p.id === profileId);
+      if (profile) {
+        window.SFTabs.main.showStatus(`"${profile.name}" set as default profile`, false);
+      }
+    }
+  } catch (error) {
+    console.error('Error setting default profile:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Error setting default profile: ' + error.message, true);
     }
   }
-
-  // In real implementation, save to storage
 }
 
 /**
@@ -443,6 +530,9 @@ function setDefaultProfile(profileId) {
  */
 function showProfileEditForm(profile = null) {
   console.log('Showing profile edit form', profile);
+
+  // Store the profile being edited
+  editingProfile = profile;
 
   // Hide other action panel content
   const tabSettingsContent = document.querySelector('#tab-settings-content');
@@ -625,8 +715,9 @@ function addUrlPattern() {
     return;
   }
 
-  // Check for duplicates across all profiles (mock validation)
-  const duplicate = mockProfiles.find(p =>
+  // Check for duplicates across all profiles (excluding current profile being edited)
+  const duplicate = profilesCache.find(p =>
+    p.id !== editingProfile?.id &&
     p.urlPatterns && p.urlPatterns.includes(pattern)
   );
 
@@ -710,7 +801,7 @@ function captureCurrentDomain() {
 /**
  * Save profile
  */
-function saveProfile() {
+async function saveProfile() {
   const nameInput = document.querySelector('#profile-name');
 
   if (!nameInput) return;
@@ -724,34 +815,108 @@ function saveProfile() {
     return;
   }
 
-  console.log('Saving profile:', name);
+  try {
+    console.log('Saving profile:', name);
 
-  // In real implementation, save to storage
-  // For now, just show success and return to list
-  if (window.SFTabs && window.SFTabs.main) {
-    window.SFTabs.main.showStatus('Profile saved (demo)', false);
+    // Get URL patterns from the list
+    const urlPatterns = Array.from(document.querySelectorAll('.url-pattern-item span[style*="flex: 1"]'))
+      .map(el => el.textContent.replace(/^\d+\.\s*/, '').trim());
+
+    if (editingProfile) {
+      // Update existing profile
+      const profile = profilesCache.find(p => p.id === editingProfile.id);
+      if (profile) {
+        profile.name = name;
+        profile.urlPatterns = urlPatterns;
+      }
+    } else {
+      // Create new profile
+      const newProfile = {
+        id: generateProfileId(),
+        name: name,
+        isDefault: profilesCache.length === 0, // First profile is default
+        urlPatterns: urlPatterns,
+        createdAt: new Date().toISOString(),
+        lastActive: null
+      };
+      profilesCache.push(newProfile);
+
+      // If this is the first profile, set it as default in settings
+      if (profilesCache.length === 1) {
+        const settings = await SFTabs.storage.getUserSettings();
+        settings.defaultProfileId = newProfile.id;
+        await SFTabs.storage.saveUserSettings(settings);
+      }
+    }
+
+    // Save to storage
+    await SFTabs.storage.saveProfiles(profilesCache);
+
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Profile saved', false);
+    }
+
+    setTimeout(() => {
+      showProfileList();
+    }, 800);
+  } catch (error) {
+    console.error('Error saving profile:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Error saving profile: ' + error.message, true);
+    }
   }
-
-  setTimeout(() => {
-    showProfileList();
-  }, 800);
 }
 
 /**
  * Delete profile
  */
-function deleteProfile(profile) {
+async function deleteProfile(profile) {
   console.log('Deleting profile:', profile.name);
 
-  // In real implementation, show confirmation modal and delete from storage
-  if (window.SFTabs && window.SFTabs.main) {
-    window.SFTabs.main.showStatus(`Profile "${profile.name}" deleted (demo)`, false);
-  }
+  // Confirm deletion
+  const confirmed = confirm(`Are you sure you want to delete the profile "${profile.name}"? This cannot be undone.`);
+  if (!confirmed) return;
 
-  // Re-render list (in real implementation, remove from array first)
-  setTimeout(() => {
-    renderProfileList();
-  }, 500);
+  try {
+    // Remove from cache
+    const index = profilesCache.findIndex(p => p.id === profile.id);
+    if (index > -1) {
+      profilesCache.splice(index, 1);
+    }
+
+    // Save to storage
+    await SFTabs.storage.saveProfiles(profilesCache);
+
+    // Check if this was the active or default profile
+    const settings = await SFTabs.storage.getUserSettings();
+    let settingsChanged = false;
+
+    if (settings.activeProfileId === profile.id) {
+      settings.activeProfileId = profilesCache.length > 0 ? profilesCache[0].id : null;
+      settingsChanged = true;
+    }
+
+    if (settings.defaultProfileId === profile.id) {
+      settings.defaultProfileId = profilesCache.length > 0 ? profilesCache[0].id : null;
+      settingsChanged = true;
+    }
+
+    if (settingsChanged) {
+      await SFTabs.storage.saveUserSettings(settings);
+    }
+
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus(`Profile "${profile.name}" deleted`, false);
+    }
+
+    // Re-render list
+    await renderProfileList();
+  } catch (error) {
+    console.error('Error deleting profile:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Error deleting profile: ' + error.message, true);
+    }
+  }
 }
 
 // Initialize when DOM is ready

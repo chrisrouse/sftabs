@@ -15,6 +15,16 @@ const TAB_STRUCTURE = {
   position: 0
 };
 
+// Profile data structure
+const PROFILE_STRUCTURE = {
+  id: '',
+  name: '',
+  isDefault: false,
+  urlPatterns: [],
+  createdAt: '',
+  lastActive: ''
+};
+
 // Default tabs configuration
 const DEFAULT_TABS = [
   {
@@ -86,7 +96,11 @@ const DEFAULT_SETTINGS = {
   themeMode: 'light',
   compactMode: false,
   skipDeleteConfirmation: false,
-  useSyncStorage: true // Enable cross-device sync by default
+  useSyncStorage: true, // Enable cross-device sync by default
+  profilesEnabled: false, // Enable profiles feature
+  autoSwitchProfiles: false, // Enable auto-switching based on URL patterns
+  activeProfileId: null, // Currently active profile ID (null = no profiles mode)
+  defaultProfileId: null // Default profile to use when auto-switch doesn't match
 };
 
 // UI selectors
@@ -147,6 +161,7 @@ const CUSTOM_TAB_CLASS = 'sf-tabs-custom-tab';
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     TAB_STRUCTURE,
+    PROFILE_STRUCTURE,
     DEFAULT_TABS,
     DEFAULT_SETTINGS,
     SELECTORS,
@@ -164,6 +179,7 @@ if (typeof module !== 'undefined' && module.exports) {
   window.SFTabs = window.SFTabs || {};
   window.SFTabs.constants = {
     TAB_STRUCTURE,
+    PROFILE_STRUCTURE,
     DEFAULT_TABS,
     DEFAULT_SETTINGS,
     SELECTORS,

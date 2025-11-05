@@ -400,6 +400,151 @@ function setupStorageListeners() {
   }
 }
 
+/**
+ * Get profiles from browser storage
+ * Reads from sync (with chunking) or local storage based on user preference
+ * @returns {Promise<Array>} Array of profile objects
+ */
+async function getProfiles() {
+  try {
+    const useSyncStorage = await getStoragePreference();
+
+    if (useSyncStorage) {
+      // Read from sync storage with chunking support
+      console.log('📦 Reading profiles from sync storage (with chunking)');
+      const profiles = await SFTabs.storageChunking.readChunkedSync('profiles');
+
+      if (profiles && profiles.length > 0) {
+        console.log('✅ Found', profiles.length, 'profiles in sync storage');
+        return profiles;
+      }
+
+      console.log('⚠️ No profiles found in sync storage');
+      return [];
+    } else {
+      // Read from local storage
+      console.log('📦 Reading profiles from local storage');
+      const localResult = await browser.storage.local.get('profiles');
+
+      if (localResult.profiles && localResult.profiles.length > 0) {
+        console.log('✅ Found', localResult.profiles.length, 'profiles in local storage');
+        return localResult.profiles;
+      }
+
+      console.log('⚠️ No profiles found in local storage');
+      return [];
+    }
+  } catch (error) {
+    console.error('Error getting profiles from storage:', error);
+    throw error;
+  }
+}
+
+/**
+ * Save profiles to browser storage
+ * Saves to sync (with chunking) or local storage based on user preference
+ * @param {Array} profiles - Array of profile objects
+ * @returns {Promise<Array>} The saved profiles
+ */
+async function saveProfiles(profiles) {
+  try {
+    // Sort profiles by creation date
+    const sortedProfiles = [...profiles].sort((a, b) =>
+      new Date(a.createdAt) - new Date(b.createdAt)
+    );
+
+    const useSyncStorage = await getStoragePreference();
+
+    if (useSyncStorage) {
+      // Save to sync storage with chunking support
+      console.log('💾 Saving profiles to sync storage (with chunking)');
+      await SFTabs.storageChunking.saveChunkedSync('profiles', sortedProfiles);
+      console.log('✅ Profiles saved successfully to sync storage (saved', sortedProfiles.length, 'profiles)');
+    } else {
+      // Save to local storage
+      console.log('💾 Saving profiles to local storage');
+      await browser.storage.local.set({
+        profiles: sortedProfiles
+      });
+      console.log('✅ Profiles saved successfully to local storage (saved', sortedProfiles.length, 'profiles)');
+    }
+
+    // Show success message
+    if (SFTabs.main) {
+      SFTabs.main.showStatus('Profiles saved', false);
+    }
+
+    return sortedProfiles;
+  } catch (error) {
+    console.error('Error saving profiles to storage:', error);
+    if (SFTabs.main) {
+      SFTabs.main.showStatus('Error saving profiles: ' + error.message, true);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Get tabs for a specific profile
+ * @param {string} profileId - The profile ID
+ * @returns {Promise<Array>} Array of tab objects for this profile
+ */
+async function getProfileTabs(profileId) {
+  try {
+    const useSyncStorage = await getStoragePreference();
+    const storageKey = `profile_${profileId}_tabs`;
+
+    if (useSyncStorage) {
+      console.log(`📦 Reading tabs for profile ${profileId} from sync storage`);
+      const tabs = await SFTabs.storageChunking.readChunkedSync(storageKey);
+      return tabs || [];
+    } else {
+      console.log(`📦 Reading tabs for profile ${profileId} from local storage`);
+      const localResult = await browser.storage.local.get(storageKey);
+      return localResult[storageKey] || [];
+    }
+  } catch (error) {
+    console.error(`Error getting tabs for profile ${profileId}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Save tabs for a specific profile
+ * @param {string} profileId - The profile ID
+ * @param {Array} tabs - Array of tab objects
+ * @returns {Promise<Array>} The saved tabs
+ */
+async function saveProfileTabs(profileId, tabs) {
+  try {
+    // Sort tabs by position before saving
+    const sortedTabs = [...tabs].sort((a, b) => a.position - b.position);
+
+    // Clean temporary fields from each tab before saving
+    const cleanedTabs = sortedTabs.map(tab => cleanTabForStorage(tab));
+
+    const useSyncStorage = await getStoragePreference();
+    const storageKey = `profile_${profileId}_tabs`;
+
+    if (useSyncStorage) {
+      console.log(`💾 Saving tabs for profile ${profileId} to sync storage`);
+      await SFTabs.storageChunking.saveChunkedSync(storageKey, cleanedTabs);
+      console.log(`✅ Tabs saved successfully to sync storage (${cleanedTabs.length} tabs)`);
+    } else {
+      console.log(`💾 Saving tabs for profile ${profileId} to local storage`);
+      const storageObj = {};
+      storageObj[storageKey] = cleanedTabs;
+      await browser.storage.local.set(storageObj);
+      console.log(`✅ Tabs saved successfully to local storage (${cleanedTabs.length} tabs)`);
+    }
+
+    return cleanedTabs;
+  } catch (error) {
+    console.error(`Error saving tabs for profile ${profileId}:`, error);
+    throw error;
+  }
+}
+
 // Initialize storage listeners when this module loads
 setupStorageListeners();
 
@@ -415,5 +560,10 @@ window.SFTabs.storage = {
   exportConfiguration,
   importConfiguration,
   migrateBetweenStorageTypes,
-  setupStorageListeners
+  setupStorageListeners,
+  // Profile storage functions
+  getProfiles,
+  saveProfiles,
+  getProfileTabs,
+  saveProfileTabs
 };

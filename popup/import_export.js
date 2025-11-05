@@ -244,11 +244,16 @@ async function exportSettings() {
 
 		let customTabs = [];
 		let userSettings = {};
+		let profiles = [];
 
 		if (useSyncStorage) {
 			// Read from sync storage with chunking support
 			console.log('📦 Reading tabs from sync storage for export');
 			customTabs = await readChunkedSync('customTabs') || [];
+
+			// Read profiles from sync storage
+			console.log('📦 Reading profiles from sync storage for export');
+			profiles = await readChunkedSync('profiles') || [];
 
 			// User settings are always in sync storage
 			const settingsResult = await browser.storage.sync.get('userSettings');
@@ -256,17 +261,36 @@ async function exportSettings() {
 		} else {
 			// Read from local storage
 			console.log('📦 Reading from local storage for export');
-			const result = await browser.storage.local.get(['customTabs', 'userSettings']);
+			const result = await browser.storage.local.get(['customTabs', 'userSettings', 'profiles']);
 			customTabs = result.customTabs || [];
 			userSettings = result.userSettings || {};
+			profiles = result.profiles || [];
 		}
 
-		console.log('✅ Found', customTabs.length, 'tabs to export');
+		console.log('✅ Found', customTabs.length, 'tabs and', profiles.length, 'profiles to export');
+
+		// If profiles exist, also export tabs for each profile
+		const profileTabs = {};
+		if (profiles.length > 0) {
+			console.log('📦 Reading tabs for each profile...');
+			for (const profile of profiles) {
+				const storageKey = `profile_${profile.id}_tabs`;
+				if (useSyncStorage) {
+					profileTabs[profile.id] = await readChunkedSync(storageKey) || [];
+				} else {
+					const result = await browser.storage.local.get(storageKey);
+					profileTabs[profile.id] = result[storageKey] || [];
+				}
+			}
+			console.log('✅ Exported tabs for', Object.keys(profileTabs).length, 'profiles');
+		}
 
 		// Create a configuration object containing all settings
 		const config = {
 			customTabs: customTabs,
-			userSettings: userSettings
+			userSettings: userSettings,
+			profiles: profiles,
+			profileTabs: profileTabs
 		};
 
 		// Convert to JSON string
@@ -342,8 +366,11 @@ function handleFileSelect(event) {
 				throw new Error('Invalid configuration format: missing customTabs array');
 			}
 
-			console.log('📥 Importing config with', config.customTabs.length, 'tabs');
-			console.log('First imported tab:', config.customTabs[0]);
+			const profileCount = (config.profiles && Array.isArray(config.profiles)) ? config.profiles.length : 0;
+			console.log('📥 Importing config with', config.customTabs.length, 'tabs and', profileCount, 'profiles');
+			if (config.customTabs.length > 0) {
+				console.log('First imported tab:', config.customTabs[0]);
+			}
 
 			// Get storage preference to determine where to save
 			const useSyncStorage = await getStoragePreference();
@@ -354,6 +381,21 @@ function handleFileSelect(event) {
 				// Save to sync storage with chunking support
 				await saveChunkedSync('customTabs', config.customTabs);
 
+				// Save profiles if they exist
+				if (config.profiles && config.profiles.length > 0) {
+					await saveChunkedSync('profiles', config.profiles);
+					console.log('✅ Saved', config.profiles.length, 'profiles to sync storage');
+
+					// Save tabs for each profile
+					if (config.profileTabs) {
+						for (const profileId of Object.keys(config.profileTabs)) {
+							const storageKey = `profile_${profileId}_tabs`;
+							await saveChunkedSync(storageKey, config.profileTabs[profileId]);
+						}
+						console.log('✅ Saved tabs for', Object.keys(config.profileTabs).length, 'profiles');
+					}
+				}
+
 				// User settings always go to sync storage
 				await browser.storage.sync.set({
 					userSettings: config.userSettings || {}
@@ -362,11 +404,25 @@ function handleFileSelect(event) {
 				console.log('✅ Configuration saved to sync storage');
 			} else {
 				// Save to local storage
-				await browser.storage.local.set({
+				const storageData = {
 					customTabs: config.customTabs,
 					userSettings: config.userSettings || {}
-				});
+				};
 
+				// Save profiles if they exist
+				if (config.profiles && config.profiles.length > 0) {
+					storageData.profiles = config.profiles;
+
+					// Save tabs for each profile
+					if (config.profileTabs) {
+						for (const profileId of Object.keys(config.profileTabs)) {
+							const storageKey = `profile_${profileId}_tabs`;
+							storageData[storageKey] = config.profileTabs[profileId];
+						}
+					}
+				}
+
+				await browser.storage.local.set(storageData);
 				console.log('✅ Configuration saved to local storage');
 			}
 
