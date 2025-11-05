@@ -193,6 +193,12 @@ async function initTabs(tabContainer) {
       console.log("Tab render complete");
     }, 200);
 
+    // Re-run highlightActiveTab after a delay to catch any Salesforce DOM updates
+    // This is especially important for Salesforce Starter Edition where native tabs need to be de-highlighted
+    setTimeout(() => {
+      highlightActiveTab();
+    }, 300);
+
     console.log("Enhanced tabs successfully added to container");
   } catch (error) {
     console.error("Error loading tabs:", error);
@@ -1008,7 +1014,9 @@ async function highlightActiveTab() {
       const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
       if (tabElement) {
         const tabUrl = tabElement.getAttribute('data-url');
-        if (tabUrl && currentUrl.startsWith(tabUrl.split('/Details')[0])) { // Match base ObjectManager URL
+        const baseTabUrl = tabUrl ? tabUrl.split('/Details')[0] : null;
+        const matches = tabUrl && currentUrl.startsWith(baseTabUrl);
+        if (matches) { // Match base ObjectManager URL
           matchedTab = tab;
           break;
         }
@@ -1018,10 +1026,18 @@ async function highlightActiveTab() {
     if (matchedTab) {
       console.log(`Highlighting active custom tab: ${matchedTab.label}`);
 
-      // Remove active state from all tabs
+      // Remove active state from all tabs in tabBarItems
       const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
       allTabs.forEach(tabEl => {
         tabEl.classList.remove('slds-is-active');
+        const anchor = tabEl.querySelector('a');
+        if (anchor) anchor.setAttribute('aria-selected', 'false');
+      });
+
+      // Also remove active state from native pinned tabs (Salesforce Starter Edition)
+      const pinnedTabs = document.querySelectorAll('.pinnedItems .tabItem');
+      pinnedTabs.forEach(tabEl => {
+        tabEl.classList.remove('slds-is-active', 'active');
         const anchor = tabEl.querySelector('a');
         if (anchor) anchor.setAttribute('aria-selected', 'false');
       });

@@ -351,6 +351,20 @@ async function initTabsWithLightningNavigation(tabContainer) {
       tabContainer.appendChild(tabElement);
     }
 
+    // Highlight active tab after rendering
+    // Use a longer delay to ensure this happens after any navigation-triggered highlights
+    // This will be the "final" highlight after tab re-rendering
+    // Cancel any existing pending highlight
+    if (pendingHighlightTimeout) {
+      clearTimeout(pendingHighlightTimeout);
+    }
+    pendingHighlightTimeout = setTimeout(() => {
+      // Force highlight by resetting debounce time
+      lastHighlightTime = 0;
+      highlightActiveTabStandalone();
+      pendingHighlightTimeout = null;
+    }, 600);
+
     console.log("Fallback tabs with Lightning Navigation and Dropdown Support successfully added to container");
   } catch (error) {
     console.error("Error in fallback tab initialization:", error);
@@ -552,6 +566,72 @@ function navigateToNavigationItem(navItem, parentTab) {
   }
 }
 
+// Debounce tracking for highlightActiveTab to prevent duplicate calls
+let lastHighlightTime = 0;
+const HIGHLIGHT_DEBOUNCE_MS = 1000; // Increased to 1 second to catch re-initialization
+let pendingHighlightTimeout = null;
+
+/**
+ * Standalone version of highlightActiveTab for use when tab-renderer.js isn't loaded yet
+ */
+async function highlightActiveTabStandalone() {
+  // Debounce: skip if we just highlighted within the last 200ms
+  const now = Date.now();
+  if (now - lastHighlightTime < HIGHLIGHT_DEBOUNCE_MS) {
+    return;
+  }
+  lastHighlightTime = now;
+
+  const currentUrl = window.location.href;
+
+  try {
+    const tabs = await getTabsFromStorage();
+    const topLevelTabs = tabs.filter(tab => !tab.parentId).sort((a, b) => a.position - b.position);
+    let matchedTab = null;
+
+    for (const tab of topLevelTabs) {
+      const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+      if (tabElement) {
+        const tabUrl = tabElement.getAttribute('data-url');
+        const baseTabUrl = tabUrl ? tabUrl.split('/Details')[0] : null;
+        const matches = tabUrl && currentUrl.startsWith(baseTabUrl);
+        if (matches) {
+          matchedTab = tab;
+          break;
+        }
+      }
+    }
+
+    if (matchedTab) {
+      // Remove active state from all tabs in tabBarItems
+      const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
+      allTabs.forEach(tabEl => {
+        tabEl.classList.remove('slds-is-active');
+        const anchor = tabEl.querySelector('a');
+        if (anchor) anchor.setAttribute('aria-selected', 'false');
+      });
+
+      // Also remove active state from native pinned tabs (Salesforce Starter Edition)
+      const pinnedTabs = document.querySelectorAll('.pinnedItems .tabItem');
+      pinnedTabs.forEach(tabEl => {
+        tabEl.classList.remove('slds-is-active', 'active');
+        const anchor = tabEl.querySelector('a');
+        if (anchor) anchor.setAttribute('aria-selected', 'false');
+      });
+
+      // Add active state to matched tab
+      const activeEl = document.querySelector(`li[data-tab-id="${matchedTab.id}"]`);
+      if (activeEl) {
+        activeEl.classList.add('slds-is-active');
+        const anchor = activeEl.querySelector('a');
+        if (anchor) anchor.setAttribute('aria-selected', 'true');
+      }
+    }
+  } catch (error) {
+    console.error('[highlightActiveTabStandalone] Error:', error);
+  }
+}
+
 /**
  * Setup dropdown event handlers
  */
@@ -594,6 +674,22 @@ function setupMessageListeners() {
         handlerReady = true;
       } else if (event.data && event.data.type === 'SF_TABS_WINDOW_NAV_READY') {
         console.log("Window navigation function ready (from inject.js)");
+      } else if (event.data && event.data.type === 'SF_TABS_NAVIGATION_COMPLETE') {
+        // After Lightning navigation completes, highlight the active tab
+        // Use a delay to ensure Salesforce has updated the DOM
+        // Clear any pending highlight calls to avoid duplicates
+        if (pendingHighlightTimeout) {
+          clearTimeout(pendingHighlightTimeout);
+        }
+        pendingHighlightTimeout = setTimeout(() => {
+          if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
+            window.SFTabsContent.tabRenderer.highlightActiveTab();
+          } else {
+            // Fallback: call standalone version
+            highlightActiveTabStandalone();
+          }
+          pendingHighlightTimeout = null;
+        }, 500);
       }
     }
   });
@@ -822,6 +918,13 @@ function debounce(func, wait) {
  */
 function handleUrlChange() {
   console.log("URL changed - checking for tab container");
+
+  // Cancel any pending highlights from navigation complete
+  // The re-initialization will schedule its own highlight
+  if (pendingHighlightTimeout) {
+    clearTimeout(pendingHighlightTimeout);
+    pendingHighlightTimeout = null;
+  }
 
   setTimeout(() => {
     const tabContainer = document.querySelector('.tabBarItems.slds-grid');
