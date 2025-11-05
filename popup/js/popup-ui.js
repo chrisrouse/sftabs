@@ -622,10 +622,16 @@ function saveTabForm() {
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
 
   // Apply staged dropdown items (from delete operations)
-  if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems) {
+  if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems !== undefined) {
     console.log('✅ Applying staged dropdown items:', currentActionPanelTab.stagedDropdownItems.length);
     tabData.dropdownItems = currentActionPanelTab.stagedDropdownItems;
     tabData.hasDropdown = currentActionPanelTab.stagedDropdownItems.length > 0;
+  } else if (tab.dropdownItems) {
+    // If no staged items but tab has dropdown items, preserve them
+    // This handles the case where the form is saved without any dropdown modifications
+    console.log('No staged items - preserving existing dropdown items:', tab.dropdownItems.length);
+    tabData.dropdownItems = tab.dropdownItems;
+    tabData.hasDropdown = tab.dropdownItems.length > 0;
   }
 
   // Apply staged promotions (create new main tabs from promoted items)

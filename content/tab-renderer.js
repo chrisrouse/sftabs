@@ -250,7 +250,15 @@ function createTabElementWithDropdown(tab) {
   a.setAttribute('title', tab.label);
   a.setAttribute('aria-selected', 'false');
   a.setAttribute('href', fullUrl);
-  
+
+  // For folder-style tabs (no path), make them appear as buttons for opening dropdowns
+  const isFolder = !tab.path || !tab.path.trim();
+  if (isFolder) {
+    // Keep pointer cursor if folder has dropdown, otherwise default
+    const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+    a.style.cursor = hasDropdown ? 'pointer' : 'default';
+  }
+
   // Set target based on openInNewTab property
   if (tab.openInNewTab) {
     a.setAttribute('target', '_blank');
@@ -896,7 +904,32 @@ function addTabClickListeners(tabs) {
   tabs.forEach(tab => {
     const links = document.querySelectorAll(`li[data-tab-id="${tab.id}"] a`);
     links.forEach(link => {
+      // Use capture phase to ensure our listener runs before any other listeners
       link.addEventListener('click', event => {
+        // FIRST: Check if this tab has an empty or missing path - if so, prevent navigation immediately
+        const hasPath = tab.path && tab.path.trim();
+
+        if (!hasPath) {
+          // Folder-style tab without URL - block navigation immediately
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+
+          const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+
+          // If it has a dropdown, open it
+          if (hasDropdown) {
+            const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+            const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
+            const dropdownArrow = tabElement?.querySelector('.dropdown-arrow-inline');
+
+            if (dropdown && dropdownArrow) {
+              toggleInlineDropdown(dropdown, dropdownArrow);
+            }
+          }
+          return;
+        }
+
         // If clicking on dropdown arrow, don't navigate
         if (event.target.closest('.dropdown-arrow-inline')) {
           return;
@@ -907,14 +940,17 @@ function addTabClickListeners(tabs) {
           return;
         }
 
-        // Check if this is a folder-style tab (no path/URL)
-        const hasPath = tab.path && tab.path.trim();
         const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
 
-        if (!hasPath) {
-          // Folder-style tab without URL
+        // Additional safety check: also check the href pattern
+        const isJsVoidHref = link.href && link.href.includes('javascript:void(0)');
+        const hasEmptyPathPattern = link.href && link.href.includes('//home');
+
+        if (isJsVoidHref || hasEmptyPathPattern) {
+          // Folder-style tab detected by href - block navigation
           event.preventDefault();
-          console.log('Folder-style tab clicked:', tab.label, 'Has dropdown:', hasDropdown);
+          event.stopPropagation();
+          event.stopImmediatePropagation();
 
           // If it has a dropdown, open it
           if (hasDropdown) {
@@ -927,6 +963,13 @@ function addTabClickListeners(tabs) {
             }
           }
           // If no dropdown and no path, just do nothing (it's a folder/placeholder)
+          return;
+        }
+
+        // For tabs with paths but also dropdowns, check if clicking on the dropdown arrow
+        if (hasDropdown && event.target.closest('.dropdown-arrow-inline')) {
+          // Clicking dropdown arrow - handled by arrow's own event listener, don't navigate
+          event.preventDefault();
           return;
         }
 

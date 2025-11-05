@@ -379,23 +379,30 @@ function createTabElementWithLightningAndDropdown(tab) {
   const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
   const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
   const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
-  
+
   let fullUrl = '';
-  const isObject = tab.isObject || false;
-  const isCustomUrl = tab.isCustomUrl || false;
-  
-  if (isCustomUrl) {
-    let formattedPath = tab.path;
-    if (!formattedPath.startsWith('/')) {
-      formattedPath = '/' + formattedPath;
-    }
-    fullUrl = `${baseUrlRoot}${formattedPath}`;
-  } else if (isObject) {
-    fullUrl = `${baseUrlObject}${tab.path}`;
-  } else if (tab.path.includes('ObjectManager/')) {
-    fullUrl = `${baseUrlSetup}${tab.path}`;
+
+  // Check if this is a folder-style tab (no path) first
+  if (!tab.path || !tab.path.trim()) {
+    // For folder tabs, return javascript:void(0) to prevent navigation
+    fullUrl = 'javascript:void(0)';
   } else {
-    fullUrl = `${baseUrlSetup}${tab.path}/home`;
+    const isObject = tab.isObject || false;
+    const isCustomUrl = tab.isCustomUrl || false;
+
+    if (isCustomUrl) {
+      let formattedPath = tab.path;
+      if (!formattedPath.startsWith('/')) {
+        formattedPath = '/' + formattedPath;
+      }
+      fullUrl = `${baseUrlRoot}${formattedPath}`;
+    } else if (isObject) {
+      fullUrl = `${baseUrlObject}${tab.path}`;
+    } else if (tab.path.includes('ObjectManager/')) {
+      fullUrl = `${baseUrlSetup}${tab.path}`;
+    } else {
+      fullUrl = `${baseUrlSetup}${tab.path}/home`;
+    }
   }
   
   const li = document.createElement('li');
@@ -470,19 +477,42 @@ if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
   
   // Add click handler WITH Lightning Navigation - FROM ORIGINAL
   a.addEventListener('click', (event) => {
+    // FIRST: Check if this is a folder-style tab (no path)
+    const hasPath = tab.path && tab.path.trim();
+
+    if (!hasPath) {
+      // Folder-style tab - prevent navigation immediately
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      // If it has a dropdown, open it
+      const hasDropdown = tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0);
+      if (hasDropdown) {
+        const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+        const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
+        const dropdownArrow = tabElement?.querySelector('.dropdown-arrow-inline');
+
+        if (dropdown && dropdownArrow) {
+          toggleInlineDropdown(dropdown, dropdownArrow);
+        }
+      }
+      return;
+    }
+
     // If clicking on dropdown arrow, don't navigate
     if (event.target.closest('.dropdown-arrow-inline')) {
       return;
     }
 
-      // NEW: If clicking within the dropdown menu, don't navigate
+    // NEW: If clicking within the dropdown menu, don't navigate
     if (event.target.closest('.sftabs-custom-dropdown')) {
       return;
     }
-    
+
     const lightningEnabled = isLightningNavigationEnabled();
     console.log('Tab clicked:', tab.label, 'Lightning Navigation enabled:', lightningEnabled, 'Open in new tab:', tab.openInNewTab);
-    
+
     if (tab.openInNewTab) {
       // For new tab, always use window.open
       event.preventDefault();
