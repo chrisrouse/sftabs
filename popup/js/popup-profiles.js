@@ -856,8 +856,8 @@ async function saveProfile() {
       window.SFTabs.main.showStatus('Profile saved', false);
     }
 
-    setTimeout(() => {
-      showProfileList();
+    setTimeout(async () => {
+      await showProfileList();
     }, 800);
   } catch (error) {
     console.error('Error saving profile:', error);
