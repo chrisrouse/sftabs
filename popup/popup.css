@@ -93,7 +93,36 @@
 	width: 410px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
+
+  /* Active Profile Banner */
+  #active-profile-banner {
+	background-color: var(--color-section-header);
+	color: var(--color-text);
+	padding: 6px 16px;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 56px;
+	left: 0;
+	z-index: 9;
+	width: 410px;
+	font-size: 12px;
+	font-weight: 500;
+	border-bottom: 1px solid var(--color-border);
+  }
+
+  #active-profile-banner #active-profile-name {
+	color: var(--color-text);
+  }
+
+  /* Adjust main content margin when banner is visible */
+  #main-content.with-banner,
+  #settings-panel.with-banner,
+  #action-panel.with-banner {
+	margin-top: 82px !important;
+  }
+
   footer {
 	margin-top: auto;
 	padding: 8px;
@@ -1146,4 +1175,66 @@
 
 .action-panel-button:hover svg {
   stroke: white;
+}
+
+/* Profile List Item Styles - Matches dropdown menu style */
+.profile-item {
+  padding: 4px 0;
+  border-bottom: 1px solid #dddbda;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: grab;
+}
+
+.profile-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="dark"] .profile-item {
+  border-bottom: 1px solid #444444;
+}
+
+[data-theme="dark"] .profile-item:last-child {
+  border-bottom: none;
+}
+
+/* URL Pattern List Item Styles - Matches dropdown menu style */
+.url-pattern-item {
+  padding: 4px 0;
+  border-bottom: 1px solid #dddbda;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: grab;
+}
+
+.url-pattern-item:last-child {
+  border-bottom: none;
+}
+
+[data-theme="dark"] .url-pattern-item {
+  border-bottom: 1px solid #444444;
+}
+
+[data-theme="dark"] .url-pattern-item:last-child {
+  border-bottom: none;
+}
+
+/* Profile and URL list containers - dark mode support */
+[data-theme="dark"] #profile-list,
+[data-theme="dark"] #url-pattern-list {
+  background: #2A2C35 !important;
+}
+
+/* Empty state for lists */
+.empty-list-state {
+  text-align: center;
+  padding: 16px;
+  color: var(--color-text-weak);
+  font-size: 12px;
+  font-style: italic;
+  background-color: var(--color-background);
+  border: 1px dashed var(--color-border);
+  border-radius: 4px;
 }

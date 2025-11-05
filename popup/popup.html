@@ -27,6 +27,16 @@
                     </svg>
                 </button>
 
+                <!-- Profiles button (users icon) -->
+                <button id="profiles-button" class="icon-button" title="Profiles" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </button>
+
                 <!-- Settings button (existing gear icon) -->
                 <button id="settings-button" class="icon-button" title="Settings">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
@@ -36,6 +46,11 @@
                 </button>
             </div>
         </header>
+
+        <!-- Active Profile Banner (only visible when profiles are enabled) -->
+        <div id="active-profile-banner" style="display: none;">
+            <span id="active-profile-name">Default</span>
+        </div>
 
         <!-- Main Section -->
         <div id="main-content">
@@ -179,6 +194,24 @@
                     <div class="help-text">Automatically sync your tabs across all your computers using browser sync. Disable this to store tabs locally on this computer only.</div>
                   </div>
 
+                  <!-- Profiles Section -->
+                  <div class="form-group checkbox-group">
+                    <label>
+                      <input type="checkbox" id="enable-profiles">
+                      <span>Enable Profiles</span>
+                    </label>
+                    <div class="help-text">Create multiple profiles with different tab sets for different Salesforce orgs or responsibilities.</div>
+                  </div>
+
+                  <!-- Profile Options (only shown when profiles are enabled) -->
+                  <div id="profile-options" class="form-group checkbox-group" style="display: none;">
+                    <label>
+                      <input type="checkbox" id="auto-switch-profiles">
+                      <span>Auto-Switch Profiles</span>
+                    </label>
+                    <div class="help-text">Automatically switch to the appropriate profile based on the current Salesforce org's URL.</div>
+                  </div>
+
                   <div class="form-group">
                     <div class="import-export-buttons"> <button id="keyboard-shortcuts-button" class="action-button">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-command">
@@ -216,10 +249,11 @@
         <!-- New Action Panel -->
         <div id="action-panel" class="action-panel">
             <div class="section-header">
-                <h2>Tab Settings</h2>
+                <h2 id="action-panel-title">Tab Settings</h2>
             </div>
 
-            <div class="action-panel-content">
+            <!-- Tab Settings Content -->
+            <div id="tab-settings-content" class="action-panel-content">
                 <div class="form-group">
                     <h3 id="action-panel-tab-name-display" style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Tab Name</h3>
                 </div>
@@ -300,6 +334,90 @@
                     <button id="action-panel-close-button" class="secondary-button">Close</button>
                 </div>
             </div>
+
+            <!-- Profile List Content -->
+            <div id="profile-list-content" class="action-panel-content" style="display: none;">
+                <!-- Active Profile Selector -->
+                <div class="form-group">
+                    <label for="active-profile-selector">Active Profile</label>
+                    <select id="active-profile-selector" class="select-input">
+                        <option value="">Select a profile...</option>
+                    </select>
+                    <div class="help-text">Switch to a different profile to view and manage its tabs.</div>
+                </div>
+
+                <div class="form-group">
+                    <button id="create-profile-button" class="primary-button" style="width: 100%;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 6px;">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Create New Profile
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-size: 12px; font-weight: 600; color: #706e6b; margin-bottom: 5px; display: block;">
+                        Profiles (<span id="profile-count">0</span>):
+                    </label>
+                    <div id="profile-list" style="max-height: 150px; overflow-y: auto; padding: 8px; background: #f3f2f2; border-radius: 4px; font-size: 12px;">
+                        <!-- Profile items will be inserted here dynamically -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button id="profile-list-close-button" class="secondary-button" style="width: 100%;">Close</button>
+                </div>
+            </div>
+
+            <!-- Profile Edit Content -->
+            <div id="profile-edit-content" class="action-panel-content" style="display: none;">
+                <div class="form-group">
+                    <h3 id="profile-edit-title" style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Edit Profile</h3>
+                </div>
+
+                <div class="form-group">
+                    <label for="profile-name">Profile Name</label>
+                    <input type="text" id="profile-name" placeholder="e.g., Work - SmartBot" maxlength="30">
+                    <div class="help-text"><span id="profile-name-counter">0</span>/30 characters</div>
+                </div>
+
+                <!-- URL Patterns Section (only visible when auto-switch is enabled) -->
+                <div id="url-patterns-section" style="display: none;">
+                    <div class="form-group">
+                        <label>URL Patterns</label>
+                        <div class="help-text" style="margin-bottom: 8px;">Add MyDomain patterns to automatically switch to this profile when visiting matching Salesforce orgs.</div>
+
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" id="url-pattern-input" placeholder="e.g., smartbottechnology-dev-ed" style="flex: 1;">
+                            <button id="add-url-pattern-button" class="secondary-button" style="margin: 0; padding: 8px 12px;">Add</button>
+                        </div>
+
+                        <button id="capture-domain-button" class="secondary-button" style="width: 100%; margin-bottom: 12px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 6px;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            Capture Current Domain
+                        </button>
+
+                        <div id="url-pattern-error" class="help-text" style="color: var(--slds-color-error); display: none; margin-bottom: 8px;"></div>
+
+                        <div style="font-size: 12px; font-weight: 600; color: #706e6b; margin-bottom: 5px;">
+                            URL Patterns (<span id="url-pattern-count">0</span>):
+                        </div>
+                        <div id="url-pattern-list" style="max-height: 150px; overflow-y: auto; padding: 8px; background: #f3f2f2; border-radius: 4px; font-size: 12px;">
+                            <!-- URL pattern items will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 24px;">
+                    <button id="profile-save-button" class="primary-button" style="width: 100%;">Save Profile</button>
+                    <button id="profile-cancel-button" class="secondary-button" style="width: 100%; margin: 8px 0 0 0;">Cancel</button>
+                </div>
+            </div>
         </div>
 
 
@@ -352,6 +470,7 @@
     <script src="js/popup-dropdown.js"></script>
     <script src="js/popup-tabs.js"></script>
     <script src="js/popup-ui.js"></script>
+    <script src="js/popup-profiles.js"></script>
 
     <!-- Load main entry point LAST -->
     <script src="js/popup-main.js"></script>
