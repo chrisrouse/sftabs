@@ -640,6 +640,7 @@ function createUrlPatternItem(pattern, index) {
 
   // Label with number and pattern
   const labelSpan = document.createElement('span');
+  labelSpan.className = 'url-pattern-text';
   labelSpan.textContent = `${index + 1}. ${pattern}`;
   labelSpan.style.flex = '1';
   labelSpan.style.fontFamily = "'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace";
@@ -819,7 +820,7 @@ async function saveProfile() {
     console.log('Saving profile:', name);
 
     // Get URL patterns from the list
-    const urlPatterns = Array.from(document.querySelectorAll('.url-pattern-item span[style*="flex: 1"]'))
+    const urlPatterns = Array.from(document.querySelectorAll('.url-pattern-text'))
       .map(el => el.textContent.replace(/^\d+\.\s*/, '').trim());
 
     if (editingProfile) {
