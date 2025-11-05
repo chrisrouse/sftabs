@@ -76,11 +76,12 @@ function cleanTabForStorage(tab) {
   // Remove legacy fields from old dropdown implementation
   delete cleanedTab.autoSetupDropdown;
   delete cleanedTab.children;
-  delete cleanedTab.parentId;
   delete cleanedTab.isExpanded;
   delete cleanedTab.cachedNavigation;
   delete cleanedTab.navigationLastUpdated;
   delete cleanedTab.needsNavigationRefresh;
+
+  // Note: parentId is intentionally NOT removed - it's needed for nested tabs functionality
 
   // Clean nested dropdown items (remove _expanded UI state)
   if (cleanedTab.dropdownItems && Array.isArray(cleanedTab.dropdownItems)) {
