@@ -55,7 +55,7 @@ function createTabElement(tab) {
   
   // Check if this tab should have a dropdown (using dropdownItems for object-dropdowns implementation)
   const hasAnyDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
-  
+
   if (hasAnyDropdown) {
     tabItem.classList.add('has-dropdown');
   }

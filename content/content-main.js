@@ -913,8 +913,14 @@ function setupStorageListeners() {
     browser.storage.onChanged.addListener((changes, area) => {
       console.log('Storage changed:', { area, changes: Object.keys(changes) });
 
-      // Check for both 'local' and 'sync' areas since we use storage.local
-      if ((area === 'local' || area === 'sync') && changes.customTabs) {
+      // Check for both 'local' and 'sync' areas
+      // For sync storage with chunking, also check for customTabs_metadata or chunk changes
+      const hasCustomTabsChange = changes.customTabs ||
+                                   changes.customTabs_metadata ||
+                                   Object.keys(changes).some(key => key.startsWith('customTabs_chunk_'));
+
+      if ((area === 'local' || area === 'sync') && hasCustomTabsChange) {
+        console.log('📦 Custom tabs changed - triggering refresh');
         debouncedRefreshTabs();
       }
 
