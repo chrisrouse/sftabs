@@ -346,6 +346,9 @@ async function switchActiveProfile(profileId) {
     if (window.SFTabs && window.SFTabs.main) {
       SFTabs.main.setTabs(profileTabs);
 
+      // Show main content to display the tab list (or empty state if no tabs)
+      SFTabs.main.showMainContent();
+
       // Re-render the tab list
       if (SFTabs.ui && SFTabs.ui.renderTabList) {
         SFTabs.ui.renderTabList();
@@ -843,26 +846,9 @@ async function saveProfile() {
         settings.defaultProfileId = newProfile.id;
         await SFTabs.storage.saveUserSettings(settings);
       }
-
-      // Save to storage
-      await SFTabs.storage.saveProfiles(profilesCache);
-
-      if (window.SFTabs && window.SFTabs.main) {
-        window.SFTabs.main.showStatus('Profile saved', false);
-      }
-
-      // Switch to the newly created profile to show its (empty) state
-      setTimeout(async () => {
-        await switchActiveProfile(newProfile.id);
-        // Show main content so user can see the empty state and add tabs
-        if (window.SFTabs && window.SFTabs.main) {
-          window.SFTabs.main.showMainContent();
-        }
-      }, 800);
-      return; // Exit early since we're switching profiles instead of showing profile list
     }
 
-    // Save to storage (for edit case)
+    // Save to storage
     await SFTabs.storage.saveProfiles(profilesCache);
 
     if (window.SFTabs && window.SFTabs.main) {
