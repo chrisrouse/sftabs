@@ -59,6 +59,53 @@
                 <div class="empty-state" id="empty-state">
                     <p>No custom tabs yet. Add your first tab below.</p>
                 </div>
+
+                <!-- Profile Initialization Options (shown for new empty profiles) -->
+                <div class="profile-init-options" id="profile-init-options" style="display: none;">
+                    <div class="profile-init-header">
+                        <h3>Initialize Profile</h3>
+                        <p>Choose how to set up this profile:</p>
+                    </div>
+
+                    <div class="profile-init-option" id="init-with-defaults">
+                        <div class="option-icon">📋</div>
+                        <div class="option-content">
+                            <div class="option-title">Add with default tabs</div>
+                            <div class="option-description">Start with the standard set of tabs (Flows, Profiles, Users, etc.)</div>
+                        </div>
+                        <div class="option-action">→</div>
+                    </div>
+
+                    <div class="profile-init-option" id="init-empty">
+                        <div class="option-icon">✨</div>
+                        <div class="option-content">
+                            <div class="option-title">Start with no tabs</div>
+                            <div class="option-description">Begin with an empty profile and add tabs manually</div>
+                        </div>
+                        <div class="option-action">→</div>
+                    </div>
+
+                    <div class="profile-init-option" id="init-clone">
+                        <div class="option-icon">📑</div>
+                        <div class="option-content">
+                            <div class="option-title">Clone another profile</div>
+                            <div class="option-description">Copy tabs from an existing profile</div>
+                        </div>
+                        <div class="option-action">→</div>
+                    </div>
+
+                    <!-- Clone Profile Selector (shown when clone option is clicked) -->
+                    <div class="profile-clone-selector" id="profile-clone-selector" style="display: none;">
+                        <label for="clone-source-profile">Select profile to clone:</label>
+                        <select id="clone-source-profile" class="clone-profile-select">
+                            <option value="">Choose a profile...</option>
+                        </select>
+                        <div class="clone-actions">
+                            <button type="button" id="clone-confirm-button" class="primary-button">Clone Profile</button>
+                            <button type="button" id="clone-cancel-button" class="secondary-button">Cancel</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Inline Tab Form -->

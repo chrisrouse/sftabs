@@ -24,11 +24,29 @@ function renderTabList() {
   // Get all tabs (sorted by position)
   const allTabs = SFTabs.main.getTabs().sort((a, b) => a.position - b.position);
 
+  // Check if profiles are enabled and this is a new empty profile
+  const settings = SFTabs.main.getUserSettings();
+  const isProfilesEnabled = settings.profilesEnabled;
+  const profileInitOptions = document.querySelector('#profile-init-options');
+
   // Show empty state if no tabs
   if (allTabs.length === 0) {
-    domElements.emptyState.style.display = 'block';
+    // If profiles are enabled, show profile initialization options
+    if (isProfilesEnabled && profileInitOptions) {
+      domElements.emptyState.style.display = 'none';
+      profileInitOptions.style.display = 'block';
+    } else {
+      // Otherwise show generic empty state
+      domElements.emptyState.style.display = 'block';
+      if (profileInitOptions) {
+        profileInitOptions.style.display = 'none';
+      }
+    }
   } else {
     domElements.emptyState.style.display = 'none';
+    if (profileInitOptions) {
+      profileInitOptions.style.display = 'none';
+    }
 
     // Create tab items (including their dropdown functionality)
     allTabs.forEach((tab) => {

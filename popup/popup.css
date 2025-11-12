@@ -1239,6 +1239,117 @@
   border-radius: 4px;
 }
 
+/* Profile Initialization Options */
+.profile-init-options {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.profile-init-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.profile-init-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-default);
+}
+
+.profile-init-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-weak);
+}
+
+.profile-init-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background-color: var(--color-item-background);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-init-option:hover {
+  background-color: var(--color-item-background-hover);
+  border-color: #0176d3;
+  transform: translateX(4px);
+}
+
+.profile-init-option .option-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.profile-init-option .option-content {
+  flex: 1;
+}
+
+.profile-init-option .option-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-default);
+  margin-bottom: 4px;
+}
+
+.profile-init-option .option-description {
+  font-size: 12px;
+  color: var(--color-text-weak);
+  line-height: 1.4;
+}
+
+.profile-init-option .option-action {
+  font-size: 18px;
+  color: var(--color-text-weak);
+  flex-shrink: 0;
+}
+
+/* Profile Clone Selector */
+.profile-clone-selector {
+  margin-top: 20px;
+  padding: 16px;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.profile-clone-selector label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-default);
+  margin-bottom: 8px;
+}
+
+.clone-profile-select {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-item-background);
+  color: var(--color-text-default);
+  margin-bottom: 12px;
+}
+
+.clone-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.clone-actions button {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
 /* Standardized list item action buttons */
 .list-action-button {
   font-size: 11px;
