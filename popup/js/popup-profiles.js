@@ -834,15 +834,35 @@ async function saveProfile() {
       };
       profilesCache.push(newProfile);
 
+      // Initialize empty tabs for this profile
+      await SFTabs.storage.saveProfileTabs(newProfile.id, []);
+
       // If this is the first profile, set it as default in settings
       if (profilesCache.length === 1) {
         const settings = await SFTabs.storage.getUserSettings();
         settings.defaultProfileId = newProfile.id;
         await SFTabs.storage.saveUserSettings(settings);
       }
+
+      // Save to storage
+      await SFTabs.storage.saveProfiles(profilesCache);
+
+      if (window.SFTabs && window.SFTabs.main) {
+        window.SFTabs.main.showStatus('Profile saved', false);
+      }
+
+      // Switch to the newly created profile to show its (empty) state
+      setTimeout(async () => {
+        await switchActiveProfile(newProfile.id);
+        // Show main content so user can see the empty state and add tabs
+        if (window.SFTabs && window.SFTabs.main) {
+          window.SFTabs.main.showMainContent();
+        }
+      }, 800);
+      return; // Exit early since we're switching profiles instead of showing profile list
     }
 
-    // Save to storage
+    // Save to storage (for edit case)
     await SFTabs.storage.saveProfiles(profilesCache);
 
     if (window.SFTabs && window.SFTabs.main) {
