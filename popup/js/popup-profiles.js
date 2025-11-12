@@ -72,6 +72,40 @@ async function initProfiles() {
     autoSwitchCheckbox.checked = settings.autoSwitchProfiles || false;
   }
 
+  // Check if profiles are enabled but no profiles exist (upgrade scenario)
+  if (settings.profilesEnabled && profilesCache.length === 0) {
+    console.log('Profiles enabled but no profiles exist - creating Default profile');
+
+    // Get current tabs to save to the Default profile
+    const currentTabs = SFTabs.main.getTabs();
+
+    // Create Default profile
+    const defaultProfile = {
+      id: generateProfileId(),
+      name: 'Default',
+      isDefault: true,
+      urlPatterns: [],
+      createdAt: new Date().toISOString(),
+      lastActive: null
+    };
+
+    // Add to cache
+    profilesCache.push(defaultProfile);
+
+    // Save profile to storage
+    await SFTabs.storage.saveProfiles(profilesCache);
+
+    // Save current tabs to this profile
+    await SFTabs.storage.saveProfileTabs(defaultProfile.id, currentTabs);
+
+    // Set as default and active profile in settings
+    settings.defaultProfileId = defaultProfile.id;
+    settings.activeProfileId = defaultProfile.id;
+    await SFTabs.storage.saveUserSettings(settings);
+
+    console.log('Default profile created on init:', defaultProfile.id);
+  }
+
   // Show/hide UI based on settings
   toggleProfilesEnabled(settings.profilesEnabled || false);
   toggleUrlPatternsSection(settings.autoSwitchProfiles || false);
@@ -86,8 +120,48 @@ async function initProfiles() {
       const enabled = this.checked;
       const settings = await SFTabs.storage.getUserSettings();
       settings.profilesEnabled = enabled;
+
+      // If enabling profiles for the first time, create a Default profile
+      if (enabled && profilesCache.length === 0) {
+        console.log('Profiles enabled for the first time - creating Default profile');
+
+        // Get current tabs to save to the Default profile
+        const currentTabs = SFTabs.main.getTabs();
+
+        // Create Default profile
+        const defaultProfile = {
+          id: generateProfileId(),
+          name: 'Default',
+          isDefault: true,
+          urlPatterns: [],
+          createdAt: new Date().toISOString(),
+          lastActive: null
+        };
+
+        // Add to cache
+        profilesCache.push(defaultProfile);
+
+        // Save profile to storage
+        await SFTabs.storage.saveProfiles(profilesCache);
+
+        // Save current tabs to this profile
+        await SFTabs.storage.saveProfileTabs(defaultProfile.id, currentTabs);
+
+        // Set as default and active profile in settings
+        settings.defaultProfileId = defaultProfile.id;
+        settings.activeProfileId = defaultProfile.id;
+
+        console.log('Default profile created:', defaultProfile.id);
+      }
+
       await SFTabs.storage.saveUserSettings(settings);
       toggleProfilesEnabled(enabled);
+
+      // Update active profile banner if profiles were just enabled
+      if (enabled) {
+        await updateActiveProfileBanner();
+        await populateActiveProfileSelector();
+      }
     });
   }
 
