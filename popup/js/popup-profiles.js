@@ -119,7 +119,7 @@ async function initProfiles() {
 
   const createProfileButton = document.querySelector('#create-profile-button');
   if (createProfileButton) {
-    createProfileButton.addEventListener('click', showProfileEditForm);
+    createProfileButton.addEventListener('click', () => showProfileEditForm());
   }
 
   // Setup profile edit buttons
@@ -391,12 +391,7 @@ function createProfileListItem(profile, index, defaultProfileId) {
   div.className = 'profile-item';
 
   // Drag handle
-  const dragHandle = document.createElement('span');
-  dragHandle.textContent = '⋮⋮';
-  dragHandle.style.marginRight = '8px';
-  dragHandle.style.color = '#706e6b';
-  dragHandle.style.cursor = 'grab';
-  dragHandle.style.fontSize = '14px';
+  const dragHandle = SFTabs.shared.createDragHandle();
 
   // Label with number
   const labelSpan = document.createElement('span');
@@ -404,75 +399,29 @@ function createProfileListItem(profile, index, defaultProfileId) {
   labelSpan.style.flex = '1';
 
   // Button container
-  const buttonContainer = document.createElement('div');
-  buttonContainer.style.display = 'flex';
-  buttonContainer.style.gap = '4px';
-  buttonContainer.style.alignItems = 'center';
+  const buttonContainer = SFTabs.shared.createButtonContainer();
 
   // Default button (D)
-  const defaultButton = document.createElement('button');
-  defaultButton.type = 'button';
-  defaultButton.textContent = 'D';
-  defaultButton.style.fontSize = '11px';
-  defaultButton.style.padding = '2px 6px';
-  defaultButton.style.fontWeight = '600';
-  defaultButton.style.border = 'none';
-  defaultButton.style.borderRadius = '3px';
-  defaultButton.style.cursor = 'pointer';
-  defaultButton.style.lineHeight = '1';
-  defaultButton.title = 'Set as default profile';
-
-  // Highlight if this is the default profile
   const isDefault = profile.id === defaultProfileId;
-  if (isDefault) {
-    defaultButton.style.background = '#2e844a';
-    defaultButton.style.color = 'white';
-  } else {
-    defaultButton.style.background = '#e0e0e0';
-    defaultButton.style.color = '#706e6b';
-  }
-
-  defaultButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDefaultProfile(profile.id);
+  const defaultButton = SFTabs.shared.createListActionButton('default', {
+    text: 'D',
+    title: 'Set as default profile',
+    onClick: () => setDefaultProfile(profile.id),
+    isActive: isDefault
   });
 
   // Edit button
-  const editButton = document.createElement('button');
-  editButton.type = 'button';
-  editButton.textContent = 'Edit';
-  editButton.style.fontSize = '11px';
-  editButton.style.padding = '2px 6px';
-  editButton.style.background = '#0176d3';
-  editButton.style.color = 'white';
-  editButton.style.border = 'none';
-  editButton.style.borderRadius = '3px';
-  editButton.style.cursor = 'pointer';
-  editButton.title = 'Edit this profile';
-  editButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    showProfileEditForm(profile);
+  const editButton = SFTabs.shared.createListActionButton('edit', {
+    text: 'Edit',
+    title: 'Edit this profile',
+    onClick: () => showProfileEditForm(profile)
   });
 
   // Delete button
-  const deleteButton = document.createElement('button');
-  deleteButton.type = 'button';
-  deleteButton.textContent = '×';
-  deleteButton.style.fontSize = '16px';
-  deleteButton.style.padding = '2px 6px';
-  deleteButton.style.background = '#c23934';
-  deleteButton.style.color = 'white';
-  deleteButton.style.border = 'none';
-  deleteButton.style.borderRadius = '3px';
-  deleteButton.style.cursor = 'pointer';
-  deleteButton.style.lineHeight = '1';
-  deleteButton.title = 'Delete this profile';
-  deleteButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    deleteProfile(profile);
+  const deleteButton = SFTabs.shared.createListActionButton('delete', {
+    text: '×',
+    title: 'Delete this profile',
+    onClick: () => deleteProfile(profile)
   });
 
   buttonContainer.appendChild(defaultButton);
@@ -631,12 +580,7 @@ function createUrlPatternItem(pattern, index) {
   div.className = 'url-pattern-item';
 
   // Drag handle
-  const dragHandle = document.createElement('span');
-  dragHandle.textContent = '⋮⋮';
-  dragHandle.style.marginRight = '8px';
-  dragHandle.style.color = '#706e6b';
-  dragHandle.style.cursor = 'grab';
-  dragHandle.style.fontSize = '14px';
+  const dragHandle = SFTabs.shared.createDragHandle();
 
   // Label with number and pattern
   const labelSpan = document.createElement('span');
@@ -647,46 +591,20 @@ function createUrlPatternItem(pattern, index) {
   labelSpan.style.fontSize = '13px';
 
   // Button container
-  const buttonContainer = document.createElement('div');
-  buttonContainer.style.display = 'flex';
-  buttonContainer.style.gap = '4px';
-  buttonContainer.style.alignItems = 'center';
+  const buttonContainer = SFTabs.shared.createButtonContainer();
 
   // Edit button
-  const editButton = document.createElement('button');
-  editButton.type = 'button';
-  editButton.textContent = 'Edit';
-  editButton.style.fontSize = '11px';
-  editButton.style.padding = '2px 6px';
-  editButton.style.background = '#0176d3';
-  editButton.style.color = 'white';
-  editButton.style.border = 'none';
-  editButton.style.borderRadius = '3px';
-  editButton.style.cursor = 'pointer';
-  editButton.title = 'Edit this URL pattern';
-  editButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    editUrlPattern(pattern, index);
+  const editButton = SFTabs.shared.createListActionButton('edit', {
+    text: 'Edit',
+    title: 'Edit this URL pattern',
+    onClick: () => editUrlPattern(pattern, index)
   });
 
   // Delete button
-  const deleteButton = document.createElement('button');
-  deleteButton.type = 'button';
-  deleteButton.textContent = '×';
-  deleteButton.style.fontSize = '16px';
-  deleteButton.style.padding = '2px 6px';
-  deleteButton.style.background = '#c23934';
-  deleteButton.style.color = 'white';
-  deleteButton.style.border = 'none';
-  deleteButton.style.borderRadius = '3px';
-  deleteButton.style.cursor = 'pointer';
-  deleteButton.style.lineHeight = '1';
-  deleteButton.title = 'Delete this URL pattern';
-  deleteButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    deleteUrlPattern(index);
+  const deleteButton = SFTabs.shared.createListActionButton('delete', {
+    text: '×',
+    title: 'Delete this URL pattern',
+    onClick: () => deleteUrlPattern(index)
   });
 
   buttonContainer.appendChild(editButton);

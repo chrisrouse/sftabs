@@ -225,79 +225,34 @@ function showDropdownPreview(items) {
 		itemDiv.style.cursor = 'grab';
 
 		// Drag handle
-		const dragHandle = document.createElement('span');
-		dragHandle.textContent = '⋮⋮';
-		dragHandle.style.marginRight = '8px';
-		dragHandle.style.color = '#706e6b';
-		dragHandle.style.cursor = 'grab';
-		dragHandle.style.fontSize = '14px';
+		const dragHandle = SFTabs.shared.createDragHandle();
 
 		const labelSpan = document.createElement('span');
 		labelSpan.textContent = `${index + 1}. ${item.label}`;
 		labelSpan.style.flex = '1';
 
 		// Button container
-		const buttonContainer = document.createElement('div');
-		buttonContainer.style.display = 'flex';
-		buttonContainer.style.gap = '4px';
-		buttonContainer.style.alignItems = 'center';
+		const buttonContainer = SFTabs.shared.createButtonContainer();
 
 		// Edit button
-		const editButton = document.createElement('button');
-		editButton.type = 'button';
-		editButton.textContent = 'Edit';
-		editButton.style.fontSize = '11px';
-		editButton.style.padding = '2px 6px';
-		editButton.style.background = '#0176d3';
-		editButton.style.color = 'white';
-		editButton.style.border = 'none';
-		editButton.style.borderRadius = '3px';
-		editButton.style.cursor = 'pointer';
-		editButton.title = 'Edit this item';
-
-		editButton.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			editObjectDropdownItem(index);
+		const editButton = SFTabs.shared.createListActionButton('edit', {
+			text: 'Edit',
+			title: 'Edit this item',
+			onClick: () => editObjectDropdownItem(index)
 		});
 
 		// Promote button
-		const promoteButton = document.createElement('button');
-		promoteButton.type = 'button';
-		promoteButton.textContent = '↑';
-		promoteButton.style.fontSize = '14px';
-		promoteButton.style.padding = '2px 6px';
-		promoteButton.style.background = '#0c9';
-		promoteButton.style.color = 'white';
-		promoteButton.style.border = 'none';
-		promoteButton.style.borderRadius = '3px';
-		promoteButton.style.cursor = 'pointer';
-		promoteButton.title = 'Promote to main tab';
-
-		promoteButton.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			promoteObjectDropdownItem(index);
+		const promoteButton = SFTabs.shared.createListActionButton('promote', {
+			text: '↑',
+			title: 'Promote to main tab',
+			onClick: () => promoteObjectDropdownItem(index)
 		});
 
 		// Delete button
-		const deleteButton = document.createElement('button');
-		deleteButton.type = 'button';
-		deleteButton.textContent = '×';
-		deleteButton.style.fontSize = '16px';
-		deleteButton.style.padding = '2px 6px';
-		deleteButton.style.background = '#c23934';
-		deleteButton.style.color = 'white';
-		deleteButton.style.border = 'none';
-		deleteButton.style.borderRadius = '3px';
-		deleteButton.style.cursor = 'pointer';
-		deleteButton.style.lineHeight = '1';
-		deleteButton.title = 'Remove this item';
-
-		deleteButton.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			removeDropdownItem(index);
+		const deleteButton = SFTabs.shared.createListActionButton('delete', {
+			text: '×',
+			title: 'Remove this item',
+			onClick: () => removeDropdownItem(index)
 		});
 
 		buttonContainer.appendChild(editButton);

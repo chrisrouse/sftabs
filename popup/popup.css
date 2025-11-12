@@ -1238,3 +1238,72 @@
   border: 1px dashed var(--color-border);
   border-radius: 4px;
 }
+
+/* Standardized list item action buttons */
+.list-action-button {
+  font-size: 11px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1.2;
+  min-height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+/* Edit button style */
+.list-action-button.edit {
+  background: #0176d3 !important;
+  color: white !important;
+}
+
+.list-action-button.edit:hover {
+  background: #014f99 !important;
+}
+
+/* Delete button style */
+.list-action-button.delete {
+  background: #c23934 !important;
+  color: white !important;
+  font-size: 16px !important;
+  padding: 2px 8px !important;
+}
+
+.list-action-button.delete:hover {
+  background: #8a1e1b !important;
+}
+
+/* Promote button style */
+.list-action-button.promote {
+  background: #0c9 !important;
+  color: white !important;
+  font-size: 14px !important;
+  padding: 2px 8px !important;
+}
+
+.list-action-button.promote:hover {
+  background: #0a7 !important;
+}
+
+/* Default button style */
+.list-action-button.default {
+  background: #e0e0e0 !important;
+  color: #706e6b !important;
+}
+
+.list-action-button.default.active {
+  background: #2e844a !important;
+  color: white !important;
+}
+
+.list-action-button.default:hover {
+  background: #d0d0d0 !important;
+}
+
+.list-action-button.default.active:hover {
+  background: #236e3a !important;
+}
