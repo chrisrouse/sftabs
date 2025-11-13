@@ -182,9 +182,6 @@ async function initTabs(tabContainer) {
     addTabClickListeners(topLevelTabs);
     highlightActiveTab();
 
-    // Try to refresh navigation for setup object tabs on current page
-    refreshNavigationForCurrentPage();
-
     // Check for overflow and handle it (use longer timeout for accurate measurement)
     setTimeout(() => {
       handleTabOverflow(tabContainer, topLevelTabs);
@@ -1692,7 +1689,6 @@ window.SFTabsContent.tabRenderer = {
   isLightningNavigationEnabled,
   lightningNavigate,
   highlightActiveTab,
-  refreshNavigationForCurrentPage,
   isCurrentPageMatchingTab,
   removeCustomTabs,
   getTabById,
