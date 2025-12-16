@@ -5,11 +5,12 @@
   "scripts": {
     "manifest:chrome": "node build-manifest.js chrome",
     "manifest:firefox": "node build-manifest.js firefox",
+    "minify": "node minify.js",
     "start:firefox": "npm run manifest:firefox && web-ext run",
     "start:chrome": "npm run manifest:chrome && web-ext run --target=chromium",
-    "build": "web-ext build --overwrite-dest",
-    "build:chrome": "npm run manifest:chrome && npm run build -- --filename=sftabs-chrome-{version}.zip",
-    "build:firefox": "npm run manifest:firefox && npm run build -- --filename=sftabs-firefox-{version}.zip",
+    "build": "web-ext build --overwrite-dest --source-dir=dist",
+    "build:chrome": "npm run manifest:chrome && npm run minify && npm run build -- --filename=sftabs-chrome-{version}.zip",
+    "build:firefox": "npm run manifest:firefox && npm run minify && npm run build -- --filename=sftabs-firefox-{version}.zip",
     "lint": "web-ext lint",
     "sign:firefox": "web-ext sign"
   },
@@ -20,6 +21,7 @@
   "author": "Chris Rouse",
   "license": "SEE LICENSE FILE",
   "devDependencies": {
-    "web-ext": "^8.3.0"
+    "web-ext": "^8.3.0",
+    "terser": "^5.36.0"
   }
 }

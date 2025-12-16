@@ -28,12 +28,6 @@ async function setupObjectDropdown() {
 			action: 'parse_navigation'
 		});
 
-			success: response.success,
-			navigationCount: response.navigation?.length,
-			objectName: response.objectName,
-			pageInfo: response.pageInfo,
-			currentUrl: response.currentUrl
-		});
 
 		// Accept both 'items' and 'navigation' response formats
 		const navigationItems = response.items || response.navigation;
@@ -105,11 +99,6 @@ async function setupObjectDropdown() {
 
 				// Store the parsed navigation items temporarily (not saved until user clicks Save)
 				// We'll use the currentActionPanelTab reference to hold this temporarily
-					tabId: currentTab.id,
-					label: currentTab.label,
-					itemCount: navigationItems.length,
-					firstItem: navigationItems[0]?.label
-				});
 
 				// Show preview with the parsed items
 				showDropdownPreview(navigationItems);

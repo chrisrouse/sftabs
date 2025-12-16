@@ -454,9 +454,6 @@ function populateFormForEdit(tabId) {
 
   // Show/hide appropriate dropdown section based on tab type
   const isObjectManagerTab = tab.path && tab.path.includes('ObjectManager/');
-    objectDropdownSection: !!domElements.objectDropdownSection,
-    manualDropdownSection: !!domElements.manualDropdownSection
-  });
 
   if (domElements.objectDropdownSection && domElements.manualDropdownSection) {
     if (isObjectManagerTab) {
@@ -476,12 +473,6 @@ function populateFormForEdit(tabId) {
       domElements.objectDropdownSection.style.margin = '';
       domElements.objectDropdownSection.style.padding = '';
       domElements.objectDropdownSection.style.overflow = '';
-
-        objectDropdownSection: domElements.objectDropdownSection.style.display,
-        manualDropdownSection: domElements.manualDropdownSection.style.display,
-        objectVisibility: domElements.objectDropdownSection.style.visibility,
-        manualVisibility: domElements.manualDropdownSection.style.visibility
-      });
 
       // Show dropdown items if they exist
       if (SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
@@ -509,19 +500,9 @@ function populateFormForEdit(tabId) {
       domElements.manualDropdownSection.style.padding = '';
       domElements.manualDropdownSection.style.overflow = '';
 
-        objectDropdownSection: domElements.objectDropdownSection.style.display,
-        manualDropdownSection: domElements.manualDropdownSection.style.display,
-        objectVisibility: domElements.objectDropdownSection.style.visibility,
-        manualVisibility: domElements.manualDropdownSection.style.visibility
-      });
-
       // Show existing dropdown items in the manage dropdown panel
       showManageDropdownPanelItems(tab);
     }
-  } else {
-      objectDropdownSection: domElements.objectDropdownSection,
-      manualDropdownSection: domElements.manualDropdownSection
-    });
   }
 }
 

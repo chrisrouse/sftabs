@@ -423,7 +423,11 @@ async function switchActiveProfile(profileId) {
         browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
           .catch(error => {});
       });
-
+    }).catch(error => {
+      if (window.SFTabs && window.SFTabs.main) {
+        SFTabs.main.showStatus('Error switching profile: ' + error.message, true);
+      }
+    });
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
       SFTabs.main.showStatus('Error switching profile: ' + error.message, true);
