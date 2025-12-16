@@ -1,3 +1,16 @@
 sftabs.zip
 .DS_Store
 TESTING_STATUS.md
+
+# Node.js
+node_modules/
+package-lock.json
+
+# web-ext build artifacts
+web-ext-artifacts/
+*.zip
+*.xpi
+
+# IDE
+.vscode/
+.idea/

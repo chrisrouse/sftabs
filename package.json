@@ -1,0 +1,23 @@
+{
+  "name": "sftabs",
+  "version": "1.5.0",
+  "description": "Add custom tabs to the Salesforce setup menu",
+  "scripts": {
+    "start:firefox": "web-ext run --firefox-profile=sf-tabs-dev",
+    "start:chrome": "web-ext run --target=chromium",
+    "build": "web-ext build --overwrite-dest",
+    "build:chrome": "npm run build -- --filename=sftabs-chrome-{version}.zip",
+    "build:firefox": "npm run build -- --filename=sftabs-firefox-{version}.zip",
+    "lint": "web-ext lint",
+    "sign:firefox": "web-ext sign"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrisrouse/sftabs"
+  },
+  "author": "Chris Rouse",
+  "license": "SEE LICENSE FILE",
+  "devDependencies": {
+    "web-ext": "^8.3.0"
+  }
+}
