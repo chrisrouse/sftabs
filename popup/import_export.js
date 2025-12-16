@@ -26,7 +26,6 @@ async function getStoragePreference() {
 		// Default to sync storage
 		return true;
 	} catch (error) {
-		console.warn('⚠️ Could not read storage preference, defaulting to sync:', error);
 		return true;
 	}
 }
@@ -77,7 +76,6 @@ async function readChunkedSync(baseKey) {
 		const data = JSON.parse(jsonString);
 		return data;
 	} catch (error) {
-		console.error(`❌ Error reading from sync storage:`, error);
 		throw error;
 	}
 }
@@ -111,7 +109,6 @@ async function clearChunkedSync(baseKey) {
 
 		await browser.storage.sync.remove(keysToRemove);
 	} catch (error) {
-		console.error(`❌ Error clearing sync storage:`, error);
 		// Don't throw - cleanup is best-effort
 	}
 }
@@ -172,8 +169,6 @@ async function saveChunkedSync(baseKey, data) {
 
 		await browser.storage.sync.set(storageObj);
 	} catch (error) {
-		console.error(`❌ Error saving to sync storage:`, error);
-
 		// Check if it's a quota error
 		if (error.message && error.message.includes('QUOTA')) {
 			throw new Error(`Sync storage quota exceeded. Your configuration is too large (${Math.round(byteSize / 1024)}KB).`);
@@ -218,7 +213,7 @@ function applyThemeFromStorage() {
 			}
 		})
 		.catch(error => {
-			console.error('Error loading theme settings:', error);
+			// Error loading theme settings
 		});
 }
 
@@ -309,7 +304,6 @@ async function exportSettings() {
 
 		showStatus('Configuration exported successfully', false);
 	} catch (error) {
-		console.error('Error exporting configuration:', error);
 		showStatus('Error exporting configuration: ' + error.message, true);
 	}
 }
@@ -364,13 +358,11 @@ async function handleFileSelect(event) {
 				await showImportModal();
 			}
 		} catch (error) {
-			console.error('Error importing configuration:', error);
 			showStatus('Error: ' + error.message, true);
 		}
 	};
 
 	reader.onerror = function() {
-		console.error('Error reading file');
 		showStatus('Error reading file', true);
 	};
 
@@ -441,7 +433,6 @@ async function showImportModal() {
 	const newProfileInput = document.getElementById('new-profile-name');
 
 	if (!modal || !profileSelect) {
-		console.error('Import modal elements not found');
 		return;
 	}
 
@@ -545,7 +536,6 @@ async function handleImportConfirm() {
 		hideImportModal();
 		notifyTabsAndPopup();
 	} catch (error) {
-		console.error('Error during import:', error);
 		showStatus('Error importing: ' + error.message, true);
 	}
 }

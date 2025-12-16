@@ -72,7 +72,6 @@ function setSelectedTheme(theme) {
   if (selectedOption) {
     selectedOption.classList.add('selected');
   } else {
-    console.warn('Could not find option for theme:', theme);
   }
 }
 
@@ -229,7 +228,6 @@ function setupEventListeners() {
             false
           );
         } catch (error) {
-          console.error('Error changing sync preference:', error);
           SFTabs.main.showStatus('Error: ' + error.message, true);
           // Revert checkbox state on error
           domElements.useSyncStorageCheckbox.checked = !newValue;
@@ -290,7 +288,6 @@ function openKeyboardShortcutsPage() {
     browser.tabs.create({ url: 'about:addons' }).then(() => {
       window.close();
     }).catch(err => {
-      console.error('Error opening Firefox addons page:', err);
       SFTabs.main.showStatus('Could not open shortcuts page', true);
     });
   } else if (isChrome) {
@@ -298,11 +295,9 @@ function openKeyboardShortcutsPage() {
     browser.tabs.create({ url: 'chrome://extensions/shortcuts' }).then(() => {
       window.close();
     }).catch(err => {
-      console.error('Error opening Chrome shortcuts page:', err);
       SFTabs.main.showStatus('Could not open shortcuts page', true);
     });
   } else {
-    console.warn('Unknown browser, cannot open shortcuts page');
     SFTabs.main.showStatus('Could not detect browser type', true);
   }
 }

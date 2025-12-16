@@ -120,7 +120,6 @@ async function setupObjectDropdown() {
 				if (actionPanelTab) {
 					actionPanelTab.pendingDropdownItems = navigationItems;
 				} else {
-					console.warn('No currentActionPanelTab available to store pending items');
 				}
 
 				// Scroll the dropdown preview into view so user can see it immediately
@@ -133,7 +132,6 @@ async function setupObjectDropdown() {
 
 				SFTabs.main.showStatus('Navigation items loaded. Click Save to apply changes.');
 			} else {
-				console.error('❌ No matching tab found for this Object Manager page');
 				const objectName = response.objectName || 'Unknown';
 				throw new Error(`No tab found for ${objectName}. Please create a tab for this page first using the Quick Add (⚡) button.`);
 			}
@@ -142,7 +140,6 @@ async function setupObjectDropdown() {
 		}
 
 	} catch (error) {
-		console.error('Error setting up dropdown:', error);
 		const errorMessage = error.message.includes('settings panel')
 			? error.message
 			: 'Failed to create dropdown: ' + error.message;
@@ -260,7 +257,6 @@ function removeDropdownItem(index) {
 	const currentTab = SFTabs.main.getCurrentActionPanelTab();
 
 	if (!currentTab) {
-		console.warn('No currentActionPanelTab found, cannot remove item');
 		return;
 	}
 
@@ -274,7 +270,6 @@ function removeDropdownItem(index) {
 		const tabs = SFTabs.main.customTabs;
 		const tab = tabs.find(t => t.id === currentTab.id);
 		if (!tab || !tab.dropdownItems) {
-			console.warn('Tab or dropdownItems not found');
 			return;
 		}
 
@@ -296,7 +291,6 @@ function editObjectDropdownItem(index) {
 
 	const currentTab = SFTabs.main.getCurrentActionPanelTab();
 	if (!currentTab) {
-		console.warn('No currentActionPanelTab found, cannot edit item');
 		return;
 	}
 
@@ -344,7 +338,6 @@ function promoteObjectDropdownItem(index) {
 
 	const currentTab = SFTabs.main.getCurrentActionPanelTab();
 	if (!currentTab) {
-		console.warn('No currentActionPanelTab found, cannot promote item');
 		return;
 	}
 
@@ -482,7 +475,6 @@ function saveObjectDropdownItemOrder(container) {
 	// Get current tab
 	const currentTab = SFTabs.main.getCurrentActionPanelTab();
 	if (!currentTab) {
-		console.warn('No currentActionPanelTab found');
 		return;
 	}
 

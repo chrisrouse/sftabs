@@ -53,7 +53,6 @@ function parseObjectManagerNavigation() {
       resolve(navigationItems);
 
     } catch (error) {
-      console.error('Error parsing navigation:', error);
       reject(error);
     }
   });

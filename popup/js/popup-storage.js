@@ -15,7 +15,6 @@ async function getStoragePreference() {
     // Default to sync storage
     return true;
   } catch (error) {
-    console.warn('⚠️ Could not read storage preference, defaulting to sync:', error);
     return true;
   }
 }
@@ -50,7 +49,6 @@ async function getTabs() {
       return [];
     }
   } catch (error) {
-    console.error('Error getting tabs from storage:', error);
     throw error;
   }
 }
@@ -116,7 +114,6 @@ async function saveTabs(tabs) {
     const settings = await getUserSettings();
 
     if (!settings.activeProfileId) {
-      console.error('❌ No active profile ID found - cannot save tabs');
       throw new Error('No active profile ID found');
     }
 
@@ -134,7 +131,6 @@ async function saveTabs(tabs) {
 
     return sortedTabs;
   } catch (error) {
-    console.error('Error saving tabs to storage:', error);
     SFTabs.main.showStatus('Error saving tabs: ' + error.message, true);
     throw error;
   }
@@ -158,7 +154,6 @@ async function getUserSettings() {
       return { ...SFTabs.constants.DEFAULT_SETTINGS };
     }
   } catch (error) {
-    console.error('Error getting user settings from storage:', error);
     throw error;
   }
 }
@@ -192,7 +187,6 @@ async function saveUserSettings(settings, skipMigration = false) {
 
     return settings;
   } catch (error) {
-    console.error('Error saving user settings to storage:', error);
     SFTabs.main.showStatus('Error saving settings: ' + error.message, true);
     throw error;
   }
@@ -211,7 +205,6 @@ async function clearAllStorage() {
     
     return true;
   } catch (error) {
-    console.error('Error clearing storage:', error);
     throw error;
   }
 }
@@ -275,7 +268,6 @@ async function importConfiguration(configData) {
 
     return true;
   } catch (error) {
-    console.error('Error importing configuration:', error);
     SFTabs.main.showStatus('Error importing configuration: ' + error.message, true);
     throw error;
   }
@@ -324,7 +316,6 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
     }
 
   } catch (error) {
-    console.error('❌ Error during migration:', error);
     throw new Error(`Failed to migrate tabs: ${error.message}`);
   }
 }
@@ -360,14 +351,12 @@ function setupStorageListeners() {
               SFTabs.ui.renderTabList();
             }
           }).catch(err => {
-            console.error('Error re-reading tabs after sync change:', err);
           });
         }
       }
     });
 
   } else {
-    console.warn('⚠️ browser.storage.onChanged not available');
   }
 }
 
@@ -400,7 +389,6 @@ async function getProfiles() {
       return [];
     }
   } catch (error) {
-    console.error('Error getting profiles from storage:', error);
     throw error;
   }
 }
@@ -437,7 +425,6 @@ async function saveProfiles(profiles) {
 
     return sortedProfiles;
   } catch (error) {
-    console.error('Error saving profiles to storage:', error);
     if (SFTabs.main) {
       SFTabs.main.showStatus('Error saving profiles: ' + error.message, true);
     }
@@ -463,7 +450,6 @@ async function getProfileTabs(profileId) {
       return localResult[storageKey] || [];
     }
   } catch (error) {
-    console.error(`Error getting tabs for profile ${profileId}:`, error);
     throw error;
   }
 }
@@ -495,7 +481,6 @@ async function saveProfileTabs(profileId, tabs) {
 
     return cleanedTabs;
   } catch (error) {
-    console.error(`Error saving tabs for profile ${profileId}:`, error);
     throw error;
   }
 }

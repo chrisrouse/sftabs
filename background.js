@@ -117,7 +117,6 @@ async function readChunkedSync(baseKey) {
     const jsonString = chunks.join('');
     return JSON.parse(jsonString);
   } catch (error) {
-    console.error('Error reading chunked sync:', error);
     return null;
   }
 }
@@ -175,7 +174,6 @@ async function saveChunkedSync(baseKey, data) {
     await browser.storage.sync.set(storageObj);
     return { success: true, chunked: true, chunkCount: chunks.length };
   } catch (error) {
-    console.error('Error saving chunked sync:', error);
     throw error;
   }
 }
@@ -210,7 +208,6 @@ async function detectStorageFormat() {
       localTabs: localData.customTabs || null
     };
   } catch (error) {
-    console.error('Error detecting storage format:', error);
     return { preferSync: true, hasChunkedSync: false, hasDirectSync: false, hasLocal: false };
   }
 }
@@ -277,7 +274,6 @@ async function migrateStorage() {
 
     return true;
   } catch (error) {
-    console.error('❌ SF Tabs Background: Migration error:', error);
     return false;
   }
 }
@@ -308,7 +304,7 @@ browser.runtime.onStartup.addListener(async () => {
     // Version mismatch - run migration
     await migrateStorage();
   } catch (error) {
-    console.error('SF Tabs: Error checking version on startup:', error);
+    // Migration error on startup
   }
 });
 
@@ -351,14 +347,10 @@ browser.commands.onCommand.addListener(async (command) => {
             action: 'navigate_to_tab',
             tab: targetTab
           });
-        } else {
-          console.warn('SF Tabs: Not on a Salesforce page, keyboard shortcut ignored');
         }
-      } else {
-        console.warn('SF Tabs: No eligible tab at position', position + 1);
       }
     } catch (error) {
-      console.error('SF Tabs: Error handling keyboard command:', error);
+      // Error handling keyboard command
     }
   }
 });

@@ -45,8 +45,6 @@ function writeManifest(browser) {
 
 // Validate target
 if (!['chrome', 'firefox'].includes(target)) {
-  console.error('Error: Target must be "chrome" or "firefox"');
-  console.error('Usage: node build-manifest.js [chrome|firefox]');
   process.exit(1);
 }
 

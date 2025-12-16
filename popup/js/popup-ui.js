@@ -299,7 +299,6 @@ function createTabActions(tab) {
       // Pass the tab object to the action panel
       SFTabs.main.showActionPanel(tab);
     } else {
-      console.error('SFTabs.main.showActionPanel not available!');
     }
   });
 
@@ -520,7 +519,6 @@ function populateFormForEdit(tabId) {
       showManageDropdownPanelItems(tab);
     }
   } else {
-    console.error('Manage dropdown panel sections not found!', {
       objectDropdownSection: domElements.objectDropdownSection,
       manualDropdownSection: domElements.manualDropdownSection
     });
@@ -675,7 +673,6 @@ function saveTabForm() {
 
     hideTabForm();
   }).catch(error => {
-    console.error('Error updating tab:', error);
     SFTabs.main.showStatus('Error updating tab: ' + error.message, true);
   });
 }
@@ -947,7 +944,6 @@ function handleDropdownCreation(draggedItem, targetItem) {
   const targetTab = tabs.find(t => t.id === targetItem.dataset.id);
 
   if (!draggedTab || !targetTab) {
-    console.error('Could not find tabs for dropdown creation');
     return;
   }
 
@@ -1070,7 +1066,6 @@ function showManageDropdownPanelItems(tab) {
   const domElements = SFTabs.main.getDOMElements();
 
   if (!domElements.manageDropdownPreview || !domElements.manageDropdownList || !domElements.manageDropdownCount) {
-    console.warn('Manage dropdown panel elements not found');
     return;
   }
 
@@ -1635,7 +1630,6 @@ function performDropOperation(parentTab, sourcePath, targetPath, dropZone) {
   // Get the dragged item
   const draggedItem = getItemByPath(parentTab.dropdownItems, sourcePath);
   if (!draggedItem) {
-    console.error('Dragged item not found');
     return;
   }
 
@@ -1679,7 +1673,6 @@ function performDropOperation(parentTab, sourcePath, targetPath, dropZone) {
     // Refresh the display
     showManageDropdownPanelItems(parentTab);
   }).catch(error => {
-    console.error('Error saving tabs after drag-and-drop:', error);
     SFTabs.main.showStatus('Error saving changes: ' + error.message, true);
   });
 }
@@ -1773,7 +1766,6 @@ function promoteDropdownItem(parentTab, itemIndex) {
 
     // Don't call renderTabList() or hideTabForm() - keep action panel open for multiple edits
   }).catch(error => {
-    console.error('Error promoting dropdown item:', error);
     SFTabs.main.showStatus('Error promoting item: ' + error.message, true);
   });
 }

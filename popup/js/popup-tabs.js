@@ -150,7 +150,6 @@ function enhancedAddTabForCurrentPage() {
       }
     })
     .catch(error => {
-      console.error('Error in Quick Add:', error);
       SFTabs.main.showStatus('Error accessing current tab: ' + error.message, true);
     });
 }
@@ -370,7 +369,6 @@ function showDeleteConfirmModal(tabId) {
   const confirmBtn = document.getElementById('delete-modal-confirm-button');
   
   if (!modal) {
-    console.error('Delete modal element not found');
     return;
   }
   

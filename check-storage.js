@@ -9,13 +9,13 @@
   try {
     const local = await storage.local.get(null);
   } catch (e) {
-    console.error("Error reading local storage:", e);
+    // Error reading local storage
   }
 
   // Check sync storage
   try {
     const sync = await storage.sync.get(null);
   } catch (e) {
-    console.error("Error reading sync storage:", e);
+    // Error reading sync storage
   }
 })();

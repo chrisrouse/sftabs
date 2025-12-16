@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     } catch (error) {
-      console.error('Error during popup initialization:', error);
       showStatus('Error initializing popup: ' + error.message, true);
     }
   })();
@@ -70,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         })
         .catch(error => {
-          console.error('Error reloading popup:', error);
         });
       return true;
     }
@@ -151,13 +149,11 @@ function initializeDOMElements() {
   let missingElements = 0;
   for (const elementName of criticalElements) {
     if (!domElements[elementName]) {
-      console.error(`Critical DOM element not found: ${elementName}`);
       missingElements++;
     }
   }
   
   if (missingElements > 0) {
-    console.error(`${missingElements} critical DOM elements missing`);
   }
   
 }
@@ -201,7 +197,6 @@ function loadUserSettings() {
       return userSettings;
     })
     .catch((error) => {
-      console.error('Error loading user settings:', error);
       showStatus('Error loading settings: ' + error.message, true);
       return SFTabs.constants.DEFAULT_SETTINGS;
     });
@@ -215,7 +210,6 @@ async function loadTabsFromStorage() {
   try {
     // Always load from profile storage (profiles are used internally even if UI is disabled)
     if (!userSettings.activeProfileId) {
-      console.error('❌ SF Tabs: No active profile ID found - this should not happen');
       customTabs = [];
       return customTabs;
     }
@@ -244,7 +238,6 @@ async function loadTabsFromStorage() {
     }
     return customTabs;
   } catch (error) {
-    console.error('❌ SF Tabs: Error loading tabs from storage:', error);
     showStatus('Error loading tabs: ' + error.message, true);
 
     // Don't automatically use defaults on error - might overwrite user data
@@ -373,7 +366,6 @@ function showSettingsPanel() {
 function showActionPanel(tab) {
 
   if (!tab) {
-    console.error('showActionPanel called with no tab!');
     return;
   }
 
@@ -398,7 +390,6 @@ function showActionPanel(tab) {
  */
 function updateActionPanelContent(tab) {
   if (!tab) {
-    console.warn('No tab provided to updateActionPanelContent');
     return;
   }
 
@@ -463,7 +454,6 @@ function updateActionPanelContent(tab) {
  */
 function showManualDropdownItems(tab) {
   if (!domElements.manualDropdownItemsPreview || !domElements.manualDropdownItemsList || !domElements.manualDropdownCount) {
-    console.warn('Manual dropdown preview elements not found');
     return;
   }
 
@@ -647,7 +637,6 @@ function saveActionPanelChanges() {
         showMainContent();
       }, 800);
     }).catch(error => {
-      console.error('Error updating dropdown item:', error);
       showStatus('Error updating dropdown item: ' + error.message, true);
     });
 
@@ -677,11 +666,9 @@ function saveActionPanelChanges() {
           showMainContent();
         }, 800);
       }).catch(error => {
-        console.error('Error creating tab:', error);
         showStatus('Error creating tab: ' + error.message, true);
       });
     } else {
-      console.error('SFTabs.tabs.createTab not available');
       showStatus('Error: Create function not available', true);
     }
   } else {
@@ -717,11 +704,9 @@ function saveActionPanelChanges() {
           showMainContent();
         }, 800);
       }).catch(error => {
-        console.error('Error updating tab:', error);
         showStatus('Error updating tab: ' + error.message, true);
       });
     } else {
-      console.error('SFTabs.tabs.updateTab not available');
       showStatus('Error: Update function not available', true);
     }
   }
@@ -732,7 +717,6 @@ function saveActionPanelChanges() {
  */
 function showStatus(message, isError = false) {
   if (!domElements.statusMessage) {
-    console.error('Status message element not found');
     return;
   }
   
@@ -759,7 +743,6 @@ function showStatus(message, isError = false) {
 function showModal(modalElement, cancelButton, confirmButton, onConfirm) {
 
   if (!modalElement) {
-    console.error('Modal element not found!');
     return;
   }
 

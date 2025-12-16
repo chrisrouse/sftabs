@@ -42,8 +42,6 @@ window.sfTabsLightningNav = function(details) {
       }
     }
   } catch (error) {
-    console.error("Lightning navigation error:", error);
-    
     // Signal error back to content script
     window.postMessage({
       type: 'SF_TABS_NAVIGATION_COMPLETE',
@@ -93,7 +91,6 @@ window.sfTabsLightningNavExtended = function(details) {
       return window.sfTabsLightningNav(details);
     }
   } catch (error) {
-    console.error("Extended Lightning navigation error:", error);
     return false;
   }
   

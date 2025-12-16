@@ -16,7 +16,6 @@ async function getStoragePreference() {
     }
     return true; // Default to sync
   } catch (error) {
-    console.warn('Could not read storage preference, defaulting to sync:', error);
     return true;
   }
 }
@@ -54,7 +53,6 @@ async function readChunkedSync(baseKey) {
     const jsonString = chunks.join('');
     return JSON.parse(jsonString);
   } catch (error) {
-    console.error('Error reading chunked sync:', error);
     return null;
   }
 }
@@ -99,7 +97,6 @@ async function getTabsFromStorage() {
       return result.customTabs || [];
     }
   } catch (error) {
-    console.error('[tab-renderer] Error getting tabs from storage:', error);
     return [];
   }
 }
@@ -235,7 +232,6 @@ async function initTabs(tabContainer) {
     }, 300);
 
   } catch (error) {
-    console.error("Error loading tabs:", error);
     // Reset flag on error
     isRenderingTabs = false;
   }
@@ -1149,7 +1145,7 @@ async function highlightActiveTab() {
 
     }
   } catch (error) {
-    console.error("Error highlighting active tab:", error);
+    // Error highlighting active tab
   }
 }
 
@@ -1184,7 +1180,6 @@ async function getTabById(tabId) {
     const tabs = result.customTabs || [];
     return tabs.find(tab => tab.id === tabId);
   } catch (error) {
-    console.error("Error getting tab by ID:", error);
     return null;
   }
 }
@@ -1204,8 +1199,6 @@ function forceRefreshTabs() {
   const tabContainer = document.querySelector('.tabBarItems.slds-grid');
   if (tabContainer) {
     initTabs(tabContainer);
-  } else {
-    console.warn("No tab container found for force refresh");
   }
 }
 
@@ -1719,7 +1712,7 @@ window.addEventListener('resize', () => {
         const topLevelTabs = getTopLevelTabs(tabs);
         handleTabOverflow(tabContainer, topLevelTabs);
       }).catch(error => {
-        console.error('Error recalculating overflow on resize:', error);
+        // Error recalculating overflow on resize
       });
     } else {
     }

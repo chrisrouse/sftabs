@@ -81,7 +81,7 @@
     window.postMessage({type: 'SF_TABS_INJECT_LOADED'}, window.location.origin);
   };
   script.onerror = function() {
-    console.error("Failed to load inject.js");
+    // Failed to load inject.js
   };
   
   if (document.head) {
@@ -113,7 +113,6 @@ async function getStoragePreference() {
     }
     return true; // Default to sync
   } catch (error) {
-    console.warn('Could not read storage preference, defaulting to sync:', error);
     return true;
   }
 }
@@ -151,7 +150,6 @@ async function readChunkedSync(baseKey) {
     const jsonString = chunks.join('');
     return JSON.parse(jsonString);
   } catch (error) {
-    console.error('Error reading chunked sync:', error);
     return null;
   }
 }
@@ -197,7 +195,6 @@ async function getTabsFromStorage() {
       return result.customTabs || [];
     }
   } catch (error) {
-    console.error('Error getting tabs from storage:', error);
     return [];
   }
 }
@@ -281,7 +278,7 @@ async function initializeContentScript() {
     setupDropdownEventHandlers();
 
   } catch (error) {
-    console.error('Error during content script initialization:', error);
+    // Error during content script initialization
   }
 }
 
@@ -298,7 +295,6 @@ function delayLoadTabs(attemptCount) {
   attemptCount++;
 
   if (attemptCount > maxLoadAttempts) {
-    console.error("SF Tabs - failed to find tab container after max attempts");
     return;
   }
 
@@ -384,7 +380,7 @@ async function initTabsWithLightningNavigation(tabContainer) {
       pendingHighlightTimeout = null;
     }, 600);
   } catch (error) {
-    console.error("Error in fallback tab initialization:", error);
+    // Error in fallback tab initialization
   }
 }
 
@@ -678,7 +674,7 @@ async function highlightActiveTabStandalone() {
       }
     }
   } catch (error) {
-    console.error('[highlightActiveTabStandalone] Error:', error);
+    // Error in highlightActiveTabStandalone
   }
 }
 
@@ -842,7 +838,6 @@ function handleNavigateToTab(message, sendResponse) {
   const { tab } = message;
 
   if (!tab) {
-    console.error('SF Tabs: No tab provided to navigate to');
     sendResponse({ success: false, error: 'No tab provided' });
     return;
   }

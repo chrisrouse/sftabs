@@ -14,7 +14,6 @@ async function loadProfiles() {
   try {
     profilesCache = await SFTabs.storage.getProfiles();
   } catch (error) {
-    console.error('Error loading profiles:', error);
     profilesCache = [];
   }
 }
@@ -424,10 +423,8 @@ async function switchActiveProfile(profileId) {
         browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
           .catch(error => {});
       });
-    }).catch(error => console.error('Error querying tabs:', error));
 
   } catch (error) {
-    console.error('Error switching profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
       SFTabs.main.showStatus('Error switching profile: ' + error.message, true);
     }
@@ -609,7 +606,6 @@ async function setDefaultProfile(profileId) {
       }
     }
   } catch (error) {
-    console.error('Error setting default profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error setting default profile: ' + error.message, true);
     }
@@ -771,7 +767,6 @@ async function showProfileSelectionForDisable() {
     const cancelButton = document.querySelector('#disable-profiles-cancel-button');
 
     if (!modal || !keepProfileSelect || !confirmButton || !cancelButton) {
-      console.error('Disable profiles modal elements not found');
       resolve(null);
       return;
     }
@@ -1016,7 +1011,6 @@ async function saveProfile() {
       await showProfileList();
     }, 800);
   } catch (error) {
-    console.error('Error saving profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error saving profile: ' + error.message, true);
     }
@@ -1067,7 +1061,6 @@ async function deleteProfile(profile) {
     // Re-render list
     await renderProfileList();
   } catch (error) {
-    console.error('Error deleting profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error deleting profile: ' + error.message, true);
     }
@@ -1090,7 +1083,6 @@ async function getLegacyTabsFromStorage(storageType) {
       return tabs;
     }
   } catch (error) {
-    console.error(`Error reading from ${storageType} storage:`, error);
     return [];
   }
 }
@@ -1114,7 +1106,6 @@ async function getLegacyTabs() {
       return result.customTabs || [];
     }
   } catch (error) {
-    console.error('Error checking for legacy tabs:', error);
     return [];
   }
 }
@@ -1156,7 +1147,6 @@ async function initializeProfileWithDefaults() {
     }
 
   } catch (error) {
-    console.error('Error initializing profile with defaults:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error initializing profile: ' + error.message, true);
     }
@@ -1200,7 +1190,6 @@ async function initializeProfileEmpty() {
     }
 
   } catch (error) {
-    console.error('Error initializing empty profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error initializing profile: ' + error.message, true);
     }
@@ -1248,7 +1237,6 @@ async function showCloneProfileSelector() {
     }, 100);
 
   } catch (error) {
-    console.error('Error showing clone profile selector:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error showing profile selector: ' + error.message, true);
     }
@@ -1324,7 +1312,6 @@ async function confirmCloneProfile() {
     hideCloneProfileSelector();
 
   } catch (error) {
-    console.error('Error cloning profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error cloning profile: ' + error.message, true);
     }

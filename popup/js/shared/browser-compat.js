@@ -19,7 +19,6 @@
             return new Promise((resolve, reject) => {
               chrome.storage.local.get(keys, (result) => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage local get error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
                   resolve(result);
@@ -31,7 +30,6 @@
             return new Promise((resolve, reject) => {
               chrome.storage.local.set(items, () => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage local set error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
                   resolve();
@@ -43,7 +41,6 @@
             return new Promise((resolve, reject) => {
               chrome.storage.local.clear(() => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage local clear error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
                   resolve();
@@ -59,7 +56,6 @@
             return new Promise((resolve, reject) => {
               chrome.storage.sync.get(keys, (result) => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage sync get error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
                   resolve(result);
@@ -71,7 +67,6 @@
             return new Promise((resolve, reject) => {
               chrome.storage.sync.set(items, () => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage sync set error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
                   resolve();
@@ -83,7 +78,6 @@
             return new Promise((resolve, reject) => {
               chrome.storage.sync.clear(() => {
                 if (chrome.runtime.lastError) {
-                  console.error('SF Tabs: Storage sync clear error:', chrome.runtime.lastError);
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
                   resolve();
@@ -104,7 +98,6 @@
           return new Promise((resolve, reject) => {
             chrome.tabs.query(queryInfo, (tabs) => {
               if (chrome.runtime.lastError) {
-                console.error('SF Tabs: Tabs query error:', chrome.runtime.lastError);
                 reject(new Error(chrome.runtime.lastError.message));
               } else {
                 resolve(tabs);
@@ -116,7 +109,6 @@
           return new Promise((resolve, reject) => {
             chrome.tabs.create(createProperties, (tab) => {
               if (chrome.runtime.lastError) {
-                console.error('SF Tabs: Tabs create error:', chrome.runtime.lastError);
                 reject(new Error(chrome.runtime.lastError.message));
               } else {
                 resolve(tab);
@@ -144,6 +136,5 @@
       }
     };
   } else if (typeof browser === 'undefined') {
-    console.error('SF Tabs: No compatible browser API found!');
   }
 })();

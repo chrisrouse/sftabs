@@ -298,7 +298,6 @@ function handleNavigationMessage(request, sender, sendResponse) {
           });
         })
         .catch(error => {
-          console.error('SF Tabs: Error parsing navigation:', error);
           sendResponse({
             success: false,
             error: error.message

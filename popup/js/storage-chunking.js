@@ -89,8 +89,6 @@ async function saveChunkedSync(baseKey, data) {
 		await browser.storage.sync.set(storageObj);
 		return { success: true, chunked: true, chunkCount: chunks.length };
 	} catch (error) {
-		console.error(`❌ Error saving to sync storage:`, error);
-
 		// Check if it's a quota error
 		if (error.message && error.message.includes('QUOTA')) {
 			throw new Error(`Sync storage quota exceeded. Your configuration is too large (${Math.round(byteSize / 1024)}KB). Please reduce the number of tabs or dropdown items.`);
@@ -145,7 +143,6 @@ async function readChunkedSync(baseKey) {
 		const data = JSON.parse(jsonString);
 		return data;
 	} catch (error) {
-		console.error(`❌ Error reading from sync storage:`, error);
 		throw error;
 	}
 }
@@ -179,7 +176,6 @@ async function clearChunkedSync(baseKey) {
 
 		await browser.storage.sync.remove(keysToRemove);
 	} catch (error) {
-		console.error(`❌ Error clearing sync storage:`, error);
 		// Don't throw - cleanup is best-effort
 	}
 }
@@ -213,7 +209,6 @@ async function detectStorageFormat(baseKey) {
 
 		return { location: 'none', metadata: null };
 	} catch (error) {
-		console.error(`❌ Error detecting storage format:`, error);
 		return { location: 'none', metadata: null };
 	}
 }
