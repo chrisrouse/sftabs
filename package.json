@@ -5,7 +5,7 @@
   "scripts": {
     "manifest:chrome": "node build-manifest.js chrome",
     "manifest:firefox": "node build-manifest.js firefox",
-    "start:firefox": "npm run manifest:firefox && web-ext run --firefox-profile=sf-tabs-dev",
+    "start:firefox": "npm run manifest:firefox && web-ext run",
     "start:chrome": "npm run manifest:chrome && web-ext run --target=chromium",
     "build": "web-ext build --overwrite-dest",
     "build:chrome": "npm run manifest:chrome && npm run build -- --filename=sftabs-chrome-{version}.zip",
