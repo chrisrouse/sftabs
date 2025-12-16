@@ -21,7 +21,6 @@ function chunkData(jsonString, chunkSize) {
 		offset += chunkSize;
 	}
 
-	console.log(`📦 Chunked data: ${jsonString.length} bytes into ${chunks.length} chunks`);
 	return chunks;
 }
 
@@ -36,7 +35,6 @@ function unchunkData(chunks) {
 	}
 
 	const reassembled = chunks.join('');
-	console.log(`🔧 Reassembled ${chunks.length} chunks into ${reassembled.length} bytes`);
 	return reassembled;
 }
 
@@ -51,8 +49,6 @@ async function saveChunkedSync(baseKey, data) {
 		const jsonString = JSON.stringify(data);
 		const byteSize = new Blob([jsonString]).size;
 		const chunkSize = SFTabs.constants.CHUNK_SIZE;
-
-		console.log(`💾 Saving to sync storage: ${baseKey} (${byteSize} bytes)`);
 
 		// Clear any existing chunks first
 		await clearChunkedSync(baseKey);
@@ -69,8 +65,6 @@ async function saveChunkedSync(baseKey, data) {
 			};
 
 			await browser.storage.sync.set(storageObj);
-			console.log(`✅ Saved to sync storage (non-chunked)`);
-
 			return { success: true, chunked: false, chunkCount: 1 };
 		}
 
@@ -93,8 +87,6 @@ async function saveChunkedSync(baseKey, data) {
 		};
 
 		await browser.storage.sync.set(storageObj);
-		console.log(`✅ Saved to sync storage (${chunks.length} chunks)`);
-
 		return { success: true, chunked: true, chunkCount: chunks.length };
 	} catch (error) {
 		console.error(`❌ Error saving to sync storage:`, error);
@@ -124,17 +116,13 @@ async function readChunkedSync(baseKey) {
 		if (!metadata || !metadata.chunked) {
 			const directResult = await browser.storage.sync.get(baseKey);
 			if (directResult[baseKey]) {
-				console.log(`📖 Read from sync storage (non-chunked)`);
 				return directResult[baseKey];
 			}
-			console.log(`ℹ️ No data found in sync storage for key: ${baseKey}`);
 			return null;
 		}
 
 		// Data is chunked - read all chunks
 		const chunkCount = metadata.chunkCount;
-		console.log(`📖 Reading ${chunkCount} chunks from sync storage`);
-
 		const chunkKeys = [];
 		for (let i = 0; i < chunkCount; i++) {
 			chunkKeys.push(`${baseKey}_chunk_${i}`);
@@ -155,8 +143,6 @@ async function readChunkedSync(baseKey) {
 		// Reassemble and parse
 		const jsonString = unchunkData(chunks);
 		const data = JSON.parse(jsonString);
-
-		console.log(`✅ Successfully reassembled data from ${chunkCount} chunks`);
 		return data;
 	} catch (error) {
 		console.error(`❌ Error reading from sync storage:`, error);
@@ -192,7 +178,6 @@ async function clearChunkedSync(baseKey) {
 		}
 
 		await browser.storage.sync.remove(keysToRemove);
-		console.log(`🗑️ Cleared sync storage for key: ${baseKey}`);
 	} catch (error) {
 		console.error(`❌ Error clearing sync storage:`, error);
 		// Don't throw - cleanup is best-effort

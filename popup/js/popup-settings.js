@@ -34,13 +34,11 @@ function initThemeSelector() {
   
   // Get current theme from user settings
   const currentTheme = SFTabs.main.getUserSettings().themeMode || 'light';
-  console.log('Current theme from settings:', currentTheme);
   
   // Add click handlers to theme options
   themeOptions.forEach(option => {
     option.addEventListener('click', () => {
       const themeValue = option.getAttribute('data-theme-value');
-      console.log('Theme option clicked:', themeValue);
       
       // Update settings
       const settings = SFTabs.main.getUserSettings();
@@ -62,7 +60,6 @@ function initThemeSelector() {
  * Set the selected theme in the UI
  */
 function setSelectedTheme(theme) {
-  console.log('Setting selected theme in UI:', theme);
   const themeOptions = document.querySelectorAll('.theme-option');
   
   // Remove selected class from all options
@@ -74,7 +71,6 @@ function setSelectedTheme(theme) {
   const selectedOption = document.querySelector(`.theme-option[data-theme-value="${theme}"]`);
   if (selectedOption) {
     selectedOption.classList.add('selected');
-    console.log('Applied selected class to:', theme);
   } else {
     console.warn('Could not find option for theme:', theme);
   }
@@ -127,7 +123,6 @@ function setupEventListeners() {
   // Settings button - toggle between panels
   if (domElements.settingsButton) {
     domElements.settingsButton.addEventListener('click', () => {
-      console.log('Settings button clicked');
       if (domElements.mainContent.classList.contains('active')) {
         SFTabs.main.showSettingsPanel();
       } else {
@@ -139,7 +134,6 @@ function setupEventListeners() {
   // Action panel close button
   if (domElements.actionPanelCloseButton) {
     domElements.actionPanelCloseButton.addEventListener('click', () => {
-      console.log('Action panel close button clicked');
       SFTabs.main.showMainContent();
     });
   }
@@ -147,7 +141,6 @@ function setupEventListeners() {
   // Action panel save button
   if (domElements.actionPanelSaveButton) {
     domElements.actionPanelSaveButton.addEventListener('click', () => {
-      console.log('Action panel save button clicked');
       if (SFTabs.main && SFTabs.main.saveActionPanelChanges) {
         SFTabs.main.saveActionPanelChanges();
       }
@@ -174,7 +167,6 @@ function setupEventListeners() {
   // Settings reset button
   if (domElements.settingsResetButton) {
     domElements.settingsResetButton.addEventListener('click', () => {
-      console.log('Settings reset button clicked');
       const modalElements = getModalElements();
       SFTabs.main.showModal(
         domElements.confirmModal,
@@ -194,7 +186,6 @@ function setupEventListeners() {
   // Compact mode change
   if (domElements.compactModeCheckbox) {
     domElements.compactModeCheckbox.addEventListener('change', () => {
-      console.log('Compact mode changed to:', domElements.compactModeCheckbox.checked);
       const settings = SFTabs.main.getUserSettings();
       settings.compactMode = domElements.compactModeCheckbox.checked;
       SFTabs.storage.saveUserSettings(settings).then(() => {
@@ -208,7 +199,6 @@ function setupEventListeners() {
   // Skip delete confirmation change
   if (domElements.skipDeleteConfirmationCheckbox) {
     domElements.skipDeleteConfirmationCheckbox.addEventListener('change', () => {
-      console.log('Skip delete confirmation changed to:', domElements.skipDeleteConfirmationCheckbox.checked);
       const settings = SFTabs.main.getUserSettings();
       settings.skipDeleteConfirmation = domElements.skipDeleteConfirmationCheckbox.checked;
       SFTabs.storage.saveUserSettings(settings);
@@ -219,7 +209,6 @@ function setupEventListeners() {
   if (domElements.useSyncStorageCheckbox) {
     domElements.useSyncStorageCheckbox.addEventListener('change', async () => {
       const newValue = domElements.useSyncStorageCheckbox.checked;
-      console.log('Sync storage preference changed to:', newValue);
 
       // Show confirmation dialog
       const confirmed = confirm(
@@ -270,7 +259,6 @@ function setupEventListeners() {
   const keyboardShortcutsButton = document.getElementById('keyboard-shortcuts-button');
   if (keyboardShortcutsButton) {
     keyboardShortcutsButton.addEventListener('click', () => {
-      console.log('Opening keyboard shortcuts page');
       openKeyboardShortcutsPage();
     });
   }
@@ -279,7 +267,6 @@ function setupEventListeners() {
   const manageConfigButton = document.getElementById('manage-config-button');
   if (manageConfigButton) {
     manageConfigButton.addEventListener('click', () => {
-      console.log('Opening import/export page');
       browser.tabs.create({ url: "/popup/import_export.html" }).then(() => {
         // Close the popup after opening the new tab
         window.close();
@@ -287,7 +274,6 @@ function setupEventListeners() {
     });
   }
 
-  console.log('Settings event listeners setup complete');
 }
 
 /**

@@ -47,16 +47,13 @@ async function readChunkedSync(baseKey) {
 		if (!metadata || !metadata.chunked) {
 			const directResult = await browser.storage.sync.get(baseKey);
 			if (directResult[baseKey]) {
-				console.log(`📖 Read from sync storage (non-chunked)`);
 				return directResult[baseKey];
 			}
-			console.log(`ℹ️ No data found in sync storage for key: ${baseKey}`);
 			return null;
 		}
 
 		// Data is chunked - read all chunks
 		const chunkCount = metadata.chunkCount;
-		console.log(`📖 Reading ${chunkCount} chunks from sync storage`);
 
 		const chunkKeys = [];
 		for (let i = 0; i < chunkCount; i++) {
@@ -78,8 +75,6 @@ async function readChunkedSync(baseKey) {
 		// Reassemble and parse
 		const jsonString = chunks.join('');
 		const data = JSON.parse(jsonString);
-
-		console.log(`✅ Successfully reassembled data from ${chunkCount} chunks`);
 		return data;
 	} catch (error) {
 		console.error(`❌ Error reading from sync storage:`, error);
@@ -115,7 +110,6 @@ async function clearChunkedSync(baseKey) {
 		}
 
 		await browser.storage.sync.remove(keysToRemove);
-		console.log(`🗑️ Cleared sync storage for key: ${baseKey}`);
 	} catch (error) {
 		console.error(`❌ Error clearing sync storage:`, error);
 		// Don't throw - cleanup is best-effort
@@ -133,8 +127,6 @@ async function saveChunkedSync(baseKey, data) {
 		const jsonString = JSON.stringify(data);
 		const byteSize = new Blob([jsonString]).size;
 
-		console.log(`💾 Saving to sync storage: ${baseKey} (${byteSize} bytes)`);
-
 		// Clear any existing chunks first
 		await clearChunkedSync(baseKey);
 
@@ -150,7 +142,6 @@ async function saveChunkedSync(baseKey, data) {
 			};
 
 			await browser.storage.sync.set(storageObj);
-			console.log(`✅ Saved to sync storage (non-chunked)`);
 			return;
 		}
 
@@ -162,8 +153,6 @@ async function saveChunkedSync(baseKey, data) {
 			chunks.push(chunk);
 			offset += CHUNK_SIZE;
 		}
-
-		console.log(`📦 Chunked data: ${jsonString.length} bytes into ${chunks.length} chunks`);
 
 		const storageObj = {};
 
@@ -182,7 +171,6 @@ async function saveChunkedSync(baseKey, data) {
 		};
 
 		await browser.storage.sync.set(storageObj);
-		console.log(`✅ Saved to sync storage (${chunks.length} chunks)`);
 	} catch (error) {
 		console.error(`❌ Error saving to sync storage:`, error);
 
@@ -197,8 +185,6 @@ async function saveChunkedSync(baseKey, data) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-	console.log('Import/Export page loaded');
-
 	// Set up event listeners
 	exportButton.addEventListener('click', exportSettings);
 	importButton.addEventListener('click', importSettings);
@@ -238,12 +224,9 @@ function applyThemeFromStorage() {
 
 // Export settings function
 async function exportSettings() {
-	console.log('Exporting settings');
-
 	try {
 		// Get storage preference to determine which storage area to read from
 		const useSyncStorage = await getStoragePreference();
-		console.log('📦 Export using storage preference:', useSyncStorage ? 'sync' : 'local');
 
 		let customTabs = [];
 		let userSettings = {};
@@ -251,11 +234,9 @@ async function exportSettings() {
 
 		if (useSyncStorage) {
 			// Read from sync storage with chunking support
-			console.log('📦 Reading tabs from sync storage for export');
 			customTabs = await readChunkedSync('customTabs') || [];
 
 			// Read profiles from sync storage
-			console.log('📦 Reading profiles from sync storage for export');
 			profiles = await readChunkedSync('profiles') || [];
 
 			// User settings are always in sync storage
@@ -263,19 +244,15 @@ async function exportSettings() {
 			userSettings = settingsResult.userSettings || {};
 		} else {
 			// Read from local storage
-			console.log('📦 Reading from local storage for export');
 			const result = await browser.storage.local.get(['customTabs', 'userSettings', 'profiles']);
 			customTabs = result.customTabs || [];
 			userSettings = result.userSettings || {};
 			profiles = result.profiles || [];
 		}
 
-		console.log('✅ Found', customTabs.length, 'tabs and', profiles.length, 'profiles to export');
-
 		// If profiles exist, also export tabs for each profile
 		const profileTabs = {};
 		if (profiles.length > 0) {
-			console.log('📦 Reading tabs for each profile...');
 			for (const profile of profiles) {
 				const storageKey = `profile_${profile.id}_tabs`;
 				if (useSyncStorage) {
@@ -285,7 +262,6 @@ async function exportSettings() {
 					profileTabs[profile.id] = result[storageKey] || [];
 				}
 			}
-			console.log('✅ Exported tabs for', Object.keys(profileTabs).length, 'profiles');
 		}
 
 		// Create a configuration object containing all settings
@@ -340,27 +316,21 @@ async function exportSettings() {
 
 // Import settings function - simplified direct approach
 function importSettings() {
-	console.log('Import function started');
 	fileInput.click();
 }
 
 // File selection handler - Updated to support profile-aware imports
 async function handleFileSelect(event) {
-	console.log('File selection handler triggered');
 	const file = event.target.files[0];
 
 	if (!file) {
-		console.log('No file selected');
 		return;
 	}
-
-	console.log('File selected:', file.name);
 
 	const reader = new FileReader();
 
 	reader.onload = async function(e) {
 		try {
-			console.log('File read successfully');
 			const fileContent = e.target.result;
 			const config = JSON.parse(fileContent);
 
@@ -368,10 +338,6 @@ async function handleFileSelect(event) {
 			if (!config.customTabs || !Array.isArray(config.customTabs)) {
 				throw new Error('Invalid configuration format: missing customTabs array');
 			}
-
-			const tabCount = config.customTabs.length;
-			const profileCount = (config.profiles && Array.isArray(config.profiles)) ? config.profiles.length : 0;
-			console.log(`📥 Parsed config: ${tabCount} tabs, ${profileCount} profiles`);
 
 			// Get user settings to check if profiles UI is enabled
 			const useSyncStorage = await getStoragePreference();
@@ -386,17 +352,14 @@ async function handleFileSelect(event) {
 			}
 
 			const profilesEnabled = userSettings.profilesEnabled || false;
-			console.log(`Profiles UI enabled: ${profilesEnabled}`);
 
 			if (!profilesEnabled) {
 				// Profiles UI is disabled - import directly to active profile
-				console.log('Profiles UI disabled - importing directly to active profile');
 				await importToActiveProfile(config);
 				showStatus('Configuration imported successfully to your tabs', false);
 				notifyTabsAndPopup();
 			} else {
 				// Profiles UI is enabled - show modal to choose import target
-				console.log('Profiles UI enabled - showing import target selection');
 				pendingImportConfig = config;
 				await showImportModal();
 			}
@@ -419,7 +382,6 @@ async function handleFileSelect(event) {
 
 // Show status message
 function showStatus(message, isError = false) {
-	console.log('Showing status message:', message, isError);
 	statusMessage.textContent = message;
 
 	// Apply appropriate class
@@ -595,8 +557,6 @@ async function importToProfile(config, profileId) {
 	const tabsToImport = config.customTabs || [];
 	const useSyncStorage = await getStoragePreference();
 
-	console.log(`📥 Importing ${tabsToImport.length} tabs to profile ${profileId}`);
-
 	const storageKey = `profile_${profileId}_tabs`;
 
 	if (useSyncStorage) {
@@ -606,8 +566,6 @@ async function importToProfile(config, profileId) {
 		storageData[storageKey] = tabsToImport;
 		await browser.storage.local.set(storageData);
 	}
-
-	console.log('✅ Tabs imported to profile successfully');
 }
 
 /**
@@ -617,8 +575,6 @@ async function importToProfile(config, profileId) {
 async function importToNewProfile(config, profileName) {
 	const tabsToImport = config.customTabs || [];
 	const useSyncStorage = await getStoragePreference();
-
-	console.log(`📥 Creating new profile "${profileName}" with ${tabsToImport.length} tabs`);
 
 	// Generate new profile ID
 	const profileId = `profile_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
@@ -654,8 +610,6 @@ async function importToNewProfile(config, profileName) {
 
 	// Save tabs for new profile
 	await importToProfile(config, profileId);
-
-	console.log('✅ New profile created and tabs imported successfully');
 	return profileId;
 }
 
@@ -680,9 +634,7 @@ async function importToActiveProfile(config) {
 		throw new Error('No active profile found');
 	}
 
-	console.log(`📥 Importing to active profile (profiles UI disabled): ${activeProfileId}`);
 	await importToProfile(config, activeProfileId);
-	console.log('✅ Imported to active profile successfully');
 }
 
 /**
@@ -711,8 +663,6 @@ async function switchToProfile(profileId) {
 	} else {
 		await browser.storage.local.set({ userSettings });
 	}
-
-	console.log(`✅ Switched to profile: ${profileId}`);
 }
 
 /**
@@ -725,22 +675,19 @@ function notifyTabsAndPopup() {
 			tabs.forEach(tab => {
 				if (tab.url && (tab.url.includes('lightning.force.com') || tab.url.includes('salesforce.com'))) {
 					browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
-						.then(() => {
-							console.log('✅ Tab refresh message sent to tab:', tab.id);
-						})
-						.catch(err => {
-							console.log('ℹ️ Could not send refresh to tab:', tab.id, err.message);
+						.catch(() => {
+							// Silently ignore - tab may not have content script
 						});
 				}
 			});
 		})
-		.catch(err => {
-			console.log('ℹ️ Could not query tabs:', err.message);
+		.catch(() => {
+			// Silently ignore query errors
 		});
 
 	// Send message to popup to reload if it's open
 	browser.runtime.sendMessage({ action: 'reload_popup' })
-		.catch(err => {
-			console.log('ℹ️ No popup to reload:', err.message);
+		.catch(() => {
+			// Silently ignore - popup may not be open
 		});
 }

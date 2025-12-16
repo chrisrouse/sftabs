@@ -13,7 +13,6 @@ let editingProfile = null;
 async function loadProfiles() {
   try {
     profilesCache = await SFTabs.storage.getProfiles();
-    console.log('Loaded', profilesCache.length, 'profiles from storage');
   } catch (error) {
     console.error('Error loading profiles:', error);
     profilesCache = [];
@@ -47,7 +46,6 @@ async function getDefaultProfileId() {
  * Initialize profiles functionality
  */
 async function initProfiles() {
-  console.log('Initializing profiles UI');
 
   // Load profiles from storage
   await loadProfiles();
@@ -75,7 +73,6 @@ async function initProfiles() {
   // Auto-create Default profile if none exist (upgrade/first use scenario)
   // This happens regardless of profilesEnabled setting - profiles are now always used internally
   if (profilesCache.length === 0) {
-    console.log('No profiles exist - creating Default profile and migrating tabs');
 
     // Try to get tabs from legacy storage first, then fall back to current state
     let tabsToMigrate = [];
@@ -84,17 +81,14 @@ async function initProfiles() {
     const legacyTabsSync = await getLegacyTabsFromStorage('sync');
     if (legacyTabsSync && legacyTabsSync.length > 0) {
       tabsToMigrate = legacyTabsSync;
-      console.log(`Found ${tabsToMigrate.length} tabs in legacy sync storage`);
     } else {
       // Check local storage for legacy tabs
       const legacyTabsLocal = await getLegacyTabsFromStorage('local');
       if (legacyTabsLocal && legacyTabsLocal.length > 0) {
         tabsToMigrate = legacyTabsLocal;
-        console.log(`Found ${tabsToMigrate.length} tabs in legacy local storage`);
       } else {
         // Fall back to current state
         tabsToMigrate = SFTabs.main.getTabs();
-        console.log(`Using ${tabsToMigrate.length} tabs from current state`);
       }
     }
 
@@ -122,7 +116,6 @@ async function initProfiles() {
     settings.activeProfileId = defaultProfile.id;
     await SFTabs.storage.saveUserSettings(settings);
 
-    console.log(`Default profile created with ${tabsToMigrate.length} tabs:`, defaultProfile.id);
   }
 
   // DISABLED: Migration recovery code removed to fix empty profile issue
@@ -147,7 +140,6 @@ async function initProfiles() {
 
       // If disabling profiles UI, clean up non-active profiles
       if (!enabled && profilesCache.length > 1) {
-        console.log('Disabling profiles UI - cleaning up non-active profiles');
 
         // Prompt user to select which profile to keep as the default
         const selectedProfile = await showProfileSelectionForDisable();
@@ -167,7 +159,6 @@ async function initProfiles() {
         const useSyncStorage = await SFTabs.storage.getStoragePreference();
 
         for (const profile of profilesToDelete) {
-          console.log(`Deleting profile: ${profile.name} (${profile.id})`);
           const profileTabsKey = `profile_${profile.id}_tabs`;
 
           if (useSyncStorage) {
@@ -182,7 +173,6 @@ async function initProfiles() {
         profilesCache.push(selectedProfile);
         await SFTabs.storage.saveProfiles(profilesCache);
 
-        console.log(`Kept profile: ${selectedProfile.name} (${selectedProfile.id})`);
 
         if (window.SFTabs && window.SFTabs.main) {
           window.SFTabs.main.showStatus(`Profiles UI disabled. Kept ${selectedProfile.name} profile`, false);
@@ -291,14 +281,12 @@ async function initProfiles() {
     cloneCancelButton.addEventListener('click', hideCloneProfileSelector);
   }
 
-  console.log('Profiles initialization complete');
 }
 
 /**
  * Toggle profiles enabled/disabled
  */
 function toggleProfilesEnabled(enabled) {
-  console.log('Profiles enabled:', enabled);
 
   const profilesButton = document.querySelector('#profiles-button');
   const profileOptions = document.querySelector('#profile-options');
@@ -376,7 +364,6 @@ async function updateActiveProfileBanner() {
  * Switch active profile
  */
 async function switchActiveProfile(profileId) {
-  console.log('Switching to profile:', profileId);
 
   if (!profileId) return;
 
@@ -403,14 +390,10 @@ async function switchActiveProfile(profileId) {
     }
 
     // Load tabs for the selected profile
-    console.log('[switchActiveProfile] Loading tabs for profile:', profileId);
     const profileTabs = await SFTabs.storage.getProfileTabs(profileId);
-    console.log('[switchActiveProfile] Loaded tabs count:', profileTabs ? profileTabs.length : 0);
-    console.log('[switchActiveProfile] Tab IDs:', profileTabs ? profileTabs.map(t => t.id) : []);
 
     // Update the main tabs state
     if (window.SFTabs && window.SFTabs.main) {
-      console.log('[switchActiveProfile] Setting tabs in main state');
       SFTabs.main.setTabs(profileTabs);
 
       // Show main content to display the tab list (or empty state if no tabs)
@@ -418,7 +401,6 @@ async function switchActiveProfile(profileId) {
 
       // Re-render the tab list
       if (SFTabs.ui && SFTabs.ui.renderTabList) {
-        console.log('[switchActiveProfile] Calling renderTabList');
         SFTabs.ui.renderTabList();
       }
 
@@ -429,7 +411,6 @@ async function switchActiveProfile(profileId) {
     }
 
     // Send message to all Salesforce tabs to refresh the tab bar immediately
-    console.log('[switchActiveProfile] Sending refresh message to content scripts');
     browser.tabs.query({
       url: [
         "*://*.lightning.force.com/lightning/setup/*",
@@ -441,7 +422,7 @@ async function switchActiveProfile(profileId) {
     }).then(tabs => {
       tabs.forEach(tab => {
         browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
-          .catch(error => console.log('Could not send refresh to tab:', tab.id, error.message));
+          .catch(error => {});
       });
     }).catch(error => console.error('Error querying tabs:', error));
 
@@ -480,7 +461,6 @@ async function populateActiveProfileSelector() {
  * Show profile list
  */
 async function showProfileList() {
-  console.log('Showing profile list');
 
   // Reload profiles from storage
   await loadProfiles();
@@ -603,7 +583,6 @@ function createProfileListItem(profile, index, defaultProfileId) {
  * Set default profile
  */
 async function setDefaultProfile(profileId) {
-  console.log('Setting default profile:', profileId);
 
   try {
     // Update all profiles' isDefault flag
@@ -641,7 +620,6 @@ async function setDefaultProfile(profileId) {
  * Show profile edit form
  */
 function showProfileEditForm(profile = null) {
-  console.log('Showing profile edit form', profile);
 
   // Store the profile being edited
   editingProfile = profile;
@@ -902,7 +880,6 @@ function addUrlPattern() {
   // Clear input
   input.value = '';
 
-  console.log('URL pattern added:', pattern);
 }
 
 /**
@@ -927,7 +904,6 @@ function editUrlPattern(pattern, index) {
   }
 
   // In real implementation, we'd need to remove the old pattern when saving
-  console.log('Editing URL pattern:', pattern, 'at index:', index);
 }
 
 /**
@@ -938,14 +914,12 @@ function deleteUrlPattern(index) {
   currentPatterns.splice(index, 1);
   renderUrlPatternList(currentPatterns);
 
-  console.log('URL pattern deleted at index:', index);
 }
 
 /**
  * Capture current domain
  */
 function captureCurrentDomain() {
-  console.log('Capturing current domain...');
 
   // In real implementation, we'd query the active tab and extract the MyDomain
   // For now, just show a demo
@@ -978,7 +952,6 @@ async function saveProfile() {
   }
 
   try {
-    console.log('Saving profile:', name);
 
     // Get URL patterns from the list
     const urlPatterns = Array.from(document.querySelectorAll('.url-pattern-text'))
@@ -1054,7 +1027,6 @@ async function saveProfile() {
  * Delete profile
  */
 async function deleteProfile(profile) {
-  console.log('Deleting profile:', profile.name);
 
   // Confirm deletion
   const confirmed = confirm(`Are you sure you want to delete the profile "${profile.name}"? This cannot be undone.`);
@@ -1111,12 +1083,10 @@ async function getLegacyTabsFromStorage(storageType) {
   try {
     if (storageType === 'sync') {
       const tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
-      console.log(`Found ${tabs ? tabs.length : 0} tabs in sync storage`);
       return tabs || [];
     } else {
       const result = await browser.storage.local.get('customTabs');
       const tabs = result.customTabs || [];
-      console.log(`Found ${tabs.length} tabs in local storage`);
       return tabs;
     }
   } catch (error) {
@@ -1153,7 +1123,6 @@ async function getLegacyTabs() {
  * Initialize profile with default tabs
  */
 async function initializeProfileWithDefaults() {
-  console.log('Initializing profile with default tabs');
 
   try {
     const settings = await SFTabs.storage.getUserSettings();
@@ -1186,7 +1155,6 @@ async function initializeProfileWithDefaults() {
       SFTabs.main.showStatus('Profile initialized with default tabs', false);
     }
 
-    console.log('Profile initialized with', defaultTabs.length, 'default tabs');
   } catch (error) {
     console.error('Error initializing profile with defaults:', error);
     if (window.SFTabs && window.SFTabs.main) {
@@ -1199,7 +1167,6 @@ async function initializeProfileWithDefaults() {
  * Initialize profile as empty (save empty array to storage)
  */
 async function initializeProfileEmpty() {
-  console.log('Initializing empty profile');
 
   try {
     const settings = await SFTabs.storage.getUserSettings();
@@ -1232,7 +1199,6 @@ async function initializeProfileEmpty() {
       SFTabs.main.showStatus('Profile initialized (empty)', false);
     }
 
-    console.log('Profile initialized as empty and saved to storage');
   } catch (error) {
     console.error('Error initializing empty profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
@@ -1245,7 +1211,6 @@ async function initializeProfileEmpty() {
  * Show clone profile selector
  */
 async function showCloneProfileSelector() {
-  console.log('Showing clone profile selector');
 
   try {
     const profileCloneSelector = document.querySelector('#profile-clone-selector');
@@ -1310,7 +1275,6 @@ function hideCloneProfileSelector() {
  * Confirm clone profile
  */
 async function confirmCloneProfile() {
-  console.log('Confirming clone profile');
 
   try {
     const cloneSourceSelect = document.querySelector('#clone-source-profile');
@@ -1359,7 +1323,6 @@ async function confirmCloneProfile() {
     // Hide the selector
     hideCloneProfileSelector();
 
-    console.log('Profile cloned successfully with', clonedTabs.length, 'tabs');
   } catch (error) {
     console.error('Error cloning profile:', error);
     if (window.SFTabs && window.SFTabs.main) {

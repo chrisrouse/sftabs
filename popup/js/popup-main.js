@@ -12,7 +12,6 @@ let domElements = {};
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('SF Tabs popup loaded - initializing...');
   
   // Initialize DOM element references
   initializeDOMElements();
@@ -48,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         SFTabs.ui.renderTabList();
       }
 
-      console.log('SF Tabs popup initialization complete');
     } catch (error) {
       console.error('Error during popup initialization:', error);
       showStatus('Error initializing popup: ' + error.message, true);
@@ -58,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Listen for reload messages from import/export
   browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'reload_popup') {
-      console.log('Reload popup message received - reloading tabs');
       loadUserSettings()
         .then(() => loadTabsFromStorage())
         .then(() => {
@@ -71,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
           if (SFTabs.ui && SFTabs.ui.renderTabList) {
             SFTabs.ui.renderTabList();
           }
-          console.log('Popup reloaded with imported configuration');
         })
         .catch(error => {
           console.error('Error reloading popup:', error);
@@ -164,7 +160,6 @@ function initializeDOMElements() {
     console.error(`${missingElements} critical DOM elements missing`);
   }
   
-  console.log('DOM elements initialized:', Object.keys(domElements).length, 'elements');
 }
 
 /**
@@ -191,14 +186,12 @@ function setupAllEventListeners() {
     SFTabs.dropdowns.setupEventListeners();
   }
   
-  console.log('All available event listeners setup complete');
 }
 
 /**
  * Load user settings from storage
  */
 function loadUserSettings() {
-  console.log('Loading user settings from storage');
   return SFTabs.storage.getUserSettings()
     .then((loadedSettings) => {
       userSettings = loadedSettings;
@@ -218,7 +211,6 @@ function loadUserSettings() {
  * Load tabs from storage
  */
 async function loadTabsFromStorage() {
-  console.log('🔵 SF Tabs: Loading tabs from storage...');
 
   try {
     // Always load from profile storage (profiles are used internally even if UI is disabled)
@@ -228,13 +220,9 @@ async function loadTabsFromStorage() {
       return customTabs;
     }
 
-    console.log('🔵 SF Tabs: Loading from profile:', userSettings.activeProfileId);
     let loadedTabs = await SFTabs.storage.getProfileTabs(userSettings.activeProfileId);
-    console.log('🔵 SF Tabs: Loaded', loadedTabs ? loadedTabs.length : 0, 'tabs from profile');
 
     if (loadedTabs && loadedTabs.length > 0) {
-      console.log('🔵 SF Tabs: Found existing tabs, checking for migration...');
-      console.log('🔵 SF Tabs: First tab sample:', JSON.stringify(loadedTabs[0], null, 2));
 
       // Migrate tabs to new structure if needed
       customTabs = migrateTabsToNewStructure(loadedTabs);
@@ -243,21 +231,16 @@ async function loadTabsFromStorage() {
       const needsSave = hasStructuralChanges(loadedTabs, customTabs);
 
       if (needsSave) {
-        console.log('✅ SF Tabs: Migration added new fields - saving to storage');
         await SFTabs.storage.saveProfileTabs(userSettings.activeProfileId, customTabs);
       } else {
-        console.log('✅ SF Tabs: Tabs already in current format - no save needed');
       }
     } else {
-      console.log('⚠️  SF Tabs: No tabs found in profile - keeping empty');
       // Profile has no tabs - this is valid (empty profile or user initialization)
       customTabs = [];
     }
 
-    console.log('✅ SF Tabs: Final tab count:', customTabs.length);
     if (customTabs.length > 0) {
       const customCount = customTabs.filter(t => !t.id.startsWith('default_tab_')).length;
-      console.log('✅ SF Tabs: Custom tabs preserved:', customCount);
     }
     return customTabs;
   } catch (error) {
@@ -302,7 +285,6 @@ function hasStructuralChanges(original, migrated) {
  * This function ensures backward compatibility when upgrading from older versions
  */
 function migrateTabsToNewStructure(existingTabs) {
-  console.log('🔄 SF Tabs: Starting migration for', existingTabs.length, 'tabs');
 
   const migratedTabs = existingTabs.map((tab, index) => {
     // Start with all existing properties
@@ -349,15 +331,12 @@ function migrateTabsToNewStructure(existingTabs) {
     }
 
     if (addedFields.length > 0) {
-      console.log(`  ✅ Tab ${index + 1}/${existingTabs.length}: "${migratedTab.label}" - added fields: ${addedFields.join(', ')}`);
     } else {
-      console.log(`  ✓ Tab ${index + 1}/${existingTabs.length}: "${migratedTab.label}" - already current`);
     }
 
     return migratedTab;
   });
 
-  console.log('✅ SF Tabs: Migration complete');
   return migratedTabs;
 }
 
@@ -365,7 +344,6 @@ function migrateTabsToNewStructure(existingTabs) {
  * Show main content panel
  */
 function showMainContent() {
-  console.log('🔙 Showing main content - closing action panel');
   console.trace('showMainContent called from:');
   // Clear the action panel tab reference since we're closing it
   currentActionPanelTab = null;
@@ -381,7 +359,6 @@ function showMainContent() {
  * Show settings panel
  */
 function showSettingsPanel() {
-  console.log('Showing settings panel');
   domElements.mainContent.classList.remove('active');
   domElements.mainContent.style.display = 'none';
   domElements.settingsPanel.classList.add('active');
@@ -394,7 +371,6 @@ function showSettingsPanel() {
  * Show action panel for a specific tab
  */
 function showActionPanel(tab) {
-  console.log('Showing action panel for tab:', tab);
 
   if (!tab) {
     console.error('showActionPanel called with no tab!');
@@ -403,7 +379,6 @@ function showActionPanel(tab) {
 
   // Store the current tab context
   currentActionPanelTab = tab;
-  console.log('✓ currentActionPanelTab set to:', currentActionPanelTab);
 
   // Update the panel content with tab information
   updateActionPanelContent(tab);
@@ -416,7 +391,6 @@ function showActionPanel(tab) {
   domElements.actionPanel.classList.add('active');
   domElements.actionPanel.style.display = 'block';
 
-  console.log('Action panel is now visible');
 }
 
 /**
@@ -428,7 +402,6 @@ function updateActionPanelContent(tab) {
     return;
   }
 
-  console.log('Updating action panel content for tab:', tab);
 
   // Check if this is a new tab, dropdown item edit, or existing tab edit
   const isNewTab = !tab.id;
@@ -465,7 +438,6 @@ function updateActionPanelContent(tab) {
 
   // Hide both dropdown sections in the action panel (+ button panel)
   // Users should manage dropdowns through drag-and-drop or the inline form (clicking tab name)
-  console.log('Action panel - Hiding dropdown sections');
 
   if (domElements.actionObjectDropdownSection) {
     domElements.actionObjectDropdownSection.style.display = 'none';
@@ -582,12 +554,8 @@ function showManualDropdownItems(tab) {
  * Save action panel changes
  */
 function saveActionPanelChanges() {
-  console.log('Saving action panel changes');
 
   const tab = currentActionPanelTab;
-  console.log('Current tab:', tab);
-  console.log('Tab has pendingDropdownItems?', !!tab?.pendingDropdownItems);
-  console.log('pendingDropdownItems:', tab?.pendingDropdownItems);
 
   if (!tab) {
     showStatus('No tab selected', true);
@@ -625,20 +593,15 @@ function saveActionPanelChanges() {
 
   // Check if there are pending dropdown items to save
   if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
-    console.log('✅ Applying pending dropdown items:', tab.pendingDropdownItems.length);
-    console.log('First item:', tab.pendingDropdownItems[0]);
     tabData.hasDropdown = true;
     tabData.dropdownItems = tab.pendingDropdownItems;
-    console.log('tabData now has:', { hasDropdown: tabData.hasDropdown, itemCount: tabData.dropdownItems.length });
 
     // Legacy dropdown properties will be stripped by cleanTabForStorage()
   } else {
-    console.log('❌ No pending dropdown items found on tab');
   }
 
   // Check if this is editing a dropdown item
   const isDropdownItemEdit = tab._isDropdownItemEdit;
-  console.log('Is dropdown item edit?', isDropdownItemEdit);
 
   if (isDropdownItemEdit) {
     // Handle dropdown item edit
@@ -669,7 +632,6 @@ function saveActionPanelChanges() {
 
     // Save and refresh
     SFTabs.storage.saveTabs(tabs).then(() => {
-      console.log('Dropdown item updated successfully');
       showStatus('Dropdown item updated successfully', false);
 
       // Reload tabs from storage
@@ -694,20 +656,17 @@ function saveActionPanelChanges() {
 
   // Check if this is a new tab (id is null) or an existing tab update
   const isNewTab = !tab.id;
-  console.log('Is new tab?', isNewTab);
 
   if (isNewTab) {
     // Create new tab
     if (SFTabs.tabs && SFTabs.tabs.createTab) {
       SFTabs.tabs.createTab(tabData).then(() => {
-        console.log('New tab created successfully from action panel');
 
         // Reload tabs from storage to ensure we have the latest data
         return loadTabsFromStorage();
       }).then(() => {
         // Explicitly re-render the tab list
         if (SFTabs.ui && SFTabs.ui.renderTabList) {
-          console.log('Re-rendering tab list after new tab creation');
           SFTabs.ui.renderTabList();
         }
 
@@ -729,12 +688,10 @@ function saveActionPanelChanges() {
     // Update existing tab
     if (SFTabs.tabs && SFTabs.tabs.updateTab) {
       SFTabs.tabs.updateTab(tab.id, tabData).then(() => {
-        console.log('Tab updated successfully from action panel');
 
         // Clear pending dropdown items after successful save
         if (tab.pendingDropdownItems) {
           delete tab.pendingDropdownItems;
-          console.log('Cleared pending dropdown items');
         }
 
         // Reload tabs from storage to ensure we have the latest data
@@ -750,7 +707,6 @@ function saveActionPanelChanges() {
 
         // Explicitly re-render the tab list to show updated name
         if (SFTabs.ui && SFTabs.ui.renderTabList) {
-          console.log('Re-rendering tab list after action panel save');
           SFTabs.ui.renderTabList();
         }
 
@@ -775,7 +731,6 @@ function saveActionPanelChanges() {
  * Show status message
  */
 function showStatus(message, isError = false) {
-  console.log('Showing status message', { message, isError });
   if (!domElements.statusMessage) {
     console.error('Status message element not found');
     return;
@@ -802,7 +757,6 @@ function showStatus(message, isError = false) {
  * Generic modal display function
  */
 function showModal(modalElement, cancelButton, confirmButton, onConfirm) {
-  console.log(`Showing modal: ${modalElement ? modalElement.id : 'unknown'}`);
 
   if (!modalElement) {
     console.error('Modal element not found!');
@@ -814,14 +768,12 @@ function showModal(modalElement, cancelButton, confirmButton, onConfirm) {
 
   // Handle Cancel button
   const handleCancel = () => {
-    console.log('Cancel button clicked');
     modalElement.classList.remove('show');
     cleanup();
   };
 
   // Handle Confirm button
   const handleConfirm = () => {
-    console.log('Confirm button clicked');
     modalElement.classList.remove('show');
     if (typeof onConfirm === 'function') {
       onConfirm();
@@ -832,7 +784,6 @@ function showModal(modalElement, cancelButton, confirmButton, onConfirm) {
   // Handle outside click
   const handleOutsideClick = (event) => {
     if (event.target === modalElement) {
-      console.log('Clicked outside modal');
       modalElement.classList.remove('show');
       cleanup();
     }

@@ -80,26 +80,21 @@ async function getTabsFromStorage() {
     // If profiles are enabled, load tabs from the active profile
     if (settings.profilesEnabled && settings.activeProfileId) {
       const profileTabsKey = `profile_${settings.activeProfileId}_tabs`;
-      console.log('[tab-renderer] Profiles enabled - reading tabs for profile:', settings.activeProfileId);
 
       if (useSyncStorage) {
         const tabs = await readChunkedSync(profileTabsKey);
-        console.log('[tab-renderer] Loaded', (tabs || []).length, 'tabs from profile');
         return tabs || [];
       } else {
         const result = await browser.storage.local.get(profileTabsKey);
-        console.log('[tab-renderer] Loaded', (result[profileTabsKey] || []).length, 'tabs from profile');
         return result[profileTabsKey] || [];
       }
     }
 
     // Profiles not enabled - use legacy customTabs key
     if (useSyncStorage) {
-      console.log('[tab-renderer] Reading tabs from sync storage (legacy)');
       const tabs = await readChunkedSync('customTabs');
       return tabs || [];
     } else {
-      console.log('[tab-renderer] Reading tabs from local storage (legacy)');
       const result = await browser.storage.local.get('customTabs');
       return result.customTabs || [];
     }
@@ -114,18 +109,15 @@ async function getTabsFromStorage() {
  */
 async function initTabs(tabContainer) {
   if (!tabContainer) {
-    console.log("No tab container found");
     return;
   }
 
   // Prevent concurrent renders
   if (isRenderingTabs) {
-    console.log("Tab render already in progress - skipping duplicate call");
     return;
   }
 
   isRenderingTabs = true;
-  console.log("Starting tab render...");
 
   try {
     let tabsToUse = await getTabsFromStorage();
@@ -147,11 +139,9 @@ async function initTabs(tabContainer) {
     if (!tabsToUse || tabsToUse.length === 0) {
       // If profiles are enabled, respect empty profiles (don't use defaults)
       if (profilesEnabled) {
-        console.log('[tab-renderer] Profiles enabled with empty profile - not using defaults');
         tabsToUse = [];
       } else {
         // Profiles not enabled - get default tabs from constants if available, otherwise use fallback
-        console.log('[tab-renderer] Profiles not enabled - using default tabs for empty storage');
         if (window.SFTabs && window.SFTabs.constants && window.SFTabs.constants.DEFAULT_TABS) {
           tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
         } else {
@@ -236,7 +226,6 @@ async function initTabs(tabContainer) {
       handleTabOverflow(tabContainer, topLevelTabs);
       // Reset flag after overflow handling completes
       isRenderingTabs = false;
-      console.log("Tab render complete");
     }, 200);
 
     // Re-run highlightActiveTab after a delay to catch any Salesforce DOM updates
@@ -245,7 +234,6 @@ async function initTabs(tabContainer) {
       highlightActiveTab();
     }, 300);
 
-    console.log("Enhanced tabs successfully added to container");
   } catch (error) {
     console.error("Error loading tabs:", error);
     // Reset flag on error
@@ -870,7 +858,6 @@ function toggleInlineDropdown(dropdown, dropdownButton) {
  * Navigate to main tab
  */
 function navigateToMainTab(tab) {
-  console.log('SF Tabs: Navigating to main tab:', tab.label);
   
   const currentUrl = window.location.href;
   const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
@@ -1050,7 +1037,6 @@ function addTabClickListeners(tabs) {
         }
 
         const lightningEnabled = isLightningNavigationEnabled();
-        console.log('Tab clicked:', tab.label, 'Lightning Navigation enabled:', lightningEnabled, 'Open in new tab:', tab.openInNewTab);
 
         if (tab.openInNewTab) {
           // For new tab, always use window.open
@@ -1060,7 +1046,6 @@ function addTabClickListeners(tabs) {
           // For same tab, check if Lightning navigation is enabled
           if (lightningEnabled) {
             // Use Lightning navigation
-            console.log('Using Lightning navigation for:', link.href);
             event.preventDefault();
             lightningNavigate({
               navigationType: "url",
@@ -1068,7 +1053,6 @@ function addTabClickListeners(tabs) {
             }, link.href);
           } else {
             // Lightning navigation is disabled, use regular navigation
-            console.log('Using regular navigation for:', link.href);
             event.preventDefault();
             window.location.href = link.href;
           }
@@ -1091,16 +1075,13 @@ function isLightningNavigationEnabled() {
  */
 function lightningNavigate(details, fallbackURL) {
   if (!isLightningNavigationEnabled()) {
-    console.log("Lightning Navigation disabled - using regular navigation");
     window.location.href = fallbackURL;
     return;
   }
 
-  console.log("Attempting Lightning navigation...");
   
   // Try inject.js window function approach first
   if (window.sfTabsLightningNav) {
-    console.log("Using inject.js window function approach");
     const success = window.sfTabsLightningNav({
       navigationType: details.navigationType || "url",
       url: details.url || fallbackURL,
@@ -1108,13 +1089,11 @@ function lightningNavigate(details, fallbackURL) {
     });
     
     if (success) {
-      console.log("Lightning navigation initiated successfully");
       return;
     }
   }
   
   // Final fallback
-  console.log("No Lightning navigation available - using regular navigation");
   window.location.href = fallbackURL;
 }
 
@@ -1143,7 +1122,6 @@ async function highlightActiveTab() {
     }
 
     if (matchedTab) {
-      console.log(`Highlighting active custom tab: ${matchedTab.label}`);
 
       // Remove active state from all tabs in tabBarItems
       const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
@@ -1225,7 +1203,6 @@ function areTabsLoaded() {
 function forceRefreshTabs() {
   const tabContainer = document.querySelector('.tabBarItems.slds-grid');
   if (tabContainer) {
-    console.log("Force refreshing all tabs");
     initTabs(tabContainer);
   } else {
     console.warn("No tab container found for force refresh");
@@ -1291,7 +1268,6 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
     totalTabsWidth += tabElement.getBoundingClientRect().width;
   });
 
-  console.log('Overflow check - Viewport:', viewportWidth, 'x', containerHeight, 'Native tabs:', nativeTabsWidth, 'Available:', availableWidthWithoutOverflow, 'Custom tabs total:', totalTabsWidth);
 
   // Check if tabs have wrapped by checking container height
   // A single row of tabs is typically 36-40px tall, wrapped tabs will be taller
@@ -1299,15 +1275,12 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
 
   // If all tabs fit (width check AND no wrapping), we're done!
   if (totalTabsWidth <= availableWidthWithoutOverflow && !hasWrapped) {
-    console.log('All tabs fit - no overflow needed');
     return; // No overflow needed
   }
 
   if (hasWrapped) {
-    console.log('Tabs have wrapped to multiple rows - overflow needed');
   }
 
-  console.log('Tabs overflow detected - need More button');
 
   // PASS 2: Tabs don't all fit - need overflow button
   const overflowButtonWidth = 60;
@@ -1736,15 +1709,12 @@ function createOverflowDropdown(hiddenTabs) {
 // Setup window resize handler for overflow recalculation
 let resizeTimeout;
 window.addEventListener('resize', () => {
-  console.log('Window resize detected');
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     const tabContainer = document.querySelector('.tabBarItems.slds-grid');
     const tabsLoaded = areTabsLoaded();
-    console.log('Resize handler: tabContainer found?', !!tabContainer, 'tabs loaded?', tabsLoaded);
 
     if (tabContainer && tabsLoaded) {
-      console.log('Recalculating overflow after resize');
       getTabsFromStorage().then(tabs => {
         const topLevelTabs = getTopLevelTabs(tabs);
         handleTabOverflow(tabContainer, topLevelTabs);
@@ -1752,7 +1722,6 @@ window.addEventListener('resize', () => {
         console.error('Error recalculating overflow on resize:', error);
       });
     } else {
-      console.log('Resize handler: conditions not met for overflow recalculation');
     }
   }, 250); // Debounce resize events
 });

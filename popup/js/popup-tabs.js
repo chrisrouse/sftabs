@@ -57,19 +57,15 @@ function ensureBrowserAPI() {
  * Enhanced Quick Add functionality with navigation caching
  */
 function enhancedAddTabForCurrentPage() {
-  console.log('Quick Add button clicked - ensuring browser API is available');
   
   ensureBrowserAPI()
     .then(browserAPI => {
-      console.log('Browser API ready, proceeding with Quick Add');
       return browserAPI.tabs.query({ active: true, currentWindow: true });
     })
     .then(tabs => {
       if (tabs.length > 0) {
         const currentUrl = tabs[0].url;
         const pageTitle = tabs[0].title;
-        console.log('Current URL:', currentUrl);
-        console.log('Page title:', pageTitle);
         
         // Check if this is a Salesforce page we can work with
         const isSalesforcePage = currentUrl.includes('salesforce') || currentUrl.includes('.force.com');
@@ -119,7 +115,6 @@ function enhancedAddTabForCurrentPage() {
           const urlParts = currentUrl.split('.com/');
           if (urlParts.length > 1) {
             path = urlParts[1].split('?')[0];
-            console.log('Detected custom URL path:', path);
           }
         }
         
@@ -368,7 +363,6 @@ function performTabDeletion(tabId) {
  * Show delete confirmation modal
  */
 function showDeleteConfirmModal(tabId) {
-  console.log('Showing delete confirm modal for tab', tabId);
   
   const domElements = SFTabs.main.getDOMElements();
   const modal = domElements.deleteConfirmModal;
@@ -398,7 +392,6 @@ function showDeleteConfirmModal(tabId) {
  * Reset to default tabs
  */
 function resetToDefaults() {
-  console.log('Resetting to default tabs');
   const defaultTabs = JSON.parse(JSON.stringify(SFTabs.constants.DEFAULT_TABS));
   
   SFTabs.storage.saveTabs(defaultTabs).then(() => {
@@ -466,7 +459,6 @@ function toggleNewTabSetting(tabId) {
   
   updateTab(tabId, { openInNewTab: !tab.openInNewTab }).then(() => {
     const status = tab.openInNewTab ? 'disabled' : 'enabled';
-    console.log(`New tab setting ${status} for "${tab.label}"`);
   });
 }
 
@@ -479,7 +471,6 @@ function setupEventListeners() {
   // Quick add button
   if (domElements.quickAddButton) {
     domElements.quickAddButton.addEventListener('click', () => {
-      console.log('Enhanced quick add button clicked');
       enhancedAddTabForCurrentPage();
     });
   }
@@ -487,7 +478,6 @@ function setupEventListeners() {
   // Add tab button - opens action panel for new tab creation
   if (domElements.addTabButton) {
     domElements.addTabButton.addEventListener('click', () => {
-      console.log('Add tab button clicked');
       // Create a temporary new tab object for the action panel
       const newTab = {
         id: null, // null ID indicates this is a new tab, not an edit
@@ -506,7 +496,6 @@ function setupEventListeners() {
     });
   }
   
-  console.log('Tab event listeners setup complete');
 }
 
 // Export tab functions

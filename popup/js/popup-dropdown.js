@@ -5,9 +5,6 @@
  * Setup Object Dropdown - Parse navigation from current page
  */
 async function setupObjectDropdown() {
-	console.log('Setting up object dropdown...');
-	console.log('Editing tab ID:', SFTabs.main.editingTabId);
-	console.log('Current action panel tab:', SFTabs.main.currentActionPanelTab);
 
 	// Get UI elements
 	const setupDropdownButton = document.getElementById('setup-dropdown-button');
@@ -31,8 +28,6 @@ async function setupObjectDropdown() {
 			action: 'parse_navigation'
 		});
 
-		console.log('Navigation parse response:', response);
-		console.log('Response structure:', {
 			success: response.success,
 			navigationCount: response.navigation?.length,
 			objectName: response.objectName,
@@ -52,10 +47,6 @@ async function setupObjectDropdown() {
 			// Get all tabs
 			const tabs = SFTabs.main.getTabs();
 
-			console.log('Available tabs:', tabs.length);
-			console.log('Response:', response);
-			console.log('Response object name:', response.objectName);
-			console.log('Response current URL:', response.currentUrl);
 
 			// Find the tab being edited
 			const editingTabId = SFTabs.main.editingTabId || SFTabs.main.getEditingTabId();
@@ -64,14 +55,12 @@ async function setupObjectDropdown() {
 			// Primary approach: Use currentActionPanelTab (for action panel workflow)
 			currentTab = SFTabs.main.getCurrentActionPanelTab();
 			if (currentTab) {
-				console.log('✓ Using currentActionPanelTab:', currentTab.label);
 			}
 
 			// Fallback: Use editingTabId (set when clicking on a tab to edit it in old form)
 			if (!currentTab && editingTabId) {
 				currentTab = tabs.find(t => t.id === editingTabId);
 				if (currentTab) {
-					console.log('✓ Using editingTabId:', currentTab.label);
 					// Store this as the current action panel tab so we can save to it later
 					SFTabs.main.setCurrentActionPanelTab(currentTab);
 				}
@@ -82,7 +71,6 @@ async function setupObjectDropdown() {
 				const objectManagerPath = `ObjectManager/${response.objectName}`;
 				currentTab = tabs.find(t => t.path && t.path.includes(objectManagerPath));
 				if (currentTab) {
-					console.log('✓ Found tab by objectName:', currentTab.label, currentTab.path);
 				}
 			}
 
@@ -90,18 +78,13 @@ async function setupObjectDropdown() {
 				const urlMatch = response.currentUrl.match(/\/lightning\/setup\/(.+?)(\?|$)/);
 				if (urlMatch) {
 					const urlPath = urlMatch[1];
-					console.log('Extracted URL path:', urlPath);
 					currentTab = tabs.find(t => t.path && urlPath.startsWith(t.path));
 					if (currentTab) {
-						console.log('✓ Found tab by URL match:', currentTab.label, currentTab.path);
 					}
 				}
 			}
 
 			if (!currentTab) {
-				console.log('✗ No matching tab found');
-				console.log('editingTabId:', editingTabId);
-				console.log('Available tabs:', tabs.map(t => ({ id: t.id, label: t.label, path: t.path })));
 			}
 
 			if (currentTab) {
@@ -114,7 +97,6 @@ async function setupObjectDropdown() {
 				if (currentTab.path && currentTab.path.includes('ObjectManager/')) {
 					const tabObjectName = currentTab.path.split('ObjectManager/')[1]?.split('/')[0];
 					tabMatchesCurrentPage = tabObjectName === currentObjectName;
-					console.log('Tab object:', tabObjectName, 'Current page object:', currentObjectName, 'Match:', tabMatchesCurrentPage);
 				}
 
 				if (!tabMatchesCurrentPage) {
@@ -123,7 +105,6 @@ async function setupObjectDropdown() {
 
 				// Store the parsed navigation items temporarily (not saved until user clicks Save)
 				// We'll use the currentActionPanelTab reference to hold this temporarily
-				console.log('✅ Navigation parsed successfully!', {
 					tabId: currentTab.id,
 					label: currentTab.label,
 					itemCount: navigationItems.length,
@@ -138,7 +119,6 @@ async function setupObjectDropdown() {
 				const actionPanelTab = SFTabs.main.getCurrentActionPanelTab();
 				if (actionPanelTab) {
 					actionPanelTab.pendingDropdownItems = navigationItems;
-					console.log('Stored pending dropdown items on currentActionPanelTab:', actionPanelTab.id);
 				} else {
 					console.warn('No currentActionPanelTab available to store pending items');
 				}
@@ -276,10 +256,8 @@ function showDropdownPreview(items) {
  * Remove a dropdown item by index
  */
 function removeDropdownItem(index) {
-	console.log('removeDropdownItem called with index:', index);
 
 	const currentTab = SFTabs.main.getCurrentActionPanelTab();
-	console.log('currentTab:', currentTab);
 
 	if (!currentTab) {
 		console.warn('No currentActionPanelTab found, cannot remove item');
@@ -288,13 +266,10 @@ function removeDropdownItem(index) {
 
 	// Check if we have pending dropdown items (not yet saved)
 	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
-		console.log('Removing from pending items. Current count:', currentTab.pendingDropdownItems.length);
 		// Remove from pending items
 		currentTab.pendingDropdownItems.splice(index, 1);
-		console.log('New count:', currentTab.pendingDropdownItems.length);
 		showDropdownPreview(currentTab.pendingDropdownItems);
 	} else {
-		console.log('No pending items, removing from saved dropdown items');
 		// Remove from saved dropdown items
 		const tabs = SFTabs.main.customTabs;
 		const tab = tabs.find(t => t.id === currentTab.id);
@@ -303,16 +278,13 @@ function removeDropdownItem(index) {
 			return;
 		}
 
-		console.log('Removing from saved items. Current count:', tab.dropdownItems.length);
 		// Remove the item
 		tab.dropdownItems.splice(index, 1);
-		console.log('New count:', tab.dropdownItems.length);
 
 		// Update the preview
 		showDropdownPreview(tab.dropdownItems);
 	}
 
-	console.log('Item removed successfully');
 	// Don't save immediately - let the user click Save button to commit changes
 	// This allows removing multiple items before saving
 }
@@ -321,7 +293,6 @@ function removeDropdownItem(index) {
  * Edit an object dropdown item by index
  */
 function editObjectDropdownItem(index) {
-	console.log('editObjectDropdownItem called with index:', index);
 
 	const currentTab = SFTabs.main.getCurrentActionPanelTab();
 	if (!currentTab) {
@@ -370,7 +341,6 @@ function editObjectDropdownItem(index) {
  * Promote an object dropdown item to main tab by index
  */
 function promoteObjectDropdownItem(index) {
-	console.log('promoteObjectDropdownItem called with index:', index);
 
 	const currentTab = SFTabs.main.getCurrentActionPanelTab();
 	if (!currentTab) {
@@ -420,7 +390,6 @@ function promoteObjectDropdownItem(index) {
 
 	// Show status message
 	SFTabs.main.showStatus(`"${dropdownItem.label}" will be promoted when you click Save`);
-	console.log('Staged promotion for:', dropdownItem.label);
 
 	// Refresh the preview with staged items
 	showDropdownPreview(currentTab.stagedDropdownItems);
@@ -522,7 +491,6 @@ function saveObjectDropdownItemOrder(container) {
 		// Reorder pending items
 		const reorderedItems = newOrder.map(oldIndex => currentTab.pendingDropdownItems[oldIndex]);
 		currentTab.pendingDropdownItems = reorderedItems;
-		console.log('Reordered pending dropdown items');
 		// Refresh the display
 		showDropdownPreview(currentTab.pendingDropdownItems);
 	} else if (currentTab.dropdownItems && currentTab.dropdownItems.length > 0) {
@@ -533,7 +501,6 @@ function saveObjectDropdownItemOrder(container) {
 		// Save to storage
 		const tabs = SFTabs.main.getTabs();
 		SFTabs.storage.saveTabs(tabs).then(() => {
-			console.log('Object dropdown item order saved');
 			// Refresh the display
 			showDropdownPreview(currentTab.dropdownItems);
 		});
@@ -550,7 +517,6 @@ function initDropdownListeners() {
 	// Setup Dropdown button
 	if (setupDropdownButton) {
 		setupDropdownButton.addEventListener('click', async () => {
-			console.log('Setup Dropdown button clicked');
 			await setupObjectDropdown();
 		});
 	}
@@ -558,7 +524,6 @@ function initDropdownListeners() {
 	// Refresh Dropdown button
 	if (refreshDropdownButton) {
 		refreshDropdownButton.addEventListener('click', async () => {
-			console.log('Refresh Dropdown button clicked');
 			await setupObjectDropdown();
 		});
 	}

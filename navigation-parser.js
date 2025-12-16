@@ -14,15 +14,12 @@ function parseObjectManagerNavigation() {
       const navContainer = document.querySelector('.objectManagerLeftNav ul[role="tablist"]');
 
       if (!navContainer) {
-        console.log('Navigation container not found');
         reject(new Error('Navigation container not found'));
         return;
       }
 
       const navigationItems = [];
       const navLinks = navContainer.querySelectorAll('li[role="presentation"] a.slds-nav-vertical__action');
-
-      console.log(`Found ${navLinks.length} navigation items`);
 
       navLinks.forEach((link, index) => {
         const label = link.textContent.trim();
@@ -53,7 +50,6 @@ function parseObjectManagerNavigation() {
         });
       });
 
-      console.log('Parsed navigation items:', navigationItems);
       resolve(navigationItems);
 
     } catch (error) {
@@ -75,14 +71,12 @@ function parseObjectManagerNavigationWithRetry(maxRetries = 3, retryDelay = 1000
 
     function attemptParse() {
       attempts++;
-      console.log(`Navigation parse attempt ${attempts}/${maxRetries}`);
 
       parseObjectManagerNavigation()
         .then(items => {
           if (items && items.length > 0) {
             resolve(items);
           } else if (attempts < maxRetries) {
-            console.log(`No items found, retrying in ${retryDelay}ms...`);
             setTimeout(attemptParse, retryDelay);
           } else {
             reject(new Error('Navigation items not found after maximum retries'));
@@ -90,7 +84,6 @@ function parseObjectManagerNavigationWithRetry(maxRetries = 3, retryDelay = 1000
         })
         .catch(error => {
           if (attempts < maxRetries) {
-            console.log(`Parse failed, retrying in ${retryDelay}ms...`);
             setTimeout(attemptParse, retryDelay);
           } else {
             reject(error);

@@ -30,29 +30,23 @@ async function getTabs() {
 
     if (useSyncStorage) {
       // Read from sync storage with chunking support
-      console.log('📦 Reading tabs from sync storage (with chunking)');
       const tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
 
       if (tabs && tabs.length > 0) {
         const customCount = tabs.filter(t => !t.id?.startsWith('default_tab_')).length;
-        console.log('✅ Found', tabs.length, 'tabs in sync storage (', customCount, 'custom)');
         return tabs;
       }
 
-      console.log('⚠️ No tabs found in sync storage');
       return [];
     } else {
       // Read from local storage
-      console.log('📦 Reading tabs from local storage');
       const localResult = await browser.storage.local.get('customTabs');
 
       if (localResult.customTabs && localResult.customTabs.length > 0) {
         const customCount = localResult.customTabs.filter(t => !t.id?.startsWith('default_tab_')).length;
-        console.log('✅ Found', localResult.customTabs.length, 'tabs in local storage (', customCount, 'custom)');
         return localResult.customTabs;
       }
 
-      console.log('⚠️ No tabs found in local storage');
       return [];
     }
   } catch (error) {
@@ -127,9 +121,7 @@ async function saveTabs(tabs) {
     }
 
     // Always save to profile-specific storage
-    console.log('💾 Saving tabs to profile:', settings.activeProfileId);
     await saveProfileTabs(settings.activeProfileId, cleanedTabs);
-    console.log('✅ Tabs saved successfully to profile (cleaned', cleanedTabs.length, 'tabs)');
 
     // Update the main state with cleaned tabs
     SFTabs.main.setTabs(cleanedTabs);
@@ -182,14 +174,12 @@ async function saveUserSettings(settings, skipMigration = false) {
       const currentSettings = SFTabs.main.getUserSettings();
       if (currentSettings.useSyncStorage !== settings.useSyncStorage) {
         // Storage preference changed - migrate tabs
-        console.log('🔄 Storage preference changed, migrating tabs...');
         await migrateBetweenStorageTypes(currentSettings.useSyncStorage, settings.useSyncStorage);
       }
     }
 
     // Settings are always in sync storage (small, no chunking needed)
     await browser.storage.sync.set({ userSettings: settings });
-    console.log('✅ User settings saved successfully to sync storage');
 
     // Update the main state
     SFTabs.main.setUserSettings(settings);
@@ -214,7 +204,6 @@ async function saveUserSettings(settings, skipMigration = false) {
 async function clearAllStorage() {
   try {
     await browser.storage.local.clear();
-    console.log('All storage cleared successfully');
     
     // Reset main state
     SFTabs.main.setTabs([]);
@@ -257,7 +246,6 @@ async function importConfiguration(configData) {
       throw new Error('Invalid configuration format: missing customTabs array');
     }
 
-    console.log('📥 Importing configuration with', configData.customTabs.length, 'tabs');
 
     // Clear existing data
     await clearAllStorage();
@@ -278,7 +266,6 @@ async function importConfiguration(configData) {
       await saveUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS, ...configData.userSettings });
     }
 
-    console.log('✅ Configuration imported successfully');
     SFTabs.main.showStatus('Configuration imported successfully. Extension will reload.', false);
 
     // Reload the popup to reflect changes
@@ -301,7 +288,6 @@ async function importConfiguration(configData) {
  */
 async function migrateBetweenStorageTypes(fromSync, toSync) {
   try {
-    console.log(`🔄 Starting migration: ${fromSync ? 'sync' : 'local'} → ${toSync ? 'sync' : 'local'}`);
 
     // Read tabs from source storage
     let tabs = [];
@@ -314,10 +300,8 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
       tabs = localResult.customTabs || [];
     }
 
-    console.log(`📦 Found ${tabs.length} tabs to migrate`);
 
     if (tabs.length === 0) {
-      console.log('ℹ️ No tabs to migrate');
       return;
     }
 
@@ -325,25 +309,20 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
     if (toSync) {
       // Save to sync storage with chunking
       await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
-      console.log('✅ Tabs migrated to sync storage');
 
       // Clear old local storage
       await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-      console.log('🗑️ Cleared old local storage');
     } else {
       // Save to local storage
       await browser.storage.local.set({
         customTabs: tabs,
         extensionVersion: '1.5.0'
       });
-      console.log('✅ Tabs migrated to local storage');
 
       // Clear old sync storage
       await SFTabs.storageChunking.clearChunkedSync('customTabs');
-      console.log('🗑️ Cleared old sync storage');
     }
 
-    console.log('✅ Migration complete');
   } catch (error) {
     console.error('❌ Error during migration:', error);
     throw new Error(`Failed to migrate tabs: ${error.message}`);
@@ -356,11 +335,9 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener((changes, area) => {
-      console.log('🔔 Storage changed:', { area, changes: Object.keys(changes) });
 
       if (area === 'local') {
         if (changes.customTabs) {
-          console.log('✅ Tabs changed in local storage - updating UI');
           const newTabs = changes.customTabs.newValue || [];
           SFTabs.main.setTabs(newTabs);
           SFTabs.ui.renderTabList();
@@ -368,7 +345,6 @@ function setupStorageListeners() {
       } else if (area === 'sync') {
         // Handle sync storage changes
         if (changes.userSettings) {
-          console.log('✅ Settings changed in sync storage - updating UI');
           const newSettings = changes.userSettings.newValue || SFTabs.constants.DEFAULT_SETTINGS;
           SFTabs.main.setUserSettings(newSettings);
           SFTabs.settings.updateSettingsUI();
@@ -377,7 +353,6 @@ function setupStorageListeners() {
 
         // Handle chunked tabs changes (check for metadata changes)
         if (changes.customTabs_metadata || changes.customTabs) {
-          console.log('✅ Tabs changed in sync storage - updating UI');
           // Re-read tabs from sync storage
           SFTabs.storageChunking.readChunkedSync('customTabs').then(tabs => {
             if (tabs) {
@@ -391,7 +366,6 @@ function setupStorageListeners() {
       }
     });
 
-    console.log('Storage change listeners setup complete');
   } else {
     console.warn('⚠️ browser.storage.onChanged not available');
   }
@@ -408,27 +382,21 @@ async function getProfiles() {
 
     if (useSyncStorage) {
       // Read from sync storage with chunking support
-      console.log('📦 Reading profiles from sync storage (with chunking)');
       const profiles = await SFTabs.storageChunking.readChunkedSync('profiles');
 
       if (profiles && profiles.length > 0) {
-        console.log('✅ Found', profiles.length, 'profiles in sync storage');
         return profiles;
       }
 
-      console.log('⚠️ No profiles found in sync storage');
       return [];
     } else {
       // Read from local storage
-      console.log('📦 Reading profiles from local storage');
       const localResult = await browser.storage.local.get('profiles');
 
       if (localResult.profiles && localResult.profiles.length > 0) {
-        console.log('✅ Found', localResult.profiles.length, 'profiles in local storage');
         return localResult.profiles;
       }
 
-      console.log('⚠️ No profiles found in local storage');
       return [];
     }
   } catch (error) {
@@ -454,16 +422,12 @@ async function saveProfiles(profiles) {
 
     if (useSyncStorage) {
       // Save to sync storage with chunking support
-      console.log('💾 Saving profiles to sync storage (with chunking)');
       await SFTabs.storageChunking.saveChunkedSync('profiles', sortedProfiles);
-      console.log('✅ Profiles saved successfully to sync storage (saved', sortedProfiles.length, 'profiles)');
     } else {
       // Save to local storage
-      console.log('💾 Saving profiles to local storage');
       await browser.storage.local.set({
         profiles: sortedProfiles
       });
-      console.log('✅ Profiles saved successfully to local storage (saved', sortedProfiles.length, 'profiles)');
     }
 
     // Show success message
@@ -492,11 +456,9 @@ async function getProfileTabs(profileId) {
     const storageKey = `profile_${profileId}_tabs`;
 
     if (useSyncStorage) {
-      console.log(`📦 Reading tabs for profile ${profileId} from sync storage`);
       const tabs = await SFTabs.storageChunking.readChunkedSync(storageKey);
       return tabs || [];
     } else {
-      console.log(`📦 Reading tabs for profile ${profileId} from local storage`);
       const localResult = await browser.storage.local.get(storageKey);
       return localResult[storageKey] || [];
     }
@@ -524,15 +486,11 @@ async function saveProfileTabs(profileId, tabs) {
     const storageKey = `profile_${profileId}_tabs`;
 
     if (useSyncStorage) {
-      console.log(`💾 Saving tabs for profile ${profileId} to sync storage`);
       await SFTabs.storageChunking.saveChunkedSync(storageKey, cleanedTabs);
-      console.log(`✅ Tabs saved successfully to sync storage (${cleanedTabs.length} tabs)`);
     } else {
-      console.log(`💾 Saving tabs for profile ${profileId} to local storage`);
       const storageObj = {};
       storageObj[storageKey] = cleanedTabs;
       await browser.storage.local.set(storageObj);
-      console.log(`✅ Tabs saved successfully to local storage (${cleanedTabs.length} tabs)`);
     }
 
     return cleanedTabs;

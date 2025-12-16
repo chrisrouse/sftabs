@@ -1,23 +1,17 @@
 // content/inject.js - Enhanced Lightning Navigation Handler for SF Tabs
 // This file is injected into the page to access Salesforce's Lightning navigation APIs
 
-console.log("SF Tabs inject.js loaded - Enhanced version");
-
 /**
  * Main Lightning navigation function
  */
 window.sfTabsLightningNav = function(details) {
-  console.log("Window Lightning navigation called with:", details);
-  
   try {
     if (details.navigationType === "url" && details.url) {
       if (typeof $A !== 'undefined' && $A.get) {
         const e = $A.get("e.force:navigateToURL");
         if (e) {
-          console.log("Firing Lightning navigation event for URL:", details.url);
           e.setParams({ url: details.url });
           e.fire();
-          console.log("Lightning navigation event fired successfully");
           
           // Signal completion back to content script
           window.postMessage({
@@ -27,20 +21,14 @@ window.sfTabsLightningNav = function(details) {
           }, window.location.origin);
           
           return true;
-        } else {
-          console.log("Lightning navigateToURL event not available");
         }
-      } else {
-        console.log("Lightning framework ($A) not available");
       }
     } else if (details.navigationType === "recordId" && details.recordId) {
       if (typeof $A !== 'undefined' && $A.get) {
         const e = $A.get("e.force:navigateToSObject");
         if (e) {
-          console.log("Firing Lightning navigation event for recordId:", details.recordId);
           e.setParams({ "recordId": details.recordId });
           e.fire();
-          console.log("Lightning SObject navigation event fired successfully");
           
           // Signal completion
           window.postMessage({
@@ -50,14 +38,8 @@ window.sfTabsLightningNav = function(details) {
           }, window.location.origin);
           
           return true;
-        } else {
-          console.log("Lightning navigateToSObject event not available");
         }
-      } else {
-        console.log("Lightning framework ($A) not available");
       }
-    } else {
-      console.log("Invalid navigation details:", details);
     }
   } catch (error) {
     console.error("Lightning navigation error:", error);
@@ -77,8 +59,6 @@ window.sfTabsLightningNav = function(details) {
  * Enhanced Lightning navigation with additional methods
  */
 window.sfTabsLightningNavExtended = function(details) {
-  console.log("Extended Lightning navigation called with:", details);
-  
   try {
     // Try different navigation approaches based on context
     if (details.navigationType === "component" && details.componentDef) {
@@ -128,16 +108,11 @@ window.addEventListener("message", function(event) {
   if (event.origin !== window.location.origin) {
     return;
   }
-  
+
   if (event.data && event.data.type === 'SF_TABS_LIGHTNING_NAVIGATE') {
-    console.log("Received Lightning navigation message:", event.data);
-    
     const success = window.sfTabsLightningNav(event.data);
-    
-    if (success) {
-      console.log("Lightning navigation initiated via postMessage");
-    } else {
-      console.log("Lightning navigation failed via postMessage");
+
+    if (!success) {
       
       // Signal failure back to content script
       window.postMessage({
@@ -147,8 +122,6 @@ window.addEventListener("message", function(event) {
       }, window.location.origin);
     }
   } else if (event.data && event.data.type === 'SF_TABS_EXTENDED_NAVIGATE') {
-    console.log("Received extended Lightning navigation message:", event.data);
-    
     const success = window.sfTabsLightningNavExtended(event.data);
     
     window.postMessage({
@@ -164,8 +137,7 @@ window.addEventListener("message", function(event) {
  */
 function checkLightningAvailability() {
   const isAvailable = typeof $A !== 'undefined' && typeof $A.get === 'function';
-  console.log("Lightning framework availability:", isAvailable);
-  
+
   if (isAvailable) {
     // Check for specific navigation events
     const events = [
@@ -174,7 +146,7 @@ function checkLightningAvailability() {
       'e.force:navigateToComponent',
       'e.force:navigateToList'
     ];
-    
+
     const availableEvents = events.filter(eventName => {
       try {
         return !!$A.get(eventName);
@@ -182,10 +154,8 @@ function checkLightningAvailability() {
         return false;
       }
     });
-    
-    console.log("Available Lightning navigation events:", availableEvents);
   }
-  
+
   return isAvailable;
 }
 
@@ -194,32 +164,24 @@ function checkLightningAvailability() {
  */
 function waitForLightning(callback, maxAttempts = 10, interval = 500) {
   let attempts = 0;
-  
+
   const check = () => {
     attempts++;
-    
+
     if (checkLightningAvailability()) {
-      console.log(`Lightning framework available after ${attempts} attempts`);
       callback(true);
     } else if (attempts >= maxAttempts) {
-      console.log(`Lightning framework not available after ${maxAttempts} attempts`);
       callback(false);
     } else {
       setTimeout(check, interval);
     }
   };
-  
+
   check();
 }
 
 // Wait for Lightning framework and signal when ready
 waitForLightning((available) => {
-  if (available) {
-    console.log("SF Tabs Lightning navigation handler ready with full framework");
-  } else {
-    console.log("SF Tabs Lightning navigation handler ready (limited functionality)");
-  }
-  
   // Signal that the handler is ready
   window.postMessage({
     type: 'SF_TABS_INJECT_LOADED',
@@ -230,7 +192,6 @@ waitForLightning((available) => {
 
 // Also provide immediate availability check
 const immediateCheck = checkLightningAvailability();
-console.log("SF Tabs inject.js - immediate Lightning check:", immediateCheck);
 
 // Signal initial load completion
 window.postMessage({

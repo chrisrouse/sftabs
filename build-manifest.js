@@ -22,13 +22,11 @@ function buildManifest(browser) {
     manifest.background = {
       scripts: ['background.js']
     };
-    console.log('✓ Built Firefox manifest with background.scripts');
   } else {
     // Chrome/Edge: Use service_worker (true MV3)
     manifest.background = {
       service_worker: 'background.js'
     };
-    console.log('✓ Built Chrome/Edge manifest with background.service_worker');
   }
 
   return manifest;
@@ -43,9 +41,6 @@ function writeManifest(browser) {
     JSON.stringify(manifest, null, 2) + '\n',
     'utf8'
   );
-
-  console.log(`✓ Wrote manifest.json for ${browser}`);
-  console.log(`  Location: ${outputPath}`);
 }
 
 // Validate target
@@ -56,5 +51,4 @@ if (!['chrome', 'firefox'].includes(target)) {
 }
 
 // Build and write manifest
-console.log(`Building manifest for: ${target}`);
 writeManifest(target);

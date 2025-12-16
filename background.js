@@ -82,8 +82,6 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
   };
 }
 
-console.log('SF Tabs: Background script loaded');
-
 /**
  * Chunked storage utilities for background script
  */
@@ -222,19 +220,8 @@ async function detectStorageFormat() {
  * This runs automatically on install/update before user opens popup
  */
 async function migrateStorage() {
-  console.log('🔄 SF Tabs Background: Starting storage migration check for v1.5.0...');
-
   try {
     const format = await detectStorageFormat();
-
-    console.log('📊 SF Tabs Background: Storage format detected:', {
-      preferSync: format.preferSync,
-      hasChunkedSync: format.hasChunkedSync,
-      hasDirectSync: format.hasDirectSync,
-      hasLocal: format.hasLocal,
-      syncTabCount: format.syncTabs?.length || 0,
-      localTabCount: format.localTabs?.length || 0
-    });
 
     // Determine what needs to be migrated
     const syncTabCount = format.syncTabs?.length || 0;
@@ -247,32 +234,21 @@ async function migrateStorage() {
       // User prefers sync storage
       if (syncTabCount > 0 && !format.hasChunkedSync) {
         // Old sync format (v1.3) - migrate to chunked sync
-        console.log('🔄 SF Tabs Background: Migrating v1.3 (non-chunked sync) → v1.5 (chunked sync)');
         await saveChunkedSync('customTabs', format.syncTabs);
         await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-        console.log('✅ SF Tabs Background: Migration complete - using chunked sync storage');
       } else if (localTabCount > 0 && syncTabCount === 0) {
         // Local storage exists but no sync - migrate local to chunked sync
-        console.log('🔄 SF Tabs Background: Migrating v1.4 (local) → v1.5 (chunked sync)');
         await saveChunkedSync('customTabs', format.localTabs);
         await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-        console.log('✅ SF Tabs Background: Migration complete - using chunked sync storage');
       } else if (localCustomCount > syncCustomCount) {
         // Local has more custom tabs - migrate to sync
-        console.log('🔄 SF Tabs Background: Local has more custom tabs - migrating to chunked sync');
         await saveChunkedSync('customTabs', format.localTabs);
         await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-        console.log('✅ SF Tabs Background: Migration complete - using chunked sync storage');
-      } else if (syncTabCount > 0) {
-        console.log('✅ SF Tabs Background: Already using sync storage - no migration needed');
-      } else {
-        console.log('ℹ️ SF Tabs Background: No tabs found - first-time install (will use sync)');
       }
     } else {
       // User prefers local storage
       if (syncTabCount > 0 && localTabCount === 0) {
         // Sync exists but no local - migrate to local
-        console.log('🔄 SF Tabs Background: Migrating sync → local (user preference)');
         await browser.storage.local.set({
           customTabs: format.syncTabs,
           extensionVersion: '1.5.0'
@@ -283,19 +259,14 @@ async function migrateStorage() {
           keysToRemove.push(`customTabs_chunk_${i}`);
         }
         await browser.storage.sync.remove(keysToRemove);
-        console.log('✅ SF Tabs Background: Migration complete - using local storage');
       } else if (localTabCount > 0) {
-        console.log('✅ SF Tabs Background: Already using local storage - no migration needed');
         await browser.storage.local.set({ extensionVersion: '1.5.0' });
-      } else {
-        console.log('ℹ️ SF Tabs Background: No tabs found - first-time install (will use local)');
       }
     }
 
     // Ensure user settings are in sync storage (they should always be there)
     const localSettings = await browser.storage.local.get('userSettings');
     if (localSettings.userSettings) {
-      console.log('🔄 SF Tabs Background: Moving userSettings to sync storage');
       await browser.storage.sync.set({ userSettings: localSettings.userSettings });
       await browser.storage.local.remove('userSettings');
     }
@@ -311,16 +282,9 @@ async function migrateStorage() {
  * Handle extension installation and updates
  */
 browser.runtime.onInstalled.addListener(async (details) => {
-  console.log('SF Tabs: Extension event:', details.reason);
-
   if (details.reason === 'install') {
-    console.log('SF Tabs: First-time installation detected');
     await migrateStorage();
   } else if (details.reason === 'update') {
-    const previousVersion = details.previousVersion;
-    const currentVersion = browser.runtime.getManifest().version;
-    console.log(`SF Tabs: Updating from ${previousVersion} to ${currentVersion}`);
-
     // Run migration on every update to handle upgrades from old versions
     await migrateStorage();
   }
@@ -328,7 +292,6 @@ browser.runtime.onInstalled.addListener(async (details) => {
 
 // Also run migration on startup to catch any edge cases
 browser.runtime.onStartup.addListener(async () => {
-  console.log('SF Tabs: Browser startup - checking storage');
   await migrateStorage();
 });
 
@@ -336,8 +299,6 @@ browser.runtime.onStartup.addListener(async () => {
  * Handle keyboard shortcuts
  */
 browser.commands.onCommand.addListener(async (command) => {
-  console.log('SF Tabs: Keyboard command received:', command);
-
   if (command.startsWith('open-tab-')) {
     try {
       // Extract position number from command (1-based)
@@ -352,12 +313,9 @@ browser.commands.onCommand.addListener(async (command) => {
         .filter(tab => !tab.parentId && tab.path)
         .sort((a, b) => a.position - b.position);
 
-      console.log('SF Tabs: Found', eligibleTabs.length, 'eligible tabs for shortcuts');
-
       // Check if we have a tab at this position
       if (eligibleTabs[position]) {
         const targetTab = eligibleTabs[position];
-        console.log('SF Tabs: Navigating to tab:', targetTab.label, 'at position', position + 1);
 
         // Get the active Salesforce tab
         const [activeTab] = await browser.tabs.query({
@@ -376,8 +334,6 @@ browser.commands.onCommand.addListener(async (command) => {
             action: 'navigate_to_tab',
             tab: targetTab
           });
-
-          console.log('SF Tabs: Navigation message sent to content script');
         } else {
           console.warn('SF Tabs: Not on a Salesforce page, keyboard shortcut ignored');
         }
@@ -389,5 +345,3 @@ browser.commands.onCommand.addListener(async (command) => {
     }
   }
 });
-
-console.log('SF Tabs: Background script initialized');

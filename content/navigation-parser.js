@@ -5,52 +5,46 @@
  * Parse ObjectManager navigation from current page
  */
 function parseCurrentObjectManagerNavigation() {
-  console.log('Parsing current ObjectManager navigation from content script');
-  
   // Get navigation selectors from constants if available, otherwise use fallback
   const NAVIGATION_SELECTORS = window.SFTabs?.constants?.NAVIGATION_SELECTORS || [
     '.objectManagerLeftNav',
     '.slds-navigation-list--vertical',
     '[role="tabpanel"] ul[role="tablist"]'
   ];
-  
+
   // Look for the navigation container using multiple selectors
   let container = null;
   for (const selector of NAVIGATION_SELECTORS) {
     container = document.querySelector(selector);
     if (container) {
-      console.log('Found navigation container with selector:', selector);
       break;
     }
   }
-  
+
   if (!container) {
-    console.log('No ObjectManager navigation container found');
     return [];
   }
-  
+
   const navItems = [];
   const links = container.querySelectorAll('li a.slds-nav-vertical__action');
-  
-  console.log(`Found ${links.length} navigation links`);
-  
+
   links.forEach((link, index) => {
     const label = link.textContent?.trim();
     let href = link.getAttribute('href');
     const dataList = link.getAttribute('data-list');
     const isActive = link.getAttribute('aria-selected') === 'true';
-    
+
     if (label && href) {
       // Convert URL format from /one/one.app#/setup/ to /lightning/setup/
       if (href.includes('/one/one.app#/setup/')) {
         href = href.replace('/one/one.app#/setup/', '/lightning/setup/');
       }
-      
+
       // Make URL relative
       if (href.startsWith(window.location.origin)) {
         href = href.substring(window.location.origin.length);
       }
-      
+
       const navItem = {
         id: `nav_${index}`,
         label: label,
@@ -60,12 +54,11 @@ function parseCurrentObjectManagerNavigation() {
         isActive: isActive,
         order: index
       };
-      
+
       navItems.push(navItem);
-      console.log(`Parsed navigation item ${index}:`, navItem);
     }
   });
-  
+
   return navItems;
 }
 
@@ -104,17 +97,16 @@ function getCurrentPageInfo() {
 async function parseNavigationWithRetry(maxRetries = 3, delayMs = 1000) {
   let items = [];
   let retryCount = 0;
-  
+
   while (items.length === 0 && retryCount < maxRetries) {
     items = parseCurrentObjectManagerNavigation();
-    
+
     if (items.length === 0) {
-      console.log(`Parse attempt ${retryCount + 1}: No navigation found, waiting ${delayMs}ms...`);
       await new Promise(resolve => setTimeout(resolve, delayMs));
       retryCount++;
     }
   }
-  
+
   return items;
 }
 
@@ -122,10 +114,8 @@ async function parseNavigationWithRetry(maxRetries = 3, delayMs = 1000) {
  * Specialized parser for Object Manager navigation with fallback patterns
  */
 function parseObjectManagerNavigationAdvanced(objectName) {
-  console.log(`Advanced parsing for object: ${objectName}`);
-  
   const items = [];
-  
+
   // Strategy 1: Use the standard parser first
   const standardItems = parseCurrentObjectManagerNavigation();
   if (standardItems.length > 0) {
@@ -270,28 +260,22 @@ function monitorNavigationChanges(callback) {
  * Main function to parse navigation for popup requests
  */
 async function parseObjectManagerNavigation() {
-  console.log('SF Tabs: Parsing ObjectManager navigation for popup');
-  
   if (!isObjectManagerPage()) {
-    console.log('SF Tabs: Not an ObjectManager page');
     return [];
   }
-  
+
   const objectName = getObjectNameFromUrl();
   if (!objectName) {
-    console.log('SF Tabs: Could not determine object name');
     return [];
   }
-  
+
   // Try advanced parsing with retry logic
   let navigation = await parseNavigationWithRetry(5, 500);
-  
+
   if (navigation.length === 0) {
-    console.log('SF Tabs: Retry failed, trying advanced parsing');
     navigation = parseObjectManagerNavigationAdvanced(objectName);
   }
-  
-  console.log(`SF Tabs: Successfully parsed ${navigation.length} navigation items`);
+
   return navigation;
 }
 
@@ -299,15 +283,12 @@ async function parseObjectManagerNavigation() {
  * Message handler for navigation parsing requests
  */
 function handleNavigationMessage(request, sender, sendResponse) {
-  console.log('SF Tabs: Received message:', request);
-  
   if (request.action === 'parse_navigation') {
     if (isObjectManagerPage()) {
       parseObjectManagerNavigation()
         .then(navigation => {
           const objectName = getObjectNameFromUrl();
-          console.log(`SF Tabs: Sending navigation for ${objectName}:`, navigation);
-          
+
           sendResponse({
             success: true,
             items: navigation,  // Changed from 'navigation' to 'items' for backward compatibility
@@ -323,10 +304,9 @@ function handleNavigationMessage(request, sender, sendResponse) {
             error: error.message
           });
         });
-      
+
       return true; // Keep message channel open for async response
     } else {
-      console.log('SF Tabs: Not an ObjectManager page');
       sendResponse({
         success: false,
         error: 'Not an ObjectManager page'
@@ -344,7 +324,6 @@ function handleNavigationMessage(request, sender, sendResponse) {
     sendResponse({ success: true });
   } else if (request.action === 'refresh_tabs') {
     // Handle tab refresh requests
-    console.log('SF Tabs: Refreshing tabs');
     sendResponse({ success: true });
   }
 }
@@ -369,5 +348,3 @@ window.SFTabsContent.navigationParser = {
   monitorNavigationChanges,
   parseObjectManagerNavigation
 };
-
-console.log('SF Tabs: Navigation parser loaded');
