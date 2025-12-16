@@ -390,6 +390,24 @@ async function switchActiveProfile(profileId) {
         SFTabs.main.showStatus(`Switched to profile: ${activeProfile.name}`, false);
       }
     }
+
+    // Send message to all Salesforce tabs to refresh the tab bar immediately
+    console.log('[switchActiveProfile] Sending refresh message to content scripts');
+    browser.tabs.query({
+      url: [
+        "*://*.lightning.force.com/lightning/setup/*",
+        "*://*.salesforce-setup.com/lightning/setup/*",
+        "*://*.my.salesforce-setup.com/lightning/setup/*",
+        "*://*.salesforce.com/lightning/setup/*",
+        "*://*.my.salesforce.com/lightning/setup/*"
+      ]
+    }).then(tabs => {
+      tabs.forEach(tab => {
+        browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
+          .catch(error => console.log('Could not send refresh to tab:', tab.id, error.message));
+      });
+    }).catch(error => console.error('Error querying tabs:', error));
+
   } catch (error) {
     console.error('Error switching profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
