@@ -355,16 +355,37 @@ async function initTabsWithLightningNavigation(tabContainer) {
   try {
     let tabsToUse = await getTabsFromStorage();
 
+    // Check if profiles are enabled before falling back to defaults
+    const useSyncStorage = await getStoragePreference();
+    const settingsKey = 'userSettings';
+    let settings;
+    if (useSyncStorage) {
+      const settingsData = await readChunkedSync(settingsKey);
+      settings = settingsData || {};
+    } else {
+      const result = await browser.storage.local.get(settingsKey);
+      settings = result[settingsKey] || {};
+    }
+
+    const profilesEnabled = settings.profilesEnabled;
+
     if (!tabsToUse || tabsToUse.length === 0) {
-      // Use default tabs from constants if available
-      if (window.SFTabs && window.SFTabs.constants) {
-        tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
+      // If profiles are enabled, respect empty profiles (don't use defaults)
+      if (profilesEnabled) {
+        console.log('Profiles enabled with empty profile - not using defaults');
+        tabsToUse = [];
       } else {
-        // Hardcoded fallback
-        tabsToUse = [
-          { id: 'default_tab_flows', label: 'Flows', path: 'Flows', openInNewTab: false, position: 0 },
-          { id: 'default_tab_users', label: 'Users', path: 'ManageUsers', openInNewTab: false, position: 1 }
-        ];
+        // Profiles not enabled - use default tabs from constants if available
+        console.log('Profiles not enabled - using default tabs for empty storage');
+        if (window.SFTabs && window.SFTabs.constants) {
+          tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
+        } else {
+          // Hardcoded fallback
+          tabsToUse = [
+            { id: 'default_tab_flows', label: 'Flows', path: 'Flows', openInNewTab: false, position: 0 },
+            { id: 'default_tab_users', label: 'Users', path: 'ManageUsers', openInNewTab: false, position: 1 }
+          ];
+        }
       }
     }
 

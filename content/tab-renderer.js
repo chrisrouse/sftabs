@@ -66,12 +66,40 @@ async function getTabsFromStorage() {
   try {
     const useSyncStorage = await getStoragePreference();
 
+    // Check if profiles are enabled
+    const settingsKey = 'userSettings';
+    let settings;
     if (useSyncStorage) {
-      console.log('[tab-renderer] Reading tabs from sync storage');
+      const settingsData = await readChunkedSync(settingsKey);
+      settings = settingsData || {};
+    } else {
+      const result = await browser.storage.local.get(settingsKey);
+      settings = result[settingsKey] || {};
+    }
+
+    // If profiles are enabled, load tabs from the active profile
+    if (settings.profilesEnabled && settings.activeProfileId) {
+      const profileTabsKey = `profile_${settings.activeProfileId}_tabs`;
+      console.log('[tab-renderer] Profiles enabled - reading tabs for profile:', settings.activeProfileId);
+
+      if (useSyncStorage) {
+        const tabs = await readChunkedSync(profileTabsKey);
+        console.log('[tab-renderer] Loaded', (tabs || []).length, 'tabs from profile');
+        return tabs || [];
+      } else {
+        const result = await browser.storage.local.get(profileTabsKey);
+        console.log('[tab-renderer] Loaded', (result[profileTabsKey] || []).length, 'tabs from profile');
+        return result[profileTabsKey] || [];
+      }
+    }
+
+    // Profiles not enabled - use legacy customTabs key
+    if (useSyncStorage) {
+      console.log('[tab-renderer] Reading tabs from sync storage (legacy)');
       const tabs = await readChunkedSync('customTabs');
       return tabs || [];
     } else {
-      console.log('[tab-renderer] Reading tabs from local storage');
+      console.log('[tab-renderer] Reading tabs from local storage (legacy)');
       const result = await browser.storage.local.get('customTabs');
       return result.customTabs || [];
     }
@@ -102,51 +130,71 @@ async function initTabs(tabContainer) {
   try {
     let tabsToUse = await getTabsFromStorage();
 
+    // Check if profiles are enabled before falling back to defaults
+    const useSyncStorage = await getStoragePreference();
+    const settingsKey = 'userSettings';
+    let settings;
+    if (useSyncStorage) {
+      const settingsData = await readChunkedSync(settingsKey);
+      settings = settingsData || {};
+    } else {
+      const result = await browser.storage.local.get(settingsKey);
+      settings = result[settingsKey] || {};
+    }
+
+    const profilesEnabled = settings.profilesEnabled;
+
     if (!tabsToUse || tabsToUse.length === 0) {
-      // Get default tabs from constants if available, otherwise use fallback
-      if (window.SFTabs && window.SFTabs.constants && window.SFTabs.constants.DEFAULT_TABS) {
-        tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
+      // If profiles are enabled, respect empty profiles (don't use defaults)
+      if (profilesEnabled) {
+        console.log('[tab-renderer] Profiles enabled with empty profile - not using defaults');
+        tabsToUse = [];
       } else {
-        // Fallback default tabs
-        tabsToUse = [
-          {
-            id: 'default_tab_flows',
-            label: 'Flows',
-            path: 'Flows',
-            openInNewTab: false,
-            isObject: false,
-            isCustomUrl: false,
-            isSetupObject: false,
-            position: 0
-          },
-          {
-            id: 'default_tab_packages',
-            label: 'Installed Packages',
-            path: 'ImportedPackage',
-            openInNewTab: false,
-            isObject: false,
-            isCustomUrl: false,
-            isSetupObject: false,
-            position: 1
-          },
-          {
-            id: 'default_tab_users',
-            label: 'Users',
-            path: 'ManageUsers',
-            openInNewTab: false,
-            isObject: false,
-            isCustomUrl: false,
-            isSetupObject: false,
-            position: 2
-          },
-          {
-            id: 'default_tab_profiles',
-            label: 'Profiles',
-            path: 'EnhancedProfiles',
-            openInNewTab: false,
-            isObject: false,
-            isCustomUrl: false,
-            isSetupObject: false,
+        // Profiles not enabled - get default tabs from constants if available, otherwise use fallback
+        console.log('[tab-renderer] Profiles not enabled - using default tabs for empty storage');
+        if (window.SFTabs && window.SFTabs.constants && window.SFTabs.constants.DEFAULT_TABS) {
+          tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
+        } else {
+          // Fallback default tabs
+          tabsToUse = [
+            {
+              id: 'default_tab_flows',
+              label: 'Flows',
+              path: 'Flows',
+              openInNewTab: false,
+              isObject: false,
+              isCustomUrl: false,
+              isSetupObject: false,
+              position: 0
+            },
+            {
+              id: 'default_tab_packages',
+              label: 'Installed Packages',
+              path: 'ImportedPackage',
+              openInNewTab: false,
+              isObject: false,
+              isCustomUrl: false,
+              isSetupObject: false,
+              position: 1
+            },
+            {
+              id: 'default_tab_users',
+              label: 'Users',
+              path: 'ManageUsers',
+              openInNewTab: false,
+              isObject: false,
+              isCustomUrl: false,
+              isSetupObject: false,
+              position: 2
+            },
+            {
+              id: 'default_tab_profiles',
+              label: 'Profiles',
+              path: 'EnhancedProfiles',
+              openInNewTab: false,
+              isObject: false,
+              isCustomUrl: false,
+              isSetupObject: false,
             position: 3
           },
           {
@@ -160,9 +208,10 @@ async function initTabs(tabContainer) {
             position: 4
           }
         ];
+        }
       }
     }
-    
+
     // Sort tabs by position (only top-level tabs)
     const topLevelTabs = getTopLevelTabs(tabsToUse);
 
