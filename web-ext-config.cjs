@@ -13,6 +13,8 @@ module.exports = {
     'package.json',
     'package-lock.json',
     'web-ext-config.cjs',
+    'manifest.base.json',
+    'build-manifest.js',
     'README.md',
     'CHANGELOG.md',
     'LICENSE.md',
