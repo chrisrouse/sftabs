@@ -271,6 +271,10 @@ async function migrateStorage() {
       await browser.storage.local.remove('userSettings');
     }
 
+    // Always set extensionVersion after successful migration
+    const currentVersion = browser.runtime.getManifest().version;
+    await browser.storage.local.set({ extensionVersion: currentVersion });
+
     return true;
   } catch (error) {
     console.error('❌ SF Tabs Background: Migration error:', error);
@@ -290,9 +294,22 @@ browser.runtime.onInstalled.addListener(async (details) => {
   }
 });
 
-// Also run migration on startup to catch any edge cases
+// Run migration on startup only if version check indicates it's needed
 browser.runtime.onStartup.addListener(async () => {
-  await migrateStorage();
+  try {
+    // Quick version check - skip if already migrated
+    const { extensionVersion } = await browser.storage.local.get('extensionVersion');
+    const currentVersion = browser.runtime.getManifest().version;
+
+    if (extensionVersion === currentVersion) {
+      return; // Already on current version, skip migration
+    }
+
+    // Version mismatch - run migration
+    await migrateStorage();
+  } catch (error) {
+    console.error('SF Tabs: Error checking version on startup:', error);
+  }
 });
 
 /**
