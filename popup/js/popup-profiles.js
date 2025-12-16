@@ -1055,6 +1055,14 @@ async function showCloneProfileSelector() {
     // Show the selector
     profileCloneSelector.style.display = 'block';
 
+    // Scroll the selector into view after a short delay to ensure it's rendered
+    setTimeout(() => {
+      profileCloneSelector.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
+    }, 100);
+
   } catch (error) {
     console.error('Error showing clone profile selector:', error);
     if (window.SFTabs && window.SFTabs.main) {
