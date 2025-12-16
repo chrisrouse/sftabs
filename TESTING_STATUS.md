@@ -151,59 +151,56 @@ console.log(`Migrating ${tabsToMigrate.length} tabs to Default profile`);
 
 ---
 
-### 4. Added Automatic Migration Recovery
-**File:** `popup/js/popup-profiles.js` (lines 109-147)
+### 4. ~~Added Automatic Migration Recovery~~ (REMOVED - Dec 16)
+**File:** `popup/js/popup-profiles.js` (lines 109-147 → now lines 109-113)
 
-**What Changed:**
-- Added recovery logic in `initProfiles()` that runs on every popup load
-- Detects if active profile has 0 tabs
-- Automatically searches for tabs and migrates them
-- Updates UI and shows status message
+**Original Implementation:**
+- Added recovery logic in `initProfiles()` that ran on every popup load
+- Detected if active profile had 0 tabs
+- Automatically searched for tabs and migrated them
+- Updated UI and showed status message
 
-**Key Code:**
+**Problem with This Approach:**
+- Ran on EVERY popup load, not just once
+- Could not distinguish between "empty by choice" (user selected "Start with no tabs") and "incomplete migration"
+- Caused user-selected empty profiles to receive tabs from legacy storage on popup reopen
+
+**What Changed (Dec 16):**
+- **REMOVED** the migration recovery code entirely
+- Migration now ONLY happens when profiles are first enabled (via checkbox handler)
+- Empty profiles stay empty as intended by user
+
+**Current Code (lines 109-113):**
 ```javascript
-// Check for incomplete migration (profile exists but has 0 tabs)
-if (settings.profilesEnabled && settings.activeProfileId) {
-  const activeProfile = profilesCache.find(p => p.id === settings.activeProfileId);
-
-  if (activeProfile) {
-    const profileTabs = await SFTabs.storage.getProfileTabs(activeProfile.id);
-
-    if (!profileTabs || profileTabs.length === 0) {
-      console.log('Detected profile with 0 tabs - checking for tabs to migrate');
-
-      // Try to find tabs using priority order
-      let tabsToMigrate = SFTabs.main.getTabs();
-      // ... fallback to sync storage, then local storage
-
-      if (tabsToMigrate && tabsToMigrate.length > 0) {
-        console.log(`Auto-migrating ${tabsToMigrate.length} tabs to ${activeProfile.name}`);
-        await SFTabs.storage.saveProfileTabs(activeProfile.id, tabsToMigrate);
-        // Update UI...
-      }
-    }
-  }
-}
+// DISABLED: Migration recovery code removed to fix empty profile issue
+// This code was running on every popup load and migrating legacy tabs to empty profiles
+// even when users explicitly chose "Start with no tabs"
+// Migration now ONLY happens when profiles are first enabled (via checkbox handler)
+// See checkbox handler around line 168-186 for migration logic
 ```
 
 ---
 
-## Current State
+## Current State (Updated Dec 16)
 
-### What We Know:
-- User has profiles enabled
-- User has a Default profile: `profile_1765850141557_r3zyn2oa4`
-- Profile currently has 0 tabs
-- User has 3 custom tabs stored somewhere in storage (customTabs key)
-- Content scripts are correctly detecting profiles and loading from profile-specific storage
+### Issues Fixed:
+- ✅ Popup now loads from correct storage location (profile-specific vs legacy)
+- ✅ Tab changes in popup auto-refresh on Salesforce page
+- ✅ Empty profiles stay empty when popup is reopened
+- ✅ Migration only happens when profiles are first enabled, not on every popup load
 
-### Expected Behavior After Fix:
-When user reloads the popup:
-1. `initProfiles()` runs and detects profile with 0 tabs
-2. Recovery logic finds the 3 tabs in storage
-3. Migrates them to the Default profile
-4. Updates UI to show the 3 tabs
-5. Tabs appear on Salesforce pages immediately
+### Expected Behavior:
+1. **Creating Empty Profile:**
+   - User creates new profile with "Start with no tabs"
+   - Popup shows empty tab list ✓
+   - Salesforce page shows no tabs ✓
+   - Close and reopen popup → stays empty ✓
+
+2. **Enabling Profiles First Time:**
+   - User enables profiles checkbox
+   - System detects legacy tabs in `customTabs`
+   - Migrates them to Default profile
+   - Tabs appear immediately in popup and Salesforce page
 
 ---
 
@@ -318,7 +315,7 @@ Migrating 3 tabs to Default profile
 
 4. **popup/js/popup-profiles.js**
    - Lines 1075-1096: Added `getLegacyTabsFromStorage()` helper
-   - Lines 109-147: Added migration recovery in `initProfiles()`
+   - Lines 109-113: REMOVED migration recovery in `initProfiles()` (was causing empty profiles to receive tabs)
    - Lines 168-186: Updated checkbox handler migration priority
 
 ---
@@ -335,26 +332,29 @@ If tabs exist in BOTH sync and local storage (shouldn't happen but possible):
 - Priority is: main state → sync → local
 - First non-empty result is used
 
-### 3. Profile Already Has Tabs
-Recovery logic only runs if profile has 0 tabs:
-- Won't overwrite existing profile tabs
-- Safe to run multiple times
+### 3. ~~Profile Already Has Tabs~~ (N/A - Recovery logic removed)
+This edge case no longer applies since migration recovery has been removed.
 
 ---
 
 ## Next Steps
 
-### Immediate (This Session):
+### Completed (Dec 16):
 1. ✅ Fix initialization race condition
-2. ✅ Add migration recovery logic
-3. ✅ Update migration priority order
-4. ⏳ Test automatic recovery (user will test)
+2. ✅ Fix popup storage disconnect (profile-aware loading/saving)
+3. ✅ Fix auto-refresh for profile tab changes
+4. ✅ Update migration priority order in checkbox handler
+5. ✅ Remove migration recovery that ran on every popup load
+
+### Ready for Testing:
+1. ⏳ Test empty profile creation (should stay empty on reopen)
+2. ⏳ Test profile switching between empty and non-empty profiles
+3. ⏳ Test enabling profiles for first time (migration from legacy storage)
 
 ### Follow-up (Future Session):
-1. Test all scenarios above
-2. Consider adding migration status to UI (badge/indicator)
-3. Add cleanup of old customTabs storage after successful migration
-4. Consider adding a manual "Re-migrate" button in settings for edge cases
+1. Consider adding migration status to UI (badge/indicator)
+2. Add cleanup of old customTabs storage after successful migration
+3. Consider adding a manual "Re-migrate" button in settings for edge cases
 
 ---
 
@@ -404,15 +404,18 @@ Or manually:
 
 ## Success Criteria
 
-- ✅ User can reload popup and see tabs automatically migrate
+- ✅ Popup loads from correct storage location (profile-specific vs legacy)
+- ✅ Tab changes in popup auto-refresh on Salesforce page
+- ✅ Empty profiles stay empty when popup is reopened
 - ✅ User can enable/disable profiles without losing tabs
 - ✅ Migration works regardless of storage type (sync/local)
 - ✅ Clear console logging shows migration status
 - ✅ No race conditions during popup initialization
 - ✅ Profile switching works correctly on Salesforce pages
+- ✅ Migration only happens when profiles first enabled, not on every popup load
 
 ---
 
-**Status:** Implementation complete, awaiting testing
+**Status:** Empty profile fix implemented, ready for user testing
 
-**Last Updated:** December 15, 2024
+**Last Updated:** December 16, 2024

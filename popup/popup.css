@@ -589,7 +589,23 @@
   .form-group {
 	margin-bottom: 16px;
   }
-  
+
+  .sub-option {
+	margin-top: 12px;
+	margin-left: 24px;
+	padding-left: 12px;
+	border-left: 2px solid var(--color-border);
+  }
+
+  .sub-option label {
+	margin-bottom: 6px;
+  }
+
+  .sub-option input[type="text"],
+  .sub-option select {
+	margin-top: 4px;
+  }
+
   .settings-form {
 	margin: 8px;
 	background-color: var(--color-item-background);

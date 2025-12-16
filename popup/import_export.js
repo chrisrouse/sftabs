@@ -204,6 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	importButton.addEventListener('click', importSettings);
 	fileInput.addEventListener('change', handleFileSelect);
 
+	// Set up modal event listeners
+	setupModalListeners();
+
 	// Styling functions
 	applyThemeFromStorage();
 });
@@ -341,8 +344,8 @@ function importSettings() {
 	fileInput.click();
 }
 
-// File selection handler
-function handleFileSelect(event) {
+// File selection handler - Updated to support profile-aware imports
+async function handleFileSelect(event) {
 	console.log('File selection handler triggered');
 	const file = event.target.files[0];
 
@@ -366,104 +369,37 @@ function handleFileSelect(event) {
 				throw new Error('Invalid configuration format: missing customTabs array');
 			}
 
+			const tabCount = config.customTabs.length;
 			const profileCount = (config.profiles && Array.isArray(config.profiles)) ? config.profiles.length : 0;
-			console.log('📥 Importing config with', config.customTabs.length, 'tabs and', profileCount, 'profiles');
-			if (config.customTabs.length > 0) {
-				console.log('First imported tab:', config.customTabs[0]);
-			}
+			console.log(`📥 Parsed config: ${tabCount} tabs, ${profileCount} profiles`);
 
-			// Get storage preference to determine where to save
+			// Get user settings to check if profiles UI is enabled
 			const useSyncStorage = await getStoragePreference();
-			console.log('💾 Import using storage preference:', useSyncStorage ? 'sync' : 'local');
+			let userSettings = {};
 
-			// Save the configuration to the appropriate storage
 			if (useSyncStorage) {
-				// Save to sync storage with chunking support
-				await saveChunkedSync('customTabs', config.customTabs);
-
-				// Save profiles if they exist
-				if (config.profiles && config.profiles.length > 0) {
-					await saveChunkedSync('profiles', config.profiles);
-					console.log('✅ Saved', config.profiles.length, 'profiles to sync storage');
-
-					// Save tabs for each profile
-					if (config.profileTabs) {
-						for (const profileId of Object.keys(config.profileTabs)) {
-							const storageKey = `profile_${profileId}_tabs`;
-							await saveChunkedSync(storageKey, config.profileTabs[profileId]);
-						}
-						console.log('✅ Saved tabs for', Object.keys(config.profileTabs).length, 'profiles');
-					}
-				}
-
-				// User settings always go to sync storage
-				await browser.storage.sync.set({
-					userSettings: config.userSettings || {}
-				});
-
-				console.log('✅ Configuration saved to sync storage');
+				const result = await browser.storage.sync.get('userSettings');
+				userSettings = result.userSettings || {};
 			} else {
-				// Save to local storage
-				const storageData = {
-					customTabs: config.customTabs,
-					userSettings: config.userSettings || {}
-				};
-
-				// Save profiles if they exist
-				if (config.profiles && config.profiles.length > 0) {
-					storageData.profiles = config.profiles;
-
-					// Save tabs for each profile
-					if (config.profileTabs) {
-						for (const profileId of Object.keys(config.profileTabs)) {
-							const storageKey = `profile_${profileId}_tabs`;
-							storageData[storageKey] = config.profileTabs[profileId];
-						}
-					}
-				}
-
-				await browser.storage.local.set(storageData);
-				console.log('✅ Configuration saved to local storage');
+				const result = await browser.storage.local.get('userSettings');
+				userSettings = result.userSettings || {};
 			}
 
-			// Verify it was saved
-			let verifyResult;
-			if (useSyncStorage) {
-				verifyResult = await readChunkedSync('customTabs');
+			const profilesEnabled = userSettings.profilesEnabled || false;
+			console.log(`Profiles UI enabled: ${profilesEnabled}`);
+
+			if (!profilesEnabled) {
+				// Profiles UI is disabled - import directly to active profile
+				console.log('Profiles UI disabled - importing directly to active profile');
+				await importToActiveProfile(config);
+				showStatus('Configuration imported successfully to your tabs', false);
+				notifyTabsAndPopup();
 			} else {
-				const result = await browser.storage.local.get(['customTabs']);
-				verifyResult = result.customTabs;
+				// Profiles UI is enabled - show modal to choose import target
+				console.log('Profiles UI enabled - showing import target selection');
+				pendingImportConfig = config;
+				await showImportModal();
 			}
-
-			console.log('✅ Verified storage contains', verifyResult?.length || 0, 'tabs');
-			console.log('Configuration imported successfully');
-
-			// Send refresh message to all Salesforce tabs
-			browser.tabs.query({})
-				.then(tabs => {
-					tabs.forEach(tab => {
-						if (tab.url && (tab.url.includes('lightning.force.com') || tab.url.includes('salesforce.com'))) {
-							browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
-								.then(() => {
-									console.log('✅ Tab refresh message sent to tab:', tab.id);
-								})
-								.catch(err => {
-									console.log('ℹ️ Could not send refresh to tab:', tab.id, err.message);
-								});
-						}
-					});
-				})
-				.catch(err => {
-					console.log('ℹ️ Could not query tabs:', err.message);
-				});
-
-			// Send message to popup to reload if it's open
-			browser.runtime.sendMessage({ action: 'reload_popup' })
-				.catch(err => {
-					console.log('ℹ️ No popup to reload:', err.message);
-				});
-
-			showStatus('Configuration imported successfully. Please reopen the popup to see your tabs.', false);
 		} catch (error) {
 			console.error('Error importing configuration:', error);
 			showStatus('Error: ' + error.message, true);
@@ -493,4 +429,318 @@ function showStatus(message, isError = false) {
 	} else {
 		statusMessage.classList.add('success');
 	}
+}
+
+// ============================================================================
+// NEW: Enhanced Import Functionality with Profile Support
+// ============================================================================
+
+// Global variable to store parsed config during import
+let pendingImportConfig = null;
+
+/**
+ * Setup modal event listeners for import target selection
+ */
+function setupModalListeners() {
+	const overwriteRadio = document.querySelector('input[name="import-option"][value="overwrite"]');
+	const newProfileRadio = document.querySelector('input[name="import-option"][value="new"]');
+	const overwriteSection = document.getElementById('overwrite-profile-section');
+	const newProfileSection = document.getElementById('new-profile-section');
+	const confirmButton = document.getElementById('import-modal-confirm');
+	const cancelButton = document.getElementById('import-modal-cancel');
+
+	if (overwriteRadio && newProfileRadio) {
+		overwriteRadio.addEventListener('change', () => {
+			if (overwriteSection) overwriteSection.style.display = 'block';
+			if (newProfileSection) newProfileSection.style.display = 'none';
+		});
+
+		newProfileRadio.addEventListener('change', () => {
+			if (overwriteSection) overwriteSection.style.display = 'none';
+			if (newProfileSection) newProfileSection.style.display = 'block';
+		});
+	}
+
+	if (confirmButton) {
+		confirmButton.addEventListener('click', handleImportConfirm);
+	}
+
+	if (cancelButton) {
+		cancelButton.addEventListener('click', hideImportModal);
+	}
+}
+
+/**
+ * Show import target selection modal
+ */
+async function showImportModal() {
+	const modal = document.getElementById('import-target-modal');
+	const profileSelect = document.getElementById('import-profile-select');
+	const newProfileInput = document.getElementById('new-profile-name');
+
+	if (!modal || !profileSelect) {
+		console.error('Import modal elements not found');
+		return;
+	}
+
+	// Get current profiles and user settings
+	const useSyncStorage = await getStoragePreference();
+	let profiles = [];
+	let userSettings = {};
+
+	if (useSyncStorage) {
+		profiles = await readChunkedSync('profiles') || [];
+		const settingsResult = await browser.storage.sync.get('userSettings');
+		userSettings = settingsResult.userSettings || {};
+	} else {
+		const result = await browser.storage.local.get(['profiles', 'userSettings']);
+		profiles = result.profiles || [];
+		userSettings = result.userSettings || {};
+	}
+
+	// Populate profile dropdown
+	profileSelect.innerHTML = '<option value="">Choose a profile...</option>';
+	const activeProfileId = userSettings.activeProfileId;
+
+	profiles.forEach(profile => {
+		const option = document.createElement('option');
+		option.value = profile.id;
+		option.textContent = profile.name;
+
+		// Pre-select active profile
+		if (profile.id === activeProfileId) {
+			option.selected = true;
+		}
+
+		profileSelect.appendChild(option);
+	});
+
+	// Clear new profile name input
+	if (newProfileInput) {
+		newProfileInput.value = '';
+	}
+
+	// Show modal
+	modal.style.display = 'flex';
+}
+
+/**
+ * Hide import target selection modal
+ */
+function hideImportModal() {
+	const modal = document.getElementById('import-target-modal');
+	if (modal) {
+		modal.style.display = 'none';
+	}
+	pendingImportConfig = null;
+}
+
+/**
+ * Handle import confirmation from modal
+ */
+async function handleImportConfirm() {
+	if (!pendingImportConfig) {
+		showStatus('No configuration to import', true);
+		hideImportModal();
+		return;
+	}
+
+	const overwriteRadio = document.querySelector('input[name="import-option"][value="overwrite"]');
+	const profileSelect = document.getElementById('import-profile-select');
+	const newProfileInput = document.getElementById('new-profile-name');
+
+	try {
+		let targetProfileId = null;
+
+		if (overwriteRadio && overwriteRadio.checked) {
+			// Overwrite existing profile
+			const profileId = profileSelect.value;
+			if (!profileId) {
+				showStatus('Please select a profile to overwrite', true);
+				return;
+			}
+
+			await importToProfile(pendingImportConfig, profileId);
+			targetProfileId = profileId;
+			showStatus('Configuration imported successfully to existing profile', false);
+		} else {
+			// Create new profile
+			const profileName = newProfileInput.value.trim();
+			if (!profileName) {
+				showStatus('Please enter a profile name', true);
+				return;
+			}
+
+			targetProfileId = await importToNewProfile(pendingImportConfig, profileName);
+			showStatus(`Configuration imported successfully to new profile "${profileName}"`, false);
+		}
+
+		// Switch to the imported/created profile
+		if (targetProfileId) {
+			await switchToProfile(targetProfileId);
+		}
+
+		hideImportModal();
+		notifyTabsAndPopup();
+	} catch (error) {
+		console.error('Error during import:', error);
+		showStatus('Error importing: ' + error.message, true);
+	}
+}
+
+/**
+ * Import tabs to an existing profile
+ */
+async function importToProfile(config, profileId) {
+	const tabsToImport = config.customTabs || [];
+	const useSyncStorage = await getStoragePreference();
+
+	console.log(`📥 Importing ${tabsToImport.length} tabs to profile ${profileId}`);
+
+	const storageKey = `profile_${profileId}_tabs`;
+
+	if (useSyncStorage) {
+		await saveChunkedSync(storageKey, tabsToImport);
+	} else {
+		const storageData = {};
+		storageData[storageKey] = tabsToImport;
+		await browser.storage.local.set(storageData);
+	}
+
+	console.log('✅ Tabs imported to profile successfully');
+}
+
+/**
+ * Import tabs to a new profile
+ * @returns {Promise<string>} The ID of the newly created profile
+ */
+async function importToNewProfile(config, profileName) {
+	const tabsToImport = config.customTabs || [];
+	const useSyncStorage = await getStoragePreference();
+
+	console.log(`📥 Creating new profile "${profileName}" with ${tabsToImport.length} tabs`);
+
+	// Generate new profile ID
+	const profileId = `profile_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
+	// Create profile object
+	const newProfile = {
+		id: profileId,
+		name: profileName,
+		isDefault: false,
+		urlPatterns: [],
+		createdAt: new Date().toISOString(),
+		lastActive: null
+	};
+
+	// Load existing profiles
+	let profiles = [];
+	if (useSyncStorage) {
+		profiles = await readChunkedSync('profiles') || [];
+	} else {
+		const result = await browser.storage.local.get('profiles');
+		profiles = result.profiles || [];
+	}
+
+	// Add new profile
+	profiles.push(newProfile);
+
+	// Save profiles
+	if (useSyncStorage) {
+		await saveChunkedSync('profiles', profiles);
+	} else {
+		await browser.storage.local.set({ profiles });
+	}
+
+	// Save tabs for new profile
+	await importToProfile(config, profileId);
+
+	console.log('✅ New profile created and tabs imported successfully');
+	return profileId;
+}
+
+/**
+ * Import directly to active profile (when profiles UI is disabled)
+ */
+async function importToActiveProfile(config) {
+	const useSyncStorage = await getStoragePreference();
+
+	// Get user settings to find active profile
+	let userSettings = {};
+	if (useSyncStorage) {
+		const result = await browser.storage.sync.get('userSettings');
+		userSettings = result.userSettings || {};
+	} else {
+		const result = await browser.storage.local.get('userSettings');
+		userSettings = result.userSettings || {};
+	}
+
+	const activeProfileId = userSettings.activeProfileId;
+	if (!activeProfileId) {
+		throw new Error('No active profile found');
+	}
+
+	console.log(`📥 Importing to active profile (profiles UI disabled): ${activeProfileId}`);
+	await importToProfile(config, activeProfileId);
+	console.log('✅ Imported to active profile successfully');
+}
+
+/**
+ * Switch to a specific profile
+ * @param {string} profileId - The ID of the profile to switch to
+ */
+async function switchToProfile(profileId) {
+	const useSyncStorage = await getStoragePreference();
+
+	// Load user settings
+	let userSettings = {};
+	if (useSyncStorage) {
+		const result = await browser.storage.sync.get('userSettings');
+		userSettings = result.userSettings || {};
+	} else {
+		const result = await browser.storage.local.get('userSettings');
+		userSettings = result.userSettings || {};
+	}
+
+	// Update active profile
+	userSettings.activeProfileId = profileId;
+
+	// Save updated settings
+	if (useSyncStorage) {
+		await browser.storage.sync.set({ userSettings });
+	} else {
+		await browser.storage.local.set({ userSettings });
+	}
+
+	console.log(`✅ Switched to profile: ${profileId}`);
+}
+
+/**
+ * Notify all tabs and popup to refresh
+ */
+function notifyTabsAndPopup() {
+	// Send refresh message to all Salesforce tabs
+	browser.tabs.query({})
+		.then(tabs => {
+			tabs.forEach(tab => {
+				if (tab.url && (tab.url.includes('lightning.force.com') || tab.url.includes('salesforce.com'))) {
+					browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
+						.then(() => {
+							console.log('✅ Tab refresh message sent to tab:', tab.id);
+						})
+						.catch(err => {
+							console.log('ℹ️ Could not send refresh to tab:', tab.id, err.message);
+						});
+				}
+			});
+		})
+		.catch(err => {
+			console.log('ℹ️ Could not query tabs:', err.message);
+		});
+
+	// Send message to popup to reload if it's open
+	browser.runtime.sendMessage({ action: 'reload_popup' })
+		.catch(err => {
+			console.log('ℹ️ No popup to reload:', err.message);
+		});
 }
