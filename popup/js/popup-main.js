@@ -239,7 +239,14 @@ function loadTabsFromStorage() {
       } else {
         console.log('⚠️  SF Tabs: No tabs found in storage - checking if first-time install...');
 
-        // Only use defaults for truly first-time users
+        // Check if profiles are enabled - if so, keep empty and let user initialize via UI
+        if (userSettings.profilesEnabled && userSettings.activeProfileId) {
+          console.log('🔵 SF Tabs: Profiles enabled with empty profile - keeping empty for user initialization');
+          customTabs = [];
+          return customTabs;
+        }
+
+        // Only use defaults for truly first-time users (when profiles not enabled)
         // Check if this is a first-time install or an upgrade issue
         return browser.storage.local.get('extensionVersion').then(result => {
           if (result.extensionVersion) {
@@ -252,7 +259,7 @@ function loadTabsFromStorage() {
             customTabs = [];
             showStatus('Warning: Tab configuration appears to be empty. Please check your settings or import a backup.', true);
           } else {
-            // First-time install - use defaults
+            // First-time install - use defaults (only if profiles not enabled)
             console.log('✅ SF Tabs: First-time install detected - initializing with default tabs');
             customTabs = [...SFTabs.constants.DEFAULT_TABS];
 
