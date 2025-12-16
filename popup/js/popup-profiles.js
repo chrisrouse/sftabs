@@ -228,6 +228,32 @@ async function initProfiles() {
     });
   }
 
+  // Setup profile initialization option buttons
+  const initWithDefaultsButton = document.querySelector('#init-with-defaults');
+  if (initWithDefaultsButton) {
+    initWithDefaultsButton.addEventListener('click', initializeProfileWithDefaults);
+  }
+
+  const initEmptyButton = document.querySelector('#init-empty');
+  if (initEmptyButton) {
+    initEmptyButton.addEventListener('click', initializeProfileEmpty);
+  }
+
+  const initCloneButton = document.querySelector('#init-clone');
+  if (initCloneButton) {
+    initCloneButton.addEventListener('click', showCloneProfileSelector);
+  }
+
+  const cloneConfirmButton = document.querySelector('#clone-confirm-button');
+  if (cloneConfirmButton) {
+    cloneConfirmButton.addEventListener('click', confirmCloneProfile);
+  }
+
+  const cloneCancelButton = document.querySelector('#clone-cancel-button');
+  if (cloneCancelButton) {
+    cloneCancelButton.addEventListener('click', hideCloneProfileSelector);
+  }
+
   console.log('Profiles initialization complete');
 }
 
@@ -914,6 +940,203 @@ async function deleteProfile(profile) {
     console.error('Error deleting profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
       window.SFTabs.main.showStatus('Error deleting profile: ' + error.message, true);
+    }
+  }
+}
+
+/**
+ * Initialize profile with default tabs
+ */
+async function initializeProfileWithDefaults() {
+  console.log('Initializing profile with default tabs');
+
+  try {
+    const settings = await SFTabs.storage.getUserSettings();
+    const activeProfileId = settings.activeProfileId;
+
+    if (!activeProfileId) {
+      throw new Error('No active profile');
+    }
+
+    // Get default tabs from constants
+    const defaultTabs = window.SFTabs && window.SFTabs.constants
+      ? window.SFTabs.constants.DEFAULT_TABS
+      : [];
+
+    if (defaultTabs.length === 0) {
+      throw new Error('No default tabs available');
+    }
+
+    // Save default tabs to the current profile
+    await SFTabs.storage.saveProfileTabs(activeProfileId, defaultTabs);
+
+    // Update main tabs state and re-render
+    if (window.SFTabs && window.SFTabs.main) {
+      SFTabs.main.setTabs(defaultTabs);
+
+      if (SFTabs.ui && SFTabs.ui.renderTabList) {
+        SFTabs.ui.renderTabList();
+      }
+
+      SFTabs.main.showStatus('Profile initialized with default tabs', false);
+    }
+
+    console.log('Profile initialized with', defaultTabs.length, 'default tabs');
+  } catch (error) {
+    console.error('Error initializing profile with defaults:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Error initializing profile: ' + error.message, true);
+    }
+  }
+}
+
+/**
+ * Initialize profile as empty (just hide the initialization UI)
+ */
+async function initializeProfileEmpty() {
+  console.log('Initializing empty profile');
+
+  try {
+    // Just hide the initialization options and show the regular empty state
+    const profileInitOptions = document.querySelector('#profile-init-options');
+    if (profileInitOptions) {
+      profileInitOptions.style.display = 'none';
+    }
+
+    // Show regular empty state
+    if (window.SFTabs && window.SFTabs.main) {
+      const domElements = SFTabs.main.getDOMElements();
+      if (domElements.emptyState) {
+        domElements.emptyState.style.display = 'block';
+      }
+
+      SFTabs.main.showStatus('Profile initialized (empty)', false);
+    }
+
+    console.log('Profile initialized as empty');
+  } catch (error) {
+    console.error('Error initializing empty profile:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Error initializing profile: ' + error.message, true);
+    }
+  }
+}
+
+/**
+ * Show clone profile selector
+ */
+async function showCloneProfileSelector() {
+  console.log('Showing clone profile selector');
+
+  try {
+    const profileCloneSelector = document.querySelector('#profile-clone-selector');
+    const cloneSourceSelect = document.querySelector('#clone-source-profile');
+
+    if (!profileCloneSelector || !cloneSourceSelect) {
+      throw new Error('Clone selector elements not found');
+    }
+
+    // Get current active profile ID so we don't show it as an option
+    const settings = await SFTabs.storage.getUserSettings();
+    const activeProfileId = settings.activeProfileId;
+
+    // Populate the select with available profiles (excluding current profile)
+    cloneSourceSelect.innerHTML = '<option value="">Choose a profile...</option>';
+
+    profilesCache.forEach(profile => {
+      if (profile.id !== activeProfileId) {
+        const option = document.createElement('option');
+        option.value = profile.id;
+        option.textContent = profile.name;
+        cloneSourceSelect.appendChild(option);
+      }
+    });
+
+    // Show the selector
+    profileCloneSelector.style.display = 'block';
+
+  } catch (error) {
+    console.error('Error showing clone profile selector:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Error showing profile selector: ' + error.message, true);
+    }
+  }
+}
+
+/**
+ * Hide clone profile selector
+ */
+function hideCloneProfileSelector() {
+  const profileCloneSelector = document.querySelector('#profile-clone-selector');
+  if (profileCloneSelector) {
+    profileCloneSelector.style.display = 'none';
+  }
+
+  // Reset the select
+  const cloneSourceSelect = document.querySelector('#clone-source-profile');
+  if (cloneSourceSelect) {
+    cloneSourceSelect.value = '';
+  }
+}
+
+/**
+ * Confirm clone profile
+ */
+async function confirmCloneProfile() {
+  console.log('Confirming clone profile');
+
+  try {
+    const cloneSourceSelect = document.querySelector('#clone-source-profile');
+    const sourceProfileId = cloneSourceSelect ? cloneSourceSelect.value : null;
+
+    if (!sourceProfileId) {
+      throw new Error('Please select a profile to clone');
+    }
+
+    const settings = await SFTabs.storage.getUserSettings();
+    const activeProfileId = settings.activeProfileId;
+
+    if (!activeProfileId) {
+      throw new Error('No active profile');
+    }
+
+    // Get tabs from the source profile
+    const sourceTabs = await SFTabs.storage.getProfileTabs(sourceProfileId);
+
+    if (!sourceTabs || sourceTabs.length === 0) {
+      throw new Error('Source profile has no tabs to clone');
+    }
+
+    // Clone the tabs (create new IDs for each tab to avoid conflicts)
+    const clonedTabs = sourceTabs.map(tab => ({
+      ...tab,
+      id: 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    }));
+
+    // Save cloned tabs to the current profile
+    await SFTabs.storage.saveProfileTabs(activeProfileId, clonedTabs);
+
+    // Update main tabs state and re-render
+    if (window.SFTabs && window.SFTabs.main) {
+      SFTabs.main.setTabs(clonedTabs);
+
+      if (SFTabs.ui && SFTabs.ui.renderTabList) {
+        SFTabs.ui.renderTabList();
+      }
+
+      const sourceProfile = profilesCache.find(p => p.id === sourceProfileId);
+      const sourceName = sourceProfile ? sourceProfile.name : 'selected profile';
+      SFTabs.main.showStatus(`Cloned ${clonedTabs.length} tabs from "${sourceName}"`, false);
+    }
+
+    // Hide the selector
+    hideCloneProfileSelector();
+
+    console.log('Profile cloned successfully with', clonedTabs.length, 'tabs');
+  } catch (error) {
+    console.error('Error cloning profile:', error);
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Error cloning profile: ' + error.message, true);
     }
   }
 }

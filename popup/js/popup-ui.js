@@ -16,10 +16,9 @@ function renderTabList() {
     console.log('Action panel is open for tab:', currentActionPanelTab.label, '- preserving panel state');
   }
 
-  // Clear existing list
-  while (domElements.tabList.firstChild) {
-    domElements.tabList.removeChild(domElements.tabList.firstChild);
-  }
+  // Clear existing tab items only (preserve empty-state and profile-init-options)
+  const tabItems = domElements.tabList.querySelectorAll('.tab-item');
+  tabItems.forEach(item => item.remove());
 
   // Get all tabs (sorted by position)
   const allTabs = SFTabs.main.getTabs().sort((a, b) => a.position - b.position);
@@ -29,20 +28,27 @@ function renderTabList() {
   const isProfilesEnabled = settings.profilesEnabled;
   const profileInitOptions = document.querySelector('#profile-init-options');
 
+  console.log('[renderTabList] Tab count:', allTabs.length);
+  console.log('[renderTabList] Profiles enabled:', isProfilesEnabled);
+  console.log('[renderTabList] Profile init options element:', profileInitOptions);
+
   // Show empty state if no tabs
   if (allTabs.length === 0) {
     // If profiles are enabled, show profile initialization options
     if (isProfilesEnabled && profileInitOptions) {
+      console.log('[renderTabList] Showing profile initialization options');
       domElements.emptyState.style.display = 'none';
       profileInitOptions.style.display = 'block';
     } else {
       // Otherwise show generic empty state
+      console.log('[renderTabList] Showing generic empty state');
       domElements.emptyState.style.display = 'block';
       if (profileInitOptions) {
         profileInitOptions.style.display = 'none';
       }
     }
   } else {
+    console.log('[renderTabList] Hiding all empty states (has tabs)');
     domElements.emptyState.style.display = 'none';
     if (profileInitOptions) {
       profileInitOptions.style.display = 'none';
