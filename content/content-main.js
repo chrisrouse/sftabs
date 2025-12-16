@@ -981,13 +981,20 @@ function setupStorageListeners() {
       console.log('Storage changed:', { area, changes: Object.keys(changes) });
 
       // Check for both 'local' and 'sync' areas
-      // For sync storage with chunking, also check for customTabs_metadata or chunk changes
+      // For sync storage with chunking, also check for metadata or chunk changes
       const hasCustomTabsChange = changes.customTabs ||
                                    changes.customTabs_metadata ||
                                    Object.keys(changes).some(key => key.startsWith('customTabs_chunk_'));
 
-      if ((area === 'local' || area === 'sync') && hasCustomTabsChange) {
-        console.log('📦 Custom tabs changed - triggering refresh');
+      // Check for profile-specific tab changes (profile_{id}_tabs)
+      const hasProfileTabsChange = Object.keys(changes).some(key =>
+        key.startsWith('profile_') && key.endsWith('_tabs')
+      ) || Object.keys(changes).some(key =>
+        key.startsWith('profile_') && (key.endsWith('_tabs_metadata') || key.includes('_tabs_chunk_'))
+      );
+
+      if ((area === 'local' || area === 'sync') && (hasCustomTabsChange || hasProfileTabsChange)) {
+        console.log('📦 Tabs changed (custom or profile) - triggering refresh');
         debouncedRefreshTabs();
       }
 

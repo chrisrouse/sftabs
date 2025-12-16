@@ -107,6 +107,7 @@ function cleanTabForStorage(tab) {
 
 /**
  * Save tabs to browser storage
+ * Saves to profile-specific storage if profiles enabled, otherwise legacy customTabs
  * Saves to sync (with chunking) or local storage based on user preference
  */
 async function saveTabs(tabs) {
@@ -117,21 +118,32 @@ async function saveTabs(tabs) {
     // Clean temporary fields from each tab before saving
     const cleanedTabs = sortedTabs.map(tab => cleanTabForStorage(tab));
 
-    const useSyncStorage = await getStoragePreference();
+    // Check if profiles are enabled
+    const settings = await getUserSettings();
 
-    if (useSyncStorage) {
-      // Save to sync storage with chunking support
-      console.log('💾 Saving tabs to sync storage (with chunking)');
-      await SFTabs.storageChunking.saveChunkedSync('customTabs', cleanedTabs);
-      console.log('✅ Tabs saved successfully to sync storage (cleaned', cleanedTabs.length, 'tabs)');
+    if (settings.profilesEnabled && settings.activeProfileId) {
+      // Save to profile-specific storage
+      console.log('💾 Saving tabs to profile:', settings.activeProfileId);
+      await saveProfileTabs(settings.activeProfileId, cleanedTabs);
+      console.log('✅ Tabs saved successfully to profile (cleaned', cleanedTabs.length, 'tabs)');
     } else {
-      // Save to local storage
-      console.log('💾 Saving tabs to local storage');
-      await browser.storage.local.set({
-        customTabs: cleanedTabs,
-        extensionVersion: '1.5.0'
-      });
-      console.log('✅ Tabs saved successfully to local storage (cleaned', cleanedTabs.length, 'tabs)');
+      // Save to legacy customTabs storage
+      const useSyncStorage = await getStoragePreference();
+
+      if (useSyncStorage) {
+        // Save to sync storage with chunking support
+        console.log('💾 Saving tabs to sync storage (with chunking)');
+        await SFTabs.storageChunking.saveChunkedSync('customTabs', cleanedTabs);
+        console.log('✅ Tabs saved successfully to sync storage (cleaned', cleanedTabs.length, 'tabs)');
+      } else {
+        // Save to local storage
+        console.log('💾 Saving tabs to local storage');
+        await browser.storage.local.set({
+          customTabs: cleanedTabs,
+          extensionVersion: '1.5.0'
+        });
+        console.log('✅ Tabs saved successfully to local storage (cleaned', cleanedTabs.length, 'tabs)');
+      }
     }
 
     // Update the main state with cleaned tabs

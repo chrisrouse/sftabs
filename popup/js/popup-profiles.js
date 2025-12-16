@@ -106,6 +106,46 @@ async function initProfiles() {
     console.log('Default profile created on init:', defaultProfile.id);
   }
 
+  // Check for incomplete migration (profile exists but has 0 tabs)
+  if (settings.profilesEnabled && settings.activeProfileId) {
+    const activeProfile = profilesCache.find(p => p.id === settings.activeProfileId);
+
+    if (activeProfile) {
+      const profileTabs = await SFTabs.storage.getProfileTabs(activeProfile.id);
+
+      if (!profileTabs || profileTabs.length === 0) {
+        console.log('Detected profile with 0 tabs - checking for tabs to migrate');
+
+        // Try to find tabs using priority order
+        let tabsToMigrate = SFTabs.main.getTabs();
+        console.log(`Found ${tabsToMigrate.length} tabs in main state`);
+
+        if (!tabsToMigrate || tabsToMigrate.length === 0) {
+          tabsToMigrate = await getLegacyTabsFromStorage('sync');
+        }
+
+        if (!tabsToMigrate || tabsToMigrate.length === 0) {
+          tabsToMigrate = await getLegacyTabsFromStorage('local');
+        }
+
+        if (tabsToMigrate && tabsToMigrate.length > 0) {
+          console.log(`Auto-migrating ${tabsToMigrate.length} tabs to ${activeProfile.name}`);
+          await SFTabs.storage.saveProfileTabs(activeProfile.id, tabsToMigrate);
+
+          // Update main state and UI
+          SFTabs.main.setTabs(tabsToMigrate);
+          if (SFTabs.ui && SFTabs.ui.renderTabList) {
+            SFTabs.ui.renderTabList();
+          }
+
+          if (window.SFTabs && window.SFTabs.main) {
+            window.SFTabs.main.showStatus(`Migrated ${tabsToMigrate.length} tabs to ${activeProfile.name}`, false);
+          }
+        }
+      }
+    }
+  }
+
   // Show/hide UI based on settings
   toggleProfilesEnabled(settings.profilesEnabled || false);
   toggleUrlPatternsSection(settings.autoSwitchProfiles || false);
@@ -119,14 +159,71 @@ async function initProfiles() {
     enableProfilesCheckbox.addEventListener('change', async function() {
       const enabled = this.checked;
       const settings = await SFTabs.storage.getUserSettings();
-      settings.profilesEnabled = enabled;
+
+      // If disabling profiles, prompt user to select which profile to keep
+      if (!enabled && profilesCache.length > 0) {
+        console.log('Disabling profiles - prompting user to select profile to keep');
+
+        // Show profile selection modal
+        const selectedProfile = await showProfileSelectionForDisable();
+
+        if (!selectedProfile) {
+          // User cancelled - revert checkbox
+          this.checked = true;
+          return;
+        }
+
+        // Load tabs from selected profile
+        const selectedTabs = await SFTabs.storage.getProfileTabs(selectedProfile.id);
+        console.log(`Migrating ${selectedTabs.length} tabs from profile ${selectedProfile.name} to legacy storage`);
+
+        // Save to legacy customTabs storage
+        await SFTabs.storage.saveTabs(selectedTabs);
+
+        // Clear all profile-specific storage
+        for (const profile of profilesCache) {
+          const profileTabsKey = `profile_${profile.id}_tabs`;
+          const useSyncStorage = await SFTabs.storage.getStoragePreference();
+
+          if (useSyncStorage) {
+            await SFTabs.storageChunking.clearChunkedSync(profileTabsKey);
+          } else {
+            await browser.storage.local.remove(profileTabsKey);
+          }
+        }
+
+        // Clear profiles
+        profilesCache.length = 0;
+        await SFTabs.storage.saveProfiles([]);
+
+        // Clear profile settings
+        settings.activeProfileId = null;
+        settings.defaultProfileId = null;
+
+        if (window.SFTabs && window.SFTabs.main) {
+          window.SFTabs.main.showStatus(`Profiles disabled. Keeping tabs from ${selectedProfile.name}`, false);
+        }
+      }
 
       // If enabling profiles for the first time, create a Default profile
       if (enabled && profilesCache.length === 0) {
         console.log('Profiles enabled for the first time - creating Default profile');
 
-        // Get current tabs to save to the Default profile
-        const currentTabs = SFTabs.main.getTabs();
+        // Priority 1: Get tabs from current state (most reliable)
+        let tabsToMigrate = SFTabs.main.getTabs();
+        console.log(`Found ${tabsToMigrate.length} tabs in main state`);
+
+        // Priority 2: If state is empty, check sync storage
+        if (!tabsToMigrate || tabsToMigrate.length === 0) {
+          tabsToMigrate = await getLegacyTabsFromStorage('sync');
+        }
+
+        // Priority 3: If still empty, check local storage
+        if (!tabsToMigrate || tabsToMigrate.length === 0) {
+          tabsToMigrate = await getLegacyTabsFromStorage('local');
+        }
+
+        console.log(`Migrating ${tabsToMigrate.length} tabs to Default profile`);
 
         // Create Default profile
         const defaultProfile = {
@@ -144,16 +241,21 @@ async function initProfiles() {
         // Save profile to storage
         await SFTabs.storage.saveProfiles(profilesCache);
 
-        // Save current tabs to this profile
-        await SFTabs.storage.saveProfileTabs(defaultProfile.id, currentTabs);
+        // Save migrated tabs to this profile
+        await SFTabs.storage.saveProfileTabs(defaultProfile.id, tabsToMigrate);
 
         // Set as default and active profile in settings
         settings.defaultProfileId = defaultProfile.id;
         settings.activeProfileId = defaultProfile.id;
 
-        console.log('Default profile created:', defaultProfile.id);
+        console.log('Default profile created:', defaultProfile.id, 'with', tabsToMigrate.length, 'tabs');
+
+        if (window.SFTabs && window.SFTabs.main) {
+          window.SFTabs.main.showStatus(`Profiles enabled. Migrated ${tabsToMigrate.length} tabs to Default profile`, false);
+        }
       }
 
+      settings.profilesEnabled = enabled;
       await SFTabs.storage.saveUserSettings(settings);
       toggleProfilesEnabled(enabled);
 
@@ -745,6 +847,36 @@ function createUrlPatternItem(pattern, index) {
 }
 
 /**
+ * Show profile selection modal when disabling profiles
+ * @returns {Promise<Object|null>} Selected profile or null if cancelled
+ */
+async function showProfileSelectionForDisable() {
+  return new Promise((resolve) => {
+    // Create simple prompt with profile names
+    const profileNames = profilesCache.map((p, i) => `${i + 1}. ${p.name}`).join('\n');
+    const message = `Disabling profiles will merge all your profiles back into a single tab list.\n\nWhich profile's tabs would you like to keep?\n\n${profileNames}\n\nEnter the number of the profile to keep, or click Cancel to abort:`;
+
+    const userInput = prompt(message);
+
+    if (!userInput) {
+      // User clicked Cancel
+      resolve(null);
+      return;
+    }
+
+    const selectedIndex = parseInt(userInput) - 1;
+
+    if (isNaN(selectedIndex) || selectedIndex < 0 || selectedIndex >= profilesCache.length) {
+      alert('Invalid selection. Please try again.');
+      resolve(null);
+      return;
+    }
+
+    resolve(profilesCache[selectedIndex]);
+  });
+}
+
+/**
  * Add URL pattern
  */
 function addUrlPattern() {
@@ -986,6 +1118,53 @@ async function deleteProfile(profile) {
 }
 
 /**
+ * Get tabs from a specific storage location
+ * @param {string} storageType - 'sync' or 'local'
+ * @returns {Promise<Array>} Array of tabs
+ */
+async function getLegacyTabsFromStorage(storageType) {
+  try {
+    if (storageType === 'sync') {
+      const tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
+      console.log(`Found ${tabs ? tabs.length : 0} tabs in sync storage`);
+      return tabs || [];
+    } else {
+      const result = await browser.storage.local.get('customTabs');
+      const tabs = result.customTabs || [];
+      console.log(`Found ${tabs.length} tabs in local storage`);
+      return tabs;
+    }
+  } catch (error) {
+    console.error(`Error reading from ${storageType} storage:`, error);
+    return [];
+  }
+}
+
+/**
+ * Check for legacy tabs in the old customTabs storage
+ * @returns {Promise<Array>} Array of legacy tabs, or empty array if none found
+ * @deprecated Use getLegacyTabsFromStorage() instead for more control
+ */
+async function getLegacyTabs() {
+  try {
+    const useSyncStorage = await SFTabs.storage.getStoragePreference();
+
+    if (useSyncStorage) {
+      // Check sync storage
+      const legacyTabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
+      return legacyTabs || [];
+    } else {
+      // Check local storage
+      const result = await browser.storage.local.get('customTabs');
+      return result.customTabs || [];
+    }
+  } catch (error) {
+    console.error('Error checking for legacy tabs:', error);
+    return [];
+  }
+}
+
+/**
  * Initialize profile with default tabs
  */
 async function initializeProfileWithDefaults() {
@@ -999,7 +1178,7 @@ async function initializeProfileWithDefaults() {
       throw new Error('No active profile');
     }
 
-    // Get default tabs from constants
+    // Get built-in default tabs
     const defaultTabs = window.SFTabs && window.SFTabs.constants
       ? window.SFTabs.constants.DEFAULT_TABS
       : [];

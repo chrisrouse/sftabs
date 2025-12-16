@@ -19,38 +19,41 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Apply initial panel visibility
   showMainContent();
-  
-  // Load user settings first, then tabs
-  loadUserSettings()
-    .then(() => {
+
+  // Initialize popup with sequential async/await to avoid race conditions
+  (async function init() {
+    try {
+      // Load user settings first
+      await loadUserSettings();
+
       // Apply theme early
       if (SFTabs.settings && SFTabs.settings.applyTheme) {
         SFTabs.settings.applyTheme();
       }
-      
-      // Load tabs from storage
-      return loadTabsFromStorage();
-    })
-    .then(() => {
-      // Setup all event listeners
+
+      // IMPORTANT: Wait for tabs to load before setting up event listeners
+      // This prevents race conditions with profile migration
+      await loadTabsFromStorage();
+
+      // Now it's safe to setup profile listeners
       setupAllEventListeners();
-      
+
       // Initialize components
       if (SFTabs.settings && SFTabs.settings.initThemeSelector) {
         SFTabs.settings.initThemeSelector();
       }
-      
+
       // Render tabs
       if (SFTabs.ui && SFTabs.ui.renderTabList) {
         SFTabs.ui.renderTabList();
       }
-      
+
       console.log('SF Tabs popup initialization complete');
-    })
-    .catch(error => {
+    } catch (error) {
       console.error('Error during popup initialization:', error);
       showStatus('Error initializing popup: ' + error.message, true);
-    });
+    }
+  })();
 
   // Listen for reload messages from import/export
   browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -214,77 +217,93 @@ function loadUserSettings() {
 /**
  * Load tabs from storage
  */
-function loadTabsFromStorage() {
+async function loadTabsFromStorage() {
   console.log('🔵 SF Tabs: Loading tabs from storage...');
-  return SFTabs.storage.getTabs()
-    .then((loadedTabs) => {
+
+  try {
+    let loadedTabs;
+
+    // Check if profiles are enabled and load from profile-specific storage
+    if (userSettings.profilesEnabled && userSettings.activeProfileId) {
+      console.log('🔵 SF Tabs: Profiles enabled - loading from profile:', userSettings.activeProfileId);
+      loadedTabs = await SFTabs.storage.getProfileTabs(userSettings.activeProfileId);
+      console.log('🔵 SF Tabs: Loaded', loadedTabs ? loadedTabs.length : 0, 'tabs from profile');
+    } else {
+      console.log('🔵 SF Tabs: Profiles disabled - loading from legacy customTabs');
+      loadedTabs = await SFTabs.storage.getTabs();
       console.log('🔵 SF Tabs: Loaded', loadedTabs ? loadedTabs.length : 0, 'tabs from storage');
+    }
 
-      if (loadedTabs && loadedTabs.length > 0) {
-        console.log('🔵 SF Tabs: Found existing tabs, checking for migration...');
-        console.log('🔵 SF Tabs: First tab sample:', JSON.stringify(loadedTabs[0], null, 2));
+    if (loadedTabs && loadedTabs.length > 0) {
+      console.log('🔵 SF Tabs: Found existing tabs, checking for migration...');
+      console.log('🔵 SF Tabs: First tab sample:', JSON.stringify(loadedTabs[0], null, 2));
 
-        // Migrate tabs to new structure if needed
-        customTabs = migrateTabsToNewStructure(loadedTabs);
+      // Migrate tabs to new structure if needed
+      customTabs = migrateTabsToNewStructure(loadedTabs);
 
-        // Check if migration actually changed anything by comparing structures
-        const needsSave = hasStructuralChanges(loadedTabs, customTabs);
+      // Check if migration actually changed anything by comparing structures
+      const needsSave = hasStructuralChanges(loadedTabs, customTabs);
 
-        if (needsSave) {
-          console.log('✅ SF Tabs: Migration added new fields - saving to storage');
-          return SFTabs.storage.saveTabs(customTabs);
+      if (needsSave) {
+        console.log('✅ SF Tabs: Migration added new fields - saving to storage');
+
+        // Save to appropriate storage location
+        if (userSettings.profilesEnabled && userSettings.activeProfileId) {
+          await SFTabs.storage.saveProfileTabs(userSettings.activeProfileId, customTabs);
         } else {
-          console.log('✅ SF Tabs: Tabs already in current format - no save needed');
+          await SFTabs.storage.saveTabs(customTabs);
         }
       } else {
-        console.log('⚠️  SF Tabs: No tabs found in storage - checking if first-time install...');
+        console.log('✅ SF Tabs: Tabs already in current format - no save needed');
+      }
+    } else {
+      console.log('⚠️  SF Tabs: No tabs found in storage - checking if first-time install...');
 
-        // Check if profiles are enabled - if so, keep empty and let user initialize via UI
-        if (userSettings.profilesEnabled && userSettings.activeProfileId) {
-          console.log('🔵 SF Tabs: Profiles enabled with empty profile - keeping empty for user initialization');
-          customTabs = [];
-          return customTabs;
-        }
-
-        // Only use defaults for truly first-time users (when profiles not enabled)
-        // Check if this is a first-time install or an upgrade issue
-        return browser.storage.local.get('extensionVersion').then(result => {
-          if (result.extensionVersion) {
-            // Extension was previously installed - this is likely a storage issue
-            console.error('❌ SF Tabs: Extension was previously installed (version: ' + result.extensionVersion + ') but tabs are missing!');
-            console.error('❌ SF Tabs: This indicates a storage migration issue or data loss');
-            console.error('❌ SF Tabs: NOT resetting to defaults - please import your backup');
-
-            // Don't overwrite with defaults - keep empty and let user know
-            customTabs = [];
-            showStatus('Warning: Tab configuration appears to be empty. Please check your settings or import a backup.', true);
-          } else {
-            // First-time install - use defaults (only if profiles not enabled)
-            console.log('✅ SF Tabs: First-time install detected - initializing with default tabs');
-            customTabs = [...SFTabs.constants.DEFAULT_TABS];
-
-            // Mark as installed
-            browser.storage.local.set({ extensionVersion: '1.4.0' });
-            return SFTabs.storage.saveTabs(customTabs);
-          }
-        });
+      // Check if profiles are enabled - if so, keep empty and let user initialize via UI
+      if (userSettings.profilesEnabled && userSettings.activeProfileId) {
+        console.log('🔵 SF Tabs: Profiles enabled with empty profile - keeping empty for user initialization');
+        customTabs = [];
+        return customTabs;
       }
 
-      console.log('✅ SF Tabs: Final tab count:', customTabs.length);
-      if (customTabs.length > 0) {
-        const customCount = customTabs.filter(t => !t.id.startsWith('default_tab_')).length;
-        console.log('✅ SF Tabs: Custom tabs preserved:', customCount);
-      }
-      return customTabs;
-    })
-    .catch((error) => {
-      console.error('❌ SF Tabs: Error loading tabs from storage:', error);
-      showStatus('Error loading tabs: ' + error.message, true);
+      // Only use defaults for truly first-time users (when profiles not enabled)
+      // Check if this is a first-time install or an upgrade issue
+      const result = await browser.storage.local.get('extensionVersion');
 
-      // Don't automatically use defaults on error - might overwrite user data
-      customTabs = [];
-      return customTabs;
-    });
+      if (result.extensionVersion) {
+        // Extension was previously installed - this is likely a storage issue
+        console.error('❌ SF Tabs: Extension was previously installed (version: ' + result.extensionVersion + ') but tabs are missing!');
+        console.error('❌ SF Tabs: This indicates a storage migration issue or data loss');
+        console.error('❌ SF Tabs: NOT resetting to defaults - please import your backup');
+
+        // Don't overwrite with defaults - keep empty and let user know
+        customTabs = [];
+        showStatus('Warning: Tab configuration appears to be empty. Please check your settings or import a backup.', true);
+      } else {
+        // First-time install - use defaults (only if profiles not enabled)
+        console.log('✅ SF Tabs: First-time install detected - initializing with default tabs');
+        customTabs = [...SFTabs.constants.DEFAULT_TABS];
+
+        // Mark as installed
+        await browser.storage.local.set({ extensionVersion: '1.4.0' });
+        await SFTabs.storage.saveTabs(customTabs);
+      }
+    }
+
+    console.log('✅ SF Tabs: Final tab count:', customTabs.length);
+    if (customTabs.length > 0) {
+      const customCount = customTabs.filter(t => !t.id.startsWith('default_tab_')).length;
+      console.log('✅ SF Tabs: Custom tabs preserved:', customCount);
+    }
+    return customTabs;
+  } catch (error) {
+    console.error('❌ SF Tabs: Error loading tabs from storage:', error);
+    showStatus('Error loading tabs: ' + error.message, true);
+
+    // Don't automatically use defaults on error - might overwrite user data
+    customTabs = [];
+    return customTabs;
+  }
 }
 
 /**
