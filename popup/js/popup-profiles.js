@@ -366,10 +366,14 @@ async function switchActiveProfile(profileId) {
     }
 
     // Load tabs for the selected profile
+    console.log('[switchActiveProfile] Loading tabs for profile:', profileId);
     const profileTabs = await SFTabs.storage.getProfileTabs(profileId);
+    console.log('[switchActiveProfile] Loaded tabs count:', profileTabs ? profileTabs.length : 0);
+    console.log('[switchActiveProfile] Tab IDs:', profileTabs ? profileTabs.map(t => t.id) : []);
 
     // Update the main tabs state
     if (window.SFTabs && window.SFTabs.main) {
+      console.log('[switchActiveProfile] Setting tabs in main state');
       SFTabs.main.setTabs(profileTabs);
 
       // Show main content to display the tab list (or empty state if no tabs)
@@ -377,6 +381,7 @@ async function switchActiveProfile(profileId) {
 
       // Re-render the tab list
       if (SFTabs.ui && SFTabs.ui.renderTabList) {
+        console.log('[switchActiveProfile] Calling renderTabList');
         SFTabs.ui.renderTabList();
       }
 

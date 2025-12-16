@@ -160,17 +160,46 @@ async function readChunkedSync(baseKey) {
 
 /**
  * Get tabs from storage (sync or local based on preference)
+ * Respects profile system if enabled
  */
 async function getTabsFromStorage() {
   try {
     const useSyncStorage = await getStoragePreference();
 
+    // Check if profiles are enabled
+    const settingsKey = useSyncStorage ? 'userSettings' : 'userSettings';
+    let settings;
     if (useSyncStorage) {
-      console.log('Reading tabs from sync storage');
+      const settingsData = await readChunkedSync(settingsKey);
+      settings = settingsData || {};
+    } else {
+      const result = await browser.storage.local.get(settingsKey);
+      settings = result[settingsKey] || {};
+    }
+
+    // If profiles are enabled, load tabs from the active profile
+    if (settings.profilesEnabled && settings.activeProfileId) {
+      const profileTabsKey = `profile_${settings.activeProfileId}_tabs`;
+      console.log('Profiles enabled - reading tabs for profile:', settings.activeProfileId);
+
+      if (useSyncStorage) {
+        const tabs = await readChunkedSync(profileTabsKey);
+        console.log('Loaded', (tabs || []).length, 'tabs from profile');
+        return tabs || [];
+      } else {
+        const result = await browser.storage.local.get(profileTabsKey);
+        console.log('Loaded', (result[profileTabsKey] || []).length, 'tabs from profile');
+        return result[profileTabsKey] || [];
+      }
+    }
+
+    // Profiles not enabled - use legacy customTabs key
+    if (useSyncStorage) {
+      console.log('Reading tabs from sync storage (legacy)');
       const tabs = await readChunkedSync('customTabs');
       return tabs || [];
     } else {
-      console.log('Reading tabs from local storage');
+      console.log('Reading tabs from local storage (legacy)');
       const result = await browser.storage.local.get('customTabs');
       return result.customTabs || [];
     }
