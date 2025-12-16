@@ -270,44 +270,60 @@ function createTabElementWithDropdown(tab) {
   const span = document.createElement('span');
   span.classList.add('title', 'slds-truncate');
   span.textContent = tab.label;
-  
-  // Add dropdown arrow if tab has dropdown functionality
+
+  // Assemble the tab label first
+  a.appendChild(span);
+  li.appendChild(a);
+
+  // Add dropdown button as separate sibling element (not nested in label)
   if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
-    // Create dropdown arrow with ID for positioning reference
-    const dropdownArrow = document.createElement('span');
-    dropdownArrow.className = 'dropdown-arrow-inline';
-    dropdownArrow.setAttribute('id', `dropdown-arrow-${tab.id}`);
-    dropdownArrow.innerHTML = `
-    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small" style="width: 12px; height: 12px; fill: currentColor;">
+    // Create wrapper div matching native Salesforce structure
+    const dropdownWrapper = document.createElement('div');
+    dropdownWrapper.className = 'slds-context-bar__label-action slds-p-left--none uiMenu oneNavItemDropdown';
+    dropdownWrapper.setAttribute('data-aura-rendered-by', `sftabs-dropdown-wrapper-${tab.id}`);
+    dropdownWrapper.setAttribute('data-aura-class', 'uiMenu oneNavItemDropdown');
+
+    // Create inner trigger wrapper
+    const triggerWrapper = document.createElement('div');
+    triggerWrapper.className = 'uiPopupTrigger';
+    triggerWrapper.setAttribute('id', `dropdown-trigger-${tab.id}`);
+    triggerWrapper.setAttribute('data-aura-rendered-by', `sftabs-trigger-${tab.id}`);
+    triggerWrapper.setAttribute('data-aura-class', 'uiPopupTrigger');
+
+    // Create dropdown button with proper ARIA attributes
+    const dropdownButton = document.createElement('a');
+    dropdownButton.className = 'slds-button slds-button--icon';
+    dropdownButton.setAttribute('id', `dropdown-arrow-${tab.id}`);
+    dropdownButton.setAttribute('role', 'button');
+    dropdownButton.setAttribute('aria-disabled', 'false');
+    dropdownButton.setAttribute('tabindex', '0');
+    dropdownButton.setAttribute('aria-expanded', 'false');
+    dropdownButton.setAttribute('aria-haspopup', 'true');
+    dropdownButton.setAttribute('aria-controls', `dropdown-menu-${tab.id}`);
+    dropdownButton.setAttribute('href', 'javascript:void(0)');
+    dropdownButton.setAttribute('title', `${tab.label} List`);
+    dropdownButton.innerHTML = `
+    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small slds-button__icon slds-button__icon--hint">
       <path d="M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21z"></path>
     </svg>
     `;
-    dropdownArrow.style.cssText = `
-      opacity: 0.7;
-      margin-left: 4px;
-      cursor: pointer;
-      user-select: none;
-      display: inline-flex;
-      align-items: center;
-    `;
 
-    span.appendChild(dropdownArrow);
+    // Assemble dropdown structure
+    triggerWrapper.appendChild(dropdownButton);
+    dropdownWrapper.appendChild(triggerWrapper);
+    li.appendChild(dropdownWrapper);
 
     // Create dropdown menu using dropdownItems
     const dropdown = createInlineDropdownMenu(tab);
     li.appendChild(dropdown);
 
     // Add dropdown toggle handler
-    dropdownArrow.addEventListener('click', (e) => {
+    dropdownButton.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      toggleInlineDropdown(dropdown, dropdownArrow);
+      toggleInlineDropdown(dropdown, dropdownButton);
     });
   }
-  
-  // Assemble the elements
-  a.appendChild(span);
-  li.appendChild(a);
   
   return li;
 }
@@ -751,39 +767,53 @@ function createInlineDropdownMenu(tab) {
 /**
  * Toggle inline dropdown visibility using SLDS visible class
  */
-function toggleInlineDropdown(dropdown, dropdownArrow) {
+function toggleInlineDropdown(dropdown, dropdownButton) {
   // Close all other SF Tabs custom dropdowns first (not native Salesforce dropdowns)
   document.querySelectorAll('.sftabs-custom-dropdown').forEach(d => {
     if (d !== dropdown) {
       d.classList.remove('visible');
       d.style.display = 'none';
+      // Reset aria-expanded on other buttons
+      const otherButtonId = d.getAttribute('aria-labelledby') || d.id.replace('dropdown-menu-', 'dropdown-arrow-');
+      const otherButton = document.getElementById(otherButtonId);
+      if (otherButton) {
+        otherButton.setAttribute('aria-expanded', 'false');
+      }
     }
   });
 
   const isCurrentlyVisible = dropdown.classList.contains('visible');
 
-  // Position the dropdown relative to the arrow before showing
-  if (!isCurrentlyVisible && dropdownArrow) {
-    // Get the arrow's position relative to the page
-    const arrowRect = dropdownArrow.getBoundingClientRect();
+  // Position the dropdown relative to the button before showing
+  if (!isCurrentlyVisible && dropdownButton) {
+    // Get the button's position relative to the page
+    const buttonRect = dropdownButton.getBoundingClientRect();
     const parentLi = dropdown.parentElement;
     const parentRect = parentLi.getBoundingClientRect();
 
-    // Calculate center of arrow relative to parent li
-    const topOffset = arrowRect.bottom - parentRect.top + 4; // 4px gap below arrow
-    const arrowCenterX = arrowRect.left + (arrowRect.width / 2) - parentRect.left;
+    // Calculate center of button relative to parent li
+    const topOffset = buttonRect.bottom - parentRect.top + 4; // 4px gap below button
+    const buttonCenterX = buttonRect.left + (buttonRect.width / 2) - parentRect.left;
 
-    // Position dropdown with center aligned to arrow center (nubbin will align with arrow)
+    // Position dropdown with center aligned to button center (nubbin will align with button)
     dropdown.style.position = 'absolute';
     dropdown.style.top = `${topOffset}px`;
-    dropdown.style.left = `${arrowCenterX}px`;
+    dropdown.style.left = `${buttonCenterX}px`;
     dropdown.style.right = 'auto';
-    dropdown.style.transform = 'translateX(-50%)'; // Center the dropdown under the arrow
+    dropdown.style.transform = 'translateX(-50%)'; // Center the dropdown under the button
     dropdown.style.display = 'block';
     dropdown.classList.add('visible');
+
+    // Update aria-expanded state
+    dropdownButton.setAttribute('aria-expanded', 'true');
   } else {
     dropdown.style.display = 'none';
     dropdown.classList.remove('visible');
+
+    // Update aria-expanded state
+    if (dropdownButton) {
+      dropdownButton.setAttribute('aria-expanded', 'false');
+    }
   }
 }
 

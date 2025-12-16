@@ -435,28 +435,48 @@ function createTabElementWithLightningAndDropdown(tab) {
   const span = document.createElement('span');
   span.classList.add('title', 'slds-truncate');
   span.textContent = tab.label;
-  
-  // Add dropdown arrow if tab has dropdown functionality
-if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
-    // Create dropdown arrow with ID for positioning reference
-    const dropdownArrow = document.createElement('span');
-    dropdownArrow.className = 'dropdown-arrow-inline';
-    dropdownArrow.setAttribute('id', `dropdown-arrow-${tab.id}`);
-    dropdownArrow.innerHTML = `
-    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small" style="width: 12px; height: 12px; fill: currentColor;">
+
+  // Assemble the tab label first
+  a.appendChild(span);
+  li.appendChild(a);
+
+  // Add dropdown button as separate sibling element (not nested in label)
+  if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
+    // Create wrapper div matching native Salesforce structure
+    const dropdownWrapper = document.createElement('div');
+    dropdownWrapper.className = 'slds-context-bar__label-action slds-p-left--none uiMenu oneNavItemDropdown';
+    dropdownWrapper.setAttribute('data-aura-rendered-by', `sftabs-dropdown-wrapper-${tab.id}`);
+    dropdownWrapper.setAttribute('data-aura-class', 'uiMenu oneNavItemDropdown');
+
+    // Create inner trigger wrapper
+    const triggerWrapper = document.createElement('div');
+    triggerWrapper.className = 'uiPopupTrigger';
+    triggerWrapper.setAttribute('id', `dropdown-trigger-${tab.id}`);
+    triggerWrapper.setAttribute('data-aura-rendered-by', `sftabs-trigger-${tab.id}`);
+    triggerWrapper.setAttribute('data-aura-class', 'uiPopupTrigger');
+
+    // Create dropdown button with proper ARIA attributes
+    const dropdownButton = document.createElement('a');
+    dropdownButton.className = 'slds-button slds-button--icon';
+    dropdownButton.setAttribute('id', `dropdown-arrow-${tab.id}`);
+    dropdownButton.setAttribute('role', 'button');
+    dropdownButton.setAttribute('aria-disabled', 'false');
+    dropdownButton.setAttribute('tabindex', '0');
+    dropdownButton.setAttribute('aria-expanded', 'false');
+    dropdownButton.setAttribute('aria-haspopup', 'true');
+    dropdownButton.setAttribute('aria-controls', `dropdown-menu-${tab.id}`);
+    dropdownButton.setAttribute('href', 'javascript:void(0)');
+    dropdownButton.setAttribute('title', `${tab.label} List`);
+    dropdownButton.innerHTML = `
+    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small slds-button__icon slds-button__icon--hint">
       <path d="M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21z"></path>
     </svg>
     `;
-    dropdownArrow.style.cssText = `
-      opacity: 0.7;
-      margin-left: 4px;
-      cursor: pointer;
-      user-select: none;
-      display: inline-flex;
-      align-items: center;
-    `;
 
-    span.appendChild(dropdownArrow);
+    // Assemble dropdown structure
+    triggerWrapper.appendChild(dropdownButton);
+    dropdownWrapper.appendChild(triggerWrapper);
+    li.appendChild(dropdownWrapper);
 
     // Create dropdown menu if dropdown items exist
     if (tab.dropdownItems && tab.dropdownItems.length > 0) {
@@ -464,16 +484,13 @@ if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
       li.appendChild(dropdown);
 
       // Add dropdown toggle handler
-      dropdownArrow.addEventListener('click', (e) => {
+      dropdownButton.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        toggleInlineDropdown(dropdown, dropdownArrow);
+        toggleInlineDropdown(dropdown, dropdownButton);
       });
     }
   }
-  
-  a.appendChild(span);
-  li.appendChild(a);
   
   // Add click handler WITH Lightning Navigation - FROM ORIGINAL
   a.addEventListener('click', (event) => {
@@ -491,10 +508,10 @@ if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
       if (hasDropdown) {
         const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
         const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
-        const dropdownArrow = tabElement?.querySelector('.dropdown-arrow-inline');
+        const dropdownButton = document.getElementById(`dropdown-arrow-${tab.id}`);
 
-        if (dropdown && dropdownArrow) {
-          toggleInlineDropdown(dropdown, dropdownArrow);
+        if (dropdown && dropdownButton) {
+          toggleInlineDropdown(dropdown, dropdownButton);
         }
       }
       return;
