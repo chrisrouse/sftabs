@@ -12,8 +12,7 @@
     }
   },
   "background": {
-    "service_worker": "background.js",
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
   "permissions": [
     "activeTab",
@@ -71,6 +70,9 @@
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "commands": {
     "open-tab-1": {
