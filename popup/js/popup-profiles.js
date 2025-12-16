@@ -782,32 +782,82 @@ function createUrlPatternItem(pattern, index) {
 }
 
 /**
- * Show profile selection modal when disabling profiles
+ * Show modal to select which profile to keep when disabling profiles
  * @returns {Promise<Object|null>} Selected profile or null if cancelled
  */
 async function showProfileSelectionForDisable() {
-  return new Promise((resolve) => {
-    // Create simple prompt with profile names
-    const profileNames = profilesCache.map((p, i) => `${i + 1}. ${p.name}`).join('\n');
-    const message = `Disabling profiles will merge all your profiles back into a single tab list.\n\nWhich profile's tabs would you like to keep?\n\n${profileNames}\n\nEnter the number of the profile to keep, or click Cancel to abort:`;
+  return new Promise(async (resolve) => {
+    const modal = document.querySelector('#disable-profiles-modal');
+    const keepProfileSelect = document.querySelector('#keep-profile-select');
+    const confirmButton = document.querySelector('#disable-profiles-confirm-button');
+    const cancelButton = document.querySelector('#disable-profiles-cancel-button');
 
-    const userInput = prompt(message);
-
-    if (!userInput) {
-      // User clicked Cancel
+    if (!modal || !keepProfileSelect || !confirmButton || !cancelButton) {
+      console.error('Disable profiles modal elements not found');
       resolve(null);
       return;
     }
 
-    const selectedIndex = parseInt(userInput) - 1;
+    // Populate dropdown with all profiles
+    keepProfileSelect.innerHTML = '<option value="">Choose a profile...</option>';
 
-    if (isNaN(selectedIndex) || selectedIndex < 0 || selectedIndex >= profilesCache.length) {
-      alert('Invalid selection. Please try again.');
+    const settings = await SFTabs.storage.getUserSettings();
+    const defaultProfileId = settings.defaultProfileId;
+
+    profilesCache.forEach(profile => {
+      const option = document.createElement('option');
+      option.value = profile.id;
+      option.textContent = profile.name;
+
+      // Pre-select the default profile
+      if (profile.id === defaultProfileId) {
+        option.selected = true;
+      }
+
+      keepProfileSelect.appendChild(option);
+    });
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Setup event handlers
+    const handleConfirm = () => {
+      const selectedProfileId = keepProfileSelect.value;
+
+      if (!selectedProfileId) {
+        alert('Please select a profile to keep');
+        return;
+      }
+
+      const selectedProfile = profilesCache.find(p => p.id === selectedProfileId);
+
+      // Clean up
+      cleanup();
+      resolve(selectedProfile);
+    };
+
+    const handleCancel = () => {
+      cleanup();
       resolve(null);
-      return;
-    }
+    };
 
-    resolve(profilesCache[selectedIndex]);
+    const cleanup = () => {
+      modal.style.display = 'none';
+      keepProfileSelect.value = '';
+      confirmButton.removeEventListener('click', handleConfirm);
+      cancelButton.removeEventListener('click', handleCancel);
+    };
+
+    // Add event listeners
+    confirmButton.addEventListener('click', handleConfirm);
+    cancelButton.addEventListener('click', handleCancel);
+
+    // Close on outside click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        handleCancel();
+      }
+    });
   });
 }
 
