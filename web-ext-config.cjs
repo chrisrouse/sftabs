@@ -37,8 +37,7 @@ module.exports = {
   run: {
     // Firefox specific settings
     firefox: 'firefox',
-    firefoxProfile: 'sf-tabs-dev',
-    keepProfileChanges: true,
+    // Uses temporary profile by default (change firefoxProfile to use persistent profile)
 
     // Chrome specific settings
     chromiumBinary: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
