@@ -991,20 +991,34 @@ async function initializeProfileWithDefaults() {
 }
 
 /**
- * Initialize profile as empty (just hide the initialization UI)
+ * Initialize profile as empty (save empty array to storage)
  */
 async function initializeProfileEmpty() {
   console.log('Initializing empty profile');
 
   try {
-    // Just hide the initialization options and show the regular empty state
-    const profileInitOptions = document.querySelector('#profile-init-options');
-    if (profileInitOptions) {
-      profileInitOptions.style.display = 'none';
+    const settings = await SFTabs.storage.getUserSettings();
+    const activeProfileId = settings.activeProfileId;
+
+    if (!activeProfileId) {
+      throw new Error('No active profile');
     }
 
-    // Show regular empty state
+    // Save empty tabs array to the current profile
+    const emptyTabs = [];
+    await SFTabs.storage.saveProfileTabs(activeProfileId, emptyTabs);
+
+    // Update main tabs state
     if (window.SFTabs && window.SFTabs.main) {
+      SFTabs.main.setTabs(emptyTabs);
+
+      // Hide the initialization options
+      const profileInitOptions = document.querySelector('#profile-init-options');
+      if (profileInitOptions) {
+        profileInitOptions.style.display = 'none';
+      }
+
+      // Show regular empty state
       const domElements = SFTabs.main.getDOMElements();
       if (domElements.emptyState) {
         domElements.emptyState.style.display = 'block';
@@ -1013,7 +1027,7 @@ async function initializeProfileEmpty() {
       SFTabs.main.showStatus('Profile initialized (empty)', false);
     }
 
-    console.log('Profile initialized as empty');
+    console.log('Profile initialized as empty and saved to storage');
   } catch (error) {
     console.error('Error initializing empty profile:', error);
     if (window.SFTabs && window.SFTabs.main) {
