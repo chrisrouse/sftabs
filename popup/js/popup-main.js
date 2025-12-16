@@ -221,18 +221,16 @@ async function loadTabsFromStorage() {
   console.log('🔵 SF Tabs: Loading tabs from storage...');
 
   try {
-    let loadedTabs;
-
-    // Check if profiles are enabled and load from profile-specific storage
-    if (userSettings.profilesEnabled && userSettings.activeProfileId) {
-      console.log('🔵 SF Tabs: Profiles enabled - loading from profile:', userSettings.activeProfileId);
-      loadedTabs = await SFTabs.storage.getProfileTabs(userSettings.activeProfileId);
-      console.log('🔵 SF Tabs: Loaded', loadedTabs ? loadedTabs.length : 0, 'tabs from profile');
-    } else {
-      console.log('🔵 SF Tabs: Profiles disabled - loading from legacy customTabs');
-      loadedTabs = await SFTabs.storage.getTabs();
-      console.log('🔵 SF Tabs: Loaded', loadedTabs ? loadedTabs.length : 0, 'tabs from storage');
+    // Always load from profile storage (profiles are used internally even if UI is disabled)
+    if (!userSettings.activeProfileId) {
+      console.error('❌ SF Tabs: No active profile ID found - this should not happen');
+      customTabs = [];
+      return customTabs;
     }
+
+    console.log('🔵 SF Tabs: Loading from profile:', userSettings.activeProfileId);
+    let loadedTabs = await SFTabs.storage.getProfileTabs(userSettings.activeProfileId);
+    console.log('🔵 SF Tabs: Loaded', loadedTabs ? loadedTabs.length : 0, 'tabs from profile');
 
     if (loadedTabs && loadedTabs.length > 0) {
       console.log('🔵 SF Tabs: Found existing tabs, checking for migration...');
@@ -246,48 +244,14 @@ async function loadTabsFromStorage() {
 
       if (needsSave) {
         console.log('✅ SF Tabs: Migration added new fields - saving to storage');
-
-        // Save to appropriate storage location
-        if (userSettings.profilesEnabled && userSettings.activeProfileId) {
-          await SFTabs.storage.saveProfileTabs(userSettings.activeProfileId, customTabs);
-        } else {
-          await SFTabs.storage.saveTabs(customTabs);
-        }
+        await SFTabs.storage.saveProfileTabs(userSettings.activeProfileId, customTabs);
       } else {
         console.log('✅ SF Tabs: Tabs already in current format - no save needed');
       }
     } else {
-      console.log('⚠️  SF Tabs: No tabs found in storage - checking if first-time install...');
-
-      // Check if profiles are enabled - if so, keep empty and let user initialize via UI
-      if (userSettings.profilesEnabled && userSettings.activeProfileId) {
-        console.log('🔵 SF Tabs: Profiles enabled with empty profile - keeping empty for user initialization');
-        customTabs = [];
-        return customTabs;
-      }
-
-      // Only use defaults for truly first-time users (when profiles not enabled)
-      // Check if this is a first-time install or an upgrade issue
-      const result = await browser.storage.local.get('extensionVersion');
-
-      if (result.extensionVersion) {
-        // Extension was previously installed - this is likely a storage issue
-        console.error('❌ SF Tabs: Extension was previously installed (version: ' + result.extensionVersion + ') but tabs are missing!');
-        console.error('❌ SF Tabs: This indicates a storage migration issue or data loss');
-        console.error('❌ SF Tabs: NOT resetting to defaults - please import your backup');
-
-        // Don't overwrite with defaults - keep empty and let user know
-        customTabs = [];
-        showStatus('Warning: Tab configuration appears to be empty. Please check your settings or import a backup.', true);
-      } else {
-        // First-time install - use defaults (only if profiles not enabled)
-        console.log('✅ SF Tabs: First-time install detected - initializing with default tabs');
-        customTabs = [...SFTabs.constants.DEFAULT_TABS];
-
-        // Mark as installed
-        await browser.storage.local.set({ extensionVersion: '1.4.0' });
-        await SFTabs.storage.saveTabs(customTabs);
-      }
+      console.log('⚠️  SF Tabs: No tabs found in profile - keeping empty');
+      // Profile has no tabs - this is valid (empty profile or user initialization)
+      customTabs = [];
     }
 
     console.log('✅ SF Tabs: Final tab count:', customTabs.length);

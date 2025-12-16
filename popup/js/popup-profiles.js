@@ -72,12 +72,31 @@ async function initProfiles() {
     autoSwitchCheckbox.checked = settings.autoSwitchProfiles || false;
   }
 
-  // Check if profiles are enabled but no profiles exist (upgrade scenario)
-  if (settings.profilesEnabled && profilesCache.length === 0) {
-    console.log('Profiles enabled but no profiles exist - creating Default profile');
+  // Auto-create Default profile if none exist (upgrade/first use scenario)
+  // This happens regardless of profilesEnabled setting - profiles are now always used internally
+  if (profilesCache.length === 0) {
+    console.log('No profiles exist - creating Default profile and migrating tabs');
 
-    // Get current tabs to save to the Default profile
-    const currentTabs = SFTabs.main.getTabs();
+    // Try to get tabs from legacy storage first, then fall back to current state
+    let tabsToMigrate = [];
+
+    // Check sync storage for legacy tabs
+    const legacyTabsSync = await getLegacyTabsFromStorage('sync');
+    if (legacyTabsSync && legacyTabsSync.length > 0) {
+      tabsToMigrate = legacyTabsSync;
+      console.log(`Found ${tabsToMigrate.length} tabs in legacy sync storage`);
+    } else {
+      // Check local storage for legacy tabs
+      const legacyTabsLocal = await getLegacyTabsFromStorage('local');
+      if (legacyTabsLocal && legacyTabsLocal.length > 0) {
+        tabsToMigrate = legacyTabsLocal;
+        console.log(`Found ${tabsToMigrate.length} tabs in legacy local storage`);
+      } else {
+        // Fall back to current state
+        tabsToMigrate = SFTabs.main.getTabs();
+        console.log(`Using ${tabsToMigrate.length} tabs from current state`);
+      }
+    }
 
     // Create Default profile
     const defaultProfile = {
@@ -95,56 +114,22 @@ async function initProfiles() {
     // Save profile to storage
     await SFTabs.storage.saveProfiles(profilesCache);
 
-    // Save current tabs to this profile
-    await SFTabs.storage.saveProfileTabs(defaultProfile.id, currentTabs);
+    // Save tabs to this profile
+    await SFTabs.storage.saveProfileTabs(defaultProfile.id, tabsToMigrate);
 
     // Set as default and active profile in settings
     settings.defaultProfileId = defaultProfile.id;
     settings.activeProfileId = defaultProfile.id;
     await SFTabs.storage.saveUserSettings(settings);
 
-    console.log('Default profile created on init:', defaultProfile.id);
+    console.log(`Default profile created with ${tabsToMigrate.length} tabs:`, defaultProfile.id);
   }
 
-  // Check for incomplete migration (profile exists but has 0 tabs)
-  if (settings.profilesEnabled && settings.activeProfileId) {
-    const activeProfile = profilesCache.find(p => p.id === settings.activeProfileId);
-
-    if (activeProfile) {
-      const profileTabs = await SFTabs.storage.getProfileTabs(activeProfile.id);
-
-      if (!profileTabs || profileTabs.length === 0) {
-        console.log('Detected profile with 0 tabs - checking for tabs to migrate');
-
-        // Try to find tabs using priority order
-        let tabsToMigrate = SFTabs.main.getTabs();
-        console.log(`Found ${tabsToMigrate.length} tabs in main state`);
-
-        if (!tabsToMigrate || tabsToMigrate.length === 0) {
-          tabsToMigrate = await getLegacyTabsFromStorage('sync');
-        }
-
-        if (!tabsToMigrate || tabsToMigrate.length === 0) {
-          tabsToMigrate = await getLegacyTabsFromStorage('local');
-        }
-
-        if (tabsToMigrate && tabsToMigrate.length > 0) {
-          console.log(`Auto-migrating ${tabsToMigrate.length} tabs to ${activeProfile.name}`);
-          await SFTabs.storage.saveProfileTabs(activeProfile.id, tabsToMigrate);
-
-          // Update main state and UI
-          SFTabs.main.setTabs(tabsToMigrate);
-          if (SFTabs.ui && SFTabs.ui.renderTabList) {
-            SFTabs.ui.renderTabList();
-          }
-
-          if (window.SFTabs && window.SFTabs.main) {
-            window.SFTabs.main.showStatus(`Migrated ${tabsToMigrate.length} tabs to ${activeProfile.name}`, false);
-          }
-        }
-      }
-    }
-  }
+  // DISABLED: Migration recovery code removed to fix empty profile issue
+  // This code was running on every popup load and migrating legacy tabs to empty profiles
+  // even when users explicitly chose "Start with no tabs"
+  // Migration now ONLY happens when profiles are first enabled (via checkbox handler)
+  // See checkbox handler around line 168-186 for migration logic
 
   // Show/hide UI based on settings
   toggleProfilesEnabled(settings.profilesEnabled || false);
@@ -160,11 +145,11 @@ async function initProfiles() {
       const enabled = this.checked;
       const settings = await SFTabs.storage.getUserSettings();
 
-      // If disabling profiles, prompt user to select which profile to keep
-      if (!enabled && profilesCache.length > 0) {
-        console.log('Disabling profiles - prompting user to select profile to keep');
+      // If disabling profiles UI, clean up non-active profiles
+      if (!enabled && profilesCache.length > 1) {
+        console.log('Disabling profiles UI - cleaning up non-active profiles');
 
-        // Show profile selection modal
+        // Prompt user to select which profile to keep as the default
         const selectedProfile = await showProfileSelectionForDisable();
 
         if (!selectedProfile) {
@@ -173,17 +158,17 @@ async function initProfiles() {
           return;
         }
 
-        // Load tabs from selected profile
-        const selectedTabs = await SFTabs.storage.getProfileTabs(selectedProfile.id);
-        console.log(`Migrating ${selectedTabs.length} tabs from profile ${selectedProfile.name} to legacy storage`);
+        // Set selected profile as active
+        settings.activeProfileId = selectedProfile.id;
+        settings.defaultProfileId = selectedProfile.id;
 
-        // Save to legacy customTabs storage
-        await SFTabs.storage.saveTabs(selectedTabs);
+        // Delete all OTHER profiles and their storage
+        const profilesToDelete = profilesCache.filter(p => p.id !== selectedProfile.id);
+        const useSyncStorage = await SFTabs.storage.getStoragePreference();
 
-        // Clear all profile-specific storage
-        for (const profile of profilesCache) {
+        for (const profile of profilesToDelete) {
+          console.log(`Deleting profile: ${profile.name} (${profile.id})`);
           const profileTabsKey = `profile_${profile.id}_tabs`;
-          const useSyncStorage = await SFTabs.storage.getStoragePreference();
 
           if (useSyncStorage) {
             await SFTabs.storageChunking.clearChunkedSync(profileTabsKey);
@@ -192,74 +177,24 @@ async function initProfiles() {
           }
         }
 
-        // Clear profiles
+        // Update cache to only contain selected profile
         profilesCache.length = 0;
-        await SFTabs.storage.saveProfiles([]);
-
-        // Clear profile settings
-        settings.activeProfileId = null;
-        settings.defaultProfileId = null;
-
-        if (window.SFTabs && window.SFTabs.main) {
-          window.SFTabs.main.showStatus(`Profiles disabled. Keeping tabs from ${selectedProfile.name}`, false);
-        }
-      }
-
-      // If enabling profiles for the first time, create a Default profile
-      if (enabled && profilesCache.length === 0) {
-        console.log('Profiles enabled for the first time - creating Default profile');
-
-        // Priority 1: Get tabs from current state (most reliable)
-        let tabsToMigrate = SFTabs.main.getTabs();
-        console.log(`Found ${tabsToMigrate.length} tabs in main state`);
-
-        // Priority 2: If state is empty, check sync storage
-        if (!tabsToMigrate || tabsToMigrate.length === 0) {
-          tabsToMigrate = await getLegacyTabsFromStorage('sync');
-        }
-
-        // Priority 3: If still empty, check local storage
-        if (!tabsToMigrate || tabsToMigrate.length === 0) {
-          tabsToMigrate = await getLegacyTabsFromStorage('local');
-        }
-
-        console.log(`Migrating ${tabsToMigrate.length} tabs to Default profile`);
-
-        // Create Default profile
-        const defaultProfile = {
-          id: generateProfileId(),
-          name: 'Default',
-          isDefault: true,
-          urlPatterns: [],
-          createdAt: new Date().toISOString(),
-          lastActive: null
-        };
-
-        // Add to cache
-        profilesCache.push(defaultProfile);
-
-        // Save profile to storage
+        profilesCache.push(selectedProfile);
         await SFTabs.storage.saveProfiles(profilesCache);
 
-        // Save migrated tabs to this profile
-        await SFTabs.storage.saveProfileTabs(defaultProfile.id, tabsToMigrate);
-
-        // Set as default and active profile in settings
-        settings.defaultProfileId = defaultProfile.id;
-        settings.activeProfileId = defaultProfile.id;
-
-        console.log('Default profile created:', defaultProfile.id, 'with', tabsToMigrate.length, 'tabs');
+        console.log(`Kept profile: ${selectedProfile.name} (${selectedProfile.id})`);
 
         if (window.SFTabs && window.SFTabs.main) {
-          window.SFTabs.main.showStatus(`Profiles enabled. Migrated ${tabsToMigrate.length} tabs to Default profile`, false);
+          window.SFTabs.main.showStatus(`Profiles UI disabled. Kept ${selectedProfile.name} profile`, false);
         }
       }
 
+      // Update settings and toggle UI visibility
       settings.profilesEnabled = enabled;
       await SFTabs.storage.saveUserSettings(settings);
       toggleProfilesEnabled(enabled);
 
-      // Update active profile banner if profiles were just enabled
+      // Update UI if enabling profiles
       if (enabled) {
         await updateActiveProfileBanner();
         await populateActiveProfileSelector();
