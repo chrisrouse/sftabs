@@ -872,8 +872,26 @@ async function saveProfile() {
         settings.defaultProfileId = newProfile.id;
         await SFTabs.storage.saveUserSettings(settings);
       }
+
+      // Save to storage
+      await SFTabs.storage.saveProfiles(profilesCache);
+
+      if (window.SFTabs && window.SFTabs.main) {
+        window.SFTabs.main.showStatus('Profile created', false);
+      }
+
+      // Switch to the newly created profile to show initialization options
+      setTimeout(async () => {
+        await switchActiveProfile(newProfile.id);
+        // Show main content so user can see the initialization options
+        if (window.SFTabs && window.SFTabs.main) {
+          window.SFTabs.main.showMainContent();
+        }
+      }, 800);
+      return; // Exit early for new profile flow
     }
 
+    // For existing profile updates, save and show profile list
     // Save to storage
     await SFTabs.storage.saveProfiles(profilesCache);
 
