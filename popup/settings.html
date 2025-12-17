@@ -28,12 +28,30 @@
 			font-weight: 600;
 			margin: 0 0 8px 0;
 			color: var(--color-text);
+			text-align: center;
 		}
 
 		.settings-container .subtitle {
 			font-size: 14px;
 			color: var(--color-text-weak);
+			margin: 0 0 8px 0;
+			text-align: center;
+		}
+
+		.settings-container .version-info {
+			font-size: 12px;
+			color: var(--color-text-weak);
 			margin: 0 0 24px 0;
+			text-align: center;
+		}
+
+		.settings-container .version-info a {
+			color: var(--slds-brand-primary);
+			text-decoration: none;
+		}
+
+		.settings-container .version-info a:hover {
+			text-decoration: underline;
 		}
 
 		/* Grid layout for settings sections */
@@ -164,23 +182,6 @@
 			stroke: var(--slds-color-error);
 		}
 
-		/* Footer */
-		.settings-footer {
-			text-align: center;
-			padding: 24px;
-			font-size: 12px;
-			color: var(--color-text-weak);
-		}
-
-		.settings-footer a {
-			color: var(--slds-brand-primary);
-			text-decoration: none;
-		}
-
-		.settings-footer a:hover {
-			text-decoration: underline;
-		}
-
 		/* Status message */
 		#status-message {
 			position: fixed;
@@ -217,8 +218,9 @@
 
 <body class="settings-page">
 	<div class="settings-container">
-		<h1>Settings</h1>
+		<h1>SF Tabs Settings</h1>
 		<p class="subtitle">Customize your SF Tabs experience</p>
+		<p class="version-info">SF Tabs v1.5.0 | <a href="#" id="changelog-link">Changelog</a></p>
 
 		<div class="settings-grid">
 			<!-- Appearance Section -->
@@ -435,11 +437,6 @@
 			</div>
 		</section>
 		</div> <!-- End settings-grid -->
-
-		<!-- Footer -->
-		<footer class="settings-footer">
-			<p>SF Tabs v1.5.0 | <a href="#" id="changelog-link">Changelog</a></p>
-		</footer>
 	</div>
 
 	<!-- Status Message -->
@@ -485,6 +482,41 @@
 		</div>
 	</div>
 
+	<!-- Export Options Modal -->
+	<div id="export-options-modal" class="modal" style="display: none;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>Export Configuration</h2>
+			</div>
+			<div class="modal-body">
+				<p>Select what you want to export:</p>
+
+				<div class="form-group" style="margin-top: 16px;">
+					<label class="checkbox-group" style="font-weight: 600; margin-bottom: 8px;">
+						<input type="checkbox" id="export-everything" checked>
+						<span>Everything</span>
+					</label>
+					<div class="setting-description" style="margin-left: 24px; margin-bottom: 12px;">Export all settings and profiles</div>
+
+					<div style="margin-left: 24px;">
+						<label class="checkbox-group" style="margin-bottom: 6px;">
+							<input type="checkbox" id="export-settings" checked disabled>
+							<span>Settings</span>
+						</label>
+
+						<div id="export-profiles-list" style="margin-top: 8px;">
+							<!-- Profile checkboxes will be inserted here -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="export-modal-cancel" class="secondary-button">Cancel</button>
+				<button id="export-modal-confirm" class="primary-button">Export</button>
+			</div>
+		</div>
+	</div>
+
 	<!-- Reset Confirmation Modal -->
 	<div id="reset-modal" class="modal" style="display: none;">
 		<div class="modal-content">
@@ -511,8 +543,7 @@
 	<script src="js/shared/browser-compat.js"></script>
 	<script src="js/shared/constants.js"></script>
 	<script src="js/shared/utils.js"></script>
-	<script src="js/storage-chunking.js"></script>
-	<script src="js/popup-storage.js"></script>
+	<!-- Settings page has its own storage logic, doesn't need popup-storage.js -->
 	<script src="settings.js"></script>
 </body>
 
