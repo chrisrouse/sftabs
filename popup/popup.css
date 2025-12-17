@@ -118,7 +118,6 @@
 
   /* Adjust main content margin when banner is visible */
   #main-content.with-banner,
-  #settings-panel.with-banner,
   #action-panel.with-banner {
 	margin-top: 82px !important;
   }
@@ -186,7 +185,6 @@
   
   /* Panel Visibility */
   #main-content,
-  #settings-panel,
   #action-panel {
 	flex: 1;
 	overflow-y: auto;
@@ -199,19 +197,8 @@
   }
 
   #main-content.active,
-  #settings-panel.active,
   #action-panel.active {
 	display: block;
-  }
-
-  #settings-panel .section-header {
-	margin-left: 8px;
-  	margin-top: 8px;
-	}
-
-  .settings-panel {
-	padding: 0;
-	background-color: var(--color-background);
   }
 
   /* Action Panel */

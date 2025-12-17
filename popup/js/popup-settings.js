@@ -119,14 +119,13 @@ function resetSettings() {
 function setupEventListeners() {
   const domElements = SFTabs.main.getDOMElements();
   
-  // Settings button - toggle between panels
+  // Settings button - open standalone settings page
   if (domElements.settingsButton) {
     domElements.settingsButton.addEventListener('click', () => {
-      if (domElements.mainContent.classList.contains('active')) {
-        SFTabs.main.showSettingsPanel();
-      } else {
-        SFTabs.main.showMainContent();
-      }
+      browser.tabs.create({ url: "/popup/settings.html" }).then(() => {
+        // Close the popup after opening the settings tab
+        window.close();
+      });
     });
   }
 

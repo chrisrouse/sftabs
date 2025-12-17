@@ -305,19 +305,16 @@ function toggleProfilesEnabled(enabled) {
 
   // Add/remove with-banner class from panels
   const mainContent = document.querySelector('#main-content');
-  const settingsPanel = document.querySelector('#settings-panel');
   const actionPanel = document.querySelector('#action-panel');
 
   if (enabled) {
     if (mainContent) mainContent.classList.add('with-banner');
-    if (settingsPanel) settingsPanel.classList.add('with-banner');
     if (actionPanel) actionPanel.classList.add('with-banner');
 
     // Update active profile banner
     updateActiveProfileBanner();
   } else {
     if (mainContent) mainContent.classList.remove('with-banner');
-    if (settingsPanel) settingsPanel.classList.remove('with-banner');
     if (actionPanel) actionPanel.classList.remove('with-banner');
   }
 }
@@ -487,13 +484,10 @@ async function showProfileList() {
   if (window.SFTabs && window.SFTabs.main) {
     const actionPanel = window.SFTabs.main.getDOMElements().actionPanel;
     const mainContent = window.SFTabs.main.getDOMElements().mainContent;
-    const settingsPanel = window.SFTabs.main.getDOMElements().settingsPanel;
 
-    if (actionPanel && mainContent && settingsPanel) {
+    if (actionPanel && mainContent) {
       mainContent.classList.remove('active');
       mainContent.style.display = 'none';
-      settingsPanel.classList.remove('active');
-      settingsPanel.style.display = 'none';
       actionPanel.classList.add('active');
       actionPanel.style.display = 'block';
     }
@@ -668,13 +662,10 @@ function showProfileEditForm(profile = null) {
   if (window.SFTabs && window.SFTabs.main) {
     const actionPanel = window.SFTabs.main.getDOMElements().actionPanel;
     const mainContent = window.SFTabs.main.getDOMElements().mainContent;
-    const settingsPanel = window.SFTabs.main.getDOMElements().settingsPanel;
 
-    if (actionPanel && mainContent && settingsPanel) {
+    if (actionPanel && mainContent) {
       mainContent.classList.remove('active');
       mainContent.style.display = 'none';
-      settingsPanel.classList.remove('active');
-      settingsPanel.style.display = 'none';
       actionPanel.classList.add('active');
       actionPanel.style.display = 'block';
     }

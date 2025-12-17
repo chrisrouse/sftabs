@@ -110,8 +110,7 @@ const SELECTORS = {
   emptyState: '#empty-state',
   tabForm: '#tab-form',
   mainContent: '#main-content',
-  settingsPanel: '#settings-panel',
-  
+
   // Form elements
   formTitle: '#form-title',
   tabNameInput: '#tab-name',

@@ -84,7 +84,6 @@ function initializeDOMElements() {
   domElements.emptyState = document.querySelector('#empty-state');
   domElements.tabForm = document.querySelector('#tab-form');
   domElements.mainContent = document.querySelector('#main-content');
-  domElements.settingsPanel = document.querySelector('#settings-panel');
   domElements.actionPanel = document.querySelector('#action-panel');
   
   // Form elements
@@ -142,7 +141,7 @@ function initializeDOMElements() {
   
   // Validate critical elements
   const criticalElements = [
-    'tabList', 'emptyState', 'mainContent', 'settingsPanel', 'actionPanel',
+    'tabList', 'emptyState', 'mainContent', 'actionPanel',
     'addTabButton', 'quickAddButton', 'actionTabNameInput', 'actionTabPathInput'
   ];
   
@@ -342,20 +341,6 @@ function showMainContent() {
   currentActionPanelTab = null;
   domElements.mainContent.classList.add('active');
   domElements.mainContent.style.display = 'block';
-  domElements.settingsPanel.classList.remove('active');
-  domElements.settingsPanel.style.display = 'none';
-  domElements.actionPanel.classList.remove('active');
-  domElements.actionPanel.style.display = 'none';
-}
-
-/**
- * Show settings panel
- */
-function showSettingsPanel() {
-  domElements.mainContent.classList.remove('active');
-  domElements.mainContent.style.display = 'none';
-  domElements.settingsPanel.classList.add('active');
-  domElements.settingsPanel.style.display = 'block';
   domElements.actionPanel.classList.remove('active');
   domElements.actionPanel.style.display = 'none';
 }
@@ -378,8 +363,6 @@ function showActionPanel(tab) {
   // Show the panel
   domElements.mainContent.classList.remove('active');
   domElements.mainContent.style.display = 'none';
-  domElements.settingsPanel.classList.remove('active');
-  domElements.settingsPanel.style.display = 'none';
   domElements.actionPanel.classList.add('active');
   domElements.actionPanel.style.display = 'block';
 
@@ -797,7 +780,6 @@ window.SFTabs.main = {
 
   // Functions
   showMainContent,
-  showSettingsPanel,
   showActionPanel,
   updateActionPanelContent,
   saveActionPanelChanges,
