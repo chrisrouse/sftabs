@@ -272,6 +272,17 @@ function setupEventListeners() {
     });
   }
 
+  // Open full settings page button
+  const openFullSettingsButton = document.getElementById('open-full-settings-button');
+  if (openFullSettingsButton) {
+    openFullSettingsButton.addEventListener('click', () => {
+      browser.tabs.create({ url: "/popup/settings.html" }).then(() => {
+        // Close the popup after opening the new tab
+        window.close();
+      });
+    });
+  }
+
 }
 
 /**
