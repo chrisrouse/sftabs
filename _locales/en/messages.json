@@ -1,0 +1,525 @@
+{
+  "extensionName": {
+    "message": "SF Tabs",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Add custom tabs to the Salesforce setup menu.",
+    "description": "Description of the extension"
+  },
+
+  "_comment_popup": "=== Popup Interface ===",
+
+  "popupTitle": {
+    "message": "SF Tabs",
+    "description": "Popup title"
+  },
+  "tabsHeader": {
+    "message": "Tabs",
+    "description": "Tabs section header"
+  },
+  "addNewTab": {
+    "message": "Add New Tab",
+    "description": "Add new tab button"
+  },
+  "settingsHeader": {
+    "message": "Settings",
+    "description": "Settings section header"
+  },
+  "openFullSettingsButton": {
+    "message": "Open Full Settings Page",
+    "description": "Button to open standalone settings page"
+  },
+  "openFullSettingsHelp": {
+    "message": "Try the new standalone settings page with a better layout and all configuration options in one place",
+    "description": "Help text for full settings button"
+  },
+  "themeMode": {
+    "message": "Theme Mode",
+    "description": "Theme mode setting label"
+  },
+  "themeLight": {
+    "message": "Light",
+    "description": "Light theme option"
+  },
+  "themeDark": {
+    "message": "Dark",
+    "description": "Dark theme option"
+  },
+  "themeSystem": {
+    "message": "System",
+    "description": "System theme option"
+  },
+  "compactMode": {
+    "message": "Compact Mode",
+    "description": "Compact mode setting label"
+  },
+  "compactModeDescription": {
+    "message": "Display tabs in a more condensed layout",
+    "description": "Compact mode description"
+  },
+  "skipDeleteConfirmation": {
+    "message": "Skip Delete Confirmation",
+    "description": "Skip delete confirmation setting label"
+  },
+  "skipDeleteConfirmationDescription": {
+    "message": "Don't ask for confirmation when deleting tabs",
+    "description": "Skip delete confirmation description"
+  },
+  "manageConfig": {
+    "message": "Manage Configuration",
+    "description": "Manage configuration button"
+  },
+  "resetToDefaults": {
+    "message": "Reset to Defaults",
+    "description": "Reset to defaults button"
+  },
+
+  "_comment_settings": "=== Settings Page ===",
+
+  "settingsPageTitle": {
+    "message": "SF Tabs Settings",
+    "description": "Settings page title"
+  },
+  "settingsSubtitle": {
+    "message": "Customize your SF Tabs experience",
+    "description": "Settings page subtitle"
+  },
+  "versionInfo": {
+    "message": "SF Tabs v$VERSION$",
+    "description": "Version information",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "1.5.0"
+      }
+    }
+  },
+  "changelog": {
+    "message": "Changelog",
+    "description": "Changelog link text"
+  },
+
+  "appearanceSection": {
+    "message": "Appearance",
+    "description": "Appearance section heading"
+  },
+  "appearanceDescription": {
+    "message": "Customize the look and feel of your extension",
+    "description": "Appearance section description"
+  },
+
+  "behaviorSection": {
+    "message": "Behavior",
+    "description": "Behavior section heading"
+  },
+  "behaviorDescription": {
+    "message": "Control how the extension behaves",
+    "description": "Behavior section description"
+  },
+
+  "syncStorageSection": {
+    "message": "Sync & Storage",
+    "description": "Sync & Storage section heading"
+  },
+  "syncStorageDescription": {
+    "message": "Manage how your tabs are stored and synced",
+    "description": "Sync & Storage section description"
+  },
+  "useSyncStorage": {
+    "message": "Cross-Device Sync",
+    "description": "Cross-device sync setting label"
+  },
+  "useSyncStorageDescription": {
+    "message": "Sync your tabs across all devices using browser sync",
+    "description": "Cross-device sync description"
+  },
+
+  "profilesSection": {
+    "message": "Profiles",
+    "description": "Profiles section heading"
+  },
+  "profilesDescription": {
+    "message": "Organize tabs into different profiles for different Salesforce orgs",
+    "description": "Profiles section description"
+  },
+  "enableProfiles": {
+    "message": "Enable Profiles",
+    "description": "Enable profiles setting label"
+  },
+  "enableProfilesDescription": {
+    "message": "Create separate sets of tabs for different Salesforce orgs",
+    "description": "Enable profiles description"
+  },
+  "autoSwitchProfiles": {
+    "message": "Auto-Switch Profiles",
+    "description": "Auto-switch profiles setting label"
+  },
+  "autoSwitchProfilesDescription": {
+    "message": "Automatically switch to the appropriate profile based on the current Salesforce org's URL",
+    "description": "Auto-switch profiles description"
+  },
+
+  "keyboardShortcutsSection": {
+    "message": "Keyboard Shortcuts",
+    "description": "Keyboard shortcuts section heading"
+  },
+  "keyboardShortcutsDescription": {
+    "message": "Set up keyboard shortcuts to quickly access your tabs",
+    "description": "Keyboard shortcuts section description"
+  },
+  "configureKeyboardShortcuts": {
+    "message": "Configure Keyboard Shortcuts",
+    "description": "Configure keyboard shortcuts button"
+  },
+  "keyboardShortcutsHelp": {
+    "message": "Set keyboard shortcuts to quickly open tabs 1-10 by position",
+    "description": "Keyboard shortcuts help text"
+  },
+
+  "importExportSection": {
+    "message": "Import & Export",
+    "description": "Import & Export section heading"
+  },
+  "importExportDescription": {
+    "message": "Backup and restore your configuration",
+    "description": "Import & Export section description"
+  },
+  "exportButton": {
+    "message": "Export",
+    "description": "Export button text"
+  },
+  "exportActionTitle": {
+    "message": "Export",
+    "description": "Export action title"
+  },
+  "exportActionDescription": {
+    "message": "Save to file",
+    "description": "Export action description"
+  },
+  "importButton": {
+    "message": "Import",
+    "description": "Import button text"
+  },
+  "importActionTitle": {
+    "message": "Import",
+    "description": "Import action title"
+  },
+  "importActionDescription": {
+    "message": "Restore from backup",
+    "description": "Import action description"
+  },
+
+  "dangerZoneSection": {
+    "message": "Danger Zone",
+    "description": "Danger zone section heading"
+  },
+  "dangerZoneDescription": {
+    "message": "Irreversible actions that will affect your data",
+    "description": "Danger zone section description"
+  },
+  "resetButton": {
+    "message": "Reset to Defaults",
+    "description": "Reset to defaults button"
+  },
+  "resetButtonDescription": {
+    "message": "This will remove all custom tabs and reset all settings to their default values. This action cannot be undone.",
+    "description": "Reset button description"
+  },
+
+  "_comment_modals": "=== Modal Dialogs ===",
+
+  "exportModalTitle": {
+    "message": "Export Configuration",
+    "description": "Export modal title"
+  },
+  "exportModalPrompt": {
+    "message": "Select what you want to export:",
+    "description": "Export modal prompt"
+  },
+  "exportEverything": {
+    "message": "Everything",
+    "description": "Export everything option"
+  },
+  "exportEverythingDescription": {
+    "message": "Export all settings and profiles",
+    "description": "Export everything description"
+  },
+  "exportSettingsOnly": {
+    "message": "Settings",
+    "description": "Export settings option"
+  },
+  "cancelButton": {
+    "message": "Cancel",
+    "description": "Cancel button"
+  },
+  "confirmButton": {
+    "message": "Confirm",
+    "description": "Confirm button"
+  },
+  "exportConfirmButton": {
+    "message": "Export",
+    "description": "Export confirm button"
+  },
+  "importConfirmButton": {
+    "message": "Import",
+    "description": "Import confirm button"
+  },
+
+  "importModalTitle": {
+    "message": "Import Configuration",
+    "description": "Import modal title"
+  },
+  "importModalPrompt": {
+    "message": "Where would you like to import this configuration?",
+    "description": "Import modal prompt"
+  },
+  "importOverwriteProfile": {
+    "message": "Overwrite existing profile",
+    "description": "Import overwrite profile option"
+  },
+  "importCreateProfile": {
+    "message": "Create new profile",
+    "description": "Import create profile option"
+  },
+  "selectProfile": {
+    "message": "Select profile:",
+    "description": "Select profile label"
+  },
+  "selectProfilePlaceholder": {
+    "message": "Choose a profile...",
+    "description": "Select profile placeholder"
+  },
+  "newProfileName": {
+    "message": "Profile name:",
+    "description": "New profile name label"
+  },
+  "newProfileNamePlaceholder": {
+    "message": "Enter profile name",
+    "description": "New profile name placeholder"
+  },
+
+  "resetModalTitle": {
+    "message": "Reset to Defaults",
+    "description": "Reset modal title"
+  },
+  "resetModalPrompt": {
+    "message": "Are you sure you want to reset to default tabs and settings? This will:",
+    "description": "Reset modal prompt"
+  },
+  "resetModalItem1": {
+    "message": "Remove all custom tabs",
+    "description": "Reset modal item 1"
+  },
+  "resetModalItem2": {
+    "message": "Remove all profiles",
+    "description": "Reset modal item 2"
+  },
+  "resetModalItem3": {
+    "message": "Reset all settings to defaults",
+    "description": "Reset modal item 3"
+  },
+  "resetModalWarning": {
+    "message": "This action cannot be undone!",
+    "description": "Reset modal warning"
+  },
+
+  "_comment_confirmations": "=== Confirmation Dialogs ===",
+
+  "enableSyncConfirmTitle": {
+    "message": "Enable cross-device sync?",
+    "description": "Enable sync confirmation title"
+  },
+  "enableSyncConfirmMessage": {
+    "message": "Your tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you're signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.",
+    "description": "Enable sync confirmation message"
+  },
+  "disableSyncConfirmTitle": {
+    "message": "Disable cross-device sync?",
+    "description": "Disable sync confirmation title"
+  },
+  "disableSyncConfirmMessage": {
+    "message": "Your tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.",
+    "description": "Disable sync confirmation message"
+  },
+  "disableProfilesConfirmMessage": {
+    "message": "Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.",
+    "description": "Disable profiles confirmation message"
+  },
+
+  "_comment_status": "=== Status Messages ===",
+
+  "settingsSaved": {
+    "message": "Settings saved",
+    "description": "Settings saved status message"
+  },
+  "settingsReset": {
+    "message": "All settings and tabs reset to defaults",
+    "description": "Settings reset status message"
+  },
+  "configExported": {
+    "message": "Configuration exported successfully",
+    "description": "Configuration exported status message"
+  },
+  "configImported": {
+    "message": "Configuration imported successfully",
+    "description": "Configuration imported status message"
+  },
+  "tabsImportedToProfile": {
+    "message": "Tabs imported to selected profile",
+    "description": "Tabs imported to profile status message"
+  },
+  "profileCreated": {
+    "message": "New profile created with imported tabs",
+    "description": "Profile created status message"
+  },
+  "syncEnabled": {
+    "message": "Sync enabled - tabs will now sync across devices",
+    "description": "Sync enabled status message"
+  },
+  "syncDisabled": {
+    "message": "Sync disabled - tabs stored locally only",
+    "description": "Sync disabled status message"
+  },
+
+  "_comment_errors": "=== Error Messages ===",
+
+  "errorSavingSettings": {
+    "message": "Error saving settings: $ERROR$",
+    "description": "Error saving settings",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "errorExport": {
+    "message": "Export failed: $ERROR$",
+    "description": "Export error message",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Permission denied"
+      }
+    }
+  },
+  "errorImport": {
+    "message": "Import failed: $ERROR$",
+    "description": "Import error message",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Invalid file format"
+      }
+    }
+  },
+  "errorReset": {
+    "message": "Reset failed: $ERROR$",
+    "description": "Reset error message",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Storage error"
+      }
+    }
+  },
+  "errorInvalidConfig": {
+    "message": "Invalid configuration file - missing required fields",
+    "description": "Invalid configuration error"
+  },
+  "selectProfileError": {
+    "message": "Please select a profile",
+    "description": "Select profile error"
+  },
+  "profileNameError": {
+    "message": "Please enter a profile name",
+    "description": "Profile name error"
+  },
+  "couldNotOpenShortcuts": {
+    "message": "Could not open shortcuts page",
+    "description": "Could not open shortcuts error"
+  },
+  "couldNotDetectBrowser": {
+    "message": "Could not detect browser type",
+    "description": "Could not detect browser error"
+  },
+
+  "_comment_tabs": "=== Tab Management ===",
+
+  "tabName": {
+    "message": "Tab Name",
+    "description": "Tab name label"
+  },
+  "tabPath": {
+    "message": "Tab Path",
+    "description": "Tab path label"
+  },
+  "addTab": {
+    "message": "Add Tab",
+    "description": "Add tab button"
+  },
+  "editTab": {
+    "message": "Edit Tab",
+    "description": "Edit tab button"
+  },
+  "deleteTab": {
+    "message": "Delete Tab",
+    "description": "Delete tab button"
+  },
+  "saveTab": {
+    "message": "Save",
+    "description": "Save tab button"
+  },
+  "moveTabUp": {
+    "message": "Move Up",
+    "description": "Move tab up button"
+  },
+  "moveTabDown": {
+    "message": "Move Down",
+    "description": "Move tab down button"
+  },
+
+  "_comment_commands": "=== Keyboard Commands ===",
+
+  "commandTab1": {
+    "message": "Tab 1",
+    "description": "Keyboard command for tab 1"
+  },
+  "commandTab2": {
+    "message": "Tab 2",
+    "description": "Keyboard command for tab 2"
+  },
+  "commandTab3": {
+    "message": "Tab 3",
+    "description": "Keyboard command for tab 3"
+  },
+  "commandTab4": {
+    "message": "Tab 4",
+    "description": "Keyboard command for tab 4"
+  },
+  "commandTab5": {
+    "message": "Tab 5",
+    "description": "Keyboard command for tab 5"
+  },
+  "commandTab6": {
+    "message": "Tab 6",
+    "description": "Keyboard command for tab 6"
+  },
+  "commandTab7": {
+    "message": "Tab 7",
+    "description": "Keyboard command for tab 7"
+  },
+  "commandTab8": {
+    "message": "Tab 8",
+    "description": "Keyboard command for tab 8"
+  },
+  "commandTab9": {
+    "message": "Tab 9",
+    "description": "Keyboard command for tab 9"
+  },
+  "commandTab10": {
+    "message": "Tab 10",
+    "description": "Keyboard command for tab 10"
+  }
+}
