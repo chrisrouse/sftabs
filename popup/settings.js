@@ -24,6 +24,7 @@ async function initSettingsPage() {
  */
 async function loadUserSettings() {
 	try {
+		// Settings are always in sync storage (small, benefit from cross-device sync)
 		const result = await browser.storage.sync.get('userSettings');
 		userSettings = result.userSettings || { ...SFTabs.constants.DEFAULT_SETTINGS };
 	} catch (error) {
@@ -155,9 +156,14 @@ function setupEventListeners() {
 		);
 
 		if (confirmed) {
+			const oldValue = userSettings.useSyncStorage;
 			userSettings.useSyncStorage = newValue;
 			try {
-				await SFTabs.storage.saveUserSettings(userSettings);
+				// Perform migration if needed
+				if (oldValue !== newValue) {
+					await migrateBetweenStorageTypes(oldValue, newValue);
+				}
+				await saveUserSettings();
 				showStatus(
 					newValue ? 'Sync enabled - tabs will now sync across devices' : 'Sync disabled - tabs stored locally only',
 					false
@@ -165,6 +171,7 @@ function setupEventListeners() {
 			} catch (error) {
 				showStatus('Error: ' + error.message, true);
 				e.target.checked = !newValue;
+				userSettings.useSyncStorage = oldValue;
 			}
 		} else {
 			e.target.checked = !newValue;
@@ -210,7 +217,7 @@ function setupEventListeners() {
 
 	// Export button
 	document.getElementById('export-button').addEventListener('click', () => {
-		exportConfiguration();
+		showExportModal();
 	});
 
 	// Import button
@@ -271,28 +278,157 @@ function openKeyboardShortcutsPage() {
 }
 
 /**
+ * Show export options modal
+ */
+async function showExportModal() {
+	const modal = document.getElementById('export-options-modal');
+	const profilesList = document.getElementById('export-profiles-list');
+	const everythingCheckbox = document.getElementById('export-everything');
+	const settingsCheckbox = document.getElementById('export-settings');
+
+	// Load current profiles
+	const result = await browser.storage.sync.get('profiles');
+	const profiles = result.profiles || [];
+
+	// Clear and populate profile checkboxes
+	profilesList.innerHTML = '';
+	profiles.forEach(profile => {
+		const label = document.createElement('label');
+		label.className = 'checkbox-group';
+
+		const checkbox = document.createElement('input');
+		checkbox.type = 'checkbox';
+		checkbox.checked = true;
+		checkbox.disabled = true;
+		checkbox.className = 'export-profile-checkbox';
+		checkbox.dataset.profileId = profile.id;
+
+		const span = document.createElement('span');
+		span.textContent = profile.name;
+
+		label.appendChild(checkbox);
+		label.appendChild(span);
+		profilesList.appendChild(label);
+	});
+
+	// Reset "Everything" checkbox to default state
+	everythingCheckbox.checked = true;
+	settingsCheckbox.disabled = true;
+	settingsCheckbox.checked = true;
+
+	// Handle "Everything" checkbox
+	const handleEverythingChange = () => {
+		const isChecked = everythingCheckbox.checked;
+		settingsCheckbox.disabled = isChecked;
+		if (isChecked) {
+			settingsCheckbox.checked = true;
+		}
+
+		const profileCheckboxes = profilesList.querySelectorAll('.export-profile-checkbox');
+		profileCheckboxes.forEach(cb => {
+			cb.disabled = isChecked;
+			if (isChecked) {
+				cb.checked = true;
+			}
+		});
+	};
+
+	// Remove old listener and add new one
+	everythingCheckbox.removeEventListener('change', handleEverythingChange);
+	everythingCheckbox.addEventListener('change', handleEverythingChange);
+
+	// Handle export confirmation
+	document.getElementById('export-modal-confirm').onclick = async () => {
+		const exportEverything = everythingCheckbox.checked;
+		const exportSettings = settingsCheckbox.checked;
+		const selectedProfileIds = [];
+
+		if (!exportEverything) {
+			const profileCheckboxes = profilesList.querySelectorAll('.export-profile-checkbox');
+			profileCheckboxes.forEach(cb => {
+				if (cb.checked) {
+					selectedProfileIds.push(cb.dataset.profileId);
+				}
+			});
+		}
+
+		await performExport(exportEverything, exportSettings, selectedProfileIds);
+		hideExportModal();
+	};
+
+	// Handle cancel
+	document.getElementById('export-modal-cancel').onclick = () => {
+		hideExportModal();
+	};
+
+	modal.style.display = 'flex';
+}
+
+/**
+ * Hide export options modal
+ */
+function hideExportModal() {
+	document.getElementById('export-options-modal').style.display = 'none';
+}
+
+/**
  * Export configuration to JSON file
  */
-async function exportConfiguration() {
+async function performExport(exportEverything, exportSettings, selectedProfileIds) {
 	try {
-		// Get all data from storage
 		const syncData = await browser.storage.sync.get(null);
 		const localData = await browser.storage.local.get(null);
 
-		// Combine data
 		const exportData = {
 			version: '1.5.0',
-			exportDate: new Date().toISOString(),
-			settings: syncData.userSettings || {},
-			tabs: syncData.tabs || [],
-			profiles: syncData.profiles || [],
-			chunkedData: {}
+			exportDate: new Date().toISOString()
 		};
 
-		// Include chunked data if it exists
-		for (const key in localData) {
-			if (key.startsWith('chunk_')) {
-				exportData.chunkedData[key] = localData[key];
+		if (exportEverything) {
+			// Export everything
+			exportData.settings = syncData.userSettings || {};
+			exportData.profiles = syncData.profiles || [];
+			exportData.profileData = {};
+			exportData.chunkedData = {};
+
+			// Export all profile tabs
+			const profiles = syncData.profiles || [];
+			for (const profile of profiles) {
+				const profileKey = `profile_${profile.id}_tabs`;
+				if (syncData[profileKey]) {
+					exportData.profileData[profile.id] = syncData[profileKey];
+				}
+			}
+
+			// Include all chunked data
+			for (const key in syncData) {
+				if (key.includes('_chunk_') || key.includes('_metadata')) {
+					exportData.chunkedData[key] = syncData[key];
+				}
+			}
+			for (const key in localData) {
+				if (key.includes('_chunk_') || key.includes('_metadata')) {
+					exportData.chunkedData[key] = localData[key];
+				}
+			}
+		} else {
+			// Selective export
+			if (exportSettings) {
+				exportData.settings = syncData.userSettings || {};
+			}
+
+			if (selectedProfileIds.length > 0) {
+				const allProfiles = syncData.profiles || [];
+				exportData.profiles = allProfiles.filter(p => selectedProfileIds.includes(p.id));
+				exportData.profileData = {};
+
+				// Export only selected profile tabs
+				for (const profileId of selectedProfileIds) {
+					const profileKey = `profile_${profileId}_tabs`;
+					if (syncData[profileKey]) {
+						exportData.profileData[profileId] = syncData[profileKey];
+					}
+				}
 			}
 		}
 
@@ -301,7 +437,20 @@ async function exportConfiguration() {
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = `sftabs_config_${new Date().toISOString().split('T')[0]}.json`;
+
+		// Create descriptive filename
+		let filename = 'sftabs';
+		if (!exportEverything) {
+			if (selectedProfileIds.length === 1) {
+				const profileName = exportData.profiles[0].name.toLowerCase().replace(/\s+/g, '_');
+				filename += `_${profileName}`;
+			} else if (selectedProfileIds.length > 1) {
+				filename += `_${selectedProfileIds.length}profiles`;
+			}
+		}
+		filename += `_${new Date().toISOString().split('T')[0]}.json`;
+
+		a.download = filename;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -321,21 +470,31 @@ async function importConfiguration(file) {
 		const text = await file.text();
 		const importData = JSON.parse(text);
 
-		// Validate import data
-		if (!importData.version) {
-			throw new Error('Invalid configuration file');
+		// Normalize old format to new format
+		let normalizedData = importData;
+
+		// Detect old format (from import_export.html)
+		if (importData.customTabs && !importData.version) {
+			normalizedData = {
+				version: '1.5.0',
+				exportDate: importData.exportedAt || new Date().toISOString(),
+				settings: importData.userSettings || {},
+				tabs: importData.customTabs || [],
+				profiles: [],
+				chunkedData: {}
+			};
+		}
+		// Detect new format but use "tabs" key if "settings" exists
+		else if (importData.version && importData.settings) {
+			normalizedData = importData;
+		}
+		// Invalid format
+		else if (!importData.version && !importData.customTabs) {
+			throw new Error('Invalid configuration file - missing required fields');
 		}
 
-		// Check if profiles are enabled
-		const profilesEnabled = importData.settings?.profilesEnabled || false;
-
-		if (profilesEnabled && importData.profiles && importData.profiles.length > 0) {
-			// Show profile selection modal
-			showImportModal(importData);
-		} else {
-			// Direct import for non-profile configurations
-			await performImport(importData, 'overwrite', null);
-		}
+		// Always show import modal to let user choose what to import
+		showImportModal(normalizedData);
 	} catch (error) {
 		showStatus('Import failed: ' + error.message, true);
 	}
@@ -349,8 +508,14 @@ async function showImportModal(importData) {
 	const profileSelect = document.getElementById('import-profile-select');
 	const newProfileSection = document.getElementById('new-profile-section');
 	const overwriteProfileSection = document.getElementById('overwrite-profile-section');
+	const importTabsCheckbox = document.getElementById('import-tabs');
+	const importSettingsCheckbox = document.getElementById('import-settings');
+	const destinationSection = document.getElementById('import-destination-section');
 
-	// Load current profiles
+	// Check if profiles are enabled
+	const profilesEnabled = userSettings.profilesEnabled || false;
+
+	// Load current profiles if enabled
 	const result = await browser.storage.sync.get('profiles');
 	const profiles = result.profiles || [];
 
@@ -362,6 +527,27 @@ async function showImportModal(importData) {
 		option.textContent = profile.name;
 		profileSelect.appendChild(option);
 	});
+
+	// Reset checkboxes to default state
+	importTabsCheckbox.checked = true;
+	importSettingsCheckbox.checked = false;
+
+	// Show/hide destination section based on profiles being enabled and tabs checkbox
+	const handleTabsCheckboxChange = () => {
+		if (importTabsCheckbox.checked && profilesEnabled) {
+			destinationSection.style.display = 'block';
+		} else {
+			destinationSection.style.display = 'none';
+		}
+	};
+
+	// Initial state - hide destination if profiles not enabled
+	if (!profilesEnabled) {
+		destinationSection.style.display = 'none';
+	}
+
+	importTabsCheckbox.removeEventListener('change', handleTabsCheckboxChange);
+	importTabsCheckbox.addEventListener('change', handleTabsCheckboxChange);
 
 	// Handle radio button changes
 	const radioButtons = modal.querySelectorAll('input[name="import-option"]');
@@ -379,24 +565,42 @@ async function showImportModal(importData) {
 
 	// Handle import confirmation
 	document.getElementById('import-modal-confirm').onclick = async () => {
-		const selectedOption = modal.querySelector('input[name="import-option"]:checked').value;
+		const importTabs = importTabsCheckbox.checked;
+		const importSettings = importSettingsCheckbox.checked;
 
-		if (selectedOption === 'overwrite') {
-			const profileId = profileSelect.value;
-			if (!profileId) {
-				showStatus('Please select a profile', true);
-				return;
-			}
-			await performImport(importData, 'overwrite', profileId);
-		} else {
-			const profileName = document.getElementById('new-profile-name').value.trim();
-			if (!profileName) {
-				showStatus('Please enter a profile name', true);
-				return;
-			}
-			await performImport(importData, 'new', profileName);
+		// Validate at least one option is selected
+		if (!importTabs && !importSettings) {
+			showStatus('Please select at least one option to import', true);
+			return;
 		}
 
+		// Only validate destination if importing tabs and profiles are enabled
+		let mode = null;
+		let target = null;
+
+		if (importTabs && profilesEnabled) {
+			const selectedOption = modal.querySelector('input[name="import-option"]:checked').value;
+
+			if (selectedOption === 'overwrite') {
+				const profileId = profileSelect.value;
+				if (!profileId) {
+					showStatus('Please select a profile', true);
+					return;
+				}
+				mode = 'overwrite';
+				target = profileId;
+			} else {
+				const profileName = document.getElementById('new-profile-name').value.trim();
+				if (!profileName) {
+					showStatus('Please enter a profile name', true);
+					return;
+				}
+				mode = 'new';
+				target = profileName;
+			}
+		}
+
+		await performImport(importData, mode, target, importTabs, importSettings);
 		hideImportModal();
 	};
 
@@ -418,57 +622,91 @@ function hideImportModal() {
 /**
  * Perform the import operation
  */
-async function performImport(importData, mode, target) {
+async function performImport(importData, mode, target, importTabs = true, importSettings = false) {
 	try {
-		// Import settings
-		if (importData.settings) {
-			await browser.storage.sync.set({ userSettings: importData.settings });
-			userSettings = importData.settings;
-		}
-
-		// Import tabs and profiles
-		if (mode === 'overwrite' && target) {
-			// Overwrite specific profile
-			const result = await browser.storage.sync.get('profiles');
-			const profiles = result.profiles || [];
-			const profileIndex = profiles.findIndex(p => p.id === target);
-
-			if (profileIndex !== -1 && importData.tabs) {
-				profiles[profileIndex].tabs = importData.tabs;
-				await browser.storage.sync.set({ profiles });
-			}
-		} else if (mode === 'new') {
-			// Create new profile
-			const result = await browser.storage.sync.get('profiles');
-			const profiles = result.profiles || [];
-
-			const newProfile = {
-				id: 'profile_' + Date.now(),
-				name: target,
-				tabs: importData.tabs || [],
-				urlPatterns: []
+		// Import settings if requested
+		if (importSettings && importData.settings) {
+			const mergedSettings = {
+				...userSettings,
+				...importData.settings,
+				// Preserve current profile state unless we're doing a full reset
+				profilesEnabled: mode === 'overwrite' && !target ? importData.settings.profilesEnabled : userSettings.profilesEnabled,
+				activeProfileId: userSettings.activeProfileId
 			};
+			await browser.storage.sync.set({ userSettings: mergedSettings });
+			userSettings = mergedSettings;
+		}
 
-			profiles.push(newProfile);
-			await browser.storage.sync.set({ profiles });
-		} else {
-			// Direct overwrite (no profiles)
-			if (importData.tabs) {
-				await browser.storage.sync.set({ tabs: importData.tabs });
+		// Import tabs if requested
+		if (importTabs) {
+			// Determine the tabs to import - handle both old format (tabs/customTabs) and new format (profileData)
+			let tabsToImport = [];
+			if (importData.profileData && Object.keys(importData.profileData).length > 0) {
+				// New format: use the first profile's tabs
+				const firstProfileId = Object.keys(importData.profileData)[0];
+				tabsToImport = importData.profileData[firstProfileId] || [];
+			} else {
+				// Old format: use tabs or customTabs
+				tabsToImport = importData.tabs || importData.customTabs || [];
+			}
+
+			// Import tabs to the specified destination
+			if (mode === 'overwrite' && target) {
+				// Overwrite specific profile's tabs
+				const storageKey = `profile_${target}_tabs`;
+				await browser.storage.sync.set({ [storageKey]: tabsToImport });
+			} else if (mode === 'new') {
+				// Create new profile with imported tabs
+				const result = await browser.storage.sync.get('profiles');
+				const profiles = result.profiles || [];
+
+				const newProfileId = 'profile_' + Date.now();
+				const newProfile = {
+					id: newProfileId,
+					name: target,
+					createdAt: new Date().toISOString(),
+					lastActive: new Date().toISOString(),
+					urlPatterns: []
+				};
+
+				profiles.push(newProfile);
+				await browser.storage.sync.set({ profiles });
+
+				// Save tabs to the new profile's storage
+				const storageKey = `profile_${newProfileId}_tabs`;
+				await browser.storage.sync.set({ [storageKey]: tabsToImport });
+			} else {
+				// Direct overwrite (no profiles) - import to active profile or default storage
+				if (userSettings.activeProfileId) {
+					const storageKey = `profile_${userSettings.activeProfileId}_tabs`;
+					await browser.storage.sync.set({ [storageKey]: tabsToImport });
+				} else if (tabsToImport.length > 0) {
+					await browser.storage.sync.set({ tabs: tabsToImport });
+				}
+			}
+
+			// Import chunked data
+			if (importData.chunkedData) {
+				await browser.storage.local.set(importData.chunkedData);
 			}
 		}
 
-		// Import chunked data
-		if (importData.chunkedData) {
-			await browser.storage.local.set(importData.chunkedData);
+		// Show appropriate success message
+		let message = 'Configuration imported successfully';
+		if (importTabs && importSettings) {
+			message = 'Tabs and settings imported successfully';
+		} else if (importTabs) {
+			message = 'Tabs imported successfully';
+		} else if (importSettings) {
+			message = 'Settings imported successfully';
 		}
+
+		showStatus(message, false);
 
 		// Reload UI
 		await loadUserSettings();
 		updateUI();
 		applyTheme();
-
-		showStatus('Configuration imported successfully', false);
 	} catch (error) {
 		showStatus('Import failed: ' + error.message, true);
 	}
@@ -503,11 +741,24 @@ async function resetToDefaults() {
 		// Remove profiles
 		await browser.storage.sync.remove(['profiles', 'activeProfileId', 'defaultProfileId']);
 
-		// Clear chunked data
+		// Clear chunked data and profile-specific storage
+		const syncData = await browser.storage.sync.get(null);
 		const localData = await browser.storage.local.get(null);
-		const chunkedKeys = Object.keys(localData).filter(key => key.startsWith('chunk_'));
-		if (chunkedKeys.length > 0) {
-			await browser.storage.local.remove(chunkedKeys);
+
+		// Remove chunked data from sync storage
+		const syncChunkedKeys = Object.keys(syncData).filter(key =>
+			key.includes('_chunk_') || key.includes('_metadata') || key.startsWith('profile_')
+		);
+		if (syncChunkedKeys.length > 0) {
+			await browser.storage.sync.remove(syncChunkedKeys);
+		}
+
+		// Remove chunked data from local storage
+		const localChunkedKeys = Object.keys(localData).filter(key =>
+			key.includes('_chunk_') || key.includes('_metadata') || key.startsWith('profile_')
+		);
+		if (localChunkedKeys.length > 0) {
+			await browser.storage.local.remove(localChunkedKeys);
 		}
 
 		// Reload UI
@@ -517,6 +768,49 @@ async function resetToDefaults() {
 		showStatus('All settings and tabs reset to defaults', false);
 	} catch (error) {
 		showStatus('Reset failed: ' + error.message, true);
+	}
+}
+
+/**
+ * Migrate tabs between storage types when user changes preference
+ * @param {boolean} fromSync - true if migrating from sync, false if from local
+ * @param {boolean} toSync - true if migrating to sync, false if to local
+ */
+async function migrateBetweenStorageTypes(fromSync, toSync) {
+	try {
+		// Read tabs from source storage
+		let tabs = [];
+		if (fromSync) {
+			// Read from sync storage
+			const syncResult = await browser.storage.sync.get('customTabs');
+			tabs = syncResult.customTabs || [];
+		} else {
+			// Read from local storage
+			const localResult = await browser.storage.local.get('customTabs');
+			tabs = localResult.customTabs || [];
+		}
+
+		if (tabs.length === 0) {
+			return;
+		}
+
+		// Save tabs to destination storage
+		if (toSync) {
+			// Save to sync storage
+			await browser.storage.sync.set({ customTabs: tabs });
+			// Clear old local storage
+			await browser.storage.local.remove(['customTabs', 'extensionVersion']);
+		} else {
+			// Save to local storage
+			await browser.storage.local.set({
+				customTabs: tabs,
+				extensionVersion: '1.5.0'
+			});
+			// Clear old sync storage
+			await browser.storage.sync.remove(['customTabs']);
+		}
+	} catch (error) {
+		throw new Error(`Failed to migrate tabs: ${error.message}`);
 	}
 }
 
