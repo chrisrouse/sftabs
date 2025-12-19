@@ -1,8 +1,8 @@
 /* Salesforce Lightning Design System Colors - Only used variables */
 :root {
 	/* Core colors used in the UI */
-	--slds-brand-primary: #0070D2; /* Used for primary buttons, active states */
-	--slds-brand-secondary: #005FB2; /* Used for hover states */
+	--slds-brand-primary: #288aff; /* Used for primary buttons, active states */
+	--slds-brand-secondary: #1a6ee6; /* Used for hover states */
 	--slds-gray-1: #FFFFFF; /* White backgrounds */
 	--slds-gray-2: #F3F3F3; /* Light backgrounds */
 	--slds-gray-3: #E5E5E5; /* Borders */
@@ -38,7 +38,7 @@
 	--color-text-weak: #CCCCCC;
 	--color-border: #444444;
 	--color-input-background: #2A2C35;
-	--color-header: #0F6BAE;
+	--color-header: #1a6ee6;
 	--color-header-text: #FFFFFF;
 	--color-section-header: #2A2C35;
 	--color-item-background: #2A2C35;
