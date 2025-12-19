@@ -63,6 +63,7 @@
 	font-size: 14px;
 	color: var(--color-text);
 	background-color: var(--color-background);
+	overflow: hidden;
   }
   
   /* Layout */
@@ -1011,6 +1012,7 @@
   #migration-modal .modal-body {
 	flex: 1;
 	overflow-y: auto;
+	overflow-x: hidden;
 	padding: 6px 14px 10px 14px;
   }
 
