@@ -8,8 +8,6 @@
     "description": "Description of the extension"
   },
 
-  "_comment_popup": "=== Popup Interface ===",
-
   "popupTitle": {
     "message": "SF Tabs",
     "description": "Popup title"
@@ -74,8 +72,6 @@
     "message": "Reset to Defaults",
     "description": "Reset to defaults button"
   },
-
-  "_comment_settings": "=== Settings Page ===",
 
   "settingsPageTitle": {
     "message": "SF Tabs Settings",
@@ -227,8 +223,6 @@
     "description": "Reset button description"
   },
 
-  "_comment_modals": "=== Modal Dialogs ===",
-
   "exportModalTitle": {
     "message": "Export Configuration",
     "description": "Export modal title"
@@ -324,8 +318,6 @@
     "description": "Reset modal warning"
   },
 
-  "_comment_confirmations": "=== Confirmation Dialogs ===",
-
   "enableSyncConfirmTitle": {
     "message": "Enable cross-device sync?",
     "description": "Enable sync confirmation title"
@@ -346,8 +338,6 @@
     "message": "Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.",
     "description": "Disable profiles confirmation message"
   },
-
-  "_comment_status": "=== Status Messages ===",
 
   "settingsSaved": {
     "message": "Settings saved",
@@ -381,8 +371,6 @@
     "message": "Sync disabled - tabs stored locally only",
     "description": "Sync disabled status message"
   },
-
-  "_comment_errors": "=== Error Messages ===",
 
   "errorSavingSettings": {
     "message": "Error saving settings: $ERROR$",
@@ -445,8 +433,6 @@
     "description": "Could not detect browser error"
   },
 
-  "_comment_tabs": "=== Tab Management ===",
-
   "tabName": {
     "message": "Tab Name",
     "description": "Tab name label"
@@ -479,8 +465,6 @@
     "message": "Move Down",
     "description": "Move tab down button"
   },
-
-  "_comment_commands": "=== Keyboard Commands ===",
 
   "commandTab1": {
     "message": "Tab 1",

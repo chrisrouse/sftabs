@@ -316,6 +316,9 @@ function toggleProfilesEnabled(enabled) {
   } else {
     if (mainContent) mainContent.classList.remove('with-banner');
     if (actionPanel) actionPanel.classList.remove('with-banner');
+
+    // Hide profile switcher dropdown if open
+    hideProfileSwitcher();
   }
 }
 
@@ -353,6 +356,88 @@ async function updateActiveProfileBanner() {
 
   if (activeProfile) {
     profileName.textContent = activeProfile.name;
+  }
+
+  // Setup profile switcher if not already done
+  if (!banner.hasAttribute('data-switcher-initialized')) {
+    setupProfileSwitcher();
+    banner.setAttribute('data-switcher-initialized', 'true');
+  }
+}
+
+/**
+ * Setup profile switcher dropdown
+ */
+function setupProfileSwitcher() {
+  const banner = document.querySelector('#active-profile-banner');
+  const dropdown = document.querySelector('#profile-switcher-dropdown');
+
+  if (!banner || !dropdown) return;
+
+  // Toggle dropdown when clicking the banner
+  banner.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const isVisible = dropdown.style.display === 'block';
+
+    if (isVisible) {
+      hideProfileSwitcher();
+    } else {
+      await showProfileSwitcher();
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && !banner.contains(e.target)) {
+      hideProfileSwitcher();
+    }
+  });
+}
+
+/**
+ * Show profile switcher dropdown
+ */
+async function showProfileSwitcher() {
+  const dropdown = document.querySelector('#profile-switcher-dropdown');
+  const dropdownList = document.querySelector('#profile-switcher-list');
+
+  if (!dropdown || !dropdownList) return;
+
+  // Get current active profile
+  const activeProfileId = await getActiveProfileId();
+
+  // Clear existing items
+  dropdownList.innerHTML = '';
+
+  // Populate with all profiles
+  profilesCache.forEach(profile => {
+    const item = document.createElement('div');
+    item.className = 'profile-switcher-item';
+    if (profile.id === activeProfileId) {
+      item.classList.add('active');
+    }
+
+    item.textContent = profile.name;
+    item.dataset.profileId = profile.id;
+
+    item.addEventListener('click', async () => {
+      await switchActiveProfile(profile.id);
+      hideProfileSwitcher();
+    });
+
+    dropdownList.appendChild(item);
+  });
+
+  dropdown.style.display = 'block';
+}
+
+/**
+ * Hide profile switcher dropdown
+ */
+function hideProfileSwitcher() {
+  const dropdown = document.querySelector('#profile-switcher-dropdown');
+  if (dropdown) {
+    dropdown.style.display = 'none';
   }
 }
 

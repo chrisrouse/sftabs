@@ -110,10 +110,74 @@
 	font-size: 12px;
 	font-weight: 500;
 	border-bottom: 1px solid var(--color-border);
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+	user-select: none;
+  }
+
+  #active-profile-banner:hover {
+	background-color: var(--color-background);
   }
 
   #active-profile-banner #active-profile-name {
 	color: var(--color-text);
+  }
+
+  /* Profile Switcher Dropdown */
+  #profile-switcher-dropdown {
+	position: fixed;
+	top: 82px;
+	left: 0;
+	right: 0;
+	background-color: var(--color-item-background);
+	border-bottom: 1px solid var(--color-border);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	z-index: 8;
+	max-height: 300px;
+	overflow-y: auto;
+	animation: slideDown 0.15s ease-out;
+  }
+
+  @keyframes slideDown {
+	from {
+	  opacity: 0;
+	  transform: translateY(-10px);
+	}
+	to {
+	  opacity: 1;
+	  transform: translateY(0);
+	}
+  }
+
+  #profile-switcher-list {
+	padding: 4px 0;
+  }
+
+  .profile-switcher-item {
+	padding: 10px 16px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	transition: background-color 0.15s ease;
+	font-size: 13px;
+	color: var(--color-text);
+  }
+
+  .profile-switcher-item:hover {
+	background-color: var(--color-background);
+  }
+
+  .profile-switcher-item.active {
+	background-color: var(--color-background);
+	font-weight: 600;
+  }
+
+  .profile-switcher-item.active::after {
+	content: "✓";
+	color: var(--slds-brand-primary);
+	font-weight: bold;
+	margin-left: 8px;
   }
 
   /* Adjust main content margin when banner is visible */
