@@ -30,6 +30,26 @@ document.addEventListener('DOMContentLoaded', () => {
         SFTabs.settings.applyTheme();
       }
 
+      // Check for pending migration before loading tabs
+      if (SFTabs.migration && SFTabs.migration.checkMigrationStatus) {
+        const migrationStatus = await SFTabs.migration.checkMigrationStatus();
+
+        if (migrationStatus.migrationPending || (migrationStatus.needsMigration && !migrationStatus.migrationCompleted)) {
+          // Initialize migration modal event listeners
+          if (SFTabs.migration.initMigrationModal) {
+            SFTabs.migration.initMigrationModal();
+          }
+
+          // Show migration modal and stop further initialization
+          if (SFTabs.migration.showMigrationModal) {
+            await SFTabs.migration.showMigrationModal();
+          }
+
+          // Don't proceed with normal initialization - let user complete migration
+          return;
+        }
+      }
+
       // IMPORTANT: Wait for tabs to load before setting up event listeners
       // This prevents race conditions with profile migration
       await loadTabsFromStorage();

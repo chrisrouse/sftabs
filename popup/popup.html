@@ -400,6 +400,118 @@
                 </div>
             </div>
         </div>
+
+        <!-- Migration Modal -->
+        <div id="migration-modal" class="modal" style="display: none;">
+            <div class="modal-content migration-modal-content">
+                <div class="modal-header">
+                    <h2 id="migration-modal-title">Welcome to SF Tabs v1.5.0!</h2>
+                </div>
+                <div class="modal-body" id="migration-modal-body">
+                    <!-- Initial migration screen -->
+                    <div id="migration-welcome" class="migration-screen">
+                        <div class="migration-icon">🚀</div>
+                        <h3>New Feature: Profiles</h3>
+                        <p class="migration-description">
+                            This version introduces Profiles - manage multiple tab configurations for different Salesforce orgs.
+                        </p>
+                        <div class="migration-info-box">
+                            <p><strong>What will happen:</strong></p>
+                            <ul>
+                                <li>Your existing tabs will be migrated to a "Default" profile</li>
+                                <li>No data will be lost during migration</li>
+                                <li>You can enable the profiles feature now or later</li>
+                                <li id="migration-time-estimate" style="display: none;">Estimated time: <span id="migration-time-value"></span></li>
+                            </ul>
+                        </div>
+                        <div class="form-group checkbox-group" style="margin-top: 16px;">
+                            <label>
+                                <input type="checkbox" id="migration-enable-profiles">
+                                <span>Enable Profiles feature after migration</span>
+                            </label>
+                            <div class="help-text">You can enable this later in Settings if you prefer</div>
+                        </div>
+                    </div>
+
+                    <!-- Migration in progress screen -->
+                    <div id="migration-progress" class="migration-screen" style="display: none;">
+                        <div class="migration-spinner"></div>
+                        <h3 id="migration-progress-title">Migrating your data...</h3>
+                        <p id="migration-progress-message" class="migration-description">This will only take a moment.</p>
+                        <div class="migration-steps">
+                            <div class="migration-step" id="migration-step-1">
+                                <span class="step-icon">⏳</span>
+                                <span class="step-text">Reading existing data</span>
+                            </div>
+                            <div class="migration-step" id="migration-step-2">
+                                <span class="step-icon">⏳</span>
+                                <span class="step-text">Creating Default profile</span>
+                            </div>
+                            <div class="migration-step" id="migration-step-3">
+                                <span class="step-icon">⏳</span>
+                                <span class="step-text">Saving new format</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Migration success screen -->
+                    <div id="migration-success" class="migration-screen" style="display: none;">
+                        <div class="migration-icon">✅</div>
+                        <h3>Migration Complete!</h3>
+                        <p class="migration-description">
+                            Your tabs have been successfully migrated to the new profile system.
+                        </p>
+                        <div class="migration-info-box success">
+                            <p><strong>What's next:</strong></p>
+                            <ul>
+                                <li>All your tabs are now in the "Default" profile</li>
+                                <li id="migration-profiles-enabled-msg" style="display: none;">Profiles feature is now enabled</li>
+                                <li id="migration-profiles-disabled-msg">You can enable profiles in Settings anytime</li>
+                                <li>Create additional profiles for different orgs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Migration error screen -->
+                    <div id="migration-error" class="migration-screen" style="display: none;">
+                        <div class="migration-icon">⚠️</div>
+                        <h3>Migration Failed</h3>
+                        <p class="migration-description">
+                            An error occurred during migration. Your original data is still intact.
+                        </p>
+                        <div class="migration-info-box error">
+                            <p><strong>Error details:</strong></p>
+                            <p id="migration-error-message" style="font-family: monospace; font-size: 11px; margin-top: 8px;"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="migration-modal-footer">
+                    <!-- Welcome screen buttons -->
+                    <div id="migration-welcome-buttons">
+                        <button id="migration-export-button" class="secondary-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 6px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Backup First
+                        </button>
+                        <button id="migration-start-button" class="primary-button">Migrate Now</button>
+                    </div>
+                    <!-- Progress screen buttons (hidden) -->
+                    <div id="migration-progress-buttons" style="display: none;"></div>
+                    <!-- Success screen buttons -->
+                    <div id="migration-success-buttons" style="display: none;">
+                        <button id="migration-done-button" class="primary-button">Get Started</button>
+                    </div>
+                    <!-- Error screen buttons -->
+                    <div id="migration-error-buttons" style="display: none;">
+                        <button id="migration-retry-button" class="primary-button">Retry Migration</button>
+                        <button id="migration-skip-button" class="secondary-button">Continue Without Migrating</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Load shared modules first -->
@@ -416,6 +528,7 @@
     <script src="js/popup-tabs.js"></script>
     <script src="js/popup-ui.js"></script>
     <script src="js/popup-profiles.js"></script>
+    <script src="js/popup-migration.js"></script>
 
     <!-- Load main entry point LAST -->
     <script src="js/popup-main.js"></script>

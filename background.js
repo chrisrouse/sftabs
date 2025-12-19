@@ -213,66 +213,58 @@ async function detectStorageFormat() {
 }
 
 /**
- * Perform storage migration - handles v1.3 (sync), v1.4 (local), and v1.5 (chunked sync)
- * This runs automatically on install/update before user opens popup
+ * Detect if migration is needed and set flag for user-initiated migration
+ * Returns true if migration is needed, false otherwise
  */
-async function migrateStorage() {
+async function detectMigrationNeeded() {
   try {
-    const format = await detectStorageFormat();
+    const currentVersion = browser.runtime.getManifest().version;
+    const localData = await browser.storage.local.get(['extensionVersion', 'migrationCompleted']);
 
-    // Determine what needs to be migrated
+    const storedVersion = localData.extensionVersion;
+    const migrationCompleted = localData.migrationCompleted;
+
+    // If migration already completed for this version, no need to migrate
+    if (migrationCompleted === currentVersion) {
+      return false;
+    }
+
+    // Check if we have legacy tab data but no profiles
+    const format = await detectStorageFormat();
     const syncTabCount = format.syncTabs?.length || 0;
     const localTabCount = format.localTabs?.length || 0;
-    const syncCustomCount = (format.syncTabs || []).filter(t => !t.id?.startsWith('default_tab_')).length;
-    const localCustomCount = (format.localTabs || []).filter(t => !t.id?.startsWith('default_tab_')).length;
 
-    // Migration logic based on user preference and existing data
-    if (format.preferSync) {
-      // User prefers sync storage
-      if (syncTabCount > 0 && !format.hasChunkedSync) {
-        // Old sync format (v1.3) - migrate to chunked sync
-        await saveChunkedSync('customTabs', format.syncTabs);
-        await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-      } else if (localTabCount > 0 && syncTabCount === 0) {
-        // Local storage exists but no sync - migrate local to chunked sync
-        await saveChunkedSync('customTabs', format.localTabs);
-        await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-      } else if (localCustomCount > syncCustomCount) {
-        // Local has more custom tabs - migrate to sync
-        await saveChunkedSync('customTabs', format.localTabs);
-        await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-      }
+    // Check if profiles exist
+    let hasProfiles = false;
+    const useSyncStorage = format.preferSync;
+
+    if (useSyncStorage) {
+      const profiles = await readChunkedSync('profiles');
+      hasProfiles = profiles && profiles.length > 0;
     } else {
-      // User prefers local storage
-      if (syncTabCount > 0 && localTabCount === 0) {
-        // Sync exists but no local - migrate to local
-        await browser.storage.local.set({
-          customTabs: format.syncTabs,
-          extensionVersion: '1.5.0'
-        });
-        // Clear sync storage
-        const keysToRemove = ['customTabs', 'customTabs_metadata'];
-        for (let i = 0; i < 50; i++) {
-          keysToRemove.push(`customTabs_chunk_${i}`);
-        }
-        await browser.storage.sync.remove(keysToRemove);
-      } else if (localTabCount > 0) {
-        await browser.storage.local.set({ extensionVersion: '1.5.0' });
-      }
+      const localProfiles = await browser.storage.local.get('profiles');
+      hasProfiles = localProfiles.profiles && localProfiles.profiles.length > 0;
     }
 
-    // Ensure user settings are in sync storage (they should always be there)
-    const localSettings = await browser.storage.local.get('userSettings');
-    if (localSettings.userSettings) {
-      await browser.storage.sync.set({ userSettings: localSettings.userSettings });
-      await browser.storage.local.remove('userSettings');
+    // Need migration if we have tabs but no profiles
+    const needsMigration = (syncTabCount > 0 || localTabCount > 0) && !hasProfiles;
+
+    if (needsMigration) {
+      // Set migration pending flag
+      await browser.storage.local.set({
+        migrationPending: true,
+        extensionVersion: storedVersion || 'unknown'
+      });
+      return true;
     }
 
-    // Always set extensionVersion after successful migration
-    const currentVersion = browser.runtime.getManifest().version;
-    await browser.storage.local.set({ extensionVersion: currentVersion });
+    // No migration needed, ensure version is up to date
+    await browser.storage.local.set({
+      extensionVersion: currentVersion,
+      migrationPending: false
+    });
 
-    return true;
+    return false;
   } catch (error) {
     return false;
   }
@@ -283,28 +275,29 @@ async function migrateStorage() {
  */
 browser.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
-    await migrateStorage();
+    // Check if migration is needed on fresh install
+    await detectMigrationNeeded();
   } else if (details.reason === 'update') {
-    // Run migration on every update to handle upgrades from old versions
-    await migrateStorage();
+    // Check if migration is needed after update
+    await detectMigrationNeeded();
   }
 });
 
-// Run migration on startup only if version check indicates it's needed
+// Check for pending migration on startup
 browser.runtime.onStartup.addListener(async () => {
   try {
-    // Quick version check - skip if already migrated
-    const { extensionVersion } = await browser.storage.local.get('extensionVersion');
+    // Quick check - if migration already completed, skip
     const currentVersion = browser.runtime.getManifest().version;
+    const { migrationCompleted } = await browser.storage.local.get('migrationCompleted');
 
-    if (extensionVersion === currentVersion) {
-      return; // Already on current version, skip migration
+    if (migrationCompleted === currentVersion) {
+      return; // Already migrated for this version
     }
 
-    // Version mismatch - run migration
-    await migrateStorage();
+    // Check if migration is needed
+    await detectMigrationNeeded();
   } catch (error) {
-    // Migration error on startup
+    // Error checking migration status on startup
   }
 });
 
