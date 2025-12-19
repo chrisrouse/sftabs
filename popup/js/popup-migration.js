@@ -142,6 +142,24 @@ async function showMigrationModal() {
     timeEstimateContainer.style.display = 'list-item';
   }
 
+  // Detect current storage preference and pre-select
+  const currentStorageInfo = await detectCurrentStorage();
+  const syncRadio = document.querySelector('#migration-storage-sync');
+  const localRadio = document.querySelector('#migration-storage-local');
+  const currentStorageMessage = document.querySelector('#migration-current-storage');
+
+  if (currentStorageInfo.usesSync) {
+    if (syncRadio) syncRadio.checked = true;
+    if (currentStorageMessage) {
+      currentStorageMessage.textContent = `Currently using: Sync Storage${currentStorageInfo.hasChunked ? ' (chunked)' : ''}`;
+    }
+  } else {
+    if (localRadio) localRadio.checked = true;
+    if (currentStorageMessage) {
+      currentStorageMessage.textContent = 'Currently using: Local Storage';
+    }
+  }
+
   // Reset to welcome screen
   showMigrationScreen('welcome');
 
@@ -149,6 +167,44 @@ async function showMigrationModal() {
   if (modal) {
     modal.classList.add('show');
     modal.style.display = 'flex';
+  }
+}
+
+/**
+ * Detect current storage location
+ * @returns {Promise<Object>} Storage info
+ */
+async function detectCurrentStorage() {
+  try {
+    // Check user settings first
+    const syncSettings = await browser.storage.sync.get('userSettings');
+    const preferSync = syncSettings.userSettings?.useSyncStorage !== false; // Default true
+
+    // Check for chunked sync storage
+    const syncMetadata = await browser.storage.sync.get('customTabs_metadata');
+    const hasChunkedSync = !!syncMetadata.customTabs_metadata;
+
+    // Check for non-chunked sync storage
+    const syncDirect = await browser.storage.sync.get('customTabs');
+    const hasDirectSync = !!syncDirect.customTabs;
+
+    // Check for local storage
+    const localData = await browser.storage.local.get('customTabs');
+    const hasLocal = !!localData.customTabs;
+
+    return {
+      usesSync: preferSync || hasChunkedSync || hasDirectSync,
+      usesLocal: !preferSync || hasLocal,
+      hasChunked: hasChunkedSync,
+      preferSync: preferSync
+    };
+  } catch (error) {
+    return {
+      usesSync: true,
+      usesLocal: false,
+      hasChunked: false,
+      preferSync: true
+    };
   }
 }
 
@@ -210,23 +266,34 @@ function updateMigrationStep(stepNumber, status) {
 /**
  * Perform the migration from legacy format to profiles
  * @param {boolean} enableProfiles - Whether to enable profiles feature
+ * @param {boolean} useSyncStorage - Whether to use sync or local storage
  * @returns {Promise<boolean>} True if successful
  */
-async function performMigration(enableProfiles = false) {
+async function performMigration(enableProfiles = false, useSyncStorage = true) {
   try {
     // Step 1: Read existing data
     updateMigrationStep(1, 'active');
     updateMigrationStep(2, 'pending');
     updateMigrationStep(3, 'pending');
 
-    const useSyncStorage = await SFTabs.storage.getStoragePreference();
+    const currentStoragePreference = await SFTabs.storage.getStoragePreference();
 
     let tabs = [];
-    if (useSyncStorage) {
+    if (currentStoragePreference) {
       tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
     } else {
       const localResult = await browser.storage.local.get('customTabs');
       tabs = localResult.customTabs || [];
+    }
+
+    // If no tabs found in preferred location, check the other
+    if (!tabs || tabs.length === 0) {
+      if (currentStoragePreference) {
+        const localResult = await browser.storage.local.get('customTabs');
+        tabs = localResult.customTabs || [];
+      } else {
+        tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
+      }
     }
 
     // Simulate some processing time for UX
@@ -263,6 +330,7 @@ async function performMigration(enableProfiles = false) {
     const settings = await SFTabs.storage.getUserSettings();
     settings.activeProfileId = defaultProfileId;
     settings.defaultProfileId = defaultProfileId;
+    settings.useSyncStorage = useSyncStorage; // Set user's storage choice
 
     if (enableProfiles) {
       settings.profilesEnabled = true;
@@ -383,11 +451,15 @@ function initMigrationModal() {
       const enableProfilesCheckbox = document.querySelector('#migration-enable-profiles');
       const enableProfiles = enableProfilesCheckbox ? enableProfilesCheckbox.checked : false;
 
+      // Get storage choice
+      const syncRadio = document.querySelector('#migration-storage-sync');
+      const useSyncStorage = syncRadio ? syncRadio.checked : true;
+
       // Show progress screen
       showMigrationScreen('progress');
 
       try {
-        await performMigration(enableProfiles);
+        await performMigration(enableProfiles, useSyncStorage);
 
         // Show success screen
         showMigrationScreen('success');
