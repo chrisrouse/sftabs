@@ -71,7 +71,7 @@
 	flex-direction: column;
 	height: auto;
 	min-height: 300px;
-	max-height: 600px;
+	max-height: 750px;
 	width: 410px;
 	overflow: hidden;
 	background-color: var(--color-background);
