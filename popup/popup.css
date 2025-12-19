@@ -201,6 +201,15 @@
 	font-size: 16px;
 	font-weight: 600;
 	margin: 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+  }
+
+  .header-logo {
+	width: 24px;
+	height: 24px;
+	display: block;
   }
   
   h2 {
