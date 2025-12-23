@@ -1,0 +1,29 @@
+title: SF Tabs Documentation
+description: Customize your Salesforce Setup menu with quick-access tabs
+theme: jekyll-theme-cayman
+baseurl: "/sftabs"
+url: "https://chrisrouse.github.io"
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Installation
+    url: /installation
+  - title: User Guide
+    url: /user-guide
+  - title: Configuration
+    url: /configuration
+  - title: Shortcuts
+    url: /shortcuts
+
+# GitHub
+github:
+  repository_url: https://github.com/chrisrouse/sftabs
+  issues_url: https://github.com/chrisrouse/sftabs/issues
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
