@@ -296,3 +296,64 @@ img {
 .quick-start strong {
     color: var(--sf-brand-primary);
 }
+
+/* Feature tiles on home page */
+.feature-tile {
+    border: 2px solid var(--sf-gray-200);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+.feature-tile:hover {
+    border-color: var(--sf-brand-primary);
+    box-shadow: 0 8px 24px rgba(40, 138, 255, 0.15);
+    transform: translateY(-5px);
+}
+
+.feature-tile .feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-tile:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+.feature-tile .card-body {
+    padding: 2rem 1.5rem;
+}
+
+.feature-tile h3 {
+    font-weight: 600;
+    color: var(--sf-gray-800);
+    margin-top: 0;
+}
+
+.feature-tile .text-muted {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.feature-tile .btn {
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+}
+
+/* Home page display title */
+.display-4 {
+    color: var(--sf-brand-primary);
+}
+
+/* Key features section */
+.border-top {
+    border-color: var(--sf-gray-200) !important;
+}
+
+/* Browser badges */
+.browser-badges img {
+    transition: transform 0.2s ease;
+}
+
+.browser-badges img:hover {
+    transform: scale(1.05);
+}

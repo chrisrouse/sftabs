@@ -3,68 +3,141 @@ layout: default
 title: Home
 ---
 
-# SF Tabs
-
-<p class="lead">Customize your Salesforce Setup menu with quick-access tabs</p>
-
-<div class="d-flex gap-3 mb-4">
-  <a href="installation" class="btn btn-primary btn-lg">
-    <i class="bi bi-download"></i> Get Started
-  </a>
-  <a href="https://github.com/chrisrouse/sftabs" class="btn btn-outline-primary btn-lg" target="_blank">
-    <i class="bi bi-github"></i> View on GitHub
-  </a>
+<div class="text-center mb-5">
+  <h1 class="display-4 fw-bold mb-3">SF Tabs</h1>
+  <p class="lead fs-4">Customize your Salesforce Setup menu with quick-access tabs</p>
 </div>
 
----
+<!-- Feature Tiles -->
+<div class="row g-4 mb-5">
+  <!-- Installation -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-download display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">Installation</h3>
+        <p class="text-muted mb-3">Get started with SF Tabs on Firefox, Chrome, or Edge browsers in minutes.</p>
+        <a href="installation" class="btn btn-outline-primary">Install Now</a>
+      </div>
+    </div>
+  </div>
 
-## Features
+  <!-- Quick Start -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-lightning-charge-fill display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">Quick Start</h3>
+        <p class="text-muted mb-3">Install, add your first tabs, and start customizing your Salesforce experience.</p>
+        <a href="user-guide#adding-a-new-tab" class="btn btn-outline-primary">Get Started</a>
+      </div>
+    </div>
+  </div>
 
-### [Profiles](user-guide#profiles) (NEW in v1.5.0)
-Create multiple tab configurations for different Salesforce orgs or work contexts. Automatically switch profiles based on URL patterns (MyDomain matching).
+  <!-- New Features -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-stars display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">New in v1.5.0</h3>
+        <p class="text-muted mb-3">Profiles, dropdown menus, and flexible storage options—all new features!</p>
+        <a href="user-guide#profiles" class="btn btn-outline-primary">Learn More</a>
+      </div>
+    </div>
+  </div>
 
-### [Dropdown Menus](user-guide#creating-dropdown-menus) (NEW in v1.5.0)
-Organize related tabs under dropdown menus. Auto-populate Object Manager dropdowns or create custom menus via drag-and-drop.
+  <!-- User Guide -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-book-fill display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">User Guide</h3>
+        <p class="text-muted mb-3">Complete documentation covering all features, settings, and advanced usage.</p>
+        <a href="user-guide" class="btn btn-outline-primary">Read Docs</a>
+      </div>
+    </div>
+  </div>
 
-### [Storage Options](user-guide#sync--storage) (NEW in v1.5.0)
-Choose between Sync Storage (cloud, cross-device) or Local Storage (device-only, unlimited tabs).
+  <!-- Translations -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-translate display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">Translations</h3>
+        <p class="text-muted mb-3">Help translate SF Tabs into your language and make it accessible to everyone.</p>
+        <a href="https://github.com/chrisrouse/sftabs/issues" target="_blank" class="btn btn-outline-primary">Contribute</a>
+      </div>
+    </div>
+  </div>
 
-### [Custom Tab Management](user-guide#adding-a-new-tab)
-Add, edit, and remove tabs directly from the Salesforce setup interface. Support for Setup pages, Object pages, and custom URLs.
+  <!-- GitHub -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-github display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">GitHub</h3>
+        <p class="text-muted mb-3">View source code, report issues, request features, and contribute to the project.</p>
+        <a href="https://github.com/chrisrouse/sftabs" target="_blank" class="btn btn-outline-primary">Visit Repo</a>
+      </div>
+    </div>
+  </div>
+</div>
 
-### [Quick Tab Creation](user-guide#adding-a-new-tab)
-Add a tab for the current page with one click. Intelligent tab name detection based on page context.
+<!-- Key Features Section -->
+<div class="mt-5 pt-5 border-top">
+  <h2 class="text-center mb-4">Key Features</h2>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <h5><i class="bi bi-people-fill text-primary me-2"></i>Profiles</h5>
+      <p class="text-muted">Create multiple tab configurations for different Salesforce orgs or work contexts with automatic switching based on URL patterns.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-list-nested text-primary me-2"></i>Dropdown Menus</h5>
+      <p class="text-muted">Organize related tabs under dropdown menus with auto-populated Object Manager menus or custom drag-and-drop structures.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-cloud-arrow-up-fill text-primary me-2"></i>Flexible Storage</h5>
+      <p class="text-muted">Choose between Sync Storage (cloud, cross-device) or Local Storage (device-only, unlimited tabs).</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-arrows-move text-primary me-2"></i>Drag & Drop</h5>
+      <p class="text-muted">Easily organize your tabs by dragging them into your preferred order with intuitive visual feedback.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-palette-fill text-primary me-2"></i>Theme Support</h5>
+      <p class="text-muted">Light mode, Dark mode, and System detection with compact mode for condensed viewing.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-keyboard-fill text-primary me-2"></i>Keyboard Shortcuts</h5>
+      <p class="text-muted">Quick access to your first 10 tabs via configurable keyboard shortcuts for power users.</p>
+    </div>
+  </div>
+</div>
 
-### [Drag & Drop Reordering](user-guide#reordering-tabs)
-Easily organize your tabs by dragging them into your preferred order.
-
-### [Theme Support](user-guide#settings)
-Light mode, Dark mode, and System detection. Compact mode for condensed viewing.
-
-### [Import/Export Settings](user-guide#importexport-configuration)
-Backup your configuration or share it with team members. Export individual profiles or everything.
-
-### [Keyboard Shortcuts](shortcuts)
-Quick access to your first 10 tabs via keyboard shortcuts (configurable).
-
----
-
-## Quick Start
-
-1. **Install the extension**
-   Available for Firefox and Chrome browsers
-
-2. **Navigate to Salesforce Setup**
-   Your custom tabs will appear in the setup menu
-
-3. **Click the extension icon**
-   Add and configure your custom tabs
-
-4. **Customize**
-   Drag to reorder, edit labels, and set preferences
-
----
-
-## Need Help?
-
-Check out our [User Guide](user-guide) for detailed instructions, or visit our [GitHub Issues](https://github.com/chrisrouse/sftabs/issues) page to report bugs or request features.
+<!-- Browser Badges -->
+<div class="mt-5 pt-4 text-center">
+  <h4 class="mb-3">Available For</h4>
+  <div class="d-flex justify-content-center gap-3 flex-wrap">
+    <a href="https://chromewebstore.google.com/detail/sf-tabs/lkimhffllnjkacnhjfehaihcjilcmdlo" target="_blank">
+      <img src="https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Chrome">
+    </a>
+    <a href="https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/" target="_blank">
+      <img src="https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white" alt="Firefox">
+    </a>
+    <a href="https://microsoftedge.microsoft.com/addons/detail/sf-tabs/kchadlkjcefbnojjnmmpcnfnhcfbdjbb" target="_blank">
+      <img src="https://img.shields.io/badge/Edge-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white" alt="Edge">
+    </a>
+  </div>
+</div>
