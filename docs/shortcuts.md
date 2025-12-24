@@ -40,6 +40,9 @@ By default, no keyboard shortcuts are assigned. You must configure them manually
 
 ## Setting Up Shortcuts in Firefox
 
+<img width="686" height="614" alt="Screenshot 2025-12-24 at 3 14 10 PM" src="https://github.com/user-attachments/assets/e9370e17-2c71-4641-8c07-7e429cb611b0" />
+
+
 1. **Open Add-ons Manager**
    Type `about:addons` in the address bar and press Enter
 
@@ -65,6 +68,7 @@ By default, no keyboard shortcuts are assigned. You must configure them manually
 
 
 ## Setting Up Shortcuts in Chrome
+<img width="701" height="752" alt="Screenshot 2025-12-24 at 3 18 25 PM" src="https://github.com/user-attachments/assets/90d7953a-5d61-4e98-a1bf-8a4e941ea459" />
 
 1. **Open Extensions Shortcuts**
    Type `chrome://extensions/shortcuts` in the address bar and press Enter
