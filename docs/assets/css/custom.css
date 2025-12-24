@@ -41,8 +41,8 @@ h4 { font-size: 1.25rem; }
 }
 
 .navbar-logo {
-    height: 32px;
-    width: auto;
+    max-width: 2rem;
+    height: auto;
     display: block;
 }
 
