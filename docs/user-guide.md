@@ -45,7 +45,7 @@ There are two ways to access SF Tabs:
 2. **Click the SF Tabs extension icon**
    The extension will detect the current page
 
-3. **Click "Add Current Page"**
+3. **Click Quick Create button <img src="{{ '/assets/images/icons/quick-add.svg' | relative_url }}" alt="Quick Add" style="display: inline; height: 1.2em; vertical-align: middle;">**
    A new tab will be created with the page name and URL automatically filled in
 
 ### Method 2: Manual Tab Creation
