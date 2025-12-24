@@ -7,7 +7,6 @@ title: New Features
 
 SF Tabs v1.5.0 introduces powerful new features to help you manage tabs across multiple Salesforce orgs and organize your setup pages more efficiently.
 
----
 
 ## 🆕 Major Features
 
@@ -17,7 +16,7 @@ Create multiple tab configurations for different Salesforce orgs, projects, or w
 
 **Key capabilities:**
 - **Multiple profiles** - Create unlimited profiles for different orgs or use cases
-- **Automatic switching** - Profiles automatically switch based on Salesforce org URL patterns
+- **Automatic switching** - Profiles can automatically switch based on Salesforce org URL patterns
 - **URL pattern matching** - Configure MyDomain patterns for each profile
 - **Easy management** - Create, edit, rename, and delete profiles through a dedicated interface
 - **Profile cloning** - Duplicate existing profiles to create new ones quickly
@@ -187,8 +186,8 @@ If you're upgrading from a previous version, here's what to expect:
 
 ## 🐛 Known Issues & Limitations
 
-### Current Limitations
-- Nested dropdowns (dropdowns within dropdowns) are not supported
+### Limitations
+- Nested dropdowns (dropdowns within dropdowns) are not recommended, but they are supported
 - Profile names are limited to 30 characters
 - Sync storage has a ~50 tab limit due to browser restrictions
 - URL pattern matching requires MyDomain to be enabled
