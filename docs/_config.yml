@@ -3,6 +3,9 @@ description: Customize your Salesforce Setup menu with quick-access tabs
 baseurl: "/sftabs"
 url: "https://chrisrouse.github.io"
 
+# Theme settings
+theme: null
+
 # Brand colors
 brand_color: "#288aff"
 brand_color_dark: "#1a6ee6"
