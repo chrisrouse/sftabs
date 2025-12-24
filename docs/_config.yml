@@ -31,14 +31,10 @@ kramdown:
   input: GFM
   syntax_highlighter: rouge
 
-# Plugins
-plugins:
-  - jekyll-seo-tag
-  - jekyll-sitemap
-
 # Exclude from processing
 exclude:
   - Gemfile
   - Gemfile.lock
   - node_modules
   - vendor
+  - README.md
