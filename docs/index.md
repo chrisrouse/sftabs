@@ -47,7 +47,7 @@ title: Home
         </div>
         <h3 class="h5 mb-3">New in v1.5.0</h3>
         <p class="text-muted mb-3">Profiles, dropdown menus, and flexible storage options—all new features!</p>
-        <a href="user-guide#profiles" class="btn btn-outline-primary">Learn More</a>
+        <a href="new-features" class="btn btn-outline-primary">Learn More</a>
       </div>
     </div>
   </div>
