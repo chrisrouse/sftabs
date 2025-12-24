@@ -100,28 +100,28 @@ title: Home
   <h2 class="text-center mb-4">Key Features</h2>
   <div class="row g-4">
     <div class="col-md-6">
+      <h5><i class="bi bi-plus-circle-fill text-primary me-2"></i>Custom Tabs</h5>
+      <p class="text-muted">Quickly add custom tabs for setup or object pages to streamline your Salesforce navigation.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-list-nested text-primary me-2"></i>Dropdowns</h5>
+      <p class="text-muted">Organize related tabs under dropdown menus with auto-populated Object Manager menus or custom drag-and-drop structures.</p>
+    </div>
+    <div class="col-md-6">
       <h5><i class="bi bi-people-fill text-primary me-2"></i>Profiles</h5>
       <p class="text-muted">Create multiple tab configurations for different Salesforce orgs or work contexts with automatic switching based on URL patterns.</p>
     </div>
     <div class="col-md-6">
-      <h5><i class="bi bi-list-nested text-primary me-2"></i>Dropdown Menus</h5>
-      <p class="text-muted">Organize related tabs under dropdown menus with auto-populated Object Manager menus or custom drag-and-drop structures.</p>
-    </div>
-    <div class="col-md-6">
-      <h5><i class="bi bi-cloud-arrow-up-fill text-primary me-2"></i>Flexible Storage</h5>
-      <p class="text-muted">Choose between Sync Storage (cloud, cross-device) or Local Storage (device-only, unlimited tabs).</p>
-    </div>
-    <div class="col-md-6">
-      <h5><i class="bi bi-arrows-move text-primary me-2"></i>Drag & Drop</h5>
+      <h5><i class="bi bi-arrows-move text-primary me-2"></i>Drag and Drop</h5>
       <p class="text-muted">Easily organize your tabs by dragging them into your preferred order with intuitive visual feedback.</p>
     </div>
     <div class="col-md-6">
-      <h5><i class="bi bi-palette-fill text-primary me-2"></i>Theme Support</h5>
-      <p class="text-muted">Light mode, Dark mode, and System detection with compact mode for condensed viewing.</p>
+      <h5><i class="bi bi-keyboard-fill text-primary me-2"></i>Shortcuts</h5>
+      <p class="text-muted">Quick access to your first 10 tabs via configurable keyboard shortcuts for power users.</p>
     </div>
     <div class="col-md-6">
-      <h5><i class="bi bi-keyboard-fill text-primary me-2"></i>Keyboard Shortcuts</h5>
-      <p class="text-muted">Quick access to your first 10 tabs via configurable keyboard shortcuts for power users.</p>
+      <h5><i class="bi bi-translate text-primary me-2"></i>Translations <span class="badge bg-secondary">Coming Soon</span></h5>
+      <p class="text-muted">Help translate SF Tabs into your language and make it accessible to everyone.</p>
     </div>
   </div>
 </div>
