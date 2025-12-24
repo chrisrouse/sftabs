@@ -1,8 +1,11 @@
-title: SF Tabs Documentation
+title: SF Tabs
 description: Customize your Salesforce Setup menu with quick-access tabs
-theme: jekyll-theme-cayman
 baseurl: "/sftabs"
 url: "https://chrisrouse.github.io"
+
+# Brand colors
+brand_color: "#288aff"
+brand_color_dark: "#1a6ee6"
 
 # Navigation
 navigation:

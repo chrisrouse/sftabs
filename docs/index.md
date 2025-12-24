@@ -5,9 +5,16 @@ title: Home
 
 # SF Tabs
 
-Customize your Salesforce Setup menu with quick-access tabs
+<p class="lead">Customize your Salesforce Setup menu with quick-access tabs</p>
 
-[Get Started](installation) | [View on GitHub](https://github.com/chrisrouse/sftabs)
+<div class="d-flex gap-3 mb-4">
+  <a href="installation" class="btn btn-primary btn-lg">
+    <i class="bi bi-download"></i> Get Started
+  </a>
+  <a href="https://github.com/chrisrouse/sftabs" class="btn btn-outline-primary btn-lg" target="_blank">
+    <i class="bi bi-github"></i> View on GitHub
+  </a>
+</div>
 
 ---
 
