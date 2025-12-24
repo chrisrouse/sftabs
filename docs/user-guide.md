@@ -29,11 +29,8 @@ Learn how to use SF Tabs to customize your Salesforce Setup experience.
 
 ## Opening the Extension
 
-There are two ways to access SF Tabs:
-
-1. **Click the extension icon** in your browser toolbar
-2. **Look for your tabs** in the Salesforce Setup menu (they appear automatically when you're on a Setup page)
-
+ **Click the extension icon** in your browser toolbar
+ 
 
 ## Adding a New Tab
 
@@ -53,14 +50,14 @@ There are two ways to access SF Tabs:
 1. **Open the extension popup**
    Click the SF Tabs icon in your browser toolbar
 
-2. **Click the "+" button**
+2. **Click the <img src="{{ '/assets/images/icons/manual-add.svg' | relative_url }}" alt="Quick Add" style="display: inline; height: 1.2em; vertical-align: middle;"> button**
    A new tab form will appear
 
 3. **Fill in the tab details**
    Enter a label and path for your tab (see Tab Types below)
 
 4. **Save your tab**
-   Click Save and your tab will appear in the Setup menu
+   Click **Save Changes** and your tab will appear in the Setup menu
 
 
 ## Tab Types
@@ -82,9 +79,9 @@ Links to standard Salesforce Setup pages. Use the Setup page name as the path.
 Links to Object Manager pages for standard or custom objects.
 
 **Examples:**
-- `Account/object` - Account Object Manager
-- `Contact/object` - Contact Object Manager
-- `Custom_Object__c/object` - Custom Object Manager
+- `Account` - Account Object Manager
+- `Contact` - Contact Object Manager
+- `Custom_Object__c` - Custom Object Manager
 
 ### Custom URLs
 
