@@ -37,6 +37,11 @@ SF Tabs provides 10 keyboard shortcut commands that correspond to your first 10 
 
 By default, no keyboard shortcuts are assigned. You must configure them manually in your browser settings.
 
+You can quickly access the Keyboard Shortcuts page by opening SF Tabs' Settings page and clicking 
+on **Configure Keyboard Shortcuts**. 
+
+<img width="782" height="188" alt="Screenshot 2025-12-24 at 3 21 08 PM" src="https://github.com/user-attachments/assets/3428e215-c181-423e-afa1-57bfba348e6c" />
+
 
 ## Setting Up Shortcuts in Firefox
 
