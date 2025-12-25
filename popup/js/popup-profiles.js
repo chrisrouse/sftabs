@@ -842,34 +842,51 @@ function createUrlPatternItem(pattern, index) {
  */
 async function showProfileSelectionForDisable() {
   return new Promise(async (resolve) => {
+    console.log('[DEBUG] showProfileSelectionForDisable: Starting');
+
     const modal = document.querySelector('#disable-profiles-modal');
     const keepProfileSelect = document.querySelector('#keep-profile-select');
     const confirmButton = document.querySelector('#disable-profiles-confirm-button');
     const cancelButton = document.querySelector('#disable-profiles-cancel-button');
 
+    console.log('[DEBUG] Found elements:', {
+      modal: !!modal,
+      select: !!keepProfileSelect,
+      confirm: !!confirmButton,
+      cancel: !!cancelButton
+    });
+
     if (!modal || !keepProfileSelect || !confirmButton || !cancelButton) {
+      console.log('[DEBUG] Missing elements, returning null');
       resolve(null);
       return;
     }
 
+    console.log('[DEBUG] Options before clear:', keepProfileSelect.options.length);
+
     // Reload profiles from storage to ensure fresh data
     await loadProfiles();
+    console.log('[DEBUG] Loaded profiles:', profilesCache.length, profilesCache.map(p => ({ id: p.id, name: p.name })));
 
     // Clear all existing options - use both methods to be safe
     keepProfileSelect.innerHTML = '';
     keepProfileSelect.options.length = 0;
+    console.log('[DEBUG] Options after clear:', keepProfileSelect.options.length);
 
     // Add placeholder option
     const placeholderOption = document.createElement('option');
     placeholderOption.value = '';
     placeholderOption.textContent = 'Choose a profile...';
     keepProfileSelect.appendChild(placeholderOption);
+    console.log('[DEBUG] Added placeholder, options count:', keepProfileSelect.options.length);
 
     const settings = await SFTabs.storage.getUserSettings();
     const defaultProfileId = settings.defaultProfileId;
+    console.log('[DEBUG] Default profile ID:', defaultProfileId);
 
     // Use a Set to ensure uniqueness by profile ID
     const uniqueProfiles = Array.from(new Map(profilesCache.map(p => [p.id, p])).values());
+    console.log('[DEBUG] Unique profiles:', uniqueProfiles.length, uniqueProfiles.map(p => ({ id: p.id, name: p.name })));
 
     uniqueProfiles.forEach(profile => {
       const option = document.createElement('option');
@@ -882,7 +899,11 @@ async function showProfileSelectionForDisable() {
       }
 
       keepProfileSelect.appendChild(option);
+      console.log('[DEBUG] Added option:', profile.name, 'Total options now:', keepProfileSelect.options.length);
     });
+
+    console.log('[DEBUG] Final options count:', keepProfileSelect.options.length);
+    console.log('[DEBUG] Final options:', Array.from(keepProfileSelect.options).map(o => o.textContent));
 
     // Show modal
     modal.style.display = 'flex';
