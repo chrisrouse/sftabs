@@ -836,6 +836,9 @@ function createUrlPatternItem(pattern, index) {
   return div;
 }
 
+// Guard to prevent concurrent calls
+let isShowingDisableModal = false;
+
 /**
  * Show modal to select which profile to keep when disabling profiles
  * @returns {Promise<Object|null>} Selected profile or null if cancelled
@@ -843,6 +846,14 @@ function createUrlPatternItem(pattern, index) {
 async function showProfileSelectionForDisable() {
   return new Promise(async (resolve) => {
     console.log('[DEBUG] showProfileSelectionForDisable: Starting');
+
+    // Prevent concurrent calls
+    if (isShowingDisableModal) {
+      console.log('[DEBUG] Already showing modal, ignoring duplicate call');
+      resolve(null);
+      return;
+    }
+    isShowingDisableModal = true;
 
     const modal = document.querySelector('#disable-profiles-modal');
     const keepProfileSelect = document.querySelector('#keep-profile-select');
@@ -934,6 +945,8 @@ async function showProfileSelectionForDisable() {
       keepProfileSelect.value = '';
       confirmButton.removeEventListener('click', handleConfirm);
       cancelButton.removeEventListener('click', handleCancel);
+      isShowingDisableModal = false; // Reset guard flag
+      console.log('[DEBUG] Modal closed, guard flag reset');
     };
 
     // Add event listeners
