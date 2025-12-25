@@ -20,8 +20,6 @@ navigation:
     url: /user-guide
   - title: Configuration
     url: /configuration
-  - title: Shortcuts
-    url: /shortcuts
 
 # GitHub
 github:

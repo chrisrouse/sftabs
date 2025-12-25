@@ -201,7 +201,7 @@ We're always working to improve SF Tabs. Check our [GitHub Issues](https://githu
 
 - [Complete User Guide](user-guide) - Detailed documentation for all features
 - [Configuration Reference](configuration) - JSON configuration file format
-- [Keyboard Shortcuts](shortcuts) - Set up keyboard shortcuts for quick access
+- [Keyboard Shortcuts](user-guide#keyboard-shortcuts) - Set up keyboard shortcuts for quick access
 - [GitHub Repository](https://github.com/chrisrouse/sftabs) - Source code and issue tracking
 
 ---
