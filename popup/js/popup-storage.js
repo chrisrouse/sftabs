@@ -330,16 +330,28 @@ function setupStorageListeners() {
       if (area === 'local') {
         if (changes.customTabs) {
           const newTabs = changes.customTabs.newValue || [];
-          SFTabs.main.setTabs(newTabs);
-          SFTabs.ui.renderTabList();
+          // Only update popup UI if we're in the popup context
+          if (SFTabs.main && SFTabs.main.setTabs) {
+            SFTabs.main.setTabs(newTabs);
+          }
+          if (SFTabs.ui && SFTabs.ui.renderTabList) {
+            SFTabs.ui.renderTabList();
+          }
         }
       } else if (area === 'sync') {
         // Handle sync storage changes
         if (changes.userSettings) {
           const newSettings = changes.userSettings.newValue || SFTabs.constants.DEFAULT_SETTINGS;
-          SFTabs.main.setUserSettings(newSettings);
-          SFTabs.settings.updateSettingsUI();
-          SFTabs.settings.applyTheme();
+          // Only update popup UI if we're in the popup context
+          if (SFTabs.main && SFTabs.main.setUserSettings) {
+            SFTabs.main.setUserSettings(newSettings);
+          }
+          if (SFTabs.settings && SFTabs.settings.updateSettingsUI) {
+            SFTabs.settings.updateSettingsUI();
+          }
+          if (SFTabs.settings && SFTabs.settings.applyTheme) {
+            SFTabs.settings.applyTheme();
+          }
         }
 
         // Handle chunked tabs changes (check for metadata changes)
@@ -347,8 +359,13 @@ function setupStorageListeners() {
           // Re-read tabs from sync storage
           SFTabs.storageChunking.readChunkedSync('customTabs').then(tabs => {
             if (tabs) {
-              SFTabs.main.setTabs(tabs);
-              SFTabs.ui.renderTabList();
+              // Only update popup UI if we're in the popup context
+              if (SFTabs.main && SFTabs.main.setTabs) {
+                SFTabs.main.setTabs(tabs);
+              }
+              if (SFTabs.ui && SFTabs.ui.renderTabList) {
+                SFTabs.ui.renderTabList();
+              }
             }
           }).catch(err => {
           });
