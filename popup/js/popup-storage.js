@@ -120,18 +120,27 @@ async function saveTabs(tabs) {
     // Always save to profile-specific storage
     await saveProfileTabs(settings.activeProfileId, cleanedTabs);
 
-    // Update the main state with cleaned tabs
-    SFTabs.main.setTabs(cleanedTabs);
+    // Update the main state with cleaned tabs (only in popup context)
+    if (SFTabs.main && SFTabs.main.setTabs) {
+      SFTabs.main.setTabs(cleanedTabs);
+    }
 
-    // Re-render the UI
-    SFTabs.ui.renderTabList();
+    // Re-render the UI (only in popup context)
+    if (SFTabs.ui && SFTabs.ui.renderTabList) {
+      SFTabs.ui.renderTabList();
+    }
 
-    // Show success message
-    SFTabs.main.showStatus('Settings saved', false);
+    // Show success message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Settings saved', false);
+    }
 
     return sortedTabs;
   } catch (error) {
-    SFTabs.main.showStatus('Error saving tabs: ' + error.message, true);
+    // Show error message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Error saving tabs: ' + error.message, true);
+    }
     throw error;
   }
 }
@@ -176,18 +185,27 @@ async function saveUserSettings(settings, skipMigration = false) {
     // Settings are always in sync storage (small, no chunking needed)
     await browser.storage.sync.set({ userSettings: settings });
 
-    // Update the main state
-    SFTabs.main.setUserSettings(settings);
+    // Update the main state (only in popup context)
+    if (SFTabs.main && SFTabs.main.setUserSettings) {
+      SFTabs.main.setUserSettings(settings);
+    }
 
     // Apply theme changes immediately
-    SFTabs.settings.applyTheme();
+    if (SFTabs.settings && SFTabs.settings.applyTheme) {
+      SFTabs.settings.applyTheme();
+    }
 
-    // Show success message
-    SFTabs.main.showStatus('Settings saved', false);
+    // Show success message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Settings saved', false);
+    }
 
     return settings;
   } catch (error) {
-    SFTabs.main.showStatus('Error saving settings: ' + error.message, true);
+    // Show error message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Error saving settings: ' + error.message, true);
+    }
     throw error;
   }
 }
@@ -198,11 +216,15 @@ async function saveUserSettings(settings, skipMigration = false) {
 async function clearAllStorage() {
   try {
     await browser.storage.local.clear();
-    
-    // Reset main state
-    SFTabs.main.setTabs([]);
-    SFTabs.main.setUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS });
-    
+
+    // Reset main state (only in popup context)
+    if (SFTabs.main && SFTabs.main.setTabs) {
+      SFTabs.main.setTabs([]);
+    }
+    if (SFTabs.main && SFTabs.main.setUserSettings) {
+      SFTabs.main.setUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS });
+    }
+
     return true;
   } catch (error) {
     throw error;
@@ -259,7 +281,10 @@ async function importConfiguration(configData) {
       await saveUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS, ...configData.userSettings });
     }
 
-    SFTabs.main.showStatus('Configuration imported successfully. Extension will reload.', false);
+    // Show success message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Configuration imported successfully. Extension will reload.', false);
+    }
 
     // Reload the popup to reflect changes
     setTimeout(() => {
@@ -268,7 +293,10 @@ async function importConfiguration(configData) {
 
     return true;
   } catch (error) {
-    SFTabs.main.showStatus('Error importing configuration: ' + error.message, true);
+    // Show error message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Error importing configuration: ' + error.message, true);
+    }
     throw error;
   }
 }
@@ -435,14 +463,15 @@ async function saveProfiles(profiles) {
       });
     }
 
-    // Show success message
-    if (SFTabs.main) {
+    // Show success message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Profiles saved', false);
     }
 
     return sortedProfiles;
   } catch (error) {
-    if (SFTabs.main) {
+    // Show error message (only in popup context)
+    if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Error saving profiles: ' + error.message, true);
     }
     throw error;
