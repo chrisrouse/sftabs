@@ -852,11 +852,12 @@ async function showProfileSelectionForDisable() {
       return;
     }
 
-    // Populate dropdown with all profiles
-    // Clear all existing options first
-    while (keepProfileSelect.firstChild) {
-      keepProfileSelect.removeChild(keepProfileSelect.firstChild);
-    }
+    // Reload profiles from storage to ensure fresh data
+    await loadProfiles();
+
+    // Clear all existing options - use both methods to be safe
+    keepProfileSelect.innerHTML = '';
+    keepProfileSelect.options.length = 0;
 
     // Add placeholder option
     const placeholderOption = document.createElement('option');
@@ -867,7 +868,10 @@ async function showProfileSelectionForDisable() {
     const settings = await SFTabs.storage.getUserSettings();
     const defaultProfileId = settings.defaultProfileId;
 
-    profilesCache.forEach(profile => {
+    // Use a Set to ensure uniqueness by profile ID
+    const uniqueProfiles = Array.from(new Map(profilesCache.map(p => [p.id, p])).values());
+
+    uniqueProfiles.forEach(profile => {
       const option = document.createElement('option');
       option.value = profile.id;
       option.textContent = profile.name;
