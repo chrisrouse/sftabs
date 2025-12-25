@@ -853,7 +853,16 @@ async function showProfileSelectionForDisable() {
     }
 
     // Populate dropdown with all profiles
-    keepProfileSelect.innerHTML = '<option value="">Choose a profile...</option>';
+    // Clear all existing options first
+    while (keepProfileSelect.firstChild) {
+      keepProfileSelect.removeChild(keepProfileSelect.firstChild);
+    }
+
+    // Add placeholder option
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Choose a profile...';
+    keepProfileSelect.appendChild(placeholderOption);
 
     const settings = await SFTabs.storage.getUserSettings();
     const defaultProfileId = settings.defaultProfileId;
