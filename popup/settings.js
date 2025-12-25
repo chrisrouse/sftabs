@@ -10,6 +10,15 @@ async function initSettingsPage() {
 	// Load user settings
 	await loadUserSettings();
 
+	// Load profiles if the profiles module is available (needed for disable profiles modal)
+	if (window.SFTabs && window.SFTabs.profiles && typeof window.SFTabs.profiles.loadProfiles === 'function') {
+		try {
+			await window.SFTabs.profiles.loadProfiles();
+		} catch (error) {
+			console.warn('Could not load profiles:', error);
+		}
+	}
+
 	// Apply current theme
 	applyTheme();
 

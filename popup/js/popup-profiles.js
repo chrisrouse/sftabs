@@ -1522,6 +1522,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.SFTabs = window.SFTabs || {};
 window.SFTabs.profiles = {
   initProfiles,
+  loadProfiles,
   toggleProfilesEnabled,
   showProfileList,
   showProfileEditForm,

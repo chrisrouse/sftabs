@@ -839,11 +839,39 @@
 		</div>
 	</div>
 
+	<!-- Disable Profiles Modal -->
+	<div id="disable-profiles-modal" class="modal" style="display: none;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>Disable Profiles</h2>
+			</div>
+			<div class="modal-body">
+				<p>Disabling profiles will keep one profile and remove all others.</p>
+				<p>Which profile would you like to keep?</p>
+				<div class="form-group">
+					<label for="keep-profile-select">Select profile to keep:</label>
+					<select id="keep-profile-select" class="clone-profile-select">
+						<option value="">Choose a profile...</option>
+					</select>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="disable-profiles-cancel-button" class="secondary-button">Cancel</button>
+				<button id="disable-profiles-confirm-button" class="primary-button">Disable Profiles</button>
+			</div>
+		</div>
+	</div>
+
 	<!-- Load shared modules first -->
 	<script src="js/shared/browser-compat.js"></script>
 	<script src="js/shared/constants.js"></script>
 	<script src="js/shared/utils.js"></script>
-	<!-- Settings page has its own storage logic, doesn't need popup-storage.js -->
+	<!-- Load storage modules for profiles support -->
+	<script src="js/storage-chunking.js"></script>
+	<script src="js/popup-storage.js"></script>
+	<!-- Load profiles module for disable profiles modal -->
+	<script src="js/popup-profiles.js"></script>
+	<!-- Load settings page logic -->
 	<script src="settings.js"></script>
 </body>
 
