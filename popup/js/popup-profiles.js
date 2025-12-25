@@ -803,6 +803,7 @@ function createUrlPatternItem(pattern, index) {
   const labelSpan = document.createElement('span');
   labelSpan.className = 'url-pattern-text';
   labelSpan.textContent = `${index + 1}. ${pattern}`;
+  labelSpan.dataset.pattern = pattern; // Store the actual pattern value
   labelSpan.style.flex = '1';
   labelSpan.style.fontFamily = "'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace";
   labelSpan.style.fontSize = '13px';
@@ -947,7 +948,7 @@ function addUrlPattern() {
   }
 
   // Add to current list (mock - just for UI demo)
-  const currentPatterns = Array.from(document.querySelectorAll('.url-pattern-text')).map(el => el.textContent);
+  const currentPatterns = Array.from(document.querySelectorAll('.url-pattern-text')).map(el => el.dataset.pattern || el.textContent);
   currentPatterns.push(pattern);
 
   renderUrlPatternList(currentPatterns);
@@ -985,7 +986,7 @@ function editUrlPattern(pattern, index) {
  * Delete URL pattern
  */
 function deleteUrlPattern(index) {
-  const currentPatterns = Array.from(document.querySelectorAll('.url-pattern-text')).map(el => el.textContent);
+  const currentPatterns = Array.from(document.querySelectorAll('.url-pattern-text')).map(el => el.dataset.pattern || el.textContent);
   currentPatterns.splice(index, 1);
   renderUrlPatternList(currentPatterns);
 
@@ -1144,7 +1145,7 @@ async function saveProfile() {
 
     // Get URL patterns from the list
     const urlPatterns = Array.from(document.querySelectorAll('.url-pattern-text'))
-      .map(el => el.textContent.replace(/^\d+\.\s*/, '').trim());
+      .map(el => el.dataset.pattern || el.textContent.replace(/^\d+\.\s*/, '').trim());
 
     if (editingProfile) {
       // Update existing profile
