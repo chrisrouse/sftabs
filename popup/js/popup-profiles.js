@@ -1526,5 +1526,6 @@ window.SFTabs.profiles = {
   showProfileList,
   showProfileEditForm,
   switchActiveProfile,
-  updateActiveProfileBanner
+  updateActiveProfileBanner,
+  showProfileSelectionForDisable
 };

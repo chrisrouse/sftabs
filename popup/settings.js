@@ -187,19 +187,37 @@ function setupEventListeners() {
 			await saveUserSettings();
 			toggleAutoSwitchVisibility();
 		} else {
-			// Show confirmation dialog
-			const confirmed = confirm(
-				'Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.'
-			);
+			// Show profile selection modal
+			if (window.SFTabs && window.SFTabs.profiles && window.SFTabs.profiles.showProfileSelectionForDisable) {
+				const selectedProfile = await window.SFTabs.profiles.showProfileSelectionForDisable();
 
-			if (confirmed) {
-				userSettings.profilesEnabled = false;
-				userSettings.autoSwitchProfiles = false;
-				document.getElementById('auto-switch-profiles').checked = false;
-				await saveUserSettings();
-				toggleAutoSwitchVisibility();
+				if (selectedProfile) {
+					// User confirmed and selected a profile to keep
+					userSettings.profilesEnabled = false;
+					userSettings.autoSwitchProfiles = false;
+					document.getElementById('auto-switch-profiles').checked = false;
+					await saveUserSettings();
+					toggleAutoSwitchVisibility();
+				} else {
+					// User cancelled, revert checkbox
+					e.target.checked = true;
+				}
 			} else {
-				e.target.checked = true;
+				// Fallback to simple confirm if the function isn't available
+				const confirmed = confirm(
+					'Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.'
+				);
+
+				if (confirmed) {
+					userSettings.profilesEnabled = false;
+					userSettings.autoSwitchProfiles = false;
+					document.getElementById('auto-switch-profiles').checked = false;
+					await saveUserSettings();
+					toggleAutoSwitchVisibility();
+				} else {
+					// User cancelled, revert checkbox
+					e.target.checked = true;
+				}
 			}
 		}
 	});
