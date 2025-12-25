@@ -992,20 +992,134 @@ function deleteUrlPattern(index) {
 }
 
 /**
- * Capture current domain
+ * Capture current domain from active Salesforce tab
  */
-function captureCurrentDomain() {
+async function captureCurrentDomain() {
+  try {
+    // Query all tabs to find Salesforce tabs
+    const allTabs = await browser.tabs.query({});
 
-  // In real implementation, we'd query the active tab and extract the MyDomain
-  // For now, just show a demo
-  const input = document.querySelector('#url-pattern-input');
-  if (input) {
-    input.value = 'example-dev-ed';
-    input.focus();
+    // Filter for Salesforce tabs only
+    const salesforceTabs = allTabs.filter(tab => {
+      const url = tab.url || '';
+      return url.includes('salesforce.com') ||
+             url.includes('salesforce-setup.com') ||
+             url.includes('force.com');
+    });
+
+    if (salesforceTabs.length === 0) {
+      throw new Error('No Salesforce tabs found. Please open a Salesforce org first.');
+    }
+
+    // Find the most recently active Salesforce tab
+    // Sort by lastAccessed (most recent first)
+    salesforceTabs.sort((a, b) => (b.lastAccessed || 0) - (a.lastAccessed || 0));
+    const targetTab = salesforceTabs[0];
+
+    const url = targetTab.url;
+
+    // Extract org identifier from various Salesforce URL formats
+    const orgIdentifier = extractOrgIdentifier(url);
+
+    if (!orgIdentifier) {
+      throw new Error(`Could not extract org identifier from URL: ${url}`);
+    }
+
+    // Set the input value
+    const input = document.querySelector('#url-pattern-input');
+
+    if (input) {
+      input.value = orgIdentifier;
+      input.focus();
+    }
+
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus(`Domain captured: ${orgIdentifier}`, false);
+    }
+
+  } catch (error) {
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus(`Error: ${error.message}`, true);
+    }
   }
+}
 
-  if (window.SFTabs && window.SFTabs.main) {
-    window.SFTabs.main.showStatus('Domain captured (demo): example-dev-ed', false);
+/**
+ * Extract org identifier from Salesforce URL
+ * @param {string} url - Full Salesforce URL
+ * @returns {string|null} Org identifier or null if not found
+ */
+function extractOrgIdentifier(url) {
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname;
+
+    // Pattern 1: subdomain.sandbox.my.salesforce-setup.com (sandbox setup URLs)
+    // Example: amplify--dev.sandbox.my.salesforce-setup.com
+    const sandboxSetupMatch = hostname.match(/^([^.]+)\.sandbox\.my\.salesforce-setup\.com$/i);
+    if (sandboxSetupMatch) {
+      return sandboxSetupMatch[1];
+    }
+
+    // Pattern 2: subdomain.sandbox.my.salesforce.com (sandbox my domain)
+    // Example: myorg--dev.sandbox.my.salesforce.com
+    const sandboxMyDomainMatch = hostname.match(/^([^.]+)\.sandbox\.my\.salesforce\.com$/i);
+    if (sandboxMyDomainMatch) {
+      return sandboxMyDomainMatch[1];
+    }
+
+    // Pattern 3: subdomain.sandbox.lightning.force.com (sandbox lightning)
+    // Example: myorg--dev.sandbox.lightning.force.com
+    const sandboxLightningMatch = hostname.match(/^([^.]+)\.sandbox\.lightning\.force\.com$/i);
+    if (sandboxLightningMatch) {
+      return sandboxLightningMatch[1];
+    }
+
+    // Pattern 4: subdomain.develop.my.salesforce-setup.com (developer edition setup URLs)
+    // Example: levelupcrm12-dev-ed.develop.my.salesforce-setup.com
+    const devSetupMatch = hostname.match(/^([^.]+)\.develop\.my\.salesforce-setup\.com$/i);
+    if (devSetupMatch) {
+      return devSetupMatch[1];
+    }
+
+    // Pattern 5: subdomain.lightning.force.com (lightning experience)
+    // Example: myorg-dev-ed.lightning.force.com
+    const lightningMatch = hostname.match(/^([^.]+)\.lightning\.force\.com$/i);
+    if (lightningMatch) {
+      return lightningMatch[1];
+    }
+
+    // Pattern 6: subdomain.my.salesforce.com (my domain)
+    // Example: myorg.my.salesforce.com
+    const myDomainMatch = hostname.match(/^([^.]+)\.my\.salesforce\.com$/i);
+    if (myDomainMatch) {
+      return myDomainMatch[1];
+    }
+
+    // Pattern 7: subdomain.salesforce.com (standard)
+    // Example: myorg.salesforce.com
+    const standardMatch = hostname.match(/^([^.]+)\.salesforce\.com$/i);
+    if (standardMatch) {
+      return standardMatch[1];
+    }
+
+    // Pattern 8: subdomain.my.salesforce-setup.com (setup URLs)
+    // Example: myorg-dev-ed.my.salesforce-setup.com
+    const setupMatch = hostname.match(/^([^.]+)\.my\.salesforce-setup\.com$/i);
+    if (setupMatch) {
+      return setupMatch[1];
+    }
+
+    // Pattern 9: subdomain.develop.lightning.force.com (developer edition)
+    // Example: myorg-dev-ed.develop.lightning.force.com
+    const devLightningMatch = hostname.match(/^([^.]+)\.develop\.lightning\.force\.com$/i);
+    if (devLightningMatch) {
+      return devLightningMatch[1];
+    }
+
+    return null;
+  } catch (error) {
+    return null;
   }
 }
 

@@ -302,6 +302,179 @@ browser.runtime.onStartup.addListener(async () => {
 });
 
 /**
+ * Extract org identifier from Salesforce URL
+ */
+function extractOrgIdentifier(url) {
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname;
+
+    // Sandbox patterns (check first)
+    const sandboxSetupMatch = hostname.match(/^([^.]+)\.sandbox\.my\.salesforce-setup\.com$/i);
+    if (sandboxSetupMatch) return sandboxSetupMatch[1];
+
+    const sandboxMyDomainMatch = hostname.match(/^([^.]+)\.sandbox\.my\.salesforce\.com$/i);
+    if (sandboxMyDomainMatch) return sandboxMyDomainMatch[1];
+
+    const sandboxLightningMatch = hostname.match(/^([^.]+)\.sandbox\.lightning\.force\.com$/i);
+    if (sandboxLightningMatch) return sandboxLightningMatch[1];
+
+    // Developer edition patterns
+    const devSetupMatch = hostname.match(/^([^.]+)\.develop\.my\.salesforce-setup\.com$/i);
+    if (devSetupMatch) return devSetupMatch[1];
+
+    const devLightningMatch = hostname.match(/^([^.]+)\.develop\.lightning\.force\.com$/i);
+    if (devLightningMatch) return devLightningMatch[1];
+
+    // Standard patterns
+    const lightningMatch = hostname.match(/^([^.]+)\.lightning\.force\.com$/i);
+    if (lightningMatch) return lightningMatch[1];
+
+    const myDomainMatch = hostname.match(/^([^.]+)\.my\.salesforce\.com$/i);
+    if (myDomainMatch) return myDomainMatch[1];
+
+    const setupMatch = hostname.match(/^([^.]+)\.my\.salesforce-setup\.com$/i);
+    if (setupMatch) return setupMatch[1];
+
+    const standardMatch = hostname.match(/^([^.]+)\.salesforce\.com$/i);
+    if (standardMatch) return standardMatch[1];
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
+ * Check if auto-switching is enabled and switch profile if URL matches
+ */
+async function checkAndSwitchProfile(url) {
+  try {
+    // Get user settings
+    const settingsResult = await browser.storage.sync.get('userSettings');
+    const settings = settingsResult.userSettings || {};
+
+    // Check if profiles and auto-switching are enabled
+    if (!settings.profilesEnabled || !settings.autoSwitchProfiles) {
+      return;
+    }
+
+    // Check if this is a Salesforce URL
+    if (!url || (!url.includes('salesforce.com') &&
+                  !url.includes('salesforce-setup.com') &&
+                  !url.includes('force.com'))) {
+      return;
+    }
+
+    // Extract org identifier from URL
+    const orgIdentifier = extractOrgIdentifier(url);
+    if (!orgIdentifier) {
+      return;
+    }
+
+    // Get all profiles
+    const profilesResult = await browser.storage.sync.get('profiles');
+    const profiles = profilesResult.profiles || [];
+
+    // Find a profile that matches this URL pattern
+    const matchingProfile = profiles.find(profile => {
+      if (!profile.urlPatterns || profile.urlPatterns.length === 0) {
+        return false;
+      }
+      return profile.urlPatterns.some(pattern => {
+        // Case-insensitive match
+        return pattern.toLowerCase() === orgIdentifier.toLowerCase();
+      });
+    });
+
+    let targetProfile = null;
+    let switchReason = '';
+
+    if (matchingProfile) {
+      // Found a matching profile
+      targetProfile = matchingProfile;
+      switchReason = `matched URL pattern for org: ${orgIdentifier}`;
+    } else {
+      // No match found - fall back to default profile
+      const defaultProfile = profiles.find(p => p.isDefault) ||
+                           profiles.find(p => p.id === settings.defaultProfileId);
+
+      if (defaultProfile) {
+        targetProfile = defaultProfile;
+        switchReason = `no URL pattern match, using default profile for org: ${orgIdentifier}`;
+      } else {
+        return; // No default profile found
+      }
+    }
+
+    // Check if this profile is already active
+    if (settings.activeProfileId === targetProfile.id) {
+      return; // Already on this profile
+    }
+
+    // Switch to the target profile
+    console.log(`Auto-switching to profile: ${targetProfile.name} (${switchReason})`);
+
+    settings.activeProfileId = targetProfile.id;
+    targetProfile.lastActive = new Date().toISOString();
+
+    // Save updated settings and profiles
+    await browser.storage.sync.set({
+      userSettings: settings,
+      profiles: profiles
+    });
+
+    // Notify all open tabs to refresh their tab bars
+    const allTabs = await browser.tabs.query({
+      url: [
+        "*://*.lightning.force.com/lightning/setup/*",
+        "*://*.salesforce-setup.com/lightning/setup/*",
+        "*://*.my.salesforce-setup.com/lightning/setup/*",
+        "*://*.salesforce.com/lightning/setup/*",
+        "*://*.my.salesforce.com/lightning/setup/*",
+        "*://*.sandbox.my.salesforce-setup.com/lightning/setup/*",
+        "*://*.sandbox.my.salesforce.com/lightning/setup/*",
+        "*://*.sandbox.lightning.force.com/lightning/setup/*",
+        "*://*.develop.my.salesforce-setup.com/lightning/setup/*",
+        "*://*.develop.lightning.force.com/lightning/setup/*"
+      ]
+    });
+
+    allTabs.forEach(tab => {
+      browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' })
+        .catch(() => {}); // Ignore errors for tabs without content script
+    });
+
+  } catch (error) {
+    console.error('Error in checkAndSwitchProfile:', error);
+  }
+}
+
+/**
+ * Listen for tab activation (user switches tabs)
+ */
+browser.tabs.onActivated.addListener(async (activeInfo) => {
+  try {
+    const tab = await browser.tabs.get(activeInfo.tabId);
+    if (tab.url) {
+      await checkAndSwitchProfile(tab.url);
+    }
+  } catch (error) {
+    // Tab might not be accessible
+  }
+});
+
+/**
+ * Listen for tab URL updates (user navigates within a tab)
+ */
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  // Only process when URL changes and is complete
+  if (changeInfo.url || (changeInfo.status === 'complete' && tab.url)) {
+    await checkAndSwitchProfile(changeInfo.url || tab.url);
+  }
+});
+
+/**
  * Handle keyboard shortcuts
  */
 browser.commands.onCommand.addListener(async (command) => {
