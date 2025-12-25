@@ -173,7 +173,7 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 #### Reordering Items in a Dropdown
 
-1. Open the parent tab's settings (edit icon)
+1. Open the parent tab's settings (edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;">)
 2. In the dropdown items preview, drag items to reorder them
 3. Save your changes
 
@@ -276,7 +276,7 @@ See the [Shortcuts](shortcuts) page for more details.
 
 ## Settings
 
-Access the Settings page by clicking the gear icon (⚙️) in the extension popup. This opens a dedicated settings page with organized sections for all configuration options.
+Access the Settings page by clicking the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup. This opens a dedicated settings page with organized sections for all configuration options.
 
 ### Appearance
 
@@ -348,18 +348,18 @@ Profiles allow you to create multiple sets of tabs for different Salesforce orgs
 ### Enabling Profiles
 
 1. **Open Settings**
-   Click the gear icon (⚙️) in the extension popup
+   Click the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup
 
 2. **Enable the Profiles feature**
    In the Profiles section, check "Enable Profiles"
 
 3. **Access the Profiles manager**
-   Click the users icon in the extension popup header to manage profiles
+   Click the users icon <img src="{{ '/assets/images/icons/profiles.svg' | relative_url }}" alt="Profiles" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup header to manage profiles
 
 ### Creating a New Profile
 
 1. **Click the Profiles button**
-   Click the users icon in the extension popup
+   Click the users icon <img src="{{ '/assets/images/icons/profiles.svg' | relative_url }}" alt="Profiles" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup
 
 2. **Click "Create New Profile"**
    This opens the profile creation wizard
@@ -399,7 +399,7 @@ Set up profiles to automatically switch based on the Salesforce org you're visit
    Go to Settings → Profiles → Enable "Auto-Switch Profiles"
 
 2. **Edit a profile**
-   Click the edit icon next to a profile in the Profiles manager
+   Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> next to a profile in the Profiles manager
 
 3. **Add URL patterns**
    Enter MyDomain patterns that match your Salesforce orgs
@@ -417,7 +417,7 @@ Set up profiles to automatically switch based on the Salesforce org you're visit
 
 #### Editing a Profile
 
-1. Open the Profiles manager (users icon)
+1. Open the Profiles manager (users icon <img src="{{ '/assets/images/icons/profiles.svg' | relative_url }}" alt="Profiles" style="display: inline; height: 1.2em; vertical-align: middle;">)
 2. Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> next to the profile
 3. Update the profile name or URL patterns
 4. Click "Save Profile"
@@ -433,7 +433,7 @@ Set up profiles to automatically switch based on the Salesforce org you're visit
 #### Renaming a Profile
 
 1. Open the Profiles manager
-2. Click the edit icon next to the profile
+2. Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> next to the profile
 3. Change the profile name (character counter shows remaining characters)
 4. Click "Save Profile"
 
@@ -478,7 +478,7 @@ You can backup your configuration or share it with team members.
 ### Export Configuration
 
 1. **Open settings**
-   Click the gear icon in the extension popup
+   Click the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup
 
 2. **Click "Export Settings"**
    A JSON file will be downloaded to your computer
@@ -489,7 +489,7 @@ You can backup your configuration or share it with team members.
 ### Import Configuration
 
 1. **Open settings**
-   Click the gear icon in the extension popup
+   Click the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup
 
 2. **Click "Import Settings"**
    A file picker will appear
