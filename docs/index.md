@@ -45,7 +45,7 @@ title: Home
         <div class="feature-icon mb-3">
           <i class="bi bi-stars display-4 text-primary"></i>
         </div>
-        <h3 class="h5 mb-3">New in v1.5.0</h3>
+        <h3 class="h5 mb-3">New in v2.0.0</h3>
         <p class="text-muted mb-3">Profiles, dropdown menus, and flexible storage options—all new features!</p>
         <a href="new-features" class="btn btn-outline-primary">Learn More</a>
       </div>

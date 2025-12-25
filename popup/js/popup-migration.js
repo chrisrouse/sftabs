@@ -26,7 +26,7 @@ async function checkMigrationStatus() {
     };
   } catch (error) {
     return {
-      currentVersion: '1.5.0',
+      currentVersion: '2.0.0',
       storedVersion: null,
       needsMigration: false,
       migrationCompleted: false,

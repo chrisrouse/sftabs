@@ -223,7 +223,7 @@ function exportConfiguration() {
     customTabs: cleanedTabs,
     userSettings: settings,
     exportedAt: new Date().toISOString(),
-    version: '1.5.0'
+    version: '2.0.0'
   };
 
   return config;
@@ -250,7 +250,7 @@ async function importConfiguration(configData) {
       // Even with no tabs, mark as installed so we don't reset to defaults
       const useSyncStorage = await getStoragePreference();
       if (!useSyncStorage) {
-        await browser.storage.local.set({ extensionVersion: '1.5.0' });
+        await browser.storage.local.set({ extensionVersion: '2.0.0' });
       }
     }
 
@@ -308,7 +308,7 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
       // Save to local storage
       await browser.storage.local.set({
         customTabs: tabs,
-        extensionVersion: '1.5.0'
+        extensionVersion: '2.0.0'
       });
 
       // Clear old sync storage

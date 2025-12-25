@@ -23,7 +23,7 @@ Learn how to use SF Tabs to customize your Salesforce Setup experience.
 - [Settings](#settings)
 - [Profiles](#profiles)
 - [Import/Export Configuration](#importexport-configuration)
-- [Upgrading to v1.5.0](#upgrading-to-v150-migration-wizard)
+- [Upgrading to v2.0.0](#upgrading-to-v200-migration-wizard)
 - [Troubleshooting](#troubleshooting)
 
 
@@ -110,7 +110,7 @@ When you create a tab that links to an Object Manager page, you can automaticall
    Click "Add Current Page" in the SF Tabs popup
 
 3. **Open the tab settings**
-   Click the edit icon (✏️) next to your new tab
+   Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> next to your new tab
 
 4. **Set up the dropdown**
    Click "Setup as Object Dropdown" button
@@ -212,7 +212,7 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 1. **Open the extension popup**
    Click the SF Tabs icon
 
-2. **Click the edit icon (✏️) next to a tab**
+2. **Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> next to a tab**
    The tab details will appear in an editable form
 
 3. **Make your changes**
@@ -244,7 +244,7 @@ You can easily reorder your tabs using drag and drop:
 1. **Open the extension popup**
    Click the SF Tabs icon
 
-2. **Click the delete icon (🗑️) next to a tab**
+2. **Click the delete icon <img src="{{ '/assets/images/icons/delete.svg' | relative_url }}" alt="Delete" style="display: inline; height: 1.2em; vertical-align: middle;"> next to a tab**
    A confirmation dialog will appear (unless you've disabled confirmations in settings)
 
 3. **Confirm deletion**
@@ -418,14 +418,14 @@ Set up profiles to automatically switch based on the Salesforce org you're visit
 #### Editing a Profile
 
 1. Open the Profiles manager (users icon)
-2. Click the edit icon (✏️) next to the profile
+2. Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> next to the profile
 3. Update the profile name or URL patterns
 4. Click "Save Profile"
 
 #### Deleting a Profile
 
 1. Open the Profiles manager
-2. Click the delete icon (🗑️) next to the profile
+2. Click the delete icon <img src="{{ '/assets/images/icons/delete.svg' | relative_url }}" alt="Delete" style="display: inline; height: 1.2em; vertical-align: middle;"> next to the profile
 3. Confirm deletion
 
 **Note:** You cannot delete the active profile. Switch to another profile first.
@@ -501,13 +501,13 @@ You can backup your configuration or share it with team members.
    Your current settings will be replaced with the imported configuration
 
 
-## Upgrading to v1.5.0 (Migration Wizard)
+## Upgrading to v2.0.0 (Migration Wizard)
 
-When you upgrade to SF Tabs v1.5.0, you'll see a migration wizard that helps you transition to the new profile-based system.
+When you upgrade to SF Tabs v2.0.0, you'll see a migration wizard that helps you transition to the new profile-based system.
 
 ### What's Being Migrated?
 
-Version 1.5.0 introduces a new data structure to support:
+Version 2.0.0 introduces a new data structure to support:
 - Multiple profiles with different tab sets
 - Choice between Sync and Local storage
 - Enhanced dropdown functionality

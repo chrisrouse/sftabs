@@ -87,7 +87,7 @@
     "placeholders": {
       "version": {
         "content": "$1",
-        "example": "1.5.0"
+        "example": "2.0.0"
       }
     }
   },

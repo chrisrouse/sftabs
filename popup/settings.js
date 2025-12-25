@@ -380,7 +380,7 @@ async function performExport(exportEverything, exportSettings, selectedProfileId
 		const localData = await browser.storage.local.get(null);
 
 		const exportData = {
-			version: '1.5.0',
+			version: '2.0.0',
 			exportDate: new Date().toISOString()
 		};
 
@@ -476,7 +476,7 @@ async function importConfiguration(file) {
 		// Detect old format (from import_export.html)
 		if (importData.customTabs && !importData.version) {
 			normalizedData = {
-				version: '1.5.0',
+				version: '2.0.0',
 				exportDate: importData.exportedAt || new Date().toISOString(),
 				settings: importData.userSettings || {},
 				tabs: importData.customTabs || [],
@@ -804,7 +804,7 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
 			// Save to local storage
 			await browser.storage.local.set({
 				customTabs: tabs,
-				extensionVersion: '1.5.0'
+				extensionVersion: '2.0.0'
 			});
 			// Clear old sync storage
 			await browser.storage.sync.remove(['customTabs']);

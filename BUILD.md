@@ -49,8 +49,8 @@ npm run build
 
 Build browser-specific packages:
 ```bash
-npm run build:chrome   # Generates Chrome manifest, builds sftabs-chrome-1.5.0.zip
-npm run build:firefox  # Generates Firefox manifest, builds sftabs-firefox-1.5.0.zip
+npm run build:chrome   # Generates Chrome manifest, builds sftabs-chrome-2.0.0.zip
+npm run build:firefox  # Generates Firefox manifest, builds sftabs-firefox-2.0.0.zip
 ```
 
 ### Test in Browser
@@ -153,12 +153,12 @@ sftabs/
 ### Chrome Web Store
 1. Build: `npm run build:chrome`
 2. This generates Chrome-specific manifest with `service_worker`
-3. Upload `web-ext-artifacts/sftabs-chrome-1.5.0.zip` to Chrome Web Store
+3. Upload `web-ext-artifacts/sftabs-chrome-2.0.0.zip` to Chrome Web Store
 
 ### Firefox Add-ons (AMO)
 1. Build: `npm run build:firefox`
 2. This generates Firefox-specific manifest with `scripts` array
-3. Upload `web-ext-artifacts/sftabs-firefox-1.5.0.zip` to Firefox Add-ons
+3. Upload `web-ext-artifacts/sftabs-firefox-2.0.0.zip` to Firefox Add-ons
 
 ### Edge Add-ons
 1. Build: `npm run build:chrome` (Edge uses Chromium)

@@ -3,9 +3,9 @@ layout: default
 title: New Features
 ---
 
-# What's New in v1.5.0
+# What's New in v2.0.0
 
-SF Tabs v1.5.0 introduces powerful new features to help you manage tabs across multiple Salesforce orgs and organize your setup pages more efficiently.
+SF Tabs v2.0.0 introduces powerful new features to help you manage tabs across multiple Salesforce orgs and organize your setup pages more efficiently.
 
 
 ## 🆕 Major Features
@@ -97,14 +97,14 @@ Choose between two storage modes based on your needs and usage patterns.
 - More efficient storage utilization
 
 ### Migration Wizard
-When upgrading to v1.5.0, a migration wizard guides you through the transition:
+When upgrading to v2.0.0, a migration wizard guides you through the transition:
 - **Automatic detection** - Detects when migration is needed
 - **Data preservation** - All existing tabs are preserved
 - **User control** - Choose when to migrate and which options to enable
 - **Progress tracking** - Real-time progress feedback during migration
 - **Backup option** - Export your data before migrating
 
-[Learn about the Migration Wizard →](user-guide#upgrading-to-v150-migration-wizard)
+[Learn about the Migration Wizard →](user-guide#upgrading-to-v200-migration-wizard)
 
 ### Settings Reorganization
 The settings page has been reorganized into clear sections:
@@ -126,7 +126,7 @@ If you're upgrading from a previous version, here's what to expect:
 3. **Check storage type** - Know whether you're using Sync or Local storage
 
 ### During Migration
-1. **Migration wizard appears** - Automatically shown on first launch of v1.5.0
+1. **Migration wizard appears** - Automatically shown on first launch of v2.0.0
 2. **Choose options** - Select storage type and profile preferences
 3. **Migration runs** - Takes only a few seconds
 4. **Completion** - Confirmation that migration succeeded
@@ -137,7 +137,7 @@ If you're upgrading from a previous version, here's what to expect:
 3. **Set up dropdowns** - Organize your tabs with dropdown menus
 4. **Configure auto-switching** - Add URL patterns for automatic profile switching
 
-[View detailed migration documentation →](user-guide#upgrading-to-v150-migration-wizard)
+[View detailed migration documentation →](user-guide#upgrading-to-v200-migration-wizard)
 
 ---
 

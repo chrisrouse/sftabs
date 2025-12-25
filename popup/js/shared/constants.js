@@ -85,7 +85,7 @@ const DEFAULT_TABS = [
 ];
 
 // Storage configuration
-const STORAGE_VERSION = '1.5.0';
+const STORAGE_VERSION = '2.0.0';
 const CHUNK_SIZE = 7000; // bytes - leave 1KB buffer under 8KB limit
 const CHUNK_KEY_PREFIX = 'customTabs_chunk_';
 const SETTINGS_CHUNK_KEY_PREFIX = 'userSettings_chunk_';
