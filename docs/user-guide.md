@@ -97,9 +97,11 @@ Links to any Lightning URL path within Salesforce.
 
 SF Tabs supports dropdown menus, allowing you to organize related tabs under a parent tab. There are two types of dropdowns:
 
-### Object Manager Dropdowns (Automatic)
+### Object Manager Dropdowns
 
-When you create a tab that links to an Object Manager page, you can automatically create a dropdown menu with all the object's sub-pages.
+When you create a tab that links to an Object Manager page, you can create a dropdown menu with all the object's sub-pages.
+
+
 
 #### Creating an Object Manager Dropdown
 
@@ -114,8 +116,10 @@ When you create a tab that links to an Object Manager page, you can automaticall
 
 4. **Set up the dropdown**
    Click "Setup as Object Dropdown" button
+   
+<img width="404" height="224" alt="Screenshot 2025-12-25 at 1 12 31 PM" src="https://github.com/user-attachments/assets/d98528bd-0d5c-4267-872d-87801435bf66" />
 
-5. **Review the dropdown items**
+6. **Review the dropdown items**
    The extension automatically detects available sub-pages:
    - Details
    - Fields & Relationships
@@ -124,13 +128,15 @@ When you create a tab that links to an Object Manager page, you can automaticall
    - Validation Rules
    - Triggers
    - And more...
+     
+<img width="406" height="344" alt="Screenshot 2025-12-25 at 1 12 55 PM" src="https://github.com/user-attachments/assets/d70d8729-0387-463d-86c4-84f653eacf5b" />
 
 6. **Save your changes**
    Click "Save Changes"
 
 Now when you click this tab in Salesforce Setup, you'll see a dropdown menu with all the object's sub-pages.
 
-**Tip:** Click "Refresh List" if you want to update the dropdown items after Salesforce changes.
+**Tip:** Click "Refresh List" to restore the default Object menu items after making manual changes.
 
 ### Manual Dropdowns (Drag and Drop)
 
@@ -171,11 +177,21 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 ### Managing Dropdown Items
 
+<img width="356" height="108" alt="Screenshot 2025-12-25 at 1 14 49 PM" src="https://github.com/user-attachments/assets/6c565416-8075-4109-a7bf-d6cf3b7f9cc2" />
+
 #### Reordering Items in a Dropdown
 
-1. Open the parent tab's settings (edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;">)
+1. Click on the parent tab's name to open the dropdown items
 2. In the dropdown items preview, drag items to reorder them
 3. Save your changes
+
+#### Editing Items in Dropdown
+
+1. Click on Edit next to an item in the dropdown preview to make changes to that menu item
+
+#### Promoting Dropdown Items to Top-level Items
+
+1. Click on the up arrow (↑) to promote a dropdown item to a top-level tab. This will remove it from the dropdown while maintaining other settings for the tab.
 
 #### Removing Items from a Dropdown
 
@@ -406,24 +422,6 @@ Here's an example of how you might organize tabs for optimal shortcut usage:
 - Check the extension popup to see which tab is in which position
 
 
-### Tips & Tricks
-
-#### Power User Workflow
-
-1. Create tabs for your 5-10 most common Setup pages
-2. Order them by frequency of use
-3. Assign shortcuts to the top 5 tabs
-4. Use shortcuts for quick navigation, popup for less frequent tabs
-
-#### Team Standardization
-
-If your team shares a configuration file, document recommended shortcuts so everyone uses the same key combinations. This makes it easier to help each other and share tips.
-
-#### Muscle Memory
-
-It takes about 2-3 weeks of regular use to build muscle memory for keyboard shortcuts. Be patient and keep using them!
-
-
 ## Settings
 
 Access the Settings page by clicking the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup. This opens a dedicated settings page with organized sections for all configuration options.
@@ -470,7 +468,7 @@ When disabled, tabs are stored locally:
   - Does not sync to other devices
   - Useful if you have many tabs or device-specific configurations
 
-**Note:** Regardless of which storage option you choose, all data remains in your browser - nothing is ever sent to external servers.
+**Note:** Regardless of which storage option you choose, all data remains in your browser or managed by your browser's sync system. SF Tabs doesn't not send your data anywhere else.
 
 ### Profiles
 
@@ -495,6 +493,8 @@ See the [Keyboard Shortcuts](#keyboard-shortcuts) section for detailed setup ins
 
 Profiles allow you to create multiple sets of tabs for different Salesforce orgs, projects, or work contexts. Each profile can have its own unique collection of tabs.
 
+<img width="389" height="307" alt="Screenshot 2025-12-25 at 1 25 39 PM" src="https://github.com/user-attachments/assets/307c2914-306a-413d-a5bb-6f464ff9930f" />
+
 ### Enabling Profiles
 
 1. **Open Settings**
@@ -503,10 +503,12 @@ Profiles allow you to create multiple sets of tabs for different Salesforce orgs
 2. **Enable the Profiles feature**
    In the Profiles section, check "Enable Profiles"
 
-3. **Access the Profiles manager**
+4. **Access the Profiles manager**
    Click the users icon <img src="{{ '/assets/images/icons/profiles.svg' | relative_url }}" alt="Profiles" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup header to manage profiles
 
 ### Creating a New Profile
+
+<img width="411" height="375" alt="Screenshot 2025-12-25 at 1 26 59 PM" src="https://github.com/user-attachments/assets/f8eb9e66-0ad6-4264-ab6c-64d2676e49b5" />
 
 1. **Click the Profiles button**
    Click the users icon <img src="{{ '/assets/images/icons/profiles.svg' | relative_url }}" alt="Profiles" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup
@@ -515,15 +517,18 @@ Profiles allow you to create multiple sets of tabs for different Salesforce orgs
    This opens the profile creation wizard
 
 3. **Choose initialization method:**
+  
+<img width="405" height="399" alt="Screenshot 2025-12-25 at 1 27 32 PM" src="https://github.com/user-attachments/assets/932c6ce4-541d-42bf-a016-58438499451c" />
+
    - **Add default tabs:** Start with the standard set of tabs (Flows, Users, Profiles, etc.)
    - **Start with no tabs:** Begin with an empty profile and add tabs manually
    - **Clone another profile:** Copy tabs from an existing profile
 
-4. **Name your profile**
+6. **Name your profile**
    Enter a descriptive name (up to 30 characters)
    Examples: "Work - Production", "Sandbox - Dev", "Client - Acme Corp"
 
-5. **Save the profile**
+7. **Save the profile**
    Your new profile is created and ready to use
 
 ### Switching Between Profiles
@@ -555,6 +560,8 @@ Set up profiles to automatically switch based on the Salesforce org you're visit
    Enter MyDomain patterns that match your Salesforce orgs
    - Example: `mycompany-dev-ed` matches `https://mycompany-dev-ed.develop.my.salesforce.com`
    - Example: `acmecorp` matches `https://acmecorp.lightning.force.com`
+     
+<img width="414" height="517" alt="Screenshot 2025-12-25 at 1 33 37 PM" src="https://github.com/user-attachments/assets/2b86ed47-3baf-44ae-8089-4167ac57f724" />
 
 4. **Capture current domain**
    Click "Capture Current Domain" to automatically add the domain from your current Salesforce tab
@@ -564,6 +571,10 @@ Set up profiles to automatically switch based on the Salesforce org you're visit
    The extension automatically switches to the matching profile
 
 ### Managing Profiles
+
+#### Default Profile
+
+1. Click on the "D" icon to set the default profile. This profile is used when URL matching is enabled for sites not specified.
 
 #### Editing a Profile
 
