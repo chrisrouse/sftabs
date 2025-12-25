@@ -198,17 +198,26 @@ function setupEventListeners() {
 		} else {
 			// Show profile selection modal
 			if (window.SFTabs && window.SFTabs.profiles && window.SFTabs.profiles.showProfileSelectionForDisable) {
+				console.log('[DEBUG SETTINGS] Showing profile selection modal');
 				const selectedProfile = await window.SFTabs.profiles.showProfileSelectionForDisable();
+				console.log('[DEBUG SETTINGS] Selected profile:', selectedProfile);
 
 				if (selectedProfile) {
-					// User confirmed and selected a profile to keep
-					userSettings.profilesEnabled = false;
-					userSettings.autoSwitchProfiles = false;
-					document.getElementById('auto-switch-profiles').checked = false;
-					await saveUserSettings();
-					toggleAutoSwitchVisibility();
+					// User confirmed and selected a profile to keep - disable profiles
+					console.log('[DEBUG SETTINGS] Calling disableProfilesAndKeepOne');
+					await window.SFTabs.profiles.disableProfilesAndKeepOne(selectedProfile);
+					console.log('[DEBUG SETTINGS] Profile disabling complete');
+
+					// Reload settings to reflect changes and update UI
+					await loadUserSettings();
+					updateUI();
+					console.log('[DEBUG SETTINGS] Settings reloaded and UI updated, profilesEnabled:', userSettings.profilesEnabled);
+
+					// Show success message
+					showStatus(`Profiles disabled. Kept "${selectedProfile.name}" profile`, false);
 				} else {
 					// User cancelled, revert checkbox
+					console.log('[DEBUG SETTINGS] User cancelled, reverting checkbox');
 					e.target.checked = true;
 				}
 			} else {

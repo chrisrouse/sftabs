@@ -149,38 +149,18 @@ async function initProfiles() {
           return;
         }
 
-        // Set selected profile as active
-        settings.activeProfileId = selectedProfile.id;
-        settings.defaultProfileId = selectedProfile.id;
-
-        // Delete all OTHER profiles and their storage
-        const profilesToDelete = profilesCache.filter(p => p.id !== selectedProfile.id);
-        const useSyncStorage = await SFTabs.storage.getStoragePreference();
-
-        for (const profile of profilesToDelete) {
-          const profileTabsKey = `profile_${profile.id}_tabs`;
-
-          if (useSyncStorage) {
-            await SFTabs.storageChunking.clearChunkedSync(profileTabsKey);
-          } else {
-            await browser.storage.local.remove(profileTabsKey);
-          }
-        }
-
-        // Update cache to only contain selected profile
-        profilesCache.length = 0;
-        profilesCache.push(selectedProfile);
-        await SFTabs.storage.saveProfiles(profilesCache);
-
+        // Disable profiles and keep only the selected one
+        await disableProfilesAndKeepOne(selectedProfile);
 
         if (window.SFTabs && window.SFTabs.main) {
           window.SFTabs.main.showStatus(`Profiles UI disabled. Kept ${selectedProfile.name} profile`, false);
         }
+      } else {
+        // Update settings and toggle UI visibility (only if not disabling)
+        settings.profilesEnabled = enabled;
+        await SFTabs.storage.saveUserSettings(settings);
       }
 
-      // Update settings and toggle UI visibility
-      settings.profilesEnabled = enabled;
-      await SFTabs.storage.saveUserSettings(settings);
       toggleProfilesEnabled(enabled);
 
       // Update UI if enabling profiles
@@ -834,6 +814,57 @@ function createUrlPatternItem(pattern, index) {
   div.appendChild(buttonContainer);
 
   return div;
+}
+
+/**
+ * Disable profiles feature, keeping only the selected profile and deleting all others
+ * @param {Object} selectedProfile - The profile to keep
+ * @returns {Promise<void>}
+ */
+async function disableProfilesAndKeepOne(selectedProfile) {
+  console.log('[DEBUG] disableProfilesAndKeepOne: Starting with profile', selectedProfile.name);
+
+  const settings = await SFTabs.storage.getUserSettings();
+
+  // Set selected profile as active and default
+  settings.activeProfileId = selectedProfile.id;
+  settings.defaultProfileId = selectedProfile.id;
+  settings.profilesEnabled = false;
+  settings.autoSwitchProfiles = false;
+
+  console.log('[DEBUG] Updated settings:', settings);
+
+  // Delete all OTHER profiles and their storage
+  const profilesToDelete = profilesCache.filter(p => p.id !== selectedProfile.id);
+  console.log('[DEBUG] Profiles to delete:', profilesToDelete.map(p => p.name));
+
+  const useSyncStorage = await SFTabs.storage.getStoragePreference();
+
+  for (const profile of profilesToDelete) {
+    const profileTabsKey = `profile_${profile.id}_tabs`;
+    console.log('[DEBUG] Deleting storage for profile:', profile.name, 'key:', profileTabsKey);
+
+    if (useSyncStorage) {
+      await SFTabs.storageChunking.clearChunkedSync(profileTabsKey);
+    } else {
+      await browser.storage.local.remove(profileTabsKey);
+    }
+  }
+
+  // Update cache to only contain selected profile
+  profilesCache.length = 0;
+  profilesCache.push(selectedProfile);
+  console.log('[DEBUG] Updated profiles cache, length:', profilesCache.length);
+
+  // Save the single profile
+  await SFTabs.storage.saveProfiles(profilesCache);
+  console.log('[DEBUG] Saved profiles to storage');
+
+  // Save updated settings
+  await SFTabs.storage.saveUserSettings(settings);
+  console.log('[DEBUG] Saved user settings');
+
+  console.log('[DEBUG] disableProfilesAndKeepOne: Complete');
 }
 
 // Guard to prevent concurrent calls
@@ -1575,5 +1606,6 @@ window.SFTabs.profiles = {
   showProfileEditForm,
   switchActiveProfile,
   updateActiveProfileBanner,
-  showProfileSelectionForDisable
+  showProfileSelectionForDisable,
+  disableProfilesAndKeepOne
 };
