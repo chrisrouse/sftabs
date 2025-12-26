@@ -740,8 +740,18 @@ function showStatus(message, isError = false) {
   }
 
   console.log('Status message element:', domElements.statusMessage);
-  console.log('Status message display:', window.getComputedStyle(domElements.statusMessage).display);
-  console.log('Status message visibility:', window.getComputedStyle(domElements.statusMessage).visibility);
+  console.log('Status message innerHTML:', domElements.statusMessage.innerHTML);
+  console.log('Status message textContent:', domElements.statusMessage.textContent);
+
+  const computedStyle = window.getComputedStyle(domElements.statusMessage);
+  console.log('Status message display:', computedStyle.display);
+  console.log('Status message visibility:', computedStyle.visibility);
+  console.log('Status message color:', computedStyle.color);
+  console.log('Status message font-size:', computedStyle.fontSize);
+  console.log('Status message line-height:', computedStyle.lineHeight);
+  console.log('Status message padding:', computedStyle.padding);
+  console.log('Status message height:', computedStyle.height);
+  console.log('Status message overflow:', computedStyle.overflow);
 
   // Clear message after a delay
   setTimeout(() => {
