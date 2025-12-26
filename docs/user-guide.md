@@ -478,7 +478,7 @@ When disabled, tabs are stored locally:
 
 ### Profiles
 
-Enable the Profiles feature to create multiple tab configurations for different Salesforce orgs or work contexts. See the [Profiles Guide](#profiles) section for complete documentation.
+Enable the Profiles feature to create multiple tab configurations for different Salesforce orgs or work contexts. See the [Profiles](#profiles) section for complete documentation.
 
 #### Enable Profiles
 
