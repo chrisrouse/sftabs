@@ -981,13 +981,13 @@ function handleDropdownCreation(draggedItem, targetItem) {
   console.log('  Calculated targetDepth:', targetDepth);
   console.log('New combined depth would be:', newDepth);
   console.log('MAX_DEPTH allowed:', 3);
-  console.log('Will block:', newDepth >= 3);
+  console.log('Will block:', newDepth > 3);
   console.log('===================================');
 
   // Maximum supported depth is 3 levels (0, 1, 2)
   // Renderer only displays flyout submenus up to level 2 to prevent UI overlay issues
   const MAX_DEPTH = 3;
-  if (newDepth >= MAX_DEPTH) {
+  if (newDepth > MAX_DEPTH) {
     SFTabs.main.showStatus(
       `Cannot nest deeper than ${MAX_DEPTH} levels. This item has ${draggedItemDepth} level${draggedItemDepth > 1 ? 's' : ''}.`,
       true
