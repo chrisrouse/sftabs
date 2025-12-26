@@ -844,18 +844,29 @@
   /* Status Message */
   .status-message {
 	text-align: center;
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--color-text-weak);
-	min-height: 24px;
+	min-height: 32px;
 	font-weight: 500;
+	padding: 8px 12px;
+	line-height: 1.4;
+	display: block;
+	position: sticky;
+	bottom: 0;
+	background-color: var(--color-background);
+	z-index: 100;
   }
-  
+
   .status-message.success {
 	color: var(--slds-color-success);
+	background-color: #d4edda;
   }
-  
+
   .status-message.error {
-	color: var(--slds-color-error);
+	color: #721c24;
+	background-color: #f8d7da;
+	border: 1px solid #f5c6cb;
+	border-radius: 4px;
   }
   
   /* Modal Styles */
