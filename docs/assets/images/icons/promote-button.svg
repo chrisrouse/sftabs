@@ -1,4 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="34" height="22" viewBox="0 0 34 22">
   <rect width="34" height="22" rx="3" fill="#00cc99"/>
-  <text x="17" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white">↑</text>
+  <g transform="translate(9.2, 3.2) scale(0.65)" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="12" y1="19" x2="12" y2="5"/>
+    <polyline points="5 12 12 5 19 12"/>
+  </g>
 </svg>
