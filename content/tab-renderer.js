@@ -464,7 +464,7 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     container.appendChild(itemLi);
 
     // Recursively render nested items as flyout submenu if they exist
-    if (hasNestedItems && level < 3) { // Support up to 4 levels (0, 1, 2, 3)
+    if (hasNestedItems && level < 2) { // Support up to 3 levels (0, 1, 2)
       const submenuContainer = document.createElement('div');
       submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
       // Calculate z-index: base 10000 + (level * 100) to ensure deeper levels appear on top
