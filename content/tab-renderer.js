@@ -464,15 +464,17 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     container.appendChild(itemLi);
 
     // Recursively render nested items as flyout submenu if they exist
-    if (hasNestedItems && level < 1) { // Only support 2 levels (0 and 1)
+    if (hasNestedItems && level < 3) { // Support up to 4 levels (0, 1, 2, 3)
       const submenuContainer = document.createElement('div');
       submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
+      // Calculate z-index: base 10000 + (level * 100) to ensure deeper levels appear on top
+      const zIndex = 10000 + (level * 100);
       submenuContainer.style.cssText = `
         display: none !important;
         position: fixed !important;
         min-width: 200px !important;
         width: 240px !important;
-        z-index: 10000 !important;
+        z-index: ${zIndex} !important;
         background-color: rgb(255, 255, 255) !important;
         border: 1px solid rgb(221, 219, 218) !important;
         border-radius: 0.25rem !important;
@@ -516,11 +518,13 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       // Create invisible bridge element between parent item and submenu
       const bridge = document.createElement('div');
       bridge.className = 'submenu-bridge';
+      // Bridge should be just below its submenu in z-index
+      const bridgeZIndex = zIndex - 1;
       bridge.style.cssText = `
         position: fixed !important;
         background: transparent !important;
         pointer-events: auto !important;
-        z-index: 9999 !important;
+        z-index: ${bridgeZIndex} !important;
         display: none !important;
       `;
       document.body.appendChild(bridge);
