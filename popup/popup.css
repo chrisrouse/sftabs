@@ -181,10 +181,11 @@
 	margin-left: 8px;
   }
 
-  /* Adjust main content margin when banner is visible */
+  /* Adjust main content margin and height when banner is visible */
   #main-content.with-banner,
   #action-panel.with-banner {
 	margin-top: 82px !important;
+	height: calc(100% - 82px) !important;
   }
 
   footer {
