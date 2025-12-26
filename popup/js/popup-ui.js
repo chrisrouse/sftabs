@@ -969,6 +969,21 @@ function handleDropdownCreation(draggedItem, targetItem) {
   // The new depth would be the max of current target depth and dragged item depth
   const newDepth = Math.max(targetDepth, draggedItemDepth);
 
+  // DEBUG: Log validation details
+  console.log('=== Dropdown Nesting Validation ===');
+  console.log('Dragged tab:', draggedTab.label);
+  console.log('  Has dropdownItems:', !!draggedTab.dropdownItems);
+  console.log('  dropdownItems count:', draggedTab.dropdownItems?.length || 0);
+  console.log('  Calculated draggedItemDepth:', draggedItemDepth);
+  console.log('Target tab:', targetTab.label);
+  console.log('  Has dropdownItems:', !!targetTab.dropdownItems);
+  console.log('  dropdownItems count:', targetTab.dropdownItems?.length || 0);
+  console.log('  Calculated targetDepth:', targetDepth);
+  console.log('New combined depth would be:', newDepth);
+  console.log('MAX_DEPTH allowed:', 3);
+  console.log('Will block:', newDepth >= 3);
+  console.log('===================================');
+
   // Maximum supported depth is 3 levels (0, 1, 2)
   // Renderer only displays flyout submenus up to level 2 to prevent UI overlay issues
   const MAX_DEPTH = 3;
