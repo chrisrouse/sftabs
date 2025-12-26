@@ -3,7 +3,7 @@ layout: default
 title: User Guide
 ---
 
-# User Guide
+# User Guide (Pre-release Documentation)
 
 Learn how to use SF Tabs to customize your Salesforce Setup experience.
 
