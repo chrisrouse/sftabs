@@ -36,6 +36,8 @@ Learn how to use SF Tabs to customize your Salesforce Setup experience.
 
 ### Method 1: Quick Add from Current Page
 
+<img width="402" height="52" alt="Screenshot 2025-12-26 at 7 30 40 AM" src="https://github.com/user-attachments/assets/c3075e90-23b8-4e4b-b6a3-0d13664d7d76" />
+
 1. **Navigate to a Salesforce Setup page**
    Go to the page you want to create a tab for (e.g., Flows, Users, Profiles)
 
@@ -43,9 +45,11 @@ Learn how to use SF Tabs to customize your Salesforce Setup experience.
    The extension will detect the current page
 
 3. **Click Quick Create button <img src="{{ '/assets/images/icons/quick-add.svg' | relative_url }}" alt="Quick Add" style="display: inline; height: 1.2em; vertical-align: middle;">**
-   A new tab will be created with the page name and URL automatically filled in
+   A new tab will be created with the page name and URL automatically filled in. Some pages display a different name than you may expect. For example, if you are using Enhanced User List View, the page title is "People" even though it displays "User" on the page. This is expected since the page title is used for the generated tab name.
 
 ### Method 2: Manual Tab Creation
+
+<img width="412" height="475" alt="Screenshot 2025-12-26 at 7 29 51 AM" src="https://github.com/user-attachments/assets/9e7efde0-6fe2-4e1d-9858-30ef4a621b16" />
 
 1. **Open the extension popup**
    Click the SF Tabs icon in your browser toolbar
@@ -70,28 +74,25 @@ Links to standard Salesforce Setup pages. Use the Setup page name as the path.
 
 **Examples:**
 - `Flows` - Links to Flow Builder
-- `ManageUsers` - Links to Users page
+- `ManageUsersLightning` - Links to Users page
 - `EnhancedProfiles` - Links to Profiles page
-- `PermSets` - Links to Permission Sets
+- `PermissionSetListView` - Links to Permission Sets
 
 ### Object Pages
 
 Links to Object Manager pages for standard or custom objects.
 
 **Examples:**
-- `Account` - Account Object Manager
-- `Contact` - Contact Object Manager
-- `Custom_Object__c` - Custom Object Manager
+- `Account` - Account Object
+- `Custom_Object__c` - Custom Object
 
 ### Custom URLs
 
 Links to any Lightning URL path within Salesforce.
 
 **Examples:**
-- `lightning/cms/home` - CMS/Digital Experience home
-- `lightning/o/Account/list` - Account list view
-- `copado__User_Story__c/list` - Custom object list view
-
+- `interaction_explorer/flowExplorer.app` - Flow Trigger Explorer
+- `Opportunity/list?filterName=ClosingNextMonth` - Opportunity "Closing Next Month" list view
 
 ## Creating Dropdown Menus
 
@@ -177,7 +178,12 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 ### Managing Dropdown Items
 
+1. Click on the tab name to see the items included in the dropdown
+
+<img width="405" height="58" alt="Screenshot 2025-12-26 at 7 58 33 AM" src="https://github.com/user-attachments/assets/db754a22-d09a-4641-aee7-3ecb425161cc" />
+
 <img width="356" height="108" alt="Screenshot 2025-12-25 at 1 14 49 PM" src="https://github.com/user-attachments/assets/6c565416-8075-4109-a7bf-d6cf3b7f9cc2" />
+
 
 #### Reordering Items in a Dropdown
 
@@ -189,20 +195,32 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 1. Click on Edit next to an item in the dropdown preview to make changes to that menu item
 
-#### Promoting Dropdown Items to Top-level Items
+#### Promoting Dropdown Items to Regular Tabs
 
-1. Click on the up arrow (↑) to promote a dropdown item to a top-level tab. This will remove it from the dropdown while maintaining other settings for the tab.
+1. Click on the up arrow <img src="https://chrisrouse.github.io/sftabs/assets/images/icons/promote-button.svg" alt="Promote" style="display: inline; vertical-align: middle;"> to promote a dropdown item to a top-level tab
+2. The item becomes a regular top-level tab again
+
 
 #### Removing Items from a Dropdown
 
 1. Open the parent tab's settings
-2. Click the remove icon (×) next to the item
-3. The item becomes a regular top-level tab again
+2. Click the remove icon <img src="https://chrisrouse.github.io/sftabs/assets/images/icons/remove-button.svg" alt="Remove" style="display: inline; vertical-align: middle;"> next to the item
+3. The item is removed from the dropdown
 
 #### Converting a Dropdown Back to a Regular Tab
 
 1. Remove all items from the dropdown
 2. The tab automatically becomes a regular tab
+
+#### Multi-level Dropdown Menus
+
+1. Nested dropdowns are supported.
+2. An example for using nested dropdowns would be having a folder that organizes your object tabs. The first level shows the object names and the second level shows the object menus.
+3. Create your object tabs first and then drag them into the parent folder. 
+
+<img width="406" height="321" alt="Screenshot 2025-12-26 at 8 03 19 AM" src="https://github.com/user-attachments/assets/92868d68-6ec1-47cb-9568-052fbaa1a80f" />
+<img width="548" height="495" alt="Screenshot 2025-12-26 at 8 03 31 AM" src="https://github.com/user-attachments/assets/da1d9a15-909f-4f6e-820e-452a08880607" />
+
 
 ### Dropdown Best Practices
 
@@ -216,7 +234,6 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 **Limit Dropdown Depth**
 - Keep menus shallow (one level) for best usability
-- Nested dropdowns are not supported
 
 **Combine with Profiles**
 - Create different dropdown structures for different profiles
