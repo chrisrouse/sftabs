@@ -916,6 +916,28 @@ function finalizeDrop(event, draggedItem) {
 }
 
 /**
+ * Calculate the maximum nesting depth of dropdown items
+ * @param {Array} items - Array of dropdown items
+ * @param {number} currentDepth - Current depth level (default 0)
+ * @returns {number} Maximum depth
+ */
+function calculateMaxNestingDepth(items, currentDepth = 0) {
+  if (!items || items.length === 0) {
+    return currentDepth;
+  }
+
+  let maxDepth = currentDepth;
+  for (const item of items) {
+    if (item.dropdownItems && item.dropdownItems.length > 0) {
+      const itemDepth = calculateMaxNestingDepth(item.dropdownItems, currentDepth + 1);
+      maxDepth = Math.max(maxDepth, itemDepth);
+    }
+  }
+
+  return maxDepth;
+}
+
+/**
  * Handle dropdown creation by dropping one tab onto another
  */
 function handleDropdownCreation(draggedItem, targetItem) {
@@ -931,6 +953,29 @@ function handleDropdownCreation(draggedItem, targetItem) {
   // Initialize dropdownItems array if it doesn't exist
   if (!targetTab.dropdownItems) {
     targetTab.dropdownItems = [];
+  }
+
+  // Check nesting depth before allowing drop
+  // Target tab will become level 0, dragged item becomes level 1
+  // Calculate depth of dragged item's children starting at level 1
+  const draggedItemDepth = draggedTab.dropdownItems
+    ? 1 + calculateMaxNestingDepth(draggedTab.dropdownItems, 0)
+    : 1;
+
+  // Calculate current depth of target tab
+  const targetDepth = calculateMaxNestingDepth(targetTab.dropdownItems, 1);
+
+  // The new depth would be the max of current target depth and dragged item depth
+  const newDepth = Math.max(targetDepth, draggedItemDepth);
+
+  // Maximum supported depth is 4 levels (0, 1, 2, 3)
+  const MAX_DEPTH = 4;
+  if (newDepth >= MAX_DEPTH) {
+    SFTabs.main.showStatus(
+      `Cannot nest deeper than ${MAX_DEPTH} levels. This item has ${draggedItemDepth} level${draggedItemDepth > 1 ? 's' : ''}.`,
+      true
+    );
+    return;
   }
 
   // Create a dropdown item from the dragged tab
