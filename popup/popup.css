@@ -185,7 +185,7 @@
   #main-content.with-banner,
   #action-panel.with-banner {
 	margin-top: 82px !important;
-	height: calc(100% - 82px) !important;
+	height: calc(100% - 82px - 60px) !important;
   }
 
   footer {
@@ -267,7 +267,7 @@
 	position: relative;
 	background-color: var(--color-background);
 	margin-top: 56px;
-	height: calc(100% - 56px);
+	height: calc(100% - 56px - 60px);
 	display: none;
   }
 
