@@ -916,25 +916,24 @@ function finalizeDrop(event, draggedItem) {
 }
 
 /**
- * Calculate the maximum nesting depth of dropdown items
+ * Calculate the maximum nesting depth (number of levels) of dropdown items
  * @param {Array} items - Array of dropdown items
- * @param {number} currentDepth - Current depth level (default 0)
- * @returns {number} Maximum depth
+ * @returns {number} Maximum number of levels (1 for items with no children, 2 for items with one level of children, etc.)
  */
-function calculateMaxNestingDepth(items, currentDepth = 0) {
+function calculateMaxNestingDepth(items) {
   if (!items || items.length === 0) {
-    return currentDepth;
+    return 0;
   }
 
-  let maxDepth = currentDepth;
+  let maxLevels = 1; // Count this level
   for (const item of items) {
     if (item.dropdownItems && item.dropdownItems.length > 0) {
-      const itemDepth = calculateMaxNestingDepth(item.dropdownItems, currentDepth + 1);
-      maxDepth = Math.max(maxDepth, itemDepth);
+      const childLevels = calculateMaxNestingDepth(item.dropdownItems);
+      maxLevels = Math.max(maxLevels, 1 + childLevels);
     }
   }
 
-  return maxDepth;
+  return maxLevels;
 }
 
 /**
@@ -957,20 +956,22 @@ function handleDropdownCreation(draggedItem, targetItem) {
 
   // Check nesting depth before allowing drop
   // Target tab will become level 0, dragged item becomes level 1
-  // Calculate depth of dragged item's children starting at level 1
+  // Calculate total levels in dragged item's structure (including the item itself)
   const draggedItemDepth = draggedTab.dropdownItems
-    ? 1 + calculateMaxNestingDepth(draggedTab.dropdownItems, 0)
+    ? 1 + calculateMaxNestingDepth(draggedTab.dropdownItems)
     : 1;
 
-  // Calculate current depth of target tab
-  const targetDepth = calculateMaxNestingDepth(targetTab.dropdownItems, 1);
+  // Calculate current levels in target tab's dropdowns
+  const targetDepth = targetTab.dropdownItems
+    ? 1 + calculateMaxNestingDepth(targetTab.dropdownItems)
+    : 1;
 
   // The new depth would be the max of current target depth and dragged item depth
   const newDepth = Math.max(targetDepth, draggedItemDepth);
 
-  // Maximum supported depth is 4 levels (0, 1, 2, 3)
-  // Note: Renderer only displays flyout submenus up to level 2 to prevent UI overlay issues
-  const MAX_DEPTH = 4;
+  // Maximum supported depth is 3 levels (0, 1, 2)
+  // Renderer only displays flyout submenus up to level 2 to prevent UI overlay issues
+  const MAX_DEPTH = 3;
   if (newDepth >= MAX_DEPTH) {
     SFTabs.main.showStatus(
       `Cannot nest deeper than ${MAX_DEPTH} levels. This item has ${draggedItemDepth} level${draggedItemDepth > 1 ? 's' : ''}.`,
