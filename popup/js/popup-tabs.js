@@ -104,8 +104,8 @@ function enhancedAddTabForCurrentPage() {
           isObject = true;
           const urlParts = currentUrl.split('/lightning/o/');
           if (urlParts.length > 1) {
-            const fullPath = urlParts[1].split('?')[0];
-            path = fullPath;
+            // Keep the full path including query parameters (e.g., for list views with filterName)
+            path = urlParts[1];
             urlBase = '/lightning/o/';
           }
         }
