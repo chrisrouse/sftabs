@@ -968,8 +968,9 @@ function handleDropdownCreation(draggedItem, targetItem) {
   // The new depth would be the max of current target depth and dragged item depth
   const newDepth = Math.max(targetDepth, draggedItemDepth);
 
-  // Maximum supported depth is 3 levels (0, 1, 2)
-  const MAX_DEPTH = 3;
+  // Maximum supported depth is 4 levels (0, 1, 2, 3)
+  // Note: Renderer only displays flyout submenus up to level 2 to prevent UI overlay issues
+  const MAX_DEPTH = 4;
   if (newDepth >= MAX_DEPTH) {
     SFTabs.main.showStatus(
       `Cannot nest deeper than ${MAX_DEPTH} levels. This item has ${draggedItemDepth} level${draggedItemDepth > 1 ? 's' : ''}.`,
