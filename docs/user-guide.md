@@ -193,7 +193,7 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 #### Editing Items in Dropdown
 
-1. Click on Edit next to an item in the dropdown preview to make changes to that menu item
+1. Click on Edit <img src="https://chrisrouse.github.io/sftabs/assets/images/icons/edit-button.svg" alt="Promote" style="display: inline; vertical-align: middle;"> next to an item in the dropdown preview to make changes to that menu item
 
 #### Promoting Dropdown Items to Regular Tabs
 
@@ -212,37 +212,26 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 1. Remove all items from the dropdown
 2. The tab automatically becomes a regular tab
 
-#### Multi-level Dropdown Menus
 
-1. Nested dropdowns are supported.
+### Multi-level Dropdown Menus
+
+1. **Up to three levels are supported** Parent > Child > Tab
 2. An example for using nested dropdowns would be having a folder that organizes your object tabs. The first level shows the object names and the second level shows the object menus.
-3. Create your object tabs first and then drag them into the parent folder. 
+3. Create your object tabs first and then drag them into the parent folder.
+4. If you attempt to add a nested group of tabs to another group and it would results in having too many levels, an error is shown.
+   
+<img width="407" height="347" alt="Screenshot 2025-12-26 at 9 42 51 AM" src="https://github.com/user-attachments/assets/cba6c9e8-e94f-480a-ab05-899ef7b59b4e" />
 
-<img width="406" height="321" alt="Screenshot 2025-12-26 at 8 03 19 AM" src="https://github.com/user-attachments/assets/92868d68-6ec1-47cb-9568-052fbaa1a80f" />
-<img width="548" height="495" alt="Screenshot 2025-12-26 at 8 03 31 AM" src="https://github.com/user-attachments/assets/da1d9a15-909f-4f6e-820e-452a08880607" />
+<img width="527" height="482" alt="Screenshot 2025-12-26 at 9 42 59 AM" src="https://github.com/user-attachments/assets/11bd77b9-2c61-4ba2-9d06-a1d468a9eba6" />
 
-
-### Dropdown Best Practices
-
-**Group Related Functionality**
-- Group related Setup pages together (e.g., all user management pages)
-- Organize object-related tasks under the object dropdown
-
-**Use Descriptive Parent Names**
-- Parent tab names should clearly indicate what's in the dropdown
-- Examples: "User Admin", "Account Config", "Dev Tools"
-
-**Limit Dropdown Depth**
-- Keep menus shallow (one level) for best usability
-
-**Combine with Profiles**
-- Create different dropdown structures for different profiles
-- Example: Admin profile might have more granular dropdowns than a basic user profile
+<img width="407" height="607" alt="Screenshot 2025-12-26 at 9 40 36 AM" src="https://github.com/user-attachments/assets/451752e7-5150-4943-b9e5-b57524825eae" />
 
 
 ## Editing Tabs
 
-1. **Open the extension popup**
+<img width="412" height="482" alt="Screenshot 2025-12-26 at 9 45 01 AM" src="https://github.com/user-attachments/assets/abfcd541-0378-47cf-a08a-26b9658a7194" />
+
+1. **Open SF Tabs**
    Click the SF Tabs icon
 
 2. **Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> next to a tab**
