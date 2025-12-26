@@ -719,19 +719,29 @@ function saveActionPanelChanges() {
  * Show status message
  */
 function showStatus(message, isError = false) {
+  console.log('showStatus called:', { message, isError, hasElement: !!domElements.statusMessage });
+
   if (!domElements.statusMessage) {
+    console.error('Status message element not found!');
     return;
   }
-  
+
+  console.log('Setting status message text to:', message);
   domElements.statusMessage.textContent = message;
 
   // Apply appropriate class
   domElements.statusMessage.classList.remove('success', 'error');
   if (isError) {
     domElements.statusMessage.classList.add('error');
+    console.log('Added error class to status message');
   } else if (message) {
     domElements.statusMessage.classList.add('success');
+    console.log('Added success class to status message');
   }
+
+  console.log('Status message element:', domElements.statusMessage);
+  console.log('Status message display:', window.getComputedStyle(domElements.statusMessage).display);
+  console.log('Status message visibility:', window.getComputedStyle(domElements.statusMessage).visibility);
 
   // Clear message after a delay
   setTimeout(() => {
