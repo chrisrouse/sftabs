@@ -753,11 +753,12 @@ function showStatus(message, isError = false) {
   console.log('Status message height:', computedStyle.height);
   console.log('Status message overflow:', computedStyle.overflow);
 
+  // TEMPORARILY DISABLED FOR DEBUGGING - Remove timeout so message stays visible
   // Clear message after a delay
-  setTimeout(() => {
-    domElements.statusMessage.textContent = '';
-    domElements.statusMessage.classList.remove('success', 'error');
-  }, 3000);
+  // setTimeout(() => {
+  //   domElements.statusMessage.textContent = '';
+  //   domElements.statusMessage.classList.remove('success', 'error');
+  // }, 3000);
 }
 
 /**

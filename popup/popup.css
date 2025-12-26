@@ -189,12 +189,14 @@
   }
 
   footer {
-	margin-top: auto;
 	padding: 8px;
 	background-color: var(--color-background);
 	border-radius: 0 0 4px 4px;
-	position: relative;
-	z-index: 5;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 410px;
+	z-index: 10;
   }
   
   /* Typography */
@@ -852,10 +854,7 @@
 	padding: 8px 12px;
 	line-height: 1.4;
 	display: block;
-	position: sticky;
-	bottom: 0;
 	background-color: var(--color-background);
-	z-index: 100;
   }
 
   .status-message.success {

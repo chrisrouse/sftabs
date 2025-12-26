@@ -988,8 +988,9 @@ function handleDropdownCreation(draggedItem, targetItem) {
   // Renderer only displays flyout submenus up to level 2 to prevent UI overlay issues
   const MAX_DEPTH = 3;
   if (newDepth > MAX_DEPTH) {
-    const errorMessage = `Cannot nest this item: Maximum nesting is ${MAX_DEPTH} levels. This would create ${newDepth} levels.`;
-    console.error('NESTING BLOCKED:', errorMessage);
+    const errorMessage = 'Cannot nest items';
+    const detailedMessage = `Cannot nest this item: Maximum nesting is ${MAX_DEPTH} levels. This would create ${newDepth} levels.`;
+    console.error('NESTING BLOCKED:', detailedMessage);
 
     if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus(errorMessage, true);
