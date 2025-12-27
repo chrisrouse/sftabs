@@ -171,7 +171,7 @@
 
 /* Modal Panel - Contains tab list */
 .sftabs-floating-modal .modal-panel {
-  background: white;
+  background: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackground, #ffffff));
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -202,11 +202,11 @@
   flex-direction: column;
 }
 
-/* Tab Items - Clean List Style */
+/* Tab Items - Inherit theme colors like main navigation */
 .sftabs-floating-modal .tab-item {
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--lwc-colorBorder, #e5e5e5);
   cursor: pointer;
   transition: background 0.15s;
   outline: none;
@@ -214,11 +214,11 @@
 }
 
 .sftabs-floating-modal .tab-item:hover {
-  background: #f3f2f2;
+  background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
 }
 
 .sftabs-floating-modal .tab-item:active {
-  background: #e5e5e5;
+  background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
 
 /* Tab Row - Contains label and chevron */
@@ -233,13 +233,13 @@
   flex: 1;
   font-size: 13px;
   font-weight: 400;
-  color: #333;
+  color: var(--slds-g-color-neutral-base-10, var(--lwc-colorTextDefault, #181818));
   line-height: 1.3;
 }
 
 .sftabs-floating-modal .tab-path {
   font-size: 11px;
-  color: #999;
+  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
   margin-top: 1px;
 }
 
@@ -247,7 +247,7 @@
 .sftabs-floating-modal .dropdown-indicator {
   display: inline-flex;
   align-items: center;
-  color: #999;
+  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -265,8 +265,8 @@
 /* Dropdown Children - Nested List */
 .sftabs-floating-modal .dropdown-children {
   display: none;
-  background: #fafafa;
-  border-top: 1px solid #e5e5e5;
+  background: var(--slds-g-color-neutral-base-98, var(--lwc-colorBackground, #fafafa));
+  border-top: 1px solid var(--lwc-colorBorder, #e5e5e5);
 }
 
 .sftabs-floating-modal .tab-item.expanded .dropdown-children {
@@ -279,7 +279,7 @@
   padding: 8px 12px 8px 24px;
   cursor: pointer;
   transition: background 0.15s;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--lwc-colorBorder, #e5e5e5);
 }
 
 .sftabs-floating-modal .dropdown-child-item:last-child {
@@ -287,22 +287,22 @@
 }
 
 .sftabs-floating-modal .dropdown-child-item:hover {
-  background: #f3f2f2;
+  background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
 }
 
 .sftabs-floating-modal .dropdown-child-item:active {
-  background: #e5e5e5;
+  background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
 
 .sftabs-floating-modal .dropdown-child-label {
   font-size: 12px;
   font-weight: 400;
-  color: #555;
+  color: var(--slds-g-color-neutral-base-30, var(--lwc-colorTextDefault, #3e3e3c));
 }
 
 .sftabs-floating-modal .dropdown-child-path {
   font-size: 10px;
-  color: #999;
+  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
   margin-top: 1px;
 }
 
@@ -310,85 +310,13 @@
 .sftabs-floating-modal .empty-state {
   text-align: center;
   padding: 24px 12px;
-  color: #888;
+  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
   font-size: 12px;
   line-height: 1.5;
 }
 
-/* Dark Theme Support */
-[data-theme="dark"] .sftabs-floating-button {
-  background: #1a6ee6;
-}
-
-[data-theme="dark"] .sftabs-floating-button:hover {
-  background: #1558c9;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .modal-panel {
-  background: #1e1e1e;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="dark"] .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb {
-  background: #444;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .tab-item {
-  border-bottom-color: #333;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .tab-item:hover {
-  background: #2a2a2a;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .tab-item:active {
-  background: #333;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .tab-label {
-  color: #e8e8e8;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .tab-path {
-  color: #888;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .dropdown-indicator {
-  color: #888;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .dropdown-children {
-  background: #252525;
-  border-top-color: #333;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .dropdown-child-item {
-  border-bottom-color: #333;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .dropdown-child-item:hover {
-  background: #2a2a2a;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .dropdown-child-item:active {
-  background: #333;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .dropdown-child-label {
-  color: #ccc;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .dropdown-child-path {
-  color: #777;
-}
-
-[data-theme="dark"] .sftabs-floating-modal .empty-state {
-  color: #888;
-}
+/* Note: Theme colors are handled by CSS variables above.
+   Dark theme and other Salesforce themes automatically inherit proper colors. */
 
 /* Responsive Design */
 @media (max-width: 768px) {
