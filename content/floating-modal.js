@@ -201,12 +201,33 @@
 
       try {
         const position = this.settings?.floatingButton?.position ?? 25;
-        console.log('[SF Tabs Floating] Setting position', {
-          position,
-          calculatedTop: `${position}%`
-        });
 
-        this.modal.style.top = `${position}%`;
+        // Get viewport to calculate position relative to it
+        const viewport = document.querySelector('div.viewport');
+
+        if (!viewport) {
+          // Fallback: use window-based percentage
+          console.log('[SF Tabs Floating] No viewport found, using window-based positioning');
+          this.modal.style.top = `${position}%`;
+        } else {
+          // Position relative to viewport bounds
+          const viewportRect = viewport.getBoundingClientRect();
+          const viewportHeight = viewportRect.height;
+          const viewportTop = viewportRect.top;
+
+          // Calculate absolute position: viewport top + (percentage of viewport height)
+          const calculatedTop = viewportTop + (viewportHeight * position / 100);
+
+          console.log('[SF Tabs Floating] Setting position relative to viewport', {
+            position,
+            percentageValue: `${position}%`,
+            viewportTop,
+            viewportHeight,
+            calculatedTop: `${calculatedTop}px`
+          });
+
+          this.modal.style.top = `${calculatedTop}px`;
+        }
 
         // Determine if panel should open upward or downward
         this.updatePanelDirection();
