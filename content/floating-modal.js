@@ -215,12 +215,15 @@
           const viewportHeight = viewportRect.height;
           const viewportTop = viewportRect.top;
           const buttonHeight = 40; // Match the CSS height
+          const padding = 20; // Generous padding to keep button away from edges
 
           // Calculate absolute position: viewport top + (percentage of viewport height)
           // But constrain it so the button never extends beyond viewport bottom
-          const maxTop = viewportTop + viewportHeight - buttonHeight - 8; // 8px padding
-          const targetTop = viewportTop + (viewportHeight * position / 100);
-          const calculatedTop = Math.min(targetTop, maxTop);
+          // Also add padding at the top so button never touches the top edge
+          const minTop = viewportTop + padding;
+          const maxTop = viewportTop + viewportHeight - buttonHeight - padding;
+          const targetTop = viewportTop + padding + ((viewportHeight - buttonHeight - (padding * 2)) * position / 100);
+          const calculatedTop = Math.max(minTop, Math.min(targetTop, maxTop));
 
           console.log('[SF Tabs Floating] Setting position relative to viewport', {
             position,
@@ -228,10 +231,13 @@
             viewportTop,
             viewportHeight,
             buttonHeight,
+            padding,
+            minTop: `${minTop}px`,
             targetTop: `${targetTop}px`,
             maxTop: `${maxTop}px`,
             calculatedTop: `${calculatedTop}px`,
-            constrained: targetTop > maxTop
+            constrainedTop: targetTop < minTop,
+            constrainedBottom: targetTop > maxTop
           });
 
           this.modal.style.top = `${calculatedTop}px`;
