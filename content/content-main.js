@@ -162,8 +162,8 @@ async function getTabsFromStorage() {
   try {
     const useSyncStorage = await getStoragePreference();
 
-    // Check if profiles are enabled
-    const settingsKey = useSyncStorage ? 'userSettings' : 'userSettings';
+    // Get user settings
+    const settingsKey = 'userSettings';
     let settings;
     if (useSyncStorage) {
       const settingsData = await readChunkedSync(settingsKey);
@@ -173,8 +173,9 @@ async function getTabsFromStorage() {
       settings = result[settingsKey] || {};
     }
 
-    // If profiles are enabled, load tabs from the active profile
-    if (settings.profilesEnabled && settings.activeProfileId) {
+    // Always load from profile storage if activeProfileId exists
+    // (profiles are used internally even if UI is disabled)
+    if (settings.activeProfileId) {
       const profileTabsKey = `profile_${settings.activeProfileId}_tabs`;
 
       if (useSyncStorage) {
@@ -186,7 +187,7 @@ async function getTabsFromStorage() {
       }
     }
 
-    // Profiles not enabled - use legacy customTabs key
+    // Fallback to legacy customTabs key (for very old installations)
     if (useSyncStorage) {
       const tabs = await readChunkedSync('customTabs');
       return tabs || [];
@@ -322,7 +323,7 @@ async function initTabsWithLightningNavigation(tabContainer) {
   try {
     let tabsToUse = await getTabsFromStorage();
 
-    // Check if profiles are enabled before falling back to defaults
+    // Get user settings to check if we should use defaults
     const useSyncStorage = await getStoragePreference();
     const settingsKey = 'userSettings';
     let settings;
@@ -334,14 +335,13 @@ async function initTabsWithLightningNavigation(tabContainer) {
       settings = result[settingsKey] || {};
     }
 
-    const profilesEnabled = settings.profilesEnabled;
-
     if (!tabsToUse || tabsToUse.length === 0) {
-      // If profiles are enabled, respect empty profiles (don't use defaults)
-      if (profilesEnabled) {
+      // If activeProfileId exists, respect empty profiles (don't use defaults)
+      // This means profiles system is active internally even if UI is disabled
+      if (settings.activeProfileId) {
         tabsToUse = [];
       } else {
-        // Profiles not enabled - use default tabs from constants if available
+        // No profile system - use default tabs from constants if available
         if (window.SFTabs && window.SFTabs.constants) {
           tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
         } else {
