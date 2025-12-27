@@ -162,12 +162,7 @@
             </svg>
           </button>
           <div class="modal-panel">
-            <div class="modal-header">
-              <h2 id="sftabs-modal-title">SF Tabs</h2>
-            </div>
-            <div class="modal-body">
-              <div class="tab-list-container" role="list"></div>
-            </div>
+            <div class="tab-list-container" role="list"></div>
           </div>
         </div>
       `;
