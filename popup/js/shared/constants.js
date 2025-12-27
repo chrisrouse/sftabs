@@ -103,8 +103,7 @@ const DEFAULT_SETTINGS = {
   defaultProfileId: null, // Default profile to use when auto-switch doesn't match
   floatingButton: {
     enabled: false, // Disabled by default (opt-in feature)
-    edge: 'right', // 'left' | 'right' | 'top' | 'bottom'
-    position: 25, // Percentage along that edge (0-100)
+    position: 25, // Vertical position along right edge (0 = top, 100 = bottom)
     displayMode: 'both', // 'setup-only' | 'floating-only' | 'both'
     defaultVisibility: true, // Show on all pages by default
     visibilityRules: [], // URL pattern rules (advanced)

@@ -17,129 +17,36 @@
 /* Modal Content - Container for button + panel */
 .sftabs-floating-modal .modal-content {
   display: flex;
+  flex-direction: row;
   transition: transform 0.3s ease-out;
 }
 
-/* --- RIGHT EDGE (Default) --- */
-.sftabs-floating-modal[data-edge="right"] {
-  top: 50%;
+/* --- RIGHT EDGE (Only) --- */
+.sftabs-floating-modal {
   right: 0;
-  transform: translateY(-50%);
+  /* top and transform are set dynamically via JavaScript based on position */
 }
 
-.sftabs-floating-modal[data-edge="right"] .modal-content {
-  flex-direction: row;
+.sftabs-floating-modal .modal-content {
   transform: translateX(280px); /* Hide panel, show only button */
 }
 
-.sftabs-floating-modal[data-edge="right"].open .modal-content {
+/* Upward opening - panel grows upward instead of downward */
+.sftabs-floating-modal.open-upward .modal-content {
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.sftabs-floating-modal.open .modal-content {
   transform: translateX(0); /* Show full unit */
 }
 
-.sftabs-floating-modal[data-edge="right"] .modal-toggle-button {
+/* Toggle Button - All Styles */
+.sftabs-floating-modal .modal-toggle-button {
   width: 20px;
-  height: 60px;
+  height: 40px;
   border-radius: 4px 0 0 4px;
   order: 1;
-}
-
-.sftabs-floating-modal[data-edge="right"] .modal-panel {
-  width: 280px;
-  border-radius: 8px 0 0 8px;
-  order: 2;
-}
-
-/* --- LEFT EDGE --- */
-.sftabs-floating-modal[data-edge="left"] {
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-}
-
-.sftabs-floating-modal[data-edge="left"] .modal-content {
-  flex-direction: row;
-  transform: translateX(-280px); /* Hide panel, show only button */
-}
-
-.sftabs-floating-modal[data-edge="left"].open .modal-content {
-  transform: translateX(0); /* Show full unit */
-}
-
-.sftabs-floating-modal[data-edge="left"] .modal-toggle-button {
-  width: 20px;
-  height: 60px;
-  border-radius: 0 4px 4px 0;
-  order: 2;
-}
-
-.sftabs-floating-modal[data-edge="left"] .modal-panel {
-  width: 280px;
-  border-radius: 0 8px 8px 0;
-  order: 1;
-}
-
-/* --- TOP EDGE --- */
-.sftabs-floating-modal[data-edge="top"] {
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.sftabs-floating-modal[data-edge="top"] .modal-content {
-  flex-direction: column;
-  transform: translateY(-500px); /* Hide panel, show only button */
-}
-
-.sftabs-floating-modal[data-edge="top"].open .modal-content {
-  transform: translateY(0); /* Show full unit */
-}
-
-.sftabs-floating-modal[data-edge="top"] .modal-toggle-button {
-  width: 60px;
-  height: 20px;
-  border-radius: 0 0 4px 4px;
-  order: 1;
-}
-
-.sftabs-floating-modal[data-edge="top"] .modal-panel {
-  width: 280px;
-  max-height: 500px;
-  border-radius: 0 0 8px 8px;
-  order: 2;
-}
-
-/* --- BOTTOM EDGE --- */
-.sftabs-floating-modal[data-edge="bottom"] {
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.sftabs-floating-modal[data-edge="bottom"] .modal-content {
-  flex-direction: column;
-  transform: translateY(500px); /* Hide panel, show only button */
-}
-
-.sftabs-floating-modal[data-edge="bottom"].open .modal-content {
-  transform: translateY(0); /* Show full unit */
-}
-
-.sftabs-floating-modal[data-edge="bottom"] .modal-toggle-button {
-  width: 60px;
-  height: 20px;
-  border-radius: 4px 4px 0 0;
-  order: 2;
-}
-
-.sftabs-floating-modal[data-edge="bottom"] .modal-panel {
-  width: 280px;
-  max-height: 500px;
-  border-radius: 8px 8px 0 0;
-  order: 1;
-}
-
-/* Toggle Button - Base Styles */
-.sftabs-floating-modal .modal-toggle-button {
   background: #288aff;
   border: none;
   cursor: pointer;
@@ -151,6 +58,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
   transition: background 0.2s ease;
+}
+
+.sftabs-floating-modal .modal-panel {
+  width: 280px;
+  border-radius: 0 8px 8px 0;
+  order: 2;
 }
 
 .sftabs-floating-modal .modal-toggle-button:hover {
@@ -175,6 +88,7 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  max-height: 400px;
 }
 
 /* Scrollbar styling */

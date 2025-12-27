@@ -131,7 +131,6 @@ function updateUI() {
 	}
 	document.getElementById('floating-button-enabled').checked = userSettings.floatingButton.enabled || false;
 	document.getElementById('floating-button-display-mode').value = userSettings.floatingButton.displayMode || 'both';
-	document.getElementById('floating-button-edge').value = userSettings.floatingButton.edge || 'right';
 	document.getElementById('floating-button-position').value = userSettings.floatingButton.position || 25;
 	document.getElementById('floating-button-position-value').textContent = `${userSettings.floatingButton.position || 25}%`;
 
@@ -284,15 +283,6 @@ function setupEventListeners() {
 			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
 		}
 		userSettings.floatingButton.displayMode = e.target.value;
-		await saveUserSettings();
-	});
-
-	// Floating button edge
-	document.getElementById('floating-button-edge').addEventListener('change', async (e) => {
-		if (!userSettings.floatingButton) {
-			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
-		}
-		userSettings.floatingButton.edge = e.target.value;
 		await saveUserSettings();
 	});
 

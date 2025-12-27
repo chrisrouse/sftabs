@@ -69,7 +69,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["content/inject.js"],
+      "resources": ["content/inject.js", "icons/invert.svg"],
       "matches": [
         "*://*.lightning.force.com/*",
         "*://*.salesforce-setup.com/*",

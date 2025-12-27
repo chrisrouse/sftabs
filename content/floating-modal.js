@@ -94,6 +94,9 @@
       await this.loadData();
       this.renderTabs();
 
+      // Update position and panel direction in case viewport changed
+      this.updatePosition();
+
       this.modal.classList.add('open');
       this.isOpen = true;
 
@@ -150,11 +153,11 @@
       this.modal.setAttribute('aria-modal', 'true');
       this.modal.setAttribute('aria-labelledby', 'sftabs-modal-title');
 
-      const edge = this.settings?.floatingButton?.edge || 'right';
-      this.modal.setAttribute('data-edge', edge);
+      // Always use right edge
+      this.modal.setAttribute('data-edge', 'right');
 
       // Get logo URL
-      const logoUrl = browser.runtime.getURL('icons/invert.png');
+      const logoUrl = browser.runtime.getURL('icons/invert.svg');
 
       this.modal.innerHTML = `
         <div class="modal-content">
@@ -169,11 +172,52 @@
 
       document.body.appendChild(this.modal);
 
+      // Apply vertical position along right edge within viewport bounds
+      this.updatePosition();
+
       // Render tabs
       this.renderTabs();
 
       // Attach events
       this.attachEvents();
+    }
+
+    updatePosition() {
+      const position = this.settings?.floatingButton?.position ?? 25;
+      this.modal.style.top = `${position}%`;
+
+      // Determine if panel should open upward or downward
+      this.updatePanelDirection();
+    }
+
+    updatePanelDirection() {
+      if (!this.modal) return;
+
+      const viewport = document.querySelector('div.viewport');
+      if (!viewport) return;
+
+      const viewportRect = viewport.getBoundingClientRect();
+      const modalRect = this.modal.getBoundingClientRect();
+      const panel = this.modal.querySelector('.modal-panel');
+      if (!panel) return;
+
+      const buttonHeight = 40;
+      const padding = 8;
+
+      // Calculate space available below and above button relative to viewport
+      const spaceBelow = viewportRect.bottom - modalRect.top - buttonHeight - padding;
+      const spaceAbove = modalRect.top - viewportRect.top - padding;
+
+      // Determine direction and set max-height
+      if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+        // Open upward
+        this.modal.classList.add('open-upward');
+        panel.style.maxHeight = `${Math.min(400, spaceAbove)}px`;
+      } else {
+        // Open downward (default)
+        this.modal.classList.remove('open-upward');
+        panel.style.maxHeight = `${Math.min(400, spaceBelow)}px`;
+      }
     }
 
     renderTabs() {
@@ -384,6 +428,15 @@
         if (e.key === 'Tab' && this.isOpen) {
           this.handleTabKey(e);
         }
+      });
+
+      // Window resize - reposition button and update panel direction
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          this.updatePosition();
+        }, 100);
       });
     }
 
