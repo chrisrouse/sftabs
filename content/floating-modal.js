@@ -97,11 +97,11 @@
       this.modal.classList.add('open');
       this.isOpen = true;
 
-      // Focus management - focus close button
+      // Focus management - focus first tab
       setTimeout(() => {
-        const closeButton = this.modal.querySelector('.close-button');
-        if (closeButton) {
-          closeButton.focus();
+        const firstTab = this.modal.querySelector('.tab-item');
+        if (firstTab) {
+          firstTab.focus();
         }
       }, 100);
     }
@@ -164,7 +164,6 @@
           <div class="modal-panel">
             <div class="modal-header">
               <h2 id="sftabs-modal-title">SF Tabs</h2>
-              <button class="close-button" aria-label="Close" title="Close (Esc)">×</button>
             </div>
             <div class="modal-body">
               <div class="tab-list-container" role="list"></div>
@@ -357,13 +356,10 @@
       // Toggle button
       const toggleButton = this.modal.querySelector('.modal-toggle-button');
       if (toggleButton) {
-        toggleButton.addEventListener('click', () => this.toggle());
-      }
-
-      // Close button
-      const closeButton = this.modal.querySelector('.close-button');
-      if (closeButton) {
-        closeButton.addEventListener('click', () => this.close());
+        toggleButton.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.toggle();
+        });
       }
 
       // ESC key to close
@@ -372,6 +368,20 @@
           e.preventDefault();
           this.close();
         }
+      });
+
+      // Click outside to close
+      document.addEventListener('click', (e) => {
+        if (!this.isOpen) return;
+
+        // Don't close if clicking within the modal content
+        const modalContent = this.modal.querySelector('.modal-content');
+        if (modalContent && modalContent.contains(e.target)) {
+          return;
+        }
+
+        // Click was outside - close the modal
+        this.close();
       });
 
       // Trap focus within modal when open
