@@ -146,6 +146,8 @@
     }
 
     createModal() {
+      console.log('[SF Tabs Floating] Creating modal');
+
       // Create modal structure with integrated button
       this.modal = document.createElement('div');
       this.modal.className = 'sftabs-floating-modal';
@@ -171,6 +173,7 @@
       `;
 
       document.body.appendChild(this.modal);
+      console.log('[SF Tabs Floating] Modal appended to body');
 
       // Apply vertical position along right edge within viewport bounds
       this.updatePosition();
@@ -180,18 +183,35 @@
 
       // Attach events
       this.attachEvents();
+
+      console.log('[SF Tabs Floating] Modal creation complete');
     }
 
     updatePosition() {
-      if (!this.modal) return;
+      console.log('[SF Tabs Floating] updatePosition called', {
+        modalExists: !!this.modal,
+        modalInDOM: this.modal ? document.body.contains(this.modal) : false,
+        settings: this.settings
+      });
+
+      if (!this.modal) {
+        console.log('[SF Tabs Floating] Modal does not exist, returning early');
+        return;
+      }
 
       try {
         const position = this.settings?.floatingButton?.position ?? 25;
+        console.log('[SF Tabs Floating] Setting position', {
+          position,
+          calculatedTop: `${position}%`
+        });
+
         this.modal.style.top = `${position}%`;
 
         // Determine if panel should open upward or downward
         this.updatePanelDirection();
       } catch (error) {
+        console.error('[SF Tabs Floating] Error in updatePosition', error);
         // Fail gracefully - ensure modal stays visible at default position
         if (this.modal) {
           this.modal.style.top = '25%';
@@ -200,16 +220,23 @@
     }
 
     updatePanelDirection() {
-      if (!this.modal) return;
+      console.log('[SF Tabs Floating] updatePanelDirection called');
+
+      if (!this.modal) {
+        console.log('[SF Tabs Floating] Modal does not exist in updatePanelDirection');
+        return;
+      }
 
       try {
         const viewport = document.querySelector('div.viewport');
         if (!viewport) {
+          console.log('[SF Tabs Floating] Viewport not found, using fallback');
           // Fallback: use default downward with standard max-height
           const panel = this.modal.querySelector('.modal-panel');
           if (panel) {
             this.modal.classList.remove('open-upward');
             panel.style.maxHeight = '400px';
+            console.log('[SF Tabs Floating] Applied fallback max-height: 400px');
           }
           return;
         }
@@ -217,7 +244,29 @@
         const viewportRect = viewport.getBoundingClientRect();
         const modalRect = this.modal.getBoundingClientRect();
         const panel = this.modal.querySelector('.modal-panel');
-        if (!panel) return;
+
+        console.log('[SF Tabs Floating] Viewport and modal rects', {
+          viewportRect: {
+            top: viewportRect.top,
+            bottom: viewportRect.bottom,
+            height: viewportRect.height
+          },
+          modalRect: {
+            top: modalRect.top,
+            bottom: modalRect.bottom,
+            height: modalRect.height
+          },
+          modalComputedStyle: this.modal ? {
+            display: window.getComputedStyle(this.modal).display,
+            visibility: window.getComputedStyle(this.modal).visibility,
+            top: window.getComputedStyle(this.modal).top
+          } : null
+        });
+
+        if (!panel) {
+          console.log('[SF Tabs Floating] Panel not found');
+          return;
+        }
 
         const buttonHeight = 40;
         const padding = 8;
@@ -227,19 +276,36 @@
         const spaceBelow = viewportRect.bottom - modalRect.top - buttonHeight - padding;
         const spaceAbove = modalRect.top - viewportRect.top - padding;
 
+        console.log('[SF Tabs Floating] Space calculations', {
+          spaceBelow,
+          spaceAbove,
+          buttonHeight,
+          padding,
+          minHeight
+        });
+
         // Determine direction and set max-height (ensure minimum height)
         if (spaceBelow < 200 && spaceAbove > spaceBelow) {
           // Open upward
-          this.modal.classList.add('open-upward');
           const maxHeight = Math.max(minHeight, Math.min(400, spaceAbove));
+          console.log('[SF Tabs Floating] Opening upward, maxHeight:', maxHeight);
+          this.modal.classList.add('open-upward');
           panel.style.maxHeight = `${maxHeight}px`;
         } else {
           // Open downward (default)
-          this.modal.classList.remove('open-upward');
           const maxHeight = Math.max(minHeight, Math.min(400, spaceBelow));
+          console.log('[SF Tabs Floating] Opening downward, maxHeight:', maxHeight);
+          this.modal.classList.remove('open-upward');
           panel.style.maxHeight = `${maxHeight}px`;
         }
+
+        console.log('[SF Tabs Floating] Final panel styles', {
+          maxHeight: panel.style.maxHeight,
+          display: window.getComputedStyle(panel).display,
+          visibility: window.getComputedStyle(panel).visibility
+        });
       } catch (error) {
+        console.error('[SF Tabs Floating] Error in updatePanelDirection', error);
         // Fail gracefully - use default settings
         const panel = this.modal.querySelector('.modal-panel');
         if (panel) {
@@ -462,16 +528,25 @@
       // Window resize - reposition button and update panel direction
       let resizeTimeout;
       const resizeHandler = () => {
+        console.log('[SF Tabs Floating] Resize event triggered');
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
+          console.log('[SF Tabs Floating] Resize debounce completed, checking modal', {
+            modalExists: !!this.modal,
+            modalInDOM: this.modal ? document.body.contains(this.modal) : false
+          });
           // Check if modal still exists in DOM before updating
           if (this.modal && document.body.contains(this.modal)) {
+            console.log('[SF Tabs Floating] Calling updatePosition from resize handler');
             this.updatePosition();
+          } else {
+            console.log('[SF Tabs Floating] Modal not in DOM, skipping update');
           }
         }, 100);
       };
 
       window.addEventListener('resize', resizeHandler);
+      console.log('[SF Tabs Floating] Resize handler attached');
 
       // Store handler for cleanup
       this.resizeHandler = resizeHandler;
@@ -501,15 +576,22 @@
     }
 
     destroy() {
+      console.log('[SF Tabs Floating] Destroying modal', {
+        modalExists: !!this.modal,
+        resizeHandlerExists: !!this.resizeHandler
+      });
+
       // Clean up resize event listener
       if (this.resizeHandler) {
         window.removeEventListener('resize', this.resizeHandler);
         this.resizeHandler = null;
+        console.log('[SF Tabs Floating] Resize handler removed');
       }
 
       if (this.modal) {
         this.modal.remove();
         this.modal = null;
+        console.log('[SF Tabs Floating] Modal removed from DOM');
       }
       this.isOpen = false;
     }
