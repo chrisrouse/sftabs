@@ -162,11 +162,10 @@
   outline-offset: 2px;
 }
 
-.sftabs-floating-modal .modal-toggle-button svg {
-  width: 12px;
-  height: 12px;
-  stroke: white;
-  fill: none;
+.sftabs-floating-modal .modal-toggle-button img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
 }
 
 /* Modal Panel - Contains tab list */
@@ -320,16 +319,16 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .sftabs-floating-modal .modal-toggle-button svg {
-    width: 11px;
-    height: 11px;
+  .sftabs-floating-modal .modal-toggle-button img {
+    width: 13px;
+    height: 13px;
   }
 }
 
 @media (max-width: 480px) {
-  .sftabs-floating-modal .modal-toggle-button svg {
-    width: 10px;
-    height: 10px;
+  .sftabs-floating-modal .modal-toggle-button img {
+    width: 12px;
+    height: 12px;
   }
 
   .sftabs-floating-modal .tab-row {
