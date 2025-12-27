@@ -100,7 +100,17 @@ const DEFAULT_SETTINGS = {
   profilesEnabled: false, // Enable profiles feature
   autoSwitchProfiles: false, // Enable auto-switching based on URL patterns
   activeProfileId: null, // Currently active profile ID (null = no profiles mode)
-  defaultProfileId: null // Default profile to use when auto-switch doesn't match
+  defaultProfileId: null, // Default profile to use when auto-switch doesn't match
+  floatingButton: {
+    enabled: false, // Disabled by default (opt-in feature)
+    edge: 'right', // 'left' | 'right' | 'top' | 'bottom'
+    position: 25, // Percentage along that edge (0-100)
+    displayMode: 'both', // 'setup-only' | 'floating-only' | 'both'
+    defaultVisibility: true, // Show on all pages by default
+    visibilityRules: [], // URL pattern rules (advanced)
+    buttonSize: 'medium', // 'small' | 'medium' | 'large'
+    showLabel: false // Show "SF Tabs" text next to icon
+  }
 };
 
 // UI selectors

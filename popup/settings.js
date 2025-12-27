@@ -125,8 +125,21 @@ function updateUI() {
 	document.getElementById('enable-profiles').checked = userSettings.profilesEnabled || false;
 	document.getElementById('auto-switch-profiles').checked = userSettings.autoSwitchProfiles || false;
 
+	// Update floating button settings
+	if (!userSettings.floatingButton) {
+		userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
+	}
+	document.getElementById('floating-button-enabled').checked = userSettings.floatingButton.enabled || false;
+	document.getElementById('floating-button-display-mode').value = userSettings.floatingButton.displayMode || 'both';
+	document.getElementById('floating-button-edge').value = userSettings.floatingButton.edge || 'right';
+	document.getElementById('floating-button-position').value = userSettings.floatingButton.position || 25;
+	document.getElementById('floating-button-position-value').textContent = `${userSettings.floatingButton.position || 25}%`;
+
 	// Show/hide auto-switch option based on profiles enabled
 	toggleAutoSwitchVisibility();
+
+	// Show/hide floating button settings based on enabled
+	toggleFloatingButtonSettings();
 }
 
 /**
@@ -136,6 +149,15 @@ function toggleAutoSwitchVisibility() {
 	const autoSwitchContainer = document.getElementById('auto-switch-container');
 	const profilesEnabled = document.getElementById('enable-profiles').checked;
 	autoSwitchContainer.style.display = profilesEnabled ? 'block' : 'none';
+}
+
+/**
+ * Toggle floating button settings visibility
+ */
+function toggleFloatingButtonSettings() {
+	const settingsContainer = document.getElementById('floating-button-settings');
+	const enabled = document.getElementById('floating-button-enabled').checked;
+	settingsContainer.style.display = enabled ? 'block' : 'none';
 }
 
 /**
@@ -243,6 +265,50 @@ function setupEventListeners() {
 	// Auto-switch profiles
 	document.getElementById('auto-switch-profiles').addEventListener('change', async (e) => {
 		userSettings.autoSwitchProfiles = e.target.checked;
+		await saveUserSettings();
+	});
+
+	// Floating button enabled
+	document.getElementById('floating-button-enabled').addEventListener('change', async (e) => {
+		if (!userSettings.floatingButton) {
+			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
+		}
+		userSettings.floatingButton.enabled = e.target.checked;
+		await saveUserSettings();
+		toggleFloatingButtonSettings();
+	});
+
+	// Floating button display mode
+	document.getElementById('floating-button-display-mode').addEventListener('change', async (e) => {
+		if (!userSettings.floatingButton) {
+			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
+		}
+		userSettings.floatingButton.displayMode = e.target.value;
+		await saveUserSettings();
+	});
+
+	// Floating button edge
+	document.getElementById('floating-button-edge').addEventListener('change', async (e) => {
+		if (!userSettings.floatingButton) {
+			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
+		}
+		userSettings.floatingButton.edge = e.target.value;
+		await saveUserSettings();
+	});
+
+	// Floating button position
+	const positionSlider = document.getElementById('floating-button-position');
+	const positionValue = document.getElementById('floating-button-position-value');
+
+	positionSlider.addEventListener('input', (e) => {
+		positionValue.textContent = `${e.target.value}%`;
+	});
+
+	positionSlider.addEventListener('change', async (e) => {
+		if (!userSettings.floatingButton) {
+			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
+		}
+		userSettings.floatingButton.position = parseInt(e.target.value);
 		await saveUserSettings();
 	});
 

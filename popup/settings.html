@@ -652,6 +652,59 @@
 			</div>
 		</section>
 
+		<!-- Floating Button Section -->
+		<section class="settings-section full-width">
+			<h2>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="10"></circle>
+					<line x1="12" y1="8" x2="12" y2="12"></line>
+					<line x1="12" y1="16" x2="12.01" y2="16"></line>
+				</svg>
+				Floating Button
+			</h2>
+			<p class="section-description">Access SF Tabs from anywhere in Salesforce with a floating button</p>
+
+			<div class="setting-item">
+				<label class="checkbox-group">
+					<input type="checkbox" id="floating-button-enabled">
+					<span>Enable floating button</span>
+				</label>
+				<div class="setting-description">Show a floating button on Salesforce pages for quick tab access</div>
+			</div>
+
+			<div id="floating-button-settings" style="display: none;">
+				<div class="setting-item">
+					<label class="setting-label">Display Mode</label>
+					<select id="floating-button-display-mode" class="select-input" style="width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-input-background); color: var(--color-text);">
+						<option value="both">Both Setup tabs and floating button</option>
+						<option value="setup-only">Setup tabs only (no floating button)</option>
+						<option value="floating-only">Floating button only</option>
+					</select>
+					<div class="setting-description">Choose how SF Tabs appears in Salesforce</div>
+				</div>
+
+				<div class="setting-item">
+					<label class="setting-label">Button Edge</label>
+					<select id="floating-button-edge" class="select-input" style="width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-input-background); color: var(--color-text);">
+						<option value="right">Right edge</option>
+						<option value="left">Left edge</option>
+						<option value="top">Top edge</option>
+						<option value="bottom">Bottom edge</option>
+					</select>
+					<div class="setting-description">Which edge of the screen to place the button</div>
+				</div>
+
+				<div class="setting-item">
+					<label class="setting-label">Position (%)</label>
+					<div style="display: flex; align-items: center; gap: 12px;">
+						<input type="range" id="floating-button-position" min="0" max="100" value="25" step="1" style="flex: 1;">
+						<span id="floating-button-position-value" style="min-width: 45px; text-align: right; font-weight: 500; color: var(--color-text);">25%</span>
+					</div>
+					<div class="setting-description">How far along the selected edge (0% = top/left, 100% = bottom/right)</div>
+				</div>
+			</div>
+		</section>
+
 		<!-- Keyboard Shortcuts Section -->
 		<section class="settings-section full-width">
 			<h2>

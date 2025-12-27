@@ -132,6 +132,12 @@ async function initTabs(tabContainer) {
       settings = result[settingsKey] || {};
     }
 
+    // Check display mode - if floating-only, don't render Setup tabs
+    if (settings.floatingButton && settings.floatingButton.displayMode === 'floating-only') {
+      isRenderingTabs = false;
+      return;
+    }
+
     if (!tabsToUse || tabsToUse.length === 0) {
       // If activeProfileId exists, respect empty profiles (don't use defaults)
       // This means profiles system is active internally even if UI is disabled
@@ -984,7 +990,7 @@ function addTabClickListeners(tabs) {
           if (hasDropdown) {
             const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
             const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
-            const dropdownArrow = tabElement?.querySelector('.dropdown-arrow-inline');
+            const dropdownArrow = tabElement?.querySelector(`#dropdown-arrow-${tab.id}`);
 
             if (dropdown && dropdownArrow) {
               toggleInlineDropdown(dropdown, dropdownArrow);
@@ -993,8 +999,10 @@ function addTabClickListeners(tabs) {
           return;
         }
 
-        // If clicking on dropdown arrow, don't navigate
-        if (event.target.closest('.dropdown-arrow-inline')) {
+        // If clicking on dropdown button or its wrapper, don't navigate
+        if (event.target.closest('.oneNavItemDropdown') ||
+            event.target.closest('.uiPopupTrigger') ||
+            event.target.closest(`#dropdown-arrow-${tab.id}`)) {
           return;
         }
 
@@ -1019,20 +1027,13 @@ function addTabClickListeners(tabs) {
           if (hasDropdown) {
             const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
             const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
-            const dropdownArrow = tabElement?.querySelector('.dropdown-arrow-inline');
+            const dropdownArrow = tabElement?.querySelector(`#dropdown-arrow-${tab.id}`);
 
             if (dropdown && dropdownArrow) {
               toggleInlineDropdown(dropdown, dropdownArrow);
             }
           }
           // If no dropdown and no path, just do nothing (it's a folder/placeholder)
-          return;
-        }
-
-        // For tabs with paths but also dropdowns, check if clicking on the dropdown arrow
-        if (hasDropdown && event.target.closest('.dropdown-arrow-inline')) {
-          // Clicking dropdown arrow - handled by arrow's own event listener, don't navigate
-          event.preventDefault();
           return;
         }
 
@@ -1741,6 +1742,7 @@ window.SFTabsContent.tabRenderer = {
   forceRefreshTabs,
   navigateToMainTab,
   navigateToNavigationItem,
+  createInlineDropdownMenu,
   toggleInlineDropdown,
   handleTabOverflow
 };

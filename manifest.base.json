@@ -35,6 +35,24 @@
   "content_scripts": [
     {
       "matches": [
+        "*://*.lightning.force.com/*",
+        "*://*.salesforce-setup.com/*",
+        "*://*.my.salesforce-setup.com/*",
+        "*://*.salesforce.com/*",
+        "*://*.my.salesforce.com/*"
+      ],
+      "js": [
+        "popup/js/shared/browser-compat.js",
+        "popup/js/shared/constants.js",
+        "popup/js/shared/utils.js",
+        "content/floating-button.js",
+        "content/floating-modal.js"
+      ],
+      "css": ["content/floating-button.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
         "*://*.lightning.force.com/lightning/setup/*",
         "*://*.salesforce-setup.com/lightning/setup/*",
         "*://*.my.salesforce-setup.com/lightning/setup/*",
@@ -42,9 +60,6 @@
         "*://*.my.salesforce.com/lightning/setup/*"
       ],
       "js": [
-        "popup/js/shared/browser-compat.js",
-        "popup/js/shared/constants.js",
-        "popup/js/shared/utils.js",
         "content/navigation-parser.js",
         "content/tab-renderer.js",
         "content/content-main.js"

@@ -335,6 +335,11 @@ async function initTabsWithLightningNavigation(tabContainer) {
       settings = result[settingsKey] || {};
     }
 
+    // Check display mode - if floating-only, don't render Setup tabs
+    if (settings.floatingButton && settings.floatingButton.displayMode === 'floating-only') {
+      return;
+    }
+
     if (!tabsToUse || tabsToUse.length === 0) {
       // If activeProfileId exists, respect empty profiles (don't use defaults)
       // This means profiles system is active internally even if UI is disabled
@@ -530,8 +535,10 @@ function createTabElementWithLightningAndDropdown(tab) {
       return;
     }
 
-    // If clicking on dropdown arrow, don't navigate
-    if (event.target.closest('.dropdown-arrow-inline')) {
+    // If clicking on dropdown button or its wrapper, don't navigate
+    if (event.target.closest('.oneNavItemDropdown') ||
+        event.target.closest('.uiPopupTrigger') ||
+        event.target.closest(`#dropdown-arrow-${tab.id}`)) {
       return;
     }
 
