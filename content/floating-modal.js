@@ -183,40 +183,69 @@
     }
 
     updatePosition() {
-      const position = this.settings?.floatingButton?.position ?? 25;
-      this.modal.style.top = `${position}%`;
+      if (!this.modal) return;
 
-      // Determine if panel should open upward or downward
-      this.updatePanelDirection();
+      try {
+        const position = this.settings?.floatingButton?.position ?? 25;
+        this.modal.style.top = `${position}%`;
+
+        // Determine if panel should open upward or downward
+        this.updatePanelDirection();
+      } catch (error) {
+        // Fail gracefully - ensure modal stays visible at default position
+        if (this.modal) {
+          this.modal.style.top = '25%';
+        }
+      }
     }
 
     updatePanelDirection() {
       if (!this.modal) return;
 
-      const viewport = document.querySelector('div.viewport');
-      if (!viewport) return;
+      try {
+        const viewport = document.querySelector('div.viewport');
+        if (!viewport) {
+          // Fallback: use default downward with standard max-height
+          const panel = this.modal.querySelector('.modal-panel');
+          if (panel) {
+            this.modal.classList.remove('open-upward');
+            panel.style.maxHeight = '400px';
+          }
+          return;
+        }
 
-      const viewportRect = viewport.getBoundingClientRect();
-      const modalRect = this.modal.getBoundingClientRect();
-      const panel = this.modal.querySelector('.modal-panel');
-      if (!panel) return;
+        const viewportRect = viewport.getBoundingClientRect();
+        const modalRect = this.modal.getBoundingClientRect();
+        const panel = this.modal.querySelector('.modal-panel');
+        if (!panel) return;
 
-      const buttonHeight = 40;
-      const padding = 8;
+        const buttonHeight = 40;
+        const padding = 8;
+        const minHeight = 150; // Minimum height to ensure usability
 
-      // Calculate space available below and above button relative to viewport
-      const spaceBelow = viewportRect.bottom - modalRect.top - buttonHeight - padding;
-      const spaceAbove = modalRect.top - viewportRect.top - padding;
+        // Calculate space available below and above button relative to viewport
+        const spaceBelow = viewportRect.bottom - modalRect.top - buttonHeight - padding;
+        const spaceAbove = modalRect.top - viewportRect.top - padding;
 
-      // Determine direction and set max-height
-      if (spaceBelow < 200 && spaceAbove > spaceBelow) {
-        // Open upward
-        this.modal.classList.add('open-upward');
-        panel.style.maxHeight = `${Math.min(400, spaceAbove)}px`;
-      } else {
-        // Open downward (default)
-        this.modal.classList.remove('open-upward');
-        panel.style.maxHeight = `${Math.min(400, spaceBelow)}px`;
+        // Determine direction and set max-height (ensure minimum height)
+        if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+          // Open upward
+          this.modal.classList.add('open-upward');
+          const maxHeight = Math.max(minHeight, Math.min(400, spaceAbove));
+          panel.style.maxHeight = `${maxHeight}px`;
+        } else {
+          // Open downward (default)
+          this.modal.classList.remove('open-upward');
+          const maxHeight = Math.max(minHeight, Math.min(400, spaceBelow));
+          panel.style.maxHeight = `${maxHeight}px`;
+        }
+      } catch (error) {
+        // Fail gracefully - use default settings
+        const panel = this.modal.querySelector('.modal-panel');
+        if (panel) {
+          this.modal.classList.remove('open-upward');
+          panel.style.maxHeight = '400px';
+        }
       }
     }
 
@@ -432,12 +461,20 @@
 
       // Window resize - reposition button and update panel direction
       let resizeTimeout;
-      window.addEventListener('resize', () => {
+      const resizeHandler = () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-          this.updatePosition();
+          // Check if modal still exists in DOM before updating
+          if (this.modal && document.body.contains(this.modal)) {
+            this.updatePosition();
+          }
         }, 100);
-      });
+      };
+
+      window.addEventListener('resize', resizeHandler);
+
+      // Store handler for cleanup
+      this.resizeHandler = resizeHandler;
     }
 
     handleTabKey(e) {
@@ -464,6 +501,12 @@
     }
 
     destroy() {
+      // Clean up resize event listener
+      if (this.resizeHandler) {
+        window.removeEventListener('resize', this.resizeHandler);
+        this.resizeHandler = null;
+      }
+
       if (this.modal) {
         this.modal.remove();
         this.modal = null;
