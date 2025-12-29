@@ -47,17 +47,18 @@
   height: 40px;
   border-radius: 4px 0 0 4px;
   order: 1;
-  background: #288aff;
-  border: none;
+  background: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackground, #ffffff));
+  border: 1px solid var(--lwc-colorBorder, #c9c9c9);
+  border-right: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   outline: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sftabs-floating-modal .modal-panel {
@@ -67,17 +68,18 @@
 }
 
 .sftabs-floating-modal .modal-toggle-button:hover {
-  background: #1a6ee6;
+  background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .sftabs-floating-modal .modal-toggle-button:focus {
-  outline: 2px solid #1a6ee6;
+  outline: 2px solid var(--lwc-brandPrimary, #0176d3);
   outline-offset: 2px;
 }
 
 .sftabs-floating-modal .modal-toggle-button img {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
 }
 
@@ -190,7 +192,7 @@
 /* Dropdown Children - Nested List */
 .sftabs-floating-modal .dropdown-children {
   display: none;
-  background: var(--slds-g-color-neutral-base-98, var(--lwc-colorBackground, #fafafa));
+  background: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackground, #ffffff));
   border-top: 1px solid var(--lwc-colorBorder, #e5e5e5);
 }
 
@@ -205,6 +207,7 @@
   cursor: pointer;
   transition: background 0.15s;
   border-bottom: 1px solid var(--lwc-colorBorder, #e5e5e5);
+  background: transparent;
 }
 
 .sftabs-floating-modal .dropdown-child-item:last-child {

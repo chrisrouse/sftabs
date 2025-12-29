@@ -157,7 +157,7 @@
       this.modal.setAttribute('data-edge', 'right');
 
       // Get logo URL
-      const logoUrl = browser.runtime.getURL('icons/invert.svg');
+      const logoUrl = browser.runtime.getURL('icons/sftabs-icon-16.png');
 
       this.modal.innerHTML = `
         <div class="modal-content">
