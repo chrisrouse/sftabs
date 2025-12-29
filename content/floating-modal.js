@@ -624,6 +624,30 @@
 
       // Store handler for cleanup
       this.resizeHandler = resizeHandler;
+
+      // Listen for storage changes to update tabs in real-time
+      const storageChangeHandler = async (changes, areaName) => {
+        // Check if tabs or settings changed
+        const tabsChanged = Object.keys(changes).some(key =>
+          key.startsWith('profile_') && key.endsWith('_tabs') ||
+          key === 'customTabs' ||
+          key === 'userSettings'
+        );
+
+        if (tabsChanged) {
+          // Reload data and re-render tabs
+          await this.loadData();
+          this.renderTabs();
+
+          // Update position in case settings changed
+          this.updatePosition();
+        }
+      };
+
+      browser.storage.onChanged.addListener(storageChangeHandler);
+
+      // Store handler for cleanup
+      this.storageChangeHandler = storageChangeHandler;
     }
 
     handleTabKey(e) {
@@ -654,6 +678,12 @@
       if (this.resizeHandler) {
         window.removeEventListener('resize', this.resizeHandler);
         this.resizeHandler = null;
+      }
+
+      // Clean up storage change listener
+      if (this.storageChangeHandler) {
+        browser.storage.onChanged.removeListener(this.storageChangeHandler);
+        this.storageChangeHandler = null;
       }
 
       if (this.modal) {

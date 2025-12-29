@@ -171,10 +171,24 @@
   // Listen for storage changes to update button
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener(async (changes, area) => {
+      const floatingButton = window.SFTabsFloating?.button;
+
+      // Check if tabs or settings changed
+      const tabsChanged = Object.keys(changes).some(key =>
+        key.startsWith('profile_') && key.endsWith('_tabs') ||
+        key === 'customTabs'
+      );
+
+      if (tabsChanged && floatingButton) {
+        // Reload tabs data
+        const data = await loadTabsAndSettings();
+        floatingButton.tabs = data.tabs;
+        floatingButton.settings = data.settings;
+      }
+
       // Check if settings changed
       if (changes.userSettings) {
         // Reload button
-        const floatingButton = window.SFTabsFloating?.button;
         if (floatingButton) {
           floatingButton.destroy();
         }
