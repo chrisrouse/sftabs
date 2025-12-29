@@ -130,8 +130,20 @@
   background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
 }
 
-.sftabs-floating-modal .tab-item:active {
+.sftabs-floating-modal .tab-item:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
+}
+
+/* Active tab state - matches main navigation active color */
+.sftabs-floating-modal .tab-item.active {
+  background: var(--slds-g-color-brand-base-20, var(--lwc-colorBackgroundRowSelected, #e8f4ff));
+  border-left: 3px solid var(--slds-g-color-brand-base-60, var(--lwc-colorBrand, #0176d3));
+  padding-left: 0; /* Compensate for border */
+}
+
+/* Don't apply hover state to active tab */
+.sftabs-floating-modal .tab-item.active:hover {
+  background: var(--slds-g-color-brand-base-20, var(--lwc-colorBackgroundRowSelected, #e8f4ff));
 }
 
 /* Tab Row - Contains label and chevron */
@@ -203,8 +215,20 @@
   background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
 }
 
-.sftabs-floating-modal .dropdown-child-item:active {
+.sftabs-floating-modal .dropdown-child-item:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
+}
+
+/* Active dropdown child state - matches main navigation active color */
+.sftabs-floating-modal .dropdown-child-item.active {
+  background: var(--slds-g-color-brand-base-20, var(--lwc-colorBackgroundRowSelected, #e8f4ff));
+  border-left: 3px solid var(--slds-g-color-brand-base-60, var(--lwc-colorBrand, #0176d3));
+  padding-left: 21px; /* Compensate for border (24px - 3px) */
+}
+
+/* Don't apply hover state to active dropdown child */
+.sftabs-floating-modal .dropdown-child-item.active:hover {
+  background: var(--slds-g-color-brand-base-20, var(--lwc-colorBackgroundRowSelected, #e8f4ff));
 }
 
 .sftabs-floating-modal .dropdown-child-label {

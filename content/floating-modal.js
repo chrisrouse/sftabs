@@ -258,6 +258,19 @@
       }
     }
 
+    isTabActive(tab) {
+      const currentUrl = window.location.href;
+      const tabUrl = buildTabUrl(tab);
+
+      if (!tabUrl) {
+        return false;
+      }
+
+      // Match based on URL prefix (similar to main navigation logic)
+      const baseTabUrl = tabUrl.split('/Details')[0];
+      return currentUrl.startsWith(baseTabUrl);
+    }
+
     renderTabs() {
       const container = this.modal.querySelector('.tab-list-container');
       if (!container) return;
@@ -288,6 +301,12 @@
       tabEl.className = 'tab-item';
       tabEl.setAttribute('role', 'listitem');
       tabEl.setAttribute('tabindex', '0');
+
+      // Check if this tab is active (matches current URL)
+      const isActive = this.isTabActive(tab);
+      if (isActive) {
+        tabEl.classList.add('active');
+      }
 
       const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
 
@@ -380,6 +399,12 @@
       const childEl = document.createElement('div');
       childEl.className = 'dropdown-child-item';
       childEl.setAttribute('tabindex', '0');
+
+      // Check if this child tab is active (matches current URL)
+      const isActive = this.isTabActive(childTab);
+      if (isActive) {
+        childEl.classList.add('active');
+      }
 
       // Label container
       const labelContainer = document.createElement('div');
