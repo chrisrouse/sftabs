@@ -464,7 +464,6 @@
         if (hasDropdown) {
           // Toggle nested dropdown if it has items
           childEl.classList.toggle('expanded');
-          console.log('[SF Tabs Floating] Toggled expanded class for:', childTab.label, 'expanded:', childEl.classList.contains('expanded'));
         } else {
           // Only navigate if child tab has a path (not a folder-style tab)
           const url = buildTabUrl(childTab);
