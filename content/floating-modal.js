@@ -418,6 +418,12 @@
         childEl.classList.add('navigable');
       }
 
+      const hasDropdown = childTab.hasDropdown && childTab.dropdownItems && childTab.dropdownItems.length > 0;
+
+      // Create child row (label + chevron wrapper)
+      const rowEl = document.createElement('div');
+      rowEl.className = 'dropdown-child-row';
+
       // Label container
       const labelContainer = document.createElement('div');
       labelContainer.style.flex = '1';
@@ -436,21 +442,30 @@
         labelContainer.appendChild(pathEl);
       }
 
-      childEl.appendChild(labelContainer);
+      rowEl.appendChild(labelContainer);
 
-      // Click handler
-      childEl.addEventListener('click', (e) => {
+      // Add dropdown indicator (chevron) if has nested dropdown
+      if (hasDropdown) {
+        const indicator = document.createElement('span');
+        indicator.className = 'dropdown-indicator';
+        indicator.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        `;
+        rowEl.appendChild(indicator);
+      }
+
+      childEl.appendChild(rowEl);
+
+      // Click handler for child row
+      rowEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        const url = buildTabUrl(childTab);
-        if (url) {
-          this.navigateToTab(childTab);
-        }
-      });
-
-      // Keyboard handler
-      childEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
+        if (hasDropdown) {
+          // Toggle nested dropdown if it has items
+          childEl.classList.toggle('expanded');
+        } else {
+          // Only navigate if child tab has a path (not a folder-style tab)
           const url = buildTabUrl(childTab);
           if (url) {
             this.navigateToTab(childTab);
@@ -458,7 +473,95 @@
         }
       });
 
+      // Keyboard handler (Enter or Space)
+      childEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (hasDropdown) {
+            childEl.classList.toggle('expanded');
+          } else {
+            const url = buildTabUrl(childTab);
+            if (url) {
+              this.navigateToTab(childTab);
+            }
+          }
+        }
+      });
+
+      // Render nested dropdown children if has dropdown (third level)
+      if (hasDropdown) {
+        const nestedContainer = document.createElement('div');
+        nestedContainer.className = 'dropdown-nested-children';
+
+        childTab.dropdownItems.forEach(nestedTab => {
+          const nestedEl = this.createNestedDropdownElement(nestedTab);
+          nestedContainer.appendChild(nestedEl);
+        });
+
+        childEl.appendChild(nestedContainer);
+      }
+
       return childEl;
+    }
+
+    createNestedDropdownElement(nestedTab) {
+      const nestedEl = document.createElement('div');
+      nestedEl.className = 'dropdown-nested-item';
+      nestedEl.setAttribute('tabindex', '0');
+
+      // Check if this nested tab is active (matches current URL)
+      const isActive = this.isTabActive(nestedTab);
+      if (isActive) {
+        nestedEl.classList.add('active');
+      }
+
+      // Check if nested tab is navigable (has a URL)
+      const nestedUrl = buildTabUrl(nestedTab);
+      if (nestedUrl) {
+        nestedEl.classList.add('navigable');
+      }
+
+      // Label container
+      const labelContainer = document.createElement('div');
+      labelContainer.style.flex = '1';
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'dropdown-nested-label';
+      labelEl.textContent = nestedTab.label;
+      labelContainer.appendChild(labelEl);
+
+      // Nested path (only if not in compact mode and has path)
+      const isCompactMode = this.settings.compactMode || false;
+      if (!isCompactMode && nestedTab.path) {
+        const pathEl = document.createElement('div');
+        pathEl.className = 'dropdown-nested-path';
+        pathEl.textContent = nestedTab.path;
+        labelContainer.appendChild(pathEl);
+      }
+
+      nestedEl.appendChild(labelContainer);
+
+      // Click handler
+      nestedEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const url = buildTabUrl(nestedTab);
+        if (url) {
+          this.navigateToTab(nestedTab);
+        }
+      });
+
+      // Keyboard handler
+      nestedEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const url = buildTabUrl(nestedTab);
+          if (url) {
+            this.navigateToTab(nestedTab);
+          }
+        }
+      });
+
+      return nestedEl;
     }
 
     navigateToTab(tab) {

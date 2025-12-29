@@ -63,7 +63,7 @@
 
 .sftabs-floating-modal .modal-panel {
   width: 280px;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0;
   order: 2;
 }
 
@@ -208,11 +208,31 @@
 
 .sftabs-floating-modal .dropdown-child-item {
   display: flex;
-  align-items: center;
-  padding: 8px 16px 8px 44px; /* Left padding aligns with chevron position */
+  flex-direction: column;
   cursor: pointer;
   transition: background 0.15s, box-shadow 0.15s;
   background: transparent;
+}
+
+.sftabs-floating-modal .dropdown-child-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px 8px 44px; /* Left padding aligns with chevron position */
+  gap: 8px;
+}
+
+/* Dropdown indicator for second-level items with nested children */
+.sftabs-floating-modal .dropdown-child-item .dropdown-indicator {
+  display: inline-flex;
+  align-items: center;
+  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  order: -1; /* Move to the left */
+}
+
+.sftabs-floating-modal .dropdown-child-item.expanded .dropdown-indicator {
+  transform: rotate(90deg);
 }
 
 .sftabs-floating-modal .dropdown-child-item:hover {
@@ -249,6 +269,64 @@
 }
 
 .sftabs-floating-modal .dropdown-child-path {
+  font-size: 10px;
+  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
+  margin-top: 1px;
+}
+
+/* Nested Dropdown Children - Third Level */
+.sftabs-floating-modal .dropdown-nested-children {
+  display: none;
+  background: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackground, #ffffff));
+}
+
+.sftabs-floating-modal .dropdown-child-item.expanded .dropdown-nested-children {
+  display: block;
+}
+
+.sftabs-floating-modal .dropdown-nested-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px 8px 64px; /* Further indentation for third level */
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  background: transparent;
+}
+
+.sftabs-floating-modal .dropdown-nested-item:hover {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
+/* Non-navigable nested items - only box-shadow on hover, no background */
+.sftabs-floating-modal .dropdown-nested-item:not(.navigable):hover {
+  background: transparent;
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
+.sftabs-floating-modal .dropdown-nested-item:active:not(.active) {
+  background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
+}
+
+/* Active nested item state */
+.sftabs-floating-modal .dropdown-nested-item.active {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
+/* Keep active state on hover for active nested items */
+.sftabs-floating-modal .dropdown-nested-item.active:hover {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
+.sftabs-floating-modal .dropdown-nested-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--slds-g-color-neutral-base-30, var(--lwc-colorTextDefault, #3e3e3c));
+}
+
+.sftabs-floating-modal .dropdown-nested-path {
   font-size: 10px;
   color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
   margin-top: 1px;
