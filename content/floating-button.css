@@ -186,7 +186,7 @@
   order: -1; /* Move to the left */
 }
 
-.sftabs-floating-modal .tab-item.expanded .dropdown-indicator {
+.sftabs-floating-modal .tab-item.expanded > .tab-row > .dropdown-indicator {
   transform: rotate(90deg);
 }
 
@@ -231,7 +231,7 @@
   order: -1; /* Move to the left */
 }
 
-.sftabs-floating-modal .dropdown-child-item.expanded .dropdown-indicator {
+.sftabs-floating-modal .dropdown-child-item.expanded > .dropdown-child-row > .dropdown-indicator {
   transform: rotate(90deg);
 }
 
