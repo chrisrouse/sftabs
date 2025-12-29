@@ -223,6 +223,7 @@ async function initTabs(tabContainer) {
     // Add click event listeners
     addTabClickListeners(topLevelTabs);
     highlightActiveTab();
+    monitorNativeTabActiveState();
 
     // Check for overflow and handle it (use longer timeout for accurate measurement)
     setTimeout(() => {
@@ -235,6 +236,7 @@ async function initTabs(tabContainer) {
     // This is especially important for Salesforce Starter Edition where native tabs need to be de-highlighted
     setTimeout(() => {
       highlightActiveTab();
+      monitorNativeTabActiveState();
     }, 300);
 
   } catch (error) {
@@ -1155,6 +1157,100 @@ async function highlightActiveTab() {
 }
 
 /**
+ * Monitor native tabs and prevent them from showing active state when custom tab is active
+ * This is necessary because Salesforce continuously re-applies active state to native tabs
+ */
+async function monitorNativeTabActiveState() {
+  const currentUrl = window.location.href;
+
+  try {
+    const tabs = await getTabsFromStorage();
+    const topLevelTabs = getTopLevelTabs(tabs);
+    let customTabIsActive = false;
+
+    // Check if any custom tab matches the current URL
+    for (const tab of topLevelTabs) {
+      const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+      if (tabElement) {
+        const tabUrl = tabElement.getAttribute('data-url');
+        const baseTabUrl = tabUrl ? tabUrl.split('/Details')[0] : null;
+        const matches = tabUrl && currentUrl.startsWith(baseTabUrl);
+        if (matches) {
+          customTabIsActive = true;
+          break;
+        }
+      }
+    }
+
+    // If a custom tab is active, watch native tabs and remove their active state
+    if (customTabIsActive) {
+      const removeNativeActiveState = () => {
+        // Remove from tabBarItems (all native tabs)
+        const allTabs = document.querySelectorAll('.tabBarItems .tabItem:not(.sf-tabs-custom-tab)');
+        allTabs.forEach(tabEl => {
+          if (tabEl.classList.contains('slds-is-active')) {
+            tabEl.classList.remove('slds-is-active');
+            const anchor = tabEl.querySelector('a');
+            if (anchor) anchor.setAttribute('aria-selected', 'false');
+          }
+        });
+
+        // Remove from pinnedItems (Home, Object Manager, etc.)
+        const pinnedTabs = document.querySelectorAll('.pinnedItems .tabItem');
+        pinnedTabs.forEach(tabEl => {
+          if (tabEl.classList.contains('slds-is-active') || tabEl.classList.contains('active')) {
+            tabEl.classList.remove('slds-is-active', 'active');
+            const anchor = tabEl.querySelector('a');
+            if (anchor) anchor.setAttribute('aria-selected', 'false');
+          }
+        });
+      };
+
+      // Set up mutation observer on the tab bar container
+      const tabBarContainer = document.querySelector('.tabBarItems');
+      const pinnedContainer = document.querySelector('.pinnedItems');
+
+      if (tabBarContainer || pinnedContainer) {
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const target = mutation.target;
+              // If a native tab got the active class, remove it
+              if (target.classList.contains('tabItem') &&
+                  !target.classList.contains('sf-tabs-custom-tab') &&
+                  (target.classList.contains('slds-is-active') || target.classList.contains('active'))) {
+                removeNativeActiveState();
+              }
+            }
+          }
+        });
+
+        // Observe both containers
+        if (tabBarContainer) {
+          observer.observe(tabBarContainer, {
+            attributes: true,
+            attributeFilter: ['class'],
+            subtree: true
+          });
+        }
+        if (pinnedContainer) {
+          observer.observe(pinnedContainer, {
+            attributes: true,
+            attributeFilter: ['class'],
+            subtree: true
+          });
+        }
+
+        // Also run immediately to catch any existing active state
+        removeNativeActiveState();
+      }
+    }
+  } catch (error) {
+    // Error monitoring native tabs
+  }
+}
+
+/**
  * Check if current page matches a tab's path
  */
 function isCurrentPageMatchingTab(tab, currentPageInfo) {
@@ -1164,7 +1260,7 @@ function isCurrentPageMatchingTab(tab, currentPageInfo) {
       return tabObjectName === currentPageInfo.objectName;
     }
   }
-  
+
   return false;
 }
 
