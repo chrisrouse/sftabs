@@ -122,34 +122,11 @@
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s;
   outline: none;
-  background: transparent;
-}
-
-/* Show hover box-shadow for all items */
-.sftabs-floating-modal .tab-item:hover {
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
-/* Navigable top-level items get background on hover */
-.sftabs-floating-modal .tab-item.navigable:hover {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
-.sftabs-floating-modal .tab-item:active:not(.active) {
-  background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
 
 /* Active tab state - only for navigable items (items with URLs) */
 .sftabs-floating-modal .tab-item.navigable.active {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
-/* Keep active state on hover for navigable active tabs */
-.sftabs-floating-modal .tab-item.navigable.active:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
@@ -160,6 +137,29 @@
   align-items: center;
   padding: 10px 16px 10px 12px;
   gap: 8px;
+  transition: background 0.15s, box-shadow 0.15s;
+  background: transparent;
+}
+
+/* Show hover box-shadow for all rows */
+.sftabs-floating-modal .tab-row:hover {
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
+/* Navigable top-level items get background on hover */
+.sftabs-floating-modal .tab-item.navigable > .tab-row:hover {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
+.sftabs-floating-modal .tab-row:active:not(.active) {
+  background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
+}
+
+/* Keep active state on hover for navigable active tabs */
+.sftabs-floating-modal .tab-item.navigable.active > .tab-row:hover {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .tab-label {
@@ -210,8 +210,12 @@
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: background 0.15s, box-shadow 0.15s;
-  background: transparent;
+}
+
+/* Active dropdown child state - uses box-shadow for left indicator */
+.sftabs-floating-modal .dropdown-child-item.active {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-child-row {
@@ -219,6 +223,8 @@
   align-items: center;
   padding: 8px 16px 8px 44px; /* Left padding aligns with chevron position */
   gap: 8px;
+  transition: background 0.15s, box-shadow 0.15s;
+  background: transparent;
 }
 
 /* Dropdown indicator for second-level items with nested children */
@@ -235,29 +241,23 @@
   transform: rotate(90deg);
 }
 
-.sftabs-floating-modal .dropdown-child-item:hover {
+.sftabs-floating-modal .dropdown-child-row:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 /* Non-navigable dropdown children - only box-shadow on hover, no background */
-.sftabs-floating-modal .dropdown-child-item:not(.navigable):hover {
+.sftabs-floating-modal .dropdown-child-item:not(.navigable) > .dropdown-child-row:hover {
   background: transparent;
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
-.sftabs-floating-modal .dropdown-child-item:active:not(.active) {
+.sftabs-floating-modal .dropdown-child-row:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
 
-/* Active dropdown child state - uses box-shadow for left indicator */
-.sftabs-floating-modal .dropdown-child-item.active {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
-/* Don't apply hover state to active dropdown child */
-.sftabs-floating-modal .dropdown-child-item.active:hover {
+/* Keep active state on hover for active dropdown children */
+.sftabs-floating-modal .dropdown-child-item.active > .dropdown-child-row:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
