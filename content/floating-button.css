@@ -137,7 +137,7 @@
 /* Active tab state - matches main navigation active color */
 .sftabs-floating-modal .tab-item.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  border-left: 3px solid var(--lwc-colorBrand, #0176d3);
+  border-left: 3px solid var(--lwc-brandPrimary, #0176d3);
   padding-left: 0; /* Compensate for border */
 }
 
@@ -222,7 +222,7 @@
 /* Active dropdown child state - matches main navigation active color */
 .sftabs-floating-modal .dropdown-child-item.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  border-left: 3px solid var(--lwc-colorBrand, #0176d3);
+  border-left: 3px solid var(--lwc-brandPrimary, #0176d3);
   padding-left: 21px; /* Compensate for border (24px - 3px) */
 }
 
