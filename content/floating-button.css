@@ -129,7 +129,6 @@
 
 /* Only show hover state for navigable items (items with URLs) */
 .sftabs-floating-modal .tab-item.navigable:hover {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
@@ -137,8 +136,8 @@
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
 
-/* Active tab state - uses box-shadow for left indicator */
-.sftabs-floating-modal .tab-item.active {
+/* Active tab state - only for navigable items (items with URLs) */
+.sftabs-floating-modal .tab-item.navigable.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
@@ -211,7 +210,6 @@
 }
 
 .sftabs-floating-modal .dropdown-child-item:hover {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
