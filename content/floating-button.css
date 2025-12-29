@@ -121,38 +121,38 @@
 .sftabs-floating-modal .tab-item {
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid var(--lwc-colorBorder, #e5e5e5);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
   outline: none;
   background: transparent;
 }
 
 .sftabs-floating-modal .tab-item:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .tab-item:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
 
-/* Active tab state - matches main navigation active color */
+/* Active tab state - uses box-shadow for left indicator */
 .sftabs-floating-modal .tab-item.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  border-left: 3px solid var(--lwc-brandPrimary, #0176d3);
-  padding-left: 0; /* Compensate for border */
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 /* Don't apply hover state to active tab */
 .sftabs-floating-modal .tab-item.active:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
-/* Tab Row - Contains label and chevron */
+/* Tab Row - Contains chevron and label */
 .sftabs-floating-modal .tab-row {
   display: flex;
   align-items: center;
-  padding: 10px 12px;
+  padding: 10px 16px 10px 12px;
   gap: 8px;
 }
 
@@ -170,13 +170,14 @@
   margin-top: 1px;
 }
 
-/* Dropdown Indicator - Chevron on Right */
+/* Dropdown Indicator - Chevron on Left */
 .sftabs-floating-modal .dropdown-indicator {
   display: inline-flex;
   align-items: center;
   color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
   transition: transform 0.2s ease;
   flex-shrink: 0;
+  order: -1; /* Move to the left */
 }
 
 .sftabs-floating-modal .tab-item.expanded .dropdown-indicator {
@@ -193,7 +194,6 @@
 .sftabs-floating-modal .dropdown-children {
   display: none;
   background: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackground, #ffffff));
-  border-top: 1px solid var(--lwc-colorBorder, #e5e5e5);
 }
 
 .sftabs-floating-modal .tab-item.expanded .dropdown-children {
@@ -203,35 +203,31 @@
 .sftabs-floating-modal .dropdown-child-item {
   display: flex;
   align-items: center;
-  padding: 8px 12px 8px 24px;
+  padding: 8px 16px 8px 44px; /* Left padding aligns with chevron position */
   cursor: pointer;
-  transition: background 0.15s;
-  border-bottom: 1px solid var(--lwc-colorBorder, #e5e5e5);
+  transition: background 0.15s, box-shadow 0.15s;
   background: transparent;
 }
 
-.sftabs-floating-modal .dropdown-child-item:last-child {
-  border-bottom: none;
-}
-
 .sftabs-floating-modal .dropdown-child-item:hover {
-  background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-child-item:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
 
-/* Active dropdown child state - matches main navigation active color */
+/* Active dropdown child state - uses box-shadow for left indicator */
 .sftabs-floating-modal .dropdown-child-item.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  border-left: 3px solid var(--lwc-brandPrimary, #0176d3);
-  padding-left: 21px; /* Compensate for border (24px - 3px) */
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 /* Don't apply hover state to active dropdown child */
 .sftabs-floating-modal .dropdown-child-item.active:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-child-label {
