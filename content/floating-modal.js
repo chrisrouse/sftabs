@@ -420,6 +420,11 @@
 
       const hasDropdown = childTab.hasDropdown && childTab.dropdownItems && childTab.dropdownItems.length > 0;
 
+      // Debug: Log if this item should have a dropdown but doesn't
+      if (childTab.hasDropdown && (!childTab.dropdownItems || childTab.dropdownItems.length === 0)) {
+        console.warn('[SF Tabs Floating] Second-level item has hasDropdown=true but no dropdownItems:', childTab.label);
+      }
+
       // Create child row (label + chevron wrapper)
       const rowEl = document.createElement('div');
       rowEl.className = 'dropdown-child-row';
@@ -490,6 +495,7 @@
 
       // Render nested dropdown children if has dropdown (third level)
       if (hasDropdown) {
+        console.log('[SF Tabs Floating] Rendering third-level items for:', childTab.label, '- Count:', childTab.dropdownItems.length);
         const nestedContainer = document.createElement('div');
         nestedContainer.className = 'dropdown-nested-children';
 
