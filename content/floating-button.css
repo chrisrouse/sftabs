@@ -127,7 +127,7 @@
 }
 
 .sftabs-floating-modal .tab-item:hover {
-  background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
 }
 
 .sftabs-floating-modal .tab-item:active:not(.active) {
