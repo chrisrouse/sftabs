@@ -308,6 +308,12 @@
         tabEl.classList.add('active');
       }
 
+      // Check if tab is navigable (has a URL)
+      const tabUrl = buildTabUrl(tab);
+      if (tabUrl) {
+        tabEl.classList.add('navigable');
+      }
+
       const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
 
       // Create tab row (label + chevron wrapper)

@@ -127,7 +127,8 @@
   background: transparent;
 }
 
-.sftabs-floating-modal .tab-item:hover {
+/* Only show hover state for navigable items (items with URLs) */
+.sftabs-floating-modal .tab-item.navigable:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
@@ -142,8 +143,8 @@
   box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
-/* Don't apply hover state to active tab */
-.sftabs-floating-modal .tab-item.active:hover {
+/* Keep active state on hover for navigable active tabs */
+.sftabs-floating-modal .tab-item.navigable.active:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
   box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
