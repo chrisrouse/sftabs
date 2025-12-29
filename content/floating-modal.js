@@ -412,6 +412,12 @@
         childEl.classList.add('active');
       }
 
+      // Check if child tab is navigable (has a URL)
+      const childUrl = buildTabUrl(childTab);
+      if (childUrl) {
+        childEl.classList.add('navigable');
+      }
+
       // Label container
       const labelContainer = document.createElement('div');
       labelContainer.style.flex = '1';

@@ -127,8 +127,8 @@
   background: transparent;
 }
 
-/* Only show hover state for navigable items (items with URLs) */
-.sftabs-floating-modal .tab-item.navigable:hover {
+/* Show hover box-shadow for all items */
+.sftabs-floating-modal .tab-item:hover {
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
@@ -210,6 +210,13 @@
 }
 
 .sftabs-floating-modal .dropdown-child-item:hover {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
+/* Non-navigable dropdown children - only box-shadow on hover, no background */
+.sftabs-floating-modal .dropdown-child-item:not(.navigable):hover {
+  background: transparent;
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
