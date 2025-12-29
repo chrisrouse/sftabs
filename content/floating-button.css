@@ -132,6 +132,12 @@
   box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
+/* Navigable top-level items get background on hover */
+.sftabs-floating-modal .tab-item.navigable:hover {
+  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
+  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+}
+
 .sftabs-floating-modal .tab-item:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
 }
