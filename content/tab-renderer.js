@@ -973,33 +973,51 @@ function buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject) {
  */
 function addTabClickListeners(tabs) {
   tabs.forEach(tab => {
-    const links = document.querySelectorAll(`li[data-tab-id="${tab.id}"] a`);
-    links.forEach(link => {
-      // Use capture phase to ensure our listener runs before any other listeners
-      link.addEventListener('click', event => {
-        // FIRST: Check if this tab has an empty or missing path - if so, prevent navigation immediately
-        const hasPath = tab.path && tab.path.trim();
+    const hasPath = tab.path && tab.path.trim();
 
-        if (!hasPath) {
-          // Folder-style tab without URL - block navigation immediately
+    // For folder-style tabs (without paths), make the entire LI clickable
+    if (!hasPath) {
+      const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+      if (tabElement) {
+        tabElement.style.cursor = 'pointer';
+        tabElement.addEventListener('click', event => {
+          // Don't trigger if clicking on dropdown button itself
+          if (event.target.closest('.oneNavItemDropdown') ||
+              event.target.closest('.uiPopupTrigger') ||
+              event.target.closest(`#dropdown-arrow-${tab.id}`)) {
+            return;
+          }
+
+          // Don't trigger if clicking within dropdown menu
+          if (event.target.closest('.sftabs-custom-dropdown')) {
+            return;
+          }
+
+          // Prevent default navigation
           event.preventDefault();
           event.stopPropagation();
-          event.stopImmediatePropagation();
 
           const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
 
-          // If it has a dropdown, open it
+          // Toggle dropdown if present
           if (hasDropdown) {
-            const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
-            const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
-            const dropdownArrow = tabElement?.querySelector(`#dropdown-arrow-${tab.id}`);
+            const dropdown = tabElement.querySelector('.sftabs-custom-dropdown');
+            const dropdownArrow = tabElement.querySelector(`#dropdown-arrow-${tab.id}`);
 
             if (dropdown && dropdownArrow) {
               toggleInlineDropdown(dropdown, dropdownArrow);
             }
           }
-          return;
-        }
+        });
+      }
+      return; // Skip the link listener logic for folder-style tabs
+    }
+
+    // For tabs with paths, add listener to the anchor element
+    const links = document.querySelectorAll(`li[data-tab-id="${tab.id}"] a`);
+    links.forEach(link => {
+      // Use capture phase to ensure our listener runs before any other listeners
+      link.addEventListener('click', event => {
 
         // If clicking on dropdown button or its wrapper, don't navigate
         if (event.target.closest('.oneNavItemDropdown') ||
@@ -1013,32 +1031,7 @@ function addTabClickListeners(tabs) {
           return;
         }
 
-        const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
-
-        // Additional safety check: also check the href pattern
-        const isJsVoidHref = link.href && link.href.includes('javascript:void(0)');
-        const hasEmptyPathPattern = link.href && link.href.includes('//home');
-
-        if (isJsVoidHref || hasEmptyPathPattern) {
-          // Folder-style tab detected by href - block navigation
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-
-          // If it has a dropdown, open it
-          if (hasDropdown) {
-            const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
-            const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
-            const dropdownArrow = tabElement?.querySelector(`#dropdown-arrow-${tab.id}`);
-
-            if (dropdown && dropdownArrow) {
-              toggleInlineDropdown(dropdown, dropdownArrow);
-            }
-          }
-          // If no dropdown and no path, just do nothing (it's a folder/placeholder)
-          return;
-        }
-
+        // At this point, we know the tab has a path (folder-style tabs are handled separately)
         const lightningEnabled = isLightningNavigationEnabled();
 
         if (tab.openInNewTab) {
