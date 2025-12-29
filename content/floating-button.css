@@ -19,7 +19,6 @@
   display: flex;
   flex-direction: row;
   transition: transform 0.3s ease-out;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* --- RIGHT EDGE (Only) --- */
@@ -40,6 +39,7 @@
 
 .sftabs-floating-modal.open .modal-content {
   transform: translateX(0); /* Show full unit */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Toggle Button - All Styles */
@@ -58,6 +58,7 @@
   outline: none;
   flex-shrink: 0;
   transition: background 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .sftabs-floating-modal .modal-panel {
@@ -68,6 +69,10 @@
 
 .sftabs-floating-modal .modal-toggle-button:hover {
   background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
+}
+
+.sftabs-floating-modal.open .modal-toggle-button {
+  box-shadow: none;
 }
 
 .sftabs-floating-modal .modal-toggle-button:focus {
