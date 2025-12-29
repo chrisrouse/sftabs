@@ -277,6 +277,9 @@
 
       container.innerHTML = '';
 
+      // Debug: Log all tabs data
+      console.log('[SF Tabs Floating] All tabs data:', JSON.stringify(this.tabs, null, 2));
+
       // Show only top-level tabs (no parentId) - matches primary navigation
       const displayTabs = this.tabs.filter(tab => !tab.parentId);
 
