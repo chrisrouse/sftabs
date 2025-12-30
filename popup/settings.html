@@ -588,29 +588,6 @@
 			border-top: 1px solid var(--color-border);
 		}
 
-		/* Reset modal specific */
-		#reset-modal .modal-body ul {
-			margin: 8px 0 12px 0;
-			padding-left: 20px;
-			line-height: 1.5;
-		}
-
-		#reset-modal .modal-body ul li {
-			margin-bottom: 4px;
-			font-size: 13px;
-			color: var(--color-text);
-		}
-
-		#reset-modal .modal-body p {
-			font-size: 13px;
-			margin: 0;
-		}
-
-		#reset-modal .modal-body strong {
-			color: var(--slds-color-error);
-			font-weight: 600;
-		}
-
 		/* Global focus indicators for accessibility */
 		button:focus,
 		input:focus,
@@ -915,8 +892,12 @@
 					<div class="setting-card danger-zone">
 						<h3>Reset</h3>
 						<div class="setting-item">
+							<p style="margin: 0 0 8px 0; color: var(--color-text);">Reset all tabs and settings to their default values.</p>
+							<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--color-text-weak);">
+								<strong>Tip:</strong> We recommend <a href="#" id="export-before-reset-link" class="keyboard-shortcuts-link">exporting your configuration</a> before resetting so you can restore it later if needed.
+							</p>
 							<button id="reset-button" class="secondary-button reset-button" style="width: 100%;">Reset to Defaults</button>
-							<div class="setting-description">This will remove all custom tabs and reset all settings to their default values. This action cannot be undone.</div>
+							<div class="setting-description" style="margin-top: 12px;">This will remove all custom tabs, reset all settings, and remove all profiles. This action cannot be undone.</div>
 						</div>
 					</div>
 				</section>
@@ -1043,28 +1024,6 @@
 			<div class="modal-footer">
 				<button id="export-modal-cancel" class="secondary-button">Cancel</button>
 				<button id="export-modal-confirm" class="primary-button">Export</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- Reset Confirmation Modal -->
-	<div id="reset-modal" class="modal" style="display: none;">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2>Reset to Defaults</h2>
-			</div>
-			<div class="modal-body">
-				<p>Are you sure you want to reset to default tabs and settings? This will:</p>
-				<ul style="margin: 12px 0; padding-left: 20px; line-height: 1.6;">
-					<li>Remove all custom tabs</li>
-					<li>Reset all settings to defaults</li>
-					<li>Remove all profiles</li>
-				</ul>
-				<p><strong>This action cannot be undone.</strong></p>
-			</div>
-			<div class="modal-footer">
-				<button id="reset-modal-cancel" class="secondary-button">Cancel</button>
-				<button id="reset-modal-confirm" class="primary-button">Reset Everything</button>
 			</div>
 		</div>
 	</div>

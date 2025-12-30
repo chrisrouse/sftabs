@@ -362,18 +362,16 @@ function setupEventListeners() {
 	});
 
 	// Reset button
-	document.getElementById('reset-button').addEventListener('click', () => {
-		showResetModal();
-	});
+	document.getElementById('reset-button').addEventListener('click', async () => {
+		const confirmed = confirm(
+			'Reset all tabs and settings to their default values?\n\n' +
+			'This will remove all custom tabs, reset all settings, and remove all profiles. ' +
+			'This action cannot be undone.'
+		);
 
-	// Reset modal buttons
-	document.getElementById('reset-modal-cancel').addEventListener('click', () => {
-		hideResetModal();
-	});
-
-	document.getElementById('reset-modal-confirm').addEventListener('click', async () => {
-		await resetToDefaults();
-		hideResetModal();
+		if (confirmed) {
+			await resetToDefaults();
+		}
 	});
 
 	// User guide link
@@ -386,6 +384,33 @@ function setupEventListeners() {
 
 	// Export before disable link (navigate to Import/Export section)
 	document.getElementById('export-before-disable-link').addEventListener('click', (e) => {
+		e.preventDefault();
+
+		// Navigate to Import/Export section
+		const navItems = document.querySelectorAll('.settings-nav-item');
+		const sections = document.querySelectorAll('.settings-section');
+
+		navItems.forEach(nav => {
+			nav.classList.remove('active');
+			nav.setAttribute('aria-selected', 'false');
+		});
+
+		const importExportNav = document.querySelector('.settings-nav-item[data-section="import-export"]');
+		if (importExportNav) {
+			importExportNav.classList.add('active');
+			importExportNav.setAttribute('aria-selected', 'true');
+		}
+
+		sections.forEach(section => section.classList.remove('active'));
+		const importExportSection = document.getElementById('section-import-export');
+		if (importExportSection) {
+			importExportSection.classList.add('active');
+			importExportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	});
+
+	// Export before reset link (navigate to Import/Export section)
+	document.getElementById('export-before-reset-link').addEventListener('click', (e) => {
 		e.preventDefault();
 
 		// Navigate to Import/Export section
@@ -845,20 +870,6 @@ async function performImport(importData, mode, target, importTabs = true, import
 	} catch (error) {
 		showStatus('Import failed: ' + error.message, true);
 	}
-}
-
-/**
- * Show reset confirmation modal
- */
-function showResetModal() {
-	document.getElementById('reset-modal').style.display = 'flex';
-}
-
-/**
- * Hide reset confirmation modal
- */
-function hideResetModal() {
-	document.getElementById('reset-modal').style.display = 'none';
 }
 
 /**
