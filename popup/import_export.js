@@ -5,7 +5,6 @@
 const exportButton = document.getElementById('export-button');
 const importButton = document.getElementById('import-button');
 const fileInput = document.getElementById('import-file-input');
-const statusMessage = document.getElementById('status-message');
 
 // Constants
 const CHUNK_SIZE = 7000; // Max bytes per chunk for sync storage (browser limit is ~8KB per key)
@@ -372,17 +371,9 @@ async function handleFileSelect(event) {
 	fileInput.value = '';
 }
 
-// Show status message
+// Show status message (now uses toast notifications)
 function showStatus(message, isError = false) {
-	statusMessage.textContent = message;
-
-	// Apply appropriate class
-	statusMessage.classList.remove('success', 'error');
-	if (isError) {
-		statusMessage.classList.add('error');
-	} else {
-		statusMessage.classList.add('success');
-	}
+	showToast(message, isError);
 }
 
 // ============================================================================

@@ -907,17 +907,10 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
 }
 
 /**
- * Show status message
+ * Show status message (now uses toast notifications)
  */
 function showStatus(message, isError) {
-	const statusEl = document.getElementById('status-message');
-	statusEl.textContent = message;
-	statusEl.className = isError ? 'error' : 'success';
-	statusEl.style.display = 'block';
-
-	setTimeout(() => {
-		statusEl.style.display = 'none';
-	}, 3000);
+	showToast(message, isError);
 }
 
 // Initialize when page loads

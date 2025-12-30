@@ -182,30 +182,39 @@
 			stroke: var(--slds-color-error);
 		}
 
-		/* Status message */
-		#status-message {
+		/* Toast notifications */
+		.sftabs-toast {
 			position: fixed;
 			bottom: 20px;
-			right: 20px;
+			left: 50%;
+			transform: translateX(-50%) translateY(100px);
+			background-color: #333;
+			color: #fff;
 			padding: 12px 20px;
-			background: var(--color-item-background);
-			border: 1px solid var(--color-border);
-			border-radius: 8px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+			border-radius: 6px;
 			font-size: 13px;
-			z-index: 1000;
-			display: none;
-			max-width: 300px;
+			font-weight: 500;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			z-index: 10000;
+			opacity: 0;
+			transition: all 0.3s ease;
+			max-width: 350px;
+			text-align: center;
 		}
 
-		#status-message.success {
-			border-color: var(--slds-color-success);
-			color: var(--slds-color-success);
+		.sftabs-toast.show {
+			transform: translateX(-50%) translateY(0);
+			opacity: 1;
 		}
 
-		#status-message.error {
-			border-color: var(--slds-color-error);
-			color: var(--slds-color-error);
+		.sftabs-toast.success {
+			background-color: #10b981;
+			color: #fff;
+		}
+
+		.sftabs-toast.error {
+			background-color: #ef4444;
+			color: #fff;
 		}
 
 		/* Action button style override for settings page */
@@ -771,9 +780,6 @@
 		</div> <!-- End settings-grid -->
 	</div>
 
-	<!-- Status Message -->
-	<div id="status-message"></div>
-
 	<!-- Import Target Modal -->
 	<div id="import-target-modal" class="modal" style="display: none;">
 		<div class="modal-content">
@@ -913,6 +919,7 @@
 	<script src="js/shared/browser-compat.js"></script>
 	<script src="js/shared/constants.js"></script>
 	<script src="js/shared/utils.js"></script>
+	<script src="js/shared/toast.js"></script>
 	<!-- Load storage modules for profiles support -->
 	<script src="js/storage-chunking.js"></script>
 	<script src="js/popup-storage.js"></script>

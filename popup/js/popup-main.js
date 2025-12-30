@@ -123,9 +123,8 @@ function initializeDOMElements() {
   domElements.cancelButton = document.querySelector('#cancel-button');
   domElements.settingsButton = document.querySelector('#settings-button');
   domElements.refreshNavButton = document.querySelector('#refresh-nav-button');
-  
-  // Status and modals
-  domElements.statusMessage = document.querySelector('#status-message');
+
+  // Modals
   domElements.confirmModal = document.querySelector('#confirm-modal');
   domElements.deleteConfirmModal = document.querySelector('#delete-confirm-modal');
   
@@ -138,6 +137,7 @@ function initializeDOMElements() {
   domElements.actionPanelCloseButton = document.querySelector('#action-panel-close-button');
   domElements.actionPanelSaveButton = document.querySelector('#action-panel-save-button');
   domElements.actionTabNameInput = document.querySelector('#action-tab-name');
+  domElements.actionTabNameCounter = document.querySelector('#action-tab-name-counter');
   domElements.actionTabPathInput = document.querySelector('#action-tab-path');
   domElements.actionPanelTabNameDisplay = document.querySelector('#action-panel-tab-name-display');
   domElements.actionIsObjectCheckbox = document.querySelector('#action-is-object');
@@ -415,6 +415,11 @@ function updateActionPanelContent(tab) {
   // Populate the input fields with current tab data
   if (domElements.actionTabNameInput) {
     domElements.actionTabNameInput.value = tab.label || '';
+
+    // Update character counter
+    if (domElements.actionTabNameCounter) {
+      domElements.actionTabNameCounter.textContent = domElements.actionTabNameInput.value.length;
+    }
   }
 
   if (domElements.actionTabPathInput) {
@@ -716,48 +721,10 @@ function saveActionPanelChanges() {
 }
 
 /**
- * Show status message
+ * Show status message (now uses toast notifications)
  */
 function showStatus(message, isError = false) {
-  console.log('showStatus called:', { message, isError, hasElement: !!domElements.statusMessage });
-
-  if (!domElements.statusMessage) {
-    console.error('Status message element not found!');
-    return;
-  }
-
-  console.log('Setting status message text to:', message);
-  domElements.statusMessage.textContent = message;
-
-  // Apply appropriate class
-  domElements.statusMessage.classList.remove('success', 'error');
-  if (isError) {
-    domElements.statusMessage.classList.add('error');
-    console.log('Added error class to status message');
-  } else if (message) {
-    domElements.statusMessage.classList.add('success');
-    console.log('Added success class to status message');
-  }
-
-  console.log('Status message element:', domElements.statusMessage);
-  console.log('Status message innerHTML:', domElements.statusMessage.innerHTML);
-  console.log('Status message textContent:', domElements.statusMessage.textContent);
-
-  const computedStyle = window.getComputedStyle(domElements.statusMessage);
-  console.log('Status message display:', computedStyle.display);
-  console.log('Status message visibility:', computedStyle.visibility);
-  console.log('Status message color:', computedStyle.color);
-  console.log('Status message font-size:', computedStyle.fontSize);
-  console.log('Status message line-height:', computedStyle.lineHeight);
-  console.log('Status message padding:', computedStyle.padding);
-  console.log('Status message height:', computedStyle.height);
-  console.log('Status message overflow:', computedStyle.overflow);
-
-  // Clear message after a delay
-  setTimeout(() => {
-    domElements.statusMessage.textContent = '';
-    domElements.statusMessage.classList.remove('success', 'error');
-  }, 3000);
+  showToast(message, isError);
 }
 
 /**

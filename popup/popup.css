@@ -70,9 +70,8 @@
   .container {
 	display: flex;
 	flex-direction: column;
-	height: 650px;
 	min-height: 300px;
-	max-height: 850px;
+	max-height: 600px;
 	width: 410px;
 	overflow: hidden;
 	background-color: var(--color-background);
@@ -185,20 +184,9 @@
   #main-content.with-banner,
   #action-panel.with-banner {
 	margin-top: 82px !important;
-	height: calc(100% - 82px - 60px) !important;
+	height: calc(100% - 82px) !important;
   }
 
-  footer {
-	padding: 8px;
-	background-color: var(--color-background);
-	border-radius: 0 0 4px 4px;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	width: 410px;
-	z-index: 10;
-  }
-  
   /* Typography */
   h1 {
 	font-size: 16px;
@@ -269,7 +257,7 @@
 	position: relative;
 	background-color: var(--color-background);
 	margin-top: 56px;
-	height: calc(100% - 56px - 60px);
+	height: calc(100% - 56px);
 	display: none;
   }
 
@@ -844,29 +832,39 @@
 	stroke: var(--color-text);
   }
   
-  /* Status Message */
-  .status-message {
-	text-align: center;
+  /* Toast Notifications */
+  .sftabs-toast {
+	position: fixed;
+	bottom: 20px;
+	left: 50%;
+	transform: translateX(-50%) translateY(100px);
+	background-color: #333;
+	color: #fff;
+	padding: 12px 20px;
+	border-radius: 6px;
 	font-size: 13px;
-	color: var(--color-text-weak);
-	min-height: 32px;
 	font-weight: 500;
-	padding: 8px 12px;
-	line-height: 1.4;
-	display: block;
-	background-color: var(--color-background);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	z-index: 10000;
+	opacity: 0;
+	transition: all 0.3s ease;
+	max-width: 350px;
+	text-align: center;
   }
 
-  .status-message.success {
-	color: var(--slds-color-success);
-	background-color: #d4edda;
+  .sftabs-toast.show {
+	transform: translateX(-50%) translateY(0);
+	opacity: 1;
   }
 
-  .status-message.error {
-	color: #721c24;
-	background-color: #f8d7da;
-	border: 1px solid #f5c6cb;
-	border-radius: 4px;
+  .sftabs-toast.success {
+	background-color: #10b981;
+	color: #fff;
+  }
+
+  .sftabs-toast.error {
+	background-color: #ef4444;
+	color: #fff;
   }
   
   /* Modal Styles */

@@ -130,9 +130,8 @@ const SELECTORS = {
   cancelButton: '#cancel-button',
   settingsButton: '#settings-button',
   refreshNavButton: '#refresh-nav-button',
-  
-  // Status and modals
-  statusMessage: '#status-message',
+
+  // Modals
   confirmModal: '#confirm-modal',
   deleteConfirmModal: '#delete-confirm-modal',
   

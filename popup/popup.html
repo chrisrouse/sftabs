@@ -184,7 +184,8 @@
 
                 <div class="form-group">
                     <label for="action-tab-name">Tab Name</label>
-                    <input type="text" id="action-tab-name" placeholder="e.g., User Management">
+                    <input type="text" id="action-tab-name" placeholder="e.g., User Management" maxlength="30">
+                    <div class="help-text"><span id="action-tab-name-counter">0</span>/30 characters</div>
                 </div>
 
                 <div class="form-group">
@@ -343,11 +344,6 @@
                 </div>
             </div>
         </div>
-
-
-        <footer>
-            <div class="status-message" id="status-message"></div>
-        </footer>
 
         <!-- Confirm Reset Modal -->
         <div id="confirm-modal" class="modal">
@@ -543,6 +539,7 @@
     <script src="js/shared/browser-compat.js"></script>
     <script src="js/shared/constants.js"></script>
     <script src="js/shared/utils.js"></script>
+    <script src="js/shared/toast.js"></script>
 
     <!-- Load storage modules -->
     <script src="js/storage-chunking.js"></script>
