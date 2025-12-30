@@ -183,35 +183,57 @@ function generateTabName(path, pageTitle, isObject, isCustomUrl, isSetupObject) 
       }
     }
   } else if (isObject) {
-    const pathSegments = path.split('/');
-    if (pathSegments.length > 0) {
-      const objectName = formatObjectNameFromURL(pathSegments[0]);
-      let viewType = '';
-      if (pathSegments.length > 1) {
-        viewType = pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1);
+    // Try to get object name from page title first (handles custom objects with IDs in URL)
+    if (pageTitle) {
+      let cleanTitle = pageTitle.split(' | ')[0];
+      name = cleanTitle;
+    }
+
+    // Fallback to extracting from path if title not available
+    if (!name || name.length === 0) {
+      const pathSegments = path.split('/');
+      if (pathSegments.length > 0) {
+        const objectName = formatObjectNameFromURL(pathSegments[0]);
+        let viewType = '';
+        if (pathSegments.length > 1) {
+          viewType = pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1);
+        }
+        name = viewType ? `${objectName} ${viewType}` : objectName;
       }
-      name = viewType ? `${objectName} ${viewType}` : objectName;
     }
   } else if (path.startsWith('ObjectManager/')) {
-    const pathSegments = path.split('/').filter(segment => segment.length > 0);
-    
-    let objectName = "";
-    if (pathSegments.length >= 2) {
-      objectName = formatObjectNameFromURL(pathSegments[1]);
-    } else {
-      objectName = "Object Manager";
+    // Try to get object name from page title first (handles custom objects with IDs in URL)
+    if (pageTitle) {
+      let cleanTitle = pageTitle.split(' | ')[0];
+      // Remove "Setup: " prefix if present
+      if (cleanTitle.includes('Setup: ')) {
+        cleanTitle = cleanTitle.split('Setup: ')[1];
+      }
+      name = cleanTitle;
     }
-    
-    let sectionName = "";
-    if (pathSegments.length >= 3) {
-      let pathSection = pathSegments[2];
-      sectionName = pathSection.replace(/([A-Z])/g, ' $1').trim();
-    }
-    
-    if (sectionName) {
-      name = `${objectName} - ${sectionName}`;
-    } else {
-      name = objectName;
+
+    // Fallback to extracting from path if title not available
+    if (!name || name.length === 0) {
+      const pathSegments = path.split('/').filter(segment => segment.length > 0);
+
+      let objectName = "";
+      if (pathSegments.length >= 2) {
+        objectName = formatObjectNameFromURL(pathSegments[1]);
+      } else {
+        objectName = "Object Manager";
+      }
+
+      let sectionName = "";
+      if (pathSegments.length >= 3) {
+        let pathSection = pathSegments[2];
+        sectionName = pathSection.replace(/([A-Z])/g, ' $1').trim();
+      }
+
+      if (sectionName) {
+        name = `${objectName} - ${sectionName}`;
+      } else {
+        name = objectName;
+      }
     }
   } else {
     if (pageTitle) {

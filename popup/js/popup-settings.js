@@ -152,6 +152,13 @@ function setupEventListeners() {
         SFTabs.main.saveActionPanelChanges();
       }
     });
+
+    // Update character counter as user types
+    domElements.actionTabNameInput.addEventListener('input', () => {
+      if (domElements.actionTabNameCounter) {
+        domElements.actionTabNameCounter.textContent = domElements.actionTabNameInput.value.length;
+      }
+    });
   }
 
   if (domElements.actionTabPathInput) {
