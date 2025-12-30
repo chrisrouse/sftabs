@@ -17,14 +17,18 @@ async function checkMigrationStatus() {
     // Check if this is a version upgrade that requires migration
     const needsMigration = await detectIfMigrationNeeded(storedVersion, currentVersion);
 
-    return {
+    const status = {
       currentVersion,
       storedVersion,
       needsMigration,
       migrationCompleted: migrationCompleted === currentVersion,
       migrationPending: migrationPending === true
     };
+
+    console.log('Migration status check:', status);
+    return status;
   } catch (error) {
+    console.error('Error checking migration status:', error);
     return {
       currentVersion: '2.0.0',
       storedVersion: null,
@@ -167,6 +171,8 @@ async function showMigrationModal() {
   if (modal) {
     modal.classList.add('show');
     modal.style.display = 'flex';
+    // Add class to body for height adjustment
+    document.body.classList.add('migration-active');
   }
 }
 
@@ -216,6 +222,8 @@ function hideMigrationModal() {
   if (modal) {
     modal.classList.remove('show');
     modal.style.display = 'none';
+    // Remove class from body
+    document.body.classList.remove('migration-active');
   }
 }
 
@@ -313,8 +321,8 @@ async function performMigration(enableProfiles = false, useSyncStorage = true) {
       updatedAt: new Date().toISOString()
     };
 
-    // Save the profile
-    await SFTabs.storage.saveProfiles([defaultProfile]);
+    // Save the profile (suppress toast during migration)
+    await SFTabs.storage.saveProfiles([defaultProfile], false);
 
     // Save tabs to the new profile
     if (tabs && tabs.length > 0) {
@@ -336,7 +344,7 @@ async function performMigration(enableProfiles = false, useSyncStorage = true) {
       settings.profilesEnabled = true;
     }
 
-    await SFTabs.storage.saveUserSettings(settings, true); // Skip migration check
+    await SFTabs.storage.saveUserSettings(settings, true, false); // Skip migration check, suppress toast
 
     // Mark migration as completed
     const currentVersion = browser.runtime.getManifest().version;

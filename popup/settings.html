@@ -19,14 +19,21 @@
 
 		.settings-layout {
 			display: flex;
+			flex-direction: column;
 			height: 100vh;
+			overflow: hidden;
+		}
+
+		.settings-body {
+			display: flex;
+			flex: 1;
 			overflow: hidden;
 		}
 
 		/* Sidebar Navigation */
 		.settings-sidebar {
 			width: 240px;
-			background: var(--color-item-background);
+			background: var(--color-background);
 			border-right: 1px solid var(--color-border);
 			display: flex;
 			flex-direction: column;
@@ -38,59 +45,60 @@
 			border-bottom: 1px solid var(--color-border);
 		}
 
-		.settings-sidebar-header h1 {
-			font-size: 18px;
-			font-weight: 600;
-			margin: 0 0 4px 0;
-			color: var(--color-text);
-			display: flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.settings-sidebar-header h1 img {
-			width: 24px;
-			height: 24px;
-		}
-
-		.settings-sidebar-header h1 .logo-blue {
-			display: block;
-		}
-
-		.settings-sidebar-header h1 .logo-white {
-			display: none;
-		}
-
-		[data-theme="dark"] .settings-sidebar-header h1 .logo-blue {
-			display: none;
-		}
-
-		[data-theme="dark"] .settings-sidebar-header h1 .logo-white {
-			display: block;
-		}
-
-		.settings-sidebar-header .version-info {
-			font-size: 12px;
-			color: var(--color-text-weak);
-			margin: 0;
-		}
-
-		.settings-sidebar-header .version-info a {
-			color: #0176d3;
-			text-decoration: none;
-		}
-
-		[data-theme="dark"] .settings-sidebar-header .version-info a {
-			color: var(--slds-brand-primary);
-		}
-
-		.settings-sidebar-header .version-info a:hover {
-			text-decoration: underline;
-		}
-
 		.settings-nav {
 			flex: 1;
 			padding: 8px 0;
+			overflow-y: auto;
+		}
+
+		.settings-sidebar-footer {
+			padding: 16px 20px;
+			border-top: 1px solid var(--color-border);
+			flex-shrink: 0;
+		}
+
+		.version-info {
+			font-size: 12px;
+			color: var(--color-text-weak);
+			margin: 0;
+			text-align: center;
+		}
+
+		.user-guide-link {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 20px;
+			cursor: pointer;
+			color: #0176d3;
+			font-size: 14px;
+			font-weight: 500;
+			transition: all 0.15s;
+			border-left: 3px solid transparent;
+			text-decoration: none;
+		}
+
+		[data-theme="dark"] .user-guide-link {
+			color: var(--slds-brand-primary);
+		}
+
+		.user-guide-link:hover {
+			background: var(--color-item-background);
+		}
+
+		.user-guide-link svg {
+			width: 18px;
+			height: 18px;
+			stroke: currentColor;
+			fill: none;
+			flex-shrink: 0;
+		}
+
+		.user-guide-link .external-icon {
+			width: 14px;
+			height: 14px;
+			margin-left: auto;
+			opacity: 0.6;
 		}
 
 		.settings-nav-item {
@@ -142,7 +150,46 @@
 		.settings-main {
 			flex: 1;
 			overflow-y: auto;
-			background: var(--color-background);
+			background: var(--color-item-background);
+		}
+
+		/* Page Header */
+		.settings-page-header {
+			padding: 16px;
+			border-bottom: 1px solid var(--color-border);
+			background: var(--color-item-background);
+			flex-shrink: 0;
+		}
+
+		.settings-page-header h1 {
+			font-size: 48px;
+			font-weight: 600;
+			margin: 0;
+			color: var(--color-text);
+			display: flex;
+			align-items: center;
+			gap: 16px;
+		}
+
+		.settings-page-header h1 img {
+			width: 48px;
+			height: 48px;
+		}
+
+		.settings-page-header h1 .logo-blue {
+			display: block;
+		}
+
+		.settings-page-header h1 .logo-white {
+			display: none;
+		}
+
+		[data-theme="dark"] .settings-page-header h1 .logo-blue {
+			display: none;
+		}
+
+		[data-theme="dark"] .settings-page-header h1 .logo-white {
+			display: block;
 		}
 
 		.settings-content {
@@ -163,7 +210,7 @@
 		}
 
 		.settings-section-header h2 {
-			font-size: 24px;
+			font-size: 32px;
 			font-weight: 600;
 			margin: 0 0 8px 0;
 			color: var(--color-text);
@@ -178,10 +225,7 @@
 
 		/* Setting Cards */
 		.setting-card {
-			background: var(--color-item-background);
-			border: 1px solid var(--color-border);
-			border-radius: 8px;
-			padding: 20px;
+			padding: 20px 0;
 			margin-bottom: 16px;
 		}
 
@@ -190,7 +234,7 @@
 		}
 
 		.setting-card h3 {
-			font-size: 15px;
+			font-size: 16px;
 			font-weight: 600;
 			margin: 0 0 12px 0;
 			color: var(--color-text);
@@ -213,7 +257,7 @@
 		}
 
 		.setting-description {
-			font-size: 13px;
+			font-size: 14px;
 			color: var(--color-text-weak);
 			margin-top: 6px;
 			line-height: 1.4;
@@ -283,13 +327,16 @@
 		}
 
 		.config-action-button .action-description {
-			font-size: 13px;
+			font-size: 14px;
 			color: var(--color-text-weak);
 		}
 
 		/* Danger Zone */
 		.danger-zone {
-			border-color: var(--slds-color-error);
+			background: var(--color-background);
+			border: 2px solid var(--slds-color-error);
+			border-radius: 8px;
+			padding: 20px;
 		}
 
 		.danger-zone h3 {
@@ -318,7 +365,7 @@
 			color: #fff;
 			padding: 12px 20px;
 			border-radius: 6px;
-			font-size: 13px;
+			font-size: 14px;
 			font-weight: 500;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 			z-index: 10000;
@@ -343,206 +390,6 @@
 			color: #fff;
 		}
 
-		/* Modal enhancements */
-		.modal {
-			animation: modalFadeIn 0.15s ease-out;
-		}
-
-		@keyframes modalFadeIn {
-			from { opacity: 0; }
-			to { opacity: 1; }
-		}
-
-		.modal-content {
-			background: var(--color-item-background);
-			border: 1px solid var(--color-border);
-			border-radius: 8px;
-			padding: 16px;
-			max-width: 460px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-			animation: modalSlideIn 0.2s ease-out;
-		}
-
-		@keyframes modalSlideIn {
-			from {
-				transform: scale(0.97);
-				opacity: 0;
-			}
-			to {
-				transform: scale(1);
-				opacity: 1;
-			}
-		}
-
-		.modal-header {
-			margin-bottom: 12px;
-			background: none !important;
-			background-color: transparent !important;
-			border: none !important;
-			padding: 0;
-		}
-
-		.modal-header h2 {
-			font-size: 16px;
-			font-weight: 600;
-			margin: 0;
-			color: var(--color-text) !important;
-		}
-
-		.modal-body {
-			font-size: 14px;
-			line-height: 1.4;
-			color: var(--color-text);
-		}
-
-		.modal-body > p:first-child {
-			font-size: 13px;
-			color: var(--color-text-weak);
-			margin: 0 0 12px 0;
-			line-height: 1.3;
-		}
-
-		.modal-body .form-group {
-			margin-bottom: 0;
-		}
-
-		.modal-body label {
-			font-size: 14px;
-			cursor: pointer;
-			transition: background-color 0.15s;
-		}
-
-		.modal-body .setting-description {
-			font-size: 12px;
-			line-height: 1.4;
-			margin-top: 4px;
-			color: var(--color-text-weak);
-		}
-
-		.modal-footer {
-			margin-top: 16px;
-			gap: 8px;
-			display: flex;
-			justify-content: flex-end;
-		}
-
-		.modal-footer button {
-			min-width: 80px;
-		}
-
-		/* Export profiles list scrolling */
-		#export-profiles-list {
-			max-height: 300px;
-			overflow-y: auto;
-			padding-right: 8px;
-		}
-
-		#export-profiles-list::-webkit-scrollbar {
-			width: 8px;
-		}
-
-		#export-profiles-list::-webkit-scrollbar-track {
-			background: var(--color-background);
-			border-radius: 4px;
-		}
-
-		#export-profiles-list::-webkit-scrollbar-thumb {
-			background: var(--color-border);
-			border-radius: 4px;
-		}
-
-		#export-profiles-list::-webkit-scrollbar-thumb:hover {
-			background: var(--color-text-weak);
-		}
-
-		/* Import modal specific */
-		#import-target-modal .modal-body label {
-			font-size: 14px;
-			font-weight: 500;
-			margin-bottom: 8px;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			padding: 6px 8px;
-			border-radius: 4px;
-			transition: background-color 0.15s;
-		}
-
-		#import-target-modal .modal-body label:hover {
-			background-color: var(--color-background);
-		}
-
-		#import-target-modal .modal-body input[type="radio"] {
-			width: 16px;
-			height: 16px;
-			margin: 0;
-			cursor: pointer;
-		}
-
-		#import-target-modal .modal-body label span {
-			user-select: none;
-		}
-
-		#import-target-modal .sub-option {
-			margin-left: 24px;
-			margin-top: 8px;
-			padding-left: 12px;
-			border-left: 2px solid var(--color-border);
-		}
-
-		#import-target-modal .sub-option label {
-			font-size: 13px;
-			font-weight: normal;
-			margin-bottom: 4px;
-			padding: 4px 8px;
-		}
-
-		#import-target-modal select,
-		#import-target-modal input[type="text"] {
-			width: 100%;
-			font-size: 14px;
-			padding: 8px 10px;
-			margin-top: 4px;
-			border: 1px solid var(--color-border);
-			border-radius: 4px;
-			background: var(--color-background);
-			color: var(--color-text);
-			transition: border-color 0.15s;
-		}
-
-		#import-target-modal select:focus,
-		#import-target-modal input[type="text"]:focus {
-			outline: none;
-			border-color: var(--slds-brand-primary);
-		}
-
-		/* Import options checkboxes */
-		#import-options-section .checkbox-group {
-			font-size: 14px;
-			margin-bottom: 4px;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			padding: 6px 4px;
-			border-radius: 4px;
-			transition: background-color 0.15s;
-		}
-
-		#import-options-section .checkbox-group:hover {
-			background-color: var(--color-background);
-		}
-
-		#import-options-section .checkbox-group input[type="checkbox"] {
-			width: 16px;
-			height: 16px;
-			margin: 0;
-			cursor: pointer;
-		}
-
-		#import-destination-section {
-			border-top: 1px solid var(--color-border);
-			padding-top: 12px;
-		}
 
 		/* Global focus indicators for accessibility */
 		button:focus,
@@ -571,15 +418,20 @@
 
 <body class="settings-page">
 	<div class="settings-layout">
-		<!-- Sidebar Navigation -->
-		<div class="settings-sidebar">
+		<!-- Page Header -->
+		<div class="settings-page-header">
+			<h1>
+				<img src="../icons/sftabs_blue.svg" alt="SF Tabs" class="logo-blue">
+				<img src="../icons/sftabs_white.svg" alt="SF Tabs" class="logo-white">
+				SF Tabs
+			</h1>
+		</div>
+
+		<div class="settings-body">
+			<!-- Sidebar Navigation -->
+			<div class="settings-sidebar">
 			<div class="settings-sidebar-header">
-				<h1>
-					<img src="../icons/sftabs_blue.svg" alt="SF Tabs" class="logo-blue">
-					<img src="../icons/sftabs_white.svg" alt="SF Tabs" class="logo-white">
-					SF Tabs
-				</h1>
-				<p class="version-info">v2.0.0 | <a href="#" id="user-guide-link">User Guide</a></p>
+				<p style="font-size: 18px; font-weight: 600; margin: 0; color: var(--color-text);">Navigation</p>
 			</div>
 			<nav class="settings-nav">
 				<div class="settings-nav-item active" data-section="settings">
@@ -628,12 +480,30 @@
 					</svg>
 					<span>Import & Export</span>
 				</div>
+				<a href="#" id="user-guide-link" class="user-guide-link" target="_blank">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+						<polyline points="14 2 14 8 20 8"></polyline>
+						<line x1="16" y1="13" x2="8" y2="13"></line>
+						<line x1="16" y1="17" x2="8" y2="17"></line>
+						<polyline points="10 9 9 9 8 9"></polyline>
+					</svg>
+					<span>User Guide</span>
+					<svg class="external-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+						<polyline points="15 3 21 3 21 9"></polyline>
+						<line x1="10" y1="14" x2="21" y2="3"></line>
+					</svg>
+				</a>
 			</nav>
+			<div class="settings-sidebar-footer">
+				<p class="version-info">v2.0.0</p>
+			</div>
 		</div>
 
-		<!-- Main Content Area -->
-		<div class="settings-main">
-			<div class="settings-content">
+			<!-- Main Content Area -->
+			<div class="settings-main">
+				<div class="settings-content">
 				<!-- Settings Section -->
 				<section id="section-settings" class="settings-section active">
 					<div class="settings-section-header">
@@ -783,7 +653,7 @@
 						<h3>Disable Profiles</h3>
 						<div class="setting-item">
 							<p style="margin: 0 0 8px 0; color: var(--color-text);">Disabling profiles will keep one profile and remove all others. Which profile would you like to keep?</p>
-							<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--color-text-weak);">
+							<p style="margin: 0 0 12px 0; font-size: 14px; color: var(--color-text-weak);">
 								<strong>Tip:</strong> We recommend <a href="#" id="export-before-disable-link" class="keyboard-shortcuts-link">exporting your configuration</a> before disabling profiles so you can restore it later if needed.
 							</p>
 							<div class="form-group" style="margin-bottom: 16px;">
@@ -814,12 +684,12 @@
 
 							<div style="background: var(--color-item-background); padding: 12px; border-radius: 6px; margin-top: 8px;">
 								<p style="margin: 0 0 8px 0; font-weight: 600; color: var(--color-text);">Firefox:</p>
-								<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--color-text-weak);">
+								<p style="margin: 0 0 12px 0; font-size: 14px; color: var(--color-text-weak);">
 									Type <code style="background: var(--color-background); padding: 2px 6px; border-radius: 3px;">about:addons</code> in the address bar and press Enter. Click on the gear icon at the top of the page and select "Manage Extension Shortcuts".
 								</p>
 
 								<p style="margin: 0 0 8px 0; font-weight: 600; color: var(--color-text);">Chrome / Edge:</p>
-								<p style="margin: 0; font-size: 13px; color: var(--color-text-weak);">
+								<p style="margin: 0; font-size: 14px; color: var(--color-text-weak);">
 									Type <code style="background: var(--color-background); padding: 2px 6px; border-radius: 3px;">chrome://extensions/shortcuts</code> in the address bar to go directly to keyboard shortcuts for all installed extensions.
 								</p>
 							</div>
@@ -849,7 +719,7 @@
 						<h3>Reset</h3>
 						<div class="setting-item">
 							<p style="margin: 0 0 8px 0; color: var(--color-text);">Reset all tabs and settings to their default values.</p>
-							<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--color-text-weak);">
+							<p style="margin: 0 0 12px 0; font-size: 14px; color: var(--color-text-weak);">
 								<strong>Tip:</strong> We recommend <a href="#" id="export-before-reset-link" class="keyboard-shortcuts-link">exporting your configuration</a> before resetting so you can restore it later if needed.
 							</p>
 							<button id="reset-button" class="secondary-button reset-button" style="width: 100%;">Reset to Defaults</button>
@@ -876,7 +746,7 @@
 									<input type="radio" name="export-mode" id="export-everything-radio" value="everything" checked style="margin-top: 2px; cursor: pointer;">
 									<div style="flex: 1;">
 										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 2px;">Everything (Recommended)</div>
-										<div style="font-size: 13px; color: var(--color-text-weak);">Export all settings and all profiles</div>
+										<div style="font-size: 14px; color: var(--color-text-weak);">Export all settings and all profiles</div>
 									</div>
 								</label>
 
@@ -884,21 +754,21 @@
 									<input type="radio" name="export-mode" id="export-custom-radio" value="custom" style="margin-top: 2px; cursor: pointer;">
 									<div style="flex: 1;">
 										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 2px;">Custom Selection</div>
-										<div style="font-size: 13px; color: var(--color-text-weak);">Choose specific settings and profiles</div>
+										<div style="font-size: 14px; color: var(--color-text-weak);">Choose specific settings and profiles</div>
 									</div>
 								</label>
 							</div>
 
 							<!-- Custom Export Options (hidden by default) -->
 							<div id="export-custom-options" style="display: none; padding: 12px 16px; background: var(--color-item-background); border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--color-border);">
-								<div style="font-weight: 500; margin-bottom: 6px; color: var(--color-text); font-size: 13px;">Settings:</div>
+								<div style="font-weight: 500; margin-bottom: 6px; color: var(--color-text); font-size: 14px;">Settings:</div>
 								<label class="checkbox-group" style="display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; margin-bottom: 8px;">
 									<input type="checkbox" id="export-settings-inline" checked style="margin-top: 2px;">
 									<div style="font-weight: 500; color: var(--color-text);">Preferences, theme, and options</div>
 								</label>
 
 								<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border);">
-									<div style="font-weight: 500; margin-bottom: 6px; color: var(--color-text); font-size: 13px;">Profiles:</div>
+									<div style="font-weight: 500; margin-bottom: 6px; color: var(--color-text); font-size: 14px;">Profiles:</div>
 									<div id="export-profiles-inline">
 										<!-- Profile checkboxes populated dynamically -->
 									</div>
@@ -920,9 +790,10 @@
 						</div>
 					</div>
 				</section>
-			</div>
-		</div>
-	</div>
+			</div><!-- .settings-content -->
+		</div><!-- .settings-main -->
+	</div><!-- .settings-body -->
+	</div><!-- .settings-layout -->
 
 	<!-- Import Target Modal -->
 	<div id="import-target-modal" class="modal" style="display: none;">

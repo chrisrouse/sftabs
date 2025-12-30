@@ -104,16 +104,16 @@ async function initProfiles() {
     // Add to cache
     profilesCache.push(defaultProfile);
 
-    // Save profile to storage
-    await SFTabs.storage.saveProfiles(profilesCache);
+    // Save profile to storage (suppress toast during initialization)
+    await SFTabs.storage.saveProfiles(profilesCache, false);
 
     // Save tabs to this profile
     await SFTabs.storage.saveProfileTabs(defaultProfile.id, tabsToMigrate);
 
-    // Set as default and active profile in settings
+    // Set as default and active profile in settings (suppress toast during initialization)
     settings.defaultProfileId = defaultProfile.id;
     settings.activeProfileId = defaultProfile.id;
-    await SFTabs.storage.saveUserSettings(settings);
+    await SFTabs.storage.saveUserSettings(settings, false, false);
 
   }
 
@@ -1572,7 +1572,18 @@ async function confirmCloneProfile() {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+// NOTE: initProfiles() should NOT run if migration is pending
+// It's now called from popup-main.js after migration check
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check if migration is pending before initializing profiles
+  if (SFTabs.migration && SFTabs.migration.checkMigrationStatus) {
+    const migrationStatus = await SFTabs.migration.checkMigrationStatus();
+    if (migrationStatus.migrationPending || (migrationStatus.needsMigration && !migrationStatus.migrationCompleted)) {
+      console.log('Migration pending - skipping profile initialization');
+      return; // Don't initialize profiles if migration is needed
+    }
+  }
+
   initProfiles();
 });
 

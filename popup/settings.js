@@ -645,6 +645,37 @@ async function importConfiguration(file) {
 		const text = await file.text();
 		const importData = JSON.parse(text);
 
+		// Detect if this is a pre-v2 config (legacy format without profiles)
+		const isLegacyConfig = !importData.version && importData.customTabs && (!importData.profiles || importData.profiles.length === 0);
+
+		if (isLegacyConfig) {
+			// This is a v1.x config - trigger migration wizard
+			showStatus('Legacy configuration detected. Preparing migration wizard...', false);
+
+			// Store the legacy data and trigger migration
+			await browser.storage.local.set({
+				extensionVersion: 'unknown',
+				migrationCompleted: false,
+				migrationPending: true,
+				customTabs: importData.customTabs,
+				userSettings: importData.userSettings || {}
+			});
+
+			// Also store in sync if that's the preference
+			const useSyncStorage = userSettings.useSyncStorage || true;
+			if (useSyncStorage) {
+				await browser.storage.sync.set({
+					userSettings: importData.userSettings || {}
+				});
+			}
+
+			// Close settings and reload main popup to show migration wizard
+			setTimeout(() => {
+				window.close();
+			}, 1500);
+			return;
+		}
+
 		// Normalize old format to new format
 		let normalizedData = importData;
 

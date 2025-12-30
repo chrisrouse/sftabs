@@ -37,12 +37,12 @@ function applyTheme() {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-  
+
   // Initialize DOM element references
   initializeDOMElements();
-  
-  // Apply initial panel visibility
-  showMainContent();
+
+  // Don't show main content yet - wait for migration check
+  // showMainContent();
 
   // Initialize popup with sequential async/await to avoid race conditions
   (async function init() {
@@ -56,8 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Check for pending migration before loading tabs
       if (SFTabs.migration && SFTabs.migration.checkMigrationStatus) {
         const migrationStatus = await SFTabs.migration.checkMigrationStatus();
+        console.log('Migration check result:', migrationStatus);
 
         if (migrationStatus.migrationPending || (migrationStatus.needsMigration && !migrationStatus.migrationCompleted)) {
+          console.log('Migration needed - showing wizard');
+
           // Initialize migration modal event listeners
           if (SFTabs.migration.initMigrationModal) {
             SFTabs.migration.initMigrationModal();
@@ -69,9 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           // Don't proceed with normal initialization - let user complete migration
+          console.log('Migration wizard shown - stopping initialization');
           return;
         }
       }
+
+      // No migration needed - show main content now
+      console.log('No migration needed - showing main content');
+      showMainContent();
 
       // IMPORTANT: Wait for tabs to load before setting up event listeners
       // This prevents race conditions with profile migration

@@ -158,8 +158,8 @@ async function getUserSettings() {
       // Merge with defaults to ensure all properties exist
       return { ...SFTabs.constants.DEFAULT_SETTINGS, ...result.userSettings };
     } else {
-      // Return defaults and save them
-      await saveUserSettings(SFTabs.constants.DEFAULT_SETTINGS);
+      // Return defaults and save them (suppress toast during initialization)
+      await saveUserSettings(SFTabs.constants.DEFAULT_SETTINGS, false, false);
       return { ...SFTabs.constants.DEFAULT_SETTINGS };
     }
   } catch (error) {
@@ -171,7 +171,7 @@ async function getUserSettings() {
  * Save user settings to browser storage
  * Settings are always stored in sync storage (they're small and benefit from cross-device sync)
  */
-async function saveUserSettings(settings, skipMigration = false) {
+async function saveUserSettings(settings, skipMigration = false, showToast = true) {
   try {
     // Check if useSyncStorage preference changed and migration is needed
     if (!skipMigration && SFTabs.main && SFTabs.main.getUserSettings) {
@@ -195,8 +195,8 @@ async function saveUserSettings(settings, skipMigration = false) {
       SFTabs.main.applyTheme();
     }
 
-    // Show success message (only in popup context)
-    if (SFTabs.main && SFTabs.main.showStatus) {
+    // Show success message (only in popup context and if requested)
+    if (showToast && SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Settings saved', false);
     }
 
@@ -276,9 +276,9 @@ async function importConfiguration(configData) {
       }
     }
 
-    // Import settings
+    // Import settings (suppress toast since import shows its own success message)
     if (configData.userSettings) {
-      await saveUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS, ...configData.userSettings });
+      await saveUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS, ...configData.userSettings }, false, false);
     }
 
     // Show success message (only in popup context)
@@ -441,7 +441,7 @@ async function getProfiles() {
  * @param {Array} profiles - Array of profile objects
  * @returns {Promise<Array>} The saved profiles
  */
-async function saveProfiles(profiles) {
+async function saveProfiles(profiles, showToast = true) {
   try {
     // Sort profiles by creation date
     const sortedProfiles = [...profiles].sort((a, b) =>
@@ -460,8 +460,8 @@ async function saveProfiles(profiles) {
       });
     }
 
-    // Show success message (only in popup context)
-    if (SFTabs.main && SFTabs.main.showStatus) {
+    // Show success message (only in popup context and if requested)
+    if (showToast && SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Profiles saved', false);
     }
 
