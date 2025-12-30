@@ -160,9 +160,71 @@ function toggleFloatingButtonSettings() {
 }
 
 /**
+ * Setup sidebar navigation
+ */
+function setupNavigation() {
+	const navItems = document.querySelectorAll('.settings-nav-item');
+	const sections = document.querySelectorAll('.settings-section');
+
+	navItems.forEach((item, index) => {
+		// Make nav items keyboard accessible
+		item.setAttribute('tabindex', '0');
+		item.setAttribute('role', 'button');
+		item.setAttribute('aria-label', `Navigate to ${item.textContent.trim()} section`);
+
+		// Handle navigation activation
+		const activateNavItem = () => {
+			const sectionId = item.dataset.section;
+
+			// Update active nav item
+			navItems.forEach(nav => {
+				nav.classList.remove('active');
+				nav.setAttribute('aria-selected', 'false');
+			});
+			item.classList.add('active');
+			item.setAttribute('aria-selected', 'true');
+
+			// Show corresponding section
+			sections.forEach(section => section.classList.remove('active'));
+			document.getElementById(`section-${sectionId}`).classList.add('active');
+		};
+
+		// Click handler
+		item.addEventListener('click', activateNavItem);
+
+		// Keyboard handler (Enter and Space)
+		item.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				activateNavItem();
+			}
+			// Arrow key navigation
+			else if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				const nextItem = navItems[index + 1];
+				if (nextItem) nextItem.focus();
+			}
+			else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				const prevItem = navItems[index - 1];
+				if (prevItem) prevItem.focus();
+			}
+		});
+	});
+
+	// Set initial aria-selected state
+	navItems.forEach(item => {
+		item.setAttribute('aria-selected', item.classList.contains('active') ? 'true' : 'false');
+	});
+}
+
+/**
  * Setup event listeners
  */
 function setupEventListeners() {
+	// Setup sidebar navigation
+	setupNavigation();
+
 	// Compact mode
 	document.getElementById('compact-mode').addEventListener('change', async (e) => {
 		userSettings.compactMode = e.target.checked;
@@ -353,19 +415,31 @@ function setupEventListeners() {
  * Open keyboard shortcuts configuration page
  */
 function openKeyboardShortcutsPage() {
-	const isFirefox = typeof browser !== 'undefined' && browser.runtime && browser.runtime.getBrowserInfo;
-	const isChrome = typeof chrome !== 'undefined' && chrome.runtime && !isFirefox;
+	// Detect if Firefox by checking for getBrowserInfo
+	const isFirefox = typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.getBrowserInfo === 'function';
 
 	if (isFirefox) {
-		browser.tabs.create({ url: 'about:addons' }).catch(err => {
-			showStatus('Could not open shortcuts page', true);
-		});
-	} else if (isChrome) {
-		browser.tabs.create({ url: 'chrome://extensions/shortcuts' }).catch(err => {
+		// Firefox: Open addons page (no direct shortcuts page)
+		browser.tabs.create({ url: 'about:addons' }).then(() => {
+			// Optionally show a message to guide the user
+			showStatus('Navigate to this extension and click "Manage" to configure shortcuts');
+		}).catch(err => {
+			console.error('Error opening Firefox addons page:', err);
 			showStatus('Could not open shortcuts page', true);
 		});
 	} else {
-		showStatus('Could not detect browser type', true);
+		// Chrome/Edge/other Chromium browsers: Use chrome:// URL
+		// Use chrome API directly for chrome:// URLs
+		if (typeof chrome !== 'undefined' && chrome.tabs) {
+			chrome.tabs.create({ url: 'chrome://extensions/shortcuts' }, (tab) => {
+				if (chrome.runtime.lastError) {
+					console.error('Error opening Chrome shortcuts page:', chrome.runtime.lastError);
+					showStatus('Could not open shortcuts page', true);
+				}
+			});
+		} else {
+			showStatus('Could not detect browser type', true);
+		}
 	}
 }
 

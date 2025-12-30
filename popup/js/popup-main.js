@@ -10,6 +10,31 @@ let userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 // DOM elements - will be initialized in DOMContentLoaded
 let domElements = {};
 
+/**
+ * Apply theme based on current settings
+ */
+function applyTheme() {
+  const settings = userSettings;
+
+  if (settings.themeMode === 'system') {
+    // Check system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+
+    // Listen for changes in system theme
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      const newTheme = e.matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+    });
+  } else {
+    // Apply user selected theme
+    document.documentElement.setAttribute('data-theme', settings.themeMode);
+  }
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
   
@@ -26,9 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await loadUserSettings();
 
       // Apply theme early
-      if (SFTabs.settings && SFTabs.settings.applyTheme) {
-        SFTabs.settings.applyTheme();
-      }
+      applyTheme();
 
       // Check for pending migration before loading tabs
       if (SFTabs.migration && SFTabs.migration.checkMigrationStatus) {
@@ -57,11 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // Now it's safe to setup profile listeners
       setupAllEventListeners();
 
-      // Initialize components
-      if (SFTabs.settings && SFTabs.settings.initThemeSelector) {
-        SFTabs.settings.initThemeSelector();
-      }
-
       // Render tabs
       if (SFTabs.ui && SFTabs.ui.renderTabList) {
         SFTabs.ui.renderTabList();
@@ -78,12 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loadUserSettings()
         .then(() => loadTabsFromStorage())
         .then(() => {
-          if (SFTabs.settings && SFTabs.settings.updateSettingsUI) {
-            SFTabs.settings.updateSettingsUI();
-          }
-          if (SFTabs.settings && SFTabs.settings.applyTheme) {
-            SFTabs.settings.applyTheme();
-          }
+          applyTheme();
           if (SFTabs.ui && SFTabs.ui.renderTabList) {
             SFTabs.ui.renderTabList();
           }
@@ -190,17 +203,12 @@ function setupAllEventListeners() {
   if (SFTabs.ui && SFTabs.ui.setupEventListeners) {
     SFTabs.ui.setupEventListeners();
   }
-  
-  // Settings listeners
-  if (SFTabs.settings && SFTabs.settings.setupEventListeners) {
-    SFTabs.settings.setupEventListeners();
-  }
-  
+
   // Dropdown listeners
   if (SFTabs.dropdowns && SFTabs.dropdowns.setupEventListeners) {
     SFTabs.dropdowns.setupEventListeners();
   }
-  
+
 }
 
 /**
@@ -210,9 +218,6 @@ function loadUserSettings() {
   return SFTabs.storage.getUserSettings()
     .then((loadedSettings) => {
       userSettings = loadedSettings;
-      if (SFTabs.settings && SFTabs.settings.updateSettingsUI) {
-        SFTabs.settings.updateSettingsUI();
-      }
       return userSettings;
     })
     .catch((error) => {
@@ -786,6 +791,7 @@ window.SFTabs.main = {
   get domElements() { return domElements; },
 
   // Functions
+  applyTheme,
   showMainContent,
   showActionPanel,
   updateActionPanelContent,

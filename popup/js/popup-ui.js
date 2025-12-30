@@ -1092,7 +1092,17 @@ function setupEventListeners() {
       // TODO: Implement manual navigation refresh functionality
     });
   }
-  
+
+  // Settings button - open standalone settings page
+  if (domElements.settingsButton) {
+    domElements.settingsButton.addEventListener('click', () => {
+      browser.tabs.create({ url: "/popup/settings.html" }).then(() => {
+        // Close the popup after opening the settings tab
+        window.close();
+      });
+    });
+  }
+
   // Enter key in form fields
   if (domElements.tabNameInput) {
     domElements.tabNameInput.addEventListener('keypress', (e) => {

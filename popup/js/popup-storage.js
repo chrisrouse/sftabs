@@ -191,8 +191,8 @@ async function saveUserSettings(settings, skipMigration = false) {
     }
 
     // Apply theme changes immediately
-    if (SFTabs.settings && SFTabs.settings.applyTheme) {
-      SFTabs.settings.applyTheme();
+    if (SFTabs.main && SFTabs.main.applyTheme) {
+      SFTabs.main.applyTheme();
     }
 
     // Show success message (only in popup context)
@@ -374,11 +374,8 @@ function setupStorageListeners() {
           if (SFTabs.main && SFTabs.main.setUserSettings) {
             SFTabs.main.setUserSettings(newSettings);
           }
-          if (SFTabs.settings && SFTabs.settings.updateSettingsUI) {
-            SFTabs.settings.updateSettingsUI();
-          }
-          if (SFTabs.settings && SFTabs.settings.applyTheme) {
-            SFTabs.settings.applyTheme();
+          if (SFTabs.main && SFTabs.main.applyTheme) {
+            SFTabs.main.applyTheme();
           }
         }
 
