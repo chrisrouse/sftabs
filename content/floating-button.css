@@ -39,7 +39,8 @@
 
 .sftabs-floating-modal.open .modal-content {
   transform: translateX(0); /* Show full unit */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--slds-g-color-border-base-4, #c9c9c9);
+  border-right: none;
 }
 
 /* Toggle Button - All Styles */
