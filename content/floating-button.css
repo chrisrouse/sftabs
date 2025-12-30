@@ -39,14 +39,12 @@
 
 .sftabs-floating-modal.open .modal-content {
   transform: translateX(0); /* Show full unit */
-  border: 1px solid var(--slds-g-color-border-base-4, #c9c9c9);
-  border-right: none;
 }
 
 /* Toggle Button - All Styles */
 .sftabs-floating-modal .modal-toggle-button {
   width: 20px;
-  height: 40px;
+  height: 36px;
   border-radius: 4px 0 0 4px;
   order: 1;
   background: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackground, #ffffff));
@@ -60,6 +58,7 @@
   flex-shrink: 0;
   transition: background 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 99999;
 }
 
 .sftabs-floating-modal .modal-panel {
@@ -70,10 +69,6 @@
 
 .sftabs-floating-modal .modal-toggle-button:hover {
   background: var(--slds-g-color-neutral-base-95, var(--lwc-colorBackgroundRowHover, #f3f2f2));
-}
-
-.sftabs-floating-modal.open .modal-toggle-button {
-  box-shadow: none;
 }
 
 .sftabs-floating-modal .modal-toggle-button:focus {
@@ -94,7 +89,10 @@
   flex-direction: column;
   overflow-y: auto;
   max-height: 400px;
-  padding-left: 2px;
+}
+
+.sftabs-floating-modal.open .modal-panel {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15); /* Subtle left shadow for depth */
 }
 
 /* Scrollbar styling */
@@ -147,13 +145,13 @@
 
 /* Show hover box-shadow for all rows */
 .sftabs-floating-modal .tab-row:hover {
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 /* Navigable top-level items get background on hover */
 .sftabs-floating-modal .tab-item.navigable > .tab-row:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .tab-row:active:not(.active) {
@@ -247,13 +245,13 @@
 
 .sftabs-floating-modal .dropdown-child-row:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 /* Non-navigable dropdown children - only box-shadow on hover, no background */
 .sftabs-floating-modal .dropdown-child-item:not(.navigable) > .dropdown-child-row:hover {
   background: transparent;
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-child-row:active:not(.active) {
@@ -299,13 +297,13 @@
 
 .sftabs-floating-modal .dropdown-nested-item:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 /* Non-navigable nested items - only box-shadow on hover, no background */
 .sftabs-floating-modal .dropdown-nested-item:not(.navigable):hover {
   background: transparent;
-  box-shadow: inset 2px 0 0 var(--lwc-brandPrimary, #0176d3);
+  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-nested-item:active:not(.active) {

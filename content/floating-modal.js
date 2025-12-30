@@ -314,7 +314,7 @@
         tabEl.classList.add('navigable');
       }
 
-      const hasDropdown = tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0);
+      const hasDropdown = tab.dropdownItems && tab.dropdownItems.length > 0;
 
       // Create tab row (label + chevron wrapper)
       const rowEl = document.createElement('div');
@@ -418,7 +418,7 @@
         childEl.classList.add('navigable');
       }
 
-      const hasDropdown = childTab.hasDropdown || (childTab.dropdownItems && childTab.dropdownItems.length > 0);
+      const hasDropdown = childTab.dropdownItems && childTab.dropdownItems.length > 0;
 
       // Create child row (label + chevron wrapper)
       const rowEl = document.createElement('div');

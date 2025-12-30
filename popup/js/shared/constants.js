@@ -10,7 +10,6 @@ const TAB_STRUCTURE = {
   isObject: false,
   isCustomUrl: false,
   isSetupObject: false,
-  hasDropdown: false,
   dropdownItems: [],
   position: 0
 };
@@ -35,7 +34,6 @@ const DEFAULT_TABS = [
     isObject: false,
     isCustomUrl: false,
     isSetupObject: false,
-    hasDropdown: false,
     position: 0
   },
   {
@@ -46,7 +44,6 @@ const DEFAULT_TABS = [
     isObject: false,
     isCustomUrl: false,
     isSetupObject: false,
-    hasDropdown: false,
     position: 1
   },
   {
@@ -57,7 +54,6 @@ const DEFAULT_TABS = [
     isObject: false,
     isCustomUrl: false,
     isSetupObject: false,
-    hasDropdown: false,
     position: 2
   },
   {
@@ -68,7 +64,6 @@ const DEFAULT_TABS = [
     isObject: false,
     isCustomUrl: false,
     isSetupObject: false,
-    hasDropdown: false,
     position: 3
   },
   {
@@ -79,7 +74,6 @@ const DEFAULT_TABS = [
     isObject: false,
     isCustomUrl: false,
     isSetupObject: false,
-    hasDropdown: false,
     position: 4
   }
 ];
@@ -128,8 +122,7 @@ const SELECTORS = {
   isObjectCheckbox: '#is-object',
   isCustomUrlCheckbox: '#is-custom-url',
   isSetupObjectCheckbox: '#is-setup-object',
-  hasDropdownCheckbox: '#has-dropdown',
-  
+
   // Buttons
   addTabButton: '#add-tab-button',
   quickAddButton: '#quick-add-button',
@@ -150,7 +143,6 @@ const SELECTORS = {
   settingsResetButton: '#settings-reset-button',
 
   // Form groups
-  hasDropdownGroup: '.has-dropdown-group',
   refreshNavGroup: '.refresh-nav-group'
 };
 

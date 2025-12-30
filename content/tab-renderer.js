@@ -274,7 +274,7 @@ function createTabElementWithDropdown(tab) {
   li.setAttribute('data-url', fullUrl);
   
   // Add dropdown indicator classes if tab has dropdown functionality
-  if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
+  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
     li.classList.add('has-dropdown');
 
     // Add navigation count
@@ -293,7 +293,7 @@ function createTabElementWithDropdown(tab) {
   const isFolder = !tab.path || !tab.path.trim();
   if (isFolder) {
     // Keep pointer cursor if folder has dropdown, otherwise default
-    const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+    const hasDropdown = tab.dropdownItems && tab.dropdownItems.length > 0;
     a.style.cursor = hasDropdown ? 'pointer' : 'default';
   }
 
@@ -317,7 +317,7 @@ function createTabElementWithDropdown(tab) {
   li.appendChild(a);
 
   // Add dropdown button as separate sibling element (not nested in label)
-  if (tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0) {
+  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
     // Create wrapper div matching native Salesforce structure
     const dropdownWrapper = document.createElement('div');
     dropdownWrapper.className = 'slds-context-bar__label-action slds-p-left--none uiMenu oneNavItemDropdown';
@@ -997,7 +997,7 @@ function addTabClickListeners(tabs) {
           event.preventDefault();
           event.stopPropagation();
 
-          const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+          const hasDropdown = tab.dropdownItems && tab.dropdownItems.length > 0;
 
           // Toggle dropdown if present
           if (hasDropdown) {
@@ -1729,7 +1729,7 @@ function createOverflowDropdown(hiddenTabs) {
     link.setAttribute('data-aura-rendered-by', `sftabs-overflow-link-${index}`);
 
     // Check if this tab has dropdown items
-    const hasDropdown = tab.hasDropdown && tab.dropdownItems && tab.dropdownItems.length > 0;
+    const hasDropdown = tab.dropdownItems && tab.dropdownItems.length > 0;
 
     // Create label container
     const labelContainer = document.createElement('span');

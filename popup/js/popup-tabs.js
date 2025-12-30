@@ -137,7 +137,6 @@ function enhancedAddTabForCurrentPage() {
           isObject: isObject,
           isCustomUrl: isCustomUrl,
           isSetupObject: isSetupObject,
-          hasDropdown: isSetupObject, // Auto-enable dropdown for setup objects
           position: existingTabs.length
         };
 
@@ -304,7 +303,6 @@ function createTab(tabData) {
     isObject: tabData.isObject || false,
     isCustomUrl: tabData.isCustomUrl || false,
     isSetupObject: tabData.isSetupObject || false,
-    hasDropdown: tabData.hasDropdown || false,
     dropdownItems: tabData.dropdownItems || [], // Support dropdown items on creation
     position: tabs.length
   };

@@ -431,7 +431,7 @@ function createTabElementWithLightningAndDropdown(tab) {
   li.setAttribute('data-url', fullUrl);
   
   // Add dropdown indicator classes if tab has dropdown functionality
-  if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
+  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
     li.classList.add('has-dropdown');
   }
   
@@ -459,7 +459,7 @@ function createTabElementWithLightningAndDropdown(tab) {
   li.appendChild(a);
 
   // Add dropdown button as separate sibling element (not nested in label)
-  if (tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0)) {
+  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
     // Create wrapper div matching native Salesforce structure
     const dropdownWrapper = document.createElement('div');
     dropdownWrapper.className = 'slds-context-bar__label-action slds-p-left--none uiMenu oneNavItemDropdown';
@@ -522,7 +522,7 @@ function createTabElementWithLightningAndDropdown(tab) {
       event.stopImmediatePropagation();
 
       // If it has a dropdown, open it
-      const hasDropdown = tab.hasDropdown || (tab.dropdownItems && tab.dropdownItems.length > 0);
+      const hasDropdown = tab.dropdownItems && tab.dropdownItems.length > 0;
       if (hasDropdown) {
         const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
         const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
