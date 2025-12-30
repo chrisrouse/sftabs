@@ -343,9 +343,18 @@ function setupEventListeners() {
 		await saveUserSettings();
 	});
 
-	// Export button
-	document.getElementById('export-button').addEventListener('click', () => {
-		showExportModal();
+	// Export mode radio buttons
+	document.getElementById('export-everything-radio').addEventListener('change', () => {
+		toggleExportCustomOptions();
+	});
+
+	document.getElementById('export-custom-radio').addEventListener('change', () => {
+		toggleExportCustomOptions();
+	});
+
+	// Export configuration button
+	document.getElementById('export-configuration-button').addEventListener('click', async () => {
+		await performExportFromInline();
 	});
 
 	// Import button
@@ -438,97 +447,103 @@ function setupEventListeners() {
 }
 
 /**
- * Show export options modal
+ * Toggle export custom options visibility
  */
-async function showExportModal() {
-	const modal = document.getElementById('export-options-modal');
-	const profilesList = document.getElementById('export-profiles-list');
-	const everythingCheckbox = document.getElementById('export-everything');
-	const settingsCheckbox = document.getElementById('export-settings');
+function toggleExportCustomOptions() {
+	const customOptions = document.getElementById('export-custom-options');
+	const customRadio = document.getElementById('export-custom-radio');
 
-	// Load current profiles
-	const result = await browser.storage.sync.get('profiles');
+	if (customRadio.checked) {
+		customOptions.style.display = 'block';
+		populateInlineProfilesList();
+	} else {
+		customOptions.style.display = 'none';
+	}
+}
+
+/**
+ * Populate inline profiles list with tab counts
+ */
+async function populateInlineProfilesList() {
+	const profilesList = document.getElementById('export-profiles-inline');
+
+	// Load profiles from storage
+	const result = await browser.storage.sync.get(['profiles', 'userSettings']);
 	const profiles = result.profiles || [];
+	const settings = result.userSettings || {};
 
-	// Clear and populate profile checkboxes
+	// Clear existing content
 	profilesList.innerHTML = '';
-	profiles.forEach(profile => {
+
+	// If no profiles exist, show a message
+	if (profiles.length === 0) {
+		const message = document.createElement('div');
+		message.style.cssText = 'font-size: 13px; color: var(--color-text-weak); font-style: italic;';
+		message.textContent = 'No profiles configured';
+		profilesList.appendChild(message);
+		return;
+	}
+
+	// Add checkbox for each profile with tab count
+	for (const profile of profiles) {
+		const profileKey = `profile_${profile.id}_tabs`;
+		const profileData = await browser.storage.sync.get(profileKey);
+		const tabs = profileData[profileKey] || [];
+		const tabCount = tabs.length;
+
 		const label = document.createElement('label');
 		label.className = 'checkbox-group';
+		label.style.cssText = 'display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; margin-bottom: 6px;';
 
 		const checkbox = document.createElement('input');
 		checkbox.type = 'checkbox';
 		checkbox.checked = true;
-		checkbox.disabled = true;
-		checkbox.className = 'export-profile-checkbox';
+		checkbox.className = 'export-profile-checkbox-inline';
 		checkbox.dataset.profileId = profile.id;
+		checkbox.style.cssText = 'margin-top: 2px;';
 
-		const span = document.createElement('span');
-		span.textContent = profile.name;
+		const textContainer = document.createElement('div');
+		textContainer.style.flex = '1';
+
+		const nameDiv = document.createElement('div');
+		nameDiv.style.cssText = 'font-weight: 500; color: var(--color-text);';
+		nameDiv.textContent = profile.name;
+
+		const countDiv = document.createElement('div');
+		countDiv.style.cssText = 'font-size: 12px; color: var(--color-text-weak); margin-top: 1px;';
+		countDiv.textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''}`;
+
+		textContainer.appendChild(nameDiv);
+		textContainer.appendChild(countDiv);
 
 		label.appendChild(checkbox);
-		label.appendChild(span);
+		label.appendChild(textContainer);
 		profilesList.appendChild(label);
-	});
-
-	// Reset "Everything" checkbox to default state
-	everythingCheckbox.checked = true;
-	settingsCheckbox.disabled = true;
-	settingsCheckbox.checked = true;
-
-	// Handle "Everything" checkbox
-	const handleEverythingChange = () => {
-		const isChecked = everythingCheckbox.checked;
-		settingsCheckbox.disabled = isChecked;
-		if (isChecked) {
-			settingsCheckbox.checked = true;
-		}
-
-		const profileCheckboxes = profilesList.querySelectorAll('.export-profile-checkbox');
-		profileCheckboxes.forEach(cb => {
-			cb.disabled = isChecked;
-			if (isChecked) {
-				cb.checked = true;
-			}
-		});
-	};
-
-	// Remove old listener and add new one
-	everythingCheckbox.removeEventListener('change', handleEverythingChange);
-	everythingCheckbox.addEventListener('change', handleEverythingChange);
-
-	// Handle export confirmation
-	document.getElementById('export-modal-confirm').onclick = async () => {
-		const exportEverything = everythingCheckbox.checked;
-		const exportSettings = settingsCheckbox.checked;
-		const selectedProfileIds = [];
-
-		if (!exportEverything) {
-			const profileCheckboxes = profilesList.querySelectorAll('.export-profile-checkbox');
-			profileCheckboxes.forEach(cb => {
-				if (cb.checked) {
-					selectedProfileIds.push(cb.dataset.profileId);
-				}
-			});
-		}
-
-		await performExport(exportEverything, exportSettings, selectedProfileIds);
-		hideExportModal();
-	};
-
-	// Handle cancel
-	document.getElementById('export-modal-cancel').onclick = () => {
-		hideExportModal();
-	};
-
-	modal.style.display = 'flex';
+	}
 }
 
 /**
- * Hide export options modal
+ * Perform export from inline controls
  */
-function hideExportModal() {
-	document.getElementById('export-options-modal').style.display = 'none';
+async function performExportFromInline() {
+	const exportMode = document.querySelector('input[name="export-mode"]:checked').value;
+	const exportEverything = (exportMode === 'everything');
+
+	let exportSettings = true;
+	let selectedProfileIds = [];
+
+	if (!exportEverything) {
+		exportSettings = document.getElementById('export-settings-inline').checked;
+
+		const profileCheckboxes = document.querySelectorAll('.export-profile-checkbox-inline');
+		profileCheckboxes.forEach(cb => {
+			if (cb.checked) {
+				selectedProfileIds.push(cb.dataset.profileId);
+			}
+		});
+	}
+
+	await performExport(exportEverything, exportSettings, selectedProfileIds);
 }
 
 /**

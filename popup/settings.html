@@ -296,6 +296,18 @@
 			color: var(--slds-color-error);
 		}
 
+		/* Radio Groups */
+		.radio-group:hover {
+			background: var(--color-background);
+		}
+
+		.radio-group input[type="radio"] {
+			width: 16px;
+			height: 16px;
+			margin: 0;
+			flex-shrink: 0;
+		}
+
 		/* Toast notifications */
 		.sftabs-toast {
 			position: fixed;
@@ -530,62 +542,6 @@
 		#import-destination-section {
 			border-top: 1px solid var(--color-border);
 			padding-top: 12px;
-		}
-
-		/* Export modal specific */
-		#export-options-modal .checkbox-group {
-			font-size: 14px;
-			margin-bottom: 4px;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			padding: 6px 4px;
-			border-radius: 4px;
-			transition: background-color 0.15s;
-		}
-
-		#export-options-modal .checkbox-group:hover:not(:has(input:disabled)) {
-			background-color: var(--color-background);
-		}
-
-		#export-options-modal .checkbox-group span {
-			font-size: 14px;
-			line-height: 1.3;
-			user-select: none;
-		}
-
-		#export-options-modal .checkbox-group input[type="checkbox"] {
-			width: 16px;
-			height: 16px;
-			margin: 0;
-			flex-shrink: 0;
-			cursor: pointer;
-		}
-
-		#export-options-modal .checkbox-group input[type="checkbox"]:disabled {
-			cursor: not-allowed;
-			opacity: 0.5;
-		}
-
-		#export-options-modal .modal-body > .form-group > .checkbox-group:first-of-type {
-			font-weight: 600;
-			margin-bottom: 8px;
-		}
-
-		#export-options-modal .setting-description {
-			display: none;
-		}
-
-		#export-options-modal .modal-body > .form-group > div:last-child {
-			margin-left: 0;
-			padding-left: 0;
-			border-left: none;
-		}
-
-		#export-options-modal #export-profiles-list {
-			margin-top: 8px;
-			padding-top: 8px;
-			border-top: 1px solid var(--color-border);
 		}
 
 		/* Global focus indicators for accessibility */
@@ -909,29 +865,59 @@
 						<p class="section-description">Backup and restore your tabs and settings</p>
 					</div>
 
+					<!-- Export Card -->
 					<div class="setting-card">
-						<div class="config-actions">
-							<button class="config-action-button" id="export-button">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-									<polyline points="17 8 12 3 7 8"></polyline>
-									<line x1="12" y1="3" x2="12" y2="15"></line>
-								</svg>
-								<div class="action-title">Export</div>
-								<div class="action-description">Save your configuration</div>
-							</button>
+						<h3>Export Configuration</h3>
+						<div class="setting-item">
+							<p style="margin: 0 0 12px 0; color: var(--color-text);">What would you like to export?</p>
 
-							<button class="config-action-button" id="import-button">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-									<polyline points="7 10 12 15 17 10"></polyline>
-									<line x1="12" y1="15" x2="12" y2="3"></line>
-								</svg>
-								<div class="action-title">Import</div>
-								<div class="action-description">Restore from backup</div>
-							</button>
+							<div style="margin-bottom: 16px;">
+								<label class="radio-group" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 4px; cursor: pointer; transition: background-color 0.15s;">
+									<input type="radio" name="export-mode" id="export-everything-radio" value="everything" checked style="margin-top: 2px; cursor: pointer;">
+									<div style="flex: 1;">
+										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 2px;">Everything (Recommended)</div>
+										<div style="font-size: 13px; color: var(--color-text-weak);">Export all settings and all profiles</div>
+									</div>
+								</label>
+
+								<label class="radio-group" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 4px; cursor: pointer; transition: background-color 0.15s; margin-top: 4px;">
+									<input type="radio" name="export-mode" id="export-custom-radio" value="custom" style="margin-top: 2px; cursor: pointer;">
+									<div style="flex: 1;">
+										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 2px;">Custom Selection</div>
+										<div style="font-size: 13px; color: var(--color-text-weak);">Choose specific settings and profiles</div>
+									</div>
+								</label>
+							</div>
+
+							<!-- Custom Export Options (hidden by default) -->
+							<div id="export-custom-options" style="display: none; padding: 12px 16px; background: var(--color-item-background); border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--color-border);">
+								<div style="font-weight: 500; margin-bottom: 6px; color: var(--color-text); font-size: 13px;">Settings:</div>
+								<label class="checkbox-group" style="display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; margin-bottom: 8px;">
+									<input type="checkbox" id="export-settings-inline" checked style="margin-top: 2px;">
+									<div style="font-weight: 500; color: var(--color-text);">Preferences, theme, and options</div>
+								</label>
+
+								<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border);">
+									<div style="font-weight: 500; margin-bottom: 6px; color: var(--color-text); font-size: 13px;">Profiles:</div>
+									<div id="export-profiles-inline">
+										<!-- Profile checkboxes populated dynamically -->
+									</div>
+								</div>
+							</div>
+
+							<button id="export-configuration-button" class="primary-button" style="width: 100%;">Export Configuration</button>
 						</div>
-						<input type="file" id="import-file-input" accept=".json" style="display: none;">
+					</div>
+
+					<!-- Import Card -->
+					<div class="setting-card">
+						<h3>Import Configuration</h3>
+						<div class="setting-item">
+							<p style="margin: 0 0 12px 0; color: var(--color-text);">Restore your tabs and settings from a backup file.</p>
+							<button id="import-button" class="secondary-button" style="width: 100%;">Choose File to Import</button>
+							<input type="file" id="import-file-input" accept=".json" style="display: none;">
+							<div class="setting-description" style="margin-top: 12px;">You'll be able to choose what to import after selecting a file.</div>
+						</div>
 					</div>
 				</section>
 			</div>
@@ -989,41 +975,6 @@
 			<div class="modal-footer">
 				<button id="import-modal-cancel" class="secondary-button">Cancel</button>
 				<button id="import-modal-confirm" class="primary-button">Import</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- Export Options Modal -->
-	<div id="export-options-modal" class="modal" style="display: none;">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2>Export Configuration</h2>
-			</div>
-			<div class="modal-body">
-				<p>Select what you want to export:</p>
-
-				<div class="form-group">
-					<label class="checkbox-group">
-						<input type="checkbox" id="export-everything" checked>
-						<span>Everything</span>
-					</label>
-					<div class="setting-description">Export all settings and profiles</div>
-
-					<div>
-						<label class="checkbox-group">
-							<input type="checkbox" id="export-settings" checked disabled>
-							<span>Settings</span>
-						</label>
-
-						<div id="export-profiles-list">
-							<!-- Profile checkboxes will be inserted here -->
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button id="export-modal-cancel" class="secondary-button">Cancel</button>
-				<button id="export-modal-confirm" class="primary-button">Export</button>
 			</div>
 		</div>
 	</div>
