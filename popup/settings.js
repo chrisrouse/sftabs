@@ -142,12 +142,24 @@ function updateUI() {
 }
 
 /**
- * Toggle auto-switch profiles visibility
+ * Toggle auto-switch profiles visibility and disable profiles section
  */
 function toggleAutoSwitchVisibility() {
 	const autoSwitchContainer = document.getElementById('auto-switch-container');
-	const profilesEnabled = document.getElementById('enable-profiles').checked;
+	const disableProfilesContainer = document.getElementById('disable-profiles-container');
+	const enableProfilesCheckbox = document.getElementById('enable-profiles');
+	const profilesEnabled = enableProfilesCheckbox.checked;
+
 	autoSwitchContainer.style.display = profilesEnabled ? 'block' : 'none';
+	disableProfilesContainer.style.display = profilesEnabled ? 'block' : 'none';
+
+	// Disable the checkbox when profiles are enabled (user must use Disable Profiles button)
+	enableProfilesCheckbox.disabled = profilesEnabled;
+
+	// Populate the profile dropdown when showing the section
+	if (profilesEnabled && window.SFTabs && window.SFTabs.profiles && window.SFTabs.profiles.populateProfileSelect) {
+		window.SFTabs.profiles.populateProfileSelect();
+	}
 }
 
 /**
@@ -278,48 +290,15 @@ function setupEventListeners() {
 			userSettings.profilesEnabled = true;
 			await saveUserSettings();
 			toggleAutoSwitchVisibility();
-		} else {
-			// Show profile selection modal
-			if (window.SFTabs && window.SFTabs.profiles && window.SFTabs.profiles.showProfileSelectionForDisable) {
-				console.log('[DEBUG SETTINGS] Showing profile selection modal');
-				const selectedProfile = await window.SFTabs.profiles.showProfileSelectionForDisable();
-				console.log('[DEBUG SETTINGS] Selected profile:', selectedProfile);
+		}
+		// Note: Checkbox is disabled when profiles are enabled, so user cannot uncheck it
+		// They must use the "Disable Profiles" button instead
+	});
 
-				if (selectedProfile) {
-					// User confirmed and selected a profile to keep - disable profiles
-					console.log('[DEBUG SETTINGS] Calling disableProfilesAndKeepOne');
-					await window.SFTabs.profiles.disableProfilesAndKeepOne(selectedProfile);
-					console.log('[DEBUG SETTINGS] Profile disabling complete');
-
-					// Reload settings to reflect changes and update UI
-					await loadUserSettings();
-					updateUI();
-					console.log('[DEBUG SETTINGS] Settings reloaded and UI updated, profilesEnabled:', userSettings.profilesEnabled);
-
-					// Show success message
-					showStatus(`Profiles disabled. Kept "${selectedProfile.name}" profile`, false);
-				} else {
-					// User cancelled, revert checkbox
-					console.log('[DEBUG SETTINGS] User cancelled, reverting checkbox');
-					e.target.checked = true;
-				}
-			} else {
-				// Fallback to simple confirm if the function isn't available
-				const confirmed = confirm(
-					'Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.'
-				);
-
-				if (confirmed) {
-					userSettings.profilesEnabled = false;
-					userSettings.autoSwitchProfiles = false;
-					document.getElementById('auto-switch-profiles').checked = false;
-					await saveUserSettings();
-					toggleAutoSwitchVisibility();
-				} else {
-					// User cancelled, revert checkbox
-					e.target.checked = true;
-				}
-			}
+	// Disable profiles button (inline section)
+	document.getElementById('disable-profiles-button').addEventListener('click', async () => {
+		if (window.SFTabs && window.SFTabs.profiles && window.SFTabs.profiles.disableProfilesFromInline) {
+			await window.SFTabs.profiles.disableProfilesFromInline();
 		}
 	});
 
@@ -403,6 +382,33 @@ function setupEventListeners() {
 		browser.tabs.create({
 			url: 'https://chrisrouse.github.io/sftabs/'
 		});
+	});
+
+	// Export before disable link (navigate to Import/Export section)
+	document.getElementById('export-before-disable-link').addEventListener('click', (e) => {
+		e.preventDefault();
+
+		// Navigate to Import/Export section
+		const navItems = document.querySelectorAll('.settings-nav-item');
+		const sections = document.querySelectorAll('.settings-section');
+
+		navItems.forEach(nav => {
+			nav.classList.remove('active');
+			nav.setAttribute('aria-selected', 'false');
+		});
+
+		const importExportNav = document.querySelector('.settings-nav-item[data-section="import-export"]');
+		if (importExportNav) {
+			importExportNav.classList.add('active');
+			importExportNav.setAttribute('aria-selected', 'true');
+		}
+
+		sections.forEach(section => section.classList.remove('active'));
+		const importExportSection = document.getElementById('section-import-export');
+		if (importExportSection) {
+			importExportSection.classList.add('active');
+			importExportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
 	});
 }
 

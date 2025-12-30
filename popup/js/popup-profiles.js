@@ -867,130 +867,110 @@ async function disableProfilesAndKeepOne(selectedProfile) {
   console.log('[DEBUG] disableProfilesAndKeepOne: Complete');
 }
 
-// Guard to prevent concurrent calls
-let isShowingDisableModal = false;
+/**
+ * Populate the inline profile select dropdown
+ */
+async function populateProfileSelect() {
+  const keepProfileSelect = document.querySelector('#keep-profile-select-inline');
+
+  if (!keepProfileSelect) {
+    console.log('[DEBUG] Inline profile select not found');
+    return;
+  }
+
+  // Reload profiles from storage to ensure fresh data
+  await loadProfiles();
+  console.log('[DEBUG] Loaded profiles:', profilesCache.length, profilesCache.map(p => ({ id: p.id, name: p.name })));
+
+  // Clear existing options
+  keepProfileSelect.innerHTML = '';
+  keepProfileSelect.options.length = 0;
+
+  // Add placeholder option
+  const placeholderOption = document.createElement('option');
+  placeholderOption.value = '';
+  placeholderOption.textContent = 'Choose a profile...';
+  keepProfileSelect.appendChild(placeholderOption);
+
+  const settings = await SFTabs.storage.getUserSettings();
+  const defaultProfileId = settings.defaultProfileId;
+  console.log('[DEBUG] Default profile ID:', defaultProfileId);
+
+  // Use a Set to ensure uniqueness by profile ID
+  const uniqueProfiles = Array.from(new Map(profilesCache.map(p => [p.id, p])).values());
+  console.log('[DEBUG] Unique profiles:', uniqueProfiles.length, uniqueProfiles.map(p => ({ id: p.id, name: p.name })));
+
+  uniqueProfiles.forEach(profile => {
+    const option = document.createElement('option');
+    option.value = profile.id;
+    option.textContent = profile.name;
+
+    // Pre-select the default profile
+    if (profile.id === defaultProfileId) {
+      option.selected = true;
+    }
+
+    keepProfileSelect.appendChild(option);
+    console.log('[DEBUG] Added option:', profile.name);
+  });
+
+  console.log('[DEBUG] Profile select populated with', keepProfileSelect.options.length, 'options');
+}
 
 /**
- * Show modal to select which profile to keep when disabling profiles
- * @returns {Promise<Object|null>} Selected profile or null if cancelled
+ * Handle disabling profiles from the inline section
  */
-async function showProfileSelectionForDisable() {
-  return new Promise(async (resolve) => {
-    console.log('[DEBUG] showProfileSelectionForDisable: Starting');
+async function disableProfilesFromInline() {
+  const keepProfileSelect = document.querySelector('#keep-profile-select-inline');
+  const selectedProfileId = keepProfileSelect.value;
 
-    // Prevent concurrent calls
-    if (isShowingDisableModal) {
-      console.log('[DEBUG] Already showing modal, ignoring duplicate call');
-      resolve(null);
-      return;
+  if (!selectedProfileId) {
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Please select a profile to keep', true);
+    } else {
+      alert('Please select a profile to keep');
     }
-    isShowingDisableModal = true;
+    return;
+  }
 
-    const modal = document.querySelector('#disable-profiles-modal');
-    const keepProfileSelect = document.querySelector('#keep-profile-select');
-    const confirmButton = document.querySelector('#disable-profiles-confirm-button');
-    const cancelButton = document.querySelector('#disable-profiles-cancel-button');
+  const selectedProfile = profilesCache.find(p => p.id === selectedProfileId);
 
-    console.log('[DEBUG] Found elements:', {
-      modal: !!modal,
-      select: !!keepProfileSelect,
-      confirm: !!confirmButton,
-      cancel: !!cancelButton
-    });
-
-    if (!modal || !keepProfileSelect || !confirmButton || !cancelButton) {
-      console.log('[DEBUG] Missing elements, returning null');
-      resolve(null);
-      return;
+  if (!selectedProfile) {
+    if (window.SFTabs && window.SFTabs.main) {
+      window.SFTabs.main.showStatus('Selected profile not found', true);
     }
+    return;
+  }
 
-    console.log('[DEBUG] Options before clear:', keepProfileSelect.options.length);
+  // Confirm the action
+  const confirmed = confirm(
+    `Disable profiles and keep "${selectedProfile.name}"?\n\nThis will remove all other profiles and their tabs. This action cannot be undone.`
+  );
 
-    // Reload profiles from storage to ensure fresh data
-    await loadProfiles();
-    console.log('[DEBUG] Loaded profiles:', profilesCache.length, profilesCache.map(p => ({ id: p.id, name: p.name })));
+  if (!confirmed) {
+    return;
+  }
 
-    // Clear all existing options - use both methods to be safe
-    keepProfileSelect.innerHTML = '';
-    keepProfileSelect.options.length = 0;
-    console.log('[DEBUG] Options after clear:', keepProfileSelect.options.length);
+  // Disable profiles and keep only the selected one
+  await disableProfilesAndKeepOne(selectedProfile);
 
-    // Add placeholder option
-    const placeholderOption = document.createElement('option');
-    placeholderOption.value = '';
-    placeholderOption.textContent = 'Choose a profile...';
-    keepProfileSelect.appendChild(placeholderOption);
-    console.log('[DEBUG] Added placeholder, options count:', keepProfileSelect.options.length);
+  // Update the UI
+  const enableProfilesCheckbox = document.getElementById('enable-profiles');
+  if (enableProfilesCheckbox) {
+    enableProfilesCheckbox.checked = false;
+    enableProfilesCheckbox.disabled = false; // Re-enable the checkbox
+  }
 
-    const settings = await SFTabs.storage.getUserSettings();
-    const defaultProfileId = settings.defaultProfileId;
-    console.log('[DEBUG] Default profile ID:', defaultProfileId);
+  // Hide the profiles sections
+  const autoSwitchContainer = document.getElementById('auto-switch-container');
+  const disableProfilesContainer = document.getElementById('disable-profiles-container');
+  if (autoSwitchContainer) autoSwitchContainer.style.display = 'none';
+  if (disableProfilesContainer) disableProfilesContainer.style.display = 'none';
 
-    // Use a Set to ensure uniqueness by profile ID
-    const uniqueProfiles = Array.from(new Map(profilesCache.map(p => [p.id, p])).values());
-    console.log('[DEBUG] Unique profiles:', uniqueProfiles.length, uniqueProfiles.map(p => ({ id: p.id, name: p.name })));
-
-    uniqueProfiles.forEach(profile => {
-      const option = document.createElement('option');
-      option.value = profile.id;
-      option.textContent = profile.name;
-
-      // Pre-select the default profile
-      if (profile.id === defaultProfileId) {
-        option.selected = true;
-      }
-
-      keepProfileSelect.appendChild(option);
-      console.log('[DEBUG] Added option:', profile.name, 'Total options now:', keepProfileSelect.options.length);
-    });
-
-    console.log('[DEBUG] Final options count:', keepProfileSelect.options.length);
-    console.log('[DEBUG] Final options:', Array.from(keepProfileSelect.options).map(o => o.textContent));
-
-    // Show modal
-    modal.style.display = 'flex';
-
-    // Setup event handlers
-    const handleConfirm = () => {
-      const selectedProfileId = keepProfileSelect.value;
-
-      if (!selectedProfileId) {
-        alert('Please select a profile to keep');
-        return;
-      }
-
-      const selectedProfile = profilesCache.find(p => p.id === selectedProfileId);
-
-      // Clean up
-      cleanup();
-      resolve(selectedProfile);
-    };
-
-    const handleCancel = () => {
-      cleanup();
-      resolve(null);
-    };
-
-    const cleanup = () => {
-      modal.style.display = 'none';
-      keepProfileSelect.value = '';
-      confirmButton.removeEventListener('click', handleConfirm);
-      cancelButton.removeEventListener('click', handleCancel);
-      isShowingDisableModal = false; // Reset guard flag
-      console.log('[DEBUG] Modal closed, guard flag reset');
-    };
-
-    // Add event listeners
-    confirmButton.addEventListener('click', handleConfirm);
-    cancelButton.addEventListener('click', handleCancel);
-
-    // Close on outside click
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        handleCancel();
-      }
-    });
-  });
+  // Show success message
+  if (window.SFTabs && window.SFTabs.main) {
+    window.SFTabs.main.showStatus(`Profiles disabled. Kept "${selectedProfile.name}" profile`, false);
+  }
 }
 
 /**
@@ -1606,6 +1586,7 @@ window.SFTabs.profiles = {
   showProfileEditForm,
   switchActiveProfile,
   updateActiveProfileBanner,
-  showProfileSelectionForDisable,
-  disableProfilesAndKeepOne
+  disableProfilesAndKeepOne,
+  populateProfileSelect,
+  disableProfilesFromInline
 };

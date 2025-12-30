@@ -611,11 +611,6 @@
 			font-weight: 600;
 		}
 
-		/* Disable profiles modal specific */
-		#disable-profiles-modal .modal-content {
-			width: 350px;
-		}
-
 		/* Global focus indicators for accessibility */
 		button:focus,
 		input:focus,
@@ -850,6 +845,24 @@
 							<div class="setting-description">Automatically switch to the appropriate profile based on the current Salesforce org's URL</div>
 						</div>
 					</div>
+
+					<div class="setting-card danger-zone" id="disable-profiles-container" style="display: none;">
+						<h3>Disable Profiles</h3>
+						<div class="setting-item">
+							<p style="margin: 0 0 8px 0; color: var(--color-text);">Disabling profiles will keep one profile and remove all others. Which profile would you like to keep?</p>
+							<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--color-text-weak);">
+								<strong>Tip:</strong> We recommend <a href="#" id="export-before-disable-link" class="keyboard-shortcuts-link">exporting your configuration</a> before disabling profiles so you can restore it later if needed.
+							</p>
+							<div class="form-group" style="margin-bottom: 16px;">
+								<label for="keep-profile-select-inline" class="setting-label">Select profile to keep:</label>
+								<select id="keep-profile-select-inline" class="select-input" style="width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-input-background); color: var(--color-text);">
+									<!-- Options populated dynamically by popup-profiles.js -->
+								</select>
+							</div>
+							<button id="disable-profiles-button" class="secondary-button reset-button" style="width: 100%;">Disable Profiles</button>
+							<div class="setting-description" style="margin-top: 12px;">This will remove all profiles except the one you select. This action cannot be undone.</div>
+						</div>
+					</div>
 				</section>
 
 				<!-- Shortcuts Section -->
@@ -1052,29 +1065,6 @@
 			<div class="modal-footer">
 				<button id="reset-modal-cancel" class="secondary-button">Cancel</button>
 				<button id="reset-modal-confirm" class="primary-button">Reset Everything</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- Disable Profiles Modal -->
-	<div id="disable-profiles-modal" class="modal" style="display: none;">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2>Disable Profiles</h2>
-			</div>
-			<div class="modal-body">
-				<p>Disabling profiles will keep one profile and remove all others.</p>
-				<p>Which profile would you like to keep?</p>
-				<div class="form-group">
-					<label for="keep-profile-select">Select profile to keep:</label>
-					<select id="keep-profile-select" class="clone-profile-select">
-						<!-- Options populated dynamically by popup-profiles.js -->
-					</select>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button id="disable-profiles-cancel-button" class="secondary-button">Cancel</button>
-				<button id="disable-profiles-confirm-button" class="primary-button">Disable Profiles</button>
 			</div>
 		</div>
 	</div>
