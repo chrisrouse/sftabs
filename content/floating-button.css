@@ -39,6 +39,7 @@
 
 .sftabs-floating-modal.open .modal-content {
   transform: translateX(0); /* Show full unit */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Toggle Button - All Styles */
@@ -58,8 +59,6 @@
   flex-shrink: 0;
   transition: background 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 2;
-  position: relative;
 }
 
 .sftabs-floating-modal .modal-panel {
@@ -73,9 +72,7 @@
 }
 
 .sftabs-floating-modal.open .modal-toggle-button {
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2),  /* left */
-              0 -4px 20px rgba(0, 0, 0, 0.2),  /* top */
-              0 4px 20px rgba(0, 0, 0, 0.2);   /* bottom */
+  box-shadow: none;
 }
 
 .sftabs-floating-modal .modal-toggle-button:focus {
@@ -97,9 +94,6 @@
   overflow-y: auto;
   max-height: 400px;
   padding-left: 2px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-  position: relative;
 }
 
 /* Scrollbar styling */
