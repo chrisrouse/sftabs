@@ -364,11 +364,6 @@ function setupEventListeners() {
 		await saveUserSettings();
 	});
 
-	// Keyboard shortcuts button
-	document.getElementById('keyboard-shortcuts-button').addEventListener('click', () => {
-		openKeyboardShortcutsPage();
-	});
-
 	// Export button
 	document.getElementById('export-button').addEventListener('click', () => {
 		showExportModal();
@@ -402,45 +397,13 @@ function setupEventListeners() {
 		hideResetModal();
 	});
 
-	// Changelog link
-	document.getElementById('changelog-link').addEventListener('click', (e) => {
+	// User guide link
+	document.getElementById('user-guide-link').addEventListener('click', (e) => {
 		e.preventDefault();
 		browser.tabs.create({
-			url: 'https://github.com/chrisrouse/sftabs/blob/main/CHANGELOG.md'
+			url: 'https://chrisrouse.github.io/sftabs/'
 		});
 	});
-}
-
-/**
- * Open keyboard shortcuts configuration page
- */
-function openKeyboardShortcutsPage() {
-	// Detect if Firefox by checking for getBrowserInfo
-	const isFirefox = typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.getBrowserInfo === 'function';
-
-	if (isFirefox) {
-		// Firefox: Open addons page (no direct shortcuts page)
-		browser.tabs.create({ url: 'about:addons' }).then(() => {
-			// Optionally show a message to guide the user
-			showStatus('Navigate to this extension and click "Manage" to configure shortcuts');
-		}).catch(err => {
-			console.error('Error opening Firefox addons page:', err);
-			showStatus('Could not open shortcuts page', true);
-		});
-	} else {
-		// Chrome/Edge/other Chromium browsers: Use chrome:// URL
-		// Use chrome API directly for chrome:// URLs
-		if (typeof chrome !== 'undefined' && chrome.tabs) {
-			chrome.tabs.create({ url: 'chrome://extensions/shortcuts' }, (tab) => {
-				if (chrome.runtime.lastError) {
-					console.error('Error opening Chrome shortcuts page:', chrome.runtime.lastError);
-					showStatus('Could not open shortcuts page', true);
-				}
-			});
-		} else {
-			showStatus('Could not detect browser type', true);
-		}
-	}
 }
 
 /**

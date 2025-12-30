@@ -219,6 +219,19 @@
 			line-height: 1.4;
 		}
 
+		.keyboard-shortcuts-link {
+			color: #0176d3;
+			text-decoration: none;
+		}
+
+		.keyboard-shortcuts-link:hover {
+			text-decoration: underline;
+		}
+
+		[data-theme="dark"] .keyboard-shortcuts-link {
+			color: var(--slds-brand-primary);
+		}
+
 		/* Import/Export Actions */
 		.config-actions {
 			display: grid;
@@ -638,7 +651,7 @@
 					<img src="../icons/sftabs_white.svg" alt="SF Tabs" class="logo-white">
 					SF Tabs
 				</h1>
-				<p class="version-info">v2.0.0 | <a href="#" id="changelog-link">Changelog</a></p>
+				<p class="version-info">v2.0.0 | <a href="#" id="user-guide-link">User Guide</a></p>
 			</div>
 			<nav class="settings-nav">
 				<div class="settings-nav-item active" data-section="settings">
@@ -848,13 +861,22 @@
 
 					<div class="setting-card">
 						<div class="setting-item">
-							<button id="keyboard-shortcuts-button" class="action-button" style="width: 100%; justify-content: center;">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
-								</svg>
-								<span>Configure Keyboard Shortcuts</span>
-							</button>
-							<div class="setting-description">Set keyboard shortcuts to quickly open tabs 1-10 by position</div>
+							<p style="margin: 0 0 12px 0; color: var(--color-text);">
+								SF Tabs supports up to 10 custom shortcuts that can be configured in your browser.
+								<a href="https://chrisrouse.github.io/sftabs/user-guide#keyboard-shortcuts" target="_blank" class="keyboard-shortcuts-link">Learn more</a>
+							</p>
+
+							<div style="background: var(--color-item-background); padding: 12px; border-radius: 6px; margin-top: 8px;">
+								<p style="margin: 0 0 8px 0; font-weight: 600; color: var(--color-text);">Firefox:</p>
+								<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--color-text-weak);">
+									Type <code style="background: var(--color-background); padding: 2px 6px; border-radius: 3px;">about:addons</code> in the address bar and press Enter. Click on the gear icon at the top of the page and select "Manage Extension Shortcuts".
+								</p>
+
+								<p style="margin: 0 0 8px 0; font-weight: 600; color: var(--color-text);">Chrome / Edge:</p>
+								<p style="margin: 0; font-size: 13px; color: var(--color-text-weak);">
+									Type <code style="background: var(--color-background); padding: 2px 6px; border-radius: 3px;">chrome://extensions/shortcuts</code> in the address bar to go directly to keyboard shortcuts for all installed extensions.
+								</p>
+							</div>
 						</div>
 					</div>
 				</section>
