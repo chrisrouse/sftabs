@@ -399,7 +399,7 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	background-color: #75b4ff;
+	background-color: #c2deff;
 	border-radius: 6px 0 0 6px;
 	cursor: grab;
 	transition: background-color 0.2s ease;
@@ -450,7 +450,7 @@
   }
 
   [data-theme="dark"] .drag-handle {
-	background-color: #5a8fd4;
+	background-color: #7ba9e0;
   }
 
   [data-theme="dark"] .drag-handle-dot {
