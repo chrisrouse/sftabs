@@ -62,6 +62,30 @@ function renderTabList() {
 }
 
 /**
+ * Create drag handle with dots
+ * @param {boolean} isCompact - Whether the tab is in compact mode
+ * @returns {HTMLElement} The drag handle element
+ */
+function createDragHandle(isCompact) {
+  const dragHandle = document.createElement('div');
+  dragHandle.className = 'drag-handle';
+  dragHandle.setAttribute('title', 'Drag to reorder');
+
+  // Add dots based on display mode
+  // Compact mode: 4 dots (smaller height)
+  // Regular mode: 6 dots (larger height)
+  const dotCount = isCompact ? 4 : 6;
+
+  for (let i = 0; i < dotCount; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'drag-handle-dot';
+    dragHandle.appendChild(dot);
+  }
+
+  return dragHandle;
+}
+
+/**
  * Create a complete tab element with enhanced dropdown functionality
  */
 function createTabElement(tab) {
@@ -76,11 +100,9 @@ function createTabElement(tab) {
     tabItem.classList.add('has-dropdown');
   }
 
-  // Create drag handle
-  const dragHandle = document.createElement('div');
-  dragHandle.className = 'drag-handle';
-  dragHandle.innerHTML = '⋮⋮';
-  dragHandle.setAttribute('title', 'Drag to reorder');
+  // Create drag handle (colored left edge with dots)
+  const settings = SFTabs.main.getUserSettings();
+  const dragHandle = createDragHandle(settings.compactMode);
   
   // Create content container
   const contentContainer = createTabContent(tab, hasAnyDropdown);

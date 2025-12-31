@@ -312,13 +312,21 @@
 	display: flex;
 	background-color: var(--color-item-background);
 	border: 1px solid var(--color-border);
-	border-radius: 4px;
-	padding: 8px 12px;
+	border-radius: 6px;
+	padding: 8px 12px 8px 32px;
 	margin-bottom: 8px;
 	cursor: pointer;
 	position: relative;
 	min-height: 36px;
 	align-items: flex-start;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+	transition: all 0.2s ease;
+	overflow: hidden;
+  }
+
+  .tab-item:hover:not(.dragging):not(.being-dragged) {
+	box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+	transform: translateY(-1px);
   }
   
   .tab-item.multi-line {
@@ -348,17 +356,12 @@
   }
   
   /* Compact mode adjustments */
-  .tab-item.compact-mode .drag-handle {
-	align-self: flex-start;
-	margin-top: 3px;
-  }
-  
   .tab-item.compact-mode .tab-actions {
 	align-self: flex-start;
 	margin-top: 1px;
 	padding-top: 1px;
   }
-  
+
   .tab-item.compact-mode {
 	align-items: center;
   }
@@ -390,17 +393,68 @@
   }
   
   .drag-handle {
-	background-color: var(--color-border);
-	border-radius: 4px;
 	width: 24px;
-	height: 24px;
 	min-width: 24px;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background-color: var(--color-border);
+	border-radius: 6px 0 0 6px;
+	cursor: grab;
+	transition: background-color 0.2s ease, color 0.2s ease;
+	opacity: 0.3;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	margin-right: 8px;
-	cursor: grab;
-	flex-shrink: 0;
+	gap: 2px;
+	padding: 4px 0;
+	color: var(--color-text);
+  }
+
+  .drag-handle-dot {
+	width: 3px;
+	height: 3px;
+	background-color: currentColor;
+	border-radius: 50%;
+	opacity: 0.6;
+  }
+
+  .tab-item:hover .drag-handle {
+	background-color: #288aff;
+	opacity: 1;
+	color: white;
+  }
+
+  .drag-handle:active,
+  .tab-item.dragging .drag-handle,
+  .tab-item.being-dragged .drag-handle {
+	background-color: #288aff;
+	opacity: 1;
+	cursor: grabbing;
+	color: white;
+  }
+
+  [data-theme="dark"] .tab-item {
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  [data-theme="dark"] .tab-item:hover:not(.dragging):not(.being-dragged) {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="dark"] .drag-handle {
+	background-color: rgba(255, 255, 255, 0.2);
+	color: rgba(255, 255, 255, 0.5);
+  }
+
+  [data-theme="dark"] .tab-item:hover .drag-handle,
+  [data-theme="dark"] .drag-handle:active,
+  [data-theme="dark"] .tab-item.dragging .drag-handle,
+  [data-theme="dark"] .tab-item.being-dragged .drag-handle {
+	background-color: #5aa7ff;
+	color: white;
   }
   
   .tab-info {
