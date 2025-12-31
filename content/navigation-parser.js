@@ -288,12 +288,14 @@ function handleNavigationMessage(request, sender, sendResponse) {
       parseObjectManagerNavigation()
         .then(navigation => {
           const objectName = getObjectNameFromUrl();
+          const pageInfo = getCurrentPageInfo();
 
           sendResponse({
             success: true,
             items: navigation,  // Changed from 'navigation' to 'items' for backward compatibility
             navigation: navigation,  // Keep both for compatibility
             objectName: objectName,
+            pageInfo: pageInfo,
             currentUrl: window.location.href
           });
         })
