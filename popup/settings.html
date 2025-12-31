@@ -68,23 +68,33 @@
 			display: flex;
 			align-items: center;
 			gap: 8px;
-			padding: 10px 20px;
+			padding: 10px 16px;
+			margin: 8px 12px;
 			cursor: pointer;
-			color: var(--color-text);
+			color: #0176d3;
 			font-size: 14px;
 			font-weight: 500;
 			transition: all 0.15s;
-			border-left: 3px solid transparent;
 			text-decoration: none;
+			background: var(--color-item-background);
+			border: 1px solid var(--color-border);
+			border-radius: 4px;
 		}
 
 		.user-guide-link:hover {
-			background: var(--color-item-background);
-			color: #0176d3;
+			background: #0176d3;
+			color: white;
+			border-color: #0176d3;
+		}
+
+		[data-theme="dark"] .user-guide-link {
+			color: var(--slds-brand-primary);
 		}
 
 		[data-theme="dark"] .user-guide-link:hover {
-			color: var(--slds-brand-primary);
+			background: var(--slds-brand-primary);
+			border-color: var(--slds-brand-primary);
+			color: white;
 		}
 
 		.user-guide-link svg {
@@ -99,7 +109,6 @@
 			width: 14px;
 			height: 14px;
 			margin-left: auto;
-			opacity: 0.6;
 		}
 
 		.settings-nav-item {
@@ -112,21 +121,18 @@
 			font-size: 14px;
 			font-weight: 500;
 			transition: all 0.15s;
-			border-left: 3px solid transparent;
 		}
 
 		.settings-nav-item:hover {
-			background: var(--color-background);
+			background: var(--color-item-background);
 		}
 
 		.settings-nav-item.active {
-			background: var(--color-background);
-			border-left-color: #0176d3;
+			background: var(--color-item-background);
 			color: #0176d3;
 		}
 
 		[data-theme="dark"] .settings-nav-item.active {
-			border-left-color: var(--slds-brand-primary);
 			color: var(--slds-brand-primary);
 		}
 
