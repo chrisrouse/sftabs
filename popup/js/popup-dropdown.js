@@ -249,21 +249,26 @@ function removeDropdownItem(index) {
 		return;
 	}
 
-	// Check if we have pending dropdown items (not yet saved)
+	// Check if we have pending dropdown items (not yet saved - from "Setup as Object Dropdown")
 	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
 		// Remove from pending items
 		currentTab.pendingDropdownItems.splice(index, 1);
 		showDropdownPreview(currentTab.pendingDropdownItems);
+	} else if (currentTab.stagedDropdownItems && currentTab.stagedDropdownItems.length > 0) {
+		// Remove from staged items (user is editing existing dropdown)
+		currentTab.stagedDropdownItems.splice(index, 1);
+		showDropdownPreview(currentTab.stagedDropdownItems);
 	} else {
-		// Remove from saved dropdown items
-		const tabs = SFTabs.main.customTabs;
+		// Fallback: Remove from saved dropdown items directly
+		const tabs = SFTabs.main.getTabs();
 		const tab = tabs.find(t => t.id === currentTab.id);
 		if (!tab || !tab.dropdownItems) {
 			return;
 		}
 
-		// Remove the item
-		tab.dropdownItems.splice(index, 1);
+		// Create staged items from existing and remove the item
+		currentTab.stagedDropdownItems = JSON.parse(JSON.stringify(tab.dropdownItems));
+		currentTab.stagedDropdownItems.splice(index, 1);
 
 		// Update the preview
 		showDropdownPreview(tab.dropdownItems);
