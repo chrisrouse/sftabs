@@ -704,34 +704,22 @@ function setupDragAndDrop() {
   const domElements = SFTabs.main.getDOMElements();
   const tabItems = domElements.tabList.querySelectorAll('.tab-item');
   const dragHandles = domElements.tabList.querySelectorAll('.drag-handle');
-  
-  // Create drop indicator element
-  const dropIndicator = createDropIndicator();
-  
+
   // Add event listeners to drag handles
   dragHandles.forEach((handle, index) => {
     const item = tabItems[index];
-    handle.addEventListener('mousedown', (e) => handleDragStart(e, item, dropIndicator));
+    handle.addEventListener('mousedown', (e) => handleDragStart(e, item));
   });
-}
-
-/**
- * Create drop indicator element
- */
-function createDropIndicator() {
-  const dropIndicator = document.createElement('div');
-  dropIndicator.className = 'drop-indicator';
-  return dropIndicator;
 }
 
 /**
  * Handle drag start (properly implemented)
  */
-function handleDragStart(e, item, dropIndicator) {
+function handleDragStart(e, item) {
   e.preventDefault();
-  
+
   const domElements = SFTabs.main.getDOMElements();
-  
+
   // Get container width before starting drag
   const tabItemWidth = item.offsetWidth;
 
@@ -750,11 +738,8 @@ function handleDragStart(e, item, dropIndicator) {
   // Move the clone element to initial position
   moveElement(clone, e.pageX - shiftX, e.pageY - shiftY);
 
-  // Add drop indicator to the DOM
-  domElements.tabList.appendChild(dropIndicator);
-
   // Set up move and drop handlers
-  setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWidth);
+  setupDragHandlers(item, clone, shiftX, shiftY, tabItemWidth);
 }
 
 /**
@@ -785,7 +770,7 @@ function moveElement(element, x, y) {
 /**
  * Set up handlers for dragging movement and dropping
  */
-function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWidth) {
+function setupDragHandlers(item, clone, shiftX, shiftY, tabItemWidth) {
   const domElements = SFTabs.main.getDOMElements();
   let dropTarget = null; // Track the target tab for dropdown creation
   let hoverTimer = null; // Timer for hover delay
@@ -804,7 +789,6 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
     if (!elemBelow) {
       // Not over anything - reset everything
       clearHoverTimer();
-      dropIndicator.style.display = 'none';
       removeDropdownHighlight();
       dropTarget = null;
       return;
@@ -816,7 +800,7 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
     if (droppableItem && droppableItem !== item) {
       // Check if we moved to a different tab
       if (droppableItem !== currentHoverTarget) {
-        // Moved to a new tab - reset timer and show reorder indicator
+        // Moved to a new tab - reset timer
         clearHoverTimer();
         removeDropdownHighlight();
         dropTarget = null;
@@ -825,25 +809,39 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
         // Start hover timer for dropdown mode
         hoverTimer = setTimeout(() => {
           // Timer completed - switch to dropdown mode
-          dropIndicator.style.display = 'none';
           droppableItem.classList.add('drop-target-dropdown');
           dropTarget = droppableItem;
         }, HOVER_DELAY);
       }
 
-      // Always show reorder indicator unless we're in dropdown mode
+      // Perform dynamic reordering unless we're in dropdown mode
       if (!dropTarget) {
-        updateDropIndicator(elemBelow, item, event, dropIndicator, tabItemWidth);
-      } else {
-        dropIndicator.style.display = 'none';
+        dynamicallyReorderTabs(elemBelow, item, event);
       }
     } else {
       // Not over a valid drop target - reset
       clearHoverTimer();
-      dropIndicator.style.display = 'none';
       removeDropdownHighlight();
       dropTarget = null;
       currentHoverTarget = null;
+    }
+  }
+
+  // Helper to dynamically reorder tabs
+  function dynamicallyReorderTabs(elemBelow, draggedItem, event) {
+    const droppableItem = elemBelow.closest('.tab-item');
+    if (!droppableItem || droppableItem === draggedItem) return;
+
+    // Determine if we should place above or below
+    const rect = droppableItem.getBoundingClientRect();
+    const middle = rect.top + rect.height / 2;
+
+    if (event.clientY < middle) {
+      // Place above the droppable item
+      domElements.tabList.insertBefore(draggedItem, droppableItem);
+    } else {
+      // Place below the droppable item
+      domElements.tabList.insertBefore(draggedItem, droppableItem.nextSibling);
     }
   }
 
@@ -876,10 +874,6 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
     item.style.opacity = '';
     item.classList.remove('being-dragged');
 
-    if (dropIndicator.parentNode) {
-      dropIndicator.parentNode.removeChild(dropIndicator);
-    }
-
     // Remove dropdown target highlight
     removeDropdownHighlight();
 
@@ -887,9 +881,8 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
     if (dropTarget) {
       handleDropdownCreation(item, dropTarget);
     } else {
-      // Handle final positioning for reordering
-      finalizeDrop(event, item);
-      // Update the tab positions in storage
+      // Item is already in the correct position from dynamic reordering
+      // Just update the tab positions in storage
       updateTabPositions();
     }
   }
@@ -897,56 +890,6 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
   // Add the event listeners
   document.addEventListener('mousemove', onMouseMove);
   document.addEventListener('mouseup', onMouseUp);
-}
-
-/**
- * Update the drop indicator position
- */
-function updateDropIndicator(elemBelow, draggedItem, event, dropIndicator, tabItemWidth) {
-  const domElements = SFTabs.main.getDOMElements();
-  
-  // Check if we're over another tab item
-  const droppableItem = elemBelow.closest('.tab-item');
-  if (droppableItem && droppableItem !== draggedItem) {
-    // Determine if we should place above or below
-    const rect = droppableItem.getBoundingClientRect();
-    const middle = rect.top + rect.height / 2;
-
-    // Show the drop indicator
-    dropIndicator.style.display = 'block';
-    dropIndicator.style.width = tabItemWidth + 'px';
-
-    if (event.clientY < middle) {
-      // Place above the droppable item
-      domElements.tabList.insertBefore(dropIndicator, droppableItem);
-    } else {
-      // Place below the droppable item
-      domElements.tabList.insertBefore(dropIndicator, droppableItem.nextSibling);
-    }
-  }
-}
-
-/**
- * Finalize the drop position
- */
-function finalizeDrop(event, draggedItem) {
-  const domElements = SFTabs.main.getDOMElements();
-  const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-
-  if (elemBelow) {
-    const droppableItem = elemBelow.closest('.tab-item');
-    if (droppableItem && droppableItem !== draggedItem) {
-      // Determine if we should place above or below
-      const rect = droppableItem.getBoundingClientRect();
-      const middle = rect.top + rect.height / 2;
-
-      if (event.clientY < middle) {
-        domElements.tabList.insertBefore(draggedItem, droppableItem);
-      } else {
-        domElements.tabList.insertBefore(draggedItem, droppableItem.nextSibling);
-      }
-    }
-  }
 }
 
 /**
