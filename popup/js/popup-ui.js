@@ -1476,23 +1476,40 @@ function deleteDropdownItemByPath(parentTab, indexPath) {
 
   // Work with staged items only - don't save yet
   const stagedItems = parentTab.stagedDropdownItems || [];
+
+  console.log('DEBUG deleteDropdownItemByPath:', {
+    parentTabId: parentTab.id,
+    indexPath,
+    stagedItemsCount: stagedItems.length,
+    hasStagedDropdownItems: !!parentTab.stagedDropdownItems
+  });
+
   const item = getItemByPath(stagedItems, indexPath);
 
   if (!item) {
+    console.log('DEBUG: Item not found at path:', indexPath);
     SFTabs.main.showStatus('Dropdown item not found', true);
     return;
   }
+
+  console.log('DEBUG: Found item to delete:', item.label);
 
   // Check if user wants to skip confirmation
   const userSettings = SFTabs.main.getUserSettings ? SFTabs.main.getUserSettings() : {};
   const skipConfirmation = userSettings.skipDeleteConfirmation;
 
   const performDelete = () => {
+    console.log('DEBUG: Before removeItemByPath, count:', stagedItems.length);
+
     // Remove the item from staged items
     removeItemByPath(stagedItems, indexPath);
 
+    console.log('DEBUG: After removeItemByPath, count:', stagedItems.length);
+
     // Update the staged items array
     parentTab.stagedDropdownItems = stagedItems;
+
+    console.log('DEBUG: Updated parentTab.stagedDropdownItems, count:', parentTab.stagedDropdownItems.length);
 
     SFTabs.main.showStatus(`"${item.label}" will be deleted when you click Save`);
 
