@@ -202,7 +202,7 @@ function setupAllEventListeners() {
   if (SFTabs.tabs && SFTabs.tabs.setupEventListeners) {
     SFTabs.tabs.setupEventListeners();
   }
-  
+
   // UI listeners
   if (SFTabs.ui && SFTabs.ui.setupEventListeners) {
     SFTabs.ui.setupEventListeners();
@@ -211,6 +211,15 @@ function setupAllEventListeners() {
   // Dropdown listeners
   if (SFTabs.dropdowns && SFTabs.dropdowns.setupEventListeners) {
     SFTabs.dropdowns.setupEventListeners();
+  }
+
+  // Action Panel listeners
+  if (domElements.actionPanelSaveButton) {
+    domElements.actionPanelSaveButton.addEventListener('click', saveActionPanelChanges);
+  }
+
+  if (domElements.actionPanelCloseButton) {
+    domElements.actionPanelCloseButton.addEventListener('click', closeActionPanel);
   }
 
 }
@@ -365,13 +374,19 @@ function migrateTabsToNewStructure(existingTabs) {
  * Show main content panel
  */
 function showMainContent() {
-  console.trace('showMainContent called from:');
   // Clear the action panel tab reference since we're closing it
   currentActionPanelTab = null;
   domElements.mainContent.classList.add('active');
   domElements.mainContent.style.display = 'block';
   domElements.actionPanel.classList.remove('active');
   domElements.actionPanel.style.display = 'none';
+}
+
+/**
+ * Close action panel and return to main content
+ */
+function closeActionPanel() {
+  showMainContent();
 }
 
 /**
@@ -797,6 +812,7 @@ window.SFTabs.main = {
   // Functions
   applyTheme,
   showMainContent,
+  closeActionPanel,
   showActionPanel,
   updateActionPanelContent,
   saveActionPanelChanges,
