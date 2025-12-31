@@ -473,22 +473,35 @@ function saveObjectDropdownItemOrder(container) {
 		return;
 	}
 
+	let reorderedItems;
+
 	// Check if we have pending dropdown items (not yet saved)
 	if (currentTab.pendingDropdownItems && currentTab.pendingDropdownItems.length > 0) {
 		// Reorder pending items
-		const reorderedItems = newOrder.map(oldIndex => currentTab.pendingDropdownItems[oldIndex]);
+		reorderedItems = newOrder.map(oldIndex => currentTab.pendingDropdownItems[oldIndex]);
 		currentTab.pendingDropdownItems = reorderedItems;
-		// Don't re-render - DOM is already in correct order from drag operation
 	} else if (currentTab.stagedDropdownItems && currentTab.stagedDropdownItems.length > 0) {
 		// Reorder staged items (user is editing existing dropdown)
-		const reorderedItems = newOrder.map(oldIndex => currentTab.stagedDropdownItems[oldIndex]);
+		reorderedItems = newOrder.map(oldIndex => currentTab.stagedDropdownItems[oldIndex]);
 		currentTab.stagedDropdownItems = reorderedItems;
-		// Don't re-render - DOM is already in correct order from drag operation
 	} else if (currentTab.dropdownItems && currentTab.dropdownItems.length > 0) {
 		// Reorder saved items - create staged items first
-		const reorderedItems = newOrder.map(oldIndex => currentTab.dropdownItems[oldIndex]);
+		reorderedItems = newOrder.map(oldIndex => currentTab.dropdownItems[oldIndex]);
 		currentTab.stagedDropdownItems = reorderedItems;
-		// Don't re-render - DOM is already in correct order from drag operation
+	}
+
+	// Update the numbering and dataset.index without re-rendering the entire list
+	if (reorderedItems) {
+		items.forEach((itemDiv, newIndex) => {
+			// Update the dataset.index to reflect new position
+			itemDiv.dataset.index = newIndex;
+
+			// Update the label text with new numbering
+			const labelSpan = itemDiv.querySelector('span');
+			if (labelSpan && reorderedItems[newIndex]) {
+				labelSpan.textContent = `${newIndex + 1}. ${reorderedItems[newIndex].label}`;
+			}
+		});
 	}
 }
 
