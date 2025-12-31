@@ -195,6 +195,7 @@ function showDropdownPreview(items) {
 		const dragHandle = SFTabs.shared.createDragHandle();
 
 		const labelSpan = document.createElement('span');
+		labelSpan.className = 'dropdown-item-label';
 		labelSpan.textContent = `${index + 1}. ${item.label}`;
 		labelSpan.style.flex = '1';
 
@@ -497,7 +498,7 @@ function saveObjectDropdownItemOrder(container) {
 			itemDiv.dataset.index = newIndex;
 
 			// Update the label text with new numbering
-			const labelSpan = itemDiv.querySelector('span');
+			const labelSpan = itemDiv.querySelector('.dropdown-item-label');
 			if (labelSpan && reorderedItems[newIndex]) {
 				labelSpan.textContent = `${newIndex + 1}. ${reorderedItems[newIndex].label}`;
 			}
