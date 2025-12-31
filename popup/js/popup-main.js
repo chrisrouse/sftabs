@@ -611,13 +611,22 @@ function saveActionPanelChanges() {
     isCustomUrl: isCustomUrl
   };
 
-  // Check if there are pending dropdown items to save
-  if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
+  // Apply dropdown items in priority order:
+  // 1. stagedDropdownItems (manual edits/deletions) - highest priority
+  // 2. pendingDropdownItems (from Object Dropdown setup)
+  // 3. existing dropdownItems (no changes)
+  if (tab.stagedDropdownItems !== undefined) {
+    // Staged items from manual edits (removing, reordering) take precedence
+    tabData.dropdownItems = tab.stagedDropdownItems;
+    tabData.hasDropdown = tab.stagedDropdownItems.length > 0;
+  } else if (tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0) {
+    // Pending items from Object Dropdown setup
     tabData.hasDropdown = true;
     tabData.dropdownItems = tab.pendingDropdownItems;
-
-    // Legacy dropdown properties will be stripped by cleanTabForStorage()
-  } else {
+  } else if (tab.dropdownItems) {
+    // No changes, preserve existing dropdown items
+    tabData.dropdownItems = tab.dropdownItems;
+    tabData.hasDropdown = tab.dropdownItems.length > 0;
   }
 
   // Check if this is editing a dropdown item

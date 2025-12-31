@@ -598,13 +598,20 @@ function saveTabForm() {
   // Check if there are staged changes to apply
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
 
-  // Apply staged dropdown items (from delete operations)
+  // Apply dropdown items in priority order:
+  // 1. stagedDropdownItems (manual edits/deletions) - highest priority
+  // 2. pendingDropdownItems (from Object Dropdown setup)
+  // 3. existing dropdownItems (no changes)
   if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems !== undefined) {
+    // Staged items from manual edits (removing, reordering) take precedence
     tabData.dropdownItems = currentActionPanelTab.stagedDropdownItems;
     tabData.hasDropdown = currentActionPanelTab.stagedDropdownItems.length > 0;
+  } else if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
+    // Pending items from Object Dropdown setup
+    tabData.hasDropdown = true;
+    tabData.dropdownItems = currentActionPanelTab.pendingDropdownItems;
   } else if (tab.dropdownItems) {
-    // If no staged items but tab has dropdown items, preserve them
-    // This handles the case where the form is saved without any dropdown modifications
+    // No changes, preserve existing dropdown items
     tabData.dropdownItems = tab.dropdownItems;
     tabData.hasDropdown = tab.dropdownItems.length > 0;
   }
@@ -628,13 +635,6 @@ function saveTabForm() {
       };
       tabs.push(newTab);
     });
-  }
-
-  // Check if there are pending dropdown items to save (from Object Dropdown setup)
-  if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
-    tabData.hasDropdown = true;
-    tabData.dropdownItems = currentActionPanelTab.pendingDropdownItems;
-    // Legacy dropdown properties will be stripped by cleanTabForStorage()
   }
 
   // Update existing tab and save all tabs (in case we added promoted tabs)
