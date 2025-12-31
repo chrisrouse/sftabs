@@ -788,6 +788,9 @@ function moveElement(element, x, y) {
 function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWidth) {
   const domElements = SFTabs.main.getDOMElements();
   let dropTarget = null; // Track the target tab for dropdown creation
+  let hoverTimer = null; // Timer for hover delay
+  let currentHoverTarget = null; // Track which tab we're hovering over
+  const HOVER_DELAY = 500; // Milliseconds to hover before switching to dropdown mode
 
   // Define mousemove handler
   function onMouseMove(event) {
@@ -798,39 +801,72 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
     const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
     clone.style.display = '';
 
-    // Reset drop indicator visibility
-    dropIndicator.style.display = 'none';
-
-    // Remove previous dropdown target highlight
-    document.querySelectorAll('.tab-item.drop-target-dropdown').forEach(el => {
-      el.classList.remove('drop-target-dropdown');
-    });
-    dropTarget = null;
-
-    if (!elemBelow) return;
+    if (!elemBelow) {
+      // Not over anything - reset everything
+      clearHoverTimer();
+      dropIndicator.style.display = 'none';
+      removeDropdownHighlight();
+      dropTarget = null;
+      return;
+    }
 
     // Check if we're over another tab item
     const droppableItem = elemBelow.closest('.tab-item');
 
     if (droppableItem && droppableItem !== item) {
-      const rect = droppableItem.getBoundingClientRect();
-      const middle = rect.top + rect.height / 2;
-      const distanceFromMiddle = Math.abs(event.clientY - middle);
-      const threshold = rect.height * 0.08; // 8% of tab height for center zone (16% total)
+      // Check if we moved to a different tab
+      if (droppableItem !== currentHoverTarget) {
+        // Moved to a new tab - reset timer and show reorder indicator
+        clearHoverTimer();
+        removeDropdownHighlight();
+        dropTarget = null;
+        currentHoverTarget = droppableItem;
 
-      // If we're in the center zone, highlight for dropdown creation
-      if (distanceFromMiddle < threshold) {
-        droppableItem.classList.add('drop-target-dropdown');
-        dropTarget = droppableItem;
-      } else {
-        // Otherwise, show reorder indicator
-        updateDropIndicator(elemBelow, item, event, dropIndicator, tabItemWidth);
+        // Start hover timer for dropdown mode
+        hoverTimer = setTimeout(() => {
+          // Timer completed - switch to dropdown mode
+          dropIndicator.style.display = 'none';
+          droppableItem.classList.add('drop-target-dropdown');
+          dropTarget = droppableItem;
+        }, HOVER_DELAY);
       }
+
+      // Always show reorder indicator unless we're in dropdown mode
+      if (!dropTarget) {
+        updateDropIndicator(elemBelow, item, event, dropIndicator, tabItemWidth);
+      } else {
+        dropIndicator.style.display = 'none';
+      }
+    } else {
+      // Not over a valid drop target - reset
+      clearHoverTimer();
+      dropIndicator.style.display = 'none';
+      removeDropdownHighlight();
+      dropTarget = null;
+      currentHoverTarget = null;
     }
+  }
+
+  // Helper to clear hover timer
+  function clearHoverTimer() {
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+      hoverTimer = null;
+    }
+  }
+
+  // Helper to remove dropdown highlight
+  function removeDropdownHighlight() {
+    document.querySelectorAll('.tab-item.drop-target-dropdown').forEach(el => {
+      el.classList.remove('drop-target-dropdown');
+    });
   }
 
   // Define mouseup/drop handler
   function onMouseUp(event) {
+    // Clean up timer
+    clearHoverTimer();
+
     // Clean up event listeners
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
@@ -845,9 +881,7 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
     }
 
     // Remove dropdown target highlight
-    document.querySelectorAll('.tab-item.drop-target-dropdown').forEach(el => {
-      el.classList.remove('drop-target-dropdown');
-    });
+    removeDropdownHighlight();
 
     // Check if we're dropping onto a tab for dropdown creation
     if (dropTarget) {
