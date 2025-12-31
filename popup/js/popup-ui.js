@@ -62,7 +62,7 @@ function renderTabList() {
 }
 
 /**
- * Create drag handle with dots
+ * Create drag handle with dots in a grid pattern
  * @param {boolean} isCompact - Whether the tab is in compact mode
  * @returns {HTMLElement} The drag handle element
  */
@@ -71,10 +71,10 @@ function createDragHandle(isCompact) {
   dragHandle.className = 'drag-handle';
   dragHandle.setAttribute('title', 'Drag to reorder');
 
-  // Add dots based on display mode
-  // Compact mode: 4 dots (smaller height)
-  // Regular mode: 6 dots (larger height)
-  const dotCount = isCompact ? 4 : 6;
+  // Add dots based on display mode (2 column grid)
+  // Compact mode: 6 dots (2x3 grid)
+  // Regular mode: 10 dots (2x5 grid)
+  const dotCount = isCompact ? 6 : 10;
 
   for (let i = 0; i < dotCount; i++) {
     const dot = document.createElement('div');
