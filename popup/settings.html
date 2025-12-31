@@ -70,7 +70,7 @@
 			gap: 8px;
 			padding: 10px 20px;
 			cursor: pointer;
-			color: #0176d3;
+			color: var(--color-text);
 			font-size: 14px;
 			font-weight: 500;
 			transition: all 0.15s;
@@ -78,12 +78,13 @@
 			text-decoration: none;
 		}
 
-		[data-theme="dark"] .user-guide-link {
-			color: var(--slds-brand-primary);
-		}
-
 		.user-guide-link:hover {
 			background: var(--color-item-background);
+			color: #0176d3;
+		}
+
+		[data-theme="dark"] .user-guide-link:hover {
+			color: var(--slds-brand-primary);
 		}
 
 		.user-guide-link svg {
