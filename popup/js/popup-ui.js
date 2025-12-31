@@ -1067,13 +1067,6 @@ function setupEventListeners() {
       checkbox.addEventListener('change', updateDropdownControlVisibility);
     }
   });
-  
-  // Refresh Navigation button
-  if (domElements.refreshNavButton) {
-    domElements.refreshNavButton.addEventListener('click', () => {
-      // TODO: Implement manual navigation refresh functionality
-    });
-  }
 
   // Settings button - open standalone settings page
   if (domElements.settingsButton) {

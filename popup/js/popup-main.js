@@ -139,7 +139,6 @@ function initializeDOMElements() {
   domElements.saveButton = document.querySelector('#save-button');
   domElements.cancelButton = document.querySelector('#cancel-button');
   domElements.settingsButton = document.querySelector('#settings-button');
-  domElements.refreshNavButton = document.querySelector('#refresh-nav-button');
 
   // Modals
   domElements.confirmModal = document.querySelector('#confirm-modal');
@@ -174,8 +173,7 @@ function initializeDOMElements() {
 
   // Form groups
   domElements.hasDropdownGroup = document.querySelector('.has-dropdown-group');
-  domElements.refreshNavGroup = document.querySelector('.refresh-nav-group');
-  
+
   // Validate critical elements
   const criticalElements = [
     'tabList', 'emptyState', 'mainContent', 'actionPanel',

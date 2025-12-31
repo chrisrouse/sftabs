@@ -129,7 +129,6 @@ const SELECTORS = {
   saveButton: '#save-button',
   cancelButton: '#cancel-button',
   settingsButton: '#settings-button',
-  refreshNavButton: '#refresh-nav-button',
 
   // Modals
   confirmModal: '#confirm-modal',
