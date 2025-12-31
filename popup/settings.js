@@ -129,8 +129,34 @@ function updateUI() {
 	if (!userSettings.floatingButton) {
 		userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
 	}
+
+	// Migrate old displayMode to new location setting
+	if (userSettings.floatingButton.displayMode && !userSettings.floatingButton.location) {
+		const displayMode = userSettings.floatingButton.displayMode;
+		if (displayMode === 'setup-only') {
+			// Old "setup-only" meant no floating button
+			userSettings.floatingButton.enabled = false;
+			userSettings.floatingButton.location = 'everywhere';
+		} else if (displayMode === 'both') {
+			userSettings.floatingButton.location = 'everywhere';
+		} else if (displayMode === 'floating-only') {
+			// Old "floating-only" becomes everywhere (Setup tabs always show now)
+			userSettings.floatingButton.location = 'everywhere';
+		} else if (displayMode === 'hide-in-setup') {
+			userSettings.floatingButton.location = 'outside-setup';
+		}
+		delete userSettings.floatingButton.displayMode;
+	}
+
 	document.getElementById('floating-button-enabled').checked = userSettings.floatingButton.enabled || false;
-	document.getElementById('floating-button-display-mode').value = userSettings.floatingButton.displayMode || 'both';
+
+	// Set the location radio button
+	const location = userSettings.floatingButton.location || 'everywhere';
+	const locationRadio = document.getElementById(`floating-location-${location}`);
+	if (locationRadio) {
+		locationRadio.checked = true;
+	}
+
 	document.getElementById('floating-button-position').value = userSettings.floatingButton.position || 25;
 	document.getElementById('floating-button-position-value').textContent = `${userSettings.floatingButton.position || 25}%`;
 
@@ -318,13 +344,16 @@ function setupEventListeners() {
 		toggleFloatingButtonSettings();
 	});
 
-	// Floating button display mode
-	document.getElementById('floating-button-display-mode').addEventListener('change', async (e) => {
-		if (!userSettings.floatingButton) {
-			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
-		}
-		userSettings.floatingButton.displayMode = e.target.value;
-		await saveUserSettings();
+	// Floating button location radio buttons
+	const locationRadios = document.querySelectorAll('input[name="floating-button-location"]');
+	locationRadios.forEach(radio => {
+		radio.addEventListener('change', async (e) => {
+			if (!userSettings.floatingButton) {
+				userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
+			}
+			userSettings.floatingButton.location = e.target.value;
+			await saveUserSettings();
+		});
 	});
 
 	// Floating button position

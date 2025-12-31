@@ -705,9 +705,8 @@
       if (window.SFTabsFloating.button?.settings) {
         const settings = window.SFTabsFloating.button.settings;
 
-        // Only create modal if floating button is enabled and not setup-only
-        if (settings.floatingButton?.enabled &&
-            settings.floatingButton?.displayMode !== 'setup-only') {
+        // Only create modal if floating button is enabled
+        if (settings.floatingButton?.enabled) {
           window.SFTabsFloating.modal = new FloatingModal();
         }
       } else if (attempts < maxAttempts) {

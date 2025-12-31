@@ -71,7 +71,7 @@
 			padding: 10px 16px;
 			margin: 8px 12px;
 			cursor: pointer;
-			color: #0176d3;
+			color: var(--color-primary);
 			font-size: 14px;
 			font-weight: 500;
 			transition: all 0.15s;
@@ -82,19 +82,9 @@
 		}
 
 		.user-guide-link:hover {
-			background: #0176d3;
+			background: var(--color-primary);
 			color: white;
-			border-color: #0176d3;
-		}
-
-		[data-theme="dark"] .user-guide-link {
-			color: var(--slds-brand-primary);
-		}
-
-		[data-theme="dark"] .user-guide-link:hover {
-			background: var(--slds-brand-primary);
-			border-color: var(--slds-brand-primary);
-			color: white;
+			border-color: var(--color-primary);
 		}
 
 		.user-guide-link svg {
@@ -124,25 +114,21 @@
 		}
 
 		.settings-nav-item:hover {
-			background: var(--color-item-background);
+			background: var(--state-hover-primary);
 		}
 
 		.settings-nav-item.active {
 			background: var(--color-item-background);
-			color: #0176d3;
+			color: var(--color-primary);
 		}
 
-		[data-theme="dark"] .settings-nav-item.active {
-			color: var(--slds-brand-primary);
+		.settings-nav-item.active svg {
+			stroke: var(--color-primary);
 		}
 
 		.settings-nav-item:focus {
-			outline: 2px solid #0176d3;
-			outline-offset: -2px;
-		}
-
-		[data-theme="dark"] .settings-nav-item:focus {
-			outline-color: var(--slds-brand-primary);
+			outline: none;
+			box-shadow: inset var(--focus-ring);
 		}
 
 		.settings-nav-item svg {
@@ -271,16 +257,13 @@
 		}
 
 		.keyboard-shortcuts-link {
-			color: #0176d3;
+			color: var(--color-primary);
 			text-decoration: none;
 		}
 
 		.keyboard-shortcuts-link:hover {
 			text-decoration: underline;
-		}
-
-		[data-theme="dark"] .keyboard-shortcuts-link {
-			color: var(--slds-brand-primary);
+			color: var(--color-primary-hover);
 		}
 
 		/* Import/Export Actions */
@@ -305,25 +288,27 @@
 		}
 
 		.config-action-button:hover {
-			border-color: var(--slds-brand-primary);
-			background: var(--color-item-background);
+			border-color: var(--color-primary);
+			background: var(--state-hover-primary);
+		}
+
+		.config-action-button:hover svg {
+			stroke: var(--color-primary);
+			transform: scale(1.05);
 		}
 
 		.config-action-button:focus {
-			outline: 2px solid #0176d3;
-			outline-offset: 2px;
-		}
-
-		[data-theme="dark"] .config-action-button:focus {
-			outline-color: var(--slds-brand-primary);
+			outline: none;
+			box-shadow: var(--focus-ring);
 		}
 
 		.config-action-button svg {
 			width: 32px;
 			height: 32px;
-			stroke: var(--slds-brand-primary);
+			stroke: var(--color-text-weak);
 			fill: none;
 			margin-bottom: 8px;
+			transition: all 0.2s;
 		}
 
 		.config-action-button .action-title {
@@ -341,18 +326,26 @@
 		/* Danger Zone */
 		.danger-zone {
 			background: var(--color-background);
-			border: 2px solid var(--slds-color-error);
+			border: 2px solid var(--color-error);
 			border-radius: 8px;
 			padding: 20px;
 		}
 
 		.danger-zone h3 {
-			color: var(--slds-color-error);
+			color: var(--color-error);
 		}
 
 		/* Radio Groups */
-		.radio-group:hover {
-			background: var(--color-background);
+		.radio-group {
+			display: flex;
+			align-items: flex-start;
+			gap: 8px;
+			cursor: pointer;
+			margin-bottom: 12px;
+		}
+
+		.radio-group:last-child {
+			margin-bottom: 0;
 		}
 
 		.radio-group input[type="radio"] {
@@ -360,6 +353,14 @@
 			height: 16px;
 			margin: 0;
 			flex-shrink: 0;
+			accent-color: var(--color-primary);
+			cursor: pointer;
+		}
+
+		/* Checkbox styling */
+		input[type="checkbox"] {
+			accent-color: var(--color-primary);
+			cursor: pointer;
 		}
 
 		/* Toast notifications */
@@ -368,18 +369,19 @@
 			bottom: 20px;
 			left: 50%;
 			transform: translateX(-50%) translateY(100px);
-			background-color: #333;
-			color: #fff;
+			background-color: var(--surface-2);
+			color: var(--color-text);
 			padding: 12px 20px;
 			border-radius: 6px;
 			font-size: 14px;
 			font-weight: 500;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			box-shadow: var(--shadow-lg);
 			z-index: 10000;
 			opacity: 0;
 			transition: all 0.3s ease;
 			max-width: 350px;
 			text-align: center;
+			border: 1px solid var(--border-medium);
 		}
 
 		.sftabs-toast.show {
@@ -388,32 +390,26 @@
 		}
 
 		.sftabs-toast.success {
-			background-color: #10b981;
-			color: #fff;
+			background-color: var(--color-success);
+			color: white;
+			border-color: var(--color-success);
 		}
 
 		.sftabs-toast.error {
-			background-color: #ef4444;
-			color: #fff;
+			background-color: var(--color-error);
+			color: white;
+			border-color: var(--color-error);
 		}
 
 
 		/* Global focus indicators for accessibility */
-		button:focus,
-		input:focus,
-		select:focus,
-		a:focus,
-		[tabindex]:focus {
-			outline: 2px solid #0176d3;
-			outline-offset: 2px;
-		}
-
-		[data-theme="dark"] button:focus,
-		[data-theme="dark"] input:focus,
-		[data-theme="dark"] select:focus,
-		[data-theme="dark"] a:focus,
-		[data-theme="dark"] [tabindex]:focus {
-			outline-color: var(--slds-brand-primary);
+		button:focus-visible,
+		input:focus-visible,
+		select:focus-visible,
+		a:focus-visible,
+		[tabindex]:focus-visible {
+			outline: none;
+			box-shadow: var(--focus-ring);
 		}
 
 		/* Ensure nav items can receive focus */
@@ -606,14 +602,29 @@
 
 					<div id="floating-button-settings" style="display: none;">
 						<div class="setting-card">
-							<h3>Display Mode</h3>
+							<h3>Location</h3>
 							<div class="setting-item">
-								<select id="floating-button-display-mode" class="select-input" style="width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-input-background); color: var(--color-text);">
-									<option value="both">Both Setup tabs and floating button</option>
-									<option value="setup-only">Setup tabs only (no floating button)</option>
-									<option value="floating-only">Floating button only</option>
-								</select>
-								<div class="setting-description">Choose how SF Tabs appears in Salesforce</div>
+								<label class="radio-group">
+									<input type="radio" name="floating-button-location" value="everywhere" id="floating-location-everywhere">
+									<div style="flex: 1;">
+										<div style="font-weight: 600; margin-bottom: 4px;">Everywhere</div>
+										<div style="font-size: 13px; color: var(--color-text-weak);">Show floating button on all Salesforce pages</div>
+									</div>
+								</label>
+								<label class="radio-group">
+									<input type="radio" name="floating-button-location" value="setup-only" id="floating-location-setup-only">
+									<div style="flex: 1;">
+										<div style="font-weight: 600; margin-bottom: 4px;">Only in Setup</div>
+										<div style="font-size: 13px; color: var(--color-text-weak);">Show floating button only on Setup pages</div>
+									</div>
+								</label>
+								<label class="radio-group">
+									<input type="radio" name="floating-button-location" value="outside-setup" id="floating-location-outside-setup">
+									<div style="flex: 1;">
+										<div style="font-weight: 600; margin-bottom: 4px;">Outside Setup</div>
+										<div style="font-size: 13px; color: var(--color-text-weak);">Show floating button everywhere except Setup pages</div>
+									</div>
+								</label>
 							</div>
 						</div>
 
@@ -749,18 +760,18 @@
 							<p style="margin: 0 0 12px 0; color: var(--color-text);">What would you like to export?</p>
 
 							<div style="margin-bottom: 16px;">
-								<label class="radio-group" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 4px; cursor: pointer; transition: background-color 0.15s;">
-									<input type="radio" name="export-mode" id="export-everything-radio" value="everything" checked style="margin-top: 2px; cursor: pointer;">
+								<label class="radio-group">
+									<input type="radio" name="export-mode" id="export-everything-radio" value="everything" checked>
 									<div style="flex: 1;">
-										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 2px;">Everything (Recommended)</div>
+										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 4px;">Everything (Recommended)</div>
 										<div style="font-size: 14px; color: var(--color-text-weak);">Export all settings and all profiles</div>
 									</div>
 								</label>
 
-								<label class="radio-group" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 4px; cursor: pointer; transition: background-color 0.15s; margin-top: 4px;">
-									<input type="radio" name="export-mode" id="export-custom-radio" value="custom" style="margin-top: 2px; cursor: pointer;">
+								<label class="radio-group">
+									<input type="radio" name="export-mode" id="export-custom-radio" value="custom">
 									<div style="flex: 1;">
-										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 2px;">Custom Selection</div>
+										<div style="font-weight: 600; color: var(--color-text); margin-bottom: 4px;">Custom Selection</div>
 										<div style="font-size: 14px; color: var(--color-text-weak);">Choose specific settings and profiles</div>
 									</div>
 								</label>

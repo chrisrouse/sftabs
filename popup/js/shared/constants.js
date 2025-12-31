@@ -98,7 +98,7 @@ const DEFAULT_SETTINGS = {
   floatingButton: {
     enabled: false, // Disabled by default (opt-in feature)
     position: 25, // Vertical position along right edge (0 = top, 100 = bottom)
-    displayMode: 'both', // 'setup-only' | 'floating-only' | 'both'
+    location: 'everywhere', // 'everywhere' | 'setup-only' | 'outside-setup'
     defaultVisibility: true, // Show on all pages by default
     visibilityRules: [], // URL pattern rules (advanced)
     buttonSize: 'medium', // 'small' | 'medium' | 'large'

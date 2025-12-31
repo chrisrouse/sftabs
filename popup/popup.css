@@ -1469,23 +1469,23 @@
   }
   
   .theme-option:hover {
-	background-color: rgba(0, 0, 0, 0.05);
+	background-color: var(--state-hover);
   }
-  
-  [data-theme="dark"] .theme-option:hover {
-	background-color: rgba(255, 255, 255, 0.1);
-  }
-  
+
   /* Make the selected state more prominent */
   .theme-option.selected {
-	background-color: rgba(0, 0, 0, 0.05);
-	border: 2px solid var(--slds-brand-primary);
+	background-color: var(--state-hover-primary);
+	border: 2px solid var(--color-primary);
 }
-  
-  [data-theme="dark"] .theme-option.selected {
-	background-color: rgba(255, 255, 255, 0.1);
-	border: 2px solid var(--slds-brand-primary);
-}
+
+  .theme-option.selected .theme-icon {
+	stroke: var(--color-primary) !important;
+  }
+
+  .theme-option.selected .theme-label {
+	color: var(--color-primary);
+	font-weight: 600;
+  }
 
   /* Darker border for light theme in light mode */
 [data-theme="light"] .theme-option.light .theme-icon-container {
@@ -1543,21 +1543,12 @@
   .theme-icon {
 	width: 32px;
 	height: 32px;
-	stroke: #555;
+	stroke: var(--color-text);
 	fill: none;
 	stroke-width: 2;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 	z-index: 1;
-  }
-  
-  /* Improved icon visibility in dark mode */
-  [data-theme="dark"] .theme-option .theme-icon {
-	stroke: #f0f0f0;
-  }
-  
-  .theme-option.dark .theme-icon {
-	stroke: #f0f0f0;
   }
   
   .theme-label {
@@ -1571,14 +1562,23 @@
 	position: absolute;
 	left: 25%;
 	transform: translateX(-50%);
-	stroke: #555 !important;
+	stroke: var(--slds-gray-6);  /* Dark gray for contrast on white */
   }
-  
+
   .theme-option.system .dark-icon {
 	position: absolute;
 	right: 25%;
 	transform: translateX(50%);
-	stroke: #f0f0f0 !important;
+	stroke: #f3f4f6;  /* Match dark mode text color for consistency */
+  }
+
+  /* Colored icons when system theme is selected */
+  .theme-option.system.selected .light-icon {
+	stroke: var(--color-primary) !important;
+  }
+
+  .theme-option.system.selected .dark-icon {
+	stroke: var(--color-primary) !important;
   }
   
   
@@ -1587,14 +1587,14 @@
 	display: none !important;
   }
 
-  /* In dark mode, adjust all icons except those in specific containers */
-[data-theme="dark"] .theme-option:not(.light):not(.system) .theme-icon {
-	stroke: #f0f0f0;
+  /* Light theme icon always uses dark color for visibility on white */
+.theme-option.light .theme-icon {
+	stroke: var(--slds-gray-6);
   }
 
-  /* Make sure the sun icon remains visible in all modes */
-.theme-option.light .theme-icon {
-	stroke: #555 !important;
+  /* Dark theme icon container has dark background, so icon should be light */
+  .theme-option.dark .theme-icon {
+	stroke: #f3f4f6;
   }
 
 /* New Tab Button - Updated to match Delete button styling */

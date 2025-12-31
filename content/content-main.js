@@ -335,10 +335,8 @@ async function initTabsWithLightningNavigation(tabContainer) {
       settings = result[settingsKey] || {};
     }
 
-    // Check display mode - if floating-only, don't render Setup tabs
-    if (settings.floatingButton && settings.floatingButton.displayMode === 'floating-only') {
-      return;
-    }
+    // Setup tabs always render (they're the core feature)
+    // The floating button location is handled separately
 
     if (!tabsToUse || tabsToUse.length === 0) {
       // If activeProfileId exists, respect empty profiles (don't use defaults)

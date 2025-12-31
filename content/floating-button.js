@@ -139,10 +139,20 @@
         return false;
       }
 
-      if (this.settings.floatingButton.displayMode === 'setup-only') {
-        return false;
+      // Check location setting
+      const location = this.settings.floatingButton.location || 'everywhere';
+      const currentUrl = window.location.href;
+      const isInSetup = currentUrl.includes('/lightning/setup/');
+
+      if (location === 'setup-only') {
+        // Only show in Setup pages
+        return isInSetup;
+      } else if (location === 'outside-setup') {
+        // Only show outside Setup pages
+        return !isInSetup;
       }
 
+      // 'everywhere' or any other value - show everywhere
       return true;
     }
   }
