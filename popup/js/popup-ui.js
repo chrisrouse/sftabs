@@ -816,7 +816,7 @@ function setupDragHandlers(item, clone, dropIndicator, shiftX, shiftY, tabItemWi
       const rect = droppableItem.getBoundingClientRect();
       const middle = rect.top + rect.height / 2;
       const distanceFromMiddle = Math.abs(event.clientY - middle);
-      const threshold = rect.height * 0.15; // 15% of tab height for center zone (30% total)
+      const threshold = rect.height * 0.08; // 8% of tab height for center zone (16% total)
 
       // If we're in the center zone, highlight for dropdown creation
       if (distanceFromMiddle < threshold) {
