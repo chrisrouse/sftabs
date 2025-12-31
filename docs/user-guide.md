@@ -3,34 +3,13 @@ layout: default
 title: User Guide
 ---
 
-# User Guide (Pre-release Documentation)
-
-Learn how to use SF Tabs to customize your Salesforce Setup experience.
-
-## Table of contents
-
-- [Opening the Extension](#opening-the-extension)
-- [Adding a New Tab](#adding-a-new-tab)
-- [Tab Types](#tab-types)
-- [Creating Dropdown Menus](#creating-dropdown-menus)
-  - [Object Manager Dropdowns](#object-manager-dropdowns-automatic)
-  - [Manual Dropdowns](#manual-dropdowns-drag-and-drop)
-  - [Folder-Style Tabs](#folder-style-tabs-menu-containers)
-- [Editing Tabs](#editing-tabs)
-- [Reordering Tabs](#reordering-tabs)
-- [Deleting Tabs](#deleting-tabs)
-- [Keyboard Shortcuts](#keyboard-shortcuts)
-- [Settings](#settings)
-- [Profiles](#profiles)
-- [Import/Export Configuration](#importexport-configuration)
-- [Upgrading to v2.0.0](#upgrading-to-v200-migration-wizard)
-- [Troubleshooting](#troubleshooting)
-
+# User Guide
 
 ## Opening the Extension
 
- **Click the extension icon** in your browser toolbar
- 
+ Click the extension icon in your browser toolbar
+<img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="SF Tabs Icon" style="display: inline; height: 1.2em; vertical-align: middle;"> 
+
 
 ## Adding a New Tab
 
@@ -45,7 +24,7 @@ Learn how to use SF Tabs to customize your Salesforce Setup experience.
    The extension will detect the current page
 
 3. **Click Quick Create button <img src="{{ '/assets/images/icons/quick-add.svg' | relative_url }}" alt="Quick Add" style="display: inline; height: 1.2em; vertical-align: middle;">**
-   A new tab will be created with the page name and URL automatically filled in. Some pages display a different name than you may expect. For example, if you are using Enhanced User List View, the page title is "People" even though it displays "User" on the page. This is expected since the page title is used for the generated tab name.
+   A new tab will be created with the page name and URL automatically filled in. If you are creating a tab outside of Setup, "Object" will be automatically seelcted for the new tab.
 
 ### Method 2: Manual Tab Creation
 
@@ -58,7 +37,7 @@ Learn how to use SF Tabs to customize your Salesforce Setup experience.
    A new tab form will appear
 
 3. **Fill in the tab details**
-   Enter a label and path for your tab (see Tab Types below)
+   Enter a label and path for your tab. See Tab Types below.
 
 4. **Save your tab**
    Click **Save Changes** and your tab will appear in the Setup menu
@@ -75,8 +54,6 @@ Links to standard Salesforce Setup pages. Use the Setup page name as the path.
 **Examples:**
 - `Flows` - Links to Flow Builder
 - `ManageUsersLightning` - Links to Users page
-- `EnhancedProfiles` - Links to Profiles page
-- `PermissionSetListView` - Links to Permission Sets
 
 ### Object Pages
 
@@ -85,6 +62,7 @@ Links to Object Manager pages for standard or custom objects.
 **Examples:**
 - `Account` - Account Object
 - `Custom_Object__c` - Custom Object
+- `My Opportunities` - List View
 
 ### Custom URLs
 
@@ -93,6 +71,21 @@ Links to any Lightning URL path within Salesforce.
 **Examples:**
 - `interaction_explorer/flowExplorer.app` - Flow Trigger Explorer
 - `Opportunity/list?filterName=ClosingNextMonth` - Opportunity "Closing Next Month" list view
+
+## Managing Tabs
+
+1. **Rearranging Tabs**
+   Tabs can be rearranged by using click-and-drag. Click on the drag handle on the left and move the tab to a new position.
+
+2. **Editing Tabs**
+   Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> on a tab to edit the name or URL.
+
+3. **Open in New Tab**
+   Click on the new tab icon <img src="{{ '/assets/images/icons/new-tab.svg' | relative_url }}" alt="New Tab" style="display: inline; height: 1.2em; vertical-align: middle;"> to have your tab open in a new tab. The icon will turn blue to indicate it is enabled.
+
+4. **Delete tabs**
+   Click on the trash can icon <img src="{{ '/assets/images/icons/delete.svg' | relative_url }}" alt="Delete" style="display: inline; height: 1.2em; vertical-align: middle;"> to delete a tab.
+
 
 ## Creating Dropdown Menus
 
