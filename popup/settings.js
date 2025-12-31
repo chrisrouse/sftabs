@@ -15,7 +15,7 @@ async function initSettingsPage() {
 		try {
 			await window.SFTabs.profiles.loadProfiles();
 		} catch (error) {
-			console.warn('Could not load profiles:', error);
+			// Silently handle profile loading errors
 		}
 	}
 

@@ -822,8 +822,6 @@ function createUrlPatternItem(pattern, index) {
  * @returns {Promise<void>}
  */
 async function disableProfilesAndKeepOne(selectedProfile) {
-  console.log('[DEBUG] disableProfilesAndKeepOne: Starting with profile', selectedProfile.name);
-
   const settings = await SFTabs.storage.getUserSettings();
 
   // Set selected profile as active and default
@@ -832,17 +830,13 @@ async function disableProfilesAndKeepOne(selectedProfile) {
   settings.profilesEnabled = false;
   settings.autoSwitchProfiles = false;
 
-  console.log('[DEBUG] Updated settings:', settings);
-
   // Delete all OTHER profiles and their storage
   const profilesToDelete = profilesCache.filter(p => p.id !== selectedProfile.id);
-  console.log('[DEBUG] Profiles to delete:', profilesToDelete.map(p => p.name));
 
   const useSyncStorage = await SFTabs.storage.getStoragePreference();
 
   for (const profile of profilesToDelete) {
     const profileTabsKey = `profile_${profile.id}_tabs`;
-    console.log('[DEBUG] Deleting storage for profile:', profile.name, 'key:', profileTabsKey);
 
     if (useSyncStorage) {
       await SFTabs.storageChunking.clearChunkedSync(profileTabsKey);
@@ -854,17 +848,12 @@ async function disableProfilesAndKeepOne(selectedProfile) {
   // Update cache to only contain selected profile
   profilesCache.length = 0;
   profilesCache.push(selectedProfile);
-  console.log('[DEBUG] Updated profiles cache, length:', profilesCache.length);
 
   // Save the single profile
   await SFTabs.storage.saveProfiles(profilesCache);
-  console.log('[DEBUG] Saved profiles to storage');
 
   // Save updated settings
   await SFTabs.storage.saveUserSettings(settings);
-  console.log('[DEBUG] Saved user settings');
-
-  console.log('[DEBUG] disableProfilesAndKeepOne: Complete');
 }
 
 /**
@@ -874,13 +863,11 @@ async function populateProfileSelect() {
   const keepProfileSelect = document.querySelector('#keep-profile-select-inline');
 
   if (!keepProfileSelect) {
-    console.log('[DEBUG] Inline profile select not found');
     return;
   }
 
   // Reload profiles from storage to ensure fresh data
   await loadProfiles();
-  console.log('[DEBUG] Loaded profiles:', profilesCache.length, profilesCache.map(p => ({ id: p.id, name: p.name })));
 
   // Clear existing options
   keepProfileSelect.innerHTML = '';
@@ -894,11 +881,9 @@ async function populateProfileSelect() {
 
   const settings = await SFTabs.storage.getUserSettings();
   const defaultProfileId = settings.defaultProfileId;
-  console.log('[DEBUG] Default profile ID:', defaultProfileId);
 
   // Use a Set to ensure uniqueness by profile ID
   const uniqueProfiles = Array.from(new Map(profilesCache.map(p => [p.id, p])).values());
-  console.log('[DEBUG] Unique profiles:', uniqueProfiles.length, uniqueProfiles.map(p => ({ id: p.id, name: p.name })));
 
   uniqueProfiles.forEach(profile => {
     const option = document.createElement('option');
@@ -911,10 +896,7 @@ async function populateProfileSelect() {
     }
 
     keepProfileSelect.appendChild(option);
-    console.log('[DEBUG] Added option:', profile.name);
   });
-
-  console.log('[DEBUG] Profile select populated with', keepProfileSelect.options.length, 'options');
 }
 
 /**
@@ -1579,7 +1561,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (SFTabs.migration && SFTabs.migration.checkMigrationStatus) {
     const migrationStatus = await SFTabs.migration.checkMigrationStatus();
     if (migrationStatus.migrationPending || (migrationStatus.needsMigration && !migrationStatus.migrationCompleted)) {
-      console.log('Migration pending - skipping profile initialization');
       return; // Don't initialize profiles if migration is needed
     }
   }

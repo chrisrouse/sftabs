@@ -248,7 +248,6 @@
           panel.style.maxHeight = `${maxHeight}px`;
         }
       } catch (error) {
-        console.error('[SF Tabs Floating] Error in updatePanelDirection', error);
         // Fail gracefully - use default settings
         const panel = this.modal.querySelector('.modal-panel');
         if (panel) {

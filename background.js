@@ -388,12 +388,10 @@ async function checkAndSwitchProfile(url) {
     });
 
     let targetProfile = null;
-    let switchReason = '';
 
     if (matchingProfile) {
       // Found a matching profile
       targetProfile = matchingProfile;
-      switchReason = `matched URL pattern for org: ${orgIdentifier}`;
     } else {
       // No match found - fall back to default profile
       const defaultProfile = profiles.find(p => p.isDefault) ||
@@ -401,7 +399,6 @@ async function checkAndSwitchProfile(url) {
 
       if (defaultProfile) {
         targetProfile = defaultProfile;
-        switchReason = `no URL pattern match, using default profile for org: ${orgIdentifier}`;
       } else {
         return; // No default profile found
       }
@@ -413,8 +410,6 @@ async function checkAndSwitchProfile(url) {
     }
 
     // Switch to the target profile
-    console.log(`Auto-switching to profile: ${targetProfile.name} (${switchReason})`);
-
     settings.activeProfileId = targetProfile.id;
     targetProfile.lastActive = new Date().toISOString();
 
@@ -446,7 +441,7 @@ async function checkAndSwitchProfile(url) {
     });
 
   } catch (error) {
-    console.error('Error in checkAndSwitchProfile:', error);
+    // Silently handle profile switching errors
   }
 }
 

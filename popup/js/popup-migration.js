@@ -25,10 +25,8 @@ async function checkMigrationStatus() {
       migrationPending: migrationPending === true
     };
 
-    console.log('Migration status check:', status);
     return status;
   } catch (error) {
-    console.error('Error checking migration status:', error);
     return {
       currentVersion: '2.0.0',
       storedVersion: null,

@@ -56,10 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Check for pending migration before loading tabs
       if (SFTabs.migration && SFTabs.migration.checkMigrationStatus) {
         const migrationStatus = await SFTabs.migration.checkMigrationStatus();
-        console.log('Migration check result:', migrationStatus);
 
         if (migrationStatus.migrationPending || (migrationStatus.needsMigration && !migrationStatus.migrationCompleted)) {
-          console.log('Migration needed - showing wizard');
 
           // Initialize migration modal event listeners
           if (SFTabs.migration.initMigrationModal) {
@@ -72,13 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           // Don't proceed with normal initialization - let user complete migration
-          console.log('Migration wizard shown - stopping initialization');
           return;
         }
       }
 
       // No migration needed - show main content now
-      console.log('No migration needed - showing main content');
       showMainContent();
 
       // IMPORTANT: Wait for tabs to load before setting up event listeners
