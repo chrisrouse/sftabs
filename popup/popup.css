@@ -425,7 +425,7 @@
   }
 
   .tab-item:hover .drag-handle-dot {
-	background-color: #0064db;
+	background-color: #c2deff;
   }
 
   .drag-handle:active,
@@ -438,7 +438,7 @@
   .drag-handle:active .drag-handle-dot,
   .tab-item.dragging .drag-handle-dot,
   .tab-item.being-dragged .drag-handle-dot {
-	background-color: #0064db;
+	background-color: #c2deff;
   }
 
   [data-theme="dark"] .tab-item {
@@ -468,7 +468,7 @@
   [data-theme="dark"] .drag-handle:active .drag-handle-dot,
   [data-theme="dark"] .tab-item.dragging .drag-handle-dot,
   [data-theme="dark"] .tab-item.being-dragged .drag-handle-dot {
-	background-color: #2563a3;
+	background-color: #7ba9e0;
   }
   
   .tab-info {
