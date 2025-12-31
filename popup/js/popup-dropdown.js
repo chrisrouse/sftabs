@@ -478,19 +478,17 @@ function saveObjectDropdownItemOrder(container) {
 		// Reorder pending items
 		const reorderedItems = newOrder.map(oldIndex => currentTab.pendingDropdownItems[oldIndex]);
 		currentTab.pendingDropdownItems = reorderedItems;
-		// Refresh the display
-		showDropdownPreview(currentTab.pendingDropdownItems);
+		// Don't re-render - DOM is already in correct order from drag operation
+	} else if (currentTab.stagedDropdownItems && currentTab.stagedDropdownItems.length > 0) {
+		// Reorder staged items (user is editing existing dropdown)
+		const reorderedItems = newOrder.map(oldIndex => currentTab.stagedDropdownItems[oldIndex]);
+		currentTab.stagedDropdownItems = reorderedItems;
+		// Don't re-render - DOM is already in correct order from drag operation
 	} else if (currentTab.dropdownItems && currentTab.dropdownItems.length > 0) {
-		// Reorder saved items
+		// Reorder saved items - create staged items first
 		const reorderedItems = newOrder.map(oldIndex => currentTab.dropdownItems[oldIndex]);
-		currentTab.dropdownItems = reorderedItems;
-
-		// Save to storage
-		const tabs = SFTabs.main.getTabs();
-		SFTabs.storage.saveTabs(tabs).then(() => {
-			// Refresh the display
-			showDropdownPreview(currentTab.dropdownItems);
-		});
+		currentTab.stagedDropdownItems = reorderedItems;
+		// Don't re-render - DOM is already in correct order from drag operation
 	}
 }
 
