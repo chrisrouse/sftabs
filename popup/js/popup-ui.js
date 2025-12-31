@@ -1111,12 +1111,24 @@ function setupEventListeners() {
 function showManageDropdownPanelItems(tab) {
   const domElements = SFTabs.main.getDOMElements();
 
+  console.log('DEBUG showManageDropdownPanelItems called:', {
+    tabId: tab.id,
+    tabLabel: tab.label,
+    hasStagedDropdownItems: !!tab.stagedDropdownItems,
+    stagedCount: tab.stagedDropdownItems?.length,
+    hasDropdownItems: !!tab.dropdownItems,
+    dropdownCount: tab.dropdownItems?.length
+  });
+
   if (!domElements.manageDropdownPreview || !domElements.manageDropdownList || !domElements.manageDropdownCount) {
+    console.log('DEBUG: Missing DOM elements for manage dropdown panel');
     return;
   }
 
   // Use staged items if available (during editing), otherwise use actual items
   const items = tab.stagedDropdownItems || tab.dropdownItems || [];
+
+  console.log('DEBUG: Rendering items, count:', items.length);
 
   // Get the label and instructions elements
   const labelElement = document.getElementById('manual-dropdown-label');
@@ -1149,8 +1161,12 @@ function showManageDropdownPanelItems(tab) {
   // Clear existing items
   domElements.manageDropdownList.innerHTML = '';
 
+  console.log('DEBUG: About to render items recursively');
+
   // Render items recursively
   renderDropdownItems(items, domElements.manageDropdownList, tab, 0);
+
+  console.log('DEBUG: Finished rendering, DOM children count:', domElements.manageDropdownList.children.length);
 
   // Show preview
   domElements.manageDropdownPreview.style.display = 'block';
