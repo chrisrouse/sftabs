@@ -1324,6 +1324,13 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
   deleteButton.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('DEBUG: Delete button clicked for item at path:', indexPath);
+    console.log('DEBUG: tab object passed to delete:', {
+      id: tab.id,
+      label: tab.label,
+      hasStagedDropdownItems: !!tab.stagedDropdownItems,
+      stagedCount: tab.stagedDropdownItems?.length
+    });
     deleteDropdownItemByPath(tab, indexPath);
   });
 
