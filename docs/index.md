@@ -73,7 +73,7 @@ title: Home
         <div class="feature-icon mb-3">
           <i class="bi bi-translate display-4 text-primary"></i>
         </div>
-        <h3 class="h5 mb-3">Translations</h3>
+        <h3 class="h5 mb-3">Translations</h3> <span class="badge bg-warning text-dark ms-2" style="font-size: 0.8rem; vertical-align: middle;">Pre-release</span>
         <p class="text-muted mb-3">Help translate SF Tabs into your language and make it accessible to everyone.</p>
         <a href="https://github.com/chrisrouse/sftabs/issues" target="_blank" class="btn btn-outline-primary">Contribute</a>
       </div>
