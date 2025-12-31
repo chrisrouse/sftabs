@@ -113,6 +113,47 @@ h4 { font-size: 1.25rem; }
     opacity: 1;
 }
 
+/* Sidebar sections and collapsible menus */
+.sidebar-section {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-toggle {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--sf-gray-800);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background-color: rgba(40, 138, 255, 0.1);
+    color: var(--sf-brand-primary);
+    text-decoration: none;
+}
+
+.sidebar-toggle i {
+    font-size: 0.875rem;
+    transition: transform 0.2s ease;
+}
+
+.sidebar-section .nav-link {
+    font-size: 0.875rem;
+    padding: 0.4rem 1rem;
+}
+
+.sidebar-section .collapse .nav-link {
+    color: var(--sf-gray-600);
+}
+
+.sidebar-section .collapse .nav-link:hover {
+    color: var(--sf-brand-primary);
+}
+
 /* Main Content */
 .main-content {
     padding-top: 2rem;

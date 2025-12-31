@@ -47,6 +47,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link{% if page.url contains 'new-features' %} active{% endif %}" href="{{ '/new-features' | relative_url }}">
+                            <i class="bi bi-stars me-1"></i>New Features
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link{% if page.url contains 'user-guide' %} active{% endif %}" href="{{ '/user-guide' | relative_url }}">
                             <i class="bi bi-book-fill me-1"></i>User Guide
                         </a>
@@ -68,7 +73,189 @@
             {% if page.url != '/' %}
             <aside class="col-lg-3 col-xl-2 d-none d-lg-block sidebar">
                 <div class="sidebar-sticky">
-                    <h6 class="sidebar-heading">Getting Started</h6>
+                    <h6 class="sidebar-heading">User Guide</h6>
+
+                    <!-- Getting Started -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#gettingStarted" role="button" aria-expanded="true">
+                            <i class="bi bi-chevron-down me-1"></i>Getting Started
+                        </a>
+                        <div class="collapse show" id="gettingStarted">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#opening-the-extension' | relative_url }}">Opening the Extension</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#adding-a-new-tab' | relative_url }}">Adding a New Tab</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#tab-types' | relative_url }}">Tab Types</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown Menus -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#dropdownMenus" role="button" aria-expanded="false">
+                            <i class="bi bi-chevron-right me-1"></i>Dropdown Menus
+                        </a>
+                        <div class="collapse" id="dropdownMenus">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#creating-dropdown-menus' | relative_url }}">Creating Dropdowns</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#object-manager-dropdowns-automatic' | relative_url }}">Object Manager Dropdowns</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#manual-dropdowns-drag-and-drop' | relative_url }}">Manual Dropdowns</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#folder-style-tabs-menu-containers' | relative_url }}">Folder-Style Tabs</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Managing Tabs -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#managingTabs" role="button" aria-expanded="false">
+                            <i class="bi bi-chevron-right me-1"></i>Managing Tabs
+                        </a>
+                        <div class="collapse" id="managingTabs">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#editing-tabs' | relative_url }}">Editing Tabs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#reordering-tabs' | relative_url }}">Reordering Tabs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#deleting-tabs' | relative_url }}">Deleting Tabs</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Keyboard Shortcuts -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#keyboardShortcuts" role="button" aria-expanded="false">
+                            <i class="bi bi-chevron-right me-1"></i>Keyboard Shortcuts
+                        </a>
+                        <div class="collapse" id="keyboardShortcuts">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#keyboard-shortcuts' | relative_url }}">Overview</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#setting-up-shortcuts-in-firefox' | relative_url }}">Firefox Setup</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#setting-up-shortcuts-in-chrome' | relative_url }}">Chrome Setup</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#settings" role="button" aria-expanded="false">
+                            <i class="bi bi-chevron-right me-1"></i>Settings
+                        </a>
+                        <div class="collapse" id="settings">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#settings' | relative_url }}">Settings Overview</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#appearance' | relative_url }}">Appearance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#behavior' | relative_url }}">Behavior</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#sync--storage' | relative_url }}">Sync & Storage</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Profiles -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#profiles" role="button" aria-expanded="false">
+                            <i class="bi bi-chevron-right me-1"></i>Profiles
+                        </a>
+                        <div class="collapse" id="profiles">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#profiles' | relative_url }}">Profiles Overview</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#enabling-profiles' | relative_url }}">Enabling Profiles</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#creating-a-new-profile' | relative_url }}">Creating Profiles</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#switching-between-profiles' | relative_url }}">Switching Profiles</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#managing-profiles' | relative_url }}">Managing Profiles</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Import/Export -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#importExport" role="button" aria-expanded="false">
+                            <i class="bi bi-chevron-right me-1"></i>Import/Export
+                        </a>
+                        <div class="collapse" id="importExport">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#importexport-configuration' | relative_url }}">Import/Export Overview</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#export-configuration' | relative_url }}">Export Configuration</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#import-configuration' | relative_url }}">Import Configuration</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Upgrading -->
+                    <div class="sidebar-section">
+                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#upgrading" role="button" aria-expanded="false">
+                            <i class="bi bi-chevron-right me-1"></i>Upgrading to v2.0
+                        </a>
+                        <div class="collapse" id="upgrading">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#upgrading-to-v200-migration-wizard' | relative_url }}">Migration Wizard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#whats-being-migrated' | relative_url }}">What's Being Migrated</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/user-guide#after-migration' | relative_url }}">After Migration</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Troubleshooting -->
+                    <div class="sidebar-section">
+                        <a class="nav-link" href="{{ '/user-guide#troubleshooting' | relative_url }}">
+                            <i class="bi bi-wrench me-2"></i>Troubleshooting
+                        </a>
+                    </div>
+
+                    <!-- Other Pages -->
+                    <h6 class="sidebar-heading mt-4">Other Pages</h6>
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">
@@ -85,37 +272,14 @@
                                 <i class="bi bi-stars me-2"></i>New Features
                             </a>
                         </li>
-                    </ul>
-
-                    <h6 class="sidebar-heading mt-4">Documentation</h6>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link{% if page.url contains 'user-guide' %} active{% endif %}" href="{{ '/user-guide' | relative_url }}">
-                                <i class="bi bi-book me-2"></i>User Guide
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ '/user-guide#upgrading-to-v200-migration-wizard' | relative_url }}">
-                                <i class="bi bi-arrow-up-circle me-2"></i>Upgrading to v2.0.0
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link{% if page.url contains 'configuration' %} active{% endif %}" href="{{ '/configuration' | relative_url }}">
                                 <i class="bi bi-file-code me-2"></i>Configuration
                             </a>
                         </li>
-                    </ul>
-
-                    <h6 class="sidebar-heading mt-4">Resources</h6>
-                    <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link" href="https://github.com/chrisrouse/sftabs" target="_blank">
-                                <i class="bi bi-github me-2"></i>GitHub Repository
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="https://github.com/chrisrouse/sftabs/issues" target="_blank">
-                                <i class="bi bi-bug me-2"></i>Report an Issue
+                                <i class="bi bi-github me-2"></i>GitHub
                             </a>
                         </li>
                     </ul>
@@ -159,5 +323,35 @@
     <!-- Syntax highlighting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
+
+    <!-- Sidebar collapse toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle sidebar toggle chevron icons
+            const toggles = document.querySelectorAll('.sidebar-toggle');
+            toggles.forEach(toggle => {
+                const target = toggle.getAttribute('href');
+                const collapseElement = document.querySelector(target);
+
+                if (collapseElement) {
+                    collapseElement.addEventListener('show.bs.collapse', function() {
+                        const icon = toggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('bi-chevron-right');
+                            icon.classList.add('bi-chevron-down');
+                        }
+                    });
+
+                    collapseElement.addEventListener('hide.bs.collapse', function() {
+                        const icon = toggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('bi-chevron-down');
+                            icon.classList.add('bi-chevron-right');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
