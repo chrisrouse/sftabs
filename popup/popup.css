@@ -489,11 +489,13 @@
   
   /* Drop indicator */
   .drop-indicator {
-	height: 2px;
+	height: 4px;
 	background-color: var(--slds-brand-primary);
 	margin-bottom: 8px;
 	display: none;
 	animation: pulse 1.5s infinite;
+	box-shadow: 0 0 4px rgba(0, 112, 210, 0.6);
+	border-radius: 2px;
   }
   
   @keyframes pulse {
