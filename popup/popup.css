@@ -1,6 +1,6 @@
 /* Salesforce Lightning Design System Colors - Only used variables */
 :root {
-	/* Core colors used in the UI */
+	/* ===== SLDS Base Colors ===== */
 	--slds-brand-primary: #288aff; /* Used for primary buttons, active states */
 	--slds-brand-secondary: #1a6ee6; /* Used for hover states */
 	--slds-gray-1: #FFFFFF; /* White backgrounds */
@@ -10,44 +10,142 @@
 	--slds-gray-5: #A8A8A8; /* Icon fills */
 	--slds-gray-6: #747474; /* Secondary text */
 	--slds-gray-7: #444444; /* Primary text */
-	
+
 	/* Functional colors that are actually used */
 	--slds-color-error: #C23934; /* Used for error states and delete buttons */
 	--slds-color-success: #04844B; /* Used for object badges */
 	--slds-color-custom: #9061F9; /* Used for custom URL badges */
-	
-	/* Theme variables that are actually referenced in the code */
-	--color-background: var(--slds-gray-2);
+
+	/* ===== Surface Elevation System (Material Design 3 inspired) ===== */
+	--surface-base: #F3F3F3;        /* Main background */
+	--surface-1: #FFFFFF;           /* Cards, panels */
+	--surface-2: #FFFFFF;           /* Elevated cards */
+	--surface-3: #FFFFFF;           /* Highest elevation (modals) */
+
+	/* ===== Border System (Tailwind inspired) ===== */
+	--border-subtle: #E5E5E5;       /* Barely visible borders */
+	--border-medium: #D3D3D3;       /* Standard dividers */
+	--border-strong: #A8A8A8;       /* Emphasized borders */
+
+	/* ===== Shadow System (Material Design 3 + Tailwind) ===== */
+	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+	/* ===== Interactive Colors ===== */
+	--color-primary: #288aff;
+	--color-primary-hover: #0176d3;
+	--color-primary-active: #014486;
+	--color-success: #04844B;
+	--color-error: #C23934;
+
+	/* ===== State Layers (Material Design 3) ===== */
+	--state-hover: rgba(0, 0, 0, 0.04);
+	--state-pressed: rgba(0, 0, 0, 0.08);
+	--state-focus: rgba(40, 138, 255, 0.12);
+	--state-hover-primary: rgba(40, 138, 255, 0.12);
+	--state-hover-primary-light: rgba(194, 222, 255, 0.3);  /* Light blue from drag handle */
+	--state-hover-primary-dark: rgba(15, 124, 255, 0.15);   /* Darker blue from drag handle */
+	--state-hover-error: rgba(194, 57, 52, 0.12);
+
+	/* ===== Focus Ring ===== */
+	--focus-ring: 0 0 0 3px rgba(40, 138, 255, 0.3);
+
+	/* ===== Selection Colors ===== */
+	--selection-bg: rgba(40, 138, 255, 0.3);
+	--selection-text: inherit;
+
+	/* ===== Semantic Theme Colors ===== */
+	--color-background: var(--surface-base);
 	--color-text: var(--slds-gray-7);
 	--color-text-weak: var(--slds-gray-6);
-	--color-border: var(--slds-gray-3);
+	--color-border: var(--border-subtle);
 	--color-input-background: var(--slds-gray-2);
 	--color-header: var(--slds-brand-primary);
 	--color-header-text: var(--slds-gray-1);
-	--color-section-header: var(--slds-gray-3);
-	--color-item-background: var(--slds-gray-1);
+	--color-section-header: var(--surface-1);
+	--color-item-background: var(--surface-1);
 	--color-toggle-background: var(--slds-gray-4);
-	--color-modal-overlay: rgba(0, 0, 0, 0.7);
+	--color-modal-overlay: rgba(0, 0, 0, 0.5);
 	--color-icon-fill: var(--slds-gray-5);
+
+	/* ===== Component Colors ===== */
+	--color-drag-handle-bg: #c2deff;
+	--color-drag-handle-dot: #0f7cff;
+	--color-drag-handle-hover-bg: #0f7cff;
+	--color-drag-handle-hover-dot: #c2deff;
   }
-  
-  /* Dark Theme - Only needed overrides */
+
+  /* ===== Dark Theme (Tailwind + Material Design 3 inspired) ===== */
   [data-theme="dark"] {
-	--color-background: #1A1C21;
-	--color-text: #FFFFFF;
-	--color-text-weak: #CCCCCC;
-	--color-border: #444444;
-	--color-input-background: #2A2C35;
-	--color-header: #1a6ee6;
-	--color-header-text: #FFFFFF;
-	--color-section-header: #2A2C35;
-	--color-item-background: #2A2C35;
+	/* Surface Elevation - Material Design 3 tones */
+	--surface-base: #1C1B1F;        /* Base (slightly warm gray) */
+	--surface-1: #28272C;           /* 1st elevation (+5% white) */
+	--surface-2: #33323A;           /* 2nd elevation (+8% white) */
+	--surface-3: #3E3D47;           /* 3rd elevation (+11% white) */
+
+	/* Softer Text Colors - Tailwind gray-100/400/500 */
+	--color-text: #f3f4f6;          /* Softer than pure white */
+	--color-text-weak: #9ca3af;     /* Better hierarchy */
+	--color-text-weaker: #6b7280;   /* Even more subtle */
+
+	/* Transparent Borders - Both frameworks use alpha transparency */
+	--border-subtle: rgba(255, 255, 255, 0.08);
+	--border-medium: rgba(255, 255, 255, 0.12);
+	--border-strong: rgba(255, 255, 255, 0.2);
+
+	/* Enhanced Shadows - Darker, more pronounced in dark mode */
+	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+	--shadow-glow: 0 0 0 1px rgba(255, 255, 255, 0.05);  /* Subtle edge highlight */
+
+	/* Brighter Interactive Colors - Both frameworks brighten in dark mode */
+	--color-primary: #5fa3ff;        /* +30% lightness */
+	--color-primary-hover: #78b3ff;  /* Even brighter on hover */
+	--color-primary-active: #91c3ff; /* Brightest when pressed */
+	--color-success: #45C65A;        /* Brighter success */
+	--color-error: #FF6B6B;          /* Brighter error */
+
+	/* State Layers - More transparent overlays in dark mode */
+	--state-hover: rgba(255, 255, 255, 0.08);
+	--state-pressed: rgba(255, 255, 255, 0.12);
+	--state-focus: rgba(95, 163, 255, 0.16);
+	--state-hover-primary: rgba(95, 163, 255, 0.16);
+	--state-hover-primary-light: rgba(90, 143, 212, 0.25);  /* Light blue from dark drag handle */
+	--state-hover-primary-dark: rgba(61, 122, 184, 0.2);    /* Darker blue from dark drag handle */
+	--state-hover-error: rgba(255, 107, 107, 0.16);
+
+	/* Focus Ring - Brighter in dark mode */
+	--focus-ring: 0 0 0 3px rgba(95, 163, 255, 0.4);
+
+	/* Selection Colors - Brighter selection in dark mode */
+	--selection-bg: rgba(95, 163, 255, 0.4);
+	--selection-text: var(--color-text);
+
+	/* Semantic Theme Colors - Using new surface system */
+	--color-background: var(--surface-base);
+	--color-border: var(--border-medium);
+	--color-input-background: var(--surface-1);
+	--color-header: var(--surface-2);
+	--color-header-text: var(--color-text);
+	--color-section-header: var(--surface-1);
+	--color-item-background: var(--surface-1);
 	--color-toggle-background: #555555;
+	--color-modal-overlay: rgba(0, 0, 0, 0.8);  /* Darker overlay */
 	--color-icon-fill: #AAAAAA;
-	
-	/* Functional color overrides used in dark mode */
-	--slds-color-success: #45C65A;
-	--slds-color-error: #FF5252;
+
+	/* Component Dark Mode Colors */
+	--color-drag-handle-bg: #5a8fd4;
+	--color-drag-handle-dot: #3d7ab8;
+	--color-drag-handle-hover-bg: #3d7ab8;
+	--color-drag-handle-hover-dot: #5a8fd4;
+
+	/* Functional color overrides */
+	--slds-color-success: var(--color-success);
+	--slds-color-error: var(--color-error);
   }
   
   /* Global styles */
@@ -319,13 +417,13 @@
 	position: relative;
 	min-height: 36px;
 	align-items: flex-start;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+	box-shadow: var(--shadow-sm);
 	transition: all 0.2s ease;
 	overflow: hidden;
   }
 
   .tab-item:hover:not(.dragging):not(.being-dragged) {
-	box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+	box-shadow: var(--shadow-md);
 	transform: translateY(-1px);
   }
   
@@ -399,7 +497,7 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	background-color: #c2deff;
+	background-color: var(--color-drag-handle-bg);
 	border-radius: 6px 0 0 6px;
 	cursor: grab;
 	transition: background-color 0.2s ease;
@@ -415,61 +513,32 @@
   .drag-handle-dot {
 	width: 4px;
 	height: 4px;
-	background-color: #0f7cff;
+	background-color: var(--color-drag-handle-dot);
 	border-radius: 50%;
 	transition: background-color 0.2s ease;
   }
 
   .tab-item:hover .drag-handle {
-	background-color: #0f7cff;
+	background-color: var(--color-drag-handle-hover-bg);
   }
 
   .tab-item:hover .drag-handle-dot {
-	background-color: #c2deff;
+	background-color: var(--color-drag-handle-hover-dot);
   }
 
   .drag-handle:active,
   .tab-item.dragging .drag-handle,
   .tab-item.being-dragged .drag-handle {
-	background-color: #0f7cff;
+	background-color: var(--color-drag-handle-hover-bg);
 	cursor: grabbing;
   }
 
   .drag-handle:active .drag-handle-dot,
   .tab-item.dragging .drag-handle-dot,
   .tab-item.being-dragged .drag-handle-dot {
-	background-color: #c2deff;
+	background-color: var(--color-drag-handle-hover-dot);
   }
 
-  [data-theme="dark"] .tab-item {
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
-
-  [data-theme="dark"] .tab-item:hover:not(.dragging):not(.being-dragged) {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  }
-
-  [data-theme="dark"] .drag-handle {
-	background-color: #7ba9e0;
-  }
-
-  [data-theme="dark"] .drag-handle-dot {
-	background-color: #3d7ab8;
-  }
-
-  [data-theme="dark"] .tab-item:hover .drag-handle,
-  [data-theme="dark"] .drag-handle:active,
-  [data-theme="dark"] .tab-item.dragging .drag-handle,
-  [data-theme="dark"] .tab-item.being-dragged .drag-handle {
-	background-color: #3d7ab8;
-  }
-
-  [data-theme="dark"] .tab-item:hover .drag-handle-dot,
-  [data-theme="dark"] .drag-handle:active .drag-handle-dot,
-  [data-theme="dark"] .tab-item.dragging .drag-handle-dot,
-  [data-theme="dark"] .tab-item.being-dragged .drag-handle-dot {
-	background-color: #7ba9e0;
-  }
   
   .tab-info {
 	flex: 1;
@@ -613,7 +682,7 @@
   }
   
   .delete-button:hover {
-	background-color: var(--color-border);
+	background-color: var(--state-hover-error);
   }
   
   .delete-button svg {
@@ -623,7 +692,7 @@
   }
   
   .delete-button:hover svg path {
-	fill: var(--slds-color-error);
+	fill: var(--color-error);
   }
 
   /* Edit Button */
@@ -645,7 +714,7 @@
   }
 
   .edit-button:hover {
-	background-color: var(--color-border);
+	background-color: var(--state-hover-primary-dark);
   }
 
   .edit-button svg {
@@ -655,7 +724,7 @@
   }
 
   .edit-button:hover svg {
-	stroke: var(--slds-brand-primary);
+	stroke: var(--color-primary);
   }
 
   /* Forms */
@@ -812,7 +881,7 @@
   }
   
   .primary-button {
-	background-color: var(--slds-brand-primary);
+	background-color: var(--color-primary);
 	color: white;
 	border: none;
 	border-radius: 4px;
@@ -822,9 +891,13 @@
 	cursor: pointer;
 	transition: background-color 0.2s;
   }
-  
+
   .primary-button:hover {
-	background-color: var(--slds-brand-secondary);
+	background-color: var(--color-primary-hover);
+  }
+
+  .primary-button:active {
+	background-color: var(--color-primary-active);
   }
   
   .secondary-button {
@@ -936,11 +1009,12 @@
   }
   
   .modal-content {
-	background-color: var(--color-background);
+	background-color: var(--surface-3);
 	border-radius: 8px;
 	max-width: 90%;
 	width: 300px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	border: 1px solid var(--border-medium);
+	box-shadow: var(--shadow-xl);
 	animation: modalFadeIn 0.3s;
   }
   
@@ -992,13 +1066,11 @@
 
   /* Enhanced Modal Styles for Dark Mode */
 [data-theme="dark"] .modal {
-	background-color: rgba(0, 0, 0, 0.85); /* Darker, more opaque overlay */
+	background-color: var(--color-modal-overlay);
   }
-  
+
   [data-theme="dark"] .modal-content {
-	background-color: #1E2128; /* Darker background */
-	border: 1px solid #444; /* Visible border */
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
+	box-shadow: var(--shadow-xl), var(--shadow-glow);
   }
   
   [data-theme="dark"] .modal-header {
@@ -1544,7 +1616,7 @@
 }
 
 .new-tab-button:hover {
-  background-color: var(--color-border);
+  background-color: var(--state-hover-primary-dark);
 }
 
 .new-tab-button svg {
@@ -1557,15 +1629,15 @@
 
 /* New tab enabled state (opens in new tab) */
 .new-tab-button.new-tab-enabled svg {
-  stroke: var(--slds-brand-primary);
+  stroke: var(--color-primary);
 }
 
 .new-tab-button.new-tab-enabled:hover svg {
-  stroke: white;
+  stroke: var(--color-primary);
 }
 
 .new-tab-button.new-tab-enabled:hover {
-  background-color: var(--slds-brand-primary);
+  background-color: var(--state-hover-primary-dark);
 }
 
 /* New tab disabled state (opens in same tab) */
@@ -1578,7 +1650,7 @@
 }
 
 .new-tab-button.new-tab-disabled:hover {
-  background-color: var(--color-border);
+  background-color: var(--state-hover-primary-dark);
 }
 
 /* Action Panel Button */
@@ -1855,3 +1927,88 @@
 .list-action-button.default.active:hover {
   background: #236e3a !important;
 }
+
+/* ===== Accessibility Enhancements (Material Design 3 inspired) ===== */
+
+/* Reduced motion support - Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+	animation-duration: 0.01ms !important;
+	animation-iteration-count: 1 !important;
+	transition-duration: 0.01ms !important;
+	scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast support - Enhance visibility when user prefers more contrast */
+@media (prefers-contrast: more) {
+  [data-theme="dark"] {
+	--color-text: #FFFFFF;
+	--color-text-weak: #E0E0E0;
+	--border-medium: rgba(255, 255, 255, 0.3);
+	--border-strong: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* ===== Enhanced Focus States (Material Design 3 inspired) ===== */
+
+/* Focus-visible for keyboard navigation - combines shadow with ring */
+.tab-item:focus-visible,
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.action-button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-md), var(--focus-ring);
+}
+
+/* Tab items need special handling to maintain hover shadow */
+.tab-item:focus-visible:hover {
+  box-shadow: var(--shadow-md), var(--focus-ring);
+}
+
+/* Settings navigation focus */
+.settings-nav-item:focus-visible {
+  outline: none;
+  box-shadow: inset var(--focus-ring);
+}
+
+/* Profile dropdown items focus */
+.profile-item:focus-visible {
+  outline: none;
+  box-shadow: inset var(--focus-ring);
+}
+
+/* ===== Custom Selection Colors (Tailwind inspired) ===== */
+
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* ===== State Layers for Hover/Press (Material Design 3) ===== */
+
+/* Optional: Add state layer pattern that can be used with ::before or ::after */
+/* Example usage in components that want the overlay effect:
+   .component::before {
+     content: '';
+     position: absolute;
+     inset: 0;
+     background: var(--state-hover);
+     border-radius: inherit;
+     opacity: 0;
+     transition: opacity 0.2s;
+   }
+   .component:hover::before {
+     opacity: 1;
+   }
+*/
