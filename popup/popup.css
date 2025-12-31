@@ -487,23 +487,6 @@
 	align-self: flex-start;
   }
   
-  /* Drop indicator */
-  .drop-indicator {
-	height: 4px;
-	background-color: var(--slds-brand-primary);
-	margin-bottom: 8px;
-	display: none;
-	animation: pulse 1.5s infinite;
-	box-shadow: 0 0 4px rgba(0, 112, 210, 0.6);
-	border-radius: 2px;
-  }
-  
-  @keyframes pulse {
-	0% { opacity: 0.4; }
-	50% { opacity: 1; }
-	100% { opacity: 0.4; }
-  }
-  
   /* Toggle Switch */
   .new-tab-toggle {
 	display: inline-block;
