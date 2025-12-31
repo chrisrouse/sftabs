@@ -306,9 +306,10 @@ function handleNavigationMessage(request, sender, sendResponse) {
 
       return true; // Keep message channel open for async response
     } else {
+      const objectName = getObjectNameFromUrl() || 'the object';
       sendResponse({
         success: false,
-        error: 'Not an ObjectManager page'
+        error: `Go to ${objectName} in Setup to refresh the list`
       });
     }
   } else if (request.action === 'navigate_to_url') {
