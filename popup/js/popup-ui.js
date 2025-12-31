@@ -598,32 +598,20 @@ function saveTabForm() {
   // Check if there are staged changes to apply
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
 
-  // DEBUG: Log the state
-  console.log('DEBUG saveTabForm:', {
-    hasCurrentActionPanelTab: !!currentActionPanelTab,
-    hasStagedItems: currentActionPanelTab?.stagedDropdownItems !== undefined,
-    stagedItemsCount: currentActionPanelTab?.stagedDropdownItems?.length,
-    hasPendingItems: !!currentActionPanelTab?.pendingDropdownItems,
-    hasExistingItems: !!tab.dropdownItems
-  });
-
   // Apply dropdown items in priority order:
   // 1. stagedDropdownItems (manual edits/deletions) - highest priority
   // 2. pendingDropdownItems (from Object Dropdown setup)
   // 3. existing dropdownItems (no changes)
   if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems !== undefined) {
     // Staged items from manual edits (removing, reordering) take precedence
-    console.log('DEBUG: Using stagedDropdownItems, count:', currentActionPanelTab.stagedDropdownItems.length);
     tabData.dropdownItems = JSON.parse(JSON.stringify(currentActionPanelTab.stagedDropdownItems));  // Make a deep copy
     tabData.hasDropdown = currentActionPanelTab.stagedDropdownItems.length > 0;
   } else if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
     // Pending items from Object Dropdown setup
-    console.log('DEBUG: Using pendingDropdownItems');
     tabData.hasDropdown = true;
     tabData.dropdownItems = currentActionPanelTab.pendingDropdownItems;
   } else if (tab.dropdownItems) {
     // No changes, preserve existing dropdown items
-    console.log('DEBUG: Using existing dropdownItems');
     tabData.dropdownItems = tab.dropdownItems;
     tabData.hasDropdown = tab.dropdownItems.length > 0;
   }
@@ -1111,24 +1099,12 @@ function setupEventListeners() {
 function showManageDropdownPanelItems(tab) {
   const domElements = SFTabs.main.getDOMElements();
 
-  console.log('DEBUG showManageDropdownPanelItems called:', {
-    tabId: tab.id,
-    tabLabel: tab.label,
-    hasStagedDropdownItems: !!tab.stagedDropdownItems,
-    stagedCount: tab.stagedDropdownItems?.length,
-    hasDropdownItems: !!tab.dropdownItems,
-    dropdownCount: tab.dropdownItems?.length
-  });
-
   if (!domElements.manageDropdownPreview || !domElements.manageDropdownList || !domElements.manageDropdownCount) {
-    console.log('DEBUG: Missing DOM elements for manage dropdown panel');
     return;
   }
 
   // Use staged items if available (during editing), otherwise use actual items
   const items = tab.stagedDropdownItems || tab.dropdownItems || [];
-
-  console.log('DEBUG: Rendering items, count:', items.length);
 
   // Get the label and instructions elements
   const labelElement = document.getElementById('manual-dropdown-label');
@@ -1161,12 +1137,8 @@ function showManageDropdownPanelItems(tab) {
   // Clear existing items
   domElements.manageDropdownList.innerHTML = '';
 
-  console.log('DEBUG: About to render items recursively');
-
   // Render items recursively
   renderDropdownItems(items, domElements.manageDropdownList, tab, 0);
-
-  console.log('DEBUG: Finished rendering, DOM children count:', domElements.manageDropdownList.children.length);
 
   // Show preview
   domElements.manageDropdownPreview.style.display = 'block';
@@ -1340,13 +1312,6 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
   deleteButton.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('DEBUG: Delete button clicked for item at path:', indexPath);
-    console.log('DEBUG: tab object passed to delete:', {
-      id: tab.id,
-      label: tab.label,
-      hasStagedDropdownItems: !!tab.stagedDropdownItems,
-      stagedCount: tab.stagedDropdownItems?.length
-    });
     deleteDropdownItemByPath(tab, indexPath);
   });
 
@@ -1499,40 +1464,23 @@ function deleteDropdownItemByPath(parentTab, indexPath) {
 
   // Work with staged items only - don't save yet
   const stagedItems = parentTab.stagedDropdownItems || [];
-
-  console.log('DEBUG deleteDropdownItemByPath:', {
-    parentTabId: parentTab.id,
-    indexPath,
-    stagedItemsCount: stagedItems.length,
-    hasStagedDropdownItems: !!parentTab.stagedDropdownItems
-  });
-
   const item = getItemByPath(stagedItems, indexPath);
 
   if (!item) {
-    console.log('DEBUG: Item not found at path:', indexPath);
     SFTabs.main.showStatus('Dropdown item not found', true);
     return;
   }
-
-  console.log('DEBUG: Found item to delete:', item.label);
 
   // Check if user wants to skip confirmation
   const userSettings = SFTabs.main.getUserSettings ? SFTabs.main.getUserSettings() : {};
   const skipConfirmation = userSettings.skipDeleteConfirmation;
 
   const performDelete = () => {
-    console.log('DEBUG: Before removeItemByPath, count:', stagedItems.length);
-
     // Remove the item from staged items
     removeItemByPath(stagedItems, indexPath);
 
-    console.log('DEBUG: After removeItemByPath, count:', stagedItems.length);
-
     // Update the staged items array
     parentTab.stagedDropdownItems = stagedItems;
-
-    console.log('DEBUG: Updated parentTab.stagedDropdownItems, count:', parentTab.stagedDropdownItems.length);
 
     SFTabs.main.showStatus(`"${item.label}" will be deleted when you click Save`);
 

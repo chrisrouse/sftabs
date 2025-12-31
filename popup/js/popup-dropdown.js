@@ -35,7 +35,8 @@ async function setupObjectDropdown() {
 		if (response && response.success && navigationItems && navigationItems.length > 0) {
 			// Check if the current page is an ObjectManager page
 			if (!response.pageInfo || response.pageInfo.type !== 'objectManager') {
-				throw new Error('Current page is not an Object Manager page. Please navigate to an Object Manager page before setting up the dropdown.');
+				const objectName = response.objectName || response.pageInfo?.objectName || 'the object';
+				throw new Error(`Go to ${objectName} in Setup to refresh the list.`);
 			}
 
 			// Get all tabs
