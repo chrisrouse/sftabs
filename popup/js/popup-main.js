@@ -399,6 +399,17 @@ function showActionPanel(tab) {
   // Store the current tab context
   currentActionPanelTab = tab;
 
+  // Initialize staged dropdown items for editing
+  // This allows users to delete/modify dropdown items without saving until they click Save
+  if (!tab._isDropdownItemEdit) {
+    // Only create staged items for main tab editing, not dropdown item editing
+    if (tab.dropdownItems && tab.dropdownItems.length > 0) {
+      tab.stagedDropdownItems = JSON.parse(JSON.stringify(tab.dropdownItems));
+    } else {
+      tab.stagedDropdownItems = [];
+    }
+  }
+
   // Update the panel content with tab information
   updateActionPanelContent(tab);
 

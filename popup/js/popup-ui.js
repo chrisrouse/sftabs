@@ -598,20 +598,32 @@ function saveTabForm() {
   // Check if there are staged changes to apply
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
 
+  // DEBUG: Log the state
+  console.log('DEBUG saveTabForm:', {
+    hasCurrentActionPanelTab: !!currentActionPanelTab,
+    hasStagedItems: currentActionPanelTab?.stagedDropdownItems !== undefined,
+    stagedItemsCount: currentActionPanelTab?.stagedDropdownItems?.length,
+    hasPendingItems: !!currentActionPanelTab?.pendingDropdownItems,
+    hasExistingItems: !!tab.dropdownItems
+  });
+
   // Apply dropdown items in priority order:
   // 1. stagedDropdownItems (manual edits/deletions) - highest priority
   // 2. pendingDropdownItems (from Object Dropdown setup)
   // 3. existing dropdownItems (no changes)
   if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems !== undefined) {
     // Staged items from manual edits (removing, reordering) take precedence
-    tabData.dropdownItems = currentActionPanelTab.stagedDropdownItems;
+    console.log('DEBUG: Using stagedDropdownItems, count:', currentActionPanelTab.stagedDropdownItems.length);
+    tabData.dropdownItems = JSON.parse(JSON.stringify(currentActionPanelTab.stagedDropdownItems));  // Make a deep copy
     tabData.hasDropdown = currentActionPanelTab.stagedDropdownItems.length > 0;
   } else if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
     // Pending items from Object Dropdown setup
+    console.log('DEBUG: Using pendingDropdownItems');
     tabData.hasDropdown = true;
     tabData.dropdownItems = currentActionPanelTab.pendingDropdownItems;
   } else if (tab.dropdownItems) {
     // No changes, preserve existing dropdown items
+    console.log('DEBUG: Using existing dropdownItems');
     tabData.dropdownItems = tab.dropdownItems;
     tabData.hasDropdown = tab.dropdownItems.length > 0;
   }
