@@ -5,11 +5,8 @@
  * Setup Object Dropdown - Parse navigation from current page
  */
 async function setupObjectDropdown() {
-	console.log('[setupObjectDropdown] Called');
-
 	// Get UI elements from the tab-form
 	const setupDropdownButton = document.querySelector('#object-dropdown-section #setup-dropdown-button');
-	console.log('[setupObjectDropdown] Button found:', !!setupDropdownButton);
 
 	if (!setupDropdownButton) {
 		console.error('[setupObjectDropdown] Could not find setup dropdown button');
@@ -115,12 +112,8 @@ async function setupObjectDropdown() {
 				// Store the pending dropdown items in a temporary property on the current tab reference
 				// This will be saved when the user clicks Save in the tab-form
 				const actionPanelTab = SFTabs.main.getCurrentActionPanelTab();
-				console.log('[setupObjectDropdown] actionPanelTab:', actionPanelTab);
-				console.log('[setupObjectDropdown] actionPanelTab ID:', actionPanelTab ? actionPanelTab.id : 'null');
-				console.log('[setupObjectDropdown] Storing', navigationItems.length, 'items in pendingDropdownItems');
 				if (actionPanelTab) {
 					actionPanelTab.pendingDropdownItems = navigationItems;
-					console.log('[setupObjectDropdown] Stored successfully. pendingDropdownItems length:', actionPanelTab.pendingDropdownItems.length);
 				} else {
 					console.error('[setupObjectDropdown] No actionPanelTab found!');
 				}
