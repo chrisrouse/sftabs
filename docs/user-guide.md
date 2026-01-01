@@ -17,7 +17,6 @@ title: User Guide
 ### Method 1: Quick Add from Current Page
 
 <img width="402" height="52" alt="Screenshot 2025-12-26 at 7 30 40 AM" src="https://github.com/user-attachments/assets/c3075e90-23b8-4e4b-b6a3-0d13664d7d76" />
-<img width="412" height="539" alt="2026-01-01_09-55-57" src="https://github.com/user-attachments/assets/8dc84577-7d12-4c1e-93f6-b11b4afed5a1" />
 
 
 1. **Navigate to a Salesforce Setup page**
@@ -31,7 +30,7 @@ title: User Guide
 
 ### Method 2: Manual Tab Creation
 
-<img width="412" height="539" alt="2026-01-01_09-55-57" src="https://github.com/user-attachments/assets/7301b3b9-17ce-47cb-81e1-73b5109f923f" />
+<img width="412" height="539" alt="2026-01-01_09-55-57" src="https://github.com/user-attachments/assets/8dc84577-7d12-4c1e-93f6-b11b4afed5a1" />
 
 1. **Open the extension popup**
    Click the SF Tabs icon in your browser toolbar
@@ -79,8 +78,8 @@ Links to any Lightning URL path within Salesforce.
 
 1. **Rearranging Tabs**
    Tabs can be rearranged by using click-and-drag. Click on the drag handle on the left and move the tab to a new position.
-
-   <img width="412" height="325" alt="2025-12-31_14-51-35" src="https://github.com/user-attachments/assets/c2c15bef-c978-44c4-bcc0-b194f43e9cf0" />
+   
+   <img width="412" height="295" alt="2025-12-31_15-01-04" src="https://github.com/user-attachments/assets/9d53fb55-e981-4e0f-b39f-9bed2e1d6f92" />
 
 3. **Editing Tabs**
    Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> on a tab to edit the name or URL.
@@ -182,9 +181,7 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 1. Click on the tab name to see the items included in the dropdown
 
-<img width="405" height="58" alt="Screenshot 2025-12-26 at 7 58 33 AM" src="https://github.com/user-attachments/assets/db754a22-d09a-4641-aee7-3ecb425161cc" />
-
-<img width="356" height="108" alt="Screenshot 2025-12-25 at 1 14 49 PM" src="https://github.com/user-attachments/assets/6c565416-8075-4109-a7bf-d6cf3b7f9cc2" />
+<img width="412" height="258" alt="2026-01-01_10-21-09" src="https://github.com/user-attachments/assets/d906b9ff-db33-4bc3-8816-51f69e6dc0e9" />
 
 
 #### Reordering Items in a Dropdown
