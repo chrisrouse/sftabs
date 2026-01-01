@@ -831,6 +831,26 @@ window.SFTabs.main = {
 
   // Controlled state setters
   setTabs: (tabs) => {
+    // If there's a current action panel tab being edited, preserve its temporary editing state
+    // This is critical because cleanTabForStorage creates new tab objects, breaking references
+    if (currentActionPanelTab) {
+      const oldTab = currentActionPanelTab;
+      const newTab = tabs.find(t => t.id === oldTab.id);
+      if (newTab) {
+        // Preserve temporary editing properties that haven't been saved yet
+        if (oldTab.pendingDropdownItems !== undefined) {
+          newTab.pendingDropdownItems = oldTab.pendingDropdownItems;
+        }
+        if (oldTab.stagedDropdownItems !== undefined) {
+          newTab.stagedDropdownItems = oldTab.stagedDropdownItems;
+        }
+        if (oldTab.stagedPromotions !== undefined) {
+          newTab.stagedPromotions = oldTab.stagedPromotions;
+        }
+        // Update the reference to point to the new tab object
+        currentActionPanelTab = newTab;
+      }
+    }
     customTabs = tabs;
   },
   setEditingTabId: (id) => {
