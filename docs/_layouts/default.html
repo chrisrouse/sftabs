@@ -75,6 +75,18 @@
                 <div class="sidebar-sticky">
                     <h6 class="sidebar-heading">User Guide</h6>
 
+                    <!-- Search Bar -->
+                    <div class="sidebar-search">
+                        <div class="search-input-wrapper">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" id="sidebarSearch" class="form-control" placeholder="Search guide..." autocomplete="off">
+                            <button id="clearSearch" class="clear-search" style="display: none;">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                        </div>
+                        <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+                    </div>
+
                     <!-- Getting Started -->
                     <div class="sidebar-section">
                         <a class="sidebar-toggle" data-bs-toggle="collapse" href="#gettingStarted" role="button" aria-expanded="true">
@@ -318,6 +330,186 @@
                             icon.classList.add('bi-chevron-right');
                         }
                     });
+                }
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('sidebarSearch');
+            const clearButton = document.getElementById('clearSearch');
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            const sidebarSections = document.querySelectorAll('.sidebar-section');
+            const contentWrapper = document.querySelector('.content-wrapper');
+
+            if (!searchInput) return;
+
+            let searchTimeout;
+            let contentIndex = [];
+
+            // Build search index from content
+            function buildContentIndex() {
+                if (!contentWrapper) return;
+
+                const headings = contentWrapper.querySelectorAll('h2, h3, h4');
+                headings.forEach(heading => {
+                    const id = heading.id;
+                    const text = heading.textContent.trim();
+                    let preview = '';
+
+                    // Get preview text from next elements
+                    let nextElement = heading.nextElementSibling;
+                    while (nextElement && preview.length < 150) {
+                        if (nextElement.tagName.match(/^H[2-6]$/)) break;
+                        if (nextElement.textContent) {
+                            preview += nextElement.textContent.trim() + ' ';
+                        }
+                        nextElement = nextElement.nextElementSibling;
+                    }
+
+                    contentIndex.push({
+                        id: id,
+                        title: text,
+                        preview: preview.substring(0, 150).trim() + '...',
+                        element: heading
+                    });
+                });
+            }
+
+            buildContentIndex();
+
+            // Debounce function
+            function debounce(func, wait) {
+                return function executedFunction(...args) {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => func(...args), wait);
+                };
+            }
+
+            // Highlight text matches
+            function highlightText(text, query) {
+                if (!query) return text;
+                const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+                return text.replace(regex, '<span class="search-suggestion-highlight">$1</span>');
+            }
+
+            // Escape regex special characters
+            function escapeRegex(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            // Filter sidebar TOC
+            function filterSidebar(query) {
+                if (!query) {
+                    sidebarSections.forEach(section => {
+                        section.classList.remove('search-hidden');
+                    });
+                    return;
+                }
+
+                const lowerQuery = query.toLowerCase();
+                sidebarSections.forEach(section => {
+                    const toggleText = section.querySelector('.sidebar-toggle')?.textContent.toLowerCase() || '';
+                    const links = section.querySelectorAll('.nav-link');
+                    let hasMatch = toggleText.includes(lowerQuery);
+
+                    links.forEach(link => {
+                        const linkText = link.textContent.toLowerCase();
+                        if (linkText.includes(lowerQuery)) {
+                            hasMatch = true;
+                        }
+                    });
+
+                    if (hasMatch) {
+                        section.classList.remove('search-hidden');
+                        // Expand matching sections
+                        const collapse = section.querySelector('.collapse');
+                        if (collapse && !collapse.classList.contains('show')) {
+                            const bsCollapse = new bootstrap.Collapse(collapse, { toggle: true });
+                        }
+                    } else {
+                        section.classList.add('search-hidden');
+                    }
+                });
+            }
+
+            // Show search suggestions
+            function showSuggestions(query) {
+                if (!query || query.length < 2) {
+                    suggestionsContainer.style.display = 'none';
+                    return;
+                }
+
+                const lowerQuery = query.toLowerCase();
+                const matches = contentIndex.filter(item =>
+                    item.title.toLowerCase().includes(lowerQuery) ||
+                    item.preview.toLowerCase().includes(lowerQuery)
+                ).slice(0, 8); // Limit to 8 suggestions
+
+                if (matches.length === 0) {
+                    suggestionsContainer.innerHTML = '<div class="no-results">No results found</div>';
+                    suggestionsContainer.style.display = 'block';
+                    return;
+                }
+
+                const html = matches.map(item => `
+                    <div class="search-suggestion-item" data-id="${item.id}">
+                        <div class="search-suggestion-title">${highlightText(item.title, query)}</div>
+                        <div class="search-suggestion-preview">${highlightText(item.preview, query)}</div>
+                    </div>
+                `).join('');
+
+                suggestionsContainer.innerHTML = html;
+                suggestionsContainer.style.display = 'block';
+
+                // Add click handlers
+                suggestionsContainer.querySelectorAll('.search-suggestion-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        if (id) {
+                            window.location.hash = id;
+                            searchInput.value = '';
+                            clearSearch();
+                        }
+                    });
+                });
+            }
+
+            // Handle search input
+            const handleSearch = debounce(function(e) {
+                const query = e.target.value.trim();
+
+                if (query) {
+                    clearButton.style.display = 'block';
+                } else {
+                    clearButton.style.display = 'none';
+                }
+
+                filterSidebar(query);
+                showSuggestions(query);
+            }, 300);
+
+            searchInput.addEventListener('input', handleSearch);
+
+            // Clear search
+            function clearSearch() {
+                searchInput.value = '';
+                clearButton.style.display = 'none';
+                suggestionsContainer.style.display = 'none';
+                filterSidebar('');
+            }
+
+            clearButton.addEventListener('click', clearSearch);
+
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            });
+
+            // Handle escape key
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    clearSearch();
                 }
             });
         });
