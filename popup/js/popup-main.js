@@ -483,6 +483,11 @@ function updateActionPanelContent(tab) {
       domElements.actionObjectDropdownSection.style.margin = '';
       domElements.actionObjectDropdownSection.style.padding = '';
       domElements.actionObjectDropdownSection.style.overflow = 'visible';
+
+      // Call showDropdownPreview with empty array to ensure button visibility is correct
+      if (SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
+        SFTabs.dropdowns.showDropdownPreview(tab.pendingDropdownItems || []);
+      }
     } else {
       // Hide the Object Dropdown section
       domElements.actionObjectDropdownSection.style.display = 'none';

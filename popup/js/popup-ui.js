@@ -7,19 +7,24 @@
 function renderTabList() {
   const domElements = SFTabs.main.getDOMElements();
 
-  // Check if action panel is currently open - if so, we'll preserve it
+  // Check if action panel is currently open
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
   const isActionPanelOpen = currentActionPanelTab !== null;
 
+  // Get all tabs BEFORE rendering to check if current panel tab still exists
+  const allTabs = SFTabs.main.getTabs().sort((a, b) => a.position - b.position);
+
+  // If action panel is open but the tab no longer exists, close it
   if (isActionPanelOpen) {
+    const tabStillExists = allTabs.some(t => t.id === currentActionPanelTab.id);
+    if (!tabStillExists && SFTabs.main.closeActionPanel) {
+      SFTabs.main.closeActionPanel();
+    }
   }
 
   // Clear existing tab items only (preserve empty-state and profile-init-options)
   const tabItems = domElements.tabList.querySelectorAll('.tab-item');
   tabItems.forEach(item => item.remove());
-
-  // Get all tabs (sorted by position)
-  const allTabs = SFTabs.main.getTabs().sort((a, b) => a.position - b.position);
 
   // Check if profiles are enabled and this is a new empty profile
   const settings = SFTabs.main.getUserSettings();
