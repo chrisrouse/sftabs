@@ -5,9 +5,17 @@
  * Setup Object Dropdown - Parse navigation from current page
  */
 async function setupObjectDropdown() {
+	console.log('[setupObjectDropdown] Called');
 
 	// Get UI elements from the action panel (not the old tab-form)
 	const setupDropdownButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
+	console.log('[setupObjectDropdown] Button found:', !!setupDropdownButton);
+
+	if (!setupDropdownButton) {
+		console.error('[setupObjectDropdown] Could not find setup dropdown button');
+		SFTabs.main.showStatus('Error: Could not find setup button', true);
+		return;
+	}
 
 	// Show loading state
 	setupDropdownButton.disabled = true;
@@ -514,20 +522,31 @@ function initDropdownListeners() {
 	// Use event delegation on the action panel section itself since it always exists
 	const actionObjectDropdownSection = document.querySelector('#action-object-dropdown-section');
 
+	console.log('[initDropdownListeners] actionObjectDropdownSection found:', !!actionObjectDropdownSection);
+
 	if (actionObjectDropdownSection) {
 		// Remove any existing listeners to prevent duplicates
 		const oldListener = actionObjectDropdownSection.getAttribute('data-listener-attached');
+		console.log('[initDropdownListeners] Listener already attached:', !!oldListener);
+
 		if (!oldListener) {
+			console.log('[initDropdownListeners] Attaching click listener to action-object-dropdown-section');
 			actionObjectDropdownSection.addEventListener('click', async (e) => {
+				console.log('[initDropdownListeners] Click detected on:', e.target.id, e.target);
 				// Check if click was on setup or refresh button
 				if (e.target.id === 'setup-dropdown-button' || e.target.id === 'refresh-dropdown-button') {
+					console.log('[initDropdownListeners] Button click confirmed, calling setupObjectDropdown');
 					e.preventDefault();
 					e.stopPropagation();
 					await setupObjectDropdown();
+				} else {
+					console.log('[initDropdownListeners] Click was not on a dropdown button');
 				}
 			});
 			actionObjectDropdownSection.setAttribute('data-listener-attached', 'true');
 		}
+	} else {
+		console.error('[initDropdownListeners] Could not find action-object-dropdown-section');
 	}
 }
 
