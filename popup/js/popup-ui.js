@@ -11,13 +11,20 @@ function renderTabList() {
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
   const isActionPanelOpen = currentActionPanelTab !== null;
 
+  console.log('[renderTabList] Action panel open:', isActionPanelOpen);
+  if (currentActionPanelTab) {
+    console.log('[renderTabList] Current action panel tab:', currentActionPanelTab.id, currentActionPanelTab.label);
+  }
+
   // Get all tabs BEFORE rendering to check if current panel tab still exists
   const allTabs = SFTabs.main.getTabs().sort((a, b) => a.position - b.position);
 
   // If action panel is open but the tab no longer exists, close it
   if (isActionPanelOpen) {
     const tabStillExists = allTabs.some(t => t.id === currentActionPanelTab.id);
+    console.log('[renderTabList] Tab still exists:', tabStillExists);
     if (!tabStillExists && SFTabs.main.closeActionPanel) {
+      console.log('[renderTabList] Closing action panel - tab was deleted');
       SFTabs.main.closeActionPanel();
     }
   }

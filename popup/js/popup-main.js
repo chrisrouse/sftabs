@@ -372,18 +372,21 @@ function migrateTabsToNewStructure(existingTabs) {
  * Show main content panel
  */
 function showMainContent() {
+  console.log('[showMainContent] Showing main content, closing action panel');
   // Clear the action panel tab reference since we're closing it
   currentActionPanelTab = null;
   domElements.mainContent.classList.add('active');
   domElements.mainContent.style.display = 'block';
   domElements.actionPanel.classList.remove('active');
   domElements.actionPanel.style.display = 'none';
+  console.log('[showMainContent] Action panel display:', domElements.actionPanel.style.display);
 }
 
 /**
  * Close action panel and return to main content
  */
 function closeActionPanel() {
+  console.log('[closeActionPanel] Called');
   showMainContent();
 }
 
@@ -395,6 +398,10 @@ function showActionPanel(tab) {
   if (!tab) {
     return;
   }
+
+  console.log('[showActionPanel] Opening panel for tab:', tab.id, tab.label);
+  console.log('[showActionPanel] Tab isSetupObject:', tab.isSetupObject);
+  console.log('[showActionPanel] Tab has dropdownItems:', tab.dropdownItems ? tab.dropdownItems.length : 0);
 
   // Store the current tab context
   currentActionPanelTab = tab;
@@ -473,10 +480,21 @@ function updateActionPanelContent(tab) {
   const hasStagedDropdownItems = tab.stagedDropdownItems && tab.stagedDropdownItems.length > 0;
   const hasPendingDropdownItems = tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0;
 
+  console.log('[updateActionPanelContent] Dropdown visibility check:');
+  console.log('  - isSetupObject:', tab.isSetupObject);
+  console.log('  - hasDropdownItems:', hasDropdownItems);
+  console.log('  - hasStagedDropdownItems:', hasStagedDropdownItems);
+  console.log('  - hasPendingDropdownItems:', hasPendingDropdownItems);
+  console.log('  - isDropdownItemEdit:', isDropdownItemEdit);
+
   // Show Object Dropdown section if this is a setup object without dropdown items yet
   if (domElements.actionObjectDropdownSection) {
-    if (tab.isSetupObject && !hasDropdownItems && !hasStagedDropdownItems && !hasPendingDropdownItems && !isDropdownItemEdit) {
+    const shouldShowObjectDropdown = tab.isSetupObject && !hasDropdownItems && !hasStagedDropdownItems && !hasPendingDropdownItems && !isDropdownItemEdit;
+    console.log('[updateActionPanelContent] Should show Object Dropdown section:', shouldShowObjectDropdown);
+
+    if (shouldShowObjectDropdown) {
       // Show the Object Dropdown section with "Setup as Object Dropdown" button
+      console.log('[updateActionPanelContent] Showing Object Dropdown section');
       domElements.actionObjectDropdownSection.style.display = 'block';
       domElements.actionObjectDropdownSection.style.visibility = 'visible';
       domElements.actionObjectDropdownSection.style.height = 'auto';
@@ -486,10 +504,12 @@ function updateActionPanelContent(tab) {
 
       // Call showDropdownPreview with empty array to ensure button visibility is correct
       if (SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
+        console.log('[updateActionPanelContent] Calling showDropdownPreview with:', tab.pendingDropdownItems || []);
         SFTabs.dropdowns.showDropdownPreview(tab.pendingDropdownItems || []);
       }
     } else {
       // Hide the Object Dropdown section
+      console.log('[updateActionPanelContent] Hiding Object Dropdown section');
       domElements.actionObjectDropdownSection.style.display = 'none';
       domElements.actionObjectDropdownSection.style.visibility = 'hidden';
       domElements.actionObjectDropdownSection.style.height = '0';

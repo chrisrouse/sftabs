@@ -370,6 +370,8 @@ function deleteTab(tabId) {
  * Perform the actual tab deletion
  */
 function performTabDeletion(tabId) {
+  console.log('[performTabDeletion] Deleting tab:', tabId);
+
   const tabs = SFTabs.main.getTabs();
   const updatedTabs = tabs.filter(tab => tab.id !== tabId);
 
@@ -377,12 +379,18 @@ function performTabDeletion(tabId) {
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
   const isDeletedTabOpen = currentActionPanelTab && currentActionPanelTab.id === tabId;
 
+  console.log('[performTabDeletion] Current action panel tab:', currentActionPanelTab ? currentActionPanelTab.id : 'none');
+  console.log('[performTabDeletion] Is deleted tab open:', isDeletedTabOpen);
+
   // If the action panel is open for this tab, close it
   if (isDeletedTabOpen && SFTabs.main.closeActionPanel) {
+    console.log('[performTabDeletion] Calling closeActionPanel');
     SFTabs.main.closeActionPanel();
   }
 
+  console.log('[performTabDeletion] Saving tabs...');
   SFTabs.storage.saveTabs(updatedTabs).then(() => {
+    console.log('[performTabDeletion] Save complete');
     SFTabs.main.showStatus('Tab removed', false);
   });
 }

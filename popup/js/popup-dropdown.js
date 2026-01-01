@@ -145,6 +145,8 @@ async function setupObjectDropdown() {
  * Show dropdown items preview
  */
 function showDropdownPreview(items) {
+	console.log('[showDropdownPreview] Called with items:', items ? items.length : 'null/undefined');
+
 	const dropdownItemsPreview = document.getElementById('dropdown-items-preview');
 	const dropdownItemsList = document.getElementById('dropdown-items-list');
 	const dropdownCount = document.getElementById('dropdown-count');
@@ -153,11 +155,16 @@ function showDropdownPreview(items) {
 	const setupButton = document.getElementById('setup-dropdown-button');
 	const helpText = document.querySelector('#object-dropdown-section .help-text');
 
+	console.log('[showDropdownPreview] setupButton exists:', !!setupButton);
+	console.log('[showDropdownPreview] helpText exists:', !!helpText);
+
 	if (!items || items.length === 0) {
+		console.log('[showDropdownPreview] No items - showing button');
 		dropdownItemsPreview.style.display = 'none';
 		// Show button and help text when no items exist
 		if (setupButton) {
 			setupButton.style.display = 'block';
+			console.log('[showDropdownPreview] Set button display to block');
 		}
 		if (helpText) {
 			helpText.style.display = 'block';
@@ -165,9 +172,11 @@ function showDropdownPreview(items) {
 		return;
 	}
 
+	console.log('[showDropdownPreview] Has items - hiding button');
 	// Hide the setup button and help text when items exist
 	if (setupButton) {
 		setupButton.style.display = 'none';
+		console.log('[showDropdownPreview] Set button display to none');
 	}
 	if (helpText) {
 		helpText.style.display = 'none';
