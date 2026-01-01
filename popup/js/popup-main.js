@@ -379,7 +379,31 @@ function showMainContent() {
   domElements.mainContent.style.display = 'block';
   domElements.actionPanel.classList.remove('active');
   domElements.actionPanel.style.display = 'none';
-  console.log('[showMainContent] Action panel display:', domElements.actionPanel.style.display);
+
+  // Check computed style and actual visibility
+  const computedStyle = window.getComputedStyle(domElements.actionPanel);
+  console.log('[showMainContent] Action panel inline display:', domElements.actionPanel.style.display);
+  console.log('[showMainContent] Action panel computed display:', computedStyle.display);
+  console.log('[showMainContent] Action panel offsetHeight:', domElements.actionPanel.offsetHeight);
+  console.log('[showMainContent] Action panel offsetWidth:', domElements.actionPanel.offsetWidth);
+
+  // Check if any child elements have absolute positioning that might escape
+  const actionPanelContent = domElements.actionPanel.querySelector('.action-panel-content');
+  if (actionPanelContent) {
+    const contentComputedStyle = window.getComputedStyle(actionPanelContent);
+    console.log('[showMainContent] Action panel content position:', contentComputedStyle.position);
+    console.log('[showMainContent] Action panel content display:', contentComputedStyle.display);
+  }
+
+  // Check dropdown sections
+  if (domElements.actionObjectDropdownSection) {
+    console.log('[showMainContent] Object dropdown section display:', domElements.actionObjectDropdownSection.style.display);
+    console.log('[showMainContent] Object dropdown section offsetHeight:', domElements.actionObjectDropdownSection.offsetHeight);
+  }
+  if (domElements.actionManualDropdownSection) {
+    console.log('[showMainContent] Manual dropdown section display:', domElements.actionManualDropdownSection.style.display);
+    console.log('[showMainContent] Manual dropdown section offsetHeight:', domElements.actionManualDropdownSection.offsetHeight);
+  }
 }
 
 /**
