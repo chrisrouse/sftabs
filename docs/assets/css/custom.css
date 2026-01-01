@@ -66,13 +66,35 @@ h4 { font-size: 1.25rem; }
 .sidebar {
     background-color: var(--sf-gray-100);
     min-height: calc(100vh - 56px);
-    padding-top: 2rem;
     border-right: 1px solid var(--sf-gray-200);
 }
 
 .sidebar-sticky {
     position: sticky;
-    top: 70px;
+    top: 0;
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+    padding-top: 2rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sf-gray-600) var(--sf-gray-200);
+}
+
+/* Webkit scrollbar styling for sidebar */
+.sidebar-sticky::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-sticky::-webkit-scrollbar-track {
+    background: var(--sf-gray-200);
+}
+
+.sidebar-sticky::-webkit-scrollbar-thumb {
+    background: var(--sf-gray-600);
+    border-radius: 3px;
+}
+
+.sidebar-sticky::-webkit-scrollbar-thumb:hover {
+    background: var(--sf-brand-primary);
 }
 
 .sidebar-heading {
