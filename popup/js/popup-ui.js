@@ -1010,7 +1010,22 @@ function handleDropdownCreation(draggedItem, targetItem) {
   // Save and refresh
   SFTabs.storage.saveTabs(tabs).then(() => {
     SFTabs.main.showStatus(`Added "${draggedTab.label}" as dropdown item to "${targetTab.label}"`);
+
+    // Check if the action panel is currently open for the target tab
+    const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
+    const isTargetTabOpen = currentActionPanelTab && currentActionPanelTab.id === targetTab.id;
+
+    // Render the tab list
     renderTabList();
+
+    // If the action panel was open for this tab, refresh it with updated data
+    if (isTargetTabOpen) {
+      const updatedTabs = SFTabs.main.getTabs();
+      const updatedTargetTab = updatedTabs.find(t => t.id === targetTab.id);
+      if (updatedTargetTab) {
+        SFTabs.main.showActionPanel(updatedTargetTab);
+      }
+    }
   });
 }
 
