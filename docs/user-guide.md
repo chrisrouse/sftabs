@@ -7,7 +7,7 @@ title: User Guide
 
 ## Opening the Extension
 
- Click the extension icon in your browser toolbar
+ Click the extension icon in your browser toolbar to open SF Tabs
  
 <img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="SF Tabs Icon" style="display: inline; height: 1.2em; vertical-align: middle;"> 
 
