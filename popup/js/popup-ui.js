@@ -68,6 +68,11 @@ function renderTabList() {
     setupDragAndDrop();
   }
 
+  // Log final action panel state
+  console.log('[renderTabList] Finished rendering. Action panel display:', domElements.actionPanel.style.display);
+  console.log('[renderTabList] Action panel classList:', domElements.actionPanel.classList.toString());
+  console.log('[renderTabList] Main content display:', domElements.mainContent.style.display);
+
   // Note: We no longer need to preserve action panel state here because
   // delete/promote operations now stage changes instead of saving immediately.
   // The form stays open naturally since storage isn't updated until Save is clicked.
