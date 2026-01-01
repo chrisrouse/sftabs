@@ -17,6 +17,8 @@ title: User Guide
 ### Method 1: Quick Add from Current Page
 
 <img width="402" height="52" alt="Screenshot 2025-12-26 at 7 30 40 AM" src="https://github.com/user-attachments/assets/c3075e90-23b8-4e4b-b6a3-0d13664d7d76" />
+<img width="412" height="539" alt="2026-01-01_09-55-57" src="https://github.com/user-attachments/assets/8dc84577-7d12-4c1e-93f6-b11b4afed5a1" />
+
 
 1. **Navigate to a Salesforce Setup page**
    Go to the page you want to create a tab for (e.g., Flows, Users, Profiles)
