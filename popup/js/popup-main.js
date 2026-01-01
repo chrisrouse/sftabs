@@ -404,6 +404,20 @@ function showMainContent() {
     console.log('[showMainContent] Manual dropdown section display:', domElements.actionManualDropdownSection.style.display);
     console.log('[showMainContent] Manual dropdown section offsetHeight:', domElements.actionManualDropdownSection.offsetHeight);
   }
+
+  // CRITICAL FIX: Hide the old tab-form and its dropdown sections
+  // There are duplicate elements with the same IDs in the old tab-form,
+  // which can become visible when manipulated by showDropdownPreview
+  const oldTabForm = document.getElementById('tab-form');
+  if (oldTabForm) {
+    console.log('[showMainContent] Hiding old tab-form');
+    oldTabForm.style.display = 'none';
+  }
+  const oldObjectDropdownSection = document.getElementById('object-dropdown-section');
+  if (oldObjectDropdownSection) {
+    console.log('[showMainContent] Hiding old object-dropdown-section');
+    oldObjectDropdownSection.style.display = 'none';
+  }
 }
 
 /**

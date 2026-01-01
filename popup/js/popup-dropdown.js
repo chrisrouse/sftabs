@@ -151,9 +151,10 @@ function showDropdownPreview(items) {
 	const dropdownItemsList = document.getElementById('dropdown-items-list');
 	const dropdownCount = document.getElementById('dropdown-count');
 
-	// Get the setup button and help text elements
-	const setupButton = document.getElementById('setup-dropdown-button');
-	const helpText = document.querySelector('#object-dropdown-section .help-text');
+	// Get the setup button and help text elements FROM THE ACTION PANEL (not the old tab-form)
+	// The action panel uses #action-object-dropdown-section, not #object-dropdown-section
+	const setupButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
+	const helpText = document.querySelector('#action-object-dropdown-section .help-text');
 
 	console.log('[showDropdownPreview] setupButton exists:', !!setupButton);
 	console.log('[showDropdownPreview] helpText exists:', !!helpText);
