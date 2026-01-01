@@ -468,25 +468,56 @@ function updateActionPanelContent(tab) {
     domElements.actionIsCustomUrlCheckbox.checked = tab.isCustomUrl || false;
   }
 
-  // Hide both dropdown sections in the action panel (+ button panel)
-  // Users should manage dropdowns through drag-and-drop or the inline form (clicking tab name)
+  // Determine which dropdown section to show based on tab properties
+  const hasDropdownItems = tab.dropdownItems && tab.dropdownItems.length > 0;
+  const hasStagedDropdownItems = tab.stagedDropdownItems && tab.stagedDropdownItems.length > 0;
+  const hasPendingDropdownItems = tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0;
 
+  // Show Object Dropdown section if this is a setup object without dropdown items yet
   if (domElements.actionObjectDropdownSection) {
-    domElements.actionObjectDropdownSection.style.display = 'none';
-    domElements.actionObjectDropdownSection.style.visibility = 'hidden';
-    domElements.actionObjectDropdownSection.style.height = '0';
-    domElements.actionObjectDropdownSection.style.margin = '0';
-    domElements.actionObjectDropdownSection.style.padding = '0';
-    domElements.actionObjectDropdownSection.style.overflow = 'hidden';
+    if (tab.isSetupObject && !hasDropdownItems && !hasStagedDropdownItems && !hasPendingDropdownItems && !isDropdownItemEdit) {
+      // Show the Object Dropdown section with "Setup as Object Dropdown" button
+      domElements.actionObjectDropdownSection.style.display = 'block';
+      domElements.actionObjectDropdownSection.style.visibility = 'visible';
+      domElements.actionObjectDropdownSection.style.height = 'auto';
+      domElements.actionObjectDropdownSection.style.margin = '';
+      domElements.actionObjectDropdownSection.style.padding = '';
+      domElements.actionObjectDropdownSection.style.overflow = 'visible';
+    } else {
+      // Hide the Object Dropdown section
+      domElements.actionObjectDropdownSection.style.display = 'none';
+      domElements.actionObjectDropdownSection.style.visibility = 'hidden';
+      domElements.actionObjectDropdownSection.style.height = '0';
+      domElements.actionObjectDropdownSection.style.margin = '0';
+      domElements.actionObjectDropdownSection.style.padding = '0';
+      domElements.actionObjectDropdownSection.style.overflow = 'hidden';
+    }
   }
 
+  // Show Manual Dropdown section if this tab has dropdown items
   if (domElements.actionManualDropdownSection) {
-    domElements.actionManualDropdownSection.style.display = 'none';
-    domElements.actionManualDropdownSection.style.visibility = 'hidden';
-    domElements.actionManualDropdownSection.style.height = '0';
-    domElements.actionManualDropdownSection.style.margin = '0';
-    domElements.actionManualDropdownSection.style.padding = '0';
-    domElements.actionManualDropdownSection.style.overflow = 'hidden';
+    if ((hasDropdownItems || hasStagedDropdownItems || hasPendingDropdownItems) && !isDropdownItemEdit) {
+      // Show the Manual Dropdown section with the list of dropdown items
+      domElements.actionManualDropdownSection.style.display = 'block';
+      domElements.actionManualDropdownSection.style.visibility = 'visible';
+      domElements.actionManualDropdownSection.style.height = 'auto';
+      domElements.actionManualDropdownSection.style.margin = '';
+      domElements.actionManualDropdownSection.style.padding = '';
+      domElements.actionManualDropdownSection.style.overflow = 'visible';
+
+      // Show the dropdown items
+      if (SFTabs.main.showManualDropdownItems) {
+        SFTabs.main.showManualDropdownItems(tab);
+      }
+    } else {
+      // Hide the Manual Dropdown section
+      domElements.actionManualDropdownSection.style.display = 'none';
+      domElements.actionManualDropdownSection.style.visibility = 'hidden';
+      domElements.actionManualDropdownSection.style.height = '0';
+      domElements.actionManualDropdownSection.style.margin = '0';
+      domElements.actionManualDropdownSection.style.padding = '0';
+      domElements.actionManualDropdownSection.style.overflow = 'hidden';
+    }
   }
 }
 
