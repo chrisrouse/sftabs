@@ -988,7 +988,7 @@ function handleDropdownCreation(draggedItem, targetItem) {
   }
 
   // Create a dropdown item from the dragged tab
-  // IMPORTANT: Preserve ALL properties including nested dropdownItems, hasDropdown, and isSetupObject flags
+  // IMPORTANT: Preserve ALL properties including nested dropdownItems and isSetupObject
   const dropdownItem = {
     label: draggedTab.label,
     path: draggedTab.path,
@@ -998,10 +998,9 @@ function handleDropdownCreation(draggedItem, targetItem) {
     isSetupObject: draggedTab.isSetupObject || false
   };
 
-  // Preserve nested dropdown items AND hasDropdown flag if they exist
+  // Preserve nested dropdown items if they exist (deep copy)
   if (draggedTab.dropdownItems && draggedTab.dropdownItems.length > 0) {
     dropdownItem.dropdownItems = JSON.parse(JSON.stringify(draggedTab.dropdownItems));
-    dropdownItem.hasDropdown = true; // Explicitly set the flag for items with sub-items
   }
 
   // Add to dropdown items
