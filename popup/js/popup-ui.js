@@ -632,14 +632,14 @@ function saveTabForm() {
   console.log('[saveTabForm] stagedDropdownItems:', currentActionPanelTab ? currentActionPanelTab.stagedDropdownItems : 'no currentActionPanelTab');
 
   // Apply dropdown items in priority order:
-  // 1. stagedDropdownItems (manual edits/deletions) - highest priority
+  // 1. stagedDropdownItems (manual edits/deletions) - highest priority, but only if it has items
   // 2. pendingDropdownItems (from Object Dropdown setup)
   // 3. existing dropdownItems (no changes)
-  if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems !== undefined) {
+  if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems && currentActionPanelTab.stagedDropdownItems.length > 0) {
     // Staged items from manual edits (removing, reordering) take precedence
     console.log('[saveTabForm] Using stagedDropdownItems');
     tabData.dropdownItems = JSON.parse(JSON.stringify(currentActionPanelTab.stagedDropdownItems));  // Make a deep copy
-    tabData.hasDropdown = currentActionPanelTab.stagedDropdownItems.length > 0;
+    tabData.hasDropdown = true;
   } else if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
     // Pending items from Object Dropdown setup
     console.log('[saveTabForm] Using pendingDropdownItems -', currentActionPanelTab.pendingDropdownItems.length, 'items');
