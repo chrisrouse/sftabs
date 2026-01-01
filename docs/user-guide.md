@@ -28,7 +28,7 @@ title: User Guide
 
 ### Method 2: Manual Tab Creation
 
-<img width="412" height="475" alt="Screenshot 2025-12-26 at 7 29 51 AM" src="https://github.com/user-attachments/assets/9e7efde0-6fe2-4e1d-9858-30ef4a621b16" />
+<img width="412" height="539" alt="2026-01-01_09-55-57" src="https://github.com/user-attachments/assets/7301b3b9-17ce-47cb-81e1-73b5109f923f" />
 
 1. **Open the extension popup**
    Click the SF Tabs icon in your browser toolbar
@@ -77,13 +77,15 @@ Links to any Lightning URL path within Salesforce.
 1. **Rearranging Tabs**
    Tabs can be rearranged by using click-and-drag. Click on the drag handle on the left and move the tab to a new position.
 
-2. **Editing Tabs**
+   <img width="412" height="325" alt="2025-12-31_14-51-35" src="https://github.com/user-attachments/assets/c2c15bef-c978-44c4-bcc0-b194f43e9cf0" />
+
+3. **Editing Tabs**
    Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> on a tab to edit the name or URL.
 
-3. **Open in New Tab**
+4. **Open in New Tab**
    Click on the new tab icon <img src="{{ '/assets/images/icons/new-tab.svg' | relative_url }}" alt="New Tab" style="display: inline; height: 1.2em; vertical-align: middle;"> to have your tab open in a new tab. The icon will turn blue to indicate it is enabled.
 
-4. **Delete tabs**
+5. **Delete tabs**
    Click on the trash can icon <img src="{{ '/assets/images/icons/delete.svg' | relative_url }}" alt="Delete" style="display: inline; height: 1.2em; vertical-align: middle;"> to delete a tab.
 
 
@@ -94,7 +96,6 @@ SF Tabs supports dropdown menus, allowing you to organize related tabs under a p
 ### Object Manager Dropdowns
 
 When you create a tab that links to an Object Manager page, you can create a dropdown menu with all the object's sub-pages.
-
 
 
 #### Creating an Object Manager Dropdown
@@ -111,7 +112,7 @@ When you create a tab that links to an Object Manager page, you can create a dro
 4. **Set up the dropdown**
    Click "Setup as Object Dropdown" button
    
-<img width="404" height="224" alt="Screenshot 2025-12-25 at 1 12 31 PM" src="https://github.com/user-attachments/assets/d98528bd-0d5c-4267-872d-87801435bf66" />
+   <img width="412" height="221" alt="2025-12-31_15-01-54" src="https://github.com/user-attachments/assets/b378f2e7-9f8e-43a2-9ad0-4653fecf9110" />
 
 6. **Review the dropdown items**
    The extension automatically detects available sub-pages:
@@ -123,8 +124,8 @@ When you create a tab that links to an Object Manager page, you can create a dro
    - Triggers
    - And more...
      
-<img width="406" height="344" alt="Screenshot 2025-12-25 at 1 12 55 PM" src="https://github.com/user-attachments/assets/d70d8729-0387-463d-86c4-84f653eacf5b" />
-
+   <img width="412" height="357" alt="2026-01-01_09-49-13" src="https://github.com/user-attachments/assets/b72d850d-8c8d-4f57-a525-ace596f83190" />
+   
 6. **Save your changes**
    Click "Save Changes"
 
@@ -136,6 +137,8 @@ Now when you click this tab in Salesforce Setup, you'll see a dropdown menu with
 
 Create custom dropdown menus by dragging existing tabs onto a parent tab.
 
+   <img width="412" height="211" alt="2026-01-01_09-54-08" src="https://github.com/user-attachments/assets/9ae33968-6e18-4967-bec3-efd4415e052f" />
+
 #### Creating a Manual Dropdown
 
 1. **Create a parent tab**
@@ -145,10 +148,13 @@ Create custom dropdown menus by dragging existing tabs onto a parent tab.
    Click and hold a tab, then drag it over another tab
    Release when you see the drop indicator
 
-3. **The dragged tab becomes a dropdown item**
+   <img width="412" height="295" alt="2025-12-31_15-01-04" src="https://github.com/user-attachments/assets/e2677c43-70ce-4dc3-9459-d03287f9ebd6" />
+
+
+4. **The dragged tab becomes a dropdown item**
    It's now nested under the parent tab
 
-4. **Add more items**
+5. **Add more items**
    Drag additional tabs onto the parent to build your menu
 
 ### Folder-Style Tabs (Menu Containers)
