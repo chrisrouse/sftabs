@@ -378,8 +378,8 @@ function performTabDeletion(tabId) {
   const isDeletedTabOpen = currentActionPanelTab && currentActionPanelTab.id === tabId;
 
   // If the action panel is open for this tab, close it
-  if (isDeletedTabOpen && SFTabs.main.hideActionPanel) {
-    SFTabs.main.hideActionPanel();
+  if (isDeletedTabOpen && SFTabs.main.closeActionPanel) {
+    SFTabs.main.closeActionPanel();
   }
 
   SFTabs.storage.saveTabs(updatedTabs).then(() => {
