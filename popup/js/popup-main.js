@@ -164,13 +164,6 @@ function initializeDOMElements() {
   domElements.manualDropdownItemsList = document.querySelector('#manual-dropdown-items-list');
   domElements.manualDropdownCount = document.querySelector('#manual-dropdown-count');
 
-  // Manage dropdown panel sections
-  domElements.objectDropdownSection = document.querySelector('#object-dropdown-section');
-  domElements.manualDropdownSection = document.querySelector('#manual-dropdown-section');
-  domElements.manageDropdownPreview = document.querySelector('#manage-dropdown-preview');
-  domElements.manageDropdownList = document.querySelector('#manage-dropdown-list');
-  domElements.manageDropdownCount = document.querySelector('#manage-dropdown-count');
-
   // Form groups
   domElements.hasDropdownGroup = document.querySelector('.has-dropdown-group');
 
@@ -379,16 +372,10 @@ function showMainContent() {
   domElements.actionPanel.classList.remove('active');
   domElements.actionPanel.style.display = 'none';
 
-  // CRITICAL FIX: Hide the old tab-form and its dropdown sections
-  // There are duplicate elements with the same IDs in the old tab-form,
-  // which can become visible when manipulated by showDropdownPreview
+  // Hide the old tab-form if it's visible
   const oldTabForm = document.getElementById('tab-form');
   if (oldTabForm) {
     oldTabForm.style.display = 'none';
-  }
-  const oldObjectDropdownSection = document.getElementById('object-dropdown-section');
-  if (oldObjectDropdownSection) {
-    oldObjectDropdownSection.style.display = 'none';
   }
 }
 
