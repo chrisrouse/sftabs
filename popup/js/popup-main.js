@@ -158,13 +158,8 @@ function initializeDOMElements() {
   domElements.actionPanelTabNameDisplay = document.querySelector('#action-panel-tab-name-display');
   domElements.actionIsObjectCheckbox = document.querySelector('#action-is-object');
   domElements.actionIsCustomUrlCheckbox = document.querySelector('#action-is-custom-url');
-  domElements.actionObjectDropdownSection = document.querySelector('#action-object-dropdown-section');
-  domElements.actionManualDropdownSection = document.querySelector('#action-manual-dropdown-section');
-  domElements.manualDropdownItemsPreview = document.querySelector('#manual-dropdown-items-preview');
-  domElements.manualDropdownItemsList = document.querySelector('#manual-dropdown-items-list');
-  domElements.manualDropdownCount = document.querySelector('#manual-dropdown-count');
 
-  // Manage dropdown panel sections
+  // Manage dropdown panel sections (in tab-form)
   domElements.objectDropdownSection = document.querySelector('#object-dropdown-section');
   domElements.manualDropdownSection = document.querySelector('#manual-dropdown-section');
   domElements.manageDropdownPreview = document.querySelector('#manage-dropdown-preview');
@@ -435,12 +430,6 @@ function showActionPanel(tab) {
   domElements.actionPanel.classList.add('active');
   domElements.actionPanel.style.display = 'block';
 
-  // Attach dropdown button listeners for this panel instance
-  // Do this after panel is shown to ensure elements are visible
-  if (SFTabs.dropdowns && SFTabs.dropdowns.attachActionPanelListeners) {
-    SFTabs.dropdowns.attachActionPanelListeners();
-  }
-
 }
 
 /**
@@ -490,64 +479,7 @@ function updateActionPanelContent(tab) {
     domElements.actionIsCustomUrlCheckbox.checked = tab.isCustomUrl || false;
   }
 
-  // Determine which dropdown section to show based on tab properties
-  const hasDropdownItems = tab.dropdownItems && tab.dropdownItems.length > 0;
-  const hasStagedDropdownItems = tab.stagedDropdownItems && tab.stagedDropdownItems.length > 0;
-  const hasPendingDropdownItems = tab.pendingDropdownItems && tab.pendingDropdownItems.length > 0;
-
-  // Show Object Dropdown section if this is a setup object without dropdown items yet
-  if (domElements.actionObjectDropdownSection) {
-    const shouldShowObjectDropdown = tab.isSetupObject && !hasDropdownItems && !hasStagedDropdownItems && !hasPendingDropdownItems && !isDropdownItemEdit;
-
-    if (shouldShowObjectDropdown) {
-      // Show the Object Dropdown section with "Setup as Object Dropdown" button
-      domElements.actionObjectDropdownSection.style.display = 'block';
-      domElements.actionObjectDropdownSection.style.visibility = 'visible';
-      domElements.actionObjectDropdownSection.style.height = 'auto';
-      domElements.actionObjectDropdownSection.style.margin = '';
-      domElements.actionObjectDropdownSection.style.padding = '';
-      domElements.actionObjectDropdownSection.style.overflow = 'visible';
-
-      // Call showDropdownPreview with empty array to ensure button visibility is correct
-      if (SFTabs.dropdowns && SFTabs.dropdowns.showDropdownPreview) {
-        SFTabs.dropdowns.showDropdownPreview(tab.pendingDropdownItems || []);
-      }
-    } else {
-      // Hide the Object Dropdown section
-      domElements.actionObjectDropdownSection.style.display = 'none';
-      domElements.actionObjectDropdownSection.style.visibility = 'hidden';
-      domElements.actionObjectDropdownSection.style.height = '0';
-      domElements.actionObjectDropdownSection.style.margin = '0';
-      domElements.actionObjectDropdownSection.style.padding = '0';
-      domElements.actionObjectDropdownSection.style.overflow = 'hidden';
-    }
-  }
-
-  // Show Manual Dropdown section if this tab has dropdown items
-  if (domElements.actionManualDropdownSection) {
-    if ((hasDropdownItems || hasStagedDropdownItems || hasPendingDropdownItems) && !isDropdownItemEdit) {
-      // Show the Manual Dropdown section with the list of dropdown items
-      domElements.actionManualDropdownSection.style.display = 'block';
-      domElements.actionManualDropdownSection.style.visibility = 'visible';
-      domElements.actionManualDropdownSection.style.height = 'auto';
-      domElements.actionManualDropdownSection.style.margin = '';
-      domElements.actionManualDropdownSection.style.padding = '';
-      domElements.actionManualDropdownSection.style.overflow = 'visible';
-
-      // Show the dropdown items
-      if (SFTabs.main.showManualDropdownItems) {
-        SFTabs.main.showManualDropdownItems(tab);
-      }
-    } else {
-      // Hide the Manual Dropdown section
-      domElements.actionManualDropdownSection.style.display = 'none';
-      domElements.actionManualDropdownSection.style.visibility = 'hidden';
-      domElements.actionManualDropdownSection.style.height = '0';
-      domElements.actionManualDropdownSection.style.margin = '0';
-      domElements.actionManualDropdownSection.style.padding = '0';
-      domElements.actionManualDropdownSection.style.overflow = 'hidden';
-    }
-  }
+  // Dropdown management is handled in tab-form, not action panel
 }
 
 /**
