@@ -71,7 +71,7 @@ h4 { font-size: 1.25rem; }
 
 .sidebar-sticky {
     position: sticky;
-    top: 0;
+    top: 56px;
     max-height: calc(100vh - 56px);
     overflow-y: auto;
     padding-top: 2rem;
