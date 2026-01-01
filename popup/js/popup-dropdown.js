@@ -113,11 +113,16 @@ async function setupObjectDropdown() {
 				showDropdownPreview(navigationItems);
 
 				// Store the pending dropdown items in a temporary property on the current tab reference
-				// This will be saved when the user clicks Save in the action panel
+				// This will be saved when the user clicks Save in the tab-form
 				const actionPanelTab = SFTabs.main.getCurrentActionPanelTab();
+				console.log('[setupObjectDropdown] actionPanelTab:', actionPanelTab);
+				console.log('[setupObjectDropdown] actionPanelTab ID:', actionPanelTab ? actionPanelTab.id : 'null');
+				console.log('[setupObjectDropdown] Storing', navigationItems.length, 'items in pendingDropdownItems');
 				if (actionPanelTab) {
 					actionPanelTab.pendingDropdownItems = navigationItems;
+					console.log('[setupObjectDropdown] Stored successfully. pendingDropdownItems length:', actionPanelTab.pendingDropdownItems.length);
 				} else {
+					console.error('[setupObjectDropdown] No actionPanelTab found!');
 				}
 
 				// Scroll the dropdown preview into view so user can see it immediately

@@ -625,22 +625,33 @@ function saveTabForm() {
   // Check if there are staged changes to apply
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
 
+  console.log('[saveTabForm] currentActionPanelTab:', currentActionPanelTab);
+  console.log('[saveTabForm] currentActionPanelTab ID:', currentActionPanelTab ? currentActionPanelTab.id : 'null');
+  console.log('[saveTabForm] editingTabId:', editingTabId);
+  console.log('[saveTabForm] pendingDropdownItems:', currentActionPanelTab ? currentActionPanelTab.pendingDropdownItems : 'no currentActionPanelTab');
+  console.log('[saveTabForm] stagedDropdownItems:', currentActionPanelTab ? currentActionPanelTab.stagedDropdownItems : 'no currentActionPanelTab');
+
   // Apply dropdown items in priority order:
   // 1. stagedDropdownItems (manual edits/deletions) - highest priority
   // 2. pendingDropdownItems (from Object Dropdown setup)
   // 3. existing dropdownItems (no changes)
   if (currentActionPanelTab && currentActionPanelTab.stagedDropdownItems !== undefined) {
     // Staged items from manual edits (removing, reordering) take precedence
+    console.log('[saveTabForm] Using stagedDropdownItems');
     tabData.dropdownItems = JSON.parse(JSON.stringify(currentActionPanelTab.stagedDropdownItems));  // Make a deep copy
     tabData.hasDropdown = currentActionPanelTab.stagedDropdownItems.length > 0;
   } else if (currentActionPanelTab && currentActionPanelTab.pendingDropdownItems && currentActionPanelTab.pendingDropdownItems.length > 0) {
     // Pending items from Object Dropdown setup
+    console.log('[saveTabForm] Using pendingDropdownItems -', currentActionPanelTab.pendingDropdownItems.length, 'items');
     tabData.hasDropdown = true;
     tabData.dropdownItems = currentActionPanelTab.pendingDropdownItems;
   } else if (tab.dropdownItems) {
     // No changes, preserve existing dropdown items
+    console.log('[saveTabForm] Using existing dropdownItems');
     tabData.dropdownItems = tab.dropdownItems;
     tabData.hasDropdown = tab.dropdownItems.length > 0;
+  } else {
+    console.log('[saveTabForm] No dropdown items to save');
   }
 
   // Apply staged promotions (create new main tabs from promoted items)
