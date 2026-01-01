@@ -374,12 +374,10 @@ function showMainContent() {
   domElements.actionPanel.classList.remove('active');
   domElements.actionPanel.style.display = 'none';
 
-  // CRITICAL FIX: Hide the old tab-form and its dropdown sections
-  // There are duplicate elements with the same IDs in the old tab-form,
-  // which can become visible when manipulated by showDropdownPreview
-  const oldTabForm = document.getElementById('tab-form');
-  if (oldTabForm) {
-    oldTabForm.style.display = 'none';
+  // Hide the tab-form if it's visible
+  const tabForm = document.getElementById('tab-form');
+  if (tabForm) {
+    tabForm.style.display = 'none';
   }
   const oldObjectDropdownSection = document.getElementById('object-dropdown-section');
   if (oldObjectDropdownSection) {
