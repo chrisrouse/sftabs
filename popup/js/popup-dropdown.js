@@ -511,22 +511,23 @@ function saveObjectDropdownItemOrder(container) {
  * Initialize dropdown event listeners
  */
 function initDropdownListeners() {
-	// Get buttons from the action panel (not the old tab-form)
-	const setupDropdownButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
-	const refreshDropdownButton = document.getElementById('refresh-dropdown-button');
+	// Use event delegation on the action panel section itself since it always exists
+	const actionObjectDropdownSection = document.querySelector('#action-object-dropdown-section');
 
-	// Setup Dropdown button
-	if (setupDropdownButton) {
-		setupDropdownButton.addEventListener('click', async () => {
-			await setupObjectDropdown();
-		});
-	}
-
-	// Refresh Dropdown button
-	if (refreshDropdownButton) {
-		refreshDropdownButton.addEventListener('click', async () => {
-			await setupObjectDropdown();
-		});
+	if (actionObjectDropdownSection) {
+		// Remove any existing listeners to prevent duplicates
+		const oldListener = actionObjectDropdownSection.getAttribute('data-listener-attached');
+		if (!oldListener) {
+			actionObjectDropdownSection.addEventListener('click', async (e) => {
+				// Check if click was on setup or refresh button
+				if (e.target.id === 'setup-dropdown-button' || e.target.id === 'refresh-dropdown-button') {
+					e.preventDefault();
+					e.stopPropagation();
+					await setupObjectDropdown();
+				}
+			});
+			actionObjectDropdownSection.setAttribute('data-listener-attached', 'true');
+		}
 	}
 }
 
