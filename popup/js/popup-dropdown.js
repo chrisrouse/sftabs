@@ -7,8 +7,8 @@
 async function setupObjectDropdown() {
 	console.log('[setupObjectDropdown] Called');
 
-	// Get UI elements from the action panel (not the old tab-form)
-	const setupDropdownButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
+	// Get UI elements from the tab-form
+	const setupDropdownButton = document.querySelector('#object-dropdown-section #setup-dropdown-button');
 	console.log('[setupObjectDropdown] Button found:', !!setupDropdownButton);
 
 	if (!setupDropdownButton) {
@@ -157,10 +157,9 @@ function showDropdownPreview(items) {
 	const dropdownItemsList = document.getElementById('dropdown-items-list');
 	const dropdownCount = document.getElementById('dropdown-count');
 
-	// Get the setup button and help text elements FROM THE ACTION PANEL (not the old tab-form)
-	// The action panel uses #action-object-dropdown-section, not #object-dropdown-section
-	const setupButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
-	const helpText = document.querySelector('#action-object-dropdown-section .help-text');
+	// Get the setup button and help text elements from the tab-form
+	const setupButton = document.querySelector('#object-dropdown-section #setup-dropdown-button');
+	const helpText = document.querySelector('#object-dropdown-section .help-text');
 
 	if (!items || items.length === 0) {
 		dropdownItemsPreview.style.display = 'none';
@@ -519,19 +518,19 @@ function saveObjectDropdownItemOrder(container) {
  * Initialize dropdown event listeners
  */
 function initDropdownListeners() {
-	// Use event delegation on the action panel section itself since it always exists
-	const actionObjectDropdownSection = document.querySelector('#action-object-dropdown-section');
+	// Use event delegation on the tab-form dropdown section
+	const objectDropdownSection = document.querySelector('#object-dropdown-section');
 
-	console.log('[initDropdownListeners] actionObjectDropdownSection found:', !!actionObjectDropdownSection);
+	console.log('[initDropdownListeners] objectDropdownSection found:', !!objectDropdownSection);
 
-	if (actionObjectDropdownSection) {
+	if (objectDropdownSection) {
 		// Remove any existing listeners to prevent duplicates
-		const oldListener = actionObjectDropdownSection.getAttribute('data-listener-attached');
+		const oldListener = objectDropdownSection.getAttribute('data-listener-attached');
 		console.log('[initDropdownListeners] Listener already attached:', !!oldListener);
 
 		if (!oldListener) {
-			console.log('[initDropdownListeners] Attaching click listener to action-object-dropdown-section');
-			actionObjectDropdownSection.addEventListener('click', async (e) => {
+			console.log('[initDropdownListeners] Attaching click listener to object-dropdown-section');
+			objectDropdownSection.addEventListener('click', async (e) => {
 				console.log('[initDropdownListeners] Click detected on:', e.target.id, e.target);
 				// Check if click was on setup or refresh button
 				if (e.target.id === 'setup-dropdown-button' || e.target.id === 'refresh-dropdown-button') {
@@ -543,52 +542,10 @@ function initDropdownListeners() {
 					console.log('[initDropdownListeners] Click was not on a dropdown button');
 				}
 			});
-			actionObjectDropdownSection.setAttribute('data-listener-attached', 'true');
+			objectDropdownSection.setAttribute('data-listener-attached', 'true');
 		}
 	} else {
-		console.error('[initDropdownListeners] Could not find action-object-dropdown-section');
-	}
-}
-
-/**
- * Attach event listeners specifically for action panel dropdown buttons
- * Called when the action panel is shown
- */
-function attachActionPanelListeners() {
-	console.log('[attachActionPanelListeners] Attaching listeners to action panel');
-
-	// Get buttons directly from action panel using specific selectors
-	const setupButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
-	const refreshButton = document.querySelector('#action-object-dropdown-section #refresh-dropdown-button');
-
-	console.log('[attachActionPanelListeners] Setup button found:', !!setupButton);
-	console.log('[attachActionPanelListeners] Refresh button found:', !!refreshButton);
-
-	// Remove old listeners if they exist (by cloning and replacing nodes)
-	if (setupButton) {
-		const newSetupButton = setupButton.cloneNode(true);
-		setupButton.parentNode.replaceChild(newSetupButton, setupButton);
-
-		newSetupButton.addEventListener('click', async (e) => {
-			console.log('[attachActionPanelListeners] Setup button clicked');
-			e.preventDefault();
-			e.stopPropagation();
-			await setupObjectDropdown();
-		});
-		console.log('[attachActionPanelListeners] Setup button listener attached');
-	}
-
-	if (refreshButton) {
-		const newRefreshButton = refreshButton.cloneNode(true);
-		refreshButton.parentNode.replaceChild(newRefreshButton, refreshButton);
-
-		newRefreshButton.addEventListener('click', async (e) => {
-			console.log('[attachActionPanelListeners] Refresh button clicked');
-			e.preventDefault();
-			e.stopPropagation();
-			await setupObjectDropdown();
-		});
-		console.log('[attachActionPanelListeners] Refresh button listener attached');
+		console.error('[initDropdownListeners] Could not find object-dropdown-section');
 	}
 }
 
@@ -598,6 +555,5 @@ window.SFTabs.dropdowns = {
 	setupObjectDropdown,
 	showDropdownPreview,
 	removeDropdownItem,
-	setupEventListeners: initDropdownListeners,
-	attachActionPanelListeners
+	setupEventListeners: initDropdownListeners
 };
