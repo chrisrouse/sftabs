@@ -11,20 +11,13 @@ function renderTabList() {
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
   const isActionPanelOpen = currentActionPanelTab !== null;
 
-  console.log('[renderTabList] Action panel open:', isActionPanelOpen);
-  if (currentActionPanelTab) {
-    console.log('[renderTabList] Current action panel tab:', currentActionPanelTab.id, currentActionPanelTab.label);
-  }
-
   // Get all tabs BEFORE rendering to check if current panel tab still exists
   const allTabs = SFTabs.main.getTabs().sort((a, b) => a.position - b.position);
 
   // If action panel is open but the tab no longer exists, close it
   if (isActionPanelOpen) {
     const tabStillExists = allTabs.some(t => t.id === currentActionPanelTab.id);
-    console.log('[renderTabList] Tab still exists:', tabStillExists);
     if (!tabStillExists && SFTabs.main.closeActionPanel) {
-      console.log('[renderTabList] Closing action panel - tab was deleted');
       SFTabs.main.closeActionPanel();
     }
   }
@@ -67,11 +60,6 @@ function renderTabList() {
     // Setup drag and drop functionality
     setupDragAndDrop();
   }
-
-  // Log final action panel state
-  console.log('[renderTabList] Finished rendering. Action panel display:', domElements.actionPanel.style.display);
-  console.log('[renderTabList] Action panel classList:', domElements.actionPanel.classList.toString());
-  console.log('[renderTabList] Main content display:', domElements.mainContent.style.display);
 
   // Note: We no longer need to preserve action panel state here because
   // delete/promote operations now stage changes instead of saving immediately.

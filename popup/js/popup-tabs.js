@@ -370,30 +370,20 @@ function deleteTab(tabId) {
  * Perform the actual tab deletion
  */
 function performTabDeletion(tabId) {
-  console.log('[performTabDeletion] Deleting tab:', tabId);
-
   // Check if the action panel is open for the tab being deleted
   const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
   const isDeletedTabOpen = currentActionPanelTab && currentActionPanelTab.id === tabId;
 
-  console.log('[performTabDeletion] Current action panel tab:', currentActionPanelTab ? currentActionPanelTab.id : 'none');
-  console.log('[performTabDeletion] Is deleted tab open:', isDeletedTabOpen);
-
   // FIRST: Close the action panel if it's open for this tab - do this BEFORE modifying tabs
   if (isDeletedTabOpen && SFTabs.main.closeActionPanel) {
-    console.log('[performTabDeletion] Calling closeActionPanel BEFORE deletion');
     SFTabs.main.closeActionPanel();
-    console.log('[performTabDeletion] Action panel closed, now proceeding with deletion');
   }
 
   // THEN: Delete the tab from the list
-  console.log('[performTabDeletion] Now filtering out deleted tab');
   const tabs = SFTabs.main.getTabs();
   const updatedTabs = tabs.filter(tab => tab.id !== tabId);
 
-  console.log('[performTabDeletion] Saving tabs...');
   SFTabs.storage.saveTabs(updatedTabs).then(() => {
-    console.log('[performTabDeletion] Save complete');
     SFTabs.main.showStatus('Tab removed', false);
   });
 }
