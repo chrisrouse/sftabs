@@ -435,6 +435,12 @@ function showActionPanel(tab) {
   domElements.actionPanel.classList.add('active');
   domElements.actionPanel.style.display = 'block';
 
+  // Attach dropdown button listeners for this panel instance
+  // Do this after panel is shown to ensure elements are visible
+  if (SFTabs.dropdowns && SFTabs.dropdowns.attachActionPanelListeners) {
+    SFTabs.dropdowns.attachActionPanelListeners();
+  }
+
 }
 
 /**

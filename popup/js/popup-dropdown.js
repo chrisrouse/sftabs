@@ -550,11 +550,54 @@ function initDropdownListeners() {
 	}
 }
 
+/**
+ * Attach event listeners specifically for action panel dropdown buttons
+ * Called when the action panel is shown
+ */
+function attachActionPanelListeners() {
+	console.log('[attachActionPanelListeners] Attaching listeners to action panel');
+
+	// Get buttons directly from action panel using specific selectors
+	const setupButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
+	const refreshButton = document.querySelector('#action-object-dropdown-section #refresh-dropdown-button');
+
+	console.log('[attachActionPanelListeners] Setup button found:', !!setupButton);
+	console.log('[attachActionPanelListeners] Refresh button found:', !!refreshButton);
+
+	// Remove old listeners if they exist (by cloning and replacing nodes)
+	if (setupButton) {
+		const newSetupButton = setupButton.cloneNode(true);
+		setupButton.parentNode.replaceChild(newSetupButton, setupButton);
+
+		newSetupButton.addEventListener('click', async (e) => {
+			console.log('[attachActionPanelListeners] Setup button clicked');
+			e.preventDefault();
+			e.stopPropagation();
+			await setupObjectDropdown();
+		});
+		console.log('[attachActionPanelListeners] Setup button listener attached');
+	}
+
+	if (refreshButton) {
+		const newRefreshButton = refreshButton.cloneNode(true);
+		refreshButton.parentNode.replaceChild(newRefreshButton, refreshButton);
+
+		newRefreshButton.addEventListener('click', async (e) => {
+			console.log('[attachActionPanelListeners] Refresh button clicked');
+			e.preventDefault();
+			e.stopPropagation();
+			await setupObjectDropdown();
+		});
+		console.log('[attachActionPanelListeners] Refresh button listener attached');
+	}
+}
+
 // Export to SFTabs namespace
 window.SFTabs = window.SFTabs || {};
 window.SFTabs.dropdowns = {
 	setupObjectDropdown,
 	showDropdownPreview,
 	removeDropdownItem,
-	setupEventListeners: initDropdownListeners
+	setupEventListeners: initDropdownListeners,
+	attachActionPanelListeners
 };
