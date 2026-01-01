@@ -6,8 +6,8 @@
  */
 async function setupObjectDropdown() {
 
-	// Get UI elements
-	const setupDropdownButton = document.getElementById('setup-dropdown-button');
+	// Get UI elements from the action panel (not the old tab-form)
+	const setupDropdownButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
 
 	// Show loading state
 	setupDropdownButton.disabled = true;
@@ -511,7 +511,8 @@ function saveObjectDropdownItemOrder(container) {
  * Initialize dropdown event listeners
  */
 function initDropdownListeners() {
-	const setupDropdownButton = document.getElementById('setup-dropdown-button');
+	// Get buttons from the action panel (not the old tab-form)
+	const setupDropdownButton = document.querySelector('#action-object-dropdown-section #setup-dropdown-button');
 	const refreshDropdownButton = document.getElementById('refresh-dropdown-button');
 
 	// Setup Dropdown button
