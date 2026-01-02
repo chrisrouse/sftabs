@@ -537,8 +537,22 @@ You can backup your configuration or share it with team members.
 - **Custom Selection** When you choose this option, you'll be able choose if you want to export Settings (Preferences, theme, and options) and/or specific profiles. Use this option if you alreday use SF Tabs on another device and only need to export certain profiles or if you are sharing a configuration with a co-worker.
 
 #### Import Configuration
-Import a JSON file that was exported from SF Tabs on a different computer or to restore a backup. You will have 
+Import a JSON file that was exported from SF Tabs on a different computer or to restore a backup. Whether you are importing an older JSON file (pre-v2.0) or a newer file, the import tool will properly identify the file and show the correct import options.
 
+- **Importing v1 configuration, profiles not enabled** If you import a file that was exported from an older version of SF Tabs and you have not enabled Profiles yet, the import tool will ask if you want to add your tabs to your existing configuration or replace your current tabs.
+
+<img width="751" height="498" alt="Screenshot 2026-01-02 at 10 55 59 AM" src="https://github.com/user-attachments/assets/fe36b992-3bf2-476f-96e3-cd5359807d23" />
+
+- **Importing v1 configuration, profiles are enabled** If you import a file that was exported from an older version of SF Tabs and you have enabled Profiles, you will be able to choose if you want to add your tabs to an existng Profile, overwrite an existing profile, or create a new Profile.
+  
+<img width="756" height="575" alt="Screenshot 2026-01-02 at 11 03 29 AM" src="https://github.com/user-attachments/assets/63ca2bd2-7ec3-4333-b33d-e4b0e3fa3ea9" />
+
+
+- **Importing v2 configuration, profiles not enabled** If you are importing a v2 configuration file, it may or may not contain Profiles. If it does not contain profiles, the import process is the same as importing a v1 file. You will be able to choose if you want to add to or overwrite the existing tabs. However, if you are importing a file that does contain Profiles from another configuration, Profiles will be enabled at that time during import. You can choose which Profiles to import.
+
+<img width="753" height="578" alt="Screenshot 2026-01-02 at 10 59 33 AM" src="https://github.com/user-attachments/assets/b49b6d1b-8f8a-4ee0-be46-5332a60ee10c" />
+
+- **Importing v2 configuration, profiles are enabled** If you are importing a v2 configuration and Profiles have been enabled, then you can choose which Profiles to import. Profiles cannot be overwritten in this instance. 
 
 ## Upgrading to v2.0.0 (Migration Wizard)
 
