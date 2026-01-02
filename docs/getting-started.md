@@ -8,7 +8,7 @@ title: Getting Started
 
 Click the extension icon in your browser toolbar to open SF Tabs
 
-<img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="SF Tabs Icon" style="display: inline; height: 1.2em; vertical-align: middle;"> 
+<img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="SF Tabs Icon" style="display: inline; height: 3em; vertical-align: middle;"> 
 
 
 ## Adding a New Tab
