@@ -303,19 +303,38 @@
     <!-- Sidebar collapse toggle -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Handle sidebar toggle chevron icons
+            // Restore sidebar section states from localStorage
+            const savedStates = JSON.parse(localStorage.getItem('sidebarStates') || '{}');
+
+            // Handle sidebar toggle chevron icons and persistence
             const toggles = document.querySelectorAll('.sidebar-toggle');
             toggles.forEach(toggle => {
                 const target = toggle.getAttribute('href');
                 const collapseElement = document.querySelector(target);
 
                 if (collapseElement) {
+                    // Restore saved state
+                    const sectionId = target.replace('#', '');
+                    if (savedStates[sectionId] === true) {
+                        collapseElement.classList.add('show');
+                        const icon = toggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('bi-chevron-right');
+                            icon.classList.add('bi-chevron-down');
+                        }
+                    }
+
                     collapseElement.addEventListener('show.bs.collapse', function() {
                         const icon = toggle.querySelector('i');
                         if (icon) {
                             icon.classList.remove('bi-chevron-right');
                             icon.classList.add('bi-chevron-down');
                         }
+                        // Save state to localStorage
+                        const sectionId = target.replace('#', '');
+                        const states = JSON.parse(localStorage.getItem('sidebarStates') || '{}');
+                        states[sectionId] = true;
+                        localStorage.setItem('sidebarStates', JSON.stringify(states));
                     });
 
                     collapseElement.addEventListener('hide.bs.collapse', function() {
@@ -324,6 +343,11 @@
                             icon.classList.remove('bi-chevron-down');
                             icon.classList.add('bi-chevron-right');
                         }
+                        // Save state to localStorage
+                        const sectionId = target.replace('#', '');
+                        const states = JSON.parse(localStorage.getItem('sidebarStates') || '{}');
+                        states[sectionId] = false;
+                        localStorage.setItem('sidebarStates', JSON.stringify(states));
                     });
                 }
             });
