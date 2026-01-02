@@ -258,6 +258,14 @@ Click on the new tab icon <img src="{{ '/assets/images/icons/new-tab.svg' | rela
 3. **Confirm deletion**
    Click OK to permanently remove the tab
 
+## Floating Button
+
+This is a new feature added in v2.0. This new floating button allows you to have quick access to your custom tabs whether you are in Setup or elsewhere in Salesforce. It can be configured in [Settings](#settings).
+
+<img width="166" height="270" alt="Screenshot 2026-01-02 at 8 16 42 AM" src="https://github.com/user-attachments/assets/4f3f57fe-8baa-403f-b066-905e59a17b17" />
+
+<img width="339" height="287" alt="Screenshot 2026-01-02 at 8 21 47 AM" src="https://github.com/user-attachments/assets/67e985d8-dff2-486f-8dbd-012d18f66abe" />
+
 
 ## Keyboard Shortcuts
 
@@ -295,76 +303,6 @@ By default, no keyboard shortcuts are assigned. You must configure them manually
 
 4. **Configure Shortcuts**
    Click in the pencil icon next to each command (e.g., "Tab 1") and press your desired key combination
-
-## Settings
-
-Access the Settings page by clicking the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup. This opens a dedicated settings page with organized sections for all configuration options.
-
-<img width="261" height="476" alt="Screenshot 2026-01-02 at 8 04 04 AM" src="https://github.com/user-attachments/assets/80de88c2-dfdf-47d9-8462-a33996aebe34" />
-
-
-### Appearance
-
-#### Theme Mode
-
-Choose how the extension looks:
-- **Light:** Light color scheme optimized for daytime use
-- **Dark:** Dark color scheme for low-light environments
-- **System:** Automatically matches your operating system's theme preference
-
-#### Compact Mode
-
-Enable compact mode to display more tabs in less space by:
-- Hiding tab URLs in the popup
-- Reducing padding and spacing between items
-- Using smaller font sizes
-
-This is useful when you have many tabs and want to see them all at once.
-
-### Behavior
-
-#### Skip Delete Confirmation
-
-When enabled, tabs will be deleted immediately without showing a confirmation dialog. Use this if you're confident in your deletions and want a faster workflow.
-
-### Sync & Storage
-
-Control how your tabs are stored and whether they sync across devices.
-
-#### Enable Cross-Device Sync (Recommended)
-
-When enabled, your tabs sync across all devices where you use the same browser account:
-- **Sync Storage (Cloud):** Tabs stored in browser's sync storage, automatically syncs across devices
-  - Limited to approximately 50 tabs due to browser sync storage limits (8KB total storage)
-  - Data is automatically split into smaller chunks to work within browser limitations
-  - Recommended for most users
-
-When disabled, tabs are stored locally:
-- **Local Storage:** Tabs stored only on this device
-  - No practical limit on number of tabs (several MB available)
-  - Does not sync to other devices
-  - Useful if you have many tabs or device-specific configurations
-
-**Note:** Regardless of which storage option you choose, all data remains in your browser or managed by your browser's sync system. SF Tabs doesn't not send your data anywhere else.
-
-### Profiles
-
-Enable the Profiles feature to create multiple tab configurations for different Salesforce orgs or work contexts. See the [Profiles](#profiles) section for complete documentation.
-
-#### Enable Profiles
-
-Turn on the Profiles feature to create and manage multiple sets of tabs.
-
-#### Auto-Switch Profiles (Only shown when Profiles are enabled)
-
-Automatically switch to the appropriate profile based on the current Salesforce org's MyDomain URL. You can configure URL patterns for each profile to enable automatic switching.
-
-### Keyboard Shortcuts
-
-Configure keyboard shortcuts to quickly access your first 10 tabs by position. Click "Configure Keyboard Shortcuts" to open your browser's keyboard shortcut configuration page.
-
-See the [Keyboard Shortcuts](#keyboard-shortcuts) section for detailed setup instructions.
-
 
 ## Profiles
 
@@ -508,35 +446,98 @@ If you want to return to a single set of tabs:
 
 This action cannot be undone, so export a backup first if needed.
 
+## Settings
 
-## Import/Export Configuration
+Access the Settings page by clicking the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup. This opens a dedicated settings page with organized sections for all configuration options.
+
+### General
+
+#### Appearance
+
+Choose how the extension looks:
+- **Light:** Light color scheme optimized for daytime use
+- **Dark:** Dark color scheme for low-light environments
+- **System:** Automatically matches your operating system's theme preference
+
+<img width="759" height="297" alt="Screenshot 2026-01-02 at 8 11 49 AM" src="https://github.com/user-attachments/assets/aff3aebc-8955-4065-9641-c9366f16f667" />
+<img width="412" height="302" alt="2026-01-02_08-13-29" src="https://github.com/user-attachments/assets/d9623eca-44ad-477b-b8d8-68b956e4eb2e" />
+
+#### Compact Mode
+
+Enable compact mode to display more tabs in less space by:
+- Hiding tab URLs in the popup
+- Reducing padding and spacing between items
+
+This is useful when you have many tabs and want to see more of them all at once in the extension popup.
+
+<img width="453" height="140" alt="Screenshot 2026-01-02 at 8 12 43 AM" src="https://github.com/user-attachments/assets/241e9f11-28bd-4b14-95bf-515679d0113f" />
+<img width="410" height="214" alt="Screenshot 2026-01-02 at 8 13 04 AM" src="https://github.com/user-attachments/assets/7fbdc6cc-ae1f-49d9-9f5b-50f37f47f8a8" />
+<img width="411" height="158" alt="Screenshot 2026-01-02 at 8 13 14 AM" src="https://github.com/user-attachments/assets/ee356562-7c86-490f-a83d-664447fd125b" />
+
+
+#### Delete Confirmation
+
+When enabled, tabs will be deleted immediately without showing a confirmation dialog. Use this if you're confident in your deletions and want a faster workflow.
+
+<img width="371" height="118" alt="Screenshot 2026-01-02 at 8 52 54 AM" src="https://github.com/user-attachments/assets/8506c268-1a51-47f9-963f-acce3782b8c7" />
+<img width="412" height="302" alt="2026-01-02_08-14-25" src="https://github.com/user-attachments/assets/514c80b1-622d-4231-b5fd-c235d3ae3eb3" />
+
+
+### Button
+
+- **Enable floating button** This enables the button
+- **Location** Choose where you want the button to be visibile. It can show on all pages, only in Setup, or only outside of Setup.
+- **Position** Adjust the slider to set the vertical position of the floating button on the right side of the window. Setting it to close to 0% or 100% can have unexpected issues depending on the size of the window, so if you see any issues, adjust the position.
+
+<img width="784" height="584" alt="Screenshot 2026-01-02 at 8 35 59 AM" src="https://github.com/user-attachments/assets/28ff4a47-7502-4263-9686-a18c752187a7" />
+
+### Profiles
+
+- **Enable Profiles** Enable this feature to create multiple tab configurations for different Salesforce orgs or work contexts. See the [Profiles](#profiles) section for complete documentation.
+- **Auto-Switch Profiles** When enabled, Profiles can use URL matching to automatically switch the active profile for the current tab.
+- **Disable Profiles** When you disable profiles, you will need to select one profile to keep as th new default set of tabs. All other profiles will be deleted from storage and cannot be retrieved, so you may want to export your data first.
+
+<img width="811" height="615" alt="Screenshot 2026-01-02 at 8 38 35 AM" src="https://github.com/user-attachments/assets/4efac4d6-69d3-4e35-a7ba-13d7c36f46b4" />
+
+### Shortcuts
+
+Configure keyboard shortcuts to quickly access your first 10 tabs by position. See the [Keyboard Shortcuts](#keyboard-shortcuts) section for detailed setup instructions.
+
+<img width="780" height="341" alt="Screenshot 2026-01-02 at 8 41 36 AM" src="https://github.com/user-attachments/assets/58fde083-9861-4daa-b11d-2f91ae0f3512" />
+
+### Data
+
+Control how your tabs are stored and whether they sync across devices.
+
+- **Enable cross-device sync** When this is enabled, SF Tabs will store information in your browser's sync storage system, allowing it to be shared across all of your computers where SF Tabs is installed. This is the recommended configuration for most users, however, it is opt-in, so you will need to enable it. Once enabled, your data will be migrated from local storage to sync storage. We recommend making a backup of your data first or changing before you start adding tabs in order to avoid data loss if there are any issues. If Profiles are enabled, those will also be synced.
+- **Reset** Use this to reset SF Tabs to the original settings.
+  
+<img width="782" height="504" alt="Screenshot 2026-01-02 at 8 48 13 AM" src="https://github.com/user-attachments/assets/0a01bc91-149b-4303-a259-4848c1eb47ee" />
+
+**Sync Storage (Cloud):** Tabs stored in browser's sync storage, automatically syncs across devices
+  - Limited to approximately 50 tabs due to browser sync storage limits (8KB total storage)
+  - Data is automatically split into smaller chunks to work within browser limitations
+  - Recommended for most users
+
+**Local Storage:** Tabs stored only on this device
+  - No practical limit on number of tabs (several MB available)
+  - Does not sync to other devices
+  - Useful if you have many tabs or device-specific configurations
+
+**Note:** Regardless of which storage option you choose, all data remains in your browser or managed by your browser's sync system. SF Tabs doesn't not send your data anywhere else.
+
+
+### Import/Export Configuration
 
 You can backup your configuration or share it with team members.
 
-### Export Configuration
+#### Export Configuration
 
-1. **Open settings**
-   Click the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup
+- **Everything (Recommended)** Choose this option to exprot all tabs, settings, and profiles to a JSON file.
+- **Custom Selection** When you choose this option, you'll be able choose if you want to export Settings (Preferences, theme, and options) and/or specific profiles. Use this option if you alreday use SF Tabs on another device and only need to export certain profiles or if you are sharing a configuration with a co-worker.
 
-2. **Click "Export Settings"**
-   A JSON file will be downloaded to your computer
-
-3. **Save the file**
-   Store it in a safe location for backup or sharing
-
-### Import Configuration
-
-1. **Open settings**
-   Click the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup
-
-2. **Click "Import Settings"**
-   A file picker will appear
-
-3. **Select your JSON file**
-   Choose the configuration file you want to import
-
-4. **Confirm import**
-   Your current settings will be replaced with the imported configuration
+#### Import Configuration
+Import a JSON file that was exported from SF Tabs on a different computer or to restore a backup. You will have 
 
 
 ## Upgrading to v2.0.0 (Migration Wizard)
