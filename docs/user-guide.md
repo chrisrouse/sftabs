@@ -296,10 +296,12 @@ By default, no keyboard shortcuts are assigned. You must configure them manually
 4. **Configure Shortcuts**
    Click in the pencil icon next to each command (e.g., "Tab 1") and press your desired key combination
 
-
 ## Settings
 
 Access the Settings page by clicking the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the extension popup. This opens a dedicated settings page with organized sections for all configuration options.
+
+<img width="261" height="476" alt="Screenshot 2026-01-02 at 8 04 04 AM" src="https://github.com/user-attachments/assets/80de88c2-dfdf-47d9-8462-a33996aebe34" />
+
 
 ### Appearance
 
