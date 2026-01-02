@@ -73,27 +73,40 @@ h4 { font-size: 1.25rem; }
     position: sticky;
     top: 56px;
     max-height: calc(100vh - 56px);
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    flex-shrink: 0;
     padding-top: 2rem;
+    background-color: var(--sf-gray-100);
+    z-index: 10;
+}
+
+.sidebar-sections {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 2rem;
     scrollbar-width: thin;
     scrollbar-color: var(--sf-gray-600) var(--sf-gray-200);
 }
 
 /* Webkit scrollbar styling for sidebar */
-.sidebar-sticky::-webkit-scrollbar {
+.sidebar-sections::-webkit-scrollbar {
     width: 6px;
 }
 
-.sidebar-sticky::-webkit-scrollbar-track {
+.sidebar-sections::-webkit-scrollbar-track {
     background: var(--sf-gray-200);
 }
 
-.sidebar-sticky::-webkit-scrollbar-thumb {
+.sidebar-sections::-webkit-scrollbar-thumb {
     background: var(--sf-gray-600);
     border-radius: 3px;
 }
 
-.sidebar-sticky::-webkit-scrollbar-thumb:hover {
+.sidebar-sections::-webkit-scrollbar-thumb:hover {
     background: var(--sf-brand-primary);
 }
 
