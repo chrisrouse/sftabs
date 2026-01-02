@@ -67,12 +67,16 @@ h4 { font-size: 1.25rem; }
     background-color: var(--sf-gray-100);
     min-height: calc(100vh - 56px);
     border-right: 1px solid var(--sf-gray-200);
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    width: inherit;
+    overflow: hidden;
 }
 
 .sidebar-sticky {
-    position: sticky;
-    top: 56px;
-    max-height: calc(100vh - 56px);
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
