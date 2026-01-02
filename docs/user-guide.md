@@ -548,11 +548,15 @@ Import a JSON file that was exported from SF Tabs on a different computer or to 
 <img width="756" height="575" alt="Screenshot 2026-01-02 at 11 03 29 AM" src="https://github.com/user-attachments/assets/63ca2bd2-7ec3-4333-b33d-e4b0e3fa3ea9" />
 
 
-- **Importing v2 configuration, profiles not enabled** If you are importing a v2 configuration file, it may or may not contain Profiles. If it does not contain profiles, the import process is the same as importing a v1 file. You will be able to choose if you want to add to or overwrite the existing tabs. However, if you are importing a file that does contain Profiles from another configuration, Profiles will be enabled at that time during import. You can choose which Profiles to import.
+- **Importing v2 configuration, profiles not enabled** When importing a v2 configuration file, there are a couple of possible outcomes. If you are importing a configuration where Profiles were not enabled, then you will have the option to create a new Profile and Enable Profiles, add to the existing configuration of tabs, or overwrite the existing configuration of tabs. Even if Profiles are not enabled, you always have one called "Default". If you are importing a file from a configuration that contains multiple Profiles, then Profiles will be enabled automatically and you can choose which Profiles to import.
 
+<img width="755" height="545" alt="Screenshot 2026-01-02 at 11 24 59 AM" src="https://github.com/user-attachments/assets/eeb491d1-c190-4361-91b9-96be3d7f2c27" />  
 <img width="753" height="578" alt="Screenshot 2026-01-02 at 10 59 33 AM" src="https://github.com/user-attachments/assets/b49b6d1b-8f8a-4ee0-be46-5332a60ee10c" />
 
-- **Importing v2 configuration, profiles are enabled** If you are importing a v2 configuration and Profiles have been enabled, then you can choose which Profiles to import. Profiles cannot be overwritten in this instance. 
+- **Importing v2 configuration, profiles are enabled** If Profiles have been enabled, but your file only contains the one Default Profile, you will have options for adding to or overwriting an existing Profile or creating a new Profile. If you are importing a configuration that has multiple Profiles, then your imported Profiles will be imported but they do not replace any existing profiles.
+  <img width="749" height="573" alt="Screenshot 2026-01-02 at 11 37 47 AM" src="https://github.com/user-attachments/assets/befd6f89-28ba-4f42-8436-89fd2ec2ec77" />
+  <img width="747" height="445" alt="Screenshot 2026-01-02 at 11 32 07 AM" src="https://github.com/user-attachments/assets/dd83f904-0e6e-4f66-93f8-ccec0c14b803" />
+
 
 ## Upgrading to v2.0.0 (Migration Wizard)
 
