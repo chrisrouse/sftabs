@@ -90,7 +90,7 @@ const DEFAULT_SETTINGS = {
   themeMode: 'light',
   compactMode: false,
   skipDeleteConfirmation: false,
-  useSyncStorage: true, // Enable cross-device sync by default
+  useSyncStorage: false, // Local storage by default (privacy-first, sync is opt-in)
   profilesEnabled: false, // Enable profiles feature
   autoSwitchProfiles: false, // Enable auto-switching based on URL patterns
   activeProfileId: null, // Currently active profile ID (null = no profiles mode)

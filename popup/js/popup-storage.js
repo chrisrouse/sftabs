@@ -9,13 +9,23 @@ async function getStoragePreference() {
   try {
     // Settings are always in sync storage (they're small)
     const result = await browser.storage.sync.get('userSettings');
+
+    // If useSyncStorage is explicitly set, use it
     if (result.userSettings && typeof result.userSettings.useSyncStorage === 'boolean') {
       return result.userSettings.useSyncStorage;
     }
-    // Default to sync storage
-    return true;
+
+    // If userSettings exists but useSyncStorage is not set, this is an existing user
+    // from before v2.1 when sync was the default - preserve that behavior
+    if (result.userSettings) {
+      return true;
+    }
+
+    // No userSettings at all - this is a new installation, use new default (local storage)
+    return false;
   } catch (error) {
-    return true;
+    // On error, default to local storage for privacy
+    return false;
   }
 }
 
@@ -155,10 +165,19 @@ async function getUserSettings() {
     const result = await browser.storage.sync.get('userSettings');
 
     if (result.userSettings) {
-      // Merge with defaults to ensure all properties exist
-      return { ...SFTabs.constants.DEFAULT_SETTINGS, ...result.userSettings };
+      // Existing user - merge with defaults
+      const mergedSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...result.userSettings };
+
+      // If useSyncStorage is not explicitly set, this is an existing user from before v2.1
+      // when sync was the default - preserve that behavior
+      if (typeof result.userSettings.useSyncStorage !== 'boolean') {
+        mergedSettings.useSyncStorage = true;
+      }
+
+      return mergedSettings;
     } else {
-      // Return defaults and save them (suppress toast during initialization)
+      // New installation - return defaults and save them (suppress toast during initialization)
+      // DEFAULT_SETTINGS now has useSyncStorage: false for privacy-first approach
       await saveUserSettings(SFTabs.constants.DEFAULT_SETTINGS, false, false);
       return { ...SFTabs.constants.DEFAULT_SETTINGS };
     }

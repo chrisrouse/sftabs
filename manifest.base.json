@@ -22,7 +22,8 @@
     "*://*.salesforce-setup.com/*",
     "*://*.my.salesforce-setup.com/*",
     "*://*.salesforce.com/*",
-    "*://*.my.salesforce.com/*"
+    "*://*.my.salesforce.com/*",
+    "*://*.builder.salesforce-experience.com/*"
   ],
   "action": {
     "default_icon": {
@@ -39,7 +40,8 @@
         "*://*.salesforce-setup.com/*",
         "*://*.my.salesforce-setup.com/*",
         "*://*.salesforce.com/*",
-        "*://*.my.salesforce.com/*"
+        "*://*.my.salesforce.com/*",
+        "*://*.builder.salesforce-experience.com/*"
       ],
       "js": [
         "popup/js/shared/browser-compat.js",
@@ -75,7 +77,8 @@
         "*://*.salesforce-setup.com/*",
         "*://*.my.salesforce-setup.com/*",
         "*://*.salesforce.com/*",
-        "*://*.my.salesforce.com/*"
+        "*://*.my.salesforce.com/*",
+        "*://*.builder.salesforce-experience.com/*"
       ]
     }
   ],

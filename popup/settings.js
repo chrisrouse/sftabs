@@ -35,7 +35,20 @@ async function loadUserSettings() {
 	try {
 		// Settings are always in sync storage (small, benefit from cross-device sync)
 		const result = await browser.storage.sync.get('userSettings');
-		userSettings = result.userSettings || { ...SFTabs.constants.DEFAULT_SETTINGS };
+
+		if (result.userSettings) {
+			// Existing user - merge with defaults
+			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...result.userSettings };
+
+			// If useSyncStorage is not explicitly set, this is an existing user from before v2.1
+			// when sync was the default - preserve that behavior
+			if (typeof result.userSettings.useSyncStorage !== 'boolean') {
+				userSettings.useSyncStorage = true;
+			}
+		} else {
+			// New installation - use defaults (useSyncStorage: false for privacy-first approach)
+			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
+		}
 	} catch (error) {
 		userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 	}
@@ -399,6 +412,40 @@ function setupEventListeners() {
 		}
 	});
 
+	// Import cancel button
+	document.getElementById('import-cancel-button').addEventListener('click', () => {
+		hideImportOptions();
+	});
+
+	// Import confirm button
+	document.getElementById('import-confirm-button').addEventListener('click', async () => {
+		await performImportFromInline();
+	});
+
+	// Import destination radio buttons
+	const importDestRadios = document.querySelectorAll('input[name="import-destination"]');
+	importDestRadios.forEach(radio => {
+		radio.addEventListener('change', (e) => {
+			const addSection = document.getElementById('import-add-section');
+			const overwriteSection = document.getElementById('import-overwrite-section');
+			const newProfileSection = document.getElementById('import-new-profile-section');
+
+			// Hide all sections first
+			addSection.style.display = 'none';
+			overwriteSection.style.display = 'none';
+			newProfileSection.style.display = 'none';
+
+			// Show the appropriate section
+			if (e.target.value === 'add') {
+				addSection.style.display = 'block';
+			} else if (e.target.value === 'overwrite') {
+				overwriteSection.style.display = 'block';
+			} else if (e.target.value === 'new') {
+				newProfileSection.style.display = 'block';
+			}
+		});
+	});
+
 	// Reset button
 	document.getElementById('reset-button').addEventListener('click', async () => {
 		const confirmed = confirm(
@@ -652,7 +699,9 @@ async function performExport(exportEverything, exportSettings, selectedProfileId
 				filename += `_${selectedProfileIds.length}profiles`;
 			}
 		}
-		filename += `_${new Date().toISOString().split('T')[0]}.json`;
+		// Add timestamp (YYYY-MM-DD_HH-MM-SS format)
+		const timestamp = new Date().toISOString().replace(/T/, '_').replace(/:/g, '-').split('.')[0];
+		filename += `_${timestamp}.json`;
 
 		a.download = filename;
 		document.body.appendChild(a);
@@ -666,6 +715,9 @@ async function performExport(exportEverything, exportSettings, selectedProfileId
 	}
 }
 
+// Store the parsed import data globally for the confirm button
+let pendingImportData = null;
+
 /**
  * Import configuration from JSON file
  */
@@ -674,269 +726,292 @@ async function importConfiguration(file) {
 		const text = await file.text();
 		const importData = JSON.parse(text);
 
-		// Detect if this is a pre-v2 config (legacy format without profiles)
-		const isLegacyConfig = !importData.version && importData.customTabs && (!importData.profiles || importData.profiles.length === 0);
+		// Normalize the data format
+		let normalizedData = normalizeImportData(importData);
 
-		if (isLegacyConfig) {
-			// This is a v1.x config - trigger migration wizard
-			showStatus('Legacy configuration detected. Preparing migration wizard...', false);
+		// Store for later use
+		pendingImportData = normalizedData;
 
-			// Store the legacy data and trigger migration
-			await browser.storage.local.set({
-				extensionVersion: 'unknown',
-				migrationCompleted: false,
-				migrationPending: true,
-				customTabs: importData.customTabs,
-				userSettings: importData.userSettings || {}
-			});
-
-			// Also store in sync if that's the preference
-			const useSyncStorage = userSettings.useSyncStorage || true;
-			if (useSyncStorage) {
-				await browser.storage.sync.set({
-					userSettings: importData.userSettings || {}
-				});
-			}
-
-			// Close settings and reload main popup to show migration wizard
-			setTimeout(() => {
-				window.close();
-			}, 1500);
-			return;
-		}
-
-		// Normalize old format to new format
-		let normalizedData = importData;
-
-		// Detect old format (from import_export.html)
-		if (importData.customTabs && !importData.version) {
-			normalizedData = {
-				version: '2.0.0',
-				exportDate: importData.exportedAt || new Date().toISOString(),
-				settings: importData.userSettings || {},
-				tabs: importData.customTabs || [],
-				profiles: [],
-				chunkedData: {}
-			};
-		}
-		// Detect new format but use "tabs" key if "settings" exists
-		else if (importData.version && importData.settings) {
-			normalizedData = importData;
-		}
-		// Invalid format
-		else if (!importData.version && !importData.customTabs) {
-			throw new Error('Invalid configuration file - missing required fields');
-		}
-
-		// Always show import modal to let user choose what to import
-		showImportModal(normalizedData);
+		// Show the inline import options
+		populateImportOptions(normalizedData, file.name);
 	} catch (error) {
 		showStatus('Import failed: ' + error.message, true);
 	}
 }
 
 /**
- * Show import modal for profile selection
+ * Normalize import data to a consistent format
  */
-async function showImportModal(importData) {
-	const modal = document.getElementById('import-target-modal');
-	const profileSelect = document.getElementById('import-profile-select');
-	const newProfileSection = document.getElementById('new-profile-section');
-	const overwriteProfileSection = document.getElementById('overwrite-profile-section');
-	const importTabsCheckbox = document.getElementById('import-tabs');
-	const importSettingsCheckbox = document.getElementById('import-settings');
-	const destinationSection = document.getElementById('import-destination-section');
+function normalizeImportData(importData) {
+	// Detect if this is a pre-v2 config (legacy format)
+	const isLegacyConfig = !importData.version && importData.customTabs;
 
-	// Check if profiles are enabled
-	const profilesEnabled = userSettings.profilesEnabled || false;
-
-	// Load current profiles if enabled
-	const result = await browser.storage.sync.get('profiles');
-	const profiles = result.profiles || [];
-
-	// Populate profile select
-	profileSelect.innerHTML = '<option value="">Choose a profile...</option>';
-	profiles.forEach(profile => {
-		const option = document.createElement('option');
-		option.value = profile.id;
-		option.textContent = profile.name;
-		profileSelect.appendChild(option);
-	});
-
-	// Reset checkboxes to default state
-	importTabsCheckbox.checked = true;
-	importSettingsCheckbox.checked = false;
-
-	// Show/hide destination section based on profiles being enabled and tabs checkbox
-	const handleTabsCheckboxChange = () => {
-		if (importTabsCheckbox.checked && profilesEnabled) {
-			destinationSection.style.display = 'block';
-		} else {
-			destinationSection.style.display = 'none';
-		}
-	};
-
-	// Initial state - hide destination if profiles not enabled
-	if (!profilesEnabled) {
-		destinationSection.style.display = 'none';
+	if (isLegacyConfig) {
+		// Convert v1.x format to v2 format
+		return {
+			version: '1.x',
+			exportDate: importData.exportedAt || new Date().toISOString(),
+			settings: importData.userSettings || {},
+			tabs: importData.customTabs || [],
+			profiles: [],
+			profileData: {},
+			chunkedData: {}
+		};
 	}
 
-	importTabsCheckbox.removeEventListener('change', handleTabsCheckboxChange);
-	importTabsCheckbox.addEventListener('change', handleTabsCheckboxChange);
+	// v2.0+ format
+	if (importData.version && importData.settings) {
+		return importData;
+	}
 
-	// Handle radio button changes
-	const radioButtons = modal.querySelectorAll('input[name="import-option"]');
-	radioButtons.forEach(radio => {
-		radio.addEventListener('change', (e) => {
-			if (e.target.value === 'overwrite') {
-				overwriteProfileSection.style.display = 'block';
-				newProfileSection.style.display = 'none';
-			} else {
-				overwriteProfileSection.style.display = 'none';
-				newProfileSection.style.display = 'block';
-			}
+	// Try to detect tabs in different locations
+	const tabs = importData.tabs || importData.customTabs || [];
+
+	return {
+		version: importData.version || '2.0.0',
+		exportDate: importData.exportDate || importData.exportedAt || new Date().toISOString(),
+		settings: importData.settings || importData.userSettings || {},
+		tabs: tabs,
+		profiles: importData.profiles || [],
+		profileData: importData.profileData || {},
+		chunkedData: importData.chunkedData || {}
+	};
+}
+
+/**
+ * Populate the inline import options UI
+ */
+async function populateImportOptions(importData, filename) {
+	// Show the container
+	document.getElementById('import-options-container').style.display = 'block';
+
+	// Set filename
+	document.getElementById('import-filename').textContent = filename;
+
+	// Reset all sections
+	document.getElementById('import-settings-container').style.display = 'none';
+	document.getElementById('import-profiles-container').style.display = 'none';
+	document.getElementById('import-tabs-container').style.display = 'none';
+	document.getElementById('import-destination-container').style.display = 'none';
+	document.getElementById('import-mode-container').style.display = 'none';
+	document.getElementById('import-hybrid-container').style.display = 'none';
+	document.getElementById('import-profiles-warning').style.display = 'none';
+
+	// Check if profiles are enabled in current installation
+	const profilesEnabled = userSettings.profilesEnabled || false;
+
+	// Show warning if importing profiles but profiles not currently enabled
+	const hasProfiles = importData.profiles && importData.profiles.length > 0 && importData.profileData && Object.keys(importData.profileData).length > 0;
+	const isSingleProfile = hasProfiles && importData.profiles.length === 1;
+
+	// Only show warning for multiple profiles (single profile has hybrid UI that explains options)
+	if (hasProfiles && !profilesEnabled && !isSingleProfile) {
+		document.getElementById('import-profiles-warning').style.display = 'block';
+	}
+
+	// Show settings option if available
+	if (importData.settings && Object.keys(importData.settings).length > 0) {
+		document.getElementById('import-settings-container').style.display = 'block';
+		document.getElementById('import-settings-checkbox').checked = false; // Unchecked by default
+	}
+
+	// Handle profiles vs tabs (variables already defined above for warning check)
+	if (hasProfiles && !isSingleProfile) {
+		// Multiple profiles in import file
+		const profilesList = document.getElementById('import-profiles-list');
+		profilesList.innerHTML = '';
+		document.getElementById('import-profiles-container').style.display = 'block';
+
+		// Add checkbox for each profile with tab count
+		for (const profile of importData.profiles) {
+			const profileTabs = importData.profileData[profile.id] || [];
+			const tabCount = profileTabs.length;
+
+			const label = document.createElement('label');
+			label.className = 'checkbox-group';
+			label.style.cssText = 'display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; margin-bottom: 6px;';
+
+			const checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.checked = true;
+			checkbox.className = 'import-profile-checkbox';
+			checkbox.dataset.profileId = profile.id;
+			checkbox.style.cssText = 'margin-top: 2px;';
+
+			const textContainer = document.createElement('div');
+			textContainer.style.flex = '1';
+
+			const nameDiv = document.createElement('div');
+			nameDiv.style.cssText = 'font-weight: 500; color: var(--color-text);';
+			nameDiv.textContent = profile.name;
+
+			const countDiv = document.createElement('div');
+			countDiv.style.cssText = 'font-size: 12px; color: var(--color-text-weak); margin-top: 1px;';
+			countDiv.textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''}`;
+
+			textContainer.appendChild(nameDiv);
+			textContainer.appendChild(countDiv);
+
+			label.appendChild(checkbox);
+			label.appendChild(textContainer);
+			profilesList.appendChild(label);
+		}
+	} else if (isSingleProfile && !profilesEnabled) {
+		// Special case: Single profile but profiles not enabled - show hybrid options
+		document.getElementById('import-tabs-container').style.display = 'block';
+		const profile = importData.profiles[0];
+		const profileTabs = importData.profileData[profile.id] || [];
+		const tabCount = profileTabs.length;
+		document.getElementById('import-tabs-count').textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''} from "${profile.name}"`;
+
+		// Show hybrid import options
+		document.getElementById('import-hybrid-container').style.display = 'block';
+	} else if (isSingleProfile && profilesEnabled) {
+		// Single profile with profiles enabled - show destination options
+		document.getElementById('import-tabs-container').style.display = 'block';
+		const profile = importData.profiles[0];
+		const profileTabs = importData.profileData[profile.id] || [];
+		const tabCount = profileTabs.length;
+		document.getElementById('import-tabs-count').textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''} from "${profile.name}"`;
+
+		// Show destination options for profiles mode
+		document.getElementById('import-destination-container').style.display = 'block';
+
+		// Populate both profile dropdowns (add and overwrite)
+		const result = await browser.storage.sync.get('profiles');
+		const profiles = result.profiles || [];
+
+		const addSelect = document.getElementById('import-profile-add-select');
+		addSelect.innerHTML = '<option value="">Choose a profile...</option>';
+
+		const overwriteSelect = document.getElementById('import-profile-select-inline');
+		overwriteSelect.innerHTML = '<option value="">Choose a profile...</option>';
+
+		profiles.forEach(profile => {
+			// Add to "add" dropdown
+			const addOption = document.createElement('option');
+			addOption.value = profile.id;
+			addOption.textContent = profile.name;
+			addSelect.appendChild(addOption);
+
+			// Add to "overwrite" dropdown
+			const overwriteOption = document.createElement('option');
+			overwriteOption.value = profile.id;
+			overwriteOption.textContent = profile.name;
+			overwriteSelect.appendChild(overwriteOption);
 		});
-	});
+	} else if (importData.tabs && importData.tabs.length > 0) {
+		// Single set of tabs (legacy or single profile with profiles enabled)
+		document.getElementById('import-tabs-container').style.display = 'block';
+		const tabCount = importData.tabs.length;
+		document.getElementById('import-tabs-count').textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''}`;
 
-	// Handle import confirmation
-	document.getElementById('import-modal-confirm').onclick = async () => {
-		const importTabs = importTabsCheckbox.checked;
-		const importSettings = importSettingsCheckbox.checked;
+		// If user has profiles enabled, show destination options
+		if (profilesEnabled) {
+			document.getElementById('import-destination-container').style.display = 'block';
 
-		// Validate at least one option is selected
-		if (!importTabs && !importSettings) {
-			showStatus('Please select at least one option to import', true);
-			return;
+			// Populate both profile dropdowns (add and overwrite)
+			const result = await browser.storage.sync.get('profiles');
+			const profiles = result.profiles || [];
+
+			const addSelect = document.getElementById('import-profile-add-select');
+			addSelect.innerHTML = '<option value="">Choose a profile...</option>';
+
+			const overwriteSelect = document.getElementById('import-profile-select-inline');
+			overwriteSelect.innerHTML = '<option value="">Choose a profile...</option>';
+
+			profiles.forEach(profile => {
+				// Add to "add" dropdown
+				const addOption = document.createElement('option');
+				addOption.value = profile.id;
+				addOption.textContent = profile.name;
+				addSelect.appendChild(addOption);
+
+				// Add to "overwrite" dropdown
+				const overwriteOption = document.createElement('option');
+				overwriteOption.value = profile.id;
+				overwriteOption.textContent = profile.name;
+				overwriteSelect.appendChild(overwriteOption);
+			});
+		} else {
+			// Profiles not enabled - show add/replace option
+			document.getElementById('import-mode-container').style.display = 'block';
 		}
-
-		// Only validate destination if importing tabs and profiles are enabled
-		let mode = null;
-		let target = null;
-
-		if (importTabs && profilesEnabled) {
-			const selectedOption = modal.querySelector('input[name="import-option"]:checked').value;
-
-			if (selectedOption === 'overwrite') {
-				const profileId = profileSelect.value;
-				if (!profileId) {
-					showStatus('Please select a profile', true);
-					return;
-				}
-				mode = 'overwrite';
-				target = profileId;
-			} else {
-				const profileName = document.getElementById('new-profile-name').value.trim();
-				if (!profileName) {
-					showStatus('Please enter a profile name', true);
-					return;
-				}
-				mode = 'new';
-				target = profileName;
-			}
-		}
-
-		await performImport(importData, mode, target, importTabs, importSettings);
-		hideImportModal();
-	};
-
-	// Handle cancel
-	document.getElementById('import-modal-cancel').onclick = () => {
-		hideImportModal();
-	};
-
-	modal.style.display = 'flex';
+	}
 }
 
 /**
- * Hide import modal
+ * Hide the inline import options UI
  */
-function hideImportModal() {
-	document.getElementById('import-target-modal').style.display = 'none';
+function hideImportOptions() {
+	document.getElementById('import-options-container').style.display = 'none';
+	document.getElementById('import-file-input').value = ''; // Reset file input
+	pendingImportData = null;
 }
 
 /**
- * Perform the import operation
+ * Perform import from inline UI
  */
-async function performImport(importData, mode, target, importTabs = true, importSettings = false) {
+async function performImportFromInline() {
+	if (!pendingImportData) {
+		showStatus('No import data available', true);
+		return;
+	}
+
 	try {
-		// Import settings if requested
-		if (importSettings && importData.settings) {
-			const mergedSettings = {
-				...userSettings,
-				...importData.settings,
-				// Preserve current profile state unless we're doing a full reset
-				profilesEnabled: mode === 'overwrite' && !target ? importData.settings.profilesEnabled : userSettings.profilesEnabled,
-				activeProfileId: userSettings.activeProfileId
-			};
-			await browser.storage.sync.set({ userSettings: mergedSettings });
-			userSettings = mergedSettings;
-		}
+		// Determine what to import
+		const importSettings = document.getElementById('import-settings-checkbox')?.checked || false;
 
-		// Import tabs if requested
-		if (importTabs) {
-			// Determine the tabs to import - handle both old format (tabs/customTabs) and new format (profileData)
-			let tabsToImport = [];
-			if (importData.profileData && Object.keys(importData.profileData).length > 0) {
-				// New format: use the first profile's tabs
-				const firstProfileId = Object.keys(importData.profileData)[0];
-				tabsToImport = importData.profileData[firstProfileId] || [];
-			} else {
-				// Old format: use tabs or customTabs
-				tabsToImport = importData.tabs || importData.customTabs || [];
-			}
+		// Check if we're in hybrid mode (single profile, profiles not enabled)
+		const hybridContainer = document.getElementById('import-hybrid-container');
+		const isHybridMode = hybridContainer && hybridContainer.style.display !== 'none';
 
-			// Import tabs to the specified destination
-			if (mode === 'overwrite' && target) {
-				// Overwrite specific profile's tabs
-				const storageKey = `profile_${target}_tabs`;
-				await browser.storage.sync.set({ [storageKey]: tabsToImport });
-			} else if (mode === 'new') {
-				// Create new profile with imported tabs
-				const result = await browser.storage.sync.get('profiles');
-				const profiles = result.profiles || [];
+		if (isHybridMode) {
+			// Handle hybrid mode for single profile
+			await importFromHybridMode(pendingImportData, importSettings);
+		} else {
+			// Check if we're importing profiles or tabs
+			const profileCheckboxes = document.querySelectorAll('.import-profile-checkbox:checked');
+			const tabsContainer = document.getElementById('import-tabs-container');
+			const isTabsVisible = tabsContainer && tabsContainer.style.display !== 'none';
 
-				const newProfileId = 'profile_' + Date.now();
-				const newProfile = {
-					id: newProfileId,
-					name: target,
-					createdAt: new Date().toISOString(),
-					lastActive: new Date().toISOString(),
-					urlPatterns: []
-				};
+			if (profileCheckboxes.length > 0) {
+				// Import selected profiles
+				const selectedProfileIds = Array.from(profileCheckboxes).map(cb => cb.dataset.profileId);
+				await importSelectedProfiles(pendingImportData, selectedProfileIds, importSettings);
+			} else if (isTabsVisible) {
+				// Check if we're importing a single profile with profiles enabled
+				const hasProfiles = pendingImportData.profiles && pendingImportData.profiles.length > 0 && pendingImportData.profileData && Object.keys(pendingImportData.profileData).length > 0;
+				const isSingleProfile = hasProfiles && pendingImportData.profiles.length === 1;
 
-				profiles.push(newProfile);
-				await browser.storage.sync.set({ profiles });
+				if (isSingleProfile && userSettings.profilesEnabled) {
+					// Extract tabs from profile data for single profile import
+					const profile = pendingImportData.profiles[0];
+					const profileTabs = pendingImportData.profileData[profile.id] || [];
 
-				// Save tabs to the new profile's storage
-				const storageKey = `profile_${newProfileId}_tabs`;
-				await browser.storage.sync.set({ [storageKey]: tabsToImport });
-			} else {
-				// Direct overwrite (no profiles) - import to active profile or default storage
-				if (userSettings.activeProfileId) {
-					const storageKey = `profile_${userSettings.activeProfileId}_tabs`;
-					await browser.storage.sync.set({ [storageKey]: tabsToImport });
-				} else if (tabsToImport.length > 0) {
-					await browser.storage.sync.set({ tabs: tabsToImport });
+					// Create a normalized import data structure with tabs at the root level
+					const normalizedImportData = {
+						...pendingImportData,
+						tabs: profileTabs
+					};
+
+					await importTabsToDestination(normalizedImportData, importSettings);
+				} else {
+					// Import tabs to a destination (normal case)
+					await importTabsToDestination(pendingImportData, importSettings);
 				}
-			}
-
-			// Import chunked data
-			if (importData.chunkedData) {
-				await browser.storage.local.set(importData.chunkedData);
+			} else if (importSettings) {
+				// Only importing settings
+				await importOnlySettings(pendingImportData);
+			} else {
+				showStatus('Please select at least one option to import', true);
+				return;
 			}
 		}
 
-		// Show appropriate success message
-		let message = 'Configuration imported successfully';
-		if (importTabs && importSettings) {
-			message = 'Tabs and settings imported successfully';
-		} else if (importTabs) {
-			message = 'Tabs imported successfully';
-		} else if (importSettings) {
-			message = 'Settings imported successfully';
-		}
-
-		showStatus(message, false);
+		// Success!
+		hideImportOptions();
+		showStatus('Configuration imported successfully', false);
 
 		// Reload UI
 		await loadUserSettings();
@@ -945,6 +1020,310 @@ async function performImport(importData, mode, target, importTabs = true, import
 	} catch (error) {
 		showStatus('Import failed: ' + error.message, true);
 	}
+}
+
+/**
+ * Import selected profiles
+ */
+async function importSelectedProfiles(importData, selectedProfileIds, importSettings) {
+	// Enable profiles if not already enabled
+	const needsProfilesEnabled = !userSettings.profilesEnabled;
+
+	// Import settings if requested
+	if (importSettings && importData.settings) {
+		const mergedSettings = {
+			...userSettings,
+			...importData.settings,
+			// Enable profiles if importing profiles
+			profilesEnabled: true,
+			// Preserve storage preference
+			useSyncStorage: userSettings.useSyncStorage
+		};
+		await browser.storage.sync.set({ userSettings: mergedSettings });
+		userSettings = mergedSettings;
+	} else if (needsProfilesEnabled) {
+		// Enable profiles even if not importing settings
+		const mergedSettings = {
+			...userSettings,
+			profilesEnabled: true
+		};
+		await browser.storage.sync.set({ userSettings: mergedSettings });
+		userSettings = mergedSettings;
+	}
+
+	// Import selected profiles
+	const result = await browser.storage.sync.get('profiles');
+	const currentProfiles = result.profiles || [];
+
+	// Filter and import selected profiles
+	const profilesToImport = importData.profiles.filter(p => selectedProfileIds.includes(p.id));
+
+	// Add imported profiles to current profiles
+	for (const profile of profilesToImport) {
+		// Generate new ID to avoid conflicts
+		const newProfileId = 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+		const newProfile = {
+			...profile,
+			id: newProfileId,
+			createdAt: new Date().toISOString(),
+			lastActive: new Date().toISOString()
+		};
+
+		currentProfiles.push(newProfile);
+
+		// Import tabs for this profile
+		const profileTabs = importData.profileData[profile.id] || [];
+		const storageKey = `profile_${newProfileId}_tabs`;
+		await browser.storage.sync.set({ [storageKey]: profileTabs });
+	}
+
+	// Save updated profiles list
+	await browser.storage.sync.set({ profiles: currentProfiles });
+}
+
+/**
+ * Import from hybrid mode (single profile, profiles not enabled)
+ */
+async function importFromHybridMode(importData, importSettings) {
+	const hybridMode = document.querySelector('input[name="import-hybrid-mode"]:checked')?.value;
+
+	if (!hybridMode) {
+		throw new Error('Please select an import option');
+	}
+
+	// Get the single profile and its tabs
+	const profile = importData.profiles[0];
+	const tabs = importData.profileData[profile.id] || [];
+
+	if (hybridMode === 'as-profile') {
+		// Import as profile and enable profiles feature
+		await importSelectedProfiles(importData, [profile.id], importSettings);
+	} else if (hybridMode === 'add-tabs') {
+		// Add tabs to existing tabs without enabling profiles
+		if (importSettings && importData.settings) {
+			const mergedSettings = {
+				...userSettings,
+				...importData.settings,
+				// Preserve current state
+				profilesEnabled: userSettings.profilesEnabled,
+				activeProfileId: userSettings.activeProfileId,
+				useSyncStorage: userSettings.useSyncStorage
+			};
+			await browser.storage.sync.set({ userSettings: mergedSettings });
+		}
+
+		// Add to existing tabs
+		const useSyncStorage = await SFTabs.storage.getStoragePreference();
+		let existingTabs = [];
+
+		if (useSyncStorage) {
+			existingTabs = await SFTabs.storageChunking.readChunkedSync('customTabs') || [];
+		} else {
+			const localResult = await browser.storage.local.get('customTabs');
+			existingTabs = localResult.customTabs || [];
+		}
+
+		// Merge tabs - imported tabs get new positions after existing ones
+		const maxPosition = existingTabs.length > 0 ? Math.max(...existingTabs.map(t => t.position || 0)) : -1;
+		const mergedTabs = [...existingTabs];
+
+		tabs.forEach((tab, index) => {
+			mergedTabs.push({
+				...tab,
+				position: maxPosition + index + 1
+			});
+		});
+
+		// Save merged tabs
+		if (useSyncStorage) {
+			await SFTabs.storageChunking.saveChunkedSync('customTabs', mergedTabs);
+		} else {
+			await browser.storage.local.set({ customTabs: mergedTabs });
+		}
+	} else if (hybridMode === 'replace-tabs') {
+		// Replace all tabs without enabling profiles
+		if (importSettings && importData.settings) {
+			const mergedSettings = {
+				...userSettings,
+				...importData.settings,
+				// Preserve current state
+				profilesEnabled: userSettings.profilesEnabled,
+				activeProfileId: userSettings.activeProfileId,
+				useSyncStorage: userSettings.useSyncStorage
+			};
+			await browser.storage.sync.set({ userSettings: mergedSettings });
+		}
+
+		// Replace all tabs
+		const useSyncStorage = await SFTabs.storage.getStoragePreference();
+
+		if (useSyncStorage) {
+			await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
+		} else {
+			await browser.storage.local.set({ customTabs: tabs });
+		}
+	}
+
+	// Import chunked data if available
+	if (importData.chunkedData && Object.keys(importData.chunkedData).length > 0) {
+		await browser.storage.local.set(importData.chunkedData);
+	}
+}
+
+/**
+ * Import tabs to a destination (for single tab set)
+ */
+async function importTabsToDestination(importData, importSettings) {
+	const profilesEnabled = userSettings.profilesEnabled || false;
+
+	// Import settings if requested
+	if (importSettings && importData.settings) {
+		const mergedSettings = {
+			...userSettings,
+			...importData.settings,
+			// Preserve current profile state and storage preference
+			profilesEnabled: userSettings.profilesEnabled,
+			activeProfileId: userSettings.activeProfileId,
+			useSyncStorage: userSettings.useSyncStorage
+		};
+		await browser.storage.sync.set({ userSettings: mergedSettings });
+	}
+
+	// Import tabs
+	const tabs = importData.tabs || [];
+
+	if (profilesEnabled) {
+		// User has profiles enabled - check destination
+		const destRadio = document.querySelector('input[name="import-destination"]:checked');
+
+		if (destRadio.value === 'add') {
+			// Add to existing profile
+			const profileId = document.getElementById('import-profile-add-select').value;
+			if (!profileId) {
+				throw new Error('Please select a profile');
+			}
+
+			// Load existing tabs from the profile
+			const storageKey = `profile_${profileId}_tabs`;
+			const result = await browser.storage.sync.get(storageKey);
+			const existingTabs = result[storageKey] || [];
+
+			// Merge tabs - imported tabs get new positions after existing ones
+			const maxPosition = existingTabs.length > 0 ? Math.max(...existingTabs.map(t => t.position || 0)) : -1;
+			const mergedTabs = [...existingTabs];
+
+			tabs.forEach((tab, index) => {
+				mergedTabs.push({
+					...tab,
+					position: maxPosition + index + 1
+				});
+			});
+
+			// Save merged tabs
+			await browser.storage.sync.set({ [storageKey]: mergedTabs });
+		} else if (destRadio.value === 'overwrite') {
+			// Overwrite existing profile
+			const profileId = document.getElementById('import-profile-select-inline').value;
+			if (!profileId) {
+				throw new Error('Please select a profile');
+			}
+
+			const storageKey = `profile_${profileId}_tabs`;
+			await browser.storage.sync.set({ [storageKey]: tabs });
+		} else if (destRadio.value === 'new') {
+			// Create new profile
+			const profileName = document.getElementById('import-new-profile-name').value.trim();
+			if (!profileName) {
+				throw new Error('Please enter a profile name');
+			}
+
+			const result = await browser.storage.sync.get('profiles');
+			const profiles = result.profiles || [];
+
+			const newProfileId = 'profile_' + Date.now();
+			const newProfile = {
+				id: newProfileId,
+				name: profileName,
+				createdAt: new Date().toISOString(),
+				lastActive: new Date().toISOString(),
+				urlPatterns: []
+			};
+
+			profiles.push(newProfile);
+			await browser.storage.sync.set({ profiles });
+
+			const storageKey = `profile_${newProfileId}_tabs`;
+			await browser.storage.sync.set({ [storageKey]: tabs });
+		}
+	} else {
+		// No profiles - check if we should add or replace
+		const importMode = document.querySelector('input[name="import-mode"]:checked')?.value || 'add';
+
+		if (importMode === 'add') {
+			// Add to existing tabs
+			const useSyncStorage = await SFTabs.storage.getStoragePreference();
+			let existingTabs = [];
+
+			if (useSyncStorage) {
+				existingTabs = await SFTabs.storageChunking.readChunkedSync('customTabs') || [];
+			} else {
+				const localResult = await browser.storage.local.get('customTabs');
+				existingTabs = localResult.customTabs || [];
+			}
+
+			// Merge tabs - imported tabs get new positions after existing ones
+			const maxPosition = existingTabs.length > 0 ? Math.max(...existingTabs.map(t => t.position || 0)) : -1;
+			const mergedTabs = [...existingTabs];
+
+			tabs.forEach((tab, index) => {
+				mergedTabs.push({
+					...tab,
+					position: maxPosition + index + 1
+				});
+			});
+
+			// Save merged tabs
+			if (useSyncStorage) {
+				await SFTabs.storageChunking.saveChunkedSync('customTabs', mergedTabs);
+			} else {
+				await browser.storage.local.set({ customTabs: mergedTabs });
+			}
+		} else {
+			// Replace all tabs
+			const useSyncStorage = await SFTabs.storage.getStoragePreference();
+
+			if (useSyncStorage) {
+				await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
+			} else {
+				await browser.storage.local.set({ customTabs: tabs });
+			}
+		}
+	}
+
+	// Import chunked data if available
+	if (importData.chunkedData && Object.keys(importData.chunkedData).length > 0) {
+		await browser.storage.local.set(importData.chunkedData);
+	}
+}
+
+/**
+ * Import only settings
+ */
+async function importOnlySettings(importData) {
+	if (!importData.settings || Object.keys(importData.settings).length === 0) {
+		throw new Error('No settings to import');
+	}
+
+	const mergedSettings = {
+		...userSettings,
+		...importData.settings,
+		// Preserve current profile state and storage preference
+		profilesEnabled: userSettings.profilesEnabled,
+		activeProfileId: userSettings.activeProfileId,
+		useSyncStorage: userSettings.useSyncStorage
+	};
+
+	await browser.storage.sync.set({ userSettings: mergedSettings });
 }
 
 /**

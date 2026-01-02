@@ -575,7 +575,7 @@
 					</div>
 
 					<div class="setting-card">
-						<h3>Behavior</h3>
+						<h3>Delete Confirmation</h3>
 						<div class="setting-item">
 							<label class="checkbox-group">
 								<input type="checkbox" id="skip-delete-confirmation">
@@ -726,13 +726,13 @@
 					</div>
 
 					<div class="setting-card">
-						<h3>Sync & Storage</h3>
+						<h3>Data Storage</h3>
 						<div class="setting-item">
 							<label class="checkbox-group">
-								<input type="checkbox" id="use-sync-storage" checked>
-								<span>Enable cross-device sync (recommended)</span>
+								<input type="checkbox" id="use-sync-storage">
+								<span>Enable cross-device sync (optional)</span>
 							</label>
-							<div class="setting-description">Automatically sync your tabs across all your computers using browser sync. Disable this to store tabs locally on this computer only.</div>
+							<div class="setting-description">Automatically sync your tabs across all your computers using browser sync. By default, tabs are stored locally on this computer only for privacy.</div>
 						</div>
 					</div>
 
@@ -807,7 +807,148 @@
 							<p style="margin: 0 0 12px 0; color: var(--color-text);">Restore your tabs and settings from a backup file.</p>
 							<button id="import-button" class="secondary-button" style="width: 100%;">Choose File to Import</button>
 							<input type="file" id="import-file-input" accept=".json" style="display: none;">
-							<div class="setting-description" style="margin-top: 12px;">You'll be able to choose what to import after selecting a file.</div>
+
+							<!-- Import Options (shown after file selection) -->
+							<div id="import-options-container" style="display: none; margin-top: 16px;">
+								<div style="padding: 16px; background: var(--color-item-background); border-radius: 6px; border: 1px solid var(--color-border);">
+									<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+										<div style="font-weight: 600; color: var(--color-text); font-size: 14px;" id="import-filename">Selected file</div>
+										<button id="import-cancel-button" class="secondary-button" style="padding: 4px 12px; font-size: 13px;">Cancel</button>
+									</div>
+
+									<div style="margin-bottom: 16px;">
+										<div style="font-weight: 500; margin-bottom: 8px; color: var(--color-text); font-size: 14px;">What would you like to import?</div>
+
+										<!-- Profiles will be enabled warning -->
+										<div id="import-profiles-warning" style="display: none; padding: 12px; background: var(--color-warning-background, #fff3cd); border: 1px solid var(--color-warning-border, #ffc107); border-radius: 4px; margin-bottom: 12px;">
+											<div style="display: flex; align-items: flex-start; gap: 8px;">
+												<svg style="width: 20px; height: 20px; flex-shrink: 0; color: var(--color-warning, #856404);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+													<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+													<line x1="12" y1="9" x2="12" y2="13"></line>
+													<line x1="12" y1="17" x2="12.01" y2="17"></line>
+												</svg>
+												<div style="flex: 1;">
+													<div style="font-weight: 600; color: var(--color-warning, #856404); margin-bottom: 4px; font-size: 14px;">Profiles will be enabled</div>
+													<div style="font-size: 13px; color: var(--color-warning, #856404);">This file contains profiles. Importing will automatically enable the Profiles feature in your settings.</div>
+												</div>
+											</div>
+										</div>
+
+										<!-- Settings Import Option -->
+										<div id="import-settings-container" style="display: none;">
+											<label class="checkbox-group" style="display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; margin-bottom: 8px;">
+												<input type="checkbox" id="import-settings-checkbox" checked style="margin-top: 2px;">
+												<div style="font-weight: 500; color: var(--color-text);">Settings</div>
+											</label>
+										</div>
+
+										<!-- Profiles Import Options -->
+										<div id="import-profiles-container" style="display: none;">
+											<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border);">
+												<div style="font-weight: 500; margin-bottom: 6px; color: var(--color-text); font-size: 14px;">Profiles:</div>
+												<div id="import-profiles-list">
+													<!-- Profile checkboxes populated dynamically -->
+												</div>
+											</div>
+										</div>
+
+										<!-- Legacy/Single Profile Import (v1.x or single profile v2) -->
+										<div id="import-tabs-container" style="display: none;">
+											<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border);">
+												<div style="font-weight: 500; margin-bottom: 8px; color: var(--color-text); font-size: 14px;">Tabs:</div>
+												<div id="import-tabs-count" style="font-size: 13px; color: var(--color-text-weak); margin-bottom: 12px;">0 tabs</div>
+
+												<!-- Import mode selection (no profiles) -->
+												<div id="import-mode-container" style="display: none; margin-bottom: 12px;">
+													<div style="font-weight: 500; margin-bottom: 8px; color: var(--color-text); font-size: 14px;">Import mode:</div>
+													<label class="radio-group" style="margin-bottom: 8px;">
+														<input type="radio" name="import-mode" value="add" checked>
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Add to existing tabs</div>
+															<div style="font-size: 13px; color: var(--color-text-weak);">Keep current tabs and add imported tabs</div>
+														</div>
+													</label>
+													<label class="radio-group">
+														<input type="radio" name="import-mode" value="replace">
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Replace all tabs</div>
+															<div style="font-size: 13px; color: var(--color-text-weak);">Remove current tabs and use only imported tabs</div>
+														</div>
+													</label>
+												</div>
+
+												<!-- Hybrid mode (single profile, profiles not enabled) -->
+												<div id="import-hybrid-container" style="display: none; margin-bottom: 12px;">
+													<div style="font-weight: 500; margin-bottom: 8px; color: var(--color-text); font-size: 14px;">How would you like to import this profile?</div>
+													<label class="radio-group" style="margin-bottom: 8px;">
+														<input type="radio" name="import-hybrid-mode" value="as-profile" checked>
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Import as profile and enable Profiles</div>
+															<div style="font-size: 13px; color: var(--color-text-weak);">Create a new profile and enable the Profiles feature</div>
+														</div>
+													</label>
+													<label class="radio-group" style="margin-bottom: 8px;">
+														<input type="radio" name="import-hybrid-mode" value="add-tabs">
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Add tabs to existing tabs</div>
+															<div style="font-size: 13px; color: var(--color-text-weak);">Keep current tabs and add tabs from this profile</div>
+														</div>
+													</label>
+													<label class="radio-group">
+														<input type="radio" name="import-hybrid-mode" value="replace-tabs">
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Replace all tabs</div>
+															<div style="font-size: 13px; color: var(--color-text-weak);">Remove current tabs and use tabs from this profile</div>
+														</div>
+													</label>
+												</div>
+
+												<!-- Destination selection for profiles mode -->
+												<div id="import-destination-container" style="display: none;">
+													<div style="font-weight: 500; margin-bottom: 8px; color: var(--color-text); font-size: 14px;">Import to:</div>
+													<label class="radio-group" style="margin-bottom: 8px;">
+														<input type="radio" name="import-destination" value="add" checked>
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Add to existing profile</div>
+															<div style="font-size: 13px; color: var(--color-text-weak);">Keep current tabs and add imported tabs</div>
+														</div>
+													</label>
+													<div id="import-add-section" style="margin-left: 24px; margin-bottom: 12px;">
+														<select id="import-profile-add-select" class="select-input" style="width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-input-background); color: var(--color-text);">
+															<option value="">Choose a profile...</option>
+														</select>
+													</div>
+
+													<label class="radio-group" style="margin-bottom: 8px;">
+														<input type="radio" name="import-destination" value="overwrite">
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Overwrite existing profile</div>
+															<div style="font-size: 13px; color: var(--color-text-weak);">Replace all tabs in the profile</div>
+														</div>
+													</label>
+													<div id="import-overwrite-section" style="display: none; margin-left: 24px; margin-bottom: 12px;">
+														<select id="import-profile-select-inline" class="select-input" style="width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-input-background); color: var(--color-text);">
+															<option value="">Choose a profile...</option>
+														</select>
+													</div>
+
+													<label class="radio-group">
+														<input type="radio" name="import-destination" value="new">
+														<div style="flex: 1;">
+															<div style="font-weight: 500; margin-bottom: 4px;">Create new profile</div>
+														</div>
+													</label>
+													<div id="import-new-profile-section" style="display: none; margin-left: 24px; margin-top: 8px;">
+														<input type="text" id="import-new-profile-name" placeholder="Enter profile name" maxlength="50" style="width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-input-background); color: var(--color-text);">
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<button id="import-confirm-button" class="primary-button" style="width: 100%;">Import Configuration</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</section>
@@ -815,61 +956,6 @@
 		</div><!-- .settings-main -->
 	</div><!-- .settings-body -->
 	</div><!-- .settings-layout -->
-
-	<!-- Import Target Modal -->
-	<div id="import-target-modal" class="modal" style="display: none;">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2>Import Configuration</h2>
-			</div>
-			<div class="modal-body">
-				<p>Choose what to import:</p>
-
-				<div class="form-group" id="import-options-section" style="margin-bottom: 16px;">
-					<label class="checkbox-group">
-						<input type="checkbox" id="import-tabs" checked>
-						<span>Tabs</span>
-					</label>
-					<label class="checkbox-group">
-						<input type="checkbox" id="import-settings">
-						<span>Settings</span>
-					</label>
-				</div>
-
-				<div id="import-destination-section">
-					<p style="margin-top: 0;">Choose destination:</p>
-
-					<div class="form-group">
-						<label>
-							<input type="radio" name="import-option" value="overwrite" checked>
-							<span>Overwrite existing profile</span>
-						</label>
-						<div id="overwrite-profile-section" class="sub-option">
-							<label for="import-profile-select">Select profile:</label>
-							<select id="import-profile-select" class="clone-profile-select">
-								<option value="">Choose a profile...</option>
-							</select>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label>
-							<input type="radio" name="import-option" value="new">
-							<span>Create new profile</span>
-						</label>
-						<div id="new-profile-section" class="sub-option" style="display: none;">
-							<label for="new-profile-name">Profile name:</label>
-							<input type="text" id="new-profile-name" placeholder="Enter profile name" maxlength="50" class="text-input">
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button id="import-modal-cancel" class="secondary-button">Cancel</button>
-				<button id="import-modal-confirm" class="primary-button">Import</button>
-			</div>
-		</div>
-	</div>
 
 	<!-- Load shared modules first -->
 	<script src="js/shared/browser-compat.js"></script>
