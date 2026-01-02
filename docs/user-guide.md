@@ -74,23 +74,6 @@ Links to any Lightning URL path within Salesforce.
 - `interaction_explorer/flowExplorer.app` - Flow Trigger Explorer
 - `Opportunity/list?filterName=ClosingNextMonth` - Opportunity "Closing Next Month" list view
 
-## Managing Tabs
-
-1. **Rearranging Tabs**
-   Tabs can be rearranged by using click-and-drag. Click on the drag handle on the left and move the tab to a new position.
-   
-   <img width="412" height="295" alt="2025-12-31_15-01-04" src="https://github.com/user-attachments/assets/9d53fb55-e981-4e0f-b39f-9bed2e1d6f92" />
-
-3. **Editing Tabs**
-   Click the edit icon <img src="{{ '/assets/images/icons/edit.svg' | relative_url }}" alt="Edit" style="display: inline; height: 1.2em; vertical-align: middle;"> on a tab to edit the name or URL.
-
-4. **Open in New Tab**
-   Click on the new tab icon <img src="{{ '/assets/images/icons/new-tab.svg' | relative_url }}" alt="New Tab" style="display: inline; height: 1.2em; vertical-align: middle;"> to have your tab open in a new tab. The icon will turn blue to indicate it is enabled.
-
-5. **Delete tabs**
-   Click on the trash can icon <img src="{{ '/assets/images/icons/delete.svg' | relative_url }}" alt="Delete" style="display: inline; height: 1.2em; vertical-align: middle;"> to delete a tab.
-
-
 ## Creating Dropdown Menus
 
 SF Tabs supports dropdown menus, allowing you to organize related tabs under a parent tab. There are two types of dropdowns:
@@ -114,7 +97,8 @@ When you create a tab that links to an Object Manager page, you can create a dro
 4. **Set up the dropdown**
    Click "Setup as Object Dropdown" button
    
-   <img width="412" height="221" alt="2025-12-31_15-01-54" src="https://github.com/user-attachments/assets/b378f2e7-9f8e-43a2-9ad0-4653fecf9110" />
+   <img width="412" height="212" alt="2026-01-01_09-54-08" src="https://github.com/user-attachments/assets/55e265ff-c839-4029-a704-a64b8ff907bb" />
+
 
 6. **Review the dropdown items**
    The extension automatically detects available sub-pages:
@@ -126,7 +110,8 @@ When you create a tab that links to an Object Manager page, you can create a dro
    - Triggers
    - And more...
      
-   <img width="412" height="357" alt="2026-01-01_09-49-13" src="https://github.com/user-attachments/assets/b72d850d-8c8d-4f57-a525-ace596f83190" />
+<img width="394" height="357" alt="2026-01-01_09-49-13" src="https://github.com/user-attachments/assets/24216384-3b8c-4371-b28b-5be2d583ee4a" />
+
    
 6. **Save your changes**
    Click "Save Changes"
@@ -139,7 +124,7 @@ Now when you click this tab in Salesforce Setup, you'll see a dropdown menu with
 
 Create custom dropdown menus by dragging existing tabs onto a parent tab.
 
-   <img width="412" height="211" alt="2026-01-01_09-54-08" src="https://github.com/user-attachments/assets/9ae33968-6e18-4967-bec3-efd4415e052f" />
+<img width="412" height="295" alt="2025-12-31_15-01-04" src="https://github.com/user-attachments/assets/8ca86ec4-c601-4e02-873c-511c3f4fb41d" />
 
 #### Creating a Manual Dropdown
 
@@ -181,7 +166,7 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 
 1. Click on the tab name to see the items included in the dropdown
 
-<img width="412" height="258" alt="2026-01-01_10-21-09" src="https://github.com/user-attachments/assets/d906b9ff-db33-4bc3-8816-51f69e6dc0e9" />
+<img width="412" height="258" alt="2026-01-01_10-21-09" src="https://github.com/user-attachments/assets/55670dd4-5c79-4865-98db-bcbc97618e86" />
 
 
 #### Reordering Items in a Dropdown
@@ -217,18 +202,14 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 1. **Up to three levels are supported** Parent > Child > Tab
 2. An example for using nested dropdowns would be having a folder that organizes your object tabs. The first level shows the object names and the second level shows the object menus.
 3. Create your object tabs first and then drag them into the parent folder.
-4. If you attempt to add a nested group of tabs to another group and it would results in having too many levels, an error is shown.
+4. If your attempt to add a folder or tab that already has three levels into another folder or tab, an error will be shown. You can only have up to three levels of hierarchy.
    
-<img width="407" height="347" alt="Screenshot 2025-12-26 at 9 42 51 AM" src="https://github.com/user-attachments/assets/cba6c9e8-e94f-480a-ab05-899ef7b59b4e" />
+<img width="412" height="490" alt="2026-01-02_07-36-47" src="https://github.com/user-attachments/assets/2c48383e-b43e-4c20-b10e-02c705576112" />
 
 <img width="527" height="482" alt="Screenshot 2025-12-26 at 9 42 59 AM" src="https://github.com/user-attachments/assets/11bd77b9-2c61-4ba2-9d06-a1d468a9eba6" />
 
-<img width="407" height="607" alt="Screenshot 2025-12-26 at 9 40 36 AM" src="https://github.com/user-attachments/assets/451752e7-5150-4943-b9e5-b57524825eae" />
-
 
 ## Editing Tabs
-
-<img width="412" height="482" alt="Screenshot 2025-12-26 at 9 45 01 AM" src="https://github.com/user-attachments/assets/abfcd541-0378-47cf-a08a-26b9658a7194" />
 
 1. **Open SF Tabs**
    Click the SF Tabs icon
@@ -242,6 +223,7 @@ This creates a folder-style tab that opens a dropdown menu when clicked, without
 4. **Save your changes**
    Click Save to apply the updates
 
+<img width="412" height="539" alt="2026-01-02_07-38-57" src="https://github.com/user-attachments/assets/c9d533a2-3ee3-49ce-a6fb-ac8dbdca0202" />
 
 ## Reordering Tabs
 
@@ -259,6 +241,11 @@ You can easily reorder your tabs using drag and drop:
 4. **Release to drop**
    The new order is saved automatically
 
+   <img width="412" height="295" alt="2025-12-31_15-01-04" src="https://github.com/user-attachments/assets/9d53fb55-e981-4e0f-b39f-9bed2e1d6f92" />
+
+## Open in New Tab
+
+Click on the new tab icon <img src="{{ '/assets/images/icons/new-tab.svg' | relative_url }}" alt="New Tab" style="display: inline; height: 1.2em; vertical-align: middle;"> to have your tab open in a new tab. The icon will turn blue to indicate it is enabled.
 
 ## Deleting Tabs
 
@@ -276,41 +263,17 @@ You can easily reorder your tabs using drag and drop:
 
 SF Tabs supports keyboard shortcuts for quick access to your first 10 custom tabs. This section explains how to set up and use these shortcuts.
 
-### Available Shortcuts
-
-SF Tabs provides 10 keyboard shortcut commands that correspond to your first 10 tabs:
-
-| Command | Default Key | Opens |
-|:--------|:------------|:------|
-| Tab 1   | Not set     | Your first tab (position 0) |
-| Tab 2   | Not set     | Your second tab (position 1) |
-| Tab 3   | Not set     | Your third tab (position 2) |
-| Tab 4   | Not set     | Your fourth tab (position 3) |
-| Tab 5   | Not set     | Your fifth tab (position 4) |
-| Tab 6   | Not set     | Your sixth tab (position 5) |
-| Tab 7   | Not set     | Your seventh tab (position 6) |
-| Tab 8   | Not set     | Your eighth tab (position 7) |
-| Tab 9   | Not set     | Your ninth tab (position 8) |
-| Tab 10  | Not set     | Your tenth tab (position 9) |
-
 By default, no keyboard shortcuts are assigned. You must configure them manually in your browser settings.
-
-You can quickly access the Keyboard Shortcuts page by opening SF Tabs' Settings page and clicking
-on **Configure Keyboard Shortcuts**.
-
-<img width="782" height="188" alt="Screenshot 2025-12-24 at 3 21 08 PM" src="https://github.com/user-attachments/assets/3428e215-c181-423e-afa1-57bfba348e6c" />
-
 
 ### Setting Up Shortcuts in Firefox
 
 <img width="686" height="614" alt="Screenshot 2025-12-24 at 3 14 10 PM" src="https://github.com/user-attachments/assets/e9370e17-2c71-4641-8c07-7e429cb611b0" />
 
-
 1. **Open Add-ons Manager**
-   Type `about:addons` in the address bar and press Enter
+   Click on the extensions menu and select Manage extensions, or click on the menu button (three lines), click Extensions and themes and select Extensions. 
 
 2. **Access Keyboard Shortcuts**
-   Click the gear icon <img src="{{ '/assets/images/icons/settings.svg' | relative_url }}" alt="Settings" style="display: inline; height: 1.2em; vertical-align: middle;"> in the top right and select "Manage Extension Shortcuts"
+   Click the cog icon in the top right and select "Manage Extension Shortcuts"
 
 3. **Find SF Tabs**
    Scroll down to find SF Tabs in the list of extensions
@@ -318,113 +281,20 @@ on **Configure Keyboard Shortcuts**.
 4. **Configure Shortcuts**
    Click in the input field next to each command (e.g., "Tab 1") and press your desired key combination
 
-5. **Save Automatically**
-   Your shortcuts are saved automatically as you configure them
-
-#### Recommended Firefox Shortcuts
-
-| Tab | Suggested Shortcut | Notes |
-|:----|:-------------------|:------|
-| Tab 1 | `Ctrl+Shift+1` (or `Cmd+Shift+1` on Mac) | Easy to remember and type |
-| Tab 2 | `Ctrl+Shift+2` (or `Cmd+Shift+2` on Mac) | Follows natural numbering |
-| Tab 3-10 | `Ctrl+Shift+3` through `Ctrl+Shift+0` | Continue the pattern |
-
 
 ### Setting Up Shortcuts in Chrome
-<img width="701" height="752" alt="Screenshot 2025-12-24 at 3 18 25 PM" src="https://github.com/user-attachments/assets/90d7953a-5d61-4e98-a1bf-8a4e941ea459" />
 
 1. **Open Extensions Shortcuts**
-   Type `chrome://extensions/shortcuts` in the address bar and press Enter
+   Click on the extensions menu and select Manage Extensions, or click on the menu button (three dots), click Extensions, click Manage Extensions. 
 
-2. **Find SF Tabs**
+2. **Access Keyboard Shortcuts**
+   CLick on Keyboard shortcuts on the left
+
+3. **Find SF Tabs**
    Scroll down to find SF Tabs in the list of extensions
 
-3. **Click the Pencil Icon**
-   Click the pencil/edit icon next to each command you want to configure
-
-4. **Enter Your Shortcut**
-   Press your desired key combination in the input field
-
-5. **Save**
-   Click outside the field or press Enter to save
-
-#### Recommended Chrome Shortcuts
-
-| Tab | Suggested Shortcut | Notes |
-|:----|:-------------------|:------|
-| Tab 1 | `Ctrl+Shift+1` (or `Cmd+Shift+1` on Mac) | Easy to remember and type |
-| Tab 2 | `Ctrl+Shift+2` (or `Cmd+Shift+2` on Mac) | Follows natural numbering |
-| Tab 3-10 | `Ctrl+Shift+3` through `Ctrl+Shift+0` | Continue the pattern |
-
-
-### Best Practices
-
-#### Choosing Key Combinations
-
-- **Use modifier keys:** Always include Ctrl/Cmd and/or Shift to avoid conflicts with existing shortcuts
-- **Be consistent:** Use a pattern like `Ctrl+Shift+[Number]` for all your tabs
-- **Avoid conflicts:** Check that your chosen shortcuts don't conflict with browser or Salesforce shortcuts
-- **Consider frequency:** Assign shortcuts to your most frequently used tabs first
-
-#### Common Key Combination Conflicts to Avoid
-
-| Shortcut | Existing Function | Browser |
-|:---------|:------------------|:--------|
-| `Ctrl+1` through `Ctrl+9` | Switch to browser tab 1-9 | Both |
-| `Ctrl+T` | New tab | Both |
-| `Ctrl+W` | Close tab | Both |
-| `Ctrl+N` | New window | Both |
-
-
-### Organizing Your Tabs for Shortcuts
-
-Since shortcuts correspond to tab positions, organize your tabs strategically:
-
-1. **Identify your most-used pages**
-   Determine which Setup pages you visit most frequently
-
-2. **Reorder tabs in the extension**
-   Drag and drop your most important tabs to positions 1-10
-
-3. **Assign shortcuts**
-   Configure keyboard shortcuts for these priority tabs
-
-4. **Test and adjust**
-   Use your shortcuts for a few days and reorder as needed
-
-#### Example Organization
-
-Here's an example of how you might organize tabs for optimal shortcut usage:
-
-| Position | Tab Name | Shortcut | Why |
-|:---------|:---------|:---------|:----|
-| 1 | Flows | `Ctrl+Shift+1` | Most frequently accessed |
-| 2 | Users | `Ctrl+Shift+2` | Second most common |
-| 3 | Profiles | `Ctrl+Shift+3` | Regular maintenance |
-| 4 | Permission Sets | `Ctrl+Shift+4` | Security configuration |
-| 5 | Custom Metadata | `Ctrl+Shift+5` | Development work |
-
-
-### Shortcuts Troubleshooting
-
-#### Shortcut doesn't work
-
-- Make sure you're on a Salesforce page when pressing the shortcut
-- Verify the shortcut is configured correctly in browser settings
-- Check that you have a tab at that position (e.g., Tab 5 won't work if you only have 4 tabs)
-- Ensure the shortcut doesn't conflict with another extension or browser function
-
-#### Can't set a shortcut
-
-- The key combination may be reserved by the browser
-- Try a different combination with more modifier keys (e.g., `Ctrl+Alt+Shift+1`)
-- Some keys may be restricted by your operating system
-
-#### Shortcut opens wrong tab
-
-- Remember that shortcuts correspond to tab positions (0-9), not tab IDs
-- If you reorder tabs, the shortcuts will open different pages
-- Check the extension popup to see which tab is in which position
+4. **Configure Shortcuts**
+   Click in the pencil icon next to each command (e.g., "Tab 1") and press your desired key combination
 
 
 ## Settings
