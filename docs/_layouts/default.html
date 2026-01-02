@@ -89,179 +89,49 @@
 
                     <!-- Getting Started -->
                     <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#gettingStarted" role="button" aria-expanded="true">
-                            <i class="bi bi-chevron-down me-1"></i>Getting Started
+                        <a class="nav-link" href="{{ '/getting-started' | relative_url }}">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Getting Started
                         </a>
-                        <div class="collapse show" id="gettingStarted">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#opening-the-extension' | relative_url }}">Opening the Extension</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#adding-a-new-tab' | relative_url }}">Adding a New Tab</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#tab-types' | relative_url }}">Tab Types</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Dropdown Menus -->
-                    <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#dropdownMenus" role="button" aria-expanded="false">
-                            <i class="bi bi-chevron-right me-1"></i>Dropdown Menus
-                        </a>
-                        <div class="collapse" id="dropdownMenus">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#creating-dropdown-menus' | relative_url }}">Creating Dropdowns</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#object-manager-dropdowns-automatic' | relative_url }}">Object Manager Dropdowns</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#manual-dropdowns-drag-and-drop' | relative_url }}">Manual Dropdowns</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#folder-style-tabs-menu-containers' | relative_url }}">Folder-Style Tabs</a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Managing Tabs -->
                     <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#managingTabs" role="button" aria-expanded="false">
-                            <i class="bi bi-chevron-right me-1"></i>Managing Tabs
+                        <a class="nav-link" href="{{ '/managing-tabs' | relative_url }}">
+                            <i class="bi bi-pencil-square me-2"></i>Managing Tabs
                         </a>
-                        <div class="collapse" id="managingTabs">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#editing-tabs' | relative_url }}">Editing Tabs</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#reordering-tabs' | relative_url }}">Reordering Tabs</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#deleting-tabs' | relative_url }}">Deleting Tabs</a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Keyboard Shortcuts -->
                     <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#keyboardShortcuts" role="button" aria-expanded="false">
-                            <i class="bi bi-chevron-right me-1"></i>Keyboard Shortcuts
+                        <a class="nav-link" href="{{ '/keyboard-shortcuts' | relative_url }}">
+                            <i class="bi bi-keyboard me-2"></i>Keyboard Shortcuts
                         </a>
-                        <div class="collapse" id="keyboardShortcuts">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#keyboard-shortcuts' | relative_url }}">Overview</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#setting-up-shortcuts-in-firefox' | relative_url }}">Firefox Setup</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#setting-up-shortcuts-in-chrome' | relative_url }}">Chrome Setup</a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Settings -->
                     <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#settings" role="button" aria-expanded="false">
-                            <i class="bi bi-chevron-right me-1"></i>Settings
+                        <a class="nav-link" href="{{ '/settings' | relative_url }}">
+                            <i class="bi bi-gear me-2"></i>Settings
                         </a>
-                        <div class="collapse" id="settings">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#settings' | relative_url }}">Settings Overview</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#appearance' | relative_url }}">Appearance</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#behavior' | relative_url }}">Behavior</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#sync--storage' | relative_url }}">Sync & Storage</a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Profiles -->
                     <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#profiles" role="button" aria-expanded="false">
-                            <i class="bi bi-chevron-right me-1"></i>Profiles
+                        <a class="nav-link" href="{{ '/profiles' | relative_url }}">
+                            <i class="bi bi-person-circle me-2"></i>Profiles
                         </a>
-                        <div class="collapse" id="profiles">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#profiles' | relative_url }}">Profiles Overview</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#enabling-profiles' | relative_url }}">Enabling Profiles</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#creating-a-new-profile' | relative_url }}">Creating Profiles</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#switching-between-profiles' | relative_url }}">Switching Profiles</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#managing-profiles' | relative_url }}">Managing Profiles</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Import/Export -->
-                    <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#importExport" role="button" aria-expanded="false">
-                            <i class="bi bi-chevron-right me-1"></i>Import/Export
-                        </a>
-                        <div class="collapse" id="importExport">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#importexport-configuration' | relative_url }}">Import/Export Overview</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#export-configuration' | relative_url }}">Export Configuration</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#import-configuration' | relative_url }}">Import Configuration</a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Upgrading -->
                     <div class="sidebar-section">
-                        <a class="sidebar-toggle" data-bs-toggle="collapse" href="#upgrading" role="button" aria-expanded="false">
-                            <i class="bi bi-chevron-right me-1"></i>Upgrading to v2.0
+                        <a class="nav-link" href="{{ '/upgrading' | relative_url }}">
+                            <i class="bi bi-arrow-up-circle me-2"></i>Upgrading to v2.0
                         </a>
-                        <div class="collapse" id="upgrading">
-                            <ul class="nav flex-column ms-3">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#upgrading-to-v200-migration-wizard' | relative_url }}">Migration Wizard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#whats-being-migrated' | relative_url }}">What's Being Migrated</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/user-guide#after-migration' | relative_url }}">After Migration</a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <!-- Troubleshooting -->
                     <div class="sidebar-section">
-                        <a class="nav-link" href="{{ '/user-guide#troubleshooting' | relative_url }}">
+                        <a class="nav-link" href="{{ '/troubleshooting' | relative_url }}">
                             <i class="bi bi-wrench me-2"></i>Troubleshooting
                         </a>
                     </div>                    
