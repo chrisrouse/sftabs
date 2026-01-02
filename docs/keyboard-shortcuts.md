@@ -11,8 +11,6 @@ By default, no keyboard shortcuts are assigned. You must configure them manually
 
 ## Setting Up Shortcuts in Firefox
 
-<img width="686" height="614" alt="Screenshot 2025-12-24 at 3 14 10 PM" src="https://github.com/user-attachments/assets/e9370e17-2c71-4641-8c07-7e429cb611b0" />
-
 1. **Open Add-ons Manager**
    Click on the extensions menu and select Manage extensions, or click on the menu button (three lines), click Extensions and themes and select Extensions. 
 
