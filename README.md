@@ -1,59 +1,14 @@
-# SF Tabs 🚀
+# SF Tabs 
 
 A browser extension that lets Salesforce administrators customize their setup menu by adding, editing, and managing quick-access tabs.
 
-## Features
-
-### Core Functionality
-- **Custom Tab Management**: 
-  - Add, edit, and remove tabs directly from the Salesforce setup interface
-  - Support for Setup pages, Object pages, and custom URLs
-  - Visual indicators to distinguish between tab types
-  - Option to open tabs in a new browser tab
-
-- **Quick Tab Creation**: 
-  - Add a tab for the current page with one click
-  - Intelligent tab name detection based on page context
-  - Support for Object Manager paths
-
-- **Intuitive Organization**:
-  - Drag-and-drop reordering
-  - Compact view option for more efficient tab display
-  - Easily navigable interface
-
-### Appearance & Usability
-- **Theme Support**:
-  - Light mode, Dark mode, and System detection
-  - Compact mode for condensed viewing
-  - Follows Salesforce Lightning Design System visuals
-
-- **Configuration Management**:
-  - Import/Export settings for backup or sharing
-  - Reset to default tabs when needed
-  - Persistent storage across sessions
-
-## Installation
-
-Search for SF Tabs in Firefox and Chrome extension listing.
-
-### Supported Browsers
-
-- Firefox
-- Chrome
-
-
-## Usage
-
-1. Click the SF Tabs extension icon
-2. Add new tabs using the "+" button
-3. Customize tab labels, paths, and behavior
-4. Drag tabs to reorder
-
+## Documentation
+There is a user guide available at [https://chrisrouse.github.io/sftabs/](https://chrisrouse.github.io/sftabs/)
 
 ## Contributing
 
-Contributions are welcome! Please check out the [issues page](https://github.com/chrisrouse/sftabs/issues).
+Contributions are welcome! Please check out the [issues page](https://github.com/chrisrouse/sftabs/issues). I'm specifically looking for help with translations right now. If there are other features you are interested in, please open a feature request issue first and explain request.
 
-## Acknowledgement
+## License and Usage
 
-SF Tabs wouldn't be possible without the original work of Warren Walter and the ["Why Salesforce"](https://github.com/walters954/why-salesforce) plugin.
+SF Tabs is open source. If you want to make your own copy of it, you can, but I'd really prefer it if you contributed to this project instead. It is offered as-is, but I've done my best to make sure there are no bugs. I don't collect any information from your usage beyond what Firefox and Chrome provide about extension installations. All of your data is stored on your computer or within your browser user profile. 
