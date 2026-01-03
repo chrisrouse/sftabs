@@ -3,13 +3,13 @@ layout: default
 title: Upgrading to v2.0
 ---
 
-# Upgrading to v2.0.0 (Migration Wizard)
+# Upgrading to v2.0 (Migration Wizard)
 
-When you upgrade to SF Tabs v2.0.0, you'll see a migration wizard that helps you transition to the new profile-based system.
+When you upgrade to SF Tabs v2.0, you'll see a migration wizard that helps you transition to the new profile-based system.
 
 ## What's Being Migrated?
 
-Version 2.0.0 introduces a new data structure to support:
+Version 2.0 introduces a new data structure to support:
 - Multiple profiles with different tab sets
 - Choice between Sync and Local storage
 - Enhanced dropdown functionality
@@ -24,6 +24,8 @@ The wizard explains what will happen during migration:
 - Your existing tabs will be moved to a "Default" profile
 - No data will be lost
 - You can choose to enable Profiles now or later
+  
+<img width="412" height="602" alt="2026-01-03_10-58-47" src="https://github.com/user-attachments/assets/86fd0dd5-1412-45a2-a4f4-6eee702f2bc8" />
 
 **Options on this screen:**
 
@@ -41,6 +43,8 @@ The wizard explains what will happen during migration:
 
 ### Migration in Progress
 
+<img width="410" height="600" alt="Screenshot 2026-01-03 at 11 00 20 AM" src="https://github.com/user-attachments/assets/26ed87fd-3b07-4524-8c4e-4287e132f50e" />
+
 The wizard shows progress as it:
 1. Reads your existing data
 2. Creates the Default profile
@@ -49,6 +53,8 @@ The wizard shows progress as it:
 This typically takes only a few seconds.
 
 ### Migration Complete
+
+<img width="412" height="602" alt="2026-01-03_11-00-28" src="https://github.com/user-attachments/assets/9fe2061f-f01f-4a3f-b5af-9bba9f28af98" />
 
 Once complete, you'll see a success message confirming:
 - Your tabs are now in the "Default" profile
