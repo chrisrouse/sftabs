@@ -105,6 +105,42 @@
 			fill: currentColor;
 		}
 
+		/* Buy Me a Coffee widget styling to match sponsor-link */
+		.bmc-button {
+			display: inline-flex !important;
+			align-items: center !important;
+			gap: 6px !important;
+			padding: 6px 12px !important;
+			border-radius: 4px !important;
+			text-decoration: none !important;
+			font-size: 12px !important;
+			color: var(--color-text-weak) !important;
+			background: var(--color-item-background) !important;
+			border: 1px solid var(--color-border) !important;
+			transition: all 0.15s !important;
+			height: auto !important;
+			line-height: normal !important;
+			box-shadow: none !important;
+		}
+
+		.bmc-button:hover {
+			color: var(--color-primary) !important;
+			border-color: var(--color-primary) !important;
+			background: var(--state-hover-primary) !important;
+			box-shadow: none !important;
+		}
+
+		.bmc-button img {
+			height: 14px !important;
+			width: 14px !important;
+			margin: 0 !important;
+		}
+
+		.bmc-button span {
+			font-size: 12px !important;
+			margin: 0 !important;
+		}
+
 		.user-guide-link {
 			display: flex;
 			align-items: center;
@@ -549,12 +585,7 @@
 						</svg>
 						<span>Sponsor</span>
 					</a>
-					<a href="https://buymeacoffee.com/chrisrouse" target="_blank" class="sponsor-link" title="Buy Me a Coffee">
-						<svg class="coffee-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-							<path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-						<span>Coffee</span>
-					</a>
+					<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="chrisrouse" data-color="#FFDD00" data-emoji="" data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
 				</div>
 			</div>
 		</div>
