@@ -17,7 +17,7 @@ Currently, SF Tabs supports the following languages:
 We welcome contributions to help translate SF Tabs into additional languages. If you'd like to help translate:
 
 1. **Check existing translations**
-   Visit the [GitHub repository](https://github.com/chrisrouse/sftabs) to see which languages need translation work
+   Visit this [Issue](https://github.com/chrisrouse/sftabs/issues/12) to see which languages need translation work
 
 2. **Submit your translation**
    Create a pull request with your translation files or open an issue to offer your help
