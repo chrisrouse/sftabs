@@ -31,6 +31,12 @@
                 <strong>SF Tabs</strong>
                 <span class="badge bg-warning text-dark ms-2" style="font-size: 0.8rem; vertical-align: middle;">Pre-release</span>
             </a>
+            {% if page.url != '/' %}
+            <!-- Mobile Menu Button (only visible on mobile for doc pages) -->
+            <button class="btn btn-outline-light d-lg-none me-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-expanded="false" aria-controls="mobileNav">
+                <i class="bi bi-list"></i> Menu
+            </button>
+            {% endif %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -65,6 +71,194 @@
             </div>
         </div>
     </nav>
+
+    <!-- Mobile Navigation (only on documentation pages) -->
+    {% if page.url != '/' %}
+    <div class="collapse d-lg-none" id="mobileNav">
+        <div class="mobile-sidebar-nav">
+            <div class="container-fluid">
+                <!-- Search Bar -->
+                <div class="mobile-search mb-3">
+                    <div class="search-input-wrapper">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" id="mobileSidebarSearch" class="form-control" placeholder="Search guide..." autocomplete="off">
+                        <button id="mobileClearSearch" class="clear-search" style="display: none;">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </button>
+                    </div>
+                    <div id="mobileSearchSuggestions" class="search-suggestions" style="display: none;"></div>
+                </div>
+
+                <!-- Navigation Sections -->
+                <div class="mobile-nav-sections">
+                    <!-- Getting Started -->
+                    <div class="mobile-nav-section">
+                        <a class="mobile-nav-toggle" data-bs-toggle="collapse" href="#mobileGettingStarted">
+                            <i class="bi bi-chevron-right me-1"></i><i class="bi bi-rocket-takeoff me-2"></i>Getting Started
+                        </a>
+                        <div class="collapse" id="mobileGettingStarted">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/getting-started#opening-the-extension' | relative_url }}">Opening the Extension</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/getting-started#adding-a-new-tab' | relative_url }}">Adding a New Tab</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/getting-started#tab-types' | relative_url }}">Tab Types</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Managing Tabs -->
+                    <div class="mobile-nav-section">
+                        <a class="mobile-nav-toggle" data-bs-toggle="collapse" href="#mobileManagingTabs">
+                            <i class="bi bi-chevron-right me-1"></i><i class="bi bi-pencil-square me-2"></i>Managing Tabs
+                        </a>
+                        <div class="collapse" id="mobileManagingTabs">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/managing-tabs#editing-tabs' | relative_url }}">Editing Tabs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/managing-tabs#reordering-tabs' | relative_url }}">Reordering Tabs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/managing-tabs#open-in-new-tab' | relative_url }}">Open in New Tab</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/managing-tabs#deleting-tabs' | relative_url }}">Deleting Tabs</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/managing-tabs#creating-dropdown-menus' | relative_url }}">Creating Dropdown Menus</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/managing-tabs#floating-button' | relative_url }}">Floating Button</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Keyboard Shortcuts -->
+                    <div class="mobile-nav-section">
+                        <a class="mobile-nav-toggle" data-bs-toggle="collapse" href="#mobileKeyboardShortcuts">
+                            <i class="bi bi-chevron-right me-1"></i><i class="bi bi-keyboard me-2"></i>Keyboard Shortcuts
+                        </a>
+                        <div class="collapse" id="mobileKeyboardShortcuts">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/keyboard-shortcuts#setting-up-shortcuts-in-firefox' | relative_url }}">Setting Up Shortcuts in Firefox</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/keyboard-shortcuts#setting-up-shortcuts-in-chrome' | relative_url }}">Setting Up Shortcuts in Chrome</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="mobile-nav-section">
+                        <a class="mobile-nav-toggle" data-bs-toggle="collapse" href="#mobileSettings">
+                            <i class="bi bi-chevron-right me-1"></i><i class="bi bi-gear me-2"></i>Settings
+                        </a>
+                        <div class="collapse" id="mobileSettings">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/settings#general' | relative_url }}">General</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/settings#floating-button' | relative_url }}">Floating Button</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/settings#keyboard-shortcuts' | relative_url }}">Keyboard Shortcuts</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/settings#data' | relative_url }}">Data</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/settings#import-export-configuration' | relative_url }}">Import/Export Configuration</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Profiles -->
+                    <div class="mobile-nav-section">
+                        <a class="mobile-nav-toggle" data-bs-toggle="collapse" href="#mobileProfiles">
+                            <i class="bi bi-chevron-right me-1"></i><i class="bi bi-person-badge me-2"></i>Profiles
+                        </a>
+                        <div class="collapse" id="mobileProfiles">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/profiles#enabling-profiles' | relative_url }}">Enabling Profiles</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/profiles#creating-a-profile' | relative_url }}">Creating a Profile</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/profiles#switching-profiles' | relative_url }}">Switching Profiles</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/profiles#managing-profiles' | relative_url }}">Managing Profiles</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/profiles#best-practices' | relative_url }}">Best Practices</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/profiles#disabling-profiles' | relative_url }}">Disabling Profiles</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Upgrading -->
+                    <div class="mobile-nav-section">
+                        <a class="mobile-nav-toggle" data-bs-toggle="collapse" href="#mobileUpgrading">
+                            <i class="bi bi-chevron-right me-1"></i><i class="bi bi-arrow-up-circle me-2"></i>Upgrading
+                        </a>
+                        <div class="collapse" id="mobileUpgrading">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/upgrading#migration-wizard' | relative_url }}">Migration Wizard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/upgrading#what-gets-migrated' | relative_url }}">What Gets Migrated</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/upgrading#important-notes' | relative_url }}">Important Notes</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Troubleshooting -->
+                    <div class="mobile-nav-section">
+                        <a class="mobile-nav-toggle" data-bs-toggle="collapse" href="#mobileTroubleshooting">
+                            <i class="bi bi-chevron-right me-1"></i><i class="bi bi-question-circle me-2"></i>Troubleshooting
+                        </a>
+                        <div class="collapse" id="mobileTroubleshooting">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/troubleshooting#tabs-not-appearing-in-salesforce' | relative_url }}">Tabs Not Appearing</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/troubleshooting#tab-links-not-working' | relative_url }}">Tab Links Not Working</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/troubleshooting#settings-not-saving' | relative_url }}">Settings Not Saving</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ '/troubleshooting#still-having-issues' | relative_url }}">Still Having Issues?</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Main Content -->
     <div class="container-fluid">
@@ -531,6 +725,181 @@
                     clearSearch();
                 }
             });
+
+            // Mobile Navigation Functionality
+            const mobileToggles = document.querySelectorAll('.mobile-nav-toggle');
+            const mobileSavedStates = JSON.parse(localStorage.getItem('mobileSidebarStates') || '{}');
+
+            // Handle mobile navigation toggle chevron icons and persistence
+            mobileToggles.forEach(toggle => {
+                const target = toggle.getAttribute('href');
+                const collapseElement = document.querySelector(target);
+
+                if (collapseElement) {
+                    // Restore saved state
+                    const sectionId = target.replace('#', '');
+                    if (mobileSavedStates[sectionId] === true) {
+                        collapseElement.classList.add('show');
+                        const icon = toggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('bi-chevron-right');
+                            icon.classList.add('bi-chevron-down');
+                        }
+                    }
+
+                    collapseElement.addEventListener('show.bs.collapse', function() {
+                        const icon = toggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('bi-chevron-right');
+                            icon.classList.add('bi-chevron-down');
+                        }
+                        // Save state to localStorage
+                        const sectionId = target.replace('#', '');
+                        const states = JSON.parse(localStorage.getItem('mobileSidebarStates') || '{}');
+                        states[sectionId] = true;
+                        localStorage.setItem('mobileSidebarStates', JSON.stringify(states));
+                    });
+
+                    collapseElement.addEventListener('hide.bs.collapse', function() {
+                        const icon = toggle.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('bi-chevron-down');
+                            icon.classList.add('bi-chevron-right');
+                        }
+                        // Save state to localStorage
+                        const sectionId = target.replace('#', '');
+                        const states = JSON.parse(localStorage.getItem('mobileSidebarStates') || '{}');
+                        states[sectionId] = false;
+                        localStorage.setItem('mobileSidebarStates', JSON.stringify(states));
+                    });
+                }
+            });
+
+            // Mobile Search Functionality
+            const mobileSearchInput = document.getElementById('mobileSidebarSearch');
+            const mobileClearButton = document.getElementById('mobileClearSearch');
+            const mobileSuggestionsContainer = document.getElementById('mobileSearchSuggestions');
+            const mobileNavSections = document.querySelectorAll('.mobile-nav-section');
+
+            if (mobileSearchInput) {
+                // Filter mobile sidebar
+                function filterMobileSidebar(query) {
+                    const lowerQuery = query.toLowerCase();
+
+                    mobileNavSections.forEach(section => {
+                        const toggle = section.querySelector('.mobile-nav-toggle');
+                        const links = section.querySelectorAll('.nav-link');
+                        let hasMatch = false;
+
+                        // Check if section title matches
+                        if (toggle && toggle.textContent.toLowerCase().includes(lowerQuery)) {
+                            hasMatch = true;
+                        }
+
+                        // Check if any links match
+                        links.forEach(link => {
+                            if (link.textContent.toLowerCase().includes(lowerQuery)) {
+                                hasMatch = true;
+                            }
+                        });
+
+                        if (query && hasMatch) {
+                            section.classList.remove('search-hidden');
+                            // Auto-expand sections with matches
+                            const collapseElement = section.querySelector('.collapse');
+                            if (collapseElement && !collapseElement.classList.contains('show')) {
+                                collapseElement.classList.add('show');
+                            }
+                        } else if (query) {
+                            section.classList.add('search-hidden');
+                        } else {
+                            section.classList.remove('search-hidden');
+                        }
+                    });
+                }
+
+                // Show mobile search suggestions
+                function showMobileSuggestions(query) {
+                    if (!query || query.length < 2) {
+                        mobileSuggestionsContainer.style.display = 'none';
+                        return;
+                    }
+
+                    const lowerQuery = query.toLowerCase();
+                    const matches = contentIndex.filter(item =>
+                        item.title.toLowerCase().includes(lowerQuery) ||
+                        item.preview.toLowerCase().includes(lowerQuery)
+                    ).slice(0, 8);
+
+                    if (matches.length === 0) {
+                        mobileSuggestionsContainer.innerHTML = '<div class="no-results">No results found</div>';
+                        mobileSuggestionsContainer.style.display = 'block';
+                        return;
+                    }
+
+                    const html = matches.map(item => `
+                        <div class="search-suggestion-item" data-id="${item.id}">
+                            <div class="search-suggestion-title">${highlightText(item.title, query)}</div>
+                            <div class="search-suggestion-preview">${highlightText(item.preview, query)}</div>
+                        </div>
+                    `).join('');
+
+                    mobileSuggestionsContainer.innerHTML = html;
+                    mobileSuggestionsContainer.style.display = 'block';
+
+                    // Add click handlers
+                    mobileSuggestionsContainer.querySelectorAll('.search-suggestion-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            if (id) {
+                                window.location.hash = id;
+                                mobileSearchInput.value = '';
+                                clearMobileSearch();
+                            }
+                        });
+                    });
+                }
+
+                // Handle mobile search input
+                const handleMobileSearch = debounce(function(e) {
+                    const query = e.target.value.trim();
+
+                    if (query) {
+                        mobileClearButton.style.display = 'block';
+                    } else {
+                        mobileClearButton.style.display = 'none';
+                    }
+
+                    filterMobileSidebar(query);
+                    showMobileSuggestions(query);
+                }, 300);
+
+                mobileSearchInput.addEventListener('input', handleMobileSearch);
+
+                // Clear mobile search
+                function clearMobileSearch() {
+                    mobileSearchInput.value = '';
+                    mobileClearButton.style.display = 'none';
+                    mobileSuggestionsContainer.style.display = 'none';
+                    filterMobileSidebar('');
+                }
+
+                mobileClearButton.addEventListener('click', clearMobileSearch);
+
+                // Close mobile suggestions when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!mobileSearchInput.contains(e.target) && !mobileSuggestionsContainer.contains(e.target)) {
+                        mobileSuggestionsContainer.style.display = 'none';
+                    }
+                });
+
+                // Handle escape key for mobile
+                mobileSearchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        clearMobileSearch();
+                    }
+                });
+            }
         });
     </script>
 </body>
