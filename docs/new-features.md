@@ -26,7 +26,7 @@ Create multiple tab configurations for different Salesforce orgs, projects, or w
 - Different profiles for different clients or projects (consultants)
 - Role-based profiles (Admin, Developer, Configuration)
 
-[Learn more about Profiles →](user-guide#profiles)
+[Learn more about Profiles →](profiles)
 
 ---
 
@@ -59,7 +59,7 @@ Create custom dropdown menus by dragging tabs onto a parent tab:
 - Provides better organization for complex setups
 - Supports nested navigation patterns
 
-[Learn more about Dropdown Menus →](user-guide#creating-dropdown-menus)
+[Learn more about Dropdown Menus →](managing-tabs#creating-dropdown-menus)
 
 ---
 
@@ -85,7 +85,7 @@ Choose between two storage modes based on your needs and usage patterns.
 - Data automatically transfers when changing storage mode
 - No data loss during storage migration
 
-[Learn more about Storage Options →](user-guide#sync--storage)
+[Learn more about Storage Options →](settings#data)
 
 ---
 
@@ -104,7 +104,7 @@ When upgrading to v2.0, a migration wizard guides you through the transition:
 - **Progress tracking** - Real-time progress feedback during migration
 - **Backup option** - Export your data before migrating
 
-[Learn about the Migration Wizard →](user-guide#upgrading-to-v200-migration-wizard)
+[Learn about the Migration Wizard →](upgrading)
 
 ### Settings Reorganization
 The settings page has been reorganized into clear sections:
@@ -137,7 +137,7 @@ If you're upgrading from a previous version, here's what to expect:
 3. **Set up dropdowns** - Organize your tabs with dropdown menus
 4. **Configure auto-switching** - Add URL patterns for automatic profile switching
 
-[View detailed migration documentation →](user-guide#upgrading-to-v200-migration-wizard)
+[View detailed migration documentation →](upgrading)
 
 ---
 
@@ -199,9 +199,9 @@ We're always working to improve SF Tabs. Check our [GitHub Issues](https://githu
 
 ## 📚 Additional Resources
 
-- [Complete User Guide](user-guide) - Detailed documentation for all features
+- [Complete User Guide](getting-started) - Detailed documentation for all features
 - [Configuration Reference](configuration) - JSON configuration file format
-- [Keyboard Shortcuts](user-guide#keyboard-shortcuts) - Set up keyboard shortcuts for quick access
+- [Keyboard Shortcuts](keyboard-shortcuts) - Set up keyboard shortcuts for quick access
 - [GitHub Repository](https://github.com/chrisrouse/sftabs) - Source code and issue tracking
 
 ---
@@ -210,7 +210,7 @@ We're always working to improve SF Tabs. Check our [GitHub Issues](https://githu
 
 If you encounter any problems or have questions about the new features:
 
-1. **Check the User Guide** - [Read the documentation](user-guide)
+1. **Check the User Guide** - [Read the documentation](getting-started)
 2. **Search existing issues** - [GitHub Issues](https://github.com/chrisrouse/sftabs/issues)
 3. **Report a bug** - [Open a new issue](https://github.com/chrisrouse/sftabs/issues/new)
 4. **Request a feature** - Share your ideas on GitHub

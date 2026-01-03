@@ -17,7 +17,7 @@ navigation:
   - title: Installation
     url: /installation
   - title: User Guide
-    url: /user-guide
+    url: /getting-started
   - title: Configuration
     url: /configuration
 
