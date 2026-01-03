@@ -73,11 +73,14 @@ h4 { font-size: 1.25rem; }
     background-color: #c2deff;
     color: #000000;
     padding: 0.5rem 1rem;
+    min-height: auto;
 }
 
 .offcanvas-title {
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    margin: 0 !important;
+    line-height: 1.5;
 }
 
 .offcanvas-body {
