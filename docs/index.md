@@ -47,7 +47,7 @@ title: Home
         </div>
         <h3 class="h5 mb-3">User Guide</h3>
         <p class="text-muted mb-3">Complete documentation covering all features, settings, and advanced usage.</p>
-        <a href="user-guide" class="btn btn-outline-primary">Read Docs</a>
+        <a href="getting-started" class="btn btn-outline-primary">Read Docs</a>
       </div>
     </div>
   </div>
