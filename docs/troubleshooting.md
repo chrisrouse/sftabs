@@ -10,6 +10,7 @@ title: Troubleshooting
 - Make sure you're on a Salesforce Setup page (URL should contain `/lightning/setup/`)
 - Try refreshing the page
 - Check that the extension is enabled in your browser
+- Check to see if the extension is requesting permissions to access your current domain
 
 ## Tab links not working
 
