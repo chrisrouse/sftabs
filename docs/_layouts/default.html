@@ -31,15 +31,15 @@
                 <strong>SF Tabs</strong>
                 <span class="badge bg-warning text-dark ms-2" style="font-size: 0.8rem; vertical-align: middle;">Pre-release</span>
             </a>
-            {% if page.url != '/' %}
-            <!-- Mobile Menu Button (only visible on mobile for doc pages) -->
-            <button class="btn btn-outline-light d-lg-none me-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-expanded="false" aria-controls="mobileNav">
-                <i class="bi bi-list"></i> Menu
-            </button>
-            {% endif %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            {% if page.url != '/' %}
+            <!-- Mobile Menu Button (only visible on mobile for doc pages) -->
+            <button class="btn btn-outline-light d-lg-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-expanded="false" aria-controls="mobileNav">
+                <i class="bi bi-list"></i> Menu
+            </button>
+            {% endif %}
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
