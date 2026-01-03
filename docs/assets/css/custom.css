@@ -62,12 +62,27 @@ h4 { font-size: 1.25rem; }
     font-weight: 500;
 }
 
-/* Mobile Navigation */
-.mobile-sidebar-nav {
+/* Mobile Navigation Offcanvas */
+.offcanvas {
     background-color: var(--sf-gray-100);
-    border-bottom: 2px solid var(--sf-gray-200);
-    padding: 1.5rem 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.offcanvas-header {
+    background: linear-gradient(135deg, var(--sf-brand-primary) 0%, var(--sf-brand-dark) 100%);
+    color: white;
+}
+
+.offcanvas-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.offcanvas-body {
+    padding: 0;
+}
+
+.mobile-sidebar-nav {
+    padding: 1.5rem 1rem;
 }
 
 .mobile-search {
@@ -75,7 +90,6 @@ h4 { font-size: 1.25rem; }
 }
 
 .mobile-nav-sections {
-    max-height: 60vh;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--sf-gray-600) var(--sf-gray-200);

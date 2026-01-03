@@ -31,16 +31,18 @@
                 <strong>SF Tabs</strong>
                 <span class="badge bg-warning text-dark ms-2" style="font-size: 0.8rem; vertical-align: middle;">Pre-release</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            {% if page.url != '/' %}
-            <!-- Mobile Menu Button (only visible on mobile for doc pages) -->
-            <button class="btn btn-outline-light d-lg-none ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-expanded="false" aria-controls="mobileNav">
-                <i class="bi bi-list"></i> Menu
-            </button>
-            {% endif %}
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="d-flex align-items-center ms-auto order-lg-2">
+                {% if page.url != '/' %}
+                <!-- Mobile Menu Button (only visible on mobile for doc pages) -->
+                <button class="btn btn-outline-light d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-controls="mobileNav">
+                    <i class="bi bi-list"></i> Menu
+                </button>
+                {% endif %}
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse order-lg-1" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">
@@ -74,9 +76,13 @@
 
     <!-- Mobile Navigation (only on documentation pages) -->
     {% if page.url != '/' %}
-    <div class="collapse d-lg-none" id="mobileNav">
-        <div class="mobile-sidebar-nav">
-            <div class="container-fluid">
+    <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileNav" aria-labelledby="mobileNavLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="mobileNavLabel">User Guide</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mobile-sidebar-nav">
                 <!-- Search Bar -->
                 <div class="mobile-search mb-3">
                     <div class="search-input-wrapper">
