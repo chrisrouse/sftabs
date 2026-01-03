@@ -66,16 +66,18 @@
 
 		.sponsor-links {
 			display: flex;
-			justify-content: center;
-			gap: 12px;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 8px;
 			margin-top: 8px;
 		}
 
 		.sponsor-link {
-			display: inline-flex;
+			display: flex;
 			align-items: center;
+			justify-content: center;
 			gap: 6px;
-			padding: 6px 12px;
+			padding: 8px 12px;
 			border-radius: 4px;
 			text-decoration: none;
 			font-size: 12px;
@@ -83,6 +85,8 @@
 			background: var(--color-item-background);
 			border: 1px solid var(--color-border);
 			transition: all 0.15s;
+			width: 100%;
+			min-height: 32px;
 		}
 
 		.sponsor-link:hover {
@@ -544,13 +548,13 @@
 						<svg class="github-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
 							<path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
 						</svg>
-						<span>Sponsor</span>
+						<span>Sponsor on Github</span>
 					</a>
 					<a href="https://buymeacoffee.com/chrisrouse" target="_blank" class="sponsor-link" title="Buy Me a Coffee">
 						<svg class="coffee-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 							<path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 						</svg>
-						<span>Coffee</span>
+						<span>Buy Me a Coffee</span>
 					</a>
 				</div>
 			</div>
