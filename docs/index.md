@@ -24,20 +24,6 @@ title: Home
     </div>
   </div>
 
-  <!-- Quick Start -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 feature-tile">
-      <div class="card-body text-center">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-lightning-charge-fill display-4 text-primary"></i>
-        </div>
-        <h3 class="h5 mb-3">Quick Start</h3>
-        <p class="text-muted mb-3">Install, add your first tabs, and start customizing your Salesforce experience.</p>
-        <a href="user-guide#adding-a-new-tab" class="btn btn-outline-primary">Get Started</a>
-      </div>
-    </div>
-  </div>
-
   <!-- New Features -->
   <div class="col-md-6 col-lg-4">
     <div class="card h-100 feature-tile">
@@ -66,34 +52,7 @@ title: Home
     </div>
   </div>
 
-  <!-- Translations -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 feature-tile">
-      <div class="card-body text-center">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-translate display-4 text-primary"></i>
-        </div>
-        <h3 class="h5 mb-3">Translations</h3> 
-        <p class="text-muted mb-3">Help translate SF Tabs into your language and make it accessible to everyone.</p>
-        <a href="https://github.com/chrisrouse/sftabs/issues" target="_blank" class="btn btn-outline-primary">Contribute</a>
-      </div>
-    </div>
-  </div>
 
-  <!-- GitHub -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 feature-tile">
-      <div class="card-body text-center">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-github display-4 text-primary"></i>
-        </div>
-        <h3 class="h5 mb-3">GitHub</h3>
-        <p class="text-muted mb-3">View source code, report issues, request features, and contribute to the project.</p>
-        <a href="https://github.com/chrisrouse/sftabs" target="_blank" class="btn btn-outline-primary">Visit Repo</a>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Key Features Section -->
 <div class="mt-5 pt-5">
