@@ -60,8 +60,49 @@
 		.version-info {
 			font-size: 12px;
 			color: var(--color-text-weak);
-			margin: 0;
+			margin: 0 0 12px 0;
 			text-align: center;
+		}
+
+		.sponsor-links {
+			display: flex;
+			justify-content: center;
+			gap: 12px;
+			margin-top: 8px;
+		}
+
+		.sponsor-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 6px 12px;
+			border-radius: 4px;
+			text-decoration: none;
+			font-size: 12px;
+			color: var(--color-text-weak);
+			background: var(--color-item-background);
+			border: 1px solid var(--color-border);
+			transition: all 0.15s;
+		}
+
+		.sponsor-link:hover {
+			color: var(--color-primary);
+			border-color: var(--color-primary);
+			background: var(--state-hover-primary);
+		}
+
+		.sponsor-link svg {
+			width: 14px;
+			height: 14px;
+			flex-shrink: 0;
+		}
+
+		.sponsor-link .github-icon {
+			fill: currentColor;
+		}
+
+		.sponsor-link .coffee-icon {
+			fill: currentColor;
 		}
 
 		.user-guide-link {
@@ -501,6 +542,20 @@
 			</nav>
 			<div class="settings-sidebar-footer">
 				<p class="version-info">v2.0.0</p>
+				<div class="sponsor-links">
+					<a href="https://github.com/sponsors/chrisrouse" target="_blank" class="sponsor-link" title="Sponsor on GitHub">
+						<svg class="github-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+							<path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+						</svg>
+						<span>Sponsor</span>
+					</a>
+					<a href="https://buymeacoffee.com/chrisrouse" target="_blank" class="sponsor-link" title="Buy Me a Coffee">
+						<svg class="coffee-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<span>Coffee</span>
+					</a>
+				</div>
 			</div>
 		</div>
 
