@@ -79,7 +79,7 @@ title: Home
       <p class="text-muted">Quick access to your first 10 tabs via configurable keyboard shortcuts for power users.</p>
     </div>
     <div class="col-md-6">
-      <h5><i class="bi bi-translate text-primary me-2"></i>Translations <span class="badge bg-secondary">Coming Soon</span></h5>
+      <h5><i class="bi bi-translate text-primary me-2"></i>Translations <span class="badge bg-success">Coming Soon</span></h5>
       <p class="text-muted">Help translate SF Tabs into your language and make it accessible to everyone.</p>
     </div>
   </div>
@@ -94,9 +94,6 @@ title: Home
     </a>
     <a href="https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/" target="_blank">
       <img src="https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white" alt="Firefox">
-    </a>
-    <a href="https://microsoftedge.microsoft.com/addons/detail/sf-tabs/kchadlkjcefbnojjnmmpcnfnhcfbdjbb" target="_blank">
-      <img src="https://img.shields.io/badge/Edge-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white" alt="Edge">
     </a>
   </div>
 </div>
