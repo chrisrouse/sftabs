@@ -32,13 +32,14 @@ h4 { font-size: 1.25rem; }
 
 /* Navigation */
 .navbar {
-    background: linear-gradient(135deg, var(--sf-brand-primary) 0%, var(--sf-brand-dark) 100%) !important;
+    background-color: #c2deff !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: 700;
+    color: #000000 !important;
 }
 
 .navbar-logo {
@@ -51,14 +52,15 @@ h4 { font-size: 1.25rem; }
     transition: all 0.2s ease;
     border-radius: 0.25rem;
     margin: 0 0.25rem;
+    color: #000000 !important;
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .navbar-nav .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(0, 0, 0, 0.15);
     font-weight: 500;
 }
 
