@@ -2,9 +2,6 @@ sftabs.zip
 .DS_Store
 TESTING_STATUS.md
 
-# Generated manifest (browser-specific)
-manifest.json
-
 # Node.js
 node_modules/
 package-lock.json

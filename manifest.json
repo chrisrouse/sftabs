@@ -1,0 +1,136 @@
+{
+  "manifest_version": 3,
+  "name": "SF Tabs",
+  "version": "2.0.0",
+  "description": "Add custom tabs to the Salesforce setup menu.",
+  "author": "Chris Rouse",
+  "homepage_url": "https://github.com/chrisrouse/sftabs",
+  "default_locale": "en",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "sftabs@github.chrisrouse",
+      "strict_min_version": "109.0"
+    }
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.lightning.force.com/*",
+    "*://*.salesforce-setup.com/*",
+    "*://*.my.salesforce-setup.com/*",
+    "*://*.salesforce.com/*",
+    "*://*.my.salesforce.com/*",
+    "*://*.builder.salesforce-experience.com/*"
+  ],
+  "action": {
+    "default_icon": {
+      "48": "icons/sftabs-icon-48.png",
+      "96": "icons/sftabs-icon-96.png"
+    },
+    "default_title": "SF Tabs",
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.lightning.force.com/*",
+        "*://*.salesforce-setup.com/*",
+        "*://*.my.salesforce-setup.com/*",
+        "*://*.salesforce.com/*",
+        "*://*.my.salesforce.com/*",
+        "*://*.builder.salesforce-experience.com/*"
+      ],
+      "js": [
+        "popup/js/shared/browser-compat.js",
+        "popup/js/shared/constants.js",
+        "popup/js/shared/utils.js",
+        "content/floating-button.js",
+        "content/floating-modal.js"
+      ],
+      "css": [
+        "content/floating-button.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://*.lightning.force.com/lightning/setup/*",
+        "*://*.salesforce-setup.com/lightning/setup/*",
+        "*://*.my.salesforce-setup.com/lightning/setup/*",
+        "*://*.salesforce.com/lightning/setup/*",
+        "*://*.my.salesforce.com/lightning/setup/*"
+      ],
+      "js": [
+        "content/navigation-parser.js",
+        "content/tab-renderer.js",
+        "content/content-main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/inject.js",
+        "icons/invert.svg",
+        "icons/sftabs-icon-16.png"
+      ],
+      "matches": [
+        "*://*.lightning.force.com/*",
+        "*://*.salesforce-setup.com/*",
+        "*://*.my.salesforce-setup.com/*",
+        "*://*.salesforce.com/*",
+        "*://*.my.salesforce.com/*",
+        "*://*.builder.salesforce-experience.com/*"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icons/sftabs-icon-16.png",
+    "48": "icons/sftabs-icon-48.png",
+    "96": "icons/sftabs-icon-96.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "commands": {
+    "open-tab-01": {
+      "description": "Tab 1"
+    },
+    "open-tab-02": {
+      "description": "Tab 2"
+    },
+    "open-tab-03": {
+      "description": "Tab 3"
+    },
+    "open-tab-04": {
+      "description": "Tab 4"
+    },
+    "open-tab-05": {
+      "description": "Tab 5"
+    },
+    "open-tab-06": {
+      "description": "Tab 6"
+    },
+    "open-tab-07": {
+      "description": "Tab 7"
+    },
+    "open-tab-08": {
+      "description": "Tab 8"
+    },
+    "open-tab-09": {
+      "description": "Tab 9"
+    },
+    "open-tab-10": {
+      "description": "Tab 10"
+    }
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  }
+}
