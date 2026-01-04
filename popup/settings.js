@@ -334,6 +334,18 @@ function setupEventListeners() {
 	document.getElementById('use-sync-storage').addEventListener('change', async (e) => {
 		const newValue = e.target.checked;
 
+		// When ENABLING sync, check for conflicts
+		if (newValue) {
+			const conflict = await detectSyncConflict();
+
+			if (conflict.hasConflict) {
+				// Show conflict resolution UI
+				e.target.checked = false; // Uncheck temporarily
+				await showSyncConflictDialog(conflict);
+				return;
+			}
+		}
+
 		const confirmed = confirm(
 			newValue
 				? 'Enable cross-device sync?\n\nYour tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you\'re signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.'
@@ -1421,6 +1433,145 @@ async function resetToDefaults() {
 		showStatus('All settings and tabs reset to defaults', false);
 	} catch (error) {
 		showStatus('Reset failed: ' + error.message, true);
+	}
+}
+
+/**
+ * Detect if enabling sync would cause a data conflict
+ * @returns {Object} Conflict information
+ */
+async function detectSyncConflict() {
+	try {
+		const [localData, syncData] = await Promise.all([
+			browser.storage.local.get(['profiles', 'userSettings']),
+			browser.storage.sync.get(['profiles', 'userSettings'])
+		]);
+
+		const localProfiles = localData.profiles || [];
+		const syncProfiles = syncData.profiles || [];
+
+		// Check if both have data
+		const hasLocalData = localProfiles.length > 0;
+		const hasSyncData = syncProfiles.length > 0;
+
+		if (hasLocalData && hasSyncData) {
+			// Get tab counts for each
+			let localTabCount = 0;
+			for (const profile of localProfiles) {
+				const tabsKey = `profile_${profile.id}_tabs`;
+				const result = await browser.storage.local.get(tabsKey);
+				localTabCount += (result[tabsKey] || []).length;
+			}
+
+			let syncTabCount = 0;
+			for (const profile of syncProfiles) {
+				const tabsKey = `profile_${profile.id}_tabs`;
+				const result = await browser.storage.sync.get(tabsKey);
+				syncTabCount += (result[tabsKey] || []).length;
+			}
+
+			return {
+				hasConflict: true,
+				local: {
+					profileCount: localProfiles.length,
+					tabCount: localTabCount,
+					profiles: localProfiles
+				},
+				sync: {
+					profileCount: syncProfiles.length,
+					tabCount: syncTabCount,
+					profiles: syncProfiles
+				}
+			};
+		}
+
+		return { hasConflict: false };
+	} catch (error) {
+		console.error('[Settings] Error detecting sync conflict:', error);
+		return { hasConflict: false };
+	}
+}
+
+/**
+ * Show sync conflict resolution dialog
+ * @param {Object} conflict - Conflict information from detectSyncConflict()
+ */
+async function showSyncConflictDialog(conflict) {
+	const message = `Sync Conflict Detected!\n\n` +
+		`Local (this computer):\n` +
+		`  ${conflict.local.profileCount} profile(s), ${conflict.local.tabCount} tab(s)\n\n` +
+		`Synced (from another device):\n` +
+		`  ${conflict.sync.profileCount} profile(s), ${conflict.sync.tabCount} tab(s)\n\n` +
+		`What would you like to do?\n\n` +
+		`Click OK to merge (keep both local and synced data)\n` +
+		`Click Cancel to stop and review your data first`;
+
+	const shouldMerge = confirm(message);
+
+	if (shouldMerge) {
+		try {
+			// Perform merge
+			await mergeSyncData(conflict);
+
+			// Enable sync
+			userSettings.useSyncStorage = true;
+			await saveUserSettings();
+
+			// Update UI
+			document.getElementById('use-sync-storage').checked = true;
+			toggleSyncDiagnostics();
+
+			showStatus('Data merged successfully - sync enabled', false);
+		} catch (error) {
+			showStatus('Merge failed: ' + error.message, true);
+		}
+	}
+}
+
+/**
+ * Merge local and sync data
+ * @param {Object} conflict - Conflict information
+ */
+async function mergeSyncData(conflict) {
+	try {
+		// Merge profiles - keep all unique profiles
+		const mergedProfiles = [...conflict.sync.profiles];
+		const syncProfileIds = new Set(conflict.sync.profiles.map(p => p.id));
+
+		// Add local profiles that don't exist in sync
+		for (const localProfile of conflict.local.profiles) {
+			if (!syncProfileIds.has(localProfile.id)) {
+				mergedProfiles.push(localProfile);
+			}
+		}
+
+		// Save merged profiles to sync
+		await browser.storage.sync.set({ profiles: mergedProfiles });
+
+		// Migrate all profile tabs to sync
+		for (const profile of mergedProfiles) {
+			const tabsKey = `profile_${profile.id}_tabs`;
+
+			// Try to get tabs from sync first (priority), then local
+			const [syncResult, localResult] = await Promise.all([
+				browser.storage.sync.get(tabsKey),
+				browser.storage.local.get(tabsKey)
+			]);
+
+			const tabs = syncResult[tabsKey] || localResult[tabsKey] || [];
+
+			if (tabs.length > 0) {
+				await SFTabs.storageChunking.saveChunkedSync(tabsKey, tabs);
+			}
+		}
+
+		// Cache merged data in local storage
+		await browser.storage.local.set({ profiles: mergedProfiles });
+
+		showStatus(`Merged ${mergedProfiles.length} profiles successfully`, false);
+	} catch (error) {
+		console.error('[Settings] Error merging data:', error);
+		throw error;
 	}
 }
 
