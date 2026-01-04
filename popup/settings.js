@@ -1475,12 +1475,14 @@ async function detectSyncConflict() {
 				local: {
 					profileCount: localProfiles.length,
 					tabCount: localTabCount,
-					profiles: localProfiles
+					profiles: localProfiles,
+					settings: localData.userSettings || {}
 				},
 				sync: {
 					profileCount: syncProfiles.length,
 					tabCount: syncTabCount,
-					profiles: syncProfiles
+					profiles: syncProfiles,
+					settings: syncData.userSettings || {}
 				}
 			};
 		}
@@ -1497,13 +1499,31 @@ async function detectSyncConflict() {
  * @param {Object} conflict - Conflict information from detectSyncConflict()
  */
 async function showSyncConflictDialog(conflict) {
+	// Build settings comparison
+	let settingsComparison = '';
+	const localSettings = conflict.local.settings;
+	const syncSettings = conflict.sync.settings;
+
+	// Check for key setting differences
+	const settingsDiffer =
+		localSettings.themeMode !== syncSettings.themeMode ||
+		localSettings.compactMode !== syncSettings.compactMode ||
+		localSettings.profilesEnabled !== syncSettings.profilesEnabled;
+
+	if (settingsDiffer) {
+		settingsComparison = `\nSettings differ:\n` +
+			`  Local: ${localSettings.themeMode} theme, ${localSettings.compactMode ? 'compact' : 'normal'} mode, profiles ${localSettings.profilesEnabled ? 'enabled' : 'disabled'}\n` +
+			`  Synced: ${syncSettings.themeMode} theme, ${syncSettings.compactMode ? 'compact' : 'normal'} mode, profiles ${syncSettings.profilesEnabled ? 'enabled' : 'disabled'}\n`;
+	}
+
 	const message = `Sync Conflict Detected!\n\n` +
 		`Local (this computer):\n` +
 		`  ${conflict.local.profileCount} profile(s), ${conflict.local.tabCount} tab(s)\n\n` +
 		`Synced (from another device):\n` +
-		`  ${conflict.sync.profileCount} profile(s), ${conflict.sync.tabCount} tab(s)\n\n` +
-		`What would you like to do?\n\n` +
-		`Click OK to merge (keep both local and synced data)\n` +
+		`  ${conflict.sync.profileCount} profile(s), ${conflict.sync.tabCount} tab(s)` +
+		settingsComparison +
+		`\nWhat would you like to do?\n\n` +
+		`Click OK to merge (keep both local and synced data, use synced settings)\n` +
 		`Click Cancel to stop and review your data first`;
 
 	const shouldMerge = confirm(message);
@@ -1545,8 +1565,44 @@ async function mergeSyncData(conflict) {
 			}
 		}
 
-		// Save merged profiles to sync
-		await browser.storage.sync.set({ profiles: mergedProfiles });
+		// Merge user settings - use sync settings as base
+		const localSettings = conflict.local.settings;
+		const syncSettings = conflict.sync.settings;
+
+		// Start with sync settings as base, then overlay with defaults for any missing values
+		const mergedSettings = {
+			...SFTabs.constants.DEFAULT_SETTINGS,
+			...syncSettings,
+			useSyncStorage: true  // Force this to true since we're enabling sync
+		};
+
+		// Merge floatingButton object specifically (in case one has properties the other doesn't)
+		if (localSettings.floatingButton || syncSettings.floatingButton) {
+			mergedSettings.floatingButton = {
+				...SFTabs.constants.DEFAULT_SETTINGS.floatingButton,
+				...(localSettings.floatingButton || {}),
+				...(syncSettings.floatingButton || {})
+			};
+		}
+
+		// Update activeProfileId to match a valid profile in the merged set
+		if (mergedProfiles.length > 0) {
+			// Use sync's active profile if it exists in merged set, otherwise use first profile
+			const syncActiveProfile = mergedProfiles.find(p => p.id === syncSettings.activeProfileId);
+			const localActiveProfile = mergedProfiles.find(p => p.id === localSettings.activeProfileId);
+			mergedSettings.activeProfileId = syncActiveProfile ? syncActiveProfile.id : (localActiveProfile?.id || mergedProfiles[0].id);
+
+			// Update defaultProfileId similarly
+			const syncDefaultProfile = mergedProfiles.find(p => p.id === syncSettings.defaultProfileId);
+			const localDefaultProfile = mergedProfiles.find(p => p.id === localSettings.defaultProfileId);
+			mergedSettings.defaultProfileId = syncDefaultProfile ? syncDefaultProfile.id : (localDefaultProfile?.id || mergedProfiles[0].id);
+		}
+
+		// Save merged data to sync storage
+		await browser.storage.sync.set({
+			profiles: mergedProfiles,
+			userSettings: mergedSettings
+		});
 
 		// Migrate all profile tabs to sync
 		for (const profile of mergedProfiles) {
@@ -1566,9 +1622,12 @@ async function mergeSyncData(conflict) {
 		}
 
 		// Cache merged data in local storage
-		await browser.storage.local.set({ profiles: mergedProfiles });
+		await browser.storage.local.set({
+			profiles: mergedProfiles,
+			userSettings: mergedSettings
+		});
 
-		showStatus(`Merged ${mergedProfiles.length} profiles successfully`, false);
+		showStatus(`Merged ${mergedProfiles.length} profiles and settings successfully`, false);
 	} catch (error) {
 		console.error('[Settings] Error merging data:', error);
 		throw error;
