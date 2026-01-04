@@ -33,20 +33,28 @@ async function initSettingsPage() {
  */
 async function loadUserSettings() {
 	try {
-		// Check local storage FIRST (new default for v2.0+)
-		const localResult = await browser.storage.local.get('userSettings');
+		// Check BOTH storages to determine which to use
+		const [localResult, syncResult] = await Promise.all([
+			browser.storage.local.get('userSettings'),
+			browser.storage.sync.get('userSettings')
+		]);
 
+		// Priority 1: If sync storage has useSyncStorage=true, use sync storage (it's the source of truth)
+		if (syncResult.userSettings && syncResult.userSettings.useSyncStorage === true) {
+			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...syncResult.userSettings };
+			// Cache in local storage for faster access
+			await browser.storage.local.set({ userSettings });
+			return;
+		}
+
+		// Priority 2: Use local storage if it exists
 		if (localResult.userSettings) {
-			// Settings found in local storage - merge with defaults
 			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...localResult.userSettings };
 			return;
 		}
 
-		// Fall back to sync storage for backward compatibility (v1.x users)
-		const syncResult = await browser.storage.sync.get('userSettings');
-
+		// Priority 3: Use sync storage if it exists (backward compatibility for v1.x users)
 		if (syncResult.userSettings) {
-			// Existing user from v1.x - merge with defaults
 			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...syncResult.userSettings };
 
 			// If useSyncStorage is not explicitly set, this is an existing user from before v2.1
@@ -57,7 +65,7 @@ async function loadUserSettings() {
 			return;
 		}
 
-		// No settings found - use defaults
+		// Priority 4: No settings found - use defaults
 		userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 	} catch (error) {
 		console.error('[Settings] Error loading settings:', error);

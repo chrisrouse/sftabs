@@ -7,21 +7,29 @@
  */
 async function getStoragePreference() {
   try {
-    // Settings are always in sync storage (they're small)
-    const result = await browser.storage.sync.get('userSettings');
+    // Check BOTH storages to find the preference
+    const [syncResult, localResult] = await Promise.all([
+      browser.storage.sync.get('userSettings'),
+      browser.storage.local.get('userSettings')
+    ]);
 
-    // If useSyncStorage is explicitly set, use it
-    if (result.userSettings && typeof result.userSettings.useSyncStorage === 'boolean') {
-      return result.userSettings.useSyncStorage;
-    }
-
-    // If userSettings exists but useSyncStorage is not set, this is an existing user
-    // from before v2.1 when sync was the default - preserve that behavior
-    if (result.userSettings) {
+    // Priority 1: If sync storage has useSyncStorage=true, sync is enabled
+    if (syncResult.userSettings && syncResult.userSettings.useSyncStorage === true) {
       return true;
     }
 
-    // No userSettings at all - this is a new installation, use new default (local storage)
+    // Priority 2: Check local storage for the preference
+    if (localResult.userSettings && typeof localResult.userSettings.useSyncStorage === 'boolean') {
+      return localResult.userSettings.useSyncStorage;
+    }
+
+    // Priority 3: If userSettings exists in sync but useSyncStorage is not set,
+    // this is an existing user from before v2.1 when sync was the default
+    if (syncResult.userSettings) {
+      return true;
+    }
+
+    // Priority 4: No userSettings found - new installation, use default (local storage)
     return false;
   } catch (error) {
     // On error, default to local storage for privacy
