@@ -157,30 +157,38 @@ async function saveTabs(tabs) {
 
 /**
  * Get user settings from browser storage
- * Settings are always stored in sync storage (they're small and benefit from cross-device sync)
+ * Settings are stored based on useSyncStorage preference (local by default)
  */
 async function getUserSettings() {
   try {
-    // Settings are always in sync storage (small, no chunking needed)
-    const result = await browser.storage.sync.get('userSettings');
+    // Check local storage first (new default since v2.1)
+    const localResult = await browser.storage.local.get('userSettings');
 
-    if (result.userSettings) {
-      // Existing user - merge with defaults
-      const mergedSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...result.userSettings };
+    if (localResult.userSettings) {
+      // Found in local storage - merge with defaults
+      const mergedSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...localResult.userSettings };
+      return mergedSettings;
+    }
+
+    // Not in local storage - check sync storage for backward compatibility
+    const syncResult = await browser.storage.sync.get('userSettings');
+
+    if (syncResult.userSettings) {
+      // Found in sync storage (existing user from before v2.1)
+      const mergedSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...syncResult.userSettings };
 
       // If useSyncStorage is not explicitly set, this is an existing user from before v2.1
       // when sync was the default - preserve that behavior
-      if (typeof result.userSettings.useSyncStorage !== 'boolean') {
+      if (typeof syncResult.userSettings.useSyncStorage !== 'boolean') {
         mergedSettings.useSyncStorage = true;
       }
 
       return mergedSettings;
-    } else {
-      // New installation - return defaults and save them (suppress toast during initialization)
-      // DEFAULT_SETTINGS now has useSyncStorage: false for privacy-first approach
-      await saveUserSettings(SFTabs.constants.DEFAULT_SETTINGS, false, false);
-      return { ...SFTabs.constants.DEFAULT_SETTINGS };
     }
+
+    // New installation - return defaults (don't save yet, let first-launch handle it)
+    return { ...SFTabs.constants.DEFAULT_SETTINGS };
+
   } catch (error) {
     throw error;
   }
@@ -188,7 +196,7 @@ async function getUserSettings() {
 
 /**
  * Save user settings to browser storage
- * Settings are always stored in sync storage (they're small and benefit from cross-device sync)
+ * Settings are stored based on useSyncStorage preference (local by default)
  */
 async function saveUserSettings(settings, skipMigration = false, showToast = true) {
   try {
@@ -201,8 +209,22 @@ async function saveUserSettings(settings, skipMigration = false, showToast = tru
       }
     }
 
-    // Settings are always in sync storage (small, no chunking needed)
-    await browser.storage.sync.set({ userSettings: settings });
+    // Save settings to the appropriate storage based on user preference
+    if (settings.useSyncStorage) {
+      // Save to sync storage
+      await browser.storage.sync.set({ userSettings: settings });
+      // Also cache in local storage for quick access
+      await browser.storage.local.set({ userSettings: settings });
+    } else {
+      // Save to local storage only
+      await browser.storage.local.set({ userSettings: settings });
+      // Remove from sync storage if it exists there
+      try {
+        await browser.storage.sync.remove('userSettings');
+      } catch (e) {
+        // Ignore errors removing from sync (might not exist)
+      }
+    }
 
     // Update the main state (only in popup context)
     if (SFTabs.main && SFTabs.main.setUserSettings) {
@@ -388,14 +410,37 @@ function setupStorageListeners() {
       } else if (area === 'sync') {
         // Handle sync storage changes
         if (changes.userSettings) {
-          const newSettings = changes.userSettings.newValue || SFTabs.constants.DEFAULT_SETTINGS;
-          // Only update popup UI if we're in the popup context
-          if (SFTabs.main && SFTabs.main.setUserSettings) {
-            SFTabs.main.setUserSettings(newSettings);
+          const newSettings = changes.userSettings.newValue;
+
+          // If sync storage is being removed (newValue is undefined), don't overwrite local storage
+          // This happens when user switches from Sync to Local storage mode
+          if (!newSettings) {
+            console.log('[Storage] Sync storage removed, skipping local cache update');
+            return;
           }
-          if (SFTabs.main && SFTabs.main.applyTheme) {
-            SFTabs.main.applyTheme();
-          }
+
+          // Update local cache to keep it in sync (only if we're using sync storage)
+          // Use promise chain instead of await since we can't make this callback async
+          browser.storage.local.get('userSettings').then(currentSettings => {
+            if (currentSettings.userSettings && currentSettings.userSettings.useSyncStorage === false) {
+              console.log('[Storage] Using local storage mode, skipping sync-triggered update');
+              return;
+            }
+
+            browser.storage.local.set({ userSettings: newSettings }).catch(err => {
+              console.error('[Storage] Failed to update local cache:', err);
+            });
+
+            // Only update popup UI if we're in the popup context
+            if (SFTabs.main && SFTabs.main.setUserSettings) {
+              SFTabs.main.setUserSettings(newSettings);
+            }
+            if (SFTabs.main && SFTabs.main.applyTheme) {
+              SFTabs.main.applyTheme();
+            }
+          }).catch(err => {
+            console.error('[Storage] Error checking storage mode:', err);
+          });
         }
 
         // Handle chunked tabs changes (check for metadata changes)
@@ -512,6 +557,7 @@ async function getProfileTabs(profileId) {
       return localResult[storageKey] || [];
     }
   } catch (error) {
+    console.error('[Storage] getProfileTabs - error:', error);
     throw error;
   }
 }

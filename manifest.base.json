@@ -91,31 +91,31 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "commands": {
-    "open-tab-1": {
+    "open-tab-01": {
       "description": "Tab 1"
     },
-    "open-tab-2": {
+    "open-tab-02": {
       "description": "Tab 2"
     },
-    "open-tab-3": {
+    "open-tab-03": {
       "description": "Tab 3"
     },
-    "open-tab-4": {
+    "open-tab-04": {
       "description": "Tab 4"
     },
-    "open-tab-5": {
+    "open-tab-05": {
       "description": "Tab 5"
     },
-    "open-tab-6": {
+    "open-tab-06": {
       "description": "Tab 6"
     },
-    "open-tab-7": {
+    "open-tab-07": {
       "description": "Tab 7"
     },
-    "open-tab-8": {
+    "open-tab-08": {
       "description": "Tab 8"
     },
-    "open-tab-9": {
+    "open-tab-09": {
       "description": "Tab 9"
     },
     "open-tab-10": {

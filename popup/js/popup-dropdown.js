@@ -9,7 +9,6 @@ async function setupObjectDropdown() {
 	const setupDropdownButton = document.querySelector('#object-dropdown-section #setup-dropdown-button');
 
 	if (!setupDropdownButton) {
-		console.error('[setupObjectDropdown] Could not find setup dropdown button');
 		SFTabs.main.showStatus('Error: Could not find setup button', true);
 		return;
 	}
@@ -114,8 +113,6 @@ async function setupObjectDropdown() {
 				const actionPanelTab = SFTabs.main.getCurrentActionPanelTab();
 				if (actionPanelTab) {
 					actionPanelTab.pendingDropdownItems = navigationItems;
-				} else {
-					console.error('[setupObjectDropdown] No actionPanelTab found!');
 				}
 
 				// Scroll the dropdown preview into view so user can see it immediately
@@ -519,31 +516,21 @@ function initDropdownListeners() {
 	// Use event delegation on the tab-form dropdown section
 	const objectDropdownSection = document.querySelector('#object-dropdown-section');
 
-	console.log('[initDropdownListeners] objectDropdownSection found:', !!objectDropdownSection);
-
 	if (objectDropdownSection) {
 		// Remove any existing listeners to prevent duplicates
 		const oldListener = objectDropdownSection.getAttribute('data-listener-attached');
-		console.log('[initDropdownListeners] Listener already attached:', !!oldListener);
 
 		if (!oldListener) {
-			console.log('[initDropdownListeners] Attaching click listener to object-dropdown-section');
 			objectDropdownSection.addEventListener('click', async (e) => {
-				console.log('[initDropdownListeners] Click detected on:', e.target.id, e.target);
 				// Check if click was on setup or refresh button
 				if (e.target.id === 'setup-dropdown-button' || e.target.id === 'refresh-dropdown-button') {
-					console.log('[initDropdownListeners] Button click confirmed, calling setupObjectDropdown');
 					e.preventDefault();
 					e.stopPropagation();
 					await setupObjectDropdown();
-				} else {
-					console.log('[initDropdownListeners] Click was not on a dropdown button');
 				}
 			});
 			objectDropdownSection.setAttribute('data-listener-attached', 'true');
 		}
-	} else {
-		console.error('[initDropdownListeners] Could not find object-dropdown-section');
 	}
 }
 

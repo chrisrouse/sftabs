@@ -33,23 +33,34 @@ async function initSettingsPage() {
  */
 async function loadUserSettings() {
 	try {
-		// Settings are always in sync storage (small, benefit from cross-device sync)
-		const result = await browser.storage.sync.get('userSettings');
+		// Check local storage FIRST (new default for v2.0+)
+		const localResult = await browser.storage.local.get('userSettings');
 
-		if (result.userSettings) {
-			// Existing user - merge with defaults
-			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...result.userSettings };
+		if (localResult.userSettings) {
+			// Settings found in local storage - merge with defaults
+			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...localResult.userSettings };
+			return;
+		}
+
+		// Fall back to sync storage for backward compatibility (v1.x users)
+		const syncResult = await browser.storage.sync.get('userSettings');
+
+		if (syncResult.userSettings) {
+			// Existing user from v1.x - merge with defaults
+			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...syncResult.userSettings };
 
 			// If useSyncStorage is not explicitly set, this is an existing user from before v2.1
 			// when sync was the default - preserve that behavior
-			if (typeof result.userSettings.useSyncStorage !== 'boolean') {
+			if (typeof syncResult.userSettings.useSyncStorage !== 'boolean') {
 				userSettings.useSyncStorage = true;
 			}
-		} else {
-			// New installation - use defaults (useSyncStorage: false for privacy-first approach)
-			userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
+			return;
 		}
+
+		// No settings found - use defaults
+		userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 	} catch (error) {
+		console.error('[Settings] Error loading settings:', error);
 		userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 	}
 }
@@ -59,9 +70,20 @@ async function loadUserSettings() {
  */
 async function saveUserSettings() {
 	try {
-		await browser.storage.sync.set({ userSettings });
+		// Respect storage preference
+		if (userSettings.useSyncStorage) {
+			// Save to sync storage AND cache in local
+			await browser.storage.sync.set({ userSettings });
+			await browser.storage.local.set({ userSettings });
+		} else {
+			// Save to local storage only AND remove from sync
+			await browser.storage.local.set({ userSettings });
+			await browser.storage.sync.remove('userSettings');
+		}
+
 		showStatus('Settings saved', false);
 	} catch (error) {
+		console.error('[Settings] Error saving settings:', error);
 		showStatus('Error saving settings: ' + error.message, true);
 	}
 }
@@ -178,6 +200,9 @@ function updateUI() {
 
 	// Show/hide floating button settings based on enabled
 	toggleFloatingButtonSettings();
+
+	// Show/hide sync diagnostics based on sync storage enabled
+	toggleSyncDiagnostics();
 }
 
 /**
@@ -208,6 +233,15 @@ function toggleFloatingButtonSettings() {
 	const settingsContainer = document.getElementById('floating-button-settings');
 	const enabled = document.getElementById('floating-button-enabled').checked;
 	settingsContainer.style.display = enabled ? 'block' : 'none';
+}
+
+/**
+ * Toggle sync diagnostics visibility based on sync storage enabled
+ */
+function toggleSyncDiagnostics() {
+	const diagnosticsCard = document.getElementById('sync-diagnostics-card');
+	const syncEnabled = document.getElementById('use-sync-storage').checked;
+	diagnosticsCard.style.display = syncEnabled ? 'block' : 'none';
 }
 
 /**
@@ -311,6 +345,8 @@ function setupEventListeners() {
 					newValue ? 'Sync enabled - tabs will now sync across devices' : 'Sync disabled - tabs stored locally only',
 					false
 				);
+				// Show/hide sync diagnostics
+				toggleSyncDiagnostics();
 			} catch (error) {
 				showStatus('Error: ' + error.message, true);
 				e.target.checked = !newValue;
@@ -519,6 +555,15 @@ function setupEventListeners() {
 			importExportSection.classList.add('active');
 			importExportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 		}
+	});
+
+	// Sync diagnostics buttons
+	document.getElementById('view-sync-storage-button').addEventListener('click', async () => {
+		await viewSyncStorage();
+	});
+
+	document.getElementById('force-sync-refresh-button').addEventListener('click', async () => {
+		await forceSyncRefresh();
 	});
 }
 
@@ -1378,39 +1423,210 @@ async function resetToDefaults() {
  */
 async function migrateBetweenStorageTypes(fromSync, toSync) {
 	try {
-		// Read tabs from source storage
-		let tabs = [];
-		if (fromSync) {
-			// Read from sync storage
-			const syncResult = await browser.storage.sync.get('customTabs');
-			tabs = syncResult.customTabs || [];
-		} else {
-			// Read from local storage
-			const localResult = await browser.storage.local.get('customTabs');
-			tabs = localResult.customTabs || [];
+		// Get all profiles to migrate their tabs
+		const sourceStorage = fromSync ? browser.storage.sync : browser.storage.local;
+		const destStorage = toSync ? browser.storage.sync : browser.storage.local;
+
+		const result = await sourceStorage.get('profiles');
+		const profiles = result.profiles || [];
+
+		// Migrate each profile's tabs
+		for (const profile of profiles) {
+			const tabsKey = `profile_${profile.id}_tabs`;
+
+			// Read tabs from source
+			const tabsResult = await sourceStorage.get(tabsKey);
+			const tabs = tabsResult[tabsKey] || [];
+
+			if (tabs.length > 0) {
+				// Save to destination
+				if (toSync) {
+					// Use chunked storage for sync
+					await SFTabs.storageChunking.saveChunkedSync(tabsKey, tabs);
+				} else {
+					// Direct save for local
+					await destStorage.set({ [tabsKey]: tabs });
+				}
+
+				// Remove from source
+				if (fromSync) {
+					// Remove chunked data from sync
+					await SFTabs.storageChunking.clearChunkedSync(tabsKey);
+				} else {
+					// Remove from local
+					await sourceStorage.remove(tabsKey);
+				}
+			}
 		}
 
-		if (tabs.length === 0) {
-			return;
-		}
-
-		// Save tabs to destination storage
-		if (toSync) {
-			// Save to sync storage
-			await browser.storage.sync.set({ customTabs: tabs });
-			// Clear old local storage
-			await browser.storage.local.remove(['customTabs', 'extensionVersion']);
-		} else {
-			// Save to local storage
-			await browser.storage.local.set({
-				customTabs: tabs,
-				extensionVersion: '2.0.0'
-			});
-			// Clear old sync storage
-			await browser.storage.sync.remove(['customTabs']);
+		// Also migrate profiles list
+		if (profiles.length > 0) {
+			await destStorage.set({ profiles });
+			// Note: Don't remove profiles from source yet - settings page will handle that
 		}
 	} catch (error) {
+		console.error('[Settings] Migration error:', error);
 		throw new Error(`Failed to migrate tabs: ${error.message}`);
+	}
+}
+
+/**
+ * View sync storage contents for diagnostics
+ */
+async function viewSyncStorage() {
+	const outputDiv = document.getElementById('sync-diagnostics-output');
+
+	try {
+		outputDiv.textContent = 'Loading sync storage...';
+
+		// Get all data from sync storage
+		const syncData = await browser.storage.sync.get(null);
+
+		// Build a diagnostic summary
+		let summary = '=== SYNC STORAGE CONTENTS ===\n\n';
+
+		// Check for userSettings
+		if (syncData.userSettings) {
+			summary += '✓ userSettings found\n';
+			summary += `  - useSyncStorage: ${syncData.userSettings.useSyncStorage}\n`;
+			summary += `  - profilesEnabled: ${syncData.userSettings.profilesEnabled}\n`;
+			summary += `  - activeProfileId: ${syncData.userSettings.activeProfileId || 'none'}\n`;
+		} else {
+			summary += '✗ No userSettings found\n';
+		}
+
+		summary += '\n';
+
+		// Check for profiles
+		if (syncData.profiles && Array.isArray(syncData.profiles)) {
+			summary += `✓ ${syncData.profiles.length} profile(s) found:\n`;
+			for (const profile of syncData.profiles) {
+				summary += `  - ${profile.name} (id: ${profile.id})\n`;
+
+				// Check for tabs for this profile
+				const tabsKey = `profile_${profile.id}_tabs`;
+				if (syncData[tabsKey]) {
+					const tabs = syncData[tabsKey];
+					summary += `    ✓ ${tabs.length} tab(s) stored\n`;
+				} else {
+					// Check for chunked data
+					const metadataKey = `${tabsKey}_metadata`;
+					if (syncData[metadataKey]) {
+						const metadata = syncData[metadataKey];
+						summary += `    ✓ Chunked: ${metadata.totalChunks} chunk(s), ~${metadata.totalSize} bytes\n`;
+					} else {
+						summary += `    ✗ No tabs found (neither direct nor chunked)\n`;
+					}
+				}
+			}
+		} else {
+			summary += '✗ No profiles found\n';
+		}
+
+		summary += '\n';
+
+		// Check for first launch flag
+		if (syncData.firstLaunchCompleted) {
+			summary += '✓ firstLaunchCompleted flag found (set to true)\n';
+		} else {
+			summary += '✗ No firstLaunchCompleted flag\n';
+		}
+
+		summary += '\n';
+
+		// Check for chunked data
+		const chunkedKeys = Object.keys(syncData).filter(key =>
+			key.includes('_chunk_') || key.includes('_metadata')
+		);
+		if (chunkedKeys.length > 0) {
+			summary += `✓ ${chunkedKeys.length} chunked storage key(s) found\n`;
+		}
+
+		summary += '\n=== END ===';
+
+		outputDiv.textContent = summary;
+		showStatus('Sync storage loaded', false);
+	} catch (error) {
+		outputDiv.textContent = `Error loading sync storage:\n${error.message}`;
+		showStatus('Failed to load sync storage', true);
+	}
+}
+
+/**
+ * Force refresh from sync storage
+ * Clears local cache and reloads everything from browser sync
+ */
+async function forceSyncRefresh() {
+	const confirmed = confirm(
+		'Force Sync Refresh?\n\n' +
+		'This will:\n' +
+		'1. Clear all local cached data\n' +
+		'2. Reload everything from browser sync storage\n' +
+		'3. Refresh this page\n\n' +
+		'This is useful if your tabs aren\'t syncing properly or if you have stale data.\n\n' +
+		'Make sure browser sync is enabled and has had time to propagate your data before proceeding.\n\n' +
+		'Click OK to continue.'
+	);
+
+	if (!confirmed) {
+		return;
+	}
+
+	try {
+		showStatus('Clearing local cache...', false);
+
+		// Get all local storage keys
+		const localData = await browser.storage.local.get(null);
+
+		// Remove all extension data from local storage
+		// But preserve browser-specific internal keys
+		const keysToRemove = Object.keys(localData).filter(key => {
+			// Keep browser internal keys (usually start with special prefixes)
+			// Remove our extension data
+			return !key.startsWith('_') && !key.startsWith('browser.');
+		});
+
+		if (keysToRemove.length > 0) {
+			await browser.storage.local.remove(keysToRemove);
+		}
+
+		showStatus('Loading from sync storage...', false);
+
+		// Get all sync storage data
+		const syncData = await browser.storage.sync.get(null);
+
+		// Cache userSettings in local storage for quick access
+		if (syncData.userSettings) {
+			await browser.storage.local.set({ userSettings: syncData.userSettings });
+		}
+
+		// If profiles exist, cache them too
+		if (syncData.profiles) {
+			await browser.storage.local.set({ profiles: syncData.profiles });
+		}
+
+		// Copy all profile tabs from sync to local (for caching)
+		const profileKeys = Object.keys(syncData).filter(key =>
+			key.startsWith('profile_') && key.endsWith('_tabs')
+		);
+
+		if (profileKeys.length > 0) {
+			const profileTabsData = {};
+			profileKeys.forEach(key => {
+				profileTabsData[key] = syncData[key];
+			});
+			await browser.storage.local.set(profileTabsData);
+		}
+
+		showStatus('Sync refresh complete! Reloading...', false);
+
+		// Wait a moment for the message to be visible
+		setTimeout(() => {
+			window.location.reload();
+		}, 1000);
+
+	} catch (error) {
+		showStatus('Force sync refresh failed: ' + error.message, true);
 	}
 }
 

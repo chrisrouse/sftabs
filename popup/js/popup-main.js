@@ -47,7 +47,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize popup with sequential async/await to avoid race conditions
   (async function init() {
     try {
-      // Load user settings first
+      // Check for first-launch BEFORE loading settings (which would create defaults)
+      if (SFTabs.firstLaunch && SFTabs.firstLaunch.checkFirstLaunch) {
+        const firstLaunchStatus = await SFTabs.firstLaunch.checkFirstLaunch();
+
+        if (firstLaunchStatus.shouldShowWizard) {
+          // Initialize first-launch modal event listeners (now async to check sync availability)
+          if (SFTabs.firstLaunch.initFirstLaunchModal) {
+            await SFTabs.firstLaunch.initFirstLaunchModal();
+          }
+
+          // Show first-launch modal and stop further initialization
+          if (SFTabs.firstLaunch.showFirstLaunchModal) {
+            await SFTabs.firstLaunch.showFirstLaunchModal();
+          }
+
+          // Don't proceed with normal initialization - let user complete first-launch setup
+          return;
+        }
+      }
+
+      // Load user settings (safe to do after first-launch check)
       await loadUserSettings();
 
       // Apply theme early
@@ -400,10 +420,6 @@ function showActionPanel(tab) {
   if (!tab) {
     return;
   }
-
-  console.log('[showActionPanel] Opening panel for tab:', tab.id, tab.label);
-  console.log('[showActionPanel] Tab isSetupObject:', tab.isSetupObject);
-  console.log('[showActionPanel] Tab has dropdownItems:', tab.dropdownItems ? tab.dropdownItems.length : 0);
 
   // Store the current tab context
   currentActionPanelTab = tab;

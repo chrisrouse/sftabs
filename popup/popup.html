@@ -81,8 +81,8 @@
                     <div class="profile-init-option" id="init-with-defaults">
                         <div class="option-icon">📋</div>
                         <div class="option-content">
-                            <div class="option-title">Add default tabs</div>
-                            <div class="option-description">Start with the standard set of tabs (Flows, Profiles, Users, etc.)</div>
+                            <div class="option-title">Start with default tabs</div>
+                            <div class="option-description">Start with the standard set of tabs</div>
                         </div>
                         <div class="option-action">→</div>
                     </div>
@@ -360,6 +360,101 @@
             </div>
         </div>
 
+        <!-- First Launch Modal -->
+        <div id="first-launch-modal" class="modal" style="display: none;">
+            <div class="modal-content migration-modal-content">
+                <div class="modal-header">
+                    <h2 style="font-size: 18px; margin: 0;">Thanks for installing SF Tabs!</h2>
+                </div>
+                <div class="modal-body">
+                    <div id="first-launch-screen" class="migration-screen">
+                        <!-- Setup Options -->
+                        <div class="setup-options">
+                            <div class="setup-option active" data-option="default" id="setup-option-default">
+                                <div class="setup-option-icon">📋</div>
+                                <div class="setup-option-content">
+                                    <div class="setup-option-title">Start with default tabs</div>
+                                    <div class="setup-option-description">
+                                        Start with the standard set of tabs
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="setup-option" data-option="empty" id="setup-option-empty">
+                                <div class="setup-option-icon">✨</div>
+                                <div class="setup-option-content">
+                                    <div class="setup-option-title">Start with no tabs</div>
+                                    <div class="setup-option-description">
+                                        Begin with an empty profile and add tabs manually
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="setup-option" data-option="import" id="setup-option-import">
+                                <div class="setup-option-icon">📥</div>
+                                <div class="setup-option-content">
+                                    <div class="setup-option-title">Import existing configuration</div>
+                                    <div class="setup-option-description">
+                                        Import an SF Tabs configuration file
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profiles Option -->
+                        <div class="form-group" style="margin: 24px 0;">
+                            <div class="option-button" data-option="profiles" id="profiles-option">
+                                <input type="checkbox" id="first-launch-enable-profiles">
+                                <div class="option-button-icon">👥</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title">Enable Profiles</div>
+                                    <div class="option-button-description">
+                                        Profiles let you manage different tab configurations
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Storage Selection -->
+                        <div class="form-group" style="margin: 16px 0 0 0;">
+                            <div class="option-button active" data-storage="local" id="storage-option-local">
+                                <input type="radio" name="first-launch-storage-choice" value="local" checked>
+                                <div class="option-button-icon">💾</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title">Local Storage</div>
+                                    <div class="option-button-description">
+                                        Stored on this device only
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="option-button" data-storage="sync" id="storage-option-sync">
+                                <input type="radio" name="first-launch-storage-choice" value="sync">
+                                <div class="option-button-icon">☁️</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title">Sync Storage</div>
+                                    <div class="option-button-description">
+                                        Your tabs can sync across devices
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div id="first-launch-buttons" class="button-group">
+                        <button id="first-launch-guide-button" class="secondary-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 6px;">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                            User Guide
+                        </button>
+                        <button id="first-launch-start-button" class="primary-button">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Migration Modal -->
         <div id="migration-modal" class="modal" style="display: none;">
             <div class="modal-content migration-modal-content">
@@ -387,9 +482,9 @@
                         <div class="form-group checkbox-group" style="margin-top: 8px;">
                             <label>
                                 <input type="checkbox" id="migration-enable-profiles">
-                                <span style="font-size: 13px;">Enable Profiles feature after migration</span>
+                                <span style="font-size: 13px;">Enable Profiles</span>
                             </label>
-                            <div class="help-text" style="font-size: 11px;">You can enable this later in Settings if you prefer</div>
+                            <div class="help-text" style="font-size: 11px;">Profiles let you manage different tab configurations</div>
                         </div>
 
                         <div class="form-group" style="margin-top: 8px;">
@@ -398,15 +493,15 @@
                                 <label class="storage-choice-option">
                                     <input type="radio" name="migration-storage-choice" id="migration-storage-sync" value="sync" checked>
                                     <div class="storage-choice-content">
-                                        <div class="storage-choice-title">☁️ Sync Storage (Recommended)</div>
-                                        <div class="storage-choice-description">Your tabs sync across devices. Limited to ~50 tabs.</div>
+                                        <div class="storage-choice-title">☁️ Sync Storage</div>
+                                        <div class="storage-choice-description">Your tabs can sync across devices</div>
                                     </div>
                                 </label>
                                 <label class="storage-choice-option">
                                     <input type="radio" name="migration-storage-choice" id="migration-storage-local" value="local">
                                     <div class="storage-choice-content">
                                         <div class="storage-choice-title">💾 Local Storage</div>
-                                        <div class="storage-choice-description">Stored on this device only. No limit on tab count.</div>
+                                        <div class="storage-choice-description">Stored on this device only</div>
                                     </div>
                                 </label>
                             </div>
@@ -509,6 +604,7 @@
     <script src="js/popup-tabs.js"></script>
     <script src="js/popup-ui.js"></script>
     <script src="js/popup-profiles.js"></script>
+    <script src="js/popup-first-launch.js"></script>
     <script src="js/popup-migration.js"></script>
 
     <!-- Load main entry point LAST -->

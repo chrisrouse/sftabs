@@ -20,9 +20,10 @@ async function loadProfiles() {
 
 /**
  * Generate a unique profile ID
+ * Note: ID is just timestamp + random string; storage layer adds "profile_" prefix
  */
 function generateProfileId() {
-  return 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  return Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 /**
@@ -1554,9 +1555,17 @@ async function confirmCloneProfile() {
 }
 
 // Initialize when DOM is ready
-// NOTE: initProfiles() should NOT run if migration is pending
-// It's now called from popup-main.js after migration check
+// NOTE: initProfiles() should NOT run if migration or first-launch is pending
+// It's now called from popup-main.js after migration/first-launch checks
 document.addEventListener('DOMContentLoaded', async () => {
+  // Check if first-launch wizard should be shown
+  if (SFTabs.firstLaunch && SFTabs.firstLaunch.checkFirstLaunch) {
+    const firstLaunchStatus = await SFTabs.firstLaunch.checkFirstLaunch();
+    if (firstLaunchStatus.shouldShowWizard) {
+      return; // Don't initialize profiles during first-launch wizard
+    }
+  }
+
   // Check if migration is pending before initializing profiles
   if (SFTabs.migration && SFTabs.migration.checkMigrationStatus) {
     const migrationStatus = await SFTabs.migration.checkMigrationStatus();

@@ -8,23 +8,44 @@ module.exports = {
     'node_modules/**',
     'web-ext-artifacts/**',
     '.git/**',
+    '.github/**',
+    '.claude/**',
     '.gitignore',
+    // Mac hidden files
     '.DS_Store',
+    '**/.DS_Store',
+    '._*',
+    '**/._*',
+    '.Spotlight-V100',
+    '.Trashes',
+    '.fseventsd',
+    '__MACOSX',
+    '__MACOSX/**',
+    // Project files
     'package.json',
     'package-lock.json',
     'web-ext-config.cjs',
     'manifest.base.json',
     'build-manifest.js',
+    // Documentation
     'README.md',
     'CHANGELOG.md',
     'LICENSE.md',
     'PRIVACYPOLICY.md',
     'TESTING_STATUS.md',
+    'BUILD.md',
+    'TRANSLATION_REFERENCE.md',
+    'translations.csv',
     'docs/**',
+    'wiki/**',
+    // IDE files
     '.vscode/**',
     '.idea/**',
+    // Other
     '*.log',
-    '*.md'
+    '*.md',
+    'dark-mode-improvements.html',
+    'design-examples.html'
   ],
 
   // Build configuration
