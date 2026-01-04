@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (firstLaunchStatus.shouldShowWizard) {
           // Initialize first-launch modal event listeners (now async to check sync availability)
           if (SFTabs.firstLaunch.initFirstLaunchModal) {
-            await SFTabs.firstLaunch.initFirstLaunchModal();
+            await SFTabs.firstLaunch.initFirstLaunchModal(firstLaunchStatus);
           }
 
           // Show first-launch modal and stop further initialization

@@ -34,10 +34,27 @@ async function checkFirstLaunch() {
     const hasUserSettings = (syncData.userSettings && Object.keys(syncData.userSettings).length > 0) ||
                             (localStorageData.userSettings && Object.keys(localStorageData.userSettings).length > 0);
 
-    const isUpgrade = hasMigration || hasProfiles || hasTabs || hasUserSettings;
+    // Check if this is a true upgrade (has local data/migration flag) vs sync data from another device
+    const hasSyncDataOnly = !hasMigration && !hasTabs && !localStorageData.profiles &&
+                            (syncData.profiles?.length > 0 || syncData.userSettings);
+
+    if (hasSyncDataOnly) {
+      // Sync data found from another device - show wizard with "use synced data" option
+      return {
+        shouldShowWizard: true,
+        reason: 'sync-data-found',
+        syncData: {
+          hasProfiles: syncData.profiles && syncData.profiles.length > 0,
+          profileCount: syncData.profiles?.length || 0,
+          hasSettings: syncData.userSettings && Object.keys(syncData.userSettings).length > 0
+        }
+      };
+    }
+
+    const isUpgrade = hasMigration || hasProfiles || hasTabs;
 
     if (isUpgrade) {
-      // This is an upgrade - skip first-launch wizard
+      // This is an upgrade with local data - skip first-launch wizard
       return {
         shouldShowWizard: false,
         reason: 'upgrade'
@@ -58,6 +75,143 @@ async function checkFirstLaunch() {
       reason: 'error',
       error: error.message
     };
+  }
+}
+
+/**
+ * Show sync data detected screen
+ * @param {Object} syncData - Information about synced data
+ */
+async function showSyncDataDetectedScreen(syncData) {
+  const modal = document.getElementById('first-launch-modal');
+  if (!modal) {
+    console.error('First launch modal not found');
+    return;
+  }
+
+  // Update modal content to show sync data detected message
+  const contentArea = modal.querySelector('.first-launch-content');
+  if (!contentArea) return;
+
+  const profileText = syncData.profileCount > 0
+    ? `${syncData.profileCount} profile${syncData.profileCount !== 1 ? 's' : ''} with tabs`
+    : 'settings';
+
+  contentArea.innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <div style="font-size: 48px; margin-bottom: 16px;">☁️</div>
+      <h2 style="font-size: 28px; font-weight: 600; margin: 0 0 12px 0; color: var(--color-text);">
+        Synced Configuration Found
+      </h2>
+      <p style="font-size: 16px; color: var(--color-text-weak); margin: 0 0 32px 0; line-height: 1.5;">
+        We found existing SF Tabs data in your browser sync${syncData.profileCount > 0 ? ` (${profileText})` : ''}.
+        <br>Would you like to use it or start fresh?
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 500px; margin: 0 auto;">
+        <button id="use-synced-data-button" class="primary-button" style="width: 100%; padding: 16px; font-size: 16px;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>✓</span>
+            <span>Use Synced Configuration (Recommended)</span>
+          </div>
+        </button>
+        <button id="start-fresh-button" class="secondary-button" style="width: 100%; padding: 16px; font-size: 16px;">
+          Start Fresh with New Setup
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Setup event listeners
+  const useSyncedButton = document.getElementById('use-synced-data-button');
+  const startFreshButton = document.getElementById('start-fresh-button');
+
+  if (useSyncedButton) {
+    useSyncedButton.addEventListener('click', async () => {
+      await useSyncedConfiguration();
+    });
+  }
+
+  if (startFreshButton) {
+    startFreshButton.addEventListener('click', async () => {
+      // Clear sync data and show normal wizard
+      await clearSyncDataAndShowWizard();
+    });
+  }
+
+  // Show the modal
+  modal.classList.add('show');
+  modal.style.display = 'flex';
+}
+
+/**
+ * Use synced configuration from browser sync
+ */
+async function useSyncedConfiguration() {
+  try {
+    // Get all sync data
+    const syncData = await browser.storage.sync.get(null);
+
+    // Copy sync data to local storage for caching
+    if (syncData.userSettings) {
+      await browser.storage.local.set({ userSettings: syncData.userSettings });
+    }
+    if (syncData.profiles) {
+      await browser.storage.local.set({ profiles: syncData.profiles });
+    }
+
+    // Copy profile tabs
+    const profileKeys = Object.keys(syncData).filter(key =>
+      key.startsWith('profile_') && key.endsWith('_tabs')
+    );
+    if (profileKeys.length > 0) {
+      const profileTabsData = {};
+      profileKeys.forEach(key => {
+        profileTabsData[key] = syncData[key];
+      });
+      await browser.storage.local.set(profileTabsData);
+    }
+
+    // Mark first launch as completed
+    await browser.storage.local.set({ firstLaunchCompleted: true });
+    await browser.storage.sync.set({ firstLaunchCompleted: true });
+
+    // Hide modal and reload
+    hideFirstLaunchModal();
+    window.location.reload();
+
+  } catch (error) {
+    console.error('Error using synced configuration:', error);
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Error loading synced data: ' + error.message, true);
+    }
+  }
+}
+
+/**
+ * Clear sync data and show the normal first-launch wizard
+ */
+async function clearSyncDataAndShowWizard() {
+  try {
+    // Clear ALL sync storage data (user wants to start fresh)
+    const syncData = await browser.storage.sync.get(null);
+    const keysToRemove = Object.keys(syncData);
+    if (keysToRemove.length > 0) {
+      await browser.storage.sync.remove(keysToRemove);
+    }
+
+    // Hide modal temporarily
+    hideFirstLaunchModal();
+
+    // Re-initialize with normal first-launch wizard
+    await initFirstLaunchModal(null);
+    showFirstLaunchModal();
+
+  } catch (error) {
+    console.error('Error clearing sync data:', error);
+    if (SFTabs.main && SFTabs.main.showStatus) {
+      SFTabs.main.showStatus('Error clearing sync data: ' + error.message, true);
+    }
   }
 }
 
@@ -89,8 +243,14 @@ function hideFirstLaunchModal() {
 
 /**
  * Initialize first-launch modal event listeners
+ * @param {Object} firstLaunchStatus - Status from checkFirstLaunch()
  */
-async function initFirstLaunchModal() {
+async function initFirstLaunchModal(firstLaunchStatus) {
+  // Check if sync data was found
+  if (firstLaunchStatus && firstLaunchStatus.reason === 'sync-data-found') {
+    await showSyncDataDetectedScreen(firstLaunchStatus.syncData);
+    return;
+  }
   // Setup option selection
   const setupOptions = document.querySelectorAll('.setup-option');
   setupOptions.forEach(option => {
