@@ -21,7 +21,7 @@ async function checkFirstLaunch() {
 
     // Check if user is upgrading from an older version (has migrationCompleted or existing data)
     // If they are, skip first-launch wizard
-    const syncData = await browser.storage.sync.get(['userSettings', 'profiles']);
+    const syncData = await browser.storage.sync.get(['userSettings', 'profiles', 'customTabs']);
     const localStorageData = await browser.storage.local.get(['userSettings', 'profiles', 'customTabs']);
 
     // Check if this is an upgrade from an older version
@@ -29,19 +29,27 @@ async function checkFirstLaunch() {
     // Note: extensionVersion is set during installation, NOT a reliable upgrade indicator
     const hasProfiles = (syncData.profiles && Array.isArray(syncData.profiles) && syncData.profiles.length > 0) ||
                         (localStorageData.profiles && Array.isArray(localStorageData.profiles) && localStorageData.profiles.length > 0);
-    const hasTabs = localStorageData.customTabs && Array.isArray(localStorageData.customTabs) && localStorageData.customTabs.length > 0;
+
+    // Check BOTH local and sync storage for tabs (v1.3.0 used sync storage)
+    const hasLocalTabs = localStorageData.customTabs && Array.isArray(localStorageData.customTabs) && localStorageData.customTabs.length > 0;
+    const hasSyncTabs = syncData.customTabs && Array.isArray(syncData.customTabs) && syncData.customTabs.length > 0;
+    const hasTabs = hasLocalTabs || hasSyncTabs;
+
     const hasMigration = localData.migrationCompleted;
     const hasUserSettings = (syncData.userSettings && Object.keys(syncData.userSettings).length > 0) ||
                             (localStorageData.userSettings && Object.keys(localStorageData.userSettings).length > 0);
 
-    // Check if this is a true upgrade (has local data/migration flag) vs sync data from another device
+    // Check if this is a true upgrade (has data indicating upgrade) vs sync data from another device
+    // If they have tabs or profiles in either storage, it's an upgrade
     const hasSyncDataOnly = !hasMigration && !hasTabs && !localStorageData.profiles &&
-                            (syncData.profiles?.length > 0 || syncData.userSettings);
+                            (syncData.profiles?.length > 0 || (syncData.userSettings && !hasSyncTabs));
 
     // Debug logging
     console.log('[First Launch] Detection check:', {
       hasMigration,
       hasTabs,
+      hasLocalTabs,
+      hasSyncTabs,
       hasLocalProfiles: !!localStorageData.profiles,
       hasSyncProfiles: syncData.profiles?.length > 0,
       hasSyncSettings: !!syncData.userSettings,

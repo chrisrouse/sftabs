@@ -240,31 +240,49 @@ function setupAllEventListeners() {
 /**
  * Load user settings from storage
  */
-function loadUserSettings() {
-  return SFTabs.storage.getUserSettings()
-    .then((loadedSettings) => {
-      userSettings = loadedSettings;
-      return userSettings;
-    })
-    .catch((error) => {
-      showStatus('Error loading settings: ' + error.message, true);
-      return SFTabs.constants.DEFAULT_SETTINGS;
-    });
+async function loadUserSettings() {
+  try {
+    // DEBUG: Dump all storage contents
+    const localKeys = await browser.storage.local.get(null);
+    console.log('[DEBUG POPUP] All local storage keys:', Object.keys(localKeys));
+    console.log('[DEBUG POPUP] All local storage contents:', localKeys);
+
+    try {
+      const syncKeys = await browser.storage.sync.get(null);
+      console.log('[DEBUG POPUP] All sync storage keys:', Object.keys(syncKeys));
+      console.log('[DEBUG POPUP] All sync storage contents:', syncKeys);
+    } catch (e) {
+      console.log('[DEBUG POPUP] Could not read sync storage:', e);
+    }
+
+    const loadedSettings = await SFTabs.storage.getUserSettings();
+    userSettings = loadedSettings;
+    console.log('[DEBUG POPUP] loadUserSettings - loaded:', userSettings);
+    return userSettings;
+  } catch (error) {
+    console.error('[DEBUG POPUP] Error loading settings:', error);
+    showStatus('Error loading settings: ' + error.message, true);
+    return SFTabs.constants.DEFAULT_SETTINGS;
+  }
 }
 
 /**
  * Load tabs from storage
  */
 async function loadTabsFromStorage() {
-
+  console.log('[DEBUG POPUP] loadTabsFromStorage - START');
+  console.log('[DEBUG POPUP] userSettings:', userSettings);
   try {
     // Always load from profile storage (profiles are used internally even if UI is disabled)
     if (!userSettings.activeProfileId) {
+      console.log('[DEBUG POPUP] No activeProfileId found, returning empty tabs');
       customTabs = [];
       return customTabs;
     }
 
+    console.log('[DEBUG POPUP] Loading tabs for profile:', userSettings.activeProfileId);
     let loadedTabs = await SFTabs.storage.getProfileTabs(userSettings.activeProfileId);
+    console.log('[DEBUG POPUP] Loaded tabs:', { count: loadedTabs ? loadedTabs.length : 0, tabs: loadedTabs });
 
     if (loadedTabs && loadedTabs.length > 0) {
 

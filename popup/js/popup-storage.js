@@ -554,14 +554,18 @@ async function saveProfiles(profiles, showToast = true) {
  */
 async function getProfileTabs(profileId) {
   try {
+    console.log('[DEBUG] getProfileTabs - START', { profileId });
     const useSyncStorage = await getStoragePreference();
+    console.log('[DEBUG] getProfileTabs - useSyncStorage:', useSyncStorage);
     const storageKey = `profile_${profileId}_tabs`;
 
     if (useSyncStorage) {
       const tabs = await SFTabs.storageChunking.readChunkedSync(storageKey);
+      console.log('[DEBUG] getProfileTabs - loaded from sync:', { storageKey, tabCount: tabs ? tabs.length : 0, tabs });
       return tabs || [];
     } else {
       const localResult = await browser.storage.local.get(storageKey);
+      console.log('[DEBUG] getProfileTabs - loaded from local:', { storageKey, tabCount: localResult[storageKey] ? localResult[storageKey].length : 0, tabs: localResult[storageKey] });
       return localResult[storageKey] || [];
     }
   } catch (error) {
