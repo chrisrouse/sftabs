@@ -346,6 +346,186 @@
 /* Note: Theme colors are handled by CSS variables above.
    Dark theme and other Salesforce themes automatically inherit proper colors. */
 
+/* Dark Mode Support */
+/* Detect dark mode via browser preference or Salesforce's dark theme */
+@media (prefers-color-scheme: dark) {
+  .sftabs-floating-modal .modal-toggle-button {
+    background: #2b2b2b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .sftabs-floating-modal .modal-toggle-button:hover {
+    background: #3a3a3a;
+  }
+
+  .sftabs-floating-modal .modal-panel {
+    background: #1a1a1a;
+  }
+
+  .sftabs-floating-modal.open .modal-panel {
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+  }
+
+  .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb:hover {
+    background: #606060;
+  }
+
+  .sftabs-floating-modal .tab-label {
+    color: #e8e8e8;
+  }
+
+  .sftabs-floating-modal .tab-path,
+  .sftabs-floating-modal .dropdown-child-path,
+  .sftabs-floating-modal .dropdown-nested-path {
+    color: #a8a8a8;
+  }
+
+  .sftabs-floating-modal .dropdown-indicator {
+    color: #a8a8a8;
+  }
+
+  .sftabs-floating-modal .dropdown-children,
+  .sftabs-floating-modal .dropdown-nested-children {
+    background: #1a1a1a;
+  }
+
+  .sftabs-floating-modal .dropdown-child-label,
+  .sftabs-floating-modal .dropdown-nested-label {
+    color: #d4d4d4;
+  }
+
+  .sftabs-floating-modal .tab-row:active:not(.active),
+  .sftabs-floating-modal .dropdown-child-row:active:not(.active),
+  .sftabs-floating-modal .dropdown-nested-item:active:not(.active) {
+    background: #2a2a2a;
+  }
+
+  .sftabs-floating-modal .empty-state {
+    color: #a8a8a8;
+  }
+}
+
+/* Salesforce Dark Theme Detection - using Salesforce's theme class */
+html[data-theme="dark"] .sftabs-floating-modal .modal-toggle-button,
+html.theme-dark .sftabs-floating-modal .modal-toggle-button,
+body[data-theme="dark"] .sftabs-floating-modal .modal-toggle-button,
+body.theme-dark .sftabs-floating-modal .modal-toggle-button {
+  background: #2b2b2b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .modal-toggle-button:hover,
+html.theme-dark .sftabs-floating-modal .modal-toggle-button:hover,
+body[data-theme="dark"] .sftabs-floating-modal .modal-toggle-button:hover,
+body.theme-dark .sftabs-floating-modal .modal-toggle-button:hover {
+  background: #3a3a3a;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .modal-panel,
+html.theme-dark .sftabs-floating-modal .modal-panel,
+body[data-theme="dark"] .sftabs-floating-modal .modal-panel,
+body.theme-dark .sftabs-floating-modal .modal-panel {
+  background: #1a1a1a;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal.open .modal-panel,
+html.theme-dark .sftabs-floating-modal.open .modal-panel,
+body[data-theme="dark"] .sftabs-floating-modal.open .modal-panel,
+body.theme-dark .sftabs-floating-modal.open .modal-panel {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb,
+html.theme-dark .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb,
+body[data-theme="dark"] .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb,
+body.theme-dark .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb:hover,
+html.theme-dark .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb:hover,
+body[data-theme="dark"] .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb:hover,
+body.theme-dark .sftabs-floating-modal .modal-panel::-webkit-scrollbar-thumb:hover {
+  background: #606060;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .tab-label,
+html.theme-dark .sftabs-floating-modal .tab-label,
+body[data-theme="dark"] .sftabs-floating-modal .tab-label,
+body.theme-dark .sftabs-floating-modal .tab-label {
+  color: #e8e8e8;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .tab-path,
+html.theme-dark .sftabs-floating-modal .tab-path,
+body[data-theme="dark"] .sftabs-floating-modal .tab-path,
+body.theme-dark .sftabs-floating-modal .tab-path,
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-child-path,
+html.theme-dark .sftabs-floating-modal .dropdown-child-path,
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-child-path,
+body.theme-dark .sftabs-floating-modal .dropdown-child-path,
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-path,
+html.theme-dark .sftabs-floating-modal .dropdown-nested-path,
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-path,
+body.theme-dark .sftabs-floating-modal .dropdown-nested-path {
+  color: #a8a8a8;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-indicator,
+html.theme-dark .sftabs-floating-modal .dropdown-indicator,
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-indicator,
+body.theme-dark .sftabs-floating-modal .dropdown-indicator {
+  color: #a8a8a8;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-children,
+html.theme-dark .sftabs-floating-modal .dropdown-children,
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-children,
+body.theme-dark .sftabs-floating-modal .dropdown-children,
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-children,
+html.theme-dark .sftabs-floating-modal .dropdown-nested-children,
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-children,
+body.theme-dark .sftabs-floating-modal .dropdown-nested-children {
+  background: #1a1a1a;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-child-label,
+html.theme-dark .sftabs-floating-modal .dropdown-child-label,
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-child-label,
+body.theme-dark .sftabs-floating-modal .dropdown-child-label,
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-label,
+html.theme-dark .sftabs-floating-modal .dropdown-nested-label,
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-label,
+body.theme-dark .sftabs-floating-modal .dropdown-nested-label {
+  color: #d4d4d4;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .tab-row:active:not(.active),
+html.theme-dark .sftabs-floating-modal .tab-row:active:not(.active),
+body[data-theme="dark"] .sftabs-floating-modal .tab-row:active:not(.active),
+body.theme-dark .sftabs-floating-modal .tab-row:active:not(.active),
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-child-row:active:not(.active),
+html.theme-dark .sftabs-floating-modal .dropdown-child-row:active:not(.active),
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-child-row:active:not(.active),
+body.theme-dark .sftabs-floating-modal .dropdown-child-row:active:not(.active),
+html[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-item:active:not(.active),
+html.theme-dark .sftabs-floating-modal .dropdown-nested-item:active:not(.active),
+body[data-theme="dark"] .sftabs-floating-modal .dropdown-nested-item:active:not(.active),
+body.theme-dark .sftabs-floating-modal .dropdown-nested-item:active:not(.active) {
+  background: #2a2a2a;
+}
+
+html[data-theme="dark"] .sftabs-floating-modal .empty-state,
+html.theme-dark .sftabs-floating-modal .empty-state,
+body[data-theme="dark"] .sftabs-floating-modal .empty-state,
+body.theme-dark .sftabs-floating-modal .empty-state {
+  color: #a8a8a8;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .sftabs-floating-modal .modal-toggle-button img {
