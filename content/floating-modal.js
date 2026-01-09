@@ -54,6 +54,18 @@
       return;
     }
 
+    // Check if in Setup and the full lightningNavigate function is available
+    // (content-main.js is only loaded on Setup pages)
+    if (typeof window.lightningNavigate === 'function') {
+      // Use the full Lightning navigation with all fallbacks
+      window.lightningNavigate({
+        navigationType: "url",
+        url: url
+      }, url);
+      return;
+    }
+
+    // Outside Setup or lightningNavigate not available - use simpler approach
     // Try inject.js window function approach first (most reliable)
     if (window.sfTabsLightningNav) {
       const success = window.sfTabsLightningNav({
