@@ -99,6 +99,7 @@
     async init() {
       await this.loadData();
       this.createModal();
+      await this.applyTheme();
     }
 
     async open() {
@@ -154,6 +155,55 @@
       } catch (error) {
         this.tabs = [];
         this.settings = {};
+      }
+    }
+
+    async applyTheme() {
+      try {
+        // Read theme preference from storage (same as popup does)
+        const result = await browser.storage.local.get('userSettings');
+        const userSettings = result.userSettings || {};
+        const themeMode = userSettings.themeMode || 'system';
+
+        if (themeMode === 'system') {
+          // Check system preference
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            this.modal.setAttribute('data-theme', 'dark');
+          } else {
+            this.modal.setAttribute('data-theme', 'light');
+          }
+
+          // Listen for changes in system theme
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            if (this.modal) {
+              this.modal.setAttribute('data-theme', newTheme);
+            }
+          });
+        } else {
+          // Apply user selected theme
+          this.modal.setAttribute('data-theme', themeMode);
+        }
+
+        // Listen for theme changes in storage
+        browser.storage.onChanged.addListener((changes, area) => {
+          if (changes.userSettings && changes.userSettings.newValue) {
+            const newThemeMode = changes.userSettings.newValue.themeMode;
+            if (newThemeMode && this.modal) {
+              if (newThemeMode === 'system') {
+                const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                this.modal.setAttribute('data-theme', isDark ? 'dark' : 'light');
+              } else {
+                this.modal.setAttribute('data-theme', newThemeMode);
+              }
+            }
+          }
+        });
+      } catch (error) {
+        // Fail gracefully - default to light theme
+        if (this.modal) {
+          this.modal.setAttribute('data-theme', 'light');
+        }
       }
     }
 
