@@ -148,18 +148,27 @@ async function showMigrationModal() {
   const currentStorageInfo = await detectCurrentStorage();
   const syncRadio = document.querySelector('#migration-storage-sync');
   const localRadio = document.querySelector('#migration-storage-local');
-  const currentStorageMessage = document.querySelector('#migration-current-storage');
+  const syncOption = document.querySelector('#migration-storage-option-sync');
+  const localOption = document.querySelector('#migration-storage-option-local');
+  const syncTitle = document.querySelector('#migration-sync-storage-title');
+  const localTitle = document.querySelector('#migration-local-storage-title');
 
   if (currentStorageInfo.usesSync) {
     if (syncRadio) syncRadio.checked = true;
-    if (currentStorageMessage) {
-      currentStorageMessage.textContent = `Currently using: Sync Storage${currentStorageInfo.hasChunked ? ' (chunked)' : ''}`;
+    if (syncOption) {
+      syncOption.classList.add('active');
+      if (localOption) localOption.classList.remove('active');
     }
+    if (syncTitle) syncTitle.textContent = 'Sync Storage (Current)';
+    if (localTitle) localTitle.textContent = 'Local Storage (New)';
   } else {
     if (localRadio) localRadio.checked = true;
-    if (currentStorageMessage) {
-      currentStorageMessage.textContent = 'Currently using: Local Storage';
+    if (localOption) {
+      localOption.classList.add('active');
+      if (syncOption) syncOption.classList.remove('active');
     }
+    if (syncTitle) syncTitle.textContent = 'Sync Storage';
+    if (localTitle) localTitle.textContent = 'Local Storage (Current)';
   }
 
   // Reset to welcome screen
@@ -411,6 +420,47 @@ async function exportBackupBeforeMigration() {
  * Initialize migration modal event listeners
  */
 function initMigrationModal() {
+  // Learn More button
+  const learnMoreButton = document.getElementById('migration-learn-more-button');
+  if (learnMoreButton) {
+    learnMoreButton.addEventListener('click', () => {
+      browser.tabs.create({
+        url: 'https://chrisrouse.github.io/sftabs/new-features'
+      });
+    });
+  }
+
+  // Profiles option toggle
+  const profilesOption = document.getElementById('migration-profiles-option');
+  const profilesCheckbox = document.getElementById('migration-enable-profiles');
+  if (profilesOption && profilesCheckbox) {
+    profilesOption.addEventListener('click', () => {
+      profilesCheckbox.checked = !profilesCheckbox.checked;
+      profilesOption.classList.toggle('active', profilesCheckbox.checked);
+    });
+  }
+
+  // Storage option selection
+  const storageOptions = document.querySelectorAll('[data-storage]');
+  storageOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      // Check if this option is disabled
+      const radio = option.querySelector('input[type="radio"]');
+      if (radio && radio.disabled) {
+        return; // Don't allow selection of disabled options
+      }
+
+      // Remove active class from all storage options
+      storageOptions.forEach(opt => opt.classList.remove('active'));
+      // Add active class to clicked option
+      option.classList.add('active');
+      // Update the hidden radio button
+      if (radio) {
+        radio.checked = true;
+      }
+    });
+  });
+
   // Export Backup button
   const exportButton = document.querySelector('#migration-export-button');
   if (exportButton) {

@@ -464,48 +464,54 @@
                 <div class="modal-body" id="migration-modal-body">
                     <!-- Initial migration screen -->
                     <div id="migration-welcome" class="migration-screen">
-                        <div class="migration-icon">🚀</div>
-                        <h3>New Feature: Profiles</h3>
-                        <p class="migration-description">
-                            This version introduces Profiles - manage multiple tab configurations for different Salesforce orgs.
-                        </p>
-                        <div class="migration-info-box">
-                            <p><strong>What will happen:</strong></p>
-                            <ul>
-                                <li>Your existing tabs will be migrated to a "Default" profile</li>
-                                <li>No data will be lost during migration</li>
-                                <li>You can enable the profiles feature now or later</li>
-                                <li id="migration-time-estimate" style="display: none;">Estimated time: <span id="migration-time-value"></span></li>
-                            </ul>
-                        </div>
-
-                        <div class="form-group checkbox-group" style="margin-top: 8px;">
-                            <label>
-                                <input type="checkbox" id="migration-enable-profiles">
-                                <span style="font-size: 13px;">Enable Profiles</span>
-                            </label>
-                            <div class="help-text" style="font-size: 11px;">Profiles let you manage different tab configurations</div>
-                        </div>
-
-                        <div class="form-group" style="margin-top: 8px;">
-                            <label style="font-weight: 600; margin-bottom: 4px; display: block; font-size: 13px;">Storage Location</label>
-                            <div class="storage-choice-options">
-                                <label class="storage-choice-option">
-                                    <input type="radio" name="migration-storage-choice" id="migration-storage-sync" value="sync" checked>
-                                    <div class="storage-choice-content">
-                                        <div class="storage-choice-title">☁️ Sync Storage</div>
-                                        <div class="storage-choice-description">Your tabs can sync across devices</div>
-                                    </div>
-                                </label>
-                                <label class="storage-choice-option">
-                                    <input type="radio" name="migration-storage-choice" id="migration-storage-local" value="local">
-                                    <div class="storage-choice-content">
-                                        <div class="storage-choice-title">💾 Local Storage</div>
-                                        <div class="storage-choice-description">Stored on this device only</div>
-                                    </div>
-                                </label>
+                        <!-- New Features Card -->
+                        <div class="form-group" style="margin: 0 0 24px 0;">
+                            <div style="background-color: var(--color-section-header); border: 2px solid var(--color-border); border-radius: 8px; padding: 16px; text-align: center;">
+                                <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
+                                <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 6px 0; color: var(--color-text);">New in v2.0</h3>
+                                <p style="font-size: 13px; color: var(--color-text-weak); margin: 0 0 14px 0; line-height: 1.5;">
+                                    Profiles, dropdown menus, and flexible storage options—all new features!
+                                </p>
+                                <button id="migration-learn-more-button" class="primary-button" style="margin: 0;">Learn More</button>
                             </div>
-                            <div class="help-text" id="migration-current-storage" style="margin-top: 4px; font-size: 11px;"></div>
+                        </div>
+
+                        <!-- Profiles Option -->
+                        <div class="form-group" style="margin: 24px 0;">
+                            <div class="option-button" data-option="profiles" id="migration-profiles-option">
+                                <input type="checkbox" id="migration-enable-profiles">
+                                <div class="option-button-icon">👥</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title">Enable Profiles</div>
+                                    <div class="option-button-description">
+                                        Profiles let you manage different tab configurations
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Storage Selection -->
+                        <div class="form-group" style="margin: 16px 0 0 0;">
+                            <div class="option-button active" data-storage="sync" id="migration-storage-option-sync">
+                                <input type="radio" name="migration-storage-choice" id="migration-storage-sync" value="sync" checked>
+                                <div class="option-button-icon">☁️</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title" id="migration-sync-storage-title">Sync Storage</div>
+                                    <div class="option-button-description">
+                                        Your tabs can sync across devices
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="option-button" data-storage="local" id="migration-storage-option-local">
+                                <input type="radio" name="migration-storage-choice" id="migration-storage-local" value="local">
+                                <div class="option-button-icon">💾</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title" id="migration-local-storage-title">Local Storage</div>
+                                    <div class="option-button-description">
+                                        Stored on this device only
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
