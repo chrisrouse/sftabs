@@ -315,6 +315,9 @@ function lightningNavigate(details, fallbackURL) {
   window.location.href = fallbackURL;
 }
 
+// Expose lightningNavigate to window for use by floating modal
+window.lightningNavigate = lightningNavigate;
+
 /**
  * Main initialization function
  */
