@@ -174,16 +174,18 @@ function updateUI() {
 	const localRadio = document.getElementById('settings-storage-local');
 	const syncRadio = document.getElementById('settings-storage-sync');
 
-	if (useSyncStorage) {
-		syncOption.classList.add('active');
-		localOption.classList.remove('active');
-		syncRadio.checked = true;
-		localRadio.checked = false;
-	} else {
-		localOption.classList.add('active');
-		syncOption.classList.remove('active');
-		localRadio.checked = true;
-		syncRadio.checked = false;
+	if (localOption && syncOption && localRadio && syncRadio) {
+		if (useSyncStorage) {
+			syncOption.classList.add('active');
+			localOption.classList.remove('active');
+			syncRadio.checked = true;
+			localRadio.checked = false;
+		} else {
+			localOption.classList.add('active');
+			syncOption.classList.remove('active');
+			localRadio.checked = true;
+			syncRadio.checked = false;
+		}
 	}
 
 	// Update floating button settings

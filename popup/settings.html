@@ -784,25 +784,27 @@
 					<div class="setting-card">
 						<h3>Data Storage</h3>
 						<div class="setting-item">
-							<div class="setting-description" style="margin-bottom: 12px;">Choose where your tabs are stored. You can switch between storage types at any time.</div>
+							<div class="setting-description" style="margin-bottom: 16px;">Choose where your tabs are stored. You can switch between storage types at any time.</div>
 
-							<div class="option-button" data-storage="local" id="settings-storage-option-local">
-								<input type="radio" name="settings-storage-choice" id="settings-storage-local" value="local" checked style="display: none;">
-								<div class="option-button-icon">💾</div>
-								<div class="option-button-content">
-									<div class="option-button-title">Local Storage</div>
-									<div class="option-button-description">
+							<div class="storage-options-container">
+								<div class="storage-option" data-storage="local" id="settings-storage-option-local">
+									<input type="radio" name="settings-storage-choice" id="settings-storage-local" value="local" checked style="display: none;">
+									<div class="storage-option-icon-container">
+										<div class="storage-option-icon">💾</div>
+									</div>
+									<div class="storage-option-title">Local Storage</div>
+									<div class="storage-option-description">
 										Stored on this device only (default, privacy-first)
 									</div>
 								</div>
-							</div>
 
-							<div class="option-button" data-storage="sync" id="settings-storage-option-sync">
-								<input type="radio" name="settings-storage-choice" id="settings-storage-sync" value="sync" style="display: none;">
-								<div class="option-button-icon">☁️</div>
-								<div class="option-button-content">
-									<div class="option-button-title">Sync Storage</div>
-									<div class="option-button-description">
+								<div class="storage-option" data-storage="sync" id="settings-storage-option-sync">
+									<input type="radio" name="settings-storage-choice" id="settings-storage-sync" value="sync" style="display: none;">
+									<div class="storage-option-icon-container">
+										<div class="storage-option-icon">☁️</div>
+									</div>
+									<div class="storage-option-title">Sync Storage</div>
+									<div class="storage-option-description">
 										Your tabs can sync across all your devices
 									</div>
 								</div>
