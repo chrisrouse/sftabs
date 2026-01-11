@@ -44,21 +44,8 @@ async function checkFirstLaunch() {
     const hasSyncDataOnly = !hasMigration && !hasTabs && !localStorageData.profiles &&
                             (syncData.profiles?.length > 0 || (syncData.userSettings && !hasSyncTabs));
 
-    // Debug logging
-    console.log('[First Launch] Detection check:', {
-      hasMigration,
-      hasTabs,
-      hasLocalTabs,
-      hasSyncTabs,
-      hasLocalProfiles: !!localStorageData.profiles,
-      hasSyncProfiles: syncData.profiles?.length > 0,
-      hasSyncSettings: !!syncData.userSettings,
-      hasSyncDataOnly
-    });
-
     if (hasSyncDataOnly) {
       // Sync data found from another device - show wizard with "use synced data" option
-      console.log('[First Launch] Sync data detected from another device');
       return {
         shouldShowWizard: true,
         reason: 'sync-data-found',

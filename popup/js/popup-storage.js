@@ -423,7 +423,6 @@ function setupStorageListeners() {
           // If sync storage is being removed (newValue is undefined), don't overwrite local storage
           // This happens when user switches from Sync to Local storage mode
           if (!newSettings) {
-            console.log('[Storage] Sync storage removed, skipping local cache update');
             return;
           }
 
@@ -431,12 +430,11 @@ function setupStorageListeners() {
           // Use promise chain instead of await since we can't make this callback async
           browser.storage.local.get('userSettings').then(currentSettings => {
             if (currentSettings.userSettings && currentSettings.userSettings.useSyncStorage === false) {
-              console.log('[Storage] Using local storage mode, skipping sync-triggered update');
               return;
             }
 
             browser.storage.local.set({ userSettings: newSettings }).catch(err => {
-              console.error('[Storage] Failed to update local cache:', err);
+              // Silently fail - local cache sync is not critical
             });
 
             // Only update popup UI if we're in the popup context
@@ -447,7 +445,7 @@ function setupStorageListeners() {
               SFTabs.main.applyTheme();
             }
           }).catch(err => {
-            console.error('[Storage] Error checking storage mode:', err);
+            // Silently fail - storage mode check is not critical
           });
         }
 
@@ -554,22 +552,17 @@ async function saveProfiles(profiles, showToast = true) {
  */
 async function getProfileTabs(profileId) {
   try {
-    console.log('[DEBUG] getProfileTabs - START', { profileId });
     const useSyncStorage = await getStoragePreference();
-    console.log('[DEBUG] getProfileTabs - useSyncStorage:', useSyncStorage);
     const storageKey = `profile_${profileId}_tabs`;
 
     if (useSyncStorage) {
       const tabs = await SFTabs.storageChunking.readChunkedSync(storageKey);
-      console.log('[DEBUG] getProfileTabs - loaded from sync:', { storageKey, tabCount: tabs ? tabs.length : 0, tabs });
       return tabs || [];
     } else {
       const localResult = await browser.storage.local.get(storageKey);
-      console.log('[DEBUG] getProfileTabs - loaded from local:', { storageKey, tabCount: localResult[storageKey] ? localResult[storageKey].length : 0, tabs: localResult[storageKey] });
       return localResult[storageKey] || [];
     }
   } catch (error) {
-    console.error('[Storage] getProfileTabs - error:', error);
     throw error;
   }
 }

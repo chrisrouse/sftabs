@@ -113,34 +113,25 @@ async function getStoragePreference() {
       browser.storage.local.get('userSettings')
     ]);
 
-    console.log('[DEBUG CONTENT] getStoragePreference - syncResult:', syncResult.userSettings);
-    console.log('[DEBUG CONTENT] getStoragePreference - localResult:', localResult.userSettings);
-
     // Priority 1: If sync storage has useSyncStorage=true, sync is enabled
     if (syncResult.userSettings && syncResult.userSettings.useSyncStorage === true) {
-      console.log('[DEBUG CONTENT] getStoragePreference - Priority 1: sync has useSyncStorage=true');
       return true;
     }
 
     // Priority 2: Check local storage for the preference (most authoritative)
     if (localResult.userSettings && typeof localResult.userSettings.useSyncStorage === 'boolean') {
-      console.log('[DEBUG CONTENT] getStoragePreference - Priority 2: local has useSyncStorage=' + localResult.userSettings.useSyncStorage);
-
       // If local says to use local storage, clean up ALL stale sync storage
       if (localResult.userSettings.useSyncStorage === false) {
-        console.log('[DEBUG CONTENT] getStoragePreference - Cleaning up ALL stale sync storage');
         try {
           // Get all sync storage keys to clean up
           const allSyncData = await browser.storage.sync.get(null);
           const keysToRemove = Object.keys(allSyncData);
 
           if (keysToRemove.length > 0) {
-            console.log('[DEBUG CONTENT] getStoragePreference - Removing sync keys:', keysToRemove);
             await browser.storage.sync.remove(keysToRemove);
-            console.log('[DEBUG CONTENT] getStoragePreference - Sync storage cleaned');
           }
         } catch (e) {
-          console.error('[DEBUG CONTENT] getStoragePreference - Failed to clean sync:', e);
+          // Silently fail - sync cleanup is not critical
         }
       }
 
@@ -150,15 +141,12 @@ async function getStoragePreference() {
     // Priority 3: If userSettings exists in sync but useSyncStorage is not set,
     // this is an existing user from before v2.1 when sync was the default
     if (syncResult.userSettings) {
-      console.log('[DEBUG CONTENT] getStoragePreference - Priority 3: old sync data exists');
       return true;
     }
 
     // Priority 4: No userSettings found - new installation, use default (local storage)
-    console.log('[DEBUG CONTENT] getStoragePreference - Priority 4: default to local');
     return false;
   } catch (error) {
-    console.error('[DEBUG CONTENT] getStoragePreference - error:', error);
     // On error, default to local storage for privacy
     return false;
   }
@@ -206,20 +194,8 @@ async function readChunkedSync(baseKey) {
  * Respects profile system if enabled
  */
 async function getTabsFromStorage() {
-  console.log('[DEBUG CONTENT] getTabsFromStorage - START');
-
-  // DEBUG: Dump all storage contents at startup
-  try {
-    const localKeys = await browser.storage.sync.get(null);
-    console.log('[DEBUG CONTENT] All local storage keys:', Object.keys(localKeys));
-    console.log('[DEBUG CONTENT] All local storage contents:', localKeys);
-  } catch (e) {
-    console.log('[DEBUG CONTENT] Could not read storage:', e);
-  }
-
   try {
     const useSyncStorage = await getStoragePreference();
-    console.log('[DEBUG CONTENT] useSyncStorage:', useSyncStorage);
 
     // Get user settings
     const settingsKey = 'userSettings';
@@ -231,38 +207,30 @@ async function getTabsFromStorage() {
       const result = await browser.storage.local.get(settingsKey);
       settings = result[settingsKey] || {};
     }
-    console.log('[DEBUG CONTENT] settings:', settings);
 
     // Always load from profile storage if activeProfileId exists
     // (profiles are used internally even if UI is disabled)
     if (settings.activeProfileId) {
-      console.log('[DEBUG CONTENT] Loading from profile storage:', settings.activeProfileId);
       const profileTabsKey = `profile_${settings.activeProfileId}_tabs`;
 
       if (useSyncStorage) {
         const tabs = await readChunkedSync(profileTabsKey);
-        console.log('[DEBUG CONTENT] Loaded from sync profile storage:', { key: profileTabsKey, count: tabs ? tabs.length : 0, tabs });
         return tabs || [];
       } else {
         const result = await browser.storage.local.get(profileTabsKey);
-        console.log('[DEBUG CONTENT] Loaded from local profile storage:', { key: profileTabsKey, count: result[profileTabsKey] ? result[profileTabsKey].length : 0, tabs: result[profileTabsKey] });
         return result[profileTabsKey] || [];
       }
     }
 
     // Fallback to legacy customTabs key (for very old installations)
-    console.log('[DEBUG CONTENT] No activeProfileId, falling back to legacy customTabs');
     if (useSyncStorage) {
       const tabs = await readChunkedSync('customTabs');
-      console.log('[DEBUG CONTENT] Loaded from sync customTabs:', { count: tabs ? tabs.length : 0, tabs });
       return tabs || [];
     } else {
       const result = await browser.storage.local.get('customTabs');
-      console.log('[DEBUG CONTENT] Loaded from local customTabs:', { count: result.customTabs ? result.customTabs.length : 0, tabs: result.customTabs });
       return result.customTabs || [];
     }
   } catch (error) {
-    console.error('[DEBUG CONTENT] Error loading tabs:', error);
     return [];
   }
 }
@@ -390,10 +358,8 @@ function delayLoadTabs(attemptCount) {
  * Fallback tab initialization WITH Lightning Navigation AND Dropdown Support
  */
 async function initTabsWithLightningNavigation(tabContainer) {
-  console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - START');
   try {
     let tabsToUse = await getTabsFromStorage();
-    console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - tabsToUse:', { count: tabsToUse ? tabsToUse.length : 0, tabs: tabsToUse });
 
     // Get user settings to check if we should use defaults
     const useSyncStorage = await getStoragePreference();
@@ -406,13 +372,11 @@ async function initTabsWithLightningNavigation(tabContainer) {
       const result = await browser.storage.local.get(settingsKey);
       settings = result[settingsKey] || {};
     }
-    console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - settings:', settings);
 
     // Setup tabs always render (they're the core feature)
     // The floating button location is handled separately
 
     if (!tabsToUse || tabsToUse.length === 0) {
-      console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - No tabs loaded, checking for defaults');
       // If activeProfileId exists, respect empty profiles (don't use defaults)
       // This means profiles system is active internally even if UI is disabled
       if (settings.activeProfileId) {
@@ -433,19 +397,15 @@ async function initTabsWithLightningNavigation(tabContainer) {
 
     // Remove existing custom tabs
     const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
-    console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - Removing existing tabs:', existingTabs.length);
     existingTabs.forEach(tab => tab.remove());
 
     // Sort and add tabs
     const topLevelTabs = tabsToUse.filter(tab => !tab.parentId).sort((a, b) => a.position - b.position);
-    console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - Rendering tabs:', { count: topLevelTabs.length, tabs: topLevelTabs });
 
     for (const tab of topLevelTabs) {
-      console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - Creating tab element:', tab);
       const tabElement = createTabElementWithLightningAndDropdown(tab);
       tabContainer.appendChild(tabElement);
     }
-    console.log('[DEBUG CONTENT] initTabsWithLightningNavigation - Finished rendering tabs');
 
     // Highlight active tab after rendering
     // Use a longer delay to ensure this happens after any navigation-triggered highlights
