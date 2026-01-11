@@ -71,6 +71,14 @@ Create custom dropdown menus by dragging tabs onto a parent tab:
 
 ---
 
+### Floating Navigation Menu
+
+A new floating navigation menu can be enabled so that your custom tabs are always available in Salesforce, even if you're working outside of Setup.
+
+<img width="1004" height="532" alt="Screenshot 2026-01-11 at 2 28 42 PM" src="https://github.com/user-attachments/assets/e168479b-3ead-4d2b-aee3-668d739911ea" />
+
+---
+
 ### Flexible Storage Options
 
 Choose between two storage modes based on your needs and usage patterns.
@@ -146,71 +154,6 @@ If you're upgrading from a previous version, here's what to expect:
 4. **Configure auto-switching** - Add URL patterns for automatic profile switching
 
 [View detailed migration documentation →](upgrading)
-
----
-
-## 🚀 Getting Started with New Features
-
-### Try Profiles
-1. Go to Settings → Enable "Profiles"
-2. Click the profiles button in the popup header
-3. Create a new profile for a different org
-4. Add URL patterns for automatic switching
-
-### Create Dropdown Menus
-1. Navigate to an Object Manager page in Salesforce
-2. Add it as a tab in SF Tabs
-3. Edit the tab and click "Setup as Object Dropdown"
-4. Or drag one tab onto another to create a manual dropdown
-
-### Optimize Storage
-1. Go to Settings → Sync & Storage
-2. Choose your preferred storage location
-3. Enable or disable cross-device sync based on your needs
-
----
-
-## 💡 Tips & Best Practices
-
-**For Profiles:**
-- Use descriptive names (max 30 characters)
-- Set up URL patterns for frequently-used orgs
-- Create a profile for each major environment (Prod, UAT, Dev)
-- Consider role-based profiles (Admin vs. Developer)
-
-**For Dropdowns:**
-- Group related Setup pages together
-- Use Object Manager dropdowns for comprehensive object access
-- Keep dropdown depth shallow (one level) for best usability
-- Create folder-style tabs for logical groupings
-
-**For Storage:**
-- Start with Sync Storage unless you have many tabs
-- Switch to Local Storage if you exceed ~50 tabs
-- Use different storage types for different devices if needed
-- Export backups regularly regardless of storage type
-
----
-
-## 🐛 Known Issues & Limitations
-
-### Limitations
-- Nested dropdowns (dropdowns within dropdowns) are not recommended, but they are supported
-- Profile names are limited to 30 characters
-- Sync storage has a ~50 tab limit due to browser restrictions
-- URL pattern matching requires MyDomain to be enabled
-
-### Planned Improvements
-We're always working to improve SF Tabs. Check our [GitHub Issues](https://github.com/chrisrouse/sftabs/issues) page for upcoming features and to submit feature requests.
-
----
-
-## 📚 Additional Resources
-
-- [Complete User Guide](getting-started) - Detailed documentation for all features
-- [Configuration Reference](configuration) - JSON configuration file format
-- [Keyboard Shortcuts](keyboard-shortcuts) - Set up keyboard shortcuts for quick access
-- [GitHub Repository](https://github.com/chrisrouse/sftabs) - Source code and issue tracking
 
 ---
 
