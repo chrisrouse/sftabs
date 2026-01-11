@@ -6,12 +6,6 @@
   "author": "Chris Rouse",
   "homepage_url": "https://github.com/chrisrouse/sftabs",
   "default_locale": "en",
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "sftabs@github.chrisrouse",
-      "strict_min_version": "109.0"
-    }
-  },
   "permissions": [
     "activeTab",
     "storage",
@@ -93,6 +87,10 @@
     "48": "icons/sftabs-icon-48.png",
     "96": "icons/sftabs-icon-96.png"
   },
+  "options_ui": {
+    "page": "popup/settings.html",
+    "open_in_tab": true
+  },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
@@ -129,8 +127,6 @@
     }
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "service_worker": "background.js"
   }
 }

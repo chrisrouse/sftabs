@@ -10,7 +10,18 @@
       runtime: {
         getURL: chrome.runtime.getURL.bind(chrome.runtime),
         onMessage: chrome.runtime.onMessage,
-        lastError: chrome.runtime.lastError
+        lastError: chrome.runtime.lastError,
+        openOptionsPage: function() {
+          return new Promise((resolve, reject) => {
+            chrome.runtime.openOptionsPage(() => {
+              if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+              } else {
+                resolve();
+              }
+            });
+          });
+        }
       },
       storage: (function() {
         // Create local storage methods
