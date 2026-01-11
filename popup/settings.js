@@ -68,7 +68,6 @@ async function loadUserSettings() {
 		// Priority 4: No settings found - use defaults
 		userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 	} catch (error) {
-		console.error('[Settings] Error loading settings:', error);
 		userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
 	}
 }
@@ -91,7 +90,6 @@ async function saveUserSettings() {
 
 		showStatus('Settings saved', false);
 	} catch (error) {
-		console.error('[Settings] Error saving settings:', error);
 		showStatus('Error saving settings: ' + error.message, true);
 	}
 }
@@ -1511,7 +1509,6 @@ async function detectSyncConflict() {
 
 		return { hasConflict: false };
 	} catch (error) {
-		console.error('[Settings] Error detecting sync conflict:', error);
 		return { hasConflict: false };
 	}
 }
@@ -1658,7 +1655,6 @@ async function mergeSyncData(conflict) {
 
 		showStatus(`Merged ${mergedProfiles.length} profiles and settings successfully`, false);
 	} catch (error) {
-		console.error('[Settings] Error merging data:', error);
 		throw error;
 	}
 }
@@ -1712,7 +1708,6 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
 			// Note: Don't remove profiles from source yet - settings page will handle that
 		}
 	} catch (error) {
-		console.error('[Settings] Migration error:', error);
 		throw new Error(`Failed to migrate tabs: ${error.message}`);
 	}
 }

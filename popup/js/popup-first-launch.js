@@ -74,7 +74,6 @@ async function checkFirstLaunch() {
     };
 
   } catch (error) {
-    console.error('Error checking first launch status:', error);
     // On error, assume not first launch to avoid breaking the extension
     return {
       shouldShowWizard: false,
@@ -91,7 +90,6 @@ async function checkFirstLaunch() {
 async function showSyncDataDetectedScreen(syncData) {
   const modal = document.getElementById('first-launch-modal');
   if (!modal) {
-    console.error('First launch modal not found');
     return;
   }
 
@@ -187,7 +185,6 @@ async function useSyncedConfiguration() {
     window.location.reload();
 
   } catch (error) {
-    console.error('Error using synced configuration:', error);
     if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Error loading synced data: ' + error.message, true);
     }
@@ -214,7 +211,6 @@ async function clearSyncDataAndShowWizard() {
     showFirstLaunchModal();
 
   } catch (error) {
-    console.error('Error clearing sync data:', error);
     if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Error clearing sync data: ' + error.message, true);
     }
@@ -227,7 +223,6 @@ async function clearSyncDataAndShowWizard() {
 async function showFirstLaunchModal() {
   const modal = document.getElementById('first-launch-modal');
   if (!modal) {
-    console.error('First launch modal not found');
     return;
   }
 
@@ -377,7 +372,6 @@ async function handleGetStarted() {
     window.location.reload();
 
   } catch (error) {
-    console.error('Error handling first launch:', error);
     if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Error during setup: ' + error.message, true);
     }
@@ -452,7 +446,6 @@ async function initializeExtension(setupOption, enableProfiles, storageType) {
     // This ensures all event handlers and initialization are set up correctly
 
   } catch (error) {
-    console.error('Error initializing extension:', error);
     throw error;
   }
 }
