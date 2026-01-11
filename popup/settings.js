@@ -164,9 +164,27 @@ function updateUI() {
 	// Update checkboxes
 	document.getElementById('compact-mode').checked = userSettings.compactMode || false;
 	document.getElementById('skip-delete-confirmation').checked = userSettings.skipDeleteConfirmation || false;
-	document.getElementById('use-sync-storage').checked = userSettings.useSyncStorage !== false;
 	document.getElementById('enable-profiles').checked = userSettings.profilesEnabled || false;
 	document.getElementById('auto-switch-profiles').checked = userSettings.autoSwitchProfiles || false;
+
+	// Update storage option buttons
+	const useSyncStorage = userSettings.useSyncStorage !== false;
+	const localOption = document.getElementById('settings-storage-option-local');
+	const syncOption = document.getElementById('settings-storage-option-sync');
+	const localRadio = document.getElementById('settings-storage-local');
+	const syncRadio = document.getElementById('settings-storage-sync');
+
+	if (useSyncStorage) {
+		syncOption.classList.add('active');
+		localOption.classList.remove('active');
+		syncRadio.checked = true;
+		localRadio.checked = false;
+	} else {
+		localOption.classList.add('active');
+		syncOption.classList.remove('active');
+		localRadio.checked = true;
+		syncRadio.checked = false;
+	}
 
 	// Update floating button settings
 	if (!userSettings.floatingButton) {
@@ -319,49 +337,73 @@ function setupEventListeners() {
 		await saveUserSettings();
 	});
 
-	// Use sync storage
-	document.getElementById('use-sync-storage').addEventListener('change', async (e) => {
-		const newValue = e.target.checked;
+	// Storage option buttons
+	const storageOptions = document.querySelectorAll('[data-storage]');
+	storageOptions.forEach(option => {
+		option.addEventListener('click', async () => {
+			const storageType = option.getAttribute('data-storage');
+			const newValue = storageType === 'sync';
+			const oldValue = userSettings.useSyncStorage;
 
-		// When ENABLING sync, check for conflicts
-		if (newValue) {
-			const conflict = await detectSyncConflict();
-
-			if (conflict.hasConflict) {
-				// Show conflict resolution UI
-				e.target.checked = false; // Uncheck temporarily
-				await showSyncConflictDialog(conflict);
+			// Don't do anything if already selected
+			if (newValue === oldValue) {
 				return;
 			}
-		}
 
-		const confirmed = confirm(
-			newValue
-				? 'Enable cross-device sync?\n\nYour tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you\'re signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.'
-				: 'Disable cross-device sync?\n\nYour tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.'
-		);
+			// When ENABLING sync, check for conflicts
+			if (newValue) {
+				const conflict = await detectSyncConflict();
 
-		if (confirmed) {
-			const oldValue = userSettings.useSyncStorage;
-			userSettings.useSyncStorage = newValue;
-			try {
-				// Perform migration if needed
-				if (oldValue !== newValue) {
-					await migrateBetweenStorageTypes(oldValue, newValue);
+				if (conflict.hasConflict) {
+					// Show conflict resolution UI
+					await showSyncConflictDialog(conflict);
+					return;
 				}
-				await saveUserSettings();
-				showStatus(
-					newValue ? 'Sync enabled - tabs will now sync across devices' : 'Sync disabled - tabs stored locally only',
-					false
-				);
-			} catch (error) {
-				showStatus('Error: ' + error.message, true);
-				e.target.checked = !newValue;
-				userSettings.useSyncStorage = oldValue;
 			}
-		} else {
-			e.target.checked = !newValue;
-		}
+
+			const confirmed = confirm(
+				newValue
+					? 'Enable cross-device sync?\n\nYour tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you\'re signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.'
+					: 'Disable cross-device sync?\n\nYour tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.'
+			);
+
+			if (confirmed) {
+				userSettings.useSyncStorage = newValue;
+				try {
+					// Perform migration if needed
+					await migrateBetweenStorageTypes(oldValue, newValue);
+					await saveUserSettings();
+
+					// Update UI
+					const localOption = document.getElementById('settings-storage-option-local');
+					const syncOption = document.getElementById('settings-storage-option-sync');
+					const localRadio = document.getElementById('settings-storage-local');
+					const syncRadio = document.getElementById('settings-storage-sync');
+
+					if (newValue) {
+						syncOption.classList.add('active');
+						localOption.classList.remove('active');
+						syncRadio.checked = true;
+						localRadio.checked = false;
+					} else {
+						localOption.classList.add('active');
+						syncOption.classList.remove('active');
+						localRadio.checked = true;
+						syncRadio.checked = false;
+					}
+
+					showStatus(
+						newValue ? 'Sync enabled - tabs will now sync across devices' : 'Sync disabled - tabs stored locally only',
+						false
+					);
+				} catch (error) {
+					showStatus('Error: ' + error.message, true);
+					userSettings.useSyncStorage = oldValue;
+					// Restore UI state
+					updateUI();
+				}
+			}
+		});
 	});
 
 	// Enable profiles
@@ -1516,8 +1558,15 @@ async function showSyncConflictDialog(conflict) {
 			await saveUserSettings();
 
 			// Update UI
-			document.getElementById('use-sync-storage').checked = true;
-			toggleSyncDiagnostics();
+			const localOption = document.getElementById('settings-storage-option-local');
+			const syncOption = document.getElementById('settings-storage-option-sync');
+			const localRadio = document.getElementById('settings-storage-local');
+			const syncRadio = document.getElementById('settings-storage-sync');
+
+			syncOption.classList.add('active');
+			localOption.classList.remove('active');
+			syncRadio.checked = true;
+			localRadio.checked = false;
 
 			showStatus('Data merged successfully - sync enabled', false);
 		} catch (error) {
