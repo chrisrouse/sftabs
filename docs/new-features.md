@@ -30,6 +30,14 @@ Create multiple tab configurations for different Salesforce orgs, projects, or w
 
 ---
 
+### Overlfow Menu
+
+If you have a large number of tabs, they will now collapse into an overflow menu, ensuring  you can always access your tabs. Sub-menus are also supported in the overflow menu.
+
+<img width="1030" height="596" alt="Screenshot 2026-01-11 at 2 25 59 PM" src="https://github.com/user-attachments/assets/1bd6d81a-adeb-4cc5-a502-aeaca4f91bbb" />
+
+---
+
 ### Dropdown Menus
 
 Organize related tabs under dropdown menus for a cleaner, more organized Setup menu experience.
