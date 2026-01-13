@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SF Tabs BETA",
-  "version": "2.0.0",
+  "version": "2.0.0.1",
   "description": "THIS EXTENSION IS FOR BETA TESTING. Add custom tabs to the Salesforce setup menu.",
   "author": "Chris Rouse",
   "homepage_url": "https://github.com/chrisrouse/sftabs",
@@ -21,8 +21,8 @@
   ],
   "action": {
     "default_icon": {
-      "48": "icons/sftabs-icon-48.png",
-      "96": "icons/sftabs-icon-96.png"
+      "48": "icons/sftabs-beta-icon-48.png",
+      "96": "icons/sftabs-beta-icon-96.png"
     },
     "default_title": "SF Tabs",
     "default_popup": "popup/popup.html"
@@ -83,9 +83,9 @@
     }
   ],
   "icons": {
-    "16": "icons/sftabs-icon-16.png",
-    "48": "icons/sftabs-icon-48.png",
-    "96": "icons/sftabs-icon-96.png"
+    "16": "icons/sftabs-beta-icon-16.png",
+    "48": "icons/sftabs-beta-icon-48.png",
+    "96": "icons/sftabs-beta-icon-96.png"
   },
   "options_ui": {
     "page": "popup/settings.html",
