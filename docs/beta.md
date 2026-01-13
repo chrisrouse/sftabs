@@ -14,7 +14,7 @@ The SF Tabs beta version is available on the Chrome Web Store for early testing.
 ### Installing the Beta
 
 1. **Visit the Chrome Web Store**
-   [Install SF Tabs BETA](https://chrome.google.com/webstore/detail/sf-tabs-beta/YOUR_BETA_EXTENSION_ID)
+   [Install SF Tabs BETA](https://chromewebstore.google.com/detail/sf-tabs-beta/enmddneajopnbjcalpeapgjoideekdhn?utm_source=item-share-cb)
 
 2. **Click "Add to Chrome"**
    The beta version can be installed alongside the stable version
@@ -53,7 +53,7 @@ The current beta includes:
 Beta versions use a four-part version number:
 - `2.0.0.1` = Beta 1
 - `2.0.0.2` = Beta 2
-- `2.0.1` = Stable release
+- `2.0.0` = Stable release
 
 ### Providing Feedback
 
@@ -82,7 +82,7 @@ If you need to switch back:
 
 ### Firefox Beta
 
-Firefox beta testing will be available soon through Mozilla Add-ons. Check back for updates!
+Releasing a beta version on Firefox isn't quite as easy as Chrome, so the Chrome beta version will be the only one for now. If you would like to test the beta in Chrome using your existing Firefox data, you can export your settings and then import after installing the beta.
 
 ---
 
