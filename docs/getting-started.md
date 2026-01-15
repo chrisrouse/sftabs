@@ -10,6 +10,24 @@ Click the extension icon in your browser toolbar to open SF Tabs
 
 <img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="SF Tabs Icon" style="display: inline; height: 3em; vertical-align: middle;"> 
 
+## First Launch Wizard
+
+<img width="410" height="604" alt="Screenshot 2026-01-15 at 2 01 19 PM" src="https://github.com/user-attachments/assets/2259eecd-bddb-424c-b748-8d7e12be7f96" />
+
+The first time you open SF Tabs you will see the First Launch Wizard. This allows you to quickly configure a few key settings.
+
+### Tab Options
+**1. Start with default tabs** to use the pre-defined defaults, just so that you have something to start with.
+**2. Start with no tabs** if you have used SF Tabs before and want a clean start.
+**3. Import existing configuration** if you have used SF Tabs on another computer and you want to import your settings.
+
+### Profiles
+Profiles are new in v2.0. If you are working in a single org, you probably don't need profiles, but if you work in different orgs or need different sets of tabs depending on your work, you may want to use profiles. You can read more about this in the Profiles section of the user guide.
+
+## Storage Options
+**1. Local Storage** keeps all SF Tabs data in the browser on your computer. If you install on another computer, none of your tabs or settings will be synced.
+**2. Sync Storage** uses your browser's sync storage (if enabled) to keep your data in sync across multiple computers, where you are signed into the same browser profile.
+
 
 ## Adding a New Tab
 
