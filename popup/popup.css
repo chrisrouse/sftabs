@@ -1321,6 +1321,7 @@
 	border-top: 1px solid var(--color-border);
   }
 
+  #first-launch-buttons,
   #migration-welcome-buttons,
   #migration-progress-buttons,
   #migration-success-buttons,
@@ -1330,6 +1331,8 @@
 	width: 100%;
   }
 
+  #first-launch-guide-button,
+  #first-launch-start-button,
   #migration-export-button {
 	flex: 1;
   }
