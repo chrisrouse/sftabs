@@ -58,6 +58,17 @@
                 }
               });
             });
+          },
+          remove: function(keys) {
+            return new Promise((resolve, reject) => {
+              chrome.storage.local.remove(keys, () => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve();
+                }
+              });
+            });
           }
         };
 
@@ -88,6 +99,17 @@
           clear: function() {
             return new Promise((resolve, reject) => {
               chrome.storage.sync.clear(() => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(chrome.runtime.lastError.message));
+                } else {
+                  resolve();
+                }
+              });
+            });
+          },
+          remove: function(keys) {
+            return new Promise((resolve, reject) => {
+              chrome.storage.sync.remove(keys, () => {
                 if (chrome.runtime.lastError) {
                   reject(new Error(chrome.runtime.lastError.message));
                 } else {
