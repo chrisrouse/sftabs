@@ -186,61 +186,6 @@ function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-/**
- * Check if sync storage is available and enabled
- * @returns {Promise<{available: boolean, error?: string}>}
- */
-async function checkSyncStorageAvailable() {
-  try {
-    // Check if sync storage API exists
-    if (!browser.storage || !browser.storage.sync) {
-      return {
-        available: false,
-        error: 'Sync storage API not available in this browser'
-      };
-    }
-
-    // Try to perform a test write/read operation
-    const testKey = '_sftabs_sync_test_' + Date.now();
-    const testValue = 'test';
-
-    try {
-      // Attempt to write to sync storage
-      await browser.storage.sync.set({ [testKey]: testValue });
-
-      // Attempt to read back
-      const result = await browser.storage.sync.get(testKey);
-
-      // Clean up test data
-      await browser.storage.sync.remove(testKey);
-
-      // Verify the test succeeded
-      if (result[testKey] === testValue) {
-        return { available: true };
-      } else {
-        return {
-          available: false,
-          error: 'Sync storage test failed'
-        };
-      }
-    } catch (syncError) {
-      // Common errors:
-      // - User not signed into browser
-      // - Sync disabled in browser settings
-      // - Quota exceeded
-      return {
-        available: false,
-        error: syncError.message || 'Sync storage not accessible'
-      };
-    }
-  } catch (error) {
-    return {
-      available: false,
-      error: error.message || 'Unknown error checking sync storage'
-    };
-  }
-}
-
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -254,8 +199,7 @@ if (typeof module !== 'undefined' && module.exports) {
     isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
     debounce,
-    deepClone,
-    checkSyncStorageAvailable
+    deepClone
   };
 } else {
   // Browser environment
@@ -271,7 +215,6 @@ if (typeof module !== 'undefined' && module.exports) {
     isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
     debounce,
-    deepClone,
-    checkSyncStorageAvailable
+    deepClone
   };
 }

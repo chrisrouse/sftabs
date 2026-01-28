@@ -74,19 +74,25 @@ async function loadUserSettings() {
 
 /**
  * Save user settings to storage
+ * Splits device-specific settings from synced settings
  */
 async function saveUserSettings() {
 	try {
-		// Respect storage preference
-		if (userSettings.useSyncStorage) {
-			// Save to sync storage AND cache in local
-			await browser.storage.sync.set({ userSettings });
-			await browser.storage.local.set({ userSettings });
-		} else {
-			// Save to local storage only AND remove from sync
-			await browser.storage.local.set({ userSettings });
-			await browser.storage.sync.remove('userSettings');
-		}
+		// Split settings into device-specific and synced
+		const { useSyncStorage, ...syncedSettings } = userSettings;
+
+		// Save device-specific setting (useSyncStorage) to local storage only
+		await browser.storage.local.set({
+			deviceSettings: { useSyncStorage }
+		});
+
+		// Save all other settings to sync storage (cross-device)
+		await browser.storage.sync.set({ userSettings: syncedSettings });
+
+		// Cache the full merged settings in local for quick access
+		await browser.storage.local.set({
+			userSettings: userSettings  // Full settings including useSyncStorage
+		});
 
 		showStatus('Settings saved', false);
 	} catch (error) {
@@ -825,9 +831,118 @@ async function importConfiguration(file) {
 }
 
 /**
+ * Parse a Salesforce URL to extract path and determine tab type flags
+ * @param {string} url - The URL to parse
+ * @returns {Object} Object with path, isObject, isCustomUrl, and isSetupObject
+ */
+function parseUrlToDetermineTabs(url) {
+	const result = {
+		path: '',
+		isObject: false,
+		isCustomUrl: false,
+		isSetupObject: false
+	};
+
+	if (!url) return result;
+
+	// Check if it's a full URL (has protocol or domain)
+	const isFullUrl = url.startsWith('http://') || url.startsWith('https://');
+
+	if (isFullUrl) {
+		// Full URLs with explicit domains should be treated as custom URLs
+		// This preserves the domain information and prevents URL reconstruction issues
+		// when using window.location.origin with different Salesforce instances
+		result.isCustomUrl = true;
+		result.path = url;
+		return result;
+	}
+
+	// At this point, we only have relative paths like /lightning/setup/Flows/home
+	// Parse Lightning URL patterns
+	// Pattern: /lightning/setup/{SETUP_NAME}/... (capture just the setup name, /home is added back by buildFullUrl)
+	const setupMatch = url.match(/^\/lightning\/setup\/([^/]+)/);
+	if (setupMatch) {
+		result.isSetupObject = true;
+		result.path = setupMatch[1];
+		return result;
+	}
+
+	// Pattern: /lightning/o/{SOBJECT_PATH} (capture everything after /o/, e.g., "Contact/list" or "Account")
+	const objectMatch = url.match(/^\/lightning\/o\/(.+)$/);
+	if (objectMatch) {
+		result.isObject = true;
+		result.path = objectMatch[1];
+		return result;
+	}
+
+	// Default: custom path (relative)
+	result.path = url;
+	return result;
+}
+
+/**
+ * Convert simple Salesforce tabs format to full tab structure
+ * @param {Array} simpleTabs - Array of {tabTitle, url, openInNewTab}
+ * @returns {Array} Array of full tab objects
+ */
+function convertSimpleTabsToFull(simpleTabs) {
+	const converted = simpleTabs.map((simpleTab, index) => {
+		const urlInfo = parseUrlToDetermineTabs(simpleTab.url);
+
+		return {
+			id: `tab_${Date.now()}_${index}`,
+			label: simpleTab.tabTitle || 'Untitled Tab',
+			path: urlInfo.path,
+			openInNewTab: simpleTab.openInNewTab || false,
+			isObject: urlInfo.isObject,
+			isCustomUrl: urlInfo.isCustomUrl,
+			isSetupObject: urlInfo.isSetupObject,
+			dropdownItems: [],
+			position: index
+		};
+	});
+	return converted;
+}
+
+/**
+ * Detect if data is in simple Salesforce tabs format
+ * @param {Object} importData - The data to check
+ * @returns {boolean} True if this appears to be simple format
+ */
+function isSimpleSalesforceFormat(importData) {
+	// Simple format: has tabs array with tabTitle and url, no version/settings
+	const isSimple = (
+		!importData.version &&
+		!importData.customTabs &&
+		Array.isArray(importData.tabs) &&
+		importData.tabs.length > 0 &&
+		importData.tabs.every(tab =>
+			typeof tab.tabTitle === 'string' &&
+			typeof tab.url === 'string' &&
+			typeof tab.openInNewTab === 'boolean'
+		)
+	);
+	return isSimple;
+}
+
+/**
  * Normalize import data to a consistent format
  */
 function normalizeImportData(importData) {
+	// Detect if this is simple Salesforce tabs format
+	if (isSimpleSalesforceFormat(importData)) {
+		const convertedTabs = convertSimpleTabsToFull(importData.tabs);
+		return {
+			version: 'simple',
+			exportDate: new Date().toISOString(),
+			settings: {},
+			tabs: convertedTabs,
+			profiles: [],
+			profileData: {},
+			chunkedData: {}
+		};
+	}
+
 	// Detect if this is a pre-v2 config (legacy format)
 	const isLegacyConfig = !importData.version && importData.customTabs;
 
@@ -1341,19 +1456,29 @@ async function importTabsToDestination(importData, importSettings) {
 			await browser.storage.sync.set({ [storageKey]: tabs });
 		}
 	} else {
-		// No profiles - check if we should add or replace
+		// No profiles UI - but popup always loads from activeProfileId profile storage internally
 		const importMode = document.querySelector('input[name="import-mode"]:checked')?.value || 'add';
+
+		// Note: Popup always loads from activeProfileId profile storage, even when profiles UI is disabled
+		// So we must save to profile storage, not to customTabs
+		const activeProfileId = userSettings.activeProfileId;
 
 		if (importMode === 'add') {
 			// Add to existing tabs
-			const useSyncStorage = await SFTabs.storage.getStoragePreference();
 			let existingTabs = [];
 
-			if (useSyncStorage) {
-				existingTabs = await SFTabs.storageChunking.readChunkedSync('customTabs') || [];
+			if (activeProfileId) {
+				// Load from profile storage (same place popup reads from)
+				existingTabs = await SFTabs.storage.getProfileTabs(activeProfileId) || [];
 			} else {
-				const localResult = await browser.storage.local.get('customTabs');
-				existingTabs = localResult.customTabs || [];
+				// Fallback to customTabs if no active profile
+				const useSyncStorage = await SFTabs.storage.getStoragePreference();
+				if (useSyncStorage) {
+					existingTabs = await SFTabs.storageChunking.readChunkedSync('customTabs') || [];
+				} else {
+					const localResult = await browser.storage.local.get('customTabs');
+					existingTabs = localResult.customTabs || [];
+				}
 			}
 
 			// Merge tabs - imported tabs get new positions after existing ones
@@ -1367,20 +1492,32 @@ async function importTabsToDestination(importData, importSettings) {
 				});
 			});
 
+
 			// Save merged tabs
-			if (useSyncStorage) {
-				await SFTabs.storageChunking.saveChunkedSync('customTabs', mergedTabs);
+			if (activeProfileId) {
+				await SFTabs.storage.saveProfileTabs(activeProfileId, mergedTabs);
 			} else {
-				await browser.storage.local.set({ customTabs: mergedTabs });
+				// Fallback to customTabs if no active profile
+				const useSyncStorage = await SFTabs.storage.getStoragePreference();
+				if (useSyncStorage) {
+					const saveResult = await SFTabs.storageChunking.saveChunkedSync('customTabs', mergedTabs);
+				} else {
+					await browser.storage.local.set({ customTabs: mergedTabs });
+				}
 			}
 		} else {
 			// Replace all tabs
-			const useSyncStorage = await SFTabs.storage.getStoragePreference();
-
-			if (useSyncStorage) {
-				await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
+			if (activeProfileId) {
+				await SFTabs.storage.saveProfileTabs(activeProfileId, tabs);
 			} else {
-				await browser.storage.local.set({ customTabs: tabs });
+				// Fallback to customTabs if no active profile
+				const useSyncStorage = await SFTabs.storage.getStoragePreference();
+
+				if (useSyncStorage) {
+					const saveResult = await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
+				} else {
+					await browser.storage.local.set({ customTabs: tabs });
+				}
 			}
 		}
 	}
@@ -1697,7 +1834,7 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
 					await SFTabs.storageChunking.clearChunkedSync(tabsKey);
 				} else {
 					// Remove from local
-					await sourceStorage.remove(tabsKey);
+					await sourceStorage.remove([tabsKey]);
 				}
 			}
 		}

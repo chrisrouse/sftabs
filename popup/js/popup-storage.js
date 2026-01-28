@@ -2,38 +2,30 @@
 // Storage operations for tabs and settings
 
 /**
- * Get storage preference from user settings
+ * Get storage preference from device-specific settings
  * @returns {Promise<boolean>} true for sync storage, false for local
  */
 async function getStoragePreference() {
   try {
-    // Check BOTH storages to find the preference
-    const [syncResult, localResult] = await Promise.all([
-      browser.storage.sync.get('userSettings'),
-      browser.storage.local.get('userSettings')
-    ]);
+    // Check local storage for device-specific setting
+    const localResult = await browser.storage.local.get(['deviceSettings', 'userSettings']);
 
-    // Priority 1: If sync storage has useSyncStorage=true, sync is enabled
-    if (syncResult.userSettings && syncResult.userSettings.useSyncStorage === true) {
-      return true;
+    // Priority 1: Check new deviceSettings location
+    if (localResult.deviceSettings && typeof localResult.deviceSettings.useSyncStorage === 'boolean') {
+      return localResult.deviceSettings.useSyncStorage;
     }
 
-    // Priority 2: Check local storage for the preference
+    // Priority 2: Backward compatibility - check old location
     if (localResult.userSettings && typeof localResult.userSettings.useSyncStorage === 'boolean') {
       return localResult.userSettings.useSyncStorage;
     }
 
-    // Priority 3: If userSettings exists in sync but useSyncStorage is not set,
-    // this is an existing user from before v2.1 when sync was the default
-    if (syncResult.userSettings) {
-      return true;
-    }
+    // Priority 3: Default to sync storage (new default)
+    return true;
 
-    // Priority 4: No userSettings found - new installation, use default (local storage)
-    return false;
   } catch (error) {
-    // On error, default to local storage for privacy
-    return false;
+    // On error, default to sync storage
+    return true;
   }
 }
 
@@ -165,37 +157,36 @@ async function saveTabs(tabs) {
 
 /**
  * Get user settings from browser storage
- * Settings are stored based on useSyncStorage preference (local by default)
+ * Merges device-specific settings (from local) with synced settings (from sync)
  */
 async function getUserSettings() {
   try {
-    // Check local storage first (new default since v2.1)
-    const localResult = await browser.storage.local.get('userSettings');
+    // Read device-specific settings from local storage
+    const localResult = await browser.storage.local.get(['deviceSettings', 'userSettings']);
 
-    if (localResult.userSettings) {
-      // Found in local storage - merge with defaults
-      const mergedSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...localResult.userSettings };
-      return mergedSettings;
-    }
-
-    // Not in local storage - check sync storage for backward compatibility
+    // Read synced settings from sync storage
     const syncResult = await browser.storage.sync.get('userSettings');
 
-    if (syncResult.userSettings) {
-      // Found in sync storage (existing user from before v2.1)
-      const mergedSettings = { ...SFTabs.constants.DEFAULT_SETTINGS, ...syncResult.userSettings };
+    // Get device-specific useSyncStorage preference (defaults to true)
+    let useSyncStorage = true; // New default
 
-      // If useSyncStorage is not explicitly set, this is an existing user from before v2.1
-      // when sync was the default - preserve that behavior
-      if (typeof syncResult.userSettings.useSyncStorage !== 'boolean') {
-        mergedSettings.useSyncStorage = true;
-      }
-
-      return mergedSettings;
+    if (localResult.deviceSettings && typeof localResult.deviceSettings.useSyncStorage === 'boolean') {
+      // Found device-specific setting
+      useSyncStorage = localResult.deviceSettings.useSyncStorage;
+    } else if (localResult.userSettings && typeof localResult.userSettings.useSyncStorage === 'boolean') {
+      // Backward compatibility - useSyncStorage was in userSettings before
+      useSyncStorage = localResult.userSettings.useSyncStorage;
     }
 
-    // New installation - return defaults (don't save yet, let first-launch handle it)
-    return { ...SFTabs.constants.DEFAULT_SETTINGS };
+    // Merge synced settings with defaults
+    const syncedSettings = syncResult.userSettings || {};
+    const mergedSettings = {
+      ...SFTabs.constants.DEFAULT_SETTINGS,
+      ...syncedSettings,
+      useSyncStorage // Override with device-specific value
+    };
+
+    return mergedSettings;
 
   } catch (error) {
     throw error;
@@ -217,22 +208,21 @@ async function saveUserSettings(settings, skipMigration = false, showToast = tru
       }
     }
 
-    // Save settings to the appropriate storage based on user preference
-    if (settings.useSyncStorage) {
-      // Save to sync storage
-      await browser.storage.sync.set({ userSettings: settings });
-      // Also cache in local storage for quick access
-      await browser.storage.local.set({ userSettings: settings });
-    } else {
-      // Save to local storage only
-      await browser.storage.local.set({ userSettings: settings });
-      // Remove from sync storage if it exists there
-      try {
-        await browser.storage.sync.remove('userSettings');
-      } catch (e) {
-        // Ignore errors removing from sync (might not exist)
-      }
-    }
+    // Split settings into device-specific and synced
+    const { useSyncStorage, ...syncedSettings } = settings;
+
+    // Save device-specific setting (useSyncStorage) to local storage only
+    await browser.storage.local.set({
+      deviceSettings: { useSyncStorage }
+    });
+
+    // Save all other settings to sync storage (cross-device)
+    await browser.storage.sync.set({ userSettings: syncedSettings });
+
+    // Cache the full merged settings in local for quick access
+    await browser.storage.local.set({
+      userSettings: settings  // Full settings including useSyncStorage
+    });
 
     // Update the main state (only in popup context)
     if (SFTabs.main && SFTabs.main.setUserSettings) {
@@ -351,49 +341,68 @@ async function importConfiguration(configData) {
 }
 
 /**
- * Migrate tabs between storage types when user changes preference
+ * Migrate tabs and profiles between storage types when user changes preference
+ * Note: userSettings always stay in sync storage regardless of preference
  * @param {boolean} fromSync - true if migrating from sync, false if from local
  * @param {boolean} toSync - true if migrating to sync, false if to local
  */
 async function migrateBetweenStorageTypes(fromSync, toSync) {
   try {
+    // Get profiles list
+    const profiles = await getProfiles();
 
-    // Read tabs from source storage
-    let tabs = [];
-    if (fromSync) {
-      // Read from sync storage
-      tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
-    } else {
-      // Read from local storage
-      const localResult = await browser.storage.local.get('customTabs');
-      tabs = localResult.customTabs || [];
+    if (!profiles || profiles.length === 0) {
+      return; // Nothing to migrate
     }
 
+    // Determine source and destination storage
+    const sourceStorage = fromSync ? browser.storage.sync : browser.storage.local;
+    const destStorage = toSync ? browser.storage.sync : browser.storage.local;
 
-    if (tabs.length === 0) {
-      return;
+    // Migrate each profile's tabs
+    for (const profile of profiles) {
+      const tabsKey = `profile_${profile.id}_tabs`;
+
+      // Read from source
+      let tabs;
+      if (fromSync) {
+        tabs = await SFTabs.storageChunking.readChunkedSync(tabsKey);
+      } else {
+        const result = await sourceStorage.get(tabsKey);
+        tabs = result[tabsKey] || [];
+      }
+
+      // Save to destination
+      if (tabs && tabs.length > 0) {
+        if (toSync) {
+          await SFTabs.storageChunking.saveChunkedSync(tabsKey, tabs);
+        } else {
+          await destStorage.set({ [tabsKey]: tabs });
+        }
+
+        // Remove from source
+        if (fromSync) {
+          await SFTabs.storageChunking.clearChunkedSync(tabsKey);
+        } else {
+          await sourceStorage.remove([tabsKey]);
+        }
+      }
     }
 
-    // Save tabs to destination storage
+    // Migrate profiles list
     if (toSync) {
-      // Save to sync storage with chunking
-      await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
-
-      // Clear old local storage
-      await browser.storage.local.remove(['customTabs', 'extensionVersion']);
+      await browser.storage.sync.set({ profiles });
+      await browser.storage.local.remove(['profiles']);
     } else {
-      // Save to local storage
-      await browser.storage.local.set({
-        customTabs: tabs,
-        extensionVersion: '2.0.0'
-      });
-
-      // Clear old sync storage
-      await SFTabs.storageChunking.clearChunkedSync('customTabs');
+      await browser.storage.local.set({ profiles });
+      // Note: Don't remove profiles from sync - keep for potential future migration
     }
+
+    // NOTE: userSettings are NOT migrated because they always stay in sync storage
+    // regardless of the useSyncStorage preference
 
   } catch (error) {
-    throw new Error(`Failed to migrate tabs: ${error.message}`);
+    throw new Error(`Failed to migrate data: ${error.message}`);
   }
 }
 

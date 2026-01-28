@@ -842,7 +842,7 @@ async function disableProfilesAndKeepOne(selectedProfile) {
     if (useSyncStorage) {
       await SFTabs.storageChunking.clearChunkedSync(profileTabsKey);
     } else {
-      await browser.storage.local.remove(profileTabsKey);
+      await browser.storage.local.remove([profileTabsKey]);
     }
   }
 

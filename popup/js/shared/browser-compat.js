@@ -166,6 +166,19 @@
             }
           });
         }
+      },
+      management: {
+        getSelf: function() {
+          return new Promise((resolve, reject) => {
+            chrome.management.getSelf((extension) => {
+              if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+              } else {
+                resolve(extension);
+              }
+            });
+          });
+        }
       }
     };
   } else if (typeof browser === 'undefined') {

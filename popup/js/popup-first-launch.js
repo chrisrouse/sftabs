@@ -273,30 +273,7 @@ async function initFirstLaunchModal(firstLaunchStatus) {
     });
   }
 
-  // Check if sync storage is available
-  const syncAvailability = await SFTabs.utils.checkSyncStorageAvailable();
-  const syncStorageOption = document.getElementById('storage-option-sync');
-
-  if (!syncAvailability.available && syncStorageOption) {
-    // Disable sync storage option if not available
-    syncStorageOption.style.opacity = '0.5';
-    syncStorageOption.style.cursor = 'not-allowed';
-    syncStorageOption.title = `Sync storage not available: ${syncAvailability.error}`;
-
-    // Disable the radio button
-    const syncRadio = syncStorageOption.querySelector('input[type="radio"]');
-    if (syncRadio) {
-      syncRadio.disabled = true;
-    }
-
-    // Update description to show it's unavailable
-    const syncDescription = syncStorageOption.querySelector('.option-button-description');
-    if (syncDescription) {
-      syncDescription.textContent = 'Not available (browser sync disabled or not signed in)';
-    }
-  }
-
-  // Storage option selection
+// Storage option selection
   const storageOptions = document.querySelectorAll('[data-storage]');
   storageOptions.forEach(option => {
     option.addEventListener('click', () => {
@@ -316,6 +293,20 @@ async function initFirstLaunchModal(firstLaunchStatus) {
       }
     });
   });
+
+  // Set default storage option to "Sync Storage"
+  const syncStorageOption = document.getElementById('storage-option-sync');
+  if (syncStorageOption) {
+    // Remove active class from all storage options first
+    storageOptions.forEach(opt => opt.classList.remove('active'));
+    // Mark sync as active
+    syncStorageOption.classList.add('active');
+    // Check the radio button
+    const syncRadio = syncStorageOption.querySelector('input[type="radio"]');
+    if (syncRadio) {
+      syncRadio.checked = true;
+    }
+  }
 
   // User Guide button
   const guideButton = document.getElementById('first-launch-guide-button');
@@ -421,22 +412,40 @@ async function initializeExtension(setupOption, enableProfiles, storageType) {
 
     // Save settings and profile to the selected storage
     if (storageType === 'sync') {
-      // Save to sync storage
+      // Save device-specific setting
+      await browser.storage.local.set({
+        deviceSettings: { useSyncStorage: true }
+      });
+
+      // Save synced settings to sync storage
+      const { useSyncStorage, ...syncedSettings } = defaultSettings;
       await browser.storage.sync.set({
-        userSettings: defaultSettings,
+        userSettings: syncedSettings,
         profiles: [defaultProfile]
       });
-      // Also cache userSettings in local storage for quick access
+
+      // Cache full settings in local for quick access
       await browser.storage.local.set({
         userSettings: defaultSettings
       });
 
-      // Save tabs to profile-specific storage (sync)
+      // Save tabs to profile-specific sync storage
       await SFTabs.storageChunking.saveChunkedSync(`profile_${defaultProfile.id}_tabs`, tabsToSave);
     } else {
-      // Save everything to local storage only
+      // Save device-specific setting
       await browser.storage.local.set({
-        userSettings: defaultSettings,
+        deviceSettings: { useSyncStorage: false }
+      });
+
+      // Save synced settings to sync storage
+      const { useSyncStorage, ...syncedSettings } = defaultSettings;
+      await browser.storage.sync.set({
+        userSettings: syncedSettings
+      });
+
+      // Save tabs/profiles to local storage
+      await browser.storage.local.set({
+        userSettings: defaultSettings,  // Cache in local for fast access
         profiles: [defaultProfile],
         [`profile_${defaultProfile.id}_tabs`]: tabsToSave
       });
