@@ -847,20 +847,24 @@ function parseUrlToDetermineTabs(url) {
 
 	// Check if it's a full URL (has protocol or domain)
 	const isFullUrl = url.startsWith('http://') || url.startsWith('https://');
+	let pathToAnalyze = url;
 
 	if (isFullUrl) {
-		// Full URLs with explicit domains should be treated as custom URLs
-		// This preserves the domain information and prevents URL reconstruction issues
-		// when using window.location.origin with different Salesforce instances
-		result.isCustomUrl = true;
-		result.path = url;
-		return result;
+		// Extract path from full URL for pattern matching
+		try {
+			const urlObj = new URL(url);
+			pathToAnalyze = urlObj.pathname;
+		} catch (e) {
+			// If URL parsing fails, treat as custom URL
+			result.isCustomUrl = true;
+			result.path = url;
+			return result;
+		}
 	}
 
-	// At this point, we only have relative paths like /lightning/setup/Flows/home
-	// Parse Lightning URL patterns
+	// Parse Lightning URL patterns (applies to both full URLs and relative paths)
 	// Pattern: /lightning/setup/{SETUP_NAME}/... (capture just the setup name, /home is added back by buildFullUrl)
-	const setupMatch = url.match(/^\/lightning\/setup\/([^/]+)/);
+	const setupMatch = pathToAnalyze.match(/^\/lightning\/setup\/([^/]+)/);
 	if (setupMatch) {
 		result.isSetupObject = true;
 		result.path = setupMatch[1];
@@ -868,10 +872,17 @@ function parseUrlToDetermineTabs(url) {
 	}
 
 	// Pattern: /lightning/o/{SOBJECT_PATH} (capture everything after /o/, e.g., "Contact/list" or "Account")
-	const objectMatch = url.match(/^\/lightning\/o\/(.+)$/);
+	const objectMatch = pathToAnalyze.match(/^\/lightning\/o\/(.+)$/);
 	if (objectMatch) {
 		result.isObject = true;
 		result.path = objectMatch[1];
+		return result;
+	}
+
+	// If it was a full URL but doesn't match any Lightning patterns, treat as custom
+	if (isFullUrl) {
+		result.isCustomUrl = true;
+		result.path = url; // Keep the full URL for custom paths
 		return result;
 	}
 
