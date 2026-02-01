@@ -46,10 +46,10 @@ If you prefer to work directly with files:
 
 ### Supported Languages
 
-- **Spanish** (es) - 0 of 269 strings translated
-- **French** (fr) - 0 of 269 strings translated
-- **German** (de) - 0 of 269 strings translated
-- **Japanese** (ja) - 0 of 269 strings translated
+- **Spanish** (es) - 0 of 96 strings translated
+- **French** (fr) - 0 of 96 strings translated
+- **German** (de) - 0 of 96 strings translated
+- **Japanese** (ja) - 0 of 96 strings translated
 
 ### Request a Language
 
