@@ -130,8 +130,8 @@ The settings page has been reorganized into clear sections:
 - **Profiles** - Profile feature toggle and auto-switching
 - **Keyboard Shortcuts** - Quick access to shortcut configuration
 
-### Import WhySalesforce
-The popular extension WhySalesforce has recently added the ability to export data in a JSON format. You can now import that data into SF Tabs via the IMport options in Setup.
+### Import Why Salesforce
+The popular extension Why Salesforce has recently added the ability to export data in a JSON format. You can now import that data into SF Tabs via the IMport options in Setup.
 
 ---
 
