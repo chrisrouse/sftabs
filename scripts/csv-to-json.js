@@ -86,6 +86,12 @@ async function convertCSVtoJSON() {
 
       // Only add if we have a key and English text
       if (key && en) {
+        // Mark as non-translatable if it's metadata or just the brand name
+        const translatable = !(
+          section === 'Extension Metadata' ||
+          (en === 'SF Tabs' && (key === 'popupTitle' || key === 'extensionName'))
+        );
+
         strings.push({
           key,
           section,
@@ -95,6 +101,7 @@ async function convertCSVtoJSON() {
           fr,
           de,
           ja,
+          translatable,
         });
       }
     }

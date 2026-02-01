@@ -411,7 +411,9 @@ permalink: /translate
 
     organizeBySection() {
       this.state.sections = {};
-      this.state.allStrings.forEach((string) => {
+      // Filter out non-translatable strings
+      const translatableStrings = this.state.allStrings.filter((s) => s.translatable !== false);
+      translatableStrings.forEach((string) => {
         if (!this.state.sections[string.section]) {
           this.state.sections[string.section] = [];
         }
@@ -421,10 +423,12 @@ permalink: /translate
 
     renderLanguageSelector() {
       const selector = document.getElementById('language-selector');
+      const translatableStrings = this.state.allStrings.filter((s) => s.translatable !== false);
+      const total = translatableStrings.length;
+
       selector.innerHTML = Object.entries(this.languages)
         .map(([code, name]) => {
-          const untranslated = this.state.allStrings.filter((s) => !s[code]).length;
-          const total = this.state.allStrings.length;
+          const untranslated = translatableStrings.filter((s) => !s[code]).length;
           const translated = total - untranslated;
 
           return `
@@ -437,7 +441,7 @@ permalink: /translate
         })
         .join('');
 
-      document.getElementById('total-count').textContent = this.state.allStrings.length;
+      document.getElementById('total-count').textContent = total;
     },
 
     selectLanguage(lang) {

@@ -20,7 +20,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": false
     },
     {
       "key": "extensionDescription",
@@ -30,7 +31,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": false
     },
     {
       "key": "popupTitle",
@@ -40,7 +42,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": false
     },
     {
       "key": "tabsHeader",
@@ -50,7 +53,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "addNewTab",
@@ -60,7 +64,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "tabName",
@@ -70,7 +75,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "tabPath",
@@ -80,7 +86,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "saveTab",
@@ -90,7 +97,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "editTab",
@@ -100,7 +108,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "deleteTab",
@@ -110,7 +119,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "moveTabUp",
@@ -120,7 +130,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "moveTabDown",
@@ -130,7 +141,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsHeader",
@@ -140,7 +152,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "openFullSettingsButton",
@@ -150,7 +163,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "openFullSettingsHelp",
@@ -160,7 +174,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeMode",
@@ -170,7 +185,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeLight",
@@ -180,7 +196,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeDark",
@@ -190,7 +207,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeSystem",
@@ -200,7 +218,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "compactMode",
@@ -210,7 +229,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "compactModeDescription",
@@ -220,7 +240,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "skipDeleteConfirmation",
@@ -230,7 +251,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "skipDeleteConfirmationDescription",
@@ -240,7 +262,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "manageConfig",
@@ -250,7 +273,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetToDefaults",
@@ -260,7 +284,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsPageTitle",
@@ -270,7 +295,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsSubtitle",
@@ -280,7 +306,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "versionInfo",
@@ -290,7 +317,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "changelog",
@@ -300,7 +328,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "appearanceSection",
@@ -310,7 +339,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "appearanceDescription",
@@ -320,7 +350,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "behaviorSection",
@@ -330,7 +361,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "behaviorDescription",
@@ -340,7 +372,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncStorageSection",
@@ -350,7 +383,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncStorageDescription",
@@ -360,7 +394,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "useSyncStorage",
@@ -370,7 +405,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "useSyncStorageDescription",
@@ -380,7 +416,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profilesSection",
@@ -390,7 +427,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profilesDescription",
@@ -400,7 +438,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "enableProfiles",
@@ -410,7 +449,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "enableProfilesDescription",
@@ -420,7 +460,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "autoSwitchProfiles",
@@ -430,7 +471,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "autoSwitchProfilesDescription",
@@ -440,7 +482,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "keyboardShortcutsSection",
@@ -450,7 +493,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "keyboardShortcutsDescription",
@@ -460,7 +504,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "configureKeyboardShortcuts",
@@ -470,7 +515,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "keyboardShortcutsHelp",
@@ -480,7 +526,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importExportSection",
@@ -490,7 +537,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importExportDescription",
@@ -500,7 +548,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportButton",
@@ -510,7 +559,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportActionTitle",
@@ -520,7 +570,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportActionDescription",
@@ -530,7 +581,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importButton",
@@ -540,7 +592,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importActionTitle",
@@ -550,7 +603,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importActionDescription",
@@ -560,7 +614,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "dangerZoneSection",
@@ -570,7 +625,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "dangerZoneDescription",
@@ -580,7 +636,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetButton",
@@ -590,7 +647,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetButtonDescription",
@@ -600,7 +658,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportModalTitle",
@@ -610,7 +669,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportModalPrompt",
@@ -620,7 +680,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportEverything",
@@ -630,7 +691,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportEverythingDescription",
@@ -640,7 +702,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportSettingsOnly",
@@ -650,7 +713,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "cancelButton",
@@ -660,7 +724,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportConfirmButton",
@@ -670,7 +735,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importModalTitle",
@@ -680,7 +746,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importModalPrompt",
@@ -690,7 +757,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importOverwriteProfile",
@@ -700,7 +768,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importCreateProfile",
@@ -710,7 +779,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "selectProfile",
@@ -720,7 +790,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "selectProfilePlaceholder",
@@ -730,7 +801,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "newProfileName",
@@ -740,7 +812,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "newProfileNamePlaceholder",
@@ -750,7 +823,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importConfirmButton",
@@ -760,7 +834,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalTitle",
@@ -770,7 +845,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalPrompt",
@@ -780,7 +856,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalItem1",
@@ -790,7 +867,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalItem2",
@@ -800,7 +878,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalItem3",
@@ -810,7 +889,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalWarning",
@@ -820,7 +900,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "confirmButton",
@@ -830,7 +911,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsSaved",
@@ -840,7 +922,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsReset",
@@ -850,7 +933,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "configExported",
@@ -860,7 +944,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "configImported",
@@ -870,7 +955,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "tabsImportedToProfile",
@@ -880,7 +966,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profileCreated",
@@ -890,7 +977,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncEnabled",
@@ -900,7 +988,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncDisabled",
@@ -910,7 +999,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorSavingSettings",
@@ -920,7 +1010,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorExport",
@@ -930,7 +1021,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorImport",
@@ -940,7 +1032,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorReset",
@@ -950,7 +1043,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorInvalidConfig",
@@ -960,7 +1054,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "selectProfileError",
@@ -970,7 +1065,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profileNameError",
@@ -980,7 +1076,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "couldNotOpenShortcuts",
@@ -990,7 +1087,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "couldNotDetectBrowser",
@@ -1000,7 +1098,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab1",
@@ -1010,7 +1109,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab2",
@@ -1020,7 +1120,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab3",
@@ -1030,7 +1131,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab4",
@@ -1040,7 +1142,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab5",
@@ -1050,7 +1153,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab6",
@@ -1060,7 +1164,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab7",
@@ -1070,7 +1175,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab8",
@@ -1080,7 +1186,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab9",
@@ -1090,7 +1197,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "commandTab10",
@@ -1100,7 +1208,8 @@
       "es": "",
       "fr": "",
       "de": "",
-      "ja": ""
+      "ja": "",
+      "translatable": true
     }
   ]
 }
