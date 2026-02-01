@@ -25,8 +25,8 @@ The easiest way to contribute translations:
 2. Select the language you want to translate to (Spanish, French, German, or Japanese)
 3. Fill in the translation fields for each string
 4. Submit your translations in two ways:
-   - **GitHub Users**: Sign in with GitHub to automatically create a pull request
-   - **No GitHub Account?**: Submit via GitHub Issue - we'll review and merge your translations
+   - **Create a Pull Request**: Get step-by-step instructions to fork, edit, and submit via GitHub
+   - **Submit via Issue**: No GitHub account needed - we'll review and merge your translations
 
 #### Option 2: Direct GitHub Contribution
 If you prefer to work directly with files:
@@ -46,10 +46,10 @@ If you prefer to work directly with files:
 
 ### Supported Languages
 
-- **Spanish** (es) - 0 of 109 strings translated
-- **French** (fr) - 0 of 109 strings translated
-- **German** (de) - 0 of 109 strings translated
-- **Japanese** (ja) - 0 of 109 strings translated
+- **Spanish** (es) - 0 of 269 strings translated
+- **French** (fr) - 0 of 269 strings translated
+- **German** (de) - 0 of 269 strings translated
+- **Japanese** (ja) - 0 of 269 strings translated
 
 ### Request a Language
 
