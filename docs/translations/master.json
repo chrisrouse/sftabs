@@ -1345,6 +1345,573 @@
       "context": "When browser detection fails",
       "en": "Could not detect browser type",
       "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsNavigation",
+      "section": "Settings - Navigation",
+      "context": "Sidebar header",
+      "en": "Navigation",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsNavGeneral",
+      "section": "Settings - Navigation",
+      "context": "Navigation item",
+      "en": "General",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsNavButton",
+      "section": "Settings - Navigation",
+      "context": "Navigation item for floating button settings",
+      "en": "Button",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsNavProfiles",
+      "section": "Settings - Navigation",
+      "context": "Navigation item",
+      "en": "Profiles",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsNavShortcuts",
+      "section": "Settings - Navigation",
+      "context": "Navigation item",
+      "en": "Shortcuts",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsNavData",
+      "section": "Settings - Navigation",
+      "context": "Navigation item",
+      "en": "Data",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsNavImportExport",
+      "section": "Settings - Navigation",
+      "context": "Navigation item",
+      "en": "Import & Export",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsUserGuide",
+      "section": "Settings Page - Header",
+      "context": "Link text in header",
+      "en": "User Guide",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsSponsor",
+      "section": "Settings Page - Header",
+      "context": "Sponsor link",
+      "en": "Sponsor on Github",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsBuyMeCoffee",
+      "section": "Settings Page - Header",
+      "context": "Sponsor link",
+      "en": "Buy Me a Coffee",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsGeneralSection",
+      "section": "Settings - General",
+      "context": "Main section heading",
+      "en": "General",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "settingsGeneralDescription",
+      "section": "Settings - General",
+      "context": "Section description",
+      "en": "Customize the look, feel, and behavior of SF Tabs",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "displayDensityCard",
+      "section": "Settings - General",
+      "context": "Card heading",
+      "en": "Display Density",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "compactModeCheckbox",
+      "section": "Settings - General",
+      "context": "Checkbox label",
+      "en": "Compact Mode",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "compactModeCheckboxDesc",
+      "section": "Settings - General",
+      "context": "Help text",
+      "en": "Condenses tabs by hiding URLs to show more tabs at once",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "deleteConfirmationCard",
+      "section": "Settings - General",
+      "context": "Card heading",
+      "en": "Delete Confirmation",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "skipDeletePrompt",
+      "section": "Settings - General",
+      "context": "Checkbox label",
+      "en": "Don't prompt when deleting",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "skipDeletePromptDesc",
+      "section": "Settings - General",
+      "context": "Help text",
+      "en": "Skip confirmation dialogs when removing tabs",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonSection",
+      "section": "Settings - Floating Button",
+      "context": "Main section heading",
+      "en": "Floating Button",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonDescription",
+      "section": "Settings - Floating Button",
+      "context": "Section description",
+      "en": "Access SF Tabs from anywhere in Salesforce with a floating button",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "enableFloatingButton",
+      "section": "Settings - Floating Button",
+      "context": "Checkbox label",
+      "en": "Enable floating button",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "enableFloatingButtonHelp",
+      "section": "Settings - Floating Button",
+      "context": "Help text",
+      "en": "Show a floating button on Salesforce pages for quick tab access",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonLocation",
+      "section": "Settings - Floating Button",
+      "context": "Subsection heading",
+      "en": "Location",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonEverywhereLabel",
+      "section": "Settings - Floating Button",
+      "context": "Radio option",
+      "en": "Everywhere",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonEverywhereDesc",
+      "section": "Settings - Floating Button",
+      "context": "Option description",
+      "en": "Show floating button on all Salesforce pages",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonSetupOnly",
+      "section": "Settings - Floating Button",
+      "context": "Radio option",
+      "en": "Only in Setup",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonSetupOnlyDesc",
+      "section": "Settings - Floating Button",
+      "context": "Option description",
+      "en": "Show floating button only on Setup pages",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonOutsideSetup",
+      "section": "Settings - Floating Button",
+      "context": "Radio option",
+      "en": "Outside Setup",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonOutsideSetupDesc",
+      "section": "Settings - Floating Button",
+      "context": "Option description",
+      "en": "Show floating button everywhere except Setup pages",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "floatingButtonPosition",
+      "section": "Settings - Floating Button",
+      "context": "Subsection heading",
+      "en": "Position",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "verticalPositionLabel",
+      "section": "Settings - Floating Button",
+      "context": "Input label",
+      "en": "Vertical Position (%)",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "verticalPositionHelp",
+      "section": "Settings - Floating Button",
+      "context": "Help text",
+      "en": "Vertical position along the right edge (0% = top, 100% = bottom)",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "dataStorageSection",
+      "section": "Settings - Data",
+      "context": "Main section heading",
+      "en": "Data",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "dataStorageDescription",
+      "section": "Settings - Data",
+      "context": "Section description",
+      "en": "Manage how your tabs are stored and reset your configuration",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "dataStorageCard",
+      "section": "Settings - Data",
+      "context": "Card heading",
+      "en": "Data Storage",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "dataStorageExplanation",
+      "section": "Settings - Data",
+      "context": "Detailed explanation",
+      "en": "Choose where your tabs are stored. You can switch between storage types at any time. Tabs and Profiles can be stored in Local Storage to prevent syncing between devices. Other settings will sync between devices if enabled in the browser. Your Data Storage option is always stored locally.",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "localStorageRadio",
+      "section": "Settings - Data",
+      "context": "Radio option",
+      "en": "Local Storage",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "localStorageDesc",
+      "section": "Settings - Data",
+      "context": "Option description",
+      "en": "Stored on this device only (default, privacy-first)",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "syncStorageRadio",
+      "section": "Settings - Data",
+      "context": "Radio option",
+      "en": "Sync Storage",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "syncStorageDesc",
+      "section": "Settings - Data",
+      "context": "Option description",
+      "en": "Your tabs can sync across all your devices",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "resetCard",
+      "section": "Settings - Data",
+      "context": "Card heading (danger zone)",
+      "en": "Reset",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "resetCardDescription",
+      "section": "Settings - Data",
+      "context": "Explanation",
+      "en": "Reset all tabs and settings to their default values.",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "resetCardTip",
+      "section": "Settings - Data",
+      "context": "Tip text",
+      "en": "We recommend exporting your configuration before resetting so you can restore it later if needed.",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "resetButtonText",
+      "section": "Settings - Data",
+      "context": "Button text",
+      "en": "Reset to Defaults",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "resetButtonWarning",
+      "section": "Settings - Data",
+      "context": "Warning text",
+      "en": "This will remove all custom tabs, reset all settings, and remove all profiles. This action cannot be undone.",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportConfigCard",
+      "section": "Settings - Import/Export",
+      "context": "Card heading",
+      "en": "Export Configuration",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "whatToExportQuestion",
+      "section": "Settings - Import/Export",
+      "context": "Question text",
+      "en": "What would you like to export?",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportEverythingRecommended",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Everything (Recommended)",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportEverythingDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Export all settings and all profiles",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportCustomSelection",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Custom Selection",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportCustomSelectionDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Choose specific settings and profiles",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportSettingsLabel",
+      "section": "Settings - Import/Export",
+      "context": "Checkbox group header",
+      "en": "Settings:",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportSettingsCheckbox",
+      "section": "Settings - Import/Export",
+      "context": "Checkbox label",
+      "en": "Preferences, theme, and options",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportProfilesLabel",
+      "section": "Settings - Import/Export",
+      "context": "Checkbox group header",
+      "en": "Profiles:",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "exportConfigButton",
+      "section": "Settings - Import/Export",
+      "context": "Button text",
+      "en": "Export Configuration",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importConfigCard",
+      "section": "Settings - Import/Export",
+      "context": "Card heading",
+      "en": "Import Configuration",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importConfigDescription",
+      "section": "Settings - Import/Export",
+      "context": "Description",
+      "en": "Restore your tabs and settings from a backup file.",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "chooseFileButton",
+      "section": "Settings - Import/Export",
+      "context": "Button text",
+      "en": "Choose File to Import",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "selectedFile",
+      "section": "Settings - Import/Export",
+      "context": "File display label",
+      "en": "Selected file",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "whatToImportQuestion",
+      "section": "Settings - Import/Export",
+      "context": "Question text",
+      "en": "What would you like to import?",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "profilesWillEnable",
+      "section": "Settings - Import/Export",
+      "context": "Warning header",
+      "en": "Profiles will be enabled",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "profilesWillEnableWarning",
+      "section": "Settings - Import/Export",
+      "context": "Warning text",
+      "en": "This file contains profiles. Importing will automatically enable the Profiles feature in your settings.",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importSettingsCheckbox",
+      "section": "Settings - Import/Export",
+      "context": "Checkbox label",
+      "en": "Settings",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "addToExistingTabs",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Add to existing tabs",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "addToExistingTabsDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Keep current tabs and add imported tabs",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "replaceAllTabs",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Replace all tabs",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "replaceAllTabsDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Remove current tabs and use only imported tabs",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importProfileQuestion",
+      "section": "Settings - Import/Export",
+      "context": "Question text",
+      "en": "How would you like to import this profile?",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importAsProfileOption",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Import as profile and enable Profiles",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importAsProfileDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Create a new profile and enable the Profiles feature",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "addTabsToExistingProfile",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Add tabs to existing profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "addTabsToExistingProfileDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Keep current tabs and add tabs from this profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "replaceProfileTabs",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Replace tabs in profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "replaceProfileTabsDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Remove current tabs and use tabs from this profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importDestinationLabel",
+      "section": "Settings - Import/Export",
+      "context": "Section label",
+      "en": "Import to:",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "addToExistingProfileOption",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Add to existing profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "overwriteProfileOption",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Overwrite existing profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "overwriteProfileDesc",
+      "section": "Settings - Import/Export",
+      "context": "Option description",
+      "en": "Replace all tabs in the profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "createNewProfileOption",
+      "section": "Settings - Import/Export",
+      "context": "Radio option",
+      "en": "Create new profile",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "enterProfileNamePlaceholder",
+      "section": "Settings - Import/Export",
+      "context": "Input placeholder",
+      "en": "Enter profile name",
+      "es": "", "fr": "", "de": "", "ja": ""
+    },
+    {
+      "key": "importConfigurationButton",
+      "section": "Settings - Import/Export",
+      "context": "Final import button",
+      "en": "Import Configuration",
+      "es": "", "fr": "", "de": "", "ja": ""
     }
   ]
 }
