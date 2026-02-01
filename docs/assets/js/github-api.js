@@ -147,35 +147,31 @@ class GitHubAPI {
 
   /**
    * Create a GitHub issue for anonymous translation submission
+   * Uses pre-filled GitHub issue URL instead of API (no auth required)
    */
   async createIssue(language, translations, contributorInfo = {}) {
     try {
-      const response = await fetch(`${this.baseUrl}/repos/${this.repoOwner}/${this.repoName}/issues`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: `Translation Contribution: ${language.toUpperCase()} (${Object.keys(translations).length} strings)`,
-          body: this.generateIssueDescription(language, translations, contributorInfo),
-          labels: ['translation', 'contribution'],
-        }),
-      });
+      const title = `Translation Contribution: ${language.toUpperCase()} (${Object.keys(translations).length} strings)`;
+      const body = this.generateIssueDescription(language, translations, contributorInfo);
+      const labels = 'translation,contribution';
 
-      if (!response.ok) {
-        throw new Error('Failed to create issue');
-      }
+      // Build GitHub issue creation URL with pre-filled data
+      const issueUrl = new URL(`https://github.com/${this.repoOwner}/${this.repoName}/issues/new`);
+      issueUrl.searchParams.set('title', title);
+      issueUrl.searchParams.set('body', body);
+      issueUrl.searchParams.set('labels', labels);
 
-      const issue = await response.json();
+      // Open in new tab
+      window.open(issueUrl.toString(), '_blank');
 
       return {
         success: true,
-        issueUrl: issue.html_url,
-        issueNumber: issue.number,
+        issueUrl: issueUrl.toString(),
+        issueNumber: null,
+        manual: true,
       };
     } catch (error) {
-      throw new Error(`Failed to create issue: ${error.message}`);
+      throw new Error(`Failed to prepare issue: ${error.message}`);
     }
   }
 

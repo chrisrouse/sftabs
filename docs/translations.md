@@ -14,22 +14,13 @@ Currently, SF Tabs supports the following languages:
 
 ## Contributing Translations
 
-We welcome contributions to help translate SF Tabs into additional languages! We've made it easy for anyone to contribute, whether you're a GitHub user or not.
+We welcome contributions to help translate SF Tabs into additional languages!
 
-### Two Ways to Contribute
+> **Note:** We're currently working on a translation contribution workflow. In the meantime, if you'd like to contribute translations, please reach out via [GitHub Issues](https://github.com/chrisrouse/sftabs/issues) or [GitHub Discussions](https://github.com/chrisrouse/sftabs/discussions).
 
-#### Option 1: Use the Translation App (Recommended)
-The easiest way to contribute translations:
+### Direct GitHub Contribution
 
-1. Visit the **[Contribute](/sftabs/translate)** page
-2. Select the language you want to translate to (Spanish, French, German, or Japanese)
-3. Fill in the translation fields for each string
-4. Submit your translations in two ways:
-   - **Create a Pull Request**: Get step-by-step instructions to fork, edit, and submit via GitHub
-   - **Submit via Issue**: No GitHub account needed - we'll review and merge your translations
-
-#### Option 2: Direct GitHub Contribution
-If you prefer to work directly with files:
+If you'd like to contribute translations directly:
 
 1. Fork the repository on [GitHub](https://github.com/chrisrouse/sftabs)
 2. Create a new branch for your language: `translations/{language-code}`

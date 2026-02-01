@@ -2,8 +2,14 @@
   "metadata": {
     "version": "2.0.0",
     "lastUpdated": "2026-02-01",
-    "languages": ["en", "es", "fr", "de", "ja"],
-    "totalStrings": 96
+    "languages": [
+      "en",
+      "es",
+      "fr",
+      "de",
+      "ja"
+    ],
+    "totalStrings": 109
   },
   "strings": [
     {
@@ -11,7 +17,10 @@
       "section": "Extension Metadata",
       "context": "Extension name shown in browser",
       "en": "SF Tabs",
-      "es": "", "fr": "", "de": "", "ja": "",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
       "translatable": false
     },
     {
@@ -19,7 +28,10 @@
       "section": "Extension Metadata",
       "context": "Extension description in store",
       "en": "Add custom tabs to the Salesforce setup menu.",
-      "es": "", "fr": "", "de": "", "ja": "",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
       "translatable": false
     },
     {
@@ -27,7 +39,10 @@
       "section": "Popup - Header",
       "context": "Main popup title",
       "en": "SF Tabs",
-      "es": "", "fr": "", "de": "", "ja": "",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
       "translatable": false
     },
     {
@@ -35,1883 +50,1166 @@
       "section": "Popup - Tabs",
       "context": "Section header",
       "en": "Tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "addNewTab",
       "section": "Popup - Tabs",
       "context": "Button to add new tab",
       "en": "Add New Tab",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "tabName",
       "section": "Popup - Tabs",
       "context": "Input label for tab name",
       "en": "Tab Name",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "tabPath",
       "section": "Popup - Tabs",
       "context": "Input label for tab path",
       "en": "Tab Path",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "saveTab",
       "section": "Popup - Tabs",
       "context": "Save tab button",
       "en": "Save",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "editTab",
       "section": "Popup - Tabs",
       "context": "Edit tab button",
       "en": "Edit Tab",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "deleteTab",
       "section": "Popup - Tabs",
       "context": "Delete tab button",
       "en": "Delete Tab",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "moveTabUp",
       "section": "Popup - Tabs",
       "context": "Move tab up button",
       "en": "Move Up",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "moveTabDown",
       "section": "Popup - Tabs",
       "context": "Move tab down button",
       "en": "Move Down",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsHeader",
       "section": "Popup - Settings",
       "context": "Section header",
       "en": "Settings",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "openFullSettingsButton",
       "section": "Popup - Settings",
       "context": "Button text",
       "en": "Open Full Settings Page",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "openFullSettingsHelp",
       "section": "Popup - Settings",
       "context": "Help text below button",
       "en": "Try the new standalone settings page with a better layout and all configuration options in one place",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeMode",
       "section": "Popup - Settings",
       "context": "Theme setting label",
       "en": "Theme Mode",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeLight",
       "section": "Popup - Settings",
       "context": "Light theme option",
       "en": "Light",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeDark",
       "section": "Popup - Settings",
       "context": "Dark theme option",
       "en": "Dark",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "themeSystem",
       "section": "Popup - Settings",
       "context": "System theme option",
       "en": "System",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "compactMode",
       "section": "Popup - Settings",
       "context": "Compact mode checkbox label",
       "en": "Compact Mode",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "compactModeDescription",
       "section": "Popup - Settings",
       "context": "Help text",
       "en": "Display tabs in a more condensed layout",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "skipDeleteConfirmation",
       "section": "Popup - Settings",
       "context": "Checkbox label",
       "en": "Skip Delete Confirmation",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "skipDeleteConfirmationDescription",
       "section": "Popup - Settings",
       "context": "Help text",
       "en": "Don't ask for confirmation when deleting tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "manageConfig",
       "section": "Popup - Settings",
       "context": "Button text",
       "en": "Manage Configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetToDefaults",
       "section": "Popup - Settings",
       "context": "Button text",
       "en": "Reset to Defaults",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "emptyStateMessage",
-      "section": "Popup - Empty State",
-      "context": "Message when popup has no tabs",
-      "en": "No custom tabs yet. Add your first tab below.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addTabForCurrentPage",
-      "section": "Popup - Header",
-      "context": "Tooltip for quick-add button",
-      "en": "Add tab for current page",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addNewTabTooltip",
-      "section": "Popup - Header",
-      "context": "Tooltip for add-tab button",
-      "en": "Add new tab",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "profilesButtonTooltip",
-      "section": "Popup - Header",
-      "context": "Tooltip for profiles button",
-      "en": "Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsButtonTooltip",
-      "section": "Popup - Header",
-      "context": "Tooltip for settings button",
-      "en": "Settings",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "initializeProfile",
-      "section": "Popup - Profile Init",
-      "context": "Profile initialization header",
-      "en": "Initialize Profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "chooseProfileSetup",
-      "section": "Popup - Profile Init",
-      "context": "Profile initialization description",
-      "en": "Choose how to set up this profile:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "startWithDefaultTabs",
-      "section": "Popup - Profile Init",
-      "context": "Profile init option title",
-      "en": "Start with default tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "startWithDefaultTabsDesc",
-      "section": "Popup - Profile Init",
-      "context": "Profile init option description",
-      "en": "Start with the standard set of tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "startWithNoTabs",
-      "section": "Popup - Profile Init",
-      "context": "Profile init option title",
-      "en": "Start with no tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "startWithNoTabsDesc",
-      "section": "Popup - Profile Init",
-      "context": "Profile init option description",
-      "en": "Begin with an empty profile and add tabs manually",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "cloneAnotherProfile",
-      "section": "Popup - Profile Init",
-      "context": "Profile init option title",
-      "en": "Clone another profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "cloneAnotherProfileDesc",
-      "section": "Popup - Profile Init",
-      "context": "Profile init option description",
-      "en": "Copy tabs from an existing profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "selectProfileToClone",
-      "section": "Popup - Profile Init",
-      "context": "Profile clone label",
-      "en": "Select profile to clone:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "chooseProfilePlaceholder",
-      "section": "Popup - Profile Init",
-      "context": "Select placeholder",
-      "en": "Choose a profile...",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "cloneProfileButton",
-      "section": "Popup - Profile Init",
-      "context": "Clone confirm button",
-      "en": "Clone Profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "cancelButton",
-      "section": "Common",
-      "context": "Cancel button text",
-      "en": "Cancel",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "objectManagerDropdown",
-      "section": "Popup - Dropdown Features",
-      "context": "Section label",
-      "en": "Object Manager Dropdown",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "setupAsObjectDropdown",
-      "section": "Popup - Dropdown Features",
-      "context": "Button text",
-      "en": "Setup as Object Dropdown",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "objectDropdownHelp",
-      "section": "Popup - Dropdown Features",
-      "context": "Help text",
-      "en": "Create a dropdown menu with navigation items from the current Object Manager page",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "dropdownItemsCount",
-      "section": "Popup - Dropdown Features",
-      "context": "Count label with dynamic number",
-      "en": "Dropdown Items (",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "dropdownItemsCountSuffix",
-      "section": "Popup - Dropdown Features",
-      "context": "Count label suffix",
-      "en": "):",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "refreshList",
-      "section": "Popup - Dropdown Features",
-      "context": "Refresh button text",
-      "en": "Refresh List",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "createDropdownMenu",
-      "section": "Popup - Dropdown Features",
-      "context": "Form section label",
-      "en": "Create Dropdown Menu",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "dropdownMenuHelp",
-      "section": "Popup - Dropdown Features",
-      "context": "Instructions text",
-      "en": "To create a dropdown menu: Drag another tab from the list and drop it onto this tab. The dragged tab will become a dropdown item under this tab.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "tabNamePlaceholder",
-      "section": "Popup - Form",
-      "context": "Tab name placeholder",
-      "en": "e.g., User Management",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "tabNameCharLimit",
-      "section": "Popup - Form",
-      "context": "Character counter",
-      "en": "/30 characters",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "pageUrlLabel",
-      "section": "Popup - Form",
-      "context": "Tab path label variant",
-      "en": "Page URL (Optional)",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "pageUrlPlaceholder",
-      "section": "Popup - Form",
-      "context": "Tab path placeholder",
-      "en": "e.g., ManageUsers",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "pageUrlHelp",
-      "section": "Popup - Form",
-      "context": "Instructions for tab path",
-      "en": "Just add the page name from the URL. Leave blank to create a folder-style tab that acts as a menu container.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "objectCheckbox",
-      "section": "Popup - Form",
-      "context": "Checkbox label",
-      "en": "Object",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "objectCheckboxHelp",
-      "section": "Popup - Form",
-      "context": "Help text",
-      "en": "Check this if the page is an object page instead of a setup page",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "customUrlCheckbox",
-      "section": "Popup - Form",
-      "context": "Checkbox label",
-      "en": "Custom URL",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "customUrlCheckboxHelp",
-      "section": "Popup - Form",
-      "context": "Help text",
-      "en": "Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "activeProfile",
-      "section": "Popup - Profile Management",
-      "context": "Form label",
-      "en": "Active Profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "switchProfile",
-      "section": "Popup - Profile Management",
-      "context": "Help text",
-      "en": "Switch to a different profile to view and manage its tabs.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "createNewProfile",
-      "section": "Popup - Profile Management",
-      "context": "Button text",
-      "en": "Create New Profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "profilesCount",
-      "section": "Popup - Profile Management",
-      "context": "Dynamic count label",
-      "en": "Profiles (",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "profileCountSuffix",
-      "section": "Popup - Profile Management",
-      "context": "Count label suffix",
-      "en": "):",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "profileNameInput",
-      "section": "Popup - Profile Management",
-      "context": "Form label",
-      "en": "Profile Name",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "urlPatterns",
-      "section": "Popup - Profile Management",
-      "context": "Section label",
-      "en": "URL Patterns",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "urlPatternsHelp",
-      "section": "Popup - Profile Management",
-      "context": "Help text",
-      "en": "Add MyDomain patterns to automatically switch to this profile when visiting matching Salesforce orgs.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "urlPatternPlaceholder",
-      "section": "Popup - Profile Management",
-      "context": "Placeholder text",
-      "en": "e.g., smartbottechnology-dev-ed",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addButton",
-      "section": "Common",
-      "context": "Add button text",
-      "en": "Add",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "captureCurrentDomain",
-      "section": "Popup - Profile Management",
-      "context": "Button text",
-      "en": "Capture Current Domain",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "saveProfileButton",
-      "section": "Popup - Profile Management",
-      "context": "Button text",
-      "en": "Save Profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "resetToDefaultTabs",
-      "section": "Popup - Modal",
-      "context": "Modal title",
-      "en": "Reset to Default Tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "resetTabsConfirm",
-      "section": "Popup - Modal",
-      "context": "Modal body",
-      "en": "Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "removeTabModal",
-      "section": "Popup - Modal",
-      "context": "Modal title",
-      "en": "Remove Tab",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "removeTabConfirm",
-      "section": "Popup - Modal",
-      "context": "Confirmation message",
-      "en": "Are you sure you want to remove this tab?",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "removeButton",
-      "section": "Common",
-      "context": "Remove/Delete button text",
-      "en": "Remove",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "disableProfilesModal",
-      "section": "Popup - Modal",
-      "context": "Modal title",
-      "en": "Disable Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "disableProfilesExplain",
-      "section": "Popup - Modal",
-      "context": "Explanation",
-      "en": "Disabling profiles will keep one profile and remove all others.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "whichProfileKeep",
-      "section": "Popup - Modal",
-      "context": "Question",
-      "en": "Which profile would you like to keep?",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "selectProfileToKeep",
-      "section": "Popup - Modal",
-      "context": "Label",
-      "en": "Select profile to keep:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "disableProfilesButton",
-      "section": "Popup - Modal",
-      "context": "Confirmation button",
-      "en": "Disable Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchTitle",
-      "section": "Popup - First Launch",
-      "context": "Modal title",
-      "en": "Thanks for installing SF Tabs!",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStartDefault",
-      "section": "Popup - First Launch",
-      "context": "Setup option",
-      "en": "Start with default tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStartDefaultDesc",
-      "section": "Popup - First Launch",
-      "context": "Description",
-      "en": "Start with the standard set of tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStartEmpty",
-      "section": "Popup - First Launch",
-      "context": "Setup option",
-      "en": "Start with no tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStartEmptyDesc",
-      "section": "Popup - First Launch",
-      "context": "Description",
-      "en": "Begin with an empty profile and add tabs manually",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchImport",
-      "section": "Popup - First Launch",
-      "context": "Setup option",
-      "en": "Import existing configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchImportDesc",
-      "section": "Popup - First Launch",
-      "context": "Description",
-      "en": "Import an SF Tabs configuration file",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchEnableProfiles",
-      "section": "Popup - First Launch",
-      "context": "Checkbox label",
-      "en": "Enable Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchProfilesHelp",
-      "section": "Popup - First Launch",
-      "context": "Description",
-      "en": "Profiles let you manage different tab configurations",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStorageSync",
-      "section": "Popup - First Launch",
-      "context": "Option title",
-      "en": "Sync Storage",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStorageSyncDesc",
-      "section": "Popup - First Launch",
-      "context": "Description",
-      "en": "Tabs can sync between computers",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStorageLocal",
-      "section": "Popup - First Launch",
-      "context": "Option title",
-      "en": "Local Storage",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "firstLaunchStorageLocalDesc",
-      "section": "Popup - First Launch",
-      "context": "Description",
-      "en": "Tabs don't sync between computers",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "userGuideButton",
-      "section": "Common",
-      "context": "Button text",
-      "en": "User Guide",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "getStartedButton",
-      "section": "Common",
-      "context": "Button text",
-      "en": "Get Started",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationWelcome",
-      "section": "Popup - Migration",
-      "context": "Modal title",
-      "en": "Welcome to SF Tabs v2.0.0!",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "newInV2",
-      "section": "Popup - Migration",
-      "context": "Section title",
-      "en": "New in v2.0",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "newInV2Desc",
-      "section": "Popup - Migration",
-      "context": "Description",
-      "en": "Profiles, dropdown menus, and flexible storage options—all new features!",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "learnMoreLink",
-      "section": "Common",
-      "context": "Link text",
-      "en": "Learn More",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migratingData",
-      "section": "Popup - Migration",
-      "context": "Progress title",
-      "en": "Migrating your data...",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migratingDataDesc",
-      "section": "Popup - Migration",
-      "context": "Progress description",
-      "en": "This will only take a moment.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationStep1",
-      "section": "Popup - Migration",
-      "context": "Step description",
-      "en": "Reading existing data",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationStep2",
-      "section": "Popup - Migration",
-      "context": "Step description",
-      "en": "Creating Default profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationStep3",
-      "section": "Popup - Migration",
-      "context": "Step description",
-      "en": "Saving new format",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationSuccess",
-      "section": "Popup - Migration",
-      "context": "Success title",
-      "en": "Migration Complete!",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationSuccessDesc",
-      "section": "Popup - Migration",
-      "context": "Description",
-      "en": "Your tabs have been successfully migrated to the new profile system.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationNextSteps",
-      "section": "Popup - Migration",
-      "context": "Info box title",
-      "en": "What's next:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationInfo1",
-      "section": "Popup - Migration",
-      "context": "Info item",
-      "en": "All your tabs are now in the \"Default\" profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationInfo2",
-      "section": "Popup - Migration",
-      "context": "Conditional info",
-      "en": "Profiles feature is now enabled",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationInfo3",
-      "section": "Popup - Migration",
-      "context": "Info item",
-      "en": "Create additional profiles for different orgs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationFailed",
-      "section": "Popup - Migration",
-      "context": "Error title",
-      "en": "Migration Failed",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrationFailedDesc",
-      "section": "Popup - Migration",
-      "context": "Error explanation",
-      "en": "An error occurred during migration. Your original data is still intact.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "errorDetailsLabel",
-      "section": "Common",
-      "context": "Error header",
-      "en": "Error details:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportBackupButton",
-      "section": "Popup - Migration",
-      "context": "Button text",
-      "en": "Export Backup",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "migrateNowButton",
-      "section": "Popup - Migration",
-      "context": "Button text",
-      "en": "Migrate Now",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "retryMigrationButton",
-      "section": "Popup - Migration",
-      "context": "Button text",
-      "en": "Retry Migration",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "continueWithoutMigrating",
-      "section": "Popup - Migration",
-      "context": "Button text",
-      "en": "Continue Without Migrating",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsPageTitle",
       "section": "Settings Page - Header",
       "context": "Page title (H1)",
       "en": "SF Tabs Settings",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsSubtitle",
       "section": "Settings Page - Header",
       "context": "Subtitle below title",
       "en": "Customize your SF Tabs experience",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "versionInfo",
       "section": "Settings Page - Header",
-      "context": "Version number with placeholder",
+      "context": "Version number (with placeholder, $VERSION$ will be replaced)",
       "en": "SF Tabs v$VERSION$",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "changelog",
       "section": "Settings Page - Header",
       "context": "Link to changelog",
       "en": "Changelog",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "appearanceSection",
       "section": "Settings - Appearance",
-      "context": "Section heading",
+      "context": "Section heading with icon",
       "en": "Appearance",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "appearanceDescription",
       "section": "Settings - Appearance",
       "context": "Section description",
       "en": "Customize the look and feel of your extension",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "behaviorSection",
       "section": "Settings - Behavior",
       "context": "Section heading",
       "en": "Behavior",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "behaviorDescription",
       "section": "Settings - Behavior",
       "context": "Section description",
       "en": "Control how the extension behaves",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncStorageSection",
       "section": "Settings - Sync",
       "context": "Section heading",
       "en": "Sync & Storage",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncStorageDescription",
       "section": "Settings - Sync",
       "context": "Section description",
       "en": "Manage how your tabs are stored and synced",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "useSyncStorage",
       "section": "Settings - Sync",
       "context": "Checkbox label",
       "en": "Cross-Device Sync",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "useSyncStorageDescription",
       "section": "Settings - Sync",
       "context": "Help text",
       "en": "Sync your tabs across all devices using browser sync",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profilesSection",
       "section": "Settings - Profiles",
       "context": "Section heading",
       "en": "Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profilesDescription",
       "section": "Settings - Profiles",
       "context": "Section description",
       "en": "Organize tabs into different profiles for different Salesforce orgs",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "enableProfiles",
       "section": "Settings - Profiles",
       "context": "Checkbox label",
       "en": "Enable Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "enableProfilesDescription",
       "section": "Settings - Profiles",
       "context": "Help text",
       "en": "Create separate sets of tabs for different Salesforce orgs",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "autoSwitchProfiles",
       "section": "Settings - Profiles",
       "context": "Checkbox label",
       "en": "Auto-Switch Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "autoSwitchProfilesDescription",
       "section": "Settings - Profiles",
       "context": "Help text",
       "en": "Automatically switch to the appropriate profile based on the current Salesforce org's URL",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "keyboardShortcutsSection",
       "section": "Settings - Shortcuts",
       "context": "Section heading",
       "en": "Keyboard Shortcuts",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "keyboardShortcutsDescription",
       "section": "Settings - Shortcuts",
       "context": "Section description",
       "en": "Set up keyboard shortcuts to quickly access your tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "configureKeyboardShortcuts",
       "section": "Settings - Shortcuts",
       "context": "Button text",
       "en": "Configure Keyboard Shortcuts",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "keyboardShortcutsHelp",
       "section": "Settings - Shortcuts",
       "context": "Help text",
       "en": "Set keyboard shortcuts to quickly open tabs 1-10 by position",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importExportSection",
       "section": "Settings - Import/Export",
       "context": "Section heading",
       "en": "Import & Export",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importExportDescription",
       "section": "Settings - Import/Export",
       "context": "Section description",
       "en": "Backup and restore your configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportButton",
       "section": "Settings - Import/Export",
       "context": "Button text",
       "en": "Export",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportActionTitle",
       "section": "Settings - Import/Export",
       "context": "Action card title",
       "en": "Export",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportActionDescription",
       "section": "Settings - Import/Export",
       "context": "Action card description",
       "en": "Save to file",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importButton",
       "section": "Settings - Import/Export",
       "context": "Button text",
       "en": "Import",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importActionTitle",
       "section": "Settings - Import/Export",
       "context": "Action card title",
       "en": "Import",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importActionDescription",
       "section": "Settings - Import/Export",
       "context": "Action card description",
       "en": "Restore from backup",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "dangerZoneSection",
       "section": "Settings - Danger Zone",
-      "context": "Section heading",
+      "context": "Section heading (red)",
       "en": "Danger Zone",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "dangerZoneDescription",
       "section": "Settings - Danger Zone",
       "context": "Section description",
       "en": "Irreversible actions that will affect your data",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetButton",
       "section": "Settings - Danger Zone",
       "context": "Button text",
       "en": "Reset to Defaults",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetButtonDescription",
       "section": "Settings - Danger Zone",
       "context": "Help text",
       "en": "This will remove all custom tabs and reset all settings to their default values. This action cannot be undone.",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportModalTitle",
       "section": "Modal - Export",
       "context": "Modal title",
       "en": "Export Configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportModalPrompt",
       "section": "Modal - Export",
       "context": "Prompt text",
       "en": "Select what you want to export:",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportEverything",
       "section": "Modal - Export",
       "context": "Checkbox label",
       "en": "Everything",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportEverythingDescription",
       "section": "Modal - Export",
       "context": "Help text",
       "en": "Export all settings and profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportSettingsOnly",
       "section": "Modal - Export",
       "context": "Checkbox label",
       "en": "Settings",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
+    },
+    {
+      "key": "cancelButton",
+      "section": "Modal - Export",
+      "context": "Button text (all modals)",
+      "en": "Cancel",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "exportConfirmButton",
       "section": "Modal - Export",
       "context": "Confirm button text",
       "en": "Export",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importModalTitle",
       "section": "Modal - Import",
       "context": "Modal title",
       "en": "Import Configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importModalPrompt",
       "section": "Modal - Import",
       "context": "Prompt text",
       "en": "Where would you like to import this configuration?",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importOverwriteProfile",
       "section": "Modal - Import",
       "context": "Radio button label",
       "en": "Overwrite existing profile",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importCreateProfile",
       "section": "Modal - Import",
       "context": "Radio button label",
       "en": "Create new profile",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "selectProfile",
       "section": "Modal - Import",
       "context": "Dropdown label",
       "en": "Select profile:",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "selectProfilePlaceholder",
       "section": "Modal - Import",
       "context": "Dropdown placeholder",
       "en": "Choose a profile...",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "newProfileName",
       "section": "Modal - Import",
       "context": "Input label",
       "en": "Profile name:",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "newProfileNamePlaceholder",
       "section": "Modal - Import",
       "context": "Input placeholder",
       "en": "Enter profile name",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "importConfirmButton",
       "section": "Modal - Import",
       "context": "Confirm button text",
       "en": "Import",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalTitle",
       "section": "Modal - Reset",
       "context": "Modal title",
       "en": "Reset to Defaults",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalPrompt",
       "section": "Modal - Reset",
       "context": "Prompt text",
       "en": "Are you sure you want to reset to default tabs and settings? This will:",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalItem1",
       "section": "Modal - Reset",
       "context": "List item",
       "en": "Remove all custom tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalItem2",
       "section": "Modal - Reset",
       "context": "List item",
       "en": "Remove all profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalItem3",
       "section": "Modal - Reset",
       "context": "List item",
       "en": "Reset all settings to defaults",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "resetModalWarning",
       "section": "Modal - Reset",
-      "context": "Warning text",
+      "context": "Warning text (bold/red)",
       "en": "This action cannot be undone!",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "confirmButton",
-      "section": "Common",
+      "section": "Modal - Reset",
       "context": "Confirm button text",
       "en": "Confirm",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsSaved",
       "section": "Status - Success",
       "context": "After saving settings",
       "en": "Settings saved",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "settingsReset",
       "section": "Status - Success",
       "context": "After reset",
       "en": "All settings and tabs reset to defaults",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "configExported",
       "section": "Status - Success",
       "context": "After export",
       "en": "Configuration exported successfully",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "configImported",
       "section": "Status - Success",
       "context": "After import",
       "en": "Configuration imported successfully",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "tabsImportedToProfile",
       "section": "Status - Success",
       "context": "After profile-specific import",
       "en": "Tabs imported to selected profile",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profileCreated",
       "section": "Status - Success",
       "context": "After creating new profile",
       "en": "New profile created with imported tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncEnabled",
       "section": "Status - Success",
       "context": "After enabling sync",
       "en": "Sync enabled - tabs will now sync across devices",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "syncDisabled",
       "section": "Status - Success",
       "context": "After disabling sync",
       "en": "Sync disabled - tabs stored locally only",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorSavingSettings",
       "section": "Status - Error",
-      "context": "When settings save fails",
+      "context": "When settings save fails ($ERROR$ will be replaced with actual error)",
       "en": "Error saving settings: $ERROR$",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorExport",
       "section": "Status - Error",
       "context": "When export fails",
       "en": "Export failed: $ERROR$",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorImport",
       "section": "Status - Error",
       "context": "When import fails",
       "en": "Import failed: $ERROR$",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorReset",
       "section": "Status - Error",
       "context": "When reset fails",
       "en": "Reset failed: $ERROR$",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "errorInvalidConfig",
       "section": "Status - Error",
       "context": "When import file is invalid",
       "en": "Invalid configuration file - missing required fields",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "selectProfileError",
       "section": "Status - Error",
-      "context": "When no profile selected",
+      "context": "When no profile selected in import modal",
       "en": "Please select a profile",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "profileNameError",
       "section": "Status - Error",
       "context": "When profile name is empty",
       "en": "Please enter a profile name",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "couldNotOpenShortcuts",
       "section": "Status - Error",
       "context": "When keyboard shortcuts page fails to open",
       "en": "Could not open shortcuts page",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
     },
     {
       "key": "couldNotDetectBrowser",
       "section": "Status - Error",
       "context": "When browser detection fails",
       "en": "Could not detect browser type",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsNavigation",
-      "section": "Settings - Navigation",
-      "context": "Sidebar header",
-      "en": "Navigation",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsNavGeneral",
-      "section": "Settings - Navigation",
-      "context": "Navigation item",
-      "en": "General",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsNavButton",
-      "section": "Settings - Navigation",
-      "context": "Navigation item for floating button settings",
-      "en": "Button",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsNavProfiles",
-      "section": "Settings - Navigation",
-      "context": "Navigation item",
-      "en": "Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsNavShortcuts",
-      "section": "Settings - Navigation",
-      "context": "Navigation item",
-      "en": "Shortcuts",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsNavData",
-      "section": "Settings - Navigation",
-      "context": "Navigation item",
-      "en": "Data",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsNavImportExport",
-      "section": "Settings - Navigation",
-      "context": "Navigation item",
-      "en": "Import & Export",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsUserGuide",
-      "section": "Settings Page - Header",
-      "context": "Link text in header",
-      "en": "User Guide",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsSponsor",
-      "section": "Settings Page - Header",
-      "context": "Sponsor link",
-      "en": "Sponsor on Github",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsBuyMeCoffee",
-      "section": "Settings Page - Header",
-      "context": "Sponsor link",
-      "en": "Buy Me a Coffee",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsGeneralSection",
-      "section": "Settings - General",
-      "context": "Main section heading",
-      "en": "General",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "settingsGeneralDescription",
-      "section": "Settings - General",
-      "context": "Section description",
-      "en": "Customize the look, feel, and behavior of SF Tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "displayDensityCard",
-      "section": "Settings - General",
-      "context": "Card heading",
-      "en": "Display Density",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "compactModeCheckbox",
-      "section": "Settings - General",
-      "context": "Checkbox label",
-      "en": "Compact Mode",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "compactModeCheckboxDesc",
-      "section": "Settings - General",
-      "context": "Help text",
-      "en": "Condenses tabs by hiding URLs to show more tabs at once",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "deleteConfirmationCard",
-      "section": "Settings - General",
-      "context": "Card heading",
-      "en": "Delete Confirmation",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "skipDeletePrompt",
-      "section": "Settings - General",
-      "context": "Checkbox label",
-      "en": "Don't prompt when deleting",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "skipDeletePromptDesc",
-      "section": "Settings - General",
-      "context": "Help text",
-      "en": "Skip confirmation dialogs when removing tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonSection",
-      "section": "Settings - Floating Button",
-      "context": "Main section heading",
-      "en": "Floating Button",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonDescription",
-      "section": "Settings - Floating Button",
-      "context": "Section description",
-      "en": "Access SF Tabs from anywhere in Salesforce with a floating button",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "enableFloatingButton",
-      "section": "Settings - Floating Button",
-      "context": "Checkbox label",
-      "en": "Enable floating button",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "enableFloatingButtonHelp",
-      "section": "Settings - Floating Button",
-      "context": "Help text",
-      "en": "Show a floating button on Salesforce pages for quick tab access",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonLocation",
-      "section": "Settings - Floating Button",
-      "context": "Subsection heading",
-      "en": "Location",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonEverywhereLabel",
-      "section": "Settings - Floating Button",
-      "context": "Radio option",
-      "en": "Everywhere",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonEverywhereDesc",
-      "section": "Settings - Floating Button",
-      "context": "Option description",
-      "en": "Show floating button on all Salesforce pages",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonSetupOnly",
-      "section": "Settings - Floating Button",
-      "context": "Radio option",
-      "en": "Only in Setup",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonSetupOnlyDesc",
-      "section": "Settings - Floating Button",
-      "context": "Option description",
-      "en": "Show floating button only on Setup pages",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonOutsideSetup",
-      "section": "Settings - Floating Button",
-      "context": "Radio option",
-      "en": "Outside Setup",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonOutsideSetupDesc",
-      "section": "Settings - Floating Button",
-      "context": "Option description",
-      "en": "Show floating button everywhere except Setup pages",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "floatingButtonPosition",
-      "section": "Settings - Floating Button",
-      "context": "Subsection heading",
-      "en": "Position",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "verticalPositionLabel",
-      "section": "Settings - Floating Button",
-      "context": "Input label",
-      "en": "Vertical Position (%)",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "verticalPositionHelp",
-      "section": "Settings - Floating Button",
-      "context": "Help text",
-      "en": "Vertical position along the right edge (0% = top, 100% = bottom)",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "dataStorageSection",
-      "section": "Settings - Data",
-      "context": "Main section heading",
-      "en": "Data",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "dataStorageDescription",
-      "section": "Settings - Data",
-      "context": "Section description",
-      "en": "Manage how your tabs are stored and reset your configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "dataStorageCard",
-      "section": "Settings - Data",
-      "context": "Card heading",
-      "en": "Data Storage",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "dataStorageExplanation",
-      "section": "Settings - Data",
-      "context": "Detailed explanation",
-      "en": "Choose where your tabs are stored. You can switch between storage types at any time. Tabs and Profiles can be stored in Local Storage to prevent syncing between devices. Other settings will sync between devices if enabled in the browser. Your Data Storage option is always stored locally.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "localStorageRadio",
-      "section": "Settings - Data",
-      "context": "Radio option",
-      "en": "Local Storage",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "localStorageDesc",
-      "section": "Settings - Data",
-      "context": "Option description",
-      "en": "Stored on this device only (default, privacy-first)",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "syncStorageRadio",
-      "section": "Settings - Data",
-      "context": "Radio option",
-      "en": "Sync Storage",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "syncStorageDesc",
-      "section": "Settings - Data",
-      "context": "Option description",
-      "en": "Your tabs can sync across all your devices",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "resetCard",
-      "section": "Settings - Data",
-      "context": "Card heading (danger zone)",
-      "en": "Reset",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "resetCardDescription",
-      "section": "Settings - Data",
-      "context": "Explanation",
-      "en": "Reset all tabs and settings to their default values.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "resetCardTip",
-      "section": "Settings - Data",
-      "context": "Tip text",
-      "en": "We recommend exporting your configuration before resetting so you can restore it later if needed.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "resetButtonText",
-      "section": "Settings - Data",
-      "context": "Button text",
-      "en": "Reset to Defaults",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "resetButtonWarning",
-      "section": "Settings - Data",
-      "context": "Warning text",
-      "en": "This will remove all custom tabs, reset all settings, and remove all profiles. This action cannot be undone.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportConfigCard",
-      "section": "Settings - Import/Export",
-      "context": "Card heading",
-      "en": "Export Configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "whatToExportQuestion",
-      "section": "Settings - Import/Export",
-      "context": "Question text",
-      "en": "What would you like to export?",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportEverythingRecommended",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Everything (Recommended)",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportEverythingDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Export all settings and all profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportCustomSelection",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Custom Selection",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportCustomSelectionDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Choose specific settings and profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportSettingsLabel",
-      "section": "Settings - Import/Export",
-      "context": "Checkbox group header",
-      "en": "Settings:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportSettingsCheckbox",
-      "section": "Settings - Import/Export",
-      "context": "Checkbox label",
-      "en": "Preferences, theme, and options",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportProfilesLabel",
-      "section": "Settings - Import/Export",
-      "context": "Checkbox group header",
-      "en": "Profiles:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "exportConfigButton",
-      "section": "Settings - Import/Export",
-      "context": "Button text",
-      "en": "Export Configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importConfigCard",
-      "section": "Settings - Import/Export",
-      "context": "Card heading",
-      "en": "Import Configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importConfigDescription",
-      "section": "Settings - Import/Export",
-      "context": "Description",
-      "en": "Restore your tabs and settings from a backup file.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "chooseFileButton",
-      "section": "Settings - Import/Export",
-      "context": "Button text",
-      "en": "Choose File to Import",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "selectedFile",
-      "section": "Settings - Import/Export",
-      "context": "File display label",
-      "en": "Selected file",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "whatToImportQuestion",
-      "section": "Settings - Import/Export",
-      "context": "Question text",
-      "en": "What would you like to import?",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "profilesWillEnable",
-      "section": "Settings - Import/Export",
-      "context": "Warning header",
-      "en": "Profiles will be enabled",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "profilesWillEnableWarning",
-      "section": "Settings - Import/Export",
-      "context": "Warning text",
-      "en": "This file contains profiles. Importing will automatically enable the Profiles feature in your settings.",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importSettingsCheckbox",
-      "section": "Settings - Import/Export",
-      "context": "Checkbox label",
-      "en": "Settings",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addToExistingTabs",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Add to existing tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addToExistingTabsDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Keep current tabs and add imported tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "replaceAllTabs",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Replace all tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "replaceAllTabsDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Remove current tabs and use only imported tabs",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importProfileQuestion",
-      "section": "Settings - Import/Export",
-      "context": "Question text",
-      "en": "How would you like to import this profile?",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importAsProfileOption",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Import as profile and enable Profiles",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importAsProfileDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Create a new profile and enable the Profiles feature",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addTabsToExistingProfile",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Add tabs to existing profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addTabsToExistingProfileDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Keep current tabs and add tabs from this profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "replaceProfileTabs",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Replace tabs in profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "replaceProfileTabsDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Remove current tabs and use tabs from this profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importDestinationLabel",
-      "section": "Settings - Import/Export",
-      "context": "Section label",
-      "en": "Import to:",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "addToExistingProfileOption",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Add to existing profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "overwriteProfileOption",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Overwrite existing profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "overwriteProfileDesc",
-      "section": "Settings - Import/Export",
-      "context": "Option description",
-      "en": "Replace all tabs in the profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "createNewProfileOption",
-      "section": "Settings - Import/Export",
-      "context": "Radio option",
-      "en": "Create new profile",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "enterProfileNamePlaceholder",
-      "section": "Settings - Import/Export",
-      "context": "Input placeholder",
-      "en": "Enter profile name",
-      "es": "", "fr": "", "de": "", "ja": ""
-    },
-    {
-      "key": "importConfigurationButton",
-      "section": "Settings - Import/Export",
-      "context": "Final import button",
-      "en": "Import Configuration",
-      "es": "", "fr": "", "de": "", "ja": ""
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": true
+    },
+    {
+      "key": "commandTab1",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 1",
+      "en": "Tab 1",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab2",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 2",
+      "en": "Tab 2",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab3",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 3",
+      "en": "Tab 3",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab4",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 4",
+      "en": "Tab 4",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab5",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 5",
+      "en": "Tab 5",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab6",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 6",
+      "en": "Tab 6",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab7",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 7",
+      "en": "Tab 7",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab8",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 8",
+      "en": "Tab 8",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab9",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 9",
+      "en": "Tab 9",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
+    },
+    {
+      "key": "commandTab10",
+      "section": "Keyboard Commands",
+      "context": "Keyboard shortcut description for tab 10",
+      "en": "Tab 10",
+      "es": "",
+      "fr": "",
+      "de": "",
+      "ja": "",
+      "translatable": false
     }
   ]
 }
