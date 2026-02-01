@@ -5,112 +5,85 @@ permalink: /translate
 ---
 
 <style>
-  /* Translation App Styles */
   .translate-container {
-    max-width: 900px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem 0;
+    padding: 2rem;
   }
 
   .translate-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   .translate-header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
   }
 
   .translate-header .lead {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     color: #666;
+    margin-bottom: 1.5rem;
   }
 
   /* Language Selector */
-  .language-selector-section {
-    margin-bottom: 3rem;
-  }
-
-  .language-grid {
+  .language-selector {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .language-card {
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
-  }
-
-  .language-card:hover {
-    border-color: #0d6efd;
-    background: #e7f1ff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
-  }
-
-  .language-card.selected {
-    border-color: #0d6efd;
-    background: #0d6efd;
-    color: white;
-  }
-
-  .language-card i {
-    font-size: 2rem;
-    display: block;
-    margin-bottom: 0.5rem;
-  }
-
-  .language-card h4 {
-    margin: 0.5rem 0 0 0;
-    font-size: 1.1rem;
-  }
-
-  .language-card .progress {
-    margin-top: 1rem;
-    height: 8px;
-    background: #ddd;
-    border-radius: 4px;
-  }
-
-  .language-card .progress-bar {
-    background: #0d6efd;
-    border-radius: 4px;
-  }
-
-  .language-card.selected .progress {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
-  .language-card.selected .progress-bar {
-    background: white;
-  }
-
-  .translation-form-section {
-    display: none;
-  }
-
-  .translation-form-section.active {
-    display: block;
-  }
-
-  /* Progress Bar */
-  .progress-container {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
     margin-bottom: 2rem;
   }
 
-  .progress-bar-large {
-    height: 30px;
-    background: #e9ecef;
+  .language-btn {
+    padding: 0.75rem;
+    border: 2px solid #ddd;
     border-radius: 6px;
+    background: #f8f9fa;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+  }
+
+  .language-btn:hover {
+    border-color: #0d6efd;
+    background: #e7f1ff;
+  }
+
+  .language-btn.active {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+  }
+
+  .language-btn .count {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 400;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+  }
+
+  /* Progress Bar */
+  .progress-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .progress-bar-wrapper {
+    width: 100%;
+    height: 24px;
+    background: #e9ecef;
+    border-radius: 4px;
     overflow: hidden;
   }
 
@@ -123,55 +96,116 @@ permalink: /translate
     justify-content: center;
     color: white;
     font-weight: 600;
-    font-size: 0.9rem;
-    min-width: 60px;
+    font-size: 0.75rem;
+    min-width: 40px;
   }
 
-  /* Translation Item */
-  .translation-item {
-    background: #f8f9fa;
+  /* Translations Table */
+  .translations-wrapper {
     border: 1px solid #dee2e6;
-    border-radius: 6px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
   }
 
-  .translation-item.completed {
-    background: #f0fdf4;
-    border-color: #86efac;
-  }
-
-  .translation-item-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    .translation-item-row {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .translation-label {
-    display: block;
+  .section-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
     color: #333;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .translation-label .badge {
-    margin-left: 0.5rem;
+  .section-header:hover {
+    background: #e9ecef;
+  }
+
+  .section-header .toggle {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    color: #666;
+  }
+
+  .section-header.collapsed .toggle::before {
+    content: '▶ ';
+  }
+
+  .section-header .toggle::before {
+    content: '▼ ';
+  }
+
+  .section-items {
+    display: none;
+  }
+
+  .section-items.show {
+    display: block;
+  }
+
+  .translation-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    align-items: start;
+  }
+
+  .translation-row:last-child {
+    border-bottom: none;
+  }
+
+  .translation-row:hover {
+    background: #f8f9fa;
+  }
+
+  .phrase-column {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .phrase-text {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+  }
+
+  .phrase-key {
+    font-size: 0.75rem;
+    color: #999;
+    font-family: monospace;
+  }
+
+  .context-column {
+    font-size: 0.85rem;
+  }
+
+  .context-location {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .context-description {
+    color: #666;
+    line-height: 1.4;
   }
 
   .translation-input {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 1rem;
-    padding: 0.75rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .translation-input:focus {
@@ -180,158 +214,9 @@ permalink: /translate
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
   }
 
-  .translation-input:disabled {
-    background: #e9ecef;
-    cursor: not-allowed;
-  }
-
-  .text-muted {
-    color: #6c757d;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-  }
-
-  .context-help {
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
-    padding: 0.75rem;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    color: #664d03;
-  }
-
-  .char-count {
-    font-weight: 600;
-    color: #0d6efd;
-  }
-
-  /* Controls */
-  .form-controls {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .form-controls button {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-weight: 600;
-  }
-
-  .btn-primary {
-    background: #0d6efd;
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background: #0b5ed7;
-  }
-
-  .btn-primary:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-  }
-
-  .btn-outline {
-    background: white;
-    border: 2px solid #0d6efd;
-    color: #0d6efd;
-  }
-
-  .btn-outline:hover {
-    background: #f0f7ff;
-  }
-
-  .btn-success {
-    background: #28a745;
-    color: white;
-  }
-
-  .btn-success:hover {
-    background: #218838;
-  }
-
-  /* Section Indicator */
-  .section-indicator {
-    background: #e7f1ff;
-    border: 1px solid #0d6efd;
-    border-radius: 6px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .section-indicator strong {
-    color: #0d6efd;
-  }
-
-  .page-indicator {
-    background: #f0f0f0;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    color: #666;
-  }
-
-  /* Submit Section */
-  .submit-section {
-    display: none;
-    background: white;
-    border: 2px solid #28a745;
-    border-radius: 8px;
-    padding: 2rem;
-    margin-top: 2rem;
-    text-align: center;
-  }
-
-  .submit-section.active {
-    display: block;
-  }
-
-  .submit-section h3 {
-    color: #28a745;
-    margin-bottom: 1rem;
-  }
-
-  .submit-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  @media (max-width: 768px) {
-    .submit-options {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .submit-option {
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 6px;
-    text-align: center;
-  }
-
-  .submit-option button {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .submit-option small {
-    display: block;
-    color: #666;
-    font-size: 0.875rem;
+  .translation-input.completed {
+    border-color: #28a745;
+    background: #f0fdf4;
   }
 
   /* Status Messages */
@@ -364,40 +249,78 @@ permalink: /translate
     color: #842029;
   }
 
-  /* Loading Spinner */
-  .spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #0d6efd;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  /* Submit Section */
+  .submit-section {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #dee2e6;
   }
 
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  .submit-btn {
+    flex: 1;
+    padding: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .submit-btn-primary {
+    background: #28a745;
+    color: white;
+  }
+
+  .submit-btn-primary:hover:not(:disabled) {
+    background: #218838;
+  }
+
+  .submit-btn-secondary {
+    background: #0d6efd;
+    color: white;
+  }
+
+  .submit-btn-secondary:hover:not(:disabled) {
+    background: #0b5ed7;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   /* Empty State */
   .empty-state {
     text-align: center;
     padding: 3rem;
-    background: #f8f9fa;
-    border-radius: 8px;
     color: #666;
   }
 
   .empty-state i {
     font-size: 3rem;
     color: #ddd;
-    margin-bottom: 1rem;
     display: block;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 1024px) {
+    .translation-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .context-location::before {
+      content: 'Location: ';
+      font-weight: 600;
+    }
+
+    .context-description::before {
+      content: 'Context: ';
+      font-weight: 600;
+    }
   }
 </style>
 
@@ -405,7 +328,7 @@ permalink: /translate
   <!-- Header -->
   <div class="translate-header">
     <h1>Contribute Translations</h1>
-    <p class="lead">Help make SF Tabs accessible in your language</p>
+    <p class="lead">Help translate SF Tabs into your language</p>
   </div>
 
   <!-- Status Messages -->
@@ -414,347 +337,215 @@ permalink: /translate
   <div id="alert-error" class="alert alert-error"></div>
 
   <!-- Language Selector -->
-  <section id="language-selector" class="language-selector-section">
-    <h2 class="mb-4">Select a Language</h2>
-    <div class="language-grid" id="language-grid">
-      <!-- Populated by JavaScript -->
+  <div id="language-selector" class="language-selector"></div>
+
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-info">
+      <span><strong id="translated-count">0</strong> of <strong id="total-count">0</strong> translated</span>
+      <span id="progress-percent">0%</span>
     </div>
-  </section>
-
-  <!-- Translation Form -->
-  <section id="translation-form" class="translation-form-section">
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar-large">
-        <div class="progress-bar-fill" style="width: 0%; min-width: 0;">
-          <span id="progress-text" style="width: 100%; text-align: center;">0/0</span>
-        </div>
-      </div>
+    <div class="progress-bar-wrapper">
+      <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
     </div>
+  </div>
 
-    <!-- Section Indicator -->
-    <div class="section-indicator">
-      <span><strong>Section:</strong> <span id="current-section">-</span></span>
-      <span class="page-indicator">
-        Page <span id="current-page">1</span> of <span id="total-pages">1</span>
-      </span>
-    </div>
+  <!-- Translations List -->
+  <div id="translations-content" class="translations-wrapper"></div>
 
-    <!-- Translation Items -->
-    <form id="translations-form">
-      <div id="translation-items-container">
-        <!-- Populated by JavaScript -->
-      </div>
-    </form>
-
-    <!-- Form Controls -->
-    <div class="form-controls">
-      <div>
-        <button id="prev-page" class="btn-outline" style="display: none;">
-          ← Previous
-        </button>
-      </div>
-      <div style="display: flex; gap: 1rem;">
-        <button id="save-draft" type="button" class="btn-outline">
-          💾 Save Draft
-        </button>
-        <button id="next-page" type="button" class="btn-primary">
-          Next →
-        </button>
-      </div>
-    </div>
-
-    <!-- Submit Section -->
-    <div id="submit-section" class="submit-section">
-      <h3>Ready to Submit Your Translations?</h3>
-      <p id="translated-count-text"></p>
-
-      <div class="submit-options">
-        <div class="submit-option">
-          <button id="submit-github" class="btn-success" type="button">
-            🔗 Create Pull Request
-          </button>
-          <small>Sign in with GitHub (recommended)</small>
-        </div>
-        <div class="submit-option">
-          <button id="submit-anonymous" class="btn-primary" type="button">
-            📧 Submit via Issue
-          </button>
-          <small>No GitHub account needed</small>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- Submit Section -->
+  <div class="submit-section">
+    <button id="submit-github" class="submit-btn submit-btn-primary">
+      🔗 Create Pull Request
+    </button>
+    <button id="submit-anonymous" class="submit-btn submit-btn-secondary">
+      📧 Submit via Issue
+    </button>
+  </div>
 </div>
 
 <script>
-  // Translation App Main Logic
   const TranslationApp = {
-    // State
     state: {
       allStrings: [],
       currentLanguage: null,
       pendingTranslations: {},
-      currentPage: 0,
-      itemsPerPage: 12,
-      isAuthenticated: false,
-      githubToken: null,
+      sections: {},
     },
 
-    // Configuration
     config: {
       translationJsonUrl: '/sftabs/translations/master.json',
       draftStorageKey: 'sf-tabs-translation-draft',
-      tokenStorageKey: 'sf-tabs-github-token',
     },
 
-    // Initialize app
+    languages: {
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
+      ja: 'Japanese',
+    },
+
     async init() {
       this.loadDraft();
-      this.loadGitHubToken();
       await this.loadTranslations();
       this.renderLanguageSelector();
       this.attachEventListeners();
 
-      // If there's a draft in progress, show form immediately
       if (this.state.currentLanguage) {
-        this.showTranslationForm();
+        this.selectLanguage(this.state.currentLanguage);
       }
     },
 
-    // Load translations from JSON
     async loadTranslations() {
       try {
         const response = await fetch(this.config.translationJsonUrl);
         if (!response.ok) throw new Error('Failed to load translations');
         const data = await response.json();
         this.state.allStrings = data.strings;
+        this.organizeBySection();
       } catch (error) {
         this.showAlert('alert-error', 'Failed to load translations. Please refresh the page.');
         console.error('Error loading translations:', error);
       }
     },
 
-    // Render language selector
-    renderLanguageSelector() {
-      const languageGrid = document.getElementById('language-grid');
-      const languages = ['es', 'fr', 'de', 'ja'];
-      const languageNames = { es: 'Spanish', fr: 'French', de: 'German', ja: 'Japanese' };
+    organizeBySection() {
+      this.state.sections = {};
+      this.state.allStrings.forEach((string) => {
+        if (!this.state.sections[string.section]) {
+          this.state.sections[string.section] = [];
+        }
+        this.state.sections[string.section].push(string);
+      });
+    },
 
-      languageGrid.innerHTML = languages
-        .map((lang) => {
-          const untranslated = this.state.allStrings.filter((s) => !s[lang]).length;
+    renderLanguageSelector() {
+      const selector = document.getElementById('language-selector');
+      selector.innerHTML = Object.entries(this.languages)
+        .map(([code, name]) => {
+          const untranslated = this.state.allStrings.filter((s) => !s[code]).length;
           const total = this.state.allStrings.length;
-          const percentage = ((total - untranslated) / total) * 100;
+          const translated = total - untranslated;
 
           return `
-            <div class="language-card ${this.state.currentLanguage === lang ? 'selected' : ''}"
-                 data-lang="${lang}"
-                 onclick="TranslationApp.selectLanguage('${lang}')">
-              <i class="bi bi-translate"></i>
-              <h4>${languageNames[lang]}</h4>
-              <div class="progress">
-                <div class="progress-bar" style="width: ${percentage}%"></div>
-              </div>
-              <small>${total - untranslated} of ${total}</small>
-            </div>
+            <button class="language-btn ${this.state.currentLanguage === code ? 'active' : ''}"
+                    onclick="TranslationApp.selectLanguage('${code}')">
+              ${name}
+              <span class="count">${translated}/${total}</span>
+            </button>
           `;
         })
         .join('');
+
+      document.getElementById('total-count').textContent = this.state.allStrings.length;
     },
 
-    // Select a language
     selectLanguage(lang) {
       this.state.currentLanguage = lang;
-      this.state.currentPage = 0;
       this.state.pendingTranslations = {};
       this.saveDraft();
-      this.showTranslationForm();
+      this.renderTranslations();
+      this.updateLanguageButtons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
-    // Show translation form
-    showTranslationForm() {
-      document.getElementById('language-selector').style.display = 'none';
-      document.getElementById('translation-form').classList.add('active');
-      this.renderPage();
-    },
+    renderTranslations() {
+      const container = document.getElementById('translations-content');
+      let html = '';
 
-    // Get current page items
-    getCurrentPageItems() {
-      const untranslated = this.state.allStrings.filter((s) => !s[this.state.currentLanguage]);
-      const start = this.state.currentPage * this.state.itemsPerPage;
-      const end = start + this.state.itemsPerPage;
-      return untranslated.slice(start, end);
-    },
+      Object.entries(this.state.sections).forEach(([section, strings]) => {
+        html += `
+          <div>
+            <div class="section-header" onclick="TranslationApp.toggleSection(this)">
+              <span class="toggle"></span>
+              <span>${section}</span>
+            </div>
+            <div class="section-items show">
+              ${strings
+                .map(
+                  (item) => `
+                <div class="translation-row">
+                  <div class="phrase-column">
+                    <div class="phrase-text">${this.escapeHtml(item.en)}</div>
+                    <div class="phrase-key">${item.key}</div>
+                  </div>
+                  <div class="context-column">
+                    <span class="context-location">${item.section}</span>
+                    <div class="context-description">${this.escapeHtml(item.context)}</div>
+                  </div>
+                  <div>
+                    <input type="text"
+                           class="translation-input ${this.state.pendingTranslations[item.key] ? 'completed' : ''}"
+                           data-key="${item.key}"
+                           placeholder="Enter translation"
+                           value="${this.escapeHtml(this.state.pendingTranslations[item.key] || '')}"
+                           onblur="TranslationApp.updateTranslation(this)">
+                  </div>
+                </div>
+              `
+                )
+                .join('')}
+            </div>
+          </div>
+        `;
+      });
 
-    // Get unique sections on current page
-    getCurrentSections() {
-      const items = this.getCurrentPageItems();
-      return [...new Set(items.map((s) => s.section))];
-    },
-
-    // Render current page
-    renderPage() {
-      const items = this.getCurrentPageItems();
-      const untranslated = this.state.allStrings.filter((s) => !s[this.state.currentLanguage]);
-      const totalPages = Math.ceil(untranslated.length / this.state.itemsPerPage);
-
-      // Update section indicator
-      const sections = this.getCurrentSections();
-      document.getElementById('current-section').textContent =
-        sections.length === 1 ? sections[0] : `${sections.length} sections`;
-      document.getElementById('current-page').textContent = this.state.currentPage + 1;
-      document.getElementById('total-pages').textContent = totalPages;
-
-      // Render items
-      const container = document.getElementById('translation-items-container');
-      container.innerHTML = items
-        .map((item) => this.renderTranslationItem(item))
-        .join('');
-
-      // Update progress
+      container.innerHTML = html;
       this.updateProgress();
-
-      // Update controls
-      document.getElementById('prev-page').style.display =
-        this.state.currentPage > 0 ? 'block' : 'none';
-      document.getElementById('next-page').textContent =
-        this.state.currentPage + 1 >= totalPages ? '✓ Review & Submit' : 'Next →';
-
-      // Show submit section on last page
-      const submitSection = document.getElementById('submit-section');
-      if (this.state.currentPage + 1 >= totalPages) {
-        submitSection.classList.add('active');
-        document.getElementById('translated-count-text').innerHTML = `You've translated <strong>${Object.keys(
-          this.state.pendingTranslations
-        ).length} strings</strong> so far!`;
-      } else {
-        submitSection.classList.remove('active');
-      }
-
-      // Focus first input
-      setTimeout(() => {
-        const firstInput = container.querySelector('.translation-input');
-        if (firstInput) firstInput.focus();
-      }, 0);
     },
 
-    // Render single translation item
-    renderTranslationItem(item) {
-      const translation = this.state.pendingTranslations[item.key] || '';
-      const isCompleted = !!translation;
-
-      return `
-        <div class="translation-item ${isCompleted ? 'completed' : ''}" data-key="${item.key}">
-          <div class="translation-item-row">
-            <div>
-              <label class="translation-label">
-                English Original
-                <span class="badge bg-secondary">${item.key}</span>
-              </label>
-              <input type="text" class="translation-input" value="${this.escapeHtml(item.en)}" readonly>
-              <div class="text-muted">Context: ${item.context}</div>
-            </div>
-            <div>
-              <label class="translation-label">
-                ${this.getLanguageName(this.state.currentLanguage)} Translation
-                <span style="color: red;">*</span>
-              </label>
-              <input type="text"
-                     class="translation-input translation-text-input"
-                     data-key="${item.key}"
-                     placeholder="Enter translation"
-                     maxlength="255"
-                     value="${this.escapeHtml(translation)}"
-                     oninput="TranslationApp.updateTranslation(this)">
-              <div class="text-muted">
-                Character count: <span class="char-count">0</span>/255
-              </div>
-            </div>
-          </div>
-          <div class="context-help">
-            <strong>Context:</strong> ${item.context}
-          </div>
-        </div>
-      `;
+    toggleSection(header) {
+      header.classList.toggle('collapsed');
+      const items = header.nextElementSibling;
+      items.classList.toggle('show');
     },
 
-    // Update translation when user types
     updateTranslation(input) {
       const key = input.getAttribute('data-key');
       const value = input.value.trim();
 
       if (value) {
         this.state.pendingTranslations[key] = value;
+        input.classList.add('completed');
       } else {
         delete this.state.pendingTranslations[key];
-      }
-
-      // Update char count
-      const charCount = input.parentElement.querySelector('.char-count');
-      charCount.textContent = input.value.length;
-
-      // Update visual state
-      const item = input.closest('.translation-item');
-      if (value) {
-        item.classList.add('completed');
-      } else {
-        item.classList.remove('completed');
+        input.classList.remove('completed');
       }
 
       this.saveDraft();
       this.updateProgress();
+      this.showAlert('alert-success', 'Draft saved automatically');
+      setTimeout(() => document.getElementById('alert-success').classList.remove('show'), 2000);
     },
 
-    // Update progress bar
     updateProgress() {
       const translated = Object.keys(this.state.pendingTranslations).length;
-      const total = this.state.allStrings.filter((s) => !s[this.state.currentLanguage]).length;
+      const total = this.state.allStrings.length;
       const percentage = total > 0 ? (translated / total) * 100 : 0;
 
-      const progressBar = document.querySelector('.progress-bar-fill');
-      const progressText = document.getElementById('progress-text');
-
-      progressBar.style.width = `${Math.max(percentage, 5)}%`;
-      progressText.textContent = `${translated}/${total}`;
+      document.getElementById('translated-count').textContent = translated;
+      document.getElementById('progress-percent').textContent = Math.round(percentage) + '%';
+      document.getElementById('progress-bar').style.width = percentage + '%';
     },
 
-    // Navigation
-    goToNextPage() {
-      const untranslated = this.state.allStrings.filter((s) => !s[this.state.currentLanguage]);
-      const totalPages = Math.ceil(untranslated.length / this.state.itemsPerPage);
-
-      if (this.state.currentPage + 1 < totalPages) {
-        this.state.currentPage += 1;
-        this.saveDraft();
-        this.renderPage();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+    updateLanguageButtons() {
+      document.querySelectorAll('.language-btn').forEach((btn) => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`[data-lang="${this.state.currentLanguage}"]`)?.classList.add('active');
     },
 
-    goToPreviousPage() {
-      if (this.state.currentPage > 0) {
-        this.state.currentPage -= 1;
-        this.saveDraft();
-        this.renderPage();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    },
-
-    // Save draft to localStorage
     saveDraft() {
       localStorage.setItem(
         this.config.draftStorageKey,
         JSON.stringify({
           language: this.state.currentLanguage,
           translations: this.state.pendingTranslations,
-          page: this.state.currentPage,
           timestamp: Date.now(),
         })
       );
     },
 
-    // Load draft from localStorage
     loadDraft() {
       const draft = localStorage.getItem(this.config.draftStorageKey);
       if (draft) {
@@ -762,40 +553,88 @@ permalink: /translate
           const data = JSON.parse(draft);
           this.state.currentLanguage = data.language;
           this.state.pendingTranslations = data.translations;
-          this.state.currentPage = data.page || 0;
         } catch (error) {
           console.error('Error loading draft:', error);
         }
       }
     },
 
-    // GitHub token management
-    saveGitHubToken(token) {
-      sessionStorage.setItem(this.config.tokenStorageKey, token);
-      this.state.githubToken = token;
-      this.state.isAuthenticated = true;
-    },
+    async submitViaGitHub() {
+      if (Object.keys(this.state.pendingTranslations).length === 0) {
+        this.showAlert('alert-error', 'Please translate at least one string before submitting.');
+        return;
+      }
 
-    loadGitHubToken() {
-      const token = sessionStorage.getItem(this.config.tokenStorageKey);
-      if (token) {
-        this.state.githubToken = token;
-        this.state.isAuthenticated = true;
+      const btn = document.getElementById('submit-github');
+      btn.disabled = true;
+      btn.textContent = '⏳ Authenticating...';
+
+      try {
+        const api = new GitHubAPI();
+        const authData = await api.startAuthentication();
+        await authData.promptUser();
+
+        btn.textContent = '⏳ Creating PR...';
+
+        const result = await api.createPullRequest(
+          this.state.currentLanguage,
+          this.state.pendingTranslations
+        );
+
+        this.showAlert(
+          'alert-success',
+          `✓ Pull request created! <a href="${result.prUrl}" target="_blank">View PR #${result.prNumber}</a>`
+        );
+
+        setTimeout(() => {
+          localStorage.removeItem(this.config.draftStorageKey);
+          window.location.reload();
+        }, 3000);
+      } catch (error) {
+        this.showAlert('alert-error', `Error: ${error.message}`);
+        btn.disabled = false;
+        btn.textContent = '🔗 Create Pull Request';
       }
     },
 
-    // Show alert message
-    showAlert(type, message) {
-      const alertEl = document.getElementById(type);
-      alertEl.textContent = message;
-      alertEl.classList.add('show');
-      setTimeout(() => alertEl.classList.remove('show'), 5000);
+    async submitAnonymous() {
+      if (Object.keys(this.state.pendingTranslations).length === 0) {
+        this.showAlert('alert-error', 'Please translate at least one string before submitting.');
+        return;
+      }
+
+      const btn = document.getElementById('submit-anonymous');
+      btn.disabled = true;
+      btn.textContent = '⏳ Submitting...';
+
+      try {
+        const api = new GitHubAPI();
+        const result = await api.createIssue(
+          this.state.currentLanguage,
+          this.state.pendingTranslations,
+          {}
+        );
+
+        this.showAlert(
+          'alert-success',
+          `✓ Submission created! <a href="${result.issueUrl}" target="_blank">View Issue #${result.issueNumber}</a>`
+        );
+
+        setTimeout(() => {
+          localStorage.removeItem(this.config.draftStorageKey);
+          window.location.reload();
+        }, 3000);
+      } catch (error) {
+        this.showAlert('alert-error', `Error: ${error.message}`);
+        btn.disabled = false;
+        btn.textContent = '📧 Submit via Issue';
+      }
     },
 
-    // Utility functions
-    getLanguageName(lang) {
-      const names = { es: 'Spanish', fr: 'French', de: 'German', ja: 'Japanese' };
-      return names[lang] || lang;
+    showAlert(type, message) {
+      const alert = document.getElementById(type);
+      alert.innerHTML = message;
+      alert.classList.add('show');
     },
 
     escapeHtml(text) {
@@ -809,105 +648,11 @@ permalink: /translate
       return text.replace(/[&<>"']/g, (m) => map[m]);
     },
 
-    // Attach event listeners
     attachEventListeners() {
-      document.getElementById('next-page').addEventListener('click', () => this.goToNextPage());
-      document.getElementById('prev-page').addEventListener('click', () => this.goToPreviousPage());
-      document.getElementById('save-draft').addEventListener('click', () => {
-        this.showAlert('alert-success', 'Draft saved! You can continue later.');
-      });
-
-      // Submit buttons
-      document.getElementById('submit-github').addEventListener('click', () => {
-        this.submitViaGitHub();
-      });
-
-      document.getElementById('submit-anonymous').addEventListener('click', () => {
-        this.submitAnonymous();
-      });
-    },
-
-    // Submit via GitHub (authenticated)
-    async submitViaGitHub() {
-      if (Object.keys(this.state.pendingTranslations).length === 0) {
-        this.showAlert('alert-error', 'Please translate at least one string before submitting.');
-        return;
-      }
-
-      const submitButton = document.getElementById('submit-github');
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<span class="spinner me-2"></span> Authenticating...';
-
-      try {
-        const api = new GitHubAPI();
-        const authData = await api.startAuthentication();
-
-        // Show the modal and wait for authorization
-        await authData.promptUser();
-
-        // User authorized, now create the PR
-        submitButton.innerHTML = '<span class="spinner me-2"></span> Creating PR...';
-
-        const result = await api.createPullRequest(
-          this.state.currentLanguage,
-          this.state.pendingTranslations
-        );
-
-        this.showAlert(
-          'alert-success',
-          `✓ Pull request created! <a href="${result.prUrl}" target="_blank">View PR #${result.prNumber}</a>`
-        );
-
-        // Reset after successful submission
-        setTimeout(() => {
-          localStorage.removeItem(this.config.draftStorageKey);
-          window.location.reload();
-        }, 3000);
-      } catch (error) {
-        this.showAlert('alert-error', `Error: ${error.message}`);
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="bi bi-github"></i> Create Pull Request';
-      }
-    },
-
-    // Submit anonymous (via GitHub Issue)
-    async submitAnonymous() {
-      if (Object.keys(this.state.pendingTranslations).length === 0) {
-        this.showAlert('alert-error', 'Please translate at least one string before submitting.');
-        return;
-      }
-
-      const submitButton = document.getElementById('submit-anonymous');
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<span class="spinner me-2"></span> Submitting...';
-
-      try {
-        const api = new GitHubAPI();
-
-        const result = await api.createIssue(
-          this.state.currentLanguage,
-          this.state.pendingTranslations,
-          {}
-        );
-
-        this.showAlert(
-          'alert-success',
-          `✓ Submission created! <a href="${result.issueUrl}" target="_blank">View Issue #${result.issueNumber}</a>`
-        );
-
-        // Reset after successful submission
-        setTimeout(() => {
-          localStorage.removeItem(this.config.draftStorageKey);
-          window.location.reload();
-        }, 3000);
-      } catch (error) {
-        this.showAlert('alert-error', `Error: ${error.message}`);
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="bi bi-envelope"></i> Submit via Issue';
-      }
+      document.getElementById('submit-github').addEventListener('click', () => this.submitViaGitHub());
+      document.getElementById('submit-anonymous').addEventListener('click', () => this.submitAnonymous());
     },
   };
 
-  // Initialize app when DOM is ready
   document.addEventListener('DOMContentLoaded', () => TranslationApp.init());
 </script>
