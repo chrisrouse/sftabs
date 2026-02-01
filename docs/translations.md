@@ -14,19 +14,53 @@ Currently, SF Tabs supports the following languages:
 
 ## Contributing Translations
 
-We welcome contributions to help translate SF Tabs into additional languages. If you'd like to help translate:
+We welcome contributions to help translate SF Tabs into additional languages! We've made it easy for anyone to contribute, whether you're a GitHub user or not.
 
-1. **Check existing translations**
-   Visit this [Issue](https://github.com/chrisrouse/sftabs/issues/12) to see which languages need translation work
+### Two Ways to Contribute
 
-2. **Submit your translation**
-   Create a pull request with your translation files or open an issue to offer your help
+#### Option 1: Use the Translation App (Recommended)
+The easiest way to contribute translations:
 
-3. **Translation guidelines**
-   - Keep translations concise to fit in the UI
-   - Maintain the tone and meaning of the original text
-   - Test translations in the extension to ensure they display correctly
+1. Visit the **[Contribute](/sftabs/translate)** page
+2. Select the language you want to translate to (Spanish, French, German, or Japanese)
+3. Fill in the translation fields for each string
+4. Submit your translations in two ways:
+   - **GitHub Users**: Sign in with GitHub to automatically create a pull request
+   - **No GitHub Account?**: Submit via GitHub Issue - we'll review and merge your translations
 
-## Request a Language
+#### Option 2: Direct GitHub Contribution
+If you prefer to work directly with files:
 
-If you'd like to see SF Tabs in a specific language, please open an issue on [GitHub](https://github.com/chrisrouse/sftabs/issues) to request it.
+1. Fork the repository on [GitHub](https://github.com/chrisrouse/sftabs)
+2. Create a new branch for your language: `translations/{language-code}`
+3. Update the JSON translation file in `docs/translations/master.json`
+4. Submit a pull request with your changes
+
+### Translation Guidelines
+
+- **Keep translations concise** - UI space is limited
+- **Maintain tone and meaning** - Translate the intent, not just the words
+- **Use clear, natural language** - Avoid literal translations when a more natural phrase exists
+- **Check context** - Each string includes context about where it's used in the extension
+- **Test if possible** - The extension will display your translations to users
+
+### Supported Languages
+
+- **Spanish** (es) - 0 of 109 strings translated
+- **French** (fr) - 0 of 109 strings translated
+- **German** (de) - 0 of 109 strings translated
+- **Japanese** (ja) - 0 of 109 strings translated
+
+### Request a Language
+
+Would you like to see SF Tabs translated into a language not listed above? Please open an [issue on GitHub](https://github.com/chrisrouse/sftabs/issues) to request it!
+
+### Review Process
+
+All translation contributions are reviewed by the maintainers to ensure quality and consistency. We may request clarifications or adjustments, but we'll work with you to get your translation merged.
+
+### Questions?
+
+If you have questions about a translation or need help, please:
+- Comment on your pull request/issue on GitHub
+- Open a new [discussion on GitHub](https://github.com/chrisrouse/sftabs/discussions)
