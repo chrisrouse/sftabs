@@ -112,3 +112,7 @@ Import a JSON file that was exported from SF Tabs on a different computer or to 
   <img width="749" height="573" alt="Screenshot 2026-01-02 at 11 37 47 AM" src="https://github.com/user-attachments/assets/befd6f89-28ba-4f42-8436-89fd2ec2ec77" />
   <img width="747" height="445" alt="Screenshot 2026-01-02 at 11 32 07 AM" src="https://github.com/user-attachments/assets/dd83f904-0e6e-4f66-93f8-ccec0c14b803" />
 
+
+## Migrate from WhySalesforce Extension
+
+If you are currently using the original WhySalesforce plugin and have updated to the version that includes an option to export your data, you can import that file directly into SF Tabs following the normal import steps above.
