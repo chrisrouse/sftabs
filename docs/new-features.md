@@ -93,7 +93,7 @@ Choose between two storage modes based on your needs and usage patterns.
 #### Local Storage
 - **Device-specific** - Stored only on this device
 - **Unlimited** - No practical limit on tab count (several MB available)
-- **No sync** - Does not sync to other devices
+- **No sync** - Does not sync tab data to other devices
 - **Best for** - Power users with many tabs or device-specific setups
 
 **Migration support:**
@@ -129,6 +129,9 @@ The settings page has been reorganized into clear sections:
 - **Sync & Storage** - Storage location preferences
 - **Profiles** - Profile feature toggle and auto-switching
 - **Keyboard Shortcuts** - Quick access to shortcut configuration
+
+### Import WhySalesforce
+The popular extension WhySalesforce has recently added the ability to export data in a JSON format. You can now import that data into SF Tabs via the IMport options in Setup.
 
 ---
 
