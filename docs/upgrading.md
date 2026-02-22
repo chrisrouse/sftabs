@@ -25,7 +25,7 @@ The wizard explains what will happen during migration:
 - No data will be lost
 - You can choose to enable Profiles now or later
   
-<img width="412" height="602" alt="2026-01-03_10-58-47" src="https://github.com/user-attachments/assets/86fd0dd5-1412-45a2-a4f4-6eee702f2bc8" />
+<img width="414" height="601" alt="Screenshot 2026-02-22 at 11 27 23 AM" src="https://github.com/user-attachments/assets/ed3909bc-2638-45bc-bc1a-863b1a9dd1b0" />
 
 **Options on this screen:**
 
