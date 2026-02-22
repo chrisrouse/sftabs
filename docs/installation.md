@@ -22,3 +22,5 @@ SF Tabs requires the following permissions to function:
 - **Access browser tabs** - Required to open tabs when you click on them
 
 After installing SF Tabs in your browser, you may need to allow permissions for the plugin. Your browser should prompt you to allow the necessary permissions. If not, visit your browser's extension pages.
+
+<img width="428" height="408" alt="Screenshot 2026-02-22 at 11 39 08 AM" src="https://github.com/user-attachments/assets/3e5a43cb-d4fb-447c-b565-94a33a779bc9" />
