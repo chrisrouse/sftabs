@@ -70,7 +70,7 @@ function enhancedAddTabForCurrentPage() {
         // Check if this is a Salesforce page we can work with
         const isSalesforcePage = currentUrl.includes('salesforce') || currentUrl.includes('.force.com');
         if (!isSalesforcePage) {
-          SFTabs.main.showStatus('Not a Salesforce page', true);
+          SFTabs.main.showStatus(chrome.i18n.getMessage('notSalesforcePage'), true);
           return;
         }
         
@@ -120,7 +120,7 @@ function enhancedAddTabForCurrentPage() {
         
         // If no valid path was found, show an error
         if (!path) {
-          SFTabs.main.showStatus('Not a recognized Salesforce setup or object page', true);
+          SFTabs.main.showStatus(chrome.i18n.getMessage('notSalesforceSetupPage'), true);
           return;
         }
 
@@ -145,11 +145,11 @@ function enhancedAddTabForCurrentPage() {
         SFTabs.storage.saveTabs(existingTabs);
         
         let pageType = isObject ? 'object' : (isCustomUrl ? 'custom' : 'setup');
-        SFTabs.main.showStatus(`Added ${pageType} tab for "${name}"`, false);
+        SFTabs.main.showStatus(chrome.i18n.getMessage('tabAdded', [pageType, name]), false);
       }
     })
     .catch(error => {
-      SFTabs.main.showStatus('Error accessing current tab: ' + error.message, true);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('errorAccessingTab', [error.message]), true);
     });
 }
 
@@ -384,7 +384,7 @@ function performTabDeletion(tabId) {
   const updatedTabs = tabs.filter(tab => tab.id !== tabId);
 
   SFTabs.storage.saveTabs(updatedTabs).then(() => {
-    SFTabs.main.showStatus('Tab removed', false);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('tabRemoved'), false);
   });
 }
 
@@ -423,7 +423,7 @@ function resetToDefaults() {
   const defaultTabs = JSON.parse(JSON.stringify(SFTabs.constants.DEFAULT_TABS));
   
   SFTabs.storage.saveTabs(defaultTabs).then(() => {
-    SFTabs.main.showStatus('Reset to default tabs', false);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('resetToDefaultTabsStatus'), false);
   });
 }
 
@@ -460,10 +460,10 @@ function getTabById(tabId) {
 function duplicateTab(tabId) {
   const originalTab = getTabById(tabId);
   if (!originalTab) {
-    SFTabs.main.showStatus('Tab not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('tabNotFound'), true);
     return;
   }
-  
+
   const tabs = SFTabs.main.getTabs();
   const duplicatedTab = {
     ...originalTab,
@@ -474,7 +474,7 @@ function duplicateTab(tabId) {
   
   tabs.push(duplicatedTab);
   SFTabs.storage.saveTabs(tabs).then(() => {
-    SFTabs.main.showStatus(`Duplicated tab "${originalTab.label}"`, false);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('tabDuplicated', [originalTab.label]), false);
   });
 }
 

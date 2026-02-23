@@ -74,7 +74,7 @@ function renderTabList() {
 function createDragHandle(isCompact) {
   const dragHandle = document.createElement('div');
   dragHandle.className = 'drag-handle';
-  dragHandle.setAttribute('title', 'Drag to reorder');
+  dragHandle.setAttribute('title', chrome.i18n.getMessage('dragToReorderTitle'));
 
   // Add dots based on display mode (2 column grid)
   // Compact mode: 6 dots (2x3 grid)
@@ -313,7 +313,7 @@ function createTabActions(tab) {
   // Create action panel button (edit/pencil icon button)
   const actionPanelButton = document.createElement('button');
   actionPanelButton.className = 'action-panel-button';
-  actionPanelButton.setAttribute('title', 'Edit tab');
+  actionPanelButton.setAttribute('title', chrome.i18n.getMessage('editTabButtonTitle'));
   actionPanelButton.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2">
       <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
@@ -336,10 +336,10 @@ function createTabActions(tab) {
   // Set initial state classes
   if (tab.openInNewTab) {
     newTabButton.classList.add('new-tab-enabled');
-    newTabButton.setAttribute('title', 'Opens in new tab (click to change)');
+    newTabButton.setAttribute('title', chrome.i18n.getMessage('opensInNewTabTitle'));
   } else {
     newTabButton.classList.add('new-tab-disabled');
-    newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
+    newTabButton.setAttribute('title', chrome.i18n.getMessage('opensInSameTabTitle'));
   }
 
   newTabButton.innerHTML = `
@@ -359,11 +359,11 @@ function createTabActions(tab) {
     if (newOpenInNewTab) {
       newTabButton.classList.remove('new-tab-disabled');
       newTabButton.classList.add('new-tab-enabled');
-      newTabButton.setAttribute('title', 'Opens in new tab (click to change)');
+      newTabButton.setAttribute('title', chrome.i18n.getMessage('opensInNewTabTitle'));
     } else {
       newTabButton.classList.remove('new-tab-enabled');
       newTabButton.classList.add('new-tab-disabled');
-      newTabButton.setAttribute('title', 'Opens in same tab (click to change)');
+      newTabButton.setAttribute('title', chrome.i18n.getMessage('opensInSameTabTitle'));
     }
 
     // Update tab and save
@@ -378,7 +378,7 @@ function createTabActions(tab) {
       <path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z"></path>
     </svg>
   `;
-  deleteButton.setAttribute('title', 'Remove tab');
+  deleteButton.setAttribute('title', chrome.i18n.getMessage('removeTabButtonTitle'));
   deleteButton.addEventListener('click', (e) => {
     e.stopPropagation();
     SFTabs.tabs.deleteTab(tab.id);
@@ -419,7 +419,7 @@ function showTabForm(tabId = null) {
 
     // Set form title if it exists (optional element)
     if (domElements.formTitle) {
-      domElements.formTitle.textContent = 'Add New Tab';
+      domElements.formTitle.textContent = chrome.i18n.getMessage('addNewTabFormTitle');
     }
 
     // Auto-detect current page for setup objects
@@ -456,7 +456,7 @@ function populateFormForEdit(tabId) {
   const tab = SFTabs.tabs.getTabById(tabId);
 
   if (!tab) {
-    SFTabs.main.showStatus('Tab not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('tabNotFound'), true);
     return;
   }
 
@@ -476,7 +476,7 @@ function populateFormForEdit(tabId) {
 
   // Set form title if it exists (optional element)
   if (domElements.formTitle) {
-    domElements.formTitle.textContent = 'Edit Tab';
+    domElements.formTitle.textContent = chrome.i18n.getMessage('editTabFormTitle');
   }
 
   // Show/hide appropriate dropdown section based on tab type
@@ -599,7 +599,7 @@ function saveTabForm() {
   // All editable fields have been moved to action panel
   // The dropdown form now only handles Object Dropdown settings
   if (!editingTabId) {
-    SFTabs.main.showStatus('No tab selected for editing', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('noTabSelectedForEditing'), true);
     return;
   }
 
@@ -618,7 +618,7 @@ function saveTabForm() {
   const tab = tabs.find(t => t.id === editingTabId);
 
   if (!tab) {
-    SFTabs.main.showStatus('Tab not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('tabNotFound'), true);
     return;
   }
 
@@ -683,7 +683,7 @@ function saveTabForm() {
 
     hideTabForm();
   }).catch(error => {
-    SFTabs.main.showStatus('Error updating tab: ' + error.message, true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('errorUpdatingTab', [error.message]), true);
   });
 }
 
@@ -979,7 +979,7 @@ function handleDropdownCreation(draggedItem, targetItem) {
   // Renderer only displays flyout submenus up to level 2 to prevent UI overlay issues
   const MAX_DEPTH = 3;
   if (newDepth > MAX_DEPTH) {
-    const errorMessage = 'Error: Too many dropdown levels';
+    const errorMessage = chrome.i18n.getMessage('errorTooManyDropdownLevels');
 
     if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus(errorMessage, true);
@@ -1017,7 +1017,7 @@ function handleDropdownCreation(draggedItem, targetItem) {
 
   // Save and refresh
   SFTabs.storage.saveTabs(tabs).then(() => {
-    SFTabs.main.showStatus(`Added "${draggedTab.label}" as dropdown item to "${targetTab.label}"`);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('tabDropdownAdded', [draggedTab.label, targetTab.label]));
 
     // Check if the action panel is currently open for the target tab
     const currentActionPanelTab = SFTabs.main.getCurrentActionPanelTab();
@@ -1238,7 +1238,7 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
     expandButton.style.border = 'none';
     expandButton.style.cursor = 'pointer';
     expandButton.style.color = '#706e6b';
-    expandButton.title = item._expanded ? 'Collapse' : 'Expand';
+    expandButton.title = item._expanded ? chrome.i18n.getMessage('dropdownItemCollapseTitle') : chrome.i18n.getMessage('dropdownItemExpandTitle');
     expandButton.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -1285,7 +1285,7 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
   // Edit button
   const editButton = document.createElement('button');
   editButton.type = 'button';
-  editButton.textContent = 'Edit';
+  editButton.textContent = chrome.i18n.getMessage('editButton');
   editButton.style.fontSize = '11px';
   editButton.style.padding = '2px 6px';
   editButton.style.background = '#0176d3';
@@ -1293,7 +1293,7 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
   editButton.style.border = 'none';
   editButton.style.borderRadius = '3px';
   editButton.style.cursor = 'pointer';
-  editButton.title = 'Edit this dropdown item';
+  editButton.title = chrome.i18n.getMessage('editDropdownItemTitle');
   editButton.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1311,7 +1311,7 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
   promoteButton.style.border = 'none';
   promoteButton.style.borderRadius = '3px';
   promoteButton.style.cursor = 'pointer';
-  promoteButton.title = 'Promote to main tab list';
+  promoteButton.title = chrome.i18n.getMessage('promoteToMainListTitle');
   promoteButton.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1330,7 +1330,7 @@ function createDropdownItemRow(item, index, tab, level, indexPath) {
   deleteButton.style.borderRadius = '3px';
   deleteButton.style.cursor = 'pointer';
   deleteButton.style.lineHeight = '1';
-  deleteButton.title = 'Delete this item';
+  deleteButton.title = chrome.i18n.getMessage('deleteDropdownItemTitle');
   deleteButton.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1406,7 +1406,7 @@ function editDropdownItemByPath(parentTab, indexPath) {
 
   const dropdownItem = getItemByPath(parentTab.dropdownItems, indexPath);
   if (!dropdownItem) {
-    SFTabs.main.showStatus('Dropdown item not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('dropdownItemNotFound'), true);
     return;
   }
 
@@ -1440,7 +1440,7 @@ function promoteDropdownItemByPath(parentTab, indexPath) {
   const dropdownItem = getItemByPath(stagedItems, indexPath);
 
   if (!dropdownItem) {
-    SFTabs.main.showStatus('Dropdown item not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('dropdownItemNotFound'), true);
     return;
   }
 
@@ -1457,9 +1457,9 @@ function promoteDropdownItemByPath(parentTab, indexPath) {
 
   // Show status - but don't save yet
   if (preservedDropdownItems.length > 0) {
-    SFTabs.main.showStatus(`"${dropdownItem.label}" with ${preservedDropdownItems.length} nested items will be promoted when you click Save`);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('itemWithNestedWillBePromoted', [dropdownItem.label, String(preservedDropdownItems.length)]));
   } else {
-    SFTabs.main.showStatus(`"${dropdownItem.label}" will be promoted when you click Save`);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('itemWillBePromoted', [dropdownItem.label]));
   }
 
   // Store the promoted item temporarily so we can apply it on Save
@@ -1489,7 +1489,7 @@ function deleteDropdownItemByPath(parentTab, indexPath) {
   const item = getItemByPath(stagedItems, indexPath);
 
   if (!item) {
-    SFTabs.main.showStatus('Dropdown item not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('dropdownItemNotFound'), true);
     return;
   }
 
@@ -1504,7 +1504,7 @@ function deleteDropdownItemByPath(parentTab, indexPath) {
     // Update the staged items array
     parentTab.stagedDropdownItems = stagedItems;
 
-    SFTabs.main.showStatus(`"${item.label}" will be deleted when you click Save`);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('itemWillBeDeleted', [item.label]));
 
     // Refresh the dropdown preview with staged items (no storage save)
     showManageDropdownPanelItems(parentTab);
@@ -1514,7 +1514,7 @@ function deleteDropdownItemByPath(parentTab, indexPath) {
     performDelete();
   } else {
     // Show confirmation dialog
-    if (confirm(`Delete "${item.label}"?`)) {
+    if (confirm(chrome.i18n.getMessage('deleteDropdownItemConfirm', [item.label]))) {
       performDelete();
     }
   }
@@ -1729,7 +1729,7 @@ function performDropOperation(parentTab, sourcePath, targetPath, dropZone) {
     // Refresh the display
     showManageDropdownPanelItems(parentTab);
   }).catch(error => {
-    SFTabs.main.showStatus('Error saving changes: ' + error.message, true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('errorSavingChanges', [error.message]), true);
   });
 }
 
@@ -1765,13 +1765,13 @@ function promoteDropdownItem(parentTab, itemIndex) {
   const parentTabIndex = tabs.findIndex(t => t.id === parentTab.id);
 
   if (parentTabIndex === -1) {
-    SFTabs.main.showStatus('Parent tab not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('parentTabNotFound'), true);
     return;
   }
 
   const dropdownItem = parentTab.dropdownItems[itemIndex];
   if (!dropdownItem) {
-    SFTabs.main.showStatus('Dropdown item not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('dropdownItemNotFound'), true);
     return;
   }
 
@@ -1804,9 +1804,9 @@ function promoteDropdownItem(parentTab, itemIndex) {
   // Save and refresh
   SFTabs.storage.saveTabs(tabs).then(() => {
     if (preservedDropdownItems.length > 0) {
-      SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" with ${preservedDropdownItems.length} nested items to main tab list`);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('promotedWithNested', [dropdownItem.label, String(preservedDropdownItems.length)]));
     } else {
-      SFTabs.main.showStatus(`Promoted "${dropdownItem.label}" to main tab list`);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('promoted', [dropdownItem.label]));
     }
 
     // Refresh the dropdown preview (but keep action panel open for multiple edits)
@@ -1822,7 +1822,7 @@ function promoteDropdownItem(parentTab, itemIndex) {
 
     // Don't call renderTabList() or hideTabForm() - keep action panel open for multiple edits
   }).catch(error => {
-    SFTabs.main.showStatus('Error promoting item: ' + error.message, true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('errorPromotingItem', [error.message]), true);
   });
 }
 
@@ -1833,7 +1833,7 @@ function editDropdownItem(parentTab, itemIndex) {
 
   const dropdownItem = parentTab.dropdownItems[itemIndex];
   if (!dropdownItem) {
-    SFTabs.main.showStatus('Dropdown item not found', true);
+    SFTabs.main.showStatus(chrome.i18n.getMessage('dropdownItemNotFound'), true);
     return;
   }
 

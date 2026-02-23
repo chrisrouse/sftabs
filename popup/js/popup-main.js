@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     } catch (error) {
-      showStatus('Error initializing popup: ' + error.message, true);
+      showStatus(chrome.i18n.getMessage('errorInitializingPopup', [error.message]), true);
     }
   })();
 
@@ -246,7 +246,7 @@ async function loadUserSettings() {
     userSettings = loadedSettings;
     return userSettings;
   } catch (error) {
-    showStatus('Error loading settings: ' + error.message, true);
+    showStatus(chrome.i18n.getMessage('errorLoadingSettings', [error.message]), true);
     return SFTabs.constants.DEFAULT_SETTINGS;
   }
 }
@@ -286,7 +286,7 @@ async function loadTabsFromStorage() {
     }
     return customTabs;
   } catch (error) {
-    showStatus('Error loading tabs: ' + error.message, true);
+    showStatus(chrome.i18n.getMessage('errorLoadingTabs', [error.message]), true);
 
     // Don't automatically use defaults on error - might overwrite user data
     customTabs = [];
@@ -460,9 +460,9 @@ function updateActionPanelContent(tab) {
   // Update tab name display at the top
   if (domElements.actionPanelTabNameDisplay) {
     if (isDropdownItemEdit) {
-      domElements.actionPanelTabNameDisplay.textContent = 'Edit Dropdown Item';
+      domElements.actionPanelTabNameDisplay.textContent = chrome.i18n.getMessage('editDropdownItemPanelTitle');
     } else if (isNewTab) {
-      domElements.actionPanelTabNameDisplay.textContent = 'New Tab';
+      domElements.actionPanelTabNameDisplay.textContent = chrome.i18n.getMessage('newTabPanelTitle');
     } else {
       domElements.actionPanelTabNameDisplay.textContent = tab.label;
     }
@@ -536,7 +536,7 @@ function showManualDropdownItems(tab) {
     // Edit button
     const editButton = document.createElement('button');
     editButton.type = 'button';
-    editButton.textContent = 'Edit';
+    editButton.textContent = chrome.i18n.getMessage('editButton');
     editButton.style.fontSize = '11px';
     editButton.style.padding = '2px 6px';
     editButton.style.background = '#0176d3';
@@ -544,7 +544,7 @@ function showManualDropdownItems(tab) {
     editButton.style.border = 'none';
     editButton.style.borderRadius = '3px';
     editButton.style.cursor = 'pointer';
-    editButton.title = 'Edit this dropdown item';
+    editButton.title = chrome.i18n.getMessage('editDropdownItemTitle');
     editButton.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -564,7 +564,7 @@ function showManualDropdownItems(tab) {
     promoteButton.style.border = 'none';
     promoteButton.style.borderRadius = '3px';
     promoteButton.style.cursor = 'pointer';
-    promoteButton.title = 'Promote to main tab list';
+    promoteButton.title = chrome.i18n.getMessage('promoteToMainListTitle');
     promoteButton.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -593,7 +593,7 @@ function saveActionPanelChanges() {
   const tab = currentActionPanelTab;
 
   if (!tab) {
-    showStatus('No tab selected', true);
+    showStatus(chrome.i18n.getMessage('noTabSelected'), true);
     return;
   }
 
@@ -603,7 +603,7 @@ function saveActionPanelChanges() {
 
   // Validation - name is required, but path is optional (for folder-style tabs)
   if (!name) {
-    showStatus('Tab name is required', true);
+    showStatus(chrome.i18n.getMessage('tabNameRequired'), true);
     return;
   }
 
@@ -613,7 +613,7 @@ function saveActionPanelChanges() {
 
   // Validation for conflicting options
   if (isObject && isCustomUrl) {
-    showStatus('Tab cannot be both Object and Custom URL', true);
+    showStatus(chrome.i18n.getMessage('tabCannotBeBoth'), true);
     return;
   }
 
@@ -656,14 +656,14 @@ function saveActionPanelChanges() {
     const parentTab = tabs.find(t => t.id === parentTabId);
 
     if (!parentTab || !parentTab.dropdownItems) {
-      showStatus('Parent tab not found', true);
+      showStatus(chrome.i18n.getMessage('parentTabNotFound'), true);
       return;
     }
 
     // Navigate to the item using the path
     const item = SFTabs.ui.getItemByPath(parentTab.dropdownItems, itemPath);
     if (!item) {
-      showStatus('Dropdown item not found', true);
+      showStatus(chrome.i18n.getMessage('dropdownItemNotFound'), true);
       return;
     }
 
@@ -676,7 +676,7 @@ function saveActionPanelChanges() {
 
     // Save and refresh
     SFTabs.storage.saveTabs(tabs).then(() => {
-      showStatus('Dropdown item updated successfully', false);
+      showStatus(chrome.i18n.getMessage('dropdownItemUpdated'), false);
 
       // Reload tabs from storage
       return loadTabsFromStorage();
@@ -691,7 +691,7 @@ function saveActionPanelChanges() {
         showMainContent();
       }, 800);
     }).catch(error => {
-      showStatus('Error updating dropdown item: ' + error.message, true);
+      showStatus(chrome.i18n.getMessage('errorUpdatingDropdownItem', [error.message]), true);
     });
 
     return;
@@ -713,17 +713,17 @@ function saveActionPanelChanges() {
           SFTabs.ui.renderTabList();
         }
 
-        showStatus('Tab created successfully', false);
+        showStatus(chrome.i18n.getMessage('tabCreated'), false);
 
         // Close panel and return to main content
         setTimeout(() => {
           showMainContent();
         }, 800);
       }).catch(error => {
-        showStatus('Error creating tab: ' + error.message, true);
+        showStatus(chrome.i18n.getMessage('errorCreatingTab', [error.message]), true);
       });
     } else {
-      showStatus('Error: Create function not available', true);
+      showStatus(chrome.i18n.getMessage('errorCreateNotAvailable'), true);
     }
   } else {
     // Update existing tab
@@ -751,17 +751,17 @@ function saveActionPanelChanges() {
           SFTabs.ui.renderTabList();
         }
 
-        showStatus('Tab updated successfully', false);
+        showStatus(chrome.i18n.getMessage('tabUpdated'), false);
 
         // Close panel and return to main content
         setTimeout(() => {
           showMainContent();
         }, 800);
       }).catch(error => {
-        showStatus('Error updating tab: ' + error.message, true);
+        showStatus(chrome.i18n.getMessage('errorUpdatingTab', [error.message]), true);
       });
     } else {
-      showStatus('Error: Update function not available', true);
+      showStatus(chrome.i18n.getMessage('errorUpdateNotAvailable'), true);
     }
   }
 }
