@@ -221,16 +221,30 @@
       // Get logo URL
       const logoUrl = browser.runtime.getURL('icons/sftabs-icon-16.png');
 
-      this.modal.innerHTML = `
-        <div class="modal-content">
-          <button class="modal-toggle-button" aria-label="Toggle SF Tabs" title="SF Tabs">
-            <img src="${logoUrl}" alt="SF Tabs" />
-          </button>
-          <div class="modal-panel">
-            <div class="tab-list-container" role="list"></div>
-          </div>
-        </div>
-      `;
+      const modalContent = document.createElement('div');
+      modalContent.className = 'modal-content';
+
+      const toggleButton = document.createElement('button');
+      toggleButton.className = 'modal-toggle-button';
+      toggleButton.setAttribute('aria-label', 'Toggle SF Tabs');
+      toggleButton.title = 'SF Tabs';
+
+      const logoImg = document.createElement('img');
+      logoImg.src = logoUrl;
+      logoImg.alt = 'SF Tabs';
+      toggleButton.appendChild(logoImg);
+
+      const modalPanel = document.createElement('div');
+      modalPanel.className = 'modal-panel';
+
+      const tabListContainer = document.createElement('div');
+      tabListContainer.className = 'tab-list-container';
+      tabListContainer.setAttribute('role', 'list');
+      modalPanel.appendChild(tabListContainer);
+
+      modalContent.appendChild(toggleButton);
+      modalContent.appendChild(modalPanel);
+      this.modal.appendChild(modalContent);
 
       document.body.appendChild(this.modal);
 
