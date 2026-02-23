@@ -1923,5 +1923,33 @@
   "untitledTab": {
     "message": "Untitled Tab",
     "description": "Fallback label for a tab with no title during export processing"
+  },
+  "tipRecommendExport": {
+    "message": "We recommend",
+    "description": "Text before the export link in tip paragraphs in settings"
+  },
+  "exportingYourConfiguration": {
+    "message": "exporting your configuration",
+    "description": "Link text in settings tip paragraphs pointing to export functionality"
+  },
+  "exportBeforeDisableHint": {
+    "message": "before disabling profiles so you can restore it later if needed.",
+    "description": "Text after the export link in the disable profiles tip"
+  },
+  "exportBeforeResetHint": {
+    "message": "before resetting so you can restore it later if needed.",
+    "description": "Text after the export link in the reset tip"
+  },
+  "syncConflictSettingsDiffer": {
+    "message": "Settings differ:",
+    "description": "Label in sync conflict dialog when settings differ between local and synced"
+  },
+  "syncConflictLocal": {
+    "message": "Local",
+    "description": "Label for local data in the sync conflict dialog"
+  },
+  "syncConflictSynced": {
+    "message": "Synced",
+    "description": "Label for synced data in the sync conflict dialog"
   }
 }

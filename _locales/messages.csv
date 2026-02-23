@@ -403,3 +403,10 @@ errorMerge,"Merge failed: $ERROR$",,,Error status when data merge fails; {$ERROR
 mergedProfilesSuccess,"Merged $COUNT$ profiles and settings successfully",,,Success status in mergeSyncData function; {$COUNT$}=number of merged profiles
 navigateToSection,Navigate to $SECTION$ section,,,Aria-label for sidebar navigation items; {$SECTION$}=section name
 untitledTab,Untitled Tab,,,Fallback label for a tab with no title during export processing
+tipRecommendExport,We recommend,,,Text before the export link in tip paragraphs in settings
+exportingYourConfiguration,exporting your configuration,,,Link text in settings tip paragraphs pointing to export functionality
+exportBeforeDisableHint,before disabling profiles so you can restore it later if needed.,,,Text after the export link in the disable profiles tip
+exportBeforeResetHint,before resetting so you can restore it later if needed.,,,Text after the export link in the reset tip
+syncConflictSettingsDiffer,Settings differ:,,,Label in sync conflict dialog when settings differ between local and synced
+syncConflictLocal,Local,,,Label for local data in the sync conflict dialog
+syncConflictSynced,Synced,,,Label for synced data in the sync conflict dialog
