@@ -11,7 +11,9 @@
     "build:chrome": "npm run manifest:chrome && npm run build -- --filename=sftabs-chrome-{version}.zip",
     "build:firefox": "npm run manifest:firefox && npm run build -- --filename=sftabs-firefox-{version}.zip",
     "lint": "web-ext lint",
-    "sign:firefox": "web-ext sign"
+    "sign:firefox": "web-ext sign",
+    "i18n:export": "node scripts/json-to-csv.js",
+    "i18n:build": "node scripts/csv-to-json.js"
   },
   "repository": {
     "type": "git",
