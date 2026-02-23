@@ -1,0 +1,127 @@
+{
+  "firstLaunchWelcomeTitle": {
+    "message": "Thanks for installing SF Tabs!",
+    "description": "First launch modal header"
+  },
+
+  "firstLaunchSetupDefaultTitle": {
+    "message": "Start with default tabs",
+    "description": "Setup option title for starting with default tabs"
+  },
+  "firstLaunchSetupDefaultDescription": {
+    "message": "Start with the standard set of tabs",
+    "description": "Setup option description for starting with default tabs"
+  },
+
+  "firstLaunchSetupEmptyTitle": {
+    "message": "Start with no tabs",
+    "description": "Setup option title for starting with an empty profile"
+  },
+  "firstLaunchSetupEmptyDescription": {
+    "message": "Begin with an empty profile and add tabs manually",
+    "description": "Setup option description for starting with an empty profile"
+  },
+
+  "firstLaunchSetupImportTitle": {
+    "message": "Import existing configuration",
+    "description": "Setup option title for importing an existing configuration"
+  },
+  "firstLaunchSetupImportDescription": {
+    "message": "Import an SF Tabs configuration file",
+    "description": "Setup option description for importing an existing configuration"
+  },
+
+  "firstLaunchEnableProfilesTitle": {
+    "message": "Enable Profiles",
+    "description": "Profiles toggle option title"
+  },
+  "firstLaunchEnableProfilesDescription": {
+    "message": "Profiles let you manage different tab configurations",
+    "description": "Profiles toggle option description"
+  },
+
+  "firstLaunchSyncStorageTitle": {
+    "message": "Sync Storage",
+    "description": "Sync storage option title"
+  },
+  "firstLaunchSyncStorageDescription": {
+    "message": "Tabs can sync between computers",
+    "description": "Sync storage option description"
+  },
+
+  "firstLaunchLocalStorageTitle": {
+    "message": "Local Storage",
+    "description": "Local storage option title"
+  },
+  "firstLaunchLocalStorageDescription": {
+    "message": "Tabs don't sync between computers",
+    "description": "Local storage option description"
+  },
+
+  "firstLaunchGuideButton": {
+    "message": "User Guide",
+    "description": "Button that opens the user guide"
+  },
+  "firstLaunchGetStartedButton": {
+    "message": "Get Started",
+    "description": "Primary button to complete first-launch setup"
+  },
+
+  "firstLaunchSyncFoundTitle": {
+    "message": "Synced Configuration Found",
+    "description": "Heading shown when existing sync data is detected on a new device"
+  },
+  "firstLaunchSyncFoundMessage": {
+    "message": "We found existing SF Tabs data in your browser sync$PROFILES$.",
+    "description": "Message shown when sync data is detected. $PROFILES$ is replaced with ' (X profiles with tabs)' when profiles exist, or omitted.",
+    "placeholders": {
+      "profiles": {
+        "content": "$1",
+        "example": " (3 profiles with tabs)"
+      }
+    }
+  },
+  "firstLaunchSyncFoundQuestion": {
+    "message": "Would you like to use it or start fresh?",
+    "description": "Question shown below the sync data detected message"
+  },
+  "firstLaunchUseSyncedButton": {
+    "message": "Use Synced Configuration (Recommended)",
+    "description": "Button to use the existing synced configuration"
+  },
+  "firstLaunchStartFreshButton": {
+    "message": "Start Fresh with New Setup",
+    "description": "Button to discard synced data and run the normal setup wizard"
+  },
+
+  "firstLaunchErrorLoadingSync": {
+    "message": "Error loading synced data: $ERROR$",
+    "description": "Error shown when loading synced configuration fails",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Storage quota exceeded"
+      }
+    }
+  },
+  "firstLaunchErrorClearingSync": {
+    "message": "Error clearing sync data: $ERROR$",
+    "description": "Error shown when clearing sync data before starting fresh fails",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Storage quota exceeded"
+      }
+    }
+  },
+  "firstLaunchErrorSetup": {
+    "message": "Error during setup: $ERROR$",
+    "description": "Error shown when the Get Started initialization fails",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Storage quota exceeded"
+      }
+    }
+  }
+}

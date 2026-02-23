@@ -36,7 +36,9 @@ module.exports = {
     'BUILD.md',
     'TRANSLATION_REFERENCE.md',
     'translations.csv',
+    'docs',
     'docs/**',
+    'wiki',
     'wiki/**',
     // IDE files
     '.vscode/**',
@@ -45,7 +47,16 @@ module.exports = {
     '*.log',
     '*.md',
     'dark-mode-improvements.html',
-    'design-examples.html'
+    'design-examples.html',
+    'first-launch-preview.html',
+    // Utility scripts (build/translation tools)
+    'scripts',
+    'scripts/**',
+    // Salesforce CLI config
+    '.sfdx/**',
+    // Beta-only icon assets (not used in production release)
+    'icons/sftabs-beta*',
+    'icons/sftabs_beta*'
   ],
 
   // Build configuration

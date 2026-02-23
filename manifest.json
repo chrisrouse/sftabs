@@ -1,11 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "SF Tabs BETA",
-  "version": "2.0.0.2",
-  "description": "THIS EXTENSION IS FOR BETA TESTING. Add custom tabs to the Salesforce setup menu.",
+  "name": "SF Tabs",
+  "version": "2.0.0",
+  "description": "Add custom tabs to the Salesforce setup menu.",
   "author": "Chris Rouse",
   "homepage_url": "https://github.com/chrisrouse/sftabs",
   "default_locale": "en",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "sftabs@github.chrisrouse",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
+    }
+  },
   "permissions": [
     "activeTab",
     "storage",
@@ -21,8 +35,8 @@
   ],
   "action": {
     "default_icon": {
-      "48": "icons/sftabs-beta-icon-48.png",
-      "96": "icons/sftabs-beta-icon-96.png"
+      "48": "icons/sftabs-icon-48.png",
+      "96": "icons/sftabs-icon-96.png"
     },
     "default_title": "SF Tabs",
     "default_popup": "popup/popup.html"
@@ -83,13 +97,9 @@
     }
   ],
   "icons": {
-    "16": "icons/sftabs-beta-icon-16.png",
-    "48": "icons/sftabs-beta-icon-48.png",
-    "96": "icons/sftabs-beta-icon-96.png"
-  },
-  "options_ui": {
-    "page": "popup/settings.html",
-    "open_in_tab": true
+    "16": "icons/sftabs-icon-16.png",
+    "48": "icons/sftabs-icon-48.png",
+    "96": "icons/sftabs-icon-96.png"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
@@ -127,6 +137,8 @@
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "scripts": [
+      "background.js"
+    ]
   }
 }

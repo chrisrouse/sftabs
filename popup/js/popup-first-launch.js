@@ -101,30 +101,55 @@ async function showSyncDataDetectedScreen(syncData) {
     ? `${syncData.profileCount} profile${syncData.profileCount !== 1 ? 's' : ''} with tabs`
     : 'settings';
 
-  contentArea.innerHTML = `
-    <div style="text-align: center; padding: 20px;">
-      <div style="font-size: 48px; margin-bottom: 16px;">☁️</div>
-      <h2 style="font-size: 28px; font-weight: 600; margin: 0 0 12px 0; color: var(--color-text);">
-        Synced Configuration Found
-      </h2>
-      <p style="font-size: 16px; color: var(--color-text-weak); margin: 0 0 32px 0; line-height: 1.5;">
-        We found existing SF Tabs data in your browser sync${syncData.profileCount > 0 ? ` (${profileText})` : ''}.
-        <br>Would you like to use it or start fresh?
-      </p>
+  const container = document.createElement('div');
+  container.style.cssText = 'text-align: center; padding: 20px;';
 
-      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 500px; margin: 0 auto;">
-        <button id="use-synced-data-button" class="primary-button" style="width: 100%; padding: 16px; font-size: 16px;">
-          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <span>✓</span>
-            <span>Use Synced Configuration (Recommended)</span>
-          </div>
-        </button>
-        <button id="start-fresh-button" class="secondary-button" style="width: 100%; padding: 16px; font-size: 16px;">
-          Start Fresh with New Setup
-        </button>
-      </div>
-    </div>
-  `;
+  const emojiDiv = document.createElement('div');
+  emojiDiv.style.cssText = 'font-size: 48px; margin-bottom: 16px;';
+  emojiDiv.textContent = '☁️';
+
+  const heading = document.createElement('h2');
+  heading.style.cssText = 'font-size: 28px; font-weight: 600; margin: 0 0 12px 0; color: var(--color-text);';
+  heading.textContent = 'Synced Configuration Found';
+
+  const para = document.createElement('p');
+  para.style.cssText = 'font-size: 16px; color: var(--color-text-weak); margin: 0 0 32px 0; line-height: 1.5;';
+  const syncText = `We found existing SF Tabs data in your browser sync${syncData.profileCount > 0 ? ` (${profileText})` : ''}.`;
+  para.appendChild(document.createTextNode(syncText));
+  para.appendChild(document.createElement('br'));
+  para.appendChild(document.createTextNode('Would you like to use it or start fresh?'));
+
+  const buttonGroup = document.createElement('div');
+  buttonGroup.style.cssText = 'display: flex; flex-direction: column; gap: 12px; max-width: 500px; margin: 0 auto;';
+
+  const useSyncedBtn = document.createElement('button');
+  useSyncedBtn.id = 'use-synced-data-button';
+  useSyncedBtn.className = 'primary-button';
+  useSyncedBtn.style.cssText = 'width: 100%; padding: 16px; font-size: 16px;';
+  const useSyncedBtnInner = document.createElement('div');
+  useSyncedBtnInner.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 8px;';
+  const checkSpan = document.createElement('span');
+  checkSpan.textContent = '✓';
+  const labelSpan = document.createElement('span');
+  labelSpan.textContent = 'Use Synced Configuration (Recommended)';
+  useSyncedBtnInner.appendChild(checkSpan);
+  useSyncedBtnInner.appendChild(labelSpan);
+  useSyncedBtn.appendChild(useSyncedBtnInner);
+
+  const startFreshBtn = document.createElement('button');
+  startFreshBtn.id = 'start-fresh-button';
+  startFreshBtn.className = 'secondary-button';
+  startFreshBtn.style.cssText = 'width: 100%; padding: 16px; font-size: 16px;';
+  startFreshBtn.textContent = 'Start Fresh with New Setup';
+
+  buttonGroup.appendChild(useSyncedBtn);
+  buttonGroup.appendChild(startFreshBtn);
+
+  container.appendChild(emojiDiv);
+  container.appendChild(heading);
+  container.appendChild(para);
+  container.appendChild(buttonGroup);
+  contentArea.appendChild(container);
 
   // Setup event listeners
   const useSyncedButton = document.getElementById('use-synced-data-button');
