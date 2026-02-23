@@ -74,15 +74,15 @@
                 <!-- Profile Initialization Options (shown for new empty profiles) -->
                 <div class="profile-init-options" id="profile-init-options" style="display: none;">
                     <div class="profile-init-header">
-                        <h3>Initialize Profile</h3>
-                        <p>Choose how to set up this profile:</p>
+                        <h3>__MSG_profileInitTitle__</h3>
+                        <p>__MSG_profileInitDesc__</p>
                     </div>
 
                     <div class="profile-init-option" id="init-with-defaults">
                         <div class="option-icon">📋</div>
                         <div class="option-content">
-                            <div class="option-title">Start with default tabs</div>
-                            <div class="option-description">Start with the standard set of tabs</div>
+                            <div class="option-title">__MSG_firstLaunchSetupDefaultTitle__</div>
+                            <div class="option-description">__MSG_firstLaunchSetupDefaultDescription__</div>
                         </div>
                         <div class="option-action">→</div>
                     </div>
@@ -90,8 +90,8 @@
                     <div class="profile-init-option" id="init-empty">
                         <div class="option-icon">✨</div>
                         <div class="option-content">
-                            <div class="option-title">Start with no tabs</div>
-                            <div class="option-description">Begin with an empty profile and add tabs manually</div>
+                            <div class="option-title">__MSG_firstLaunchSetupEmptyTitle__</div>
+                            <div class="option-description">__MSG_firstLaunchSetupEmptyDescription__</div>
                         </div>
                         <div class="option-action">→</div>
                     </div>
@@ -99,21 +99,21 @@
                     <div class="profile-init-option" id="init-clone">
                         <div class="option-icon">📑</div>
                         <div class="option-content">
-                            <div class="option-title">Clone another profile</div>
-                            <div class="option-description">Copy tabs from an existing profile</div>
+                            <div class="option-title">__MSG_cloneAnotherProfileTitle__</div>
+                            <div class="option-description">__MSG_cloneAnotherProfileDesc__</div>
                         </div>
                         <div class="option-action">→</div>
                     </div>
 
                     <!-- Clone Profile Selector (shown when clone option is clicked) -->
                     <div class="profile-clone-selector" id="profile-clone-selector" style="display: none;">
-                        <label for="clone-source-profile">Select profile to clone:</label>
+                        <label for="clone-source-profile">__MSG_selectProfileToCloneLabel__</label>
                         <select id="clone-source-profile" class="clone-profile-select">
-                            <option value="">Choose a profile...</option>
+                            <option value="">__MSG_selectProfilePlaceholder__</option>
                         </select>
                         <div class="clone-actions">
-                            <button type="button" id="clone-confirm-button" class="primary-button">Clone Profile</button>
-                            <button type="button" id="clone-cancel-button" class="secondary-button">Cancel</button>
+                            <button type="button" id="clone-confirm-button" class="primary-button">__MSG_cloneProfileButton__</button>
+                            <button type="button" id="clone-cancel-button" class="secondary-button">__MSG_cancelButton__</button>
                         </div>
                     </div>
                 </div>
@@ -224,11 +224,11 @@
             <div id="profile-list-content" class="action-panel-content" style="display: none;">
                 <!-- Active Profile Selector -->
                 <div class="form-group">
-                    <label for="active-profile-selector">Active Profile</label>
+                    <label for="active-profile-selector">__MSG_activeProfileLabel__</label>
                     <select id="active-profile-selector" class="select-input">
-                        <option value="">Select a profile...</option>
+                        <option value="">__MSG_selectProfilePlaceholder__</option>
                     </select>
-                    <div class="help-text">Switch to a different profile to view and manage its tabs.</div>
+                    <div class="help-text">__MSG_switchProfileHelp__</div>
                 </div>
 
                 <div class="form-group">
@@ -237,7 +237,7 @@
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
-                        Create New Profile
+                        __MSG_createNewProfileButton__
                     </button>
                 </div>
 
@@ -251,31 +251,31 @@
                 </div>
 
                 <div class="form-group">
-                    <button id="profile-list-close-button" class="secondary-button" style="width: 100%;">Close</button>
+                    <button id="profile-list-close-button" class="secondary-button" style="width: 100%;">__MSG_closeButton__</button>
                 </div>
             </div>
 
             <!-- Profile Edit Content -->
             <div id="profile-edit-content" class="action-panel-content" style="display: none;">
                 <div class="form-group">
-                    <h3 id="profile-edit-title" style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">Edit Profile</h3>
+                    <h3 id="profile-edit-title" style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">__MSG_editProfilePanelTitle__</h3>
                 </div>
 
                 <div class="form-group">
-                    <label for="profile-name">Profile Name</label>
-                    <input type="text" id="profile-name" placeholder="e.g., Work - SmartBot" maxlength="30">
+                    <label for="profile-name">__MSG_profileNameLabel__</label>
+                    <input type="text" id="profile-name" placeholder="__MSG_profileNamePlaceholder__" maxlength="30">
                     <div class="help-text"><span id="profile-name-counter">0</span>/30 characters</div>
                 </div>
 
                 <!-- URL Patterns Section (only visible when auto-switch is enabled) -->
                 <div id="url-patterns-section" style="display: none;">
                     <div class="form-group">
-                        <label>URL Patterns</label>
-                        <div class="help-text" style="margin-bottom: 8px;">Add MyDomain patterns to automatically switch to this profile when visiting matching Salesforce orgs.</div>
+                        <label>__MSG_urlPatternsLabel__</label>
+                        <div class="help-text" style="margin-bottom: 8px;">__MSG_urlPatternsHelp__</div>
 
                         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                            <input type="text" id="url-pattern-input" placeholder="e.g., smartbottechnology-dev-ed" style="flex: 1;">
-                            <button id="add-url-pattern-button" class="secondary-button" style="margin: 0; padding: 8px 12px;">Add</button>
+                            <input type="text" id="url-pattern-input" placeholder="__MSG_urlPatternInputPlaceholder__" style="flex: 1;">
+                            <button id="add-url-pattern-button" class="secondary-button" style="margin: 0; padding: 8px 12px;">__MSG_addButton__</button>
                         </div>
 
                         <button id="capture-domain-button" class="secondary-button" style="width: 100%; margin-bottom: 12px;">
@@ -284,7 +284,7 @@
                                 <line x1="2" y1="12" x2="22" y2="12"></line>
                                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                             </svg>
-                            Capture Current Domain
+                            __MSG_captureCurrentDomainButton__
                         </button>
 
                         <div id="url-pattern-error" class="help-text" style="color: var(--slds-color-error); display: none; margin-bottom: 8px;"></div>
@@ -299,8 +299,8 @@
                 </div>
 
                 <div class="form-group" style="margin-top: 24px;">
-                    <button id="profile-save-button" class="primary-button" style="width: 100%;">Save Profile</button>
-                    <button id="profile-cancel-button" class="secondary-button" style="width: 100%; margin: 8px 0 0 0;">Cancel</button>
+                    <button id="profile-save-button" class="primary-button" style="width: 100%;">__MSG_saveProfileButton__</button>
+                    <button id="profile-cancel-button" class="secondary-button" style="width: 100%; margin: 8px 0 0 0;">__MSG_cancelButton__</button>
                 </div>
             </div>
         </div>
@@ -341,21 +341,21 @@
         <div id="disable-profiles-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Disable Profiles</h2>
+                    <h2>__MSG_disableProfilesTitle__</h2>
                 </div>
                 <div class="modal-body">
-                    <p>Disabling profiles will keep one profile and remove all others.</p>
-                    <p>Which profile would you like to keep?</p>
+                    <p>__MSG_disableProfilesBody__</p>
+                    <p>__MSG_disableProfilesQuestion__</p>
                     <div class="form-group">
-                        <label for="keep-profile-select">Select profile to keep:</label>
+                        <label for="keep-profile-select">__MSG_selectProfileToKeepLabel__</label>
                         <select id="keep-profile-select" class="clone-profile-select">
                             <!-- Options populated dynamically by popup-profiles.js -->
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="disable-profiles-cancel-button" class="secondary-button">Cancel</button>
-                    <button id="disable-profiles-confirm-button" class="primary-button">Disable Profiles</button>
+                    <button id="disable-profiles-cancel-button" class="secondary-button">__MSG_cancelButton__</button>
+                    <button id="disable-profiles-confirm-button" class="primary-button">__MSG_disableProfilesButton__</button>
                 </div>
             </div>
         </div>
@@ -364,7 +364,7 @@
         <div id="first-launch-modal" class="modal" style="display: none;">
             <div class="modal-content migration-modal-content">
                 <div class="modal-header">
-                    <h2 style="font-size: 18px; margin: 0;">Thanks for installing SF Tabs!</h2>
+                    <h2 style="font-size: 18px; margin: 0;">__MSG_firstLaunchWelcomeTitle__</h2>
                 </div>
                 <div class="modal-body">
                     <div id="first-launch-screen" class="migration-screen">
@@ -373,9 +373,9 @@
                             <div class="setup-option active" data-option="default" id="setup-option-default">
                                 <div class="setup-option-icon">📋</div>
                                 <div class="setup-option-content">
-                                    <div class="setup-option-title">Start with default tabs</div>
+                                    <div class="setup-option-title">__MSG_firstLaunchSetupDefaultTitle__</div>
                                     <div class="setup-option-description">
-                                        Start with the standard set of tabs
+                                        __MSG_firstLaunchSetupDefaultDescription__
                                     </div>
                                 </div>
                             </div>
@@ -383,9 +383,9 @@
                             <div class="setup-option" data-option="empty" id="setup-option-empty">
                                 <div class="setup-option-icon">✨</div>
                                 <div class="setup-option-content">
-                                    <div class="setup-option-title">Start with no tabs</div>
+                                    <div class="setup-option-title">__MSG_firstLaunchSetupEmptyTitle__</div>
                                     <div class="setup-option-description">
-                                        Begin with an empty profile and add tabs manually
+                                        __MSG_firstLaunchSetupEmptyDescription__
                                     </div>
                                 </div>
                             </div>
@@ -393,9 +393,9 @@
                             <div class="setup-option" data-option="import" id="setup-option-import">
                                 <div class="setup-option-icon">📥</div>
                                 <div class="setup-option-content">
-                                    <div class="setup-option-title">Import existing configuration</div>
+                                    <div class="setup-option-title">__MSG_firstLaunchSetupImportTitle__</div>
                                     <div class="setup-option-description">
-                                        Import an SF Tabs configuration file
+                                        __MSG_firstLaunchSetupImportDescription__
                                     </div>
                                 </div>
                             </div>
@@ -407,9 +407,9 @@
                                 <input type="checkbox" id="first-launch-enable-profiles">
                                 <div class="option-button-icon">👥</div>
                                 <div class="option-button-content">
-                                    <div class="option-button-title">Enable Profiles</div>
+                                    <div class="option-button-title">__MSG_firstLaunchEnableProfilesTitle__</div>
                                     <div class="option-button-description">
-                                        Profiles let you manage different tab configurations
+                                        __MSG_firstLaunchEnableProfilesDescription__
                                     </div>
                                 </div>
                             </div>
@@ -421,9 +421,9 @@
                                 <input type="radio" name="first-launch-storage-choice" value="sync" checked>
                                 <div class="option-button-icon">☁️</div>
                                 <div class="option-button-content">
-                                    <div class="option-button-title">Sync Storage</div>
+                                    <div class="option-button-title">__MSG_firstLaunchSyncStorageTitle__</div>
                                     <div class="option-button-description">
-                                        Tabs can sync between computers
+                                        __MSG_firstLaunchSyncStorageDescription__
                                     </div>
                                 </div>
                             </div>
@@ -431,9 +431,9 @@
                                 <input type="radio" name="first-launch-storage-choice" value="local">
                                 <div class="option-button-icon">💾</div>
                                 <div class="option-button-content">
-                                    <div class="option-button-title">Local Storage</div>
+                                    <div class="option-button-title">__MSG_firstLaunchLocalStorageTitle__</div>
                                     <div class="option-button-description">
-                                        Tabs don't sync between computers
+                                        __MSG_firstLaunchLocalStorageDescription__
                                     </div>
                                 </div>
                             </div>
@@ -447,9 +447,9 @@
                                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                             </svg>
-                            User Guide
+                            __MSG_firstLaunchGuideButton__
                         </button>
-                        <button id="first-launch-start-button" class="primary-button">Get Started</button>
+                        <button id="first-launch-start-button" class="primary-button">__MSG_firstLaunchGetStartedButton__</button>
                     </div>
                 </div>
             </div>
@@ -468,11 +468,11 @@
                         <div class="form-group" style="margin: 0 0 24px 0;">
                             <div style="background-color: var(--color-section-header); border: 2px solid var(--color-border); border-radius: 8px; padding: 16px; text-align: center;">
                                 <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
-                                <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 6px 0; color: var(--color-text);">New in v2.0</h3>
+                                <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 6px 0; color: var(--color-text);">__MSG_migrationNewFeaturesTitle__</h3>
                                 <p style="font-size: 13px; color: var(--color-text-weak); margin: 0 0 14px 0; line-height: 1.5;">
-                                    Profiles, dropdown menus, and flexible storage options—all new features!
+                                    __MSG_migrationNewFeaturesDesc__
                                 </p>
-                                <button id="migration-learn-more-button" class="primary-button" style="margin: 0;">Learn More</button>
+                                <button id="migration-learn-more-button" class="primary-button" style="margin: 0;">__MSG_learnMoreLink__</button>
                             </div>
                         </div>
 
@@ -482,9 +482,9 @@
                                 <input type="checkbox" id="migration-enable-profiles">
                                 <div class="option-button-icon">👥</div>
                                 <div class="option-button-content">
-                                    <div class="option-button-title">Enable Profiles</div>
+                                    <div class="option-button-title">__MSG_firstLaunchEnableProfilesTitle__</div>
                                     <div class="option-button-description">
-                                        Profiles let you manage different tab configurations
+                                        __MSG_firstLaunchEnableProfilesDescription__
                                     </div>
                                 </div>
                             </div>
@@ -496,9 +496,9 @@
                                 <input type="radio" name="migration-storage-choice" id="migration-storage-sync" value="sync" checked>
                                 <div class="option-button-icon">☁️</div>
                                 <div class="option-button-content">
-                                    <div class="option-button-title" id="migration-sync-storage-title">Sync Storage</div>
+                                    <div class="option-button-title" id="migration-sync-storage-title">__MSG_firstLaunchSyncStorageTitle__</div>
                                     <div class="option-button-description">
-                                        Your tabs can sync across devices
+                                        __MSG_migrationSyncStorageDesc__
                                     </div>
                                 </div>
                             </div>
@@ -506,9 +506,9 @@
                                 <input type="radio" name="migration-storage-choice" id="migration-storage-local" value="local">
                                 <div class="option-button-icon">💾</div>
                                 <div class="option-button-content">
-                                    <div class="option-button-title" id="migration-local-storage-title">Local Storage</div>
+                                    <div class="option-button-title" id="migration-local-storage-title">__MSG_firstLaunchLocalStorageTitle__</div>
                                     <div class="option-button-description">
-                                        Stored on this device only
+                                        __MSG_migrationLocalStorageDesc__
                                     </div>
                                 </div>
                             </div>
@@ -518,20 +518,20 @@
                     <!-- Migration in progress screen -->
                     <div id="migration-progress" class="migration-screen" style="display: none;">
                         <div class="migration-spinner"></div>
-                        <h3 id="migration-progress-title">Migrating your data...</h3>
-                        <p id="migration-progress-message" class="migration-description">This will only take a moment.</p>
+                        <h3 id="migration-progress-title">__MSG_migrationProgressTitle__</h3>
+                        <p id="migration-progress-message" class="migration-description">__MSG_migrationProgressMessage__</p>
                         <div class="migration-steps">
                             <div class="migration-step" id="migration-step-1">
                                 <span class="step-icon">⏳</span>
-                                <span class="step-text">Reading existing data</span>
+                                <span class="step-text">__MSG_migrationStep1__</span>
                             </div>
                             <div class="migration-step" id="migration-step-2">
                                 <span class="step-icon">⏳</span>
-                                <span class="step-text">Creating Default profile</span>
+                                <span class="step-text">__MSG_migrationStep2__</span>
                             </div>
                             <div class="migration-step" id="migration-step-3">
                                 <span class="step-icon">⏳</span>
-                                <span class="step-text">Saving new format</span>
+                                <span class="step-text">__MSG_migrationStep3__</span>
                             </div>
                         </div>
                     </div>
@@ -539,17 +539,17 @@
                     <!-- Migration success screen -->
                     <div id="migration-success" class="migration-screen" style="display: none;">
                         <div class="migration-icon">✅</div>
-                        <h3>Migration Complete!</h3>
+                        <h3>__MSG_migrationSuccessTitle__</h3>
                         <p class="migration-description">
-                            Your tabs have been successfully migrated to the new profile system.
+                            __MSG_migrationSuccessMessage__
                         </p>
                         <div class="migration-info-box success">
-                            <p><strong>What's next:</strong></p>
+                            <p><strong>__MSG_migrationWhatsNext__</strong></p>
                             <ul>
-                                <li>All your tabs are now in the "Default" profile</li>
-                                <li id="migration-profiles-enabled-msg" style="display: none;">Profiles feature is now enabled</li>
-                                <li id="migration-profiles-disabled-msg">You can enable profiles in Settings anytime</li>
-                                <li>Create additional profiles for different orgs</li>
+                                <li>__MSG_migrationDefaultProfileNote__</li>
+                                <li id="migration-profiles-enabled-msg" style="display: none;">__MSG_migrationProfilesEnabledNote__</li>
+                                <li id="migration-profiles-disabled-msg">__MSG_migrationCanEnableLaterNote__</li>
+                                <li>__MSG_migrationCreateProfilesNote__</li>
                             </ul>
                         </div>
                     </div>
@@ -557,12 +557,12 @@
                     <!-- Migration error screen -->
                     <div id="migration-error" class="migration-screen" style="display: none;">
                         <div class="migration-icon">⚠️</div>
-                        <h3>Migration Failed</h3>
+                        <h3>__MSG_migrationErrorTitle__</h3>
                         <p class="migration-description">
-                            An error occurred during migration. Your original data is still intact.
+                            __MSG_migrationErrorMessage__
                         </p>
                         <div class="migration-info-box error">
-                            <p><strong>Error details:</strong></p>
+                            <p><strong>__MSG_migrationErrorDetailsLabel__</strong></p>
                             <p id="migration-error-message" style="font-family: monospace; font-size: 11px; margin-top: 8px;"></p>
                         </div>
                     </div>
@@ -576,20 +576,20 @@
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" y1="15" x2="12" y2="3"></line>
                             </svg>
-                            Export Backup
+                            __MSG_exportBackupButton__
                         </button>
-                        <button id="migration-start-button" class="primary-button">Migrate Now</button>
+                        <button id="migration-start-button" class="primary-button">__MSG_migrateNowButton__</button>
                     </div>
                     <!-- Progress screen buttons (hidden) -->
                     <div id="migration-progress-buttons" style="display: none;"></div>
                     <!-- Success screen buttons -->
                     <div id="migration-success-buttons" style="display: none;">
-                        <button id="migration-done-button" class="primary-button">Get Started</button>
+                        <button id="migration-done-button" class="primary-button">__MSG_firstLaunchGetStartedButton__</button>
                     </div>
                     <!-- Error screen buttons -->
                     <div id="migration-error-buttons" style="display: none;">
-                        <button id="migration-retry-button" class="primary-button">Retry Migration</button>
-                        <button id="migration-skip-button" class="secondary-button">Continue Without Migrating</button>
+                        <button id="migration-retry-button" class="primary-button">__MSG_retryMigrationButton__</button>
+                        <button id="migration-skip-button" class="secondary-button">__MSG_continueWithoutMigratingButton__</button>
                     </div>
                 </div>
             </div>

@@ -94,9 +94,9 @@ async function saveUserSettings() {
 			userSettings: userSettings  // Full settings including useSyncStorage
 		});
 
-		showStatus('Settings saved', false);
+		showStatus(chrome.i18n.getMessage('settingsSaved'), false);
 	} catch (error) {
-		showStatus('Error saving settings: ' + error.message, true);
+		showStatus(chrome.i18n.getMessage('errorSavingSettings', [error.message]), true);
 	}
 }
 
@@ -276,7 +276,7 @@ function setupNavigation() {
 		// Make nav items keyboard accessible
 		item.setAttribute('tabindex', '0');
 		item.setAttribute('role', 'button');
-		item.setAttribute('aria-label', `Navigate to ${item.textContent.trim()} section`);
+		item.setAttribute('aria-label', chrome.i18n.getMessage('navigateToSection', [item.textContent.trim()]));
 
 		// Handle navigation activation
 		const activateNavItem = () => {
@@ -369,8 +369,8 @@ function setupEventListeners() {
 
 			const confirmed = confirm(
 				newValue
-					? 'Enable cross-device sync?\n\nYour tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you\'re signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.'
-					: 'Disable cross-device sync?\n\nYour tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.'
+					? chrome.i18n.getMessage('enableSyncConfirmTitle') + '\n\n' + chrome.i18n.getMessage('enableSyncConfirmMessage')
+					: chrome.i18n.getMessage('disableSyncConfirmTitle') + '\n\n' + chrome.i18n.getMessage('disableSyncConfirmMessage')
 			);
 
 			if (confirmed) {
@@ -399,11 +399,11 @@ function setupEventListeners() {
 					}
 
 					showStatus(
-						newValue ? 'Sync enabled - tabs will now sync across devices' : 'Sync disabled - tabs stored locally only',
+						newValue ? chrome.i18n.getMessage('syncEnabled') : chrome.i18n.getMessage('syncDisabled'),
 						false
 					);
 				} catch (error) {
-					showStatus('Error: ' + error.message, true);
+					showStatus(chrome.i18n.getMessage('errorSavingSettings', [error.message]), true);
 					userSettings.useSyncStorage = oldValue;
 					// Restore UI state
 					updateUI();
@@ -540,10 +540,9 @@ function setupEventListeners() {
 	// Reset button
 	document.getElementById('reset-button').addEventListener('click', async () => {
 		const confirmed = confirm(
-			'Reset all tabs and settings to their default values?\n\n' +
-			'This will remove all custom tabs, reset all settings, and remove all profiles. ' +
-			'This action cannot be undone.'
-		);
+			chrome.i18n.getMessage('resetModalTitle') + '\n\n' + chrome.i18n.getMessage('resetModalPrompt') + '\n\n' +
+			chrome.i18n.getMessage('resetModalWarning')
+				);
 
 		if (confirmed) {
 			await resetToDefaults();
@@ -646,7 +645,7 @@ async function populateInlineProfilesList() {
 	if (profiles.length === 0) {
 		const message = document.createElement('div');
 		message.style.cssText = 'font-size: 13px; color: var(--color-text-weak); font-style: italic;';
-		message.textContent = 'No profiles configured';
+		message.textContent = chrome.i18n.getMessage('noProfilesConfigured');
 		profilesList.appendChild(message);
 		return;
 	}
@@ -678,7 +677,7 @@ async function populateInlineProfilesList() {
 
 		const countDiv = document.createElement('div');
 		countDiv.style.cssText = 'font-size: 12px; color: var(--color-text-weak); margin-top: 1px;';
-		countDiv.textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''}`;
+		countDiv.textContent = tabCount !== 1 ? chrome.i18n.getMessage('tabCountPlural', [String(tabCount)]) : chrome.i18n.getMessage('tabCountSingular', [String(tabCount)]);
 
 		textContainer.appendChild(nameDiv);
 		textContainer.appendChild(countDiv);
@@ -800,9 +799,9 @@ async function performExport(exportEverything, exportSettings, selectedProfileId
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
 
-		showStatus('Configuration exported successfully', false);
+		showStatus(chrome.i18n.getMessage('configExported'), false);
 	} catch (error) {
-		showStatus('Export failed: ' + error.message, true);
+		showStatus(chrome.i18n.getMessage('errorExport', [error.message]), true);
 	}
 }
 
@@ -826,7 +825,7 @@ async function importConfiguration(file) {
 		// Show the inline import options
 		populateImportOptions(normalizedData, file.name);
 	} catch (error) {
-		showStatus('Import failed: ' + error.message, true);
+		showStatus(chrome.i18n.getMessage('errorImport', [error.message]), true);
 	}
 }
 
@@ -902,7 +901,7 @@ function convertSimpleTabsToFull(simpleTabs) {
 
 		return {
 			id: `tab_${Date.now()}_${index}`,
-			label: simpleTab.tabTitle || 'Untitled Tab',
+			label: simpleTab.tabTitle || chrome.i18n.getMessage('untitledTab'),
 			path: urlInfo.path,
 			openInNewTab: simpleTab.openInNewTab || false,
 			isObject: urlInfo.isObject,
@@ -1058,7 +1057,7 @@ async function populateImportOptions(importData, filename) {
 
 			const countDiv = document.createElement('div');
 			countDiv.style.cssText = 'font-size: 12px; color: var(--color-text-weak); margin-top: 1px;';
-			countDiv.textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''}`;
+			countDiv.textContent = tabCount !== 1 ? chrome.i18n.getMessage('tabCountPlural', [String(tabCount)]) : chrome.i18n.getMessage('tabCountSingular', [String(tabCount)]);
 
 			textContainer.appendChild(nameDiv);
 			textContainer.appendChild(countDiv);
@@ -1073,7 +1072,7 @@ async function populateImportOptions(importData, filename) {
 		const profile = importData.profiles[0];
 		const profileTabs = importData.profileData[profile.id] || [];
 		const tabCount = profileTabs.length;
-		document.getElementById('import-tabs-count').textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''} from "${profile.name}"`;
+		document.getElementById('import-tabs-count').textContent = chrome.i18n.getMessage('tabsFromProfile', [tabCount !== 1 ? chrome.i18n.getMessage('tabCountPlural', [String(tabCount)]) : chrome.i18n.getMessage('tabCountSingular', [String(tabCount)]), profile.name]);
 
 		// Show hybrid import options
 		document.getElementById('import-hybrid-container').style.display = 'block';
@@ -1083,7 +1082,7 @@ async function populateImportOptions(importData, filename) {
 		const profile = importData.profiles[0];
 		const profileTabs = importData.profileData[profile.id] || [];
 		const tabCount = profileTabs.length;
-		document.getElementById('import-tabs-count').textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''} from "${profile.name}"`;
+		document.getElementById('import-tabs-count').textContent = chrome.i18n.getMessage('tabsFromProfile', [tabCount !== 1 ? chrome.i18n.getMessage('tabCountPlural', [String(tabCount)]) : chrome.i18n.getMessage('tabCountSingular', [String(tabCount)]), profile.name]);
 
 		// Show destination options for profiles mode
 		document.getElementById('import-destination-container').style.display = 'block';
@@ -1115,7 +1114,7 @@ async function populateImportOptions(importData, filename) {
 		// Single set of tabs (legacy or single profile with profiles enabled)
 		document.getElementById('import-tabs-container').style.display = 'block';
 		const tabCount = importData.tabs.length;
-		document.getElementById('import-tabs-count').textContent = `${tabCount} tab${tabCount !== 1 ? 's' : ''}`;
+		document.getElementById('import-tabs-count').textContent = tabCount !== 1 ? chrome.i18n.getMessage('tabCountPlural', [String(tabCount)]) : chrome.i18n.getMessage('tabCountSingular', [String(tabCount)]);
 
 		// If user has profiles enabled, show destination options
 		if (profilesEnabled) {
@@ -1165,7 +1164,7 @@ function hideImportOptions() {
  */
 async function performImportFromInline() {
 	if (!pendingImportData) {
-		showStatus('No import data available', true);
+		showStatus(chrome.i18n.getMessage('errorInvalidConfig'), true);
 		return;
 	}
 
@@ -1215,21 +1214,21 @@ async function performImportFromInline() {
 				// Only importing settings
 				await importOnlySettings(pendingImportData);
 			} else {
-				showStatus('Please select at least one option to import', true);
+				showStatus(chrome.i18n.getMessage('selectImportOptionError'), true);
 				return;
 			}
 		}
 
 		// Success!
 		hideImportOptions();
-		showStatus('Configuration imported successfully', false);
+		showStatus(chrome.i18n.getMessage('configImported'), false);
 
 		// Reload UI
 		await loadUserSettings();
 		updateUI();
 		applyTheme();
 	} catch (error) {
-		showStatus('Import failed: ' + error.message, true);
+		showStatus(chrome.i18n.getMessage('errorImport', [error.message]), true);
 	}
 }
 
@@ -1299,7 +1298,7 @@ async function importFromHybridMode(importData, importSettings) {
 	const hybridMode = document.querySelector('input[name="import-hybrid-mode"]:checked')?.value;
 
 	if (!hybridMode) {
-		throw new Error('Please select an import option');
+		throw new Error(chrome.i18n.getMessage('selectImportOptionError'));
 	}
 
 	// Get the single profile and its tabs
@@ -1411,7 +1410,7 @@ async function importTabsToDestination(importData, importSettings) {
 			// Add to existing profile
 			const profileId = document.getElementById('import-profile-add-select').value;
 			if (!profileId) {
-				throw new Error('Please select a profile');
+				throw new Error(chrome.i18n.getMessage('selectProfileError'));
 			}
 
 			// Load existing tabs from the profile
@@ -1436,7 +1435,7 @@ async function importTabsToDestination(importData, importSettings) {
 			// Overwrite existing profile
 			const profileId = document.getElementById('import-profile-select-inline').value;
 			if (!profileId) {
-				throw new Error('Please select a profile');
+				throw new Error(chrome.i18n.getMessage('selectProfileError'));
 			}
 
 			const storageKey = `profile_${profileId}_tabs`;
@@ -1445,7 +1444,7 @@ async function importTabsToDestination(importData, importSettings) {
 			// Create new profile
 			const profileName = document.getElementById('import-new-profile-name').value.trim();
 			if (!profileName) {
-				throw new Error('Please enter a profile name');
+				throw new Error(chrome.i18n.getMessage('profileNameError'));
 			}
 
 			const result = await browser.storage.sync.get('profiles');
@@ -1544,7 +1543,7 @@ async function importTabsToDestination(importData, importSettings) {
  */
 async function importOnlySettings(importData) {
 	if (!importData.settings || Object.keys(importData.settings).length === 0) {
-		throw new Error('No settings to import');
+		throw new Error(chrome.i18n.getMessage('errorInvalidConfig'));
 	}
 
 	const mergedSettings = {
@@ -1598,9 +1597,9 @@ async function resetToDefaults() {
 		updateUI();
 		applyTheme();
 
-		showStatus('All settings and tabs reset to defaults', false);
+		showStatus(chrome.i18n.getMessage('settingsReset'), false);
 	} catch (error) {
-		showStatus('Reset failed: ' + error.message, true);
+		showStatus(chrome.i18n.getMessage('errorReset', [error.message]), true);
 	}
 }
 
@@ -1678,20 +1677,16 @@ async function showSyncConflictDialog(conflict) {
 		localSettings.profilesEnabled !== syncSettings.profilesEnabled;
 
 	if (settingsDiffer) {
-		settingsComparison = `\nSettings differ:\n` +
-			`  Local: ${localSettings.themeMode} theme, ${localSettings.compactMode ? 'compact' : 'normal'} mode, profiles ${localSettings.profilesEnabled ? 'enabled' : 'disabled'}\n` +
-			`  Synced: ${syncSettings.themeMode} theme, ${syncSettings.compactMode ? 'compact' : 'normal'} mode, profiles ${syncSettings.profilesEnabled ? 'enabled' : 'disabled'}\n`;
+		settingsComparison = '\n' + chrome.i18n.getMessage('syncConflictSettingsDiffer') + '\n' +
+			'  ' + chrome.i18n.getMessage('syncConflictLocal') + ': ' + localSettings.themeMode + ' ' + chrome.i18n.getMessage('themeMode').toLowerCase() + ', ' + (localSettings.compactMode ? chrome.i18n.getMessage('compactMode').toLowerCase() : chrome.i18n.getMessage('themeSystem').toLowerCase()) + ', ' + chrome.i18n.getMessage('profilesSection').toLowerCase() + ' ' + (localSettings.profilesEnabled ? chrome.i18n.getMessage('syncEnabled').split(' ')[0].toLowerCase() : chrome.i18n.getMessage('syncDisabled').split(' ')[0].toLowerCase()) + '\n' +
+			'  ' + chrome.i18n.getMessage('syncConflictSynced') + ': ' + syncSettings.themeMode + ' ' + chrome.i18n.getMessage('themeMode').toLowerCase() + ', ' + (syncSettings.compactMode ? chrome.i18n.getMessage('compactMode').toLowerCase() : chrome.i18n.getMessage('themeSystem').toLowerCase()) + ', ' + chrome.i18n.getMessage('profilesSection').toLowerCase() + ' ' + (syncSettings.profilesEnabled ? chrome.i18n.getMessage('syncEnabled').split(' ')[0].toLowerCase() : chrome.i18n.getMessage('syncDisabled').split(' ')[0].toLowerCase()) + '\n';
 	}
 
-	const message = `Sync Conflict Detected!\n\n` +
-		`Local (this computer):\n` +
-		`  ${conflict.local.profileCount} profile(s), ${conflict.local.tabCount} tab(s)\n\n` +
-		`Synced (from another device):\n` +
-		`  ${conflict.sync.profileCount} profile(s), ${conflict.sync.tabCount} tab(s)` +
+	const message = chrome.i18n.getMessage('syncConflictTitle') + '\n\n' +
+		chrome.i18n.getMessage('syncConflictLocalData', [String(conflict.local.profileCount), String(conflict.local.tabCount)]) + '\n\n' +
+		chrome.i18n.getMessage('syncConflictSyncedData', [String(conflict.sync.profileCount), String(conflict.sync.tabCount)]) +
 		settingsComparison +
-		`\nWhat would you like to do?\n\n` +
-		`Click OK to merge (keep both local and synced data, use synced settings)\n` +
-		`Click Cancel to stop and review your data first`;
+		'\n' + chrome.i18n.getMessage('syncConflictPrompt');
 
 	const shouldMerge = confirm(message);
 
@@ -1715,9 +1710,9 @@ async function showSyncConflictDialog(conflict) {
 			syncRadio.checked = true;
 			localRadio.checked = false;
 
-			showStatus('Data merged successfully - sync enabled', false);
+			showStatus(chrome.i18n.getMessage('dataMergedSyncEnabled'), false);
 		} catch (error) {
-			showStatus('Merge failed: ' + error.message, true);
+			showStatus(chrome.i18n.getMessage('errorMerge', [error.message]), true);
 		}
 	}
 }
@@ -1801,7 +1796,7 @@ async function mergeSyncData(conflict) {
 			userSettings: mergedSettings
 		});
 
-		showStatus(`Merged ${mergedProfiles.length} profiles and settings successfully`, false);
+		showStatus(chrome.i18n.getMessage('mergedProfilesSuccess', [String(mergedProfiles.length)]), false);
 	} catch (error) {
 		throw error;
 	}
@@ -1856,7 +1851,7 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
 			// Note: Don't remove profiles from source yet - settings page will handle that
 		}
 	} catch (error) {
-		throw new Error(`Failed to migrate tabs: ${error.message}`);
+		throw new Error(chrome.i18n.getMessage('errorMigrateTabs', [error.message]));
 	}
 }
 

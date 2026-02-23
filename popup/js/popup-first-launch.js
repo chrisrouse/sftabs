@@ -98,8 +98,10 @@ async function showSyncDataDetectedScreen(syncData) {
   if (!contentArea) return;
 
   const profileText = syncData.profileCount > 0
-    ? `${syncData.profileCount} profile${syncData.profileCount !== 1 ? 's' : ''} with tabs`
-    : 'settings';
+    ? (syncData.profileCount === 1
+        ? chrome.i18n.getMessage('firstLaunchSyncProfileCountSingular', [String(syncData.profileCount)])
+        : chrome.i18n.getMessage('firstLaunchSyncProfileCountPlural', [String(syncData.profileCount)]))
+    : chrome.i18n.getMessage('firstLaunchSyncSettingsOnly');
 
   const container = document.createElement('div');
   container.style.cssText = 'text-align: center; padding: 20px;';
@@ -110,14 +112,15 @@ async function showSyncDataDetectedScreen(syncData) {
 
   const heading = document.createElement('h2');
   heading.style.cssText = 'font-size: 28px; font-weight: 600; margin: 0 0 12px 0; color: var(--color-text);';
-  heading.textContent = 'Synced Configuration Found';
+  heading.textContent = chrome.i18n.getMessage('firstLaunchSyncFoundTitle');
 
   const para = document.createElement('p');
   para.style.cssText = 'font-size: 16px; color: var(--color-text-weak); margin: 0 0 32px 0; line-height: 1.5;';
-  const syncText = `We found existing SF Tabs data in your browser sync${syncData.profileCount > 0 ? ` (${profileText})` : ''}.`;
+  const profilesArg = syncData.profileCount > 0 ? ` (${profileText})` : '';
+  const syncText = chrome.i18n.getMessage('firstLaunchSyncFoundMessage', [profilesArg]);
   para.appendChild(document.createTextNode(syncText));
   para.appendChild(document.createElement('br'));
-  para.appendChild(document.createTextNode('Would you like to use it or start fresh?'));
+  para.appendChild(document.createTextNode(chrome.i18n.getMessage('firstLaunchSyncFoundQuestion')));
 
   const buttonGroup = document.createElement('div');
   buttonGroup.style.cssText = 'display: flex; flex-direction: column; gap: 12px; max-width: 500px; margin: 0 auto;';
@@ -131,7 +134,7 @@ async function showSyncDataDetectedScreen(syncData) {
   const checkSpan = document.createElement('span');
   checkSpan.textContent = '✓';
   const labelSpan = document.createElement('span');
-  labelSpan.textContent = 'Use Synced Configuration (Recommended)';
+  labelSpan.textContent = chrome.i18n.getMessage('firstLaunchUseSyncedButton');
   useSyncedBtnInner.appendChild(checkSpan);
   useSyncedBtnInner.appendChild(labelSpan);
   useSyncedBtn.appendChild(useSyncedBtnInner);
@@ -140,7 +143,7 @@ async function showSyncDataDetectedScreen(syncData) {
   startFreshBtn.id = 'start-fresh-button';
   startFreshBtn.className = 'secondary-button';
   startFreshBtn.style.cssText = 'width: 100%; padding: 16px; font-size: 16px;';
-  startFreshBtn.textContent = 'Start Fresh with New Setup';
+  startFreshBtn.textContent = chrome.i18n.getMessage('firstLaunchStartFreshButton');
 
   buttonGroup.appendChild(useSyncedBtn);
   buttonGroup.appendChild(startFreshBtn);
@@ -211,7 +214,7 @@ async function useSyncedConfiguration() {
 
   } catch (error) {
     if (SFTabs.main && SFTabs.main.showStatus) {
-      SFTabs.main.showStatus('Error loading synced data: ' + error.message, true);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('firstLaunchErrorLoadingSync', [error.message]), true);
     }
   }
 }
@@ -237,7 +240,7 @@ async function clearSyncDataAndShowWizard() {
 
   } catch (error) {
     if (SFTabs.main && SFTabs.main.showStatus) {
-      SFTabs.main.showStatus('Error clearing sync data: ' + error.message, true);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('firstLaunchErrorClearingSync', [error.message]), true);
     }
   }
 }
@@ -389,7 +392,7 @@ async function handleGetStarted() {
 
   } catch (error) {
     if (SFTabs.main && SFTabs.main.showStatus) {
-      SFTabs.main.showStatus('Error during setup: ' + error.message, true);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('firstLaunchErrorSetup', [error.message]), true);
     }
   }
 }

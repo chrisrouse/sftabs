@@ -159,16 +159,16 @@ async function showMigrationModal() {
       syncOption.classList.add('active');
       if (localOption) localOption.classList.remove('active');
     }
-    if (syncTitle) syncTitle.textContent = 'Sync Storage (Current)';
-    if (localTitle) localTitle.textContent = 'Local Storage (New)';
+    if (syncTitle) syncTitle.textContent = chrome.i18n.getMessage('migrationSyncStorageCurrent');
+    if (localTitle) localTitle.textContent = chrome.i18n.getMessage('migrationLocalStorageNew');
   } else {
     if (localRadio) localRadio.checked = true;
     if (localOption) {
       localOption.classList.add('active');
       if (syncOption) syncOption.classList.remove('active');
     }
-    if (syncTitle) syncTitle.textContent = 'Sync Storage';
-    if (localTitle) localTitle.textContent = 'Local Storage (Current)';
+    if (syncTitle) syncTitle.textContent = chrome.i18n.getMessage('firstLaunchSyncStorageTitle');
+    if (localTitle) localTitle.textContent = chrome.i18n.getMessage('migrationLocalStorageCurrent');
   }
 
   // Reset to welcome screen
@@ -467,11 +467,11 @@ function initMigrationModal() {
     exportButton.addEventListener('click', async () => {
       try {
         exportButton.disabled = true;
-        exportButton.textContent = 'Exporting...';
+        exportButton.textContent = chrome.i18n.getMessage('migrationExporting');
 
         await exportBackupBeforeMigration();
 
-        exportButton.textContent = '✓ Backup Exported';
+        exportButton.textContent = chrome.i18n.getMessage('migrationBackupExported');
         setTimeout(() => {
           exportButton.disabled = false;
           exportButton.innerHTML = `
@@ -480,12 +480,12 @@ function initMigrationModal() {
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Export Backup
+            ${chrome.i18n.getMessage('migrationExportBackup')}
           `;
         }, 2000);
       } catch (error) {
         exportButton.disabled = false;
-        exportButton.textContent = 'Export Failed';
+        exportButton.textContent = chrome.i18n.getMessage('migrationExportFailed');
         setTimeout(() => {
           exportButton.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 6px;">
@@ -493,7 +493,7 @@ function initMigrationModal() {
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Export Backup
+            ${chrome.i18n.getMessage('migrationExportBackup')}
           `;
         }, 2000);
       }
@@ -535,7 +535,7 @@ function initMigrationModal() {
         showMigrationScreen('error');
         const errorMsg = document.querySelector('#migration-error-message');
         if (errorMsg) {
-          errorMsg.textContent = error.message || 'Unknown error occurred';
+          errorMsg.textContent = error.message || chrome.i18n.getMessage('migrationUnknownError');
         }
       }
     });

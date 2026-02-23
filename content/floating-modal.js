@@ -226,12 +226,12 @@
 
       const toggleButton = document.createElement('button');
       toggleButton.className = 'modal-toggle-button';
-      toggleButton.setAttribute('aria-label', 'Toggle SF Tabs');
-      toggleButton.title = 'SF Tabs';
+      toggleButton.setAttribute('aria-label', chrome.i18n.getMessage('floatingModalToggleAriaLabel'));
+      toggleButton.title = chrome.i18n.getMessage('extensionName');
 
       const logoImg = document.createElement('img');
       logoImg.src = logoUrl;
-      logoImg.alt = 'SF Tabs';
+      logoImg.alt = chrome.i18n.getMessage('extensionName');
       toggleButton.appendChild(logoImg);
 
       const modalPanel = document.createElement('div');
@@ -357,7 +357,7 @@
 
       // Show empty state if no tabs
       if (displayTabs.length === 0) {
-        container.innerHTML = '<div class="empty-state">No tabs available. Add tabs in the extension popup.</div>';
+        container.innerHTML = `<div class="empty-state">${chrome.i18n.getMessage('floatingModalEmptyState')}</div>`;
         return;
       }
 

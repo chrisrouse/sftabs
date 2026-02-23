@@ -154,7 +154,7 @@ async function initProfiles() {
         await disableProfilesAndKeepOne(selectedProfile);
 
         if (window.SFTabs && window.SFTabs.main) {
-          window.SFTabs.main.showStatus(`Profiles UI disabled. Kept ${selectedProfile.name} profile`, false);
+          window.SFTabs.main.showStatus(chrome.i18n.getMessage('profilesUiDisabledKept', [selectedProfile.name]), false);
         }
       } else {
         // Update settings and toggle UI visibility (only if not disabling)
@@ -468,7 +468,7 @@ async function switchActiveProfile(profileId) {
 
       const activeProfile = profilesCache.find(p => p.id === profileId);
       if (activeProfile) {
-        SFTabs.main.showStatus(`Switched to profile: ${activeProfile.name}`, false);
+        SFTabs.main.showStatus(chrome.i18n.getMessage('switchedToProfile', [activeProfile.name]), false);
       }
     }
 
@@ -488,12 +488,12 @@ async function switchActiveProfile(profileId) {
       });
     }).catch(error => {
       if (window.SFTabs && window.SFTabs.main) {
-        SFTabs.main.showStatus('Error switching profile: ' + error.message, true);
+        SFTabs.main.showStatus(chrome.i18n.getMessage('errorSwitchingProfile', [error.message]), true);
       }
     });
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      SFTabs.main.showStatus('Error switching profile: ' + error.message, true);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('errorSwitchingProfile', [error.message]), true);
     }
   }
 }
@@ -506,7 +506,7 @@ async function populateActiveProfileSelector() {
   if (!selector) return;
 
   // Clear existing options except the first one
-  selector.innerHTML = '<option value="">Select a profile...</option>';
+  selector.innerHTML = `<option value="">${chrome.i18n.getMessage('selectProfilePlaceholder')}</option>`;
 
   // Add profiles from cache
   profilesCache.forEach(profile => {
@@ -538,7 +538,7 @@ async function showProfileList() {
   if (tabSettingsContent) tabSettingsContent.style.display = 'none';
   if (profileEditContent) profileEditContent.style.display = 'none';
   if (profileListContent) profileListContent.style.display = 'block';
-  if (actionPanelTitle) actionPanelTitle.textContent = 'Profiles';
+  if (actionPanelTitle) actionPanelTitle.textContent = chrome.i18n.getMessage('profilesSection');
 
   // Populate active profile selector
   await populateActiveProfileSelector();
@@ -609,7 +609,7 @@ function createProfileListItem(profile, index, defaultProfileId) {
   const isDefault = profile.id === defaultProfileId;
   const defaultButton = SFTabs.shared.createListActionButton('default', {
     text: 'D',
-    title: 'Set as default profile',
+    title: chrome.i18n.getMessage('setAsDefaultProfileTitle'),
     onClick: () => setDefaultProfile(profile.id),
     isActive: isDefault
   });
@@ -617,14 +617,14 @@ function createProfileListItem(profile, index, defaultProfileId) {
   // Edit button
   const editButton = SFTabs.shared.createListActionButton('edit', {
     text: 'Edit',
-    title: 'Edit this profile',
+    title: chrome.i18n.getMessage('editProfileTitle'),
     onClick: () => showProfileEditForm(profile)
   });
 
   // Delete button
   const deleteButton = SFTabs.shared.createListActionButton('delete', {
     text: '×',
-    title: 'Delete this profile',
+    title: chrome.i18n.getMessage('deleteProfileTitle'),
     onClick: () => deleteProfile(profile)
   });
 
@@ -666,12 +666,12 @@ async function setDefaultProfile(profileId) {
     if (window.SFTabs && window.SFTabs.main) {
       const profile = profilesCache.find(p => p.id === profileId);
       if (profile) {
-        window.SFTabs.main.showStatus(`"${profile.name}" set as default profile`, false);
+        window.SFTabs.main.showStatus(chrome.i18n.getMessage('profileSetAsDefault', [profile.name]), false);
       }
     }
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Error setting default profile: ' + error.message, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorSettingDefaultProfile', [error.message]), true);
     }
   }
 }
@@ -697,10 +697,10 @@ function showProfileEditForm(profile = null) {
   // Update title
   const profileEditTitle = document.querySelector('#profile-edit-title');
   if (profileEditTitle) {
-    profileEditTitle.textContent = profile ? `Edit Profile: ${profile.name}` : 'New Profile';
+    profileEditTitle.textContent = profile ? chrome.i18n.getMessage('editProfileTitleWithName', [profile.name]) : chrome.i18n.getMessage('newProfileTitle');
   }
   if (actionPanelTitle) {
-    actionPanelTitle.textContent = profile ? 'Edit Profile' : 'New Profile';
+    actionPanelTitle.textContent = profile ? chrome.i18n.getMessage('editProfilePanelTitle') : chrome.i18n.getMessage('newProfileTitle');
   }
 
   // Populate form
@@ -758,7 +758,7 @@ function renderUrlPatternList(patterns) {
   if (patterns.length === 0) {
     const emptyState = document.createElement('div');
     emptyState.className = 'empty-list-state';
-    emptyState.textContent = 'No URL patterns yet. Add one above.';
+    emptyState.textContent = chrome.i18n.getMessage('noUrlPatternsYet');
     patternList.appendChild(emptyState);
     return;
   }
@@ -795,14 +795,14 @@ function createUrlPatternItem(pattern, index) {
   // Edit button
   const editButton = SFTabs.shared.createListActionButton('edit', {
     text: 'Edit',
-    title: 'Edit this URL pattern',
+    title: chrome.i18n.getMessage('editUrlPatternTitle'),
     onClick: () => editUrlPattern(pattern, index)
   });
 
   // Delete button
   const deleteButton = SFTabs.shared.createListActionButton('delete', {
     text: '×',
-    title: 'Delete this URL pattern',
+    title: chrome.i18n.getMessage('deleteUrlPatternTitle'),
     onClick: () => deleteUrlPattern(index)
   });
 
@@ -877,7 +877,7 @@ async function populateProfileSelect() {
   // Add placeholder option
   const placeholderOption = document.createElement('option');
   placeholderOption.value = '';
-  placeholderOption.textContent = 'Choose a profile...';
+  placeholderOption.textContent = chrome.i18n.getMessage('selectProfilePlaceholder');
   keepProfileSelect.appendChild(placeholderOption);
 
   const settings = await SFTabs.storage.getUserSettings();
@@ -909,9 +909,9 @@ async function disableProfilesFromInline() {
 
   if (!selectedProfileId) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Please select a profile to keep', true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('selectProfileToKeepError'), true);
     } else {
-      alert('Please select a profile to keep');
+      alert(chrome.i18n.getMessage('selectProfileToKeepError'));
     }
     return;
   }
@@ -920,14 +920,14 @@ async function disableProfilesFromInline() {
 
   if (!selectedProfile) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Selected profile not found', true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('selectedProfileNotFound'), true);
     }
     return;
   }
 
   // Confirm the action
   const confirmed = confirm(
-    `Disable profiles and keep "${selectedProfile.name}"?\n\nThis will remove all other profiles and their tabs. This action cannot be undone.`
+    chrome.i18n.getMessage('disableProfilesConfirm', [selectedProfile.name])
   );
 
   if (!confirmed) {
@@ -952,7 +952,7 @@ async function disableProfilesFromInline() {
 
   // Show success message
   if (window.SFTabs && window.SFTabs.main) {
-    window.SFTabs.main.showStatus(`Profiles disabled. Kept "${selectedProfile.name}" profile`, false);
+    window.SFTabs.main.showStatus(chrome.i18n.getMessage('profilesDisabledKept', [selectedProfile.name]), false);
   }
 }
 
@@ -968,7 +968,7 @@ function addUrlPattern() {
   const pattern = input.value.trim();
 
   if (!pattern) {
-    showUrlPatternError('Please enter a URL pattern');
+    showUrlPatternError(chrome.i18n.getMessage('urlPatternRequired'));
     return;
   }
 
@@ -979,7 +979,7 @@ function addUrlPattern() {
   );
 
   if (duplicate) {
-    showUrlPatternError(`URL already used by ${duplicate.name}`);
+    showUrlPatternError(chrome.i18n.getMessage('urlPatternAlreadyUsed', [duplicate.name]));
     return;
   }
 
@@ -1076,12 +1076,12 @@ async function captureCurrentDomain() {
     }
 
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus(`Domain captured: ${orgIdentifier}`, false);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('domainCaptured', [orgIdentifier]), false);
     }
 
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus(`Error: ${error.message}`, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorCapturingDomain', [error.message]), true);
     }
   }
 }
@@ -1177,7 +1177,7 @@ async function saveProfile() {
 
   if (!name) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Profile name is required', true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('profileNameRequired'), true);
     }
     return;
   }
@@ -1221,7 +1221,7 @@ async function saveProfile() {
       await SFTabs.storage.saveProfiles(profilesCache);
 
       if (window.SFTabs && window.SFTabs.main) {
-        window.SFTabs.main.showStatus('Profile created', false);
+        window.SFTabs.main.showStatus(chrome.i18n.getMessage('profileCreatedStatus'), false);
       }
 
       // Switch to the newly created profile to show initialization options
@@ -1240,7 +1240,7 @@ async function saveProfile() {
     await SFTabs.storage.saveProfiles(profilesCache);
 
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Profile saved', false);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('profileSaved'), false);
     }
 
     setTimeout(async () => {
@@ -1248,7 +1248,7 @@ async function saveProfile() {
     }, 800);
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Error saving profile: ' + error.message, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorSavingProfile', [error.message]), true);
     }
   }
 }
@@ -1259,7 +1259,7 @@ async function saveProfile() {
 async function deleteProfile(profile) {
 
   // Confirm deletion
-  const confirmed = confirm(`Are you sure you want to delete the profile "${profile.name}"? This cannot be undone.`);
+  const confirmed = confirm(chrome.i18n.getMessage('deleteProfileConfirm', [profile.name]));
   if (!confirmed) return;
 
   try {
@@ -1291,14 +1291,14 @@ async function deleteProfile(profile) {
     }
 
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus(`Profile "${profile.name}" deleted`, false);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('profileDeleted', [profile.name]), false);
     }
 
     // Re-render list
     await renderProfileList();
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Error deleting profile: ' + error.message, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorDeletingProfile', [error.message]), true);
     }
   }
 }
@@ -1379,12 +1379,12 @@ async function initializeProfileWithDefaults() {
         SFTabs.ui.renderTabList();
       }
 
-      SFTabs.main.showStatus('Profile initialized with default tabs', false);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('profileInitializedWithDefaults'), false);
     }
 
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Error initializing profile: ' + error.message, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorInitializingProfile', [error.message]), true);
     }
   }
 }
@@ -1422,12 +1422,12 @@ async function initializeProfileEmpty() {
         domElements.emptyState.style.display = 'block';
       }
 
-      SFTabs.main.showStatus('Profile initialized (empty)', false);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('profileInitializedEmpty'), false);
     }
 
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Error initializing profile: ' + error.message, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorInitializingProfile', [error.message]), true);
     }
   }
 }
@@ -1450,7 +1450,7 @@ async function showCloneProfileSelector() {
     const activeProfileId = settings.activeProfileId;
 
     // Populate the select with available profiles (excluding current profile)
-    cloneSourceSelect.innerHTML = '<option value="">Choose a profile...</option>';
+    cloneSourceSelect.innerHTML = `<option value="">${chrome.i18n.getMessage('selectProfilePlaceholder')}</option>`;
 
     profilesCache.forEach(profile => {
       if (profile.id !== activeProfileId) {
@@ -1474,7 +1474,7 @@ async function showCloneProfileSelector() {
 
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Error showing profile selector: ' + error.message, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorShowingProfileSelector', [error.message]), true);
     }
   }
 }
@@ -1541,7 +1541,7 @@ async function confirmCloneProfile() {
 
       const sourceProfile = profilesCache.find(p => p.id === sourceProfileId);
       const sourceName = sourceProfile ? sourceProfile.name : 'selected profile';
-      SFTabs.main.showStatus(`Cloned ${clonedTabs.length} tabs from "${sourceName}"`, false);
+      SFTabs.main.showStatus(chrome.i18n.getMessage('profileCloned', [String(clonedTabs.length), sourceName]), false);
     }
 
     // Hide the selector
@@ -1549,7 +1549,7 @@ async function confirmCloneProfile() {
 
   } catch (error) {
     if (window.SFTabs && window.SFTabs.main) {
-      window.SFTabs.main.showStatus('Error cloning profile: ' + error.message, true);
+      window.SFTabs.main.showStatus(chrome.i18n.getMessage('errorCloningProfile', [error.message]), true);
     }
   }
 }
