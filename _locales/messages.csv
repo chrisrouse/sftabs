@@ -1,0 +1,146 @@
+identifier,en-US,de,es-ES,context
+extensionName,SF Tabs,,,Name of the extension
+extensionDescription,Add custom tabs to the Salesforce setup menu.,,,Description of the extension
+popupTitle,SF Tabs,,,Popup title
+tabsHeader,Tabs,,,Tabs section header
+addNewTab,Add New Tab,,,Add new tab button
+settingsHeader,Settings,,,Settings section header
+openFullSettingsButton,Open Full Settings Page,,,Button to open standalone settings page
+openFullSettingsHelp,Try the new standalone settings page with a better layout and all configuration options in one place,,,Help text for full settings button
+themeMode,Theme Mode,,,Theme mode setting label
+themeLight,Light,,,Light theme option
+themeDark,Dark,,,Dark theme option
+themeSystem,System,,,System theme option
+compactMode,Compact Mode,,,Compact mode setting label
+compactModeDescription,Display tabs in a more condensed layout,,,Compact mode description
+skipDeleteConfirmation,Skip Delete Confirmation,,,Skip delete confirmation setting label
+skipDeleteConfirmationDescription,Don't ask for confirmation when deleting tabs,,,Skip delete confirmation description
+manageConfig,Manage Configuration,,,Manage configuration button
+resetToDefaults,Reset to Defaults,,,Reset to defaults button
+settingsPageTitle,SF Tabs Settings,,,Settings page title
+settingsSubtitle,Customize your SF Tabs experience,,,Settings page subtitle
+versionInfo,SF Tabs v$VERSION$,,,Version information
+changelog,Changelog,,,Changelog link text
+appearanceSection,Appearance,,,Appearance section heading
+appearanceDescription,Customize the look and feel of your extension,,,Appearance section description
+behaviorSection,Behavior,,,Behavior section heading
+behaviorDescription,Control how the extension behaves,,,Behavior section description
+syncStorageSection,Sync & Storage,,,Sync & Storage section heading
+syncStorageDescription,Manage how your tabs are stored and synced,,,Sync & Storage section description
+useSyncStorage,Cross-Device Sync,,,Cross-device sync setting label
+useSyncStorageDescription,Sync your tabs across all devices using browser sync,,,Cross-device sync description
+profilesSection,Profiles,,,Profiles section heading
+profilesDescription,Organize tabs into different profiles for different Salesforce orgs,,,Profiles section description
+enableProfiles,Enable Profiles,,,Enable profiles setting label
+enableProfilesDescription,Create separate sets of tabs for different Salesforce orgs,,,Enable profiles description
+autoSwitchProfiles,Auto-Switch Profiles,,,Auto-switch profiles setting label
+autoSwitchProfilesDescription,Automatically switch to the appropriate profile based on the current Salesforce org's URL,,,Auto-switch profiles description
+keyboardShortcutsSection,Keyboard Shortcuts,,,Keyboard shortcuts section heading
+keyboardShortcutsDescription,Set up keyboard shortcuts to quickly access your tabs,,,Keyboard shortcuts section description
+configureKeyboardShortcuts,Configure Keyboard Shortcuts,,,Configure keyboard shortcuts button
+keyboardShortcutsHelp,Set keyboard shortcuts to quickly open tabs 1-10 by position,,,Keyboard shortcuts help text
+importExportSection,Import & Export,,,Import & Export section heading
+importExportDescription,Backup and restore your configuration,,,Import & Export section description
+exportButton,Export,,,Export button text
+exportActionTitle,Export,,,Export action title
+exportActionDescription,Save to file,,,Export action description
+importButton,Import,,,Import button text
+importActionTitle,Import,,,Import action title
+importActionDescription,Restore from backup,,,Import action description
+dangerZoneSection,Danger Zone,,,Danger zone section heading
+dangerZoneDescription,Irreversible actions that will affect your data,,,Danger zone section description
+resetButton,Reset to Defaults,,,Reset to defaults button
+resetButtonDescription,This will remove all custom tabs and reset all settings to their default values. This action cannot be undone.,,,Reset button description
+exportModalTitle,Export Configuration,,,Export modal title
+exportModalPrompt,Select what you want to export:,,,Export modal prompt
+exportEverything,Everything,,,Export everything option
+exportEverythingDescription,Export all settings and profiles,,,Export everything description
+exportSettingsOnly,Settings,,,Export settings option
+cancelButton,Cancel,,,Cancel button
+confirmButton,Confirm,,,Confirm button
+exportConfirmButton,Export,,,Export confirm button
+importConfirmButton,Import,,,Import confirm button
+importModalTitle,Import Configuration,,,Import modal title
+importModalPrompt,Where would you like to import this configuration?,,,Import modal prompt
+importOverwriteProfile,Overwrite existing profile,,,Import overwrite profile option
+importCreateProfile,Create new profile,,,Import create profile option
+selectProfile,Select profile:,,,Select profile label
+selectProfilePlaceholder,Choose a profile...,,,Select profile placeholder
+newProfileName,Profile name:,,,New profile name label
+newProfileNamePlaceholder,Enter profile name,,,New profile name placeholder
+resetModalTitle,Reset to Defaults,,,Reset modal title
+resetModalPrompt,Are you sure you want to reset to default tabs and settings? This will:,,,Reset modal prompt
+resetModalItem1,Remove all custom tabs,,,Reset modal item 1
+resetModalItem2,Remove all profiles,,,Reset modal item 2
+resetModalItem3,Reset all settings to defaults,,,Reset modal item 3
+resetModalWarning,This action cannot be undone!,,,Reset modal warning
+enableSyncConfirmTitle,Enable cross-device sync?,,,Enable sync confirmation title
+enableSyncConfirmMessage,Your tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you're signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.,,,Enable sync confirmation message
+disableSyncConfirmTitle,Disable cross-device sync?,,,Disable sync confirmation title
+disableSyncConfirmMessage,Your tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.,,,Disable sync confirmation message
+disableProfilesConfirmMessage,Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.,,,Disable profiles confirmation message
+settingsSaved,Settings saved,,,Settings saved status message
+settingsReset,All settings and tabs reset to defaults,,,Settings reset status message
+configExported,Configuration exported successfully,,,Configuration exported status message
+configImported,Configuration imported successfully,,,Configuration imported status message
+tabsImportedToProfile,Tabs imported to selected profile,,,Tabs imported to profile status message
+profileCreated,New profile created with imported tabs,,,Profile created status message
+syncEnabled,Sync enabled - tabs will now sync across devices,,,Sync enabled status message
+syncDisabled,Sync disabled - tabs stored locally only,,,Sync disabled status message
+errorSavingSettings,Error saving settings: $ERROR$,,,Error saving settings
+errorExport,Export failed: $ERROR$,,,Export error message
+errorImport,Import failed: $ERROR$,,,Import error message
+errorReset,Reset failed: $ERROR$,,,Reset error message
+errorInvalidConfig,Invalid configuration file - missing required fields,,,Invalid configuration error
+selectProfileError,Please select a profile,,,Select profile error
+profileNameError,Please enter a profile name,,,Profile name error
+couldNotOpenShortcuts,Could not open shortcuts page,,,Could not open shortcuts error
+couldNotDetectBrowser,Could not detect browser type,,,Could not detect browser error
+tabName,Tab Name,,,Tab name label
+tabPath,Tab Path,,,Tab path label
+addTab,Add Tab,,,Add tab button
+editTab,Edit Tab,,,Edit tab button
+deleteTab,Delete Tab,,,Delete tab button
+saveTab,Save,,,Save tab button
+moveTabUp,Move Up,,,Move tab up button
+moveTabDown,Move Down,,,Move tab down button
+commandTab1,Tab 1,,,Keyboard command for tab 1
+commandTab2,Tab 2,,,Keyboard command for tab 2
+commandTab3,Tab 3,,,Keyboard command for tab 3
+commandTab4,Tab 4,,,Keyboard command for tab 4
+commandTab5,Tab 5,,,Keyboard command for tab 5
+commandTab6,Tab 6,,,Keyboard command for tab 6
+commandTab7,Tab 7,,,Keyboard command for tab 7
+commandTab8,Tab 8,,,Keyboard command for tab 8
+commandTab9,Tab 9,,,Keyboard command for tab 9
+commandTab10,Tab 10,,,Keyboard command for tab 10
+firstLaunchWelcomeTitle,Thanks for installing SF Tabs!,,,First launch modal header
+firstLaunchSetupDefaultTitle,Start with default tabs,,,Setup option title for starting with default tabs
+firstLaunchSetupDefaultDescription,Start with the standard set of tabs,,,Setup option description for starting with default tabs
+firstLaunchSetupEmptyTitle,Start with no tabs,,,Setup option title for starting with an empty profile
+firstLaunchSetupEmptyDescription,Begin with an empty profile and add tabs manually,,,Setup option description for starting with an empty profile
+firstLaunchSetupImportTitle,Import existing configuration,,,Setup option title for importing an existing configuration
+firstLaunchSetupImportDescription,Import an SF Tabs configuration file,,,Setup option description for importing an existing configuration
+firstLaunchEnableProfilesTitle,Enable Profiles,,,Profiles toggle option title
+firstLaunchEnableProfilesDescription,Profiles let you manage different tab configurations,,,Profiles toggle option description
+firstLaunchSyncStorageTitle,Sync Storage,,,Sync storage option title
+firstLaunchSyncStorageDescription,Tabs can sync between computers,,,Sync storage option description
+firstLaunchLocalStorageTitle,Local Storage,,,Local storage option title
+firstLaunchLocalStorageDescription,Tabs don't sync between computers,,,Local storage option description
+firstLaunchGuideButton,User Guide,,,Button that opens the user guide
+firstLaunchGetStartedButton,Get Started,,,Primary button to complete first-launch setup
+firstLaunchSyncFoundTitle,Synced Configuration Found,,,Heading shown when existing sync data is detected on a new device
+firstLaunchSyncFoundMessage,We found existing SF Tabs data in your browser sync$PROFILES$.,,,"Message shown when sync data is detected. $PROFILES$ is replaced with ' (X profiles with tabs)' when profiles exist, or omitted."
+firstLaunchSyncFoundQuestion,Would you like to use it or start fresh?,,,Question shown below the sync data detected message
+firstLaunchUseSyncedButton,Use Synced Configuration (Recommended),,,Button to use the existing synced configuration
+firstLaunchStartFreshButton,Start Fresh with New Setup,,,Button to discard synced data and run the normal setup wizard
+firstLaunchErrorLoadingSync,Error loading synced data: $ERROR$,,,Error shown when loading synced configuration fails
+firstLaunchErrorClearingSync,Error clearing sync data: $ERROR$,,,Error shown when clearing sync data before starting fresh fails
+firstLaunchErrorSetup,Error during setup: $ERROR$,,,Error shown when the Get Started initialization fails
+closeButton,Close,,,Close/dismiss button used in panels and modals
+editButton,Edit,,,Edit action button label (short form used in lists)
+removeButton,Remove,,,Remove/delete action button label
+addButton,Add,,,Add action button label (short form)
+learnMoreLink,Learn More,,,Link text to open more information
+sponsorLink,Sponsor on Github,,,Link in settings sidebar footer to the GitHub sponsors page
+buyMeCoffeeLink,Buy Me a Coffee,,,Link in settings sidebar footer to the Buy Me a Coffee page
