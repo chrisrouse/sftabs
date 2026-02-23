@@ -623,5 +623,399 @@
   "buyMeCoffeeLink": {
     "message": "Buy Me a Coffee",
     "description": "Link in settings sidebar footer to the Buy Me a Coffee page"
+  },
+  "quickAddButtonTitle": {
+    "message": "Add tab for current page",
+    "description": "Title attribute on the Quick Add button in the popup header"
+  },
+  "addNewTabButtonTitle": {
+    "message": "Add new tab",
+    "description": "Title attribute on the Add New Tab button in the popup header"
+  },
+  "profilesButtonTitle": {
+    "message": "Profiles",
+    "description": "Title attribute on the Profiles button in the popup header"
+  },
+  "settingsButtonTitle": {
+    "message": "Settings",
+    "description": "Title attribute on the Settings button in the popup header"
+  },
+  "emptyStateText": {
+    "message": "No custom tabs yet. Add your first tab below.",
+    "description": "Text shown in the popup when no tabs have been added yet"
+  },
+  "objectManagerDropdownLabel": {
+    "message": "Object Manager Dropdown",
+    "description": "Label for the Object Manager dropdown section in the tab form"
+  },
+  "setupAsObjectDropdownButton": {
+    "message": "Setup as Object Dropdown",
+    "description": "Button to set up a tab as an Object Manager dropdown"
+  },
+  "setupAsObjectDropdownHelp": {
+    "message": "Create a dropdown menu with navigation items from the current Object Manager page",
+    "description": "Help text for the Setup as Object Dropdown button"
+  },
+  "refreshListButton": {
+    "message": "Refresh List",
+    "description": "Button to refresh the dropdown items list in the tab form"
+  },
+  "createDropdownMenuLabel": {
+    "message": "Create Dropdown Menu",
+    "description": "Label for the manual dropdown creation section in the tab form"
+  },
+  "tabSettingsHeader": {
+    "message": "Tab Settings",
+    "description": "Header for the tab settings section in the action panel"
+  },
+  "tabNamePlaceholder": {
+    "message": "e.g., User Management",
+    "description": "Placeholder text for the tab name input"
+  },
+  "tabPathLabel": {
+    "message": "Page URL (Optional)",
+    "description": "Label for the page URL input in the action panel"
+  },
+  "tabPathPlaceholder": {
+    "message": "e.g., ManageUsers",
+    "description": "Placeholder text for the tab path input"
+  },
+  "tabPathHelp": {
+    "message": "Just add the page name from the URL. Leave blank to create a folder-style tab that acts as a menu container.",
+    "description": "Help text for the tab path input"
+  },
+  "tabIsObjectLabel": {
+    "message": "Object",
+    "description": "Label for the Object checkbox in the tab form"
+  },
+  "tabIsObjectHelp": {
+    "message": "Check this if the page is an object page instead of a setup page",
+    "description": "Help text for the Object checkbox"
+  },
+  "tabIsCustomUrlLabel": {
+    "message": "Custom URL",
+    "description": "Label for the Custom URL checkbox in the tab form"
+  },
+  "tabIsCustomUrlHelp": {
+    "message": "Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)",
+    "description": "Help text for the Custom URL checkbox"
+  },
+  "confirmModalTitle": {
+    "message": "Reset to Default Tabs",
+    "description": "Title of the confirm reset modal dialog"
+  },
+  "confirmModalBody": {
+    "message": "Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.",
+    "description": "Body text of the confirm reset modal dialog"
+  },
+  "resetConfirmButton": {
+    "message": "Reset",
+    "description": "Confirm button text in the reset to defaults modal"
+  },
+  "deleteModalTitle": {
+    "message": "Remove Tab",
+    "description": "Title of the delete tab confirmation modal dialog"
+  },
+  "deleteModalBody": {
+    "message": "Are you sure you want to remove this tab?",
+    "description": "Body text of the delete tab confirmation modal dialog"
+  },
+  "notSalesforcePage": {
+    "message": "Not a Salesforce page",
+    "description": "Status message shown when Quick Add is clicked on a non-Salesforce page"
+  },
+  "notSalesforceSetupPage": {
+    "message": "Not a recognized Salesforce setup or object page",
+    "description": "Status message shown when Quick Add cannot identify the Salesforce page type"
+  },
+  "tabAdded": {
+    "message": "Added $PAGETYPE$ tab for \"$NAME$\"",
+    "description": "{$PAGETYPE$}=setup/object/custom; {$NAME$}=tab label",
+    "placeholders": {
+      "pagetype": {
+        "content": "$1"
+      },
+      "name": {
+        "content": "$2"
+      }
+    }
+  },
+  "errorAccessingTab": {
+    "message": "Error accessing current tab: $ERROR$",
+    "description": "Error shown when Quick Add fails to access the current tab; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "tabRemoved": {
+    "message": "Tab removed",
+    "description": "Status message shown after deleting a tab"
+  },
+  "resetToDefaultTabsStatus": {
+    "message": "Reset to default tabs",
+    "description": "Status message shown after resetting tabs to defaults"
+  },
+  "tabNotFound": {
+    "message": "Tab not found",
+    "description": "Error shown when a tab cannot be found by its ID"
+  },
+  "tabDuplicated": {
+    "message": "Duplicated tab \"$NAME$\"",
+    "description": "Status shown after duplicating a tab; {$NAME$}=tab label",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "noTabSelected": {
+    "message": "No tab selected",
+    "description": "Error when the save action is triggered without a tab selected"
+  },
+  "tabNameRequired": {
+    "message": "Tab name is required",
+    "description": "Validation error shown when the tab name field is empty"
+  },
+  "tabCannotBeBoth": {
+    "message": "Tab cannot be both Object and Custom URL",
+    "description": "Validation error when both Object and Custom URL checkboxes are checked"
+  },
+  "parentTabNotFound": {
+    "message": "Parent tab not found",
+    "description": "Error when the parent tab of a dropdown item cannot be found"
+  },
+  "dropdownItemNotFound": {
+    "message": "Dropdown item not found",
+    "description": "Error when a specific dropdown item cannot be found"
+  },
+  "dropdownItemUpdated": {
+    "message": "Dropdown item updated successfully",
+    "description": "Status shown after successfully updating a dropdown item"
+  },
+  "tabCreated": {
+    "message": "Tab created successfully",
+    "description": "Status shown after successfully creating a new tab"
+  },
+  "tabUpdated": {
+    "message": "Tab updated successfully",
+    "description": "Status shown after successfully updating an existing tab"
+  },
+  "errorInitializingPopup": {
+    "message": "Error initializing popup: $ERROR$",
+    "description": "Error shown if the popup fails to initialize; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorLoadingSettings": {
+    "message": "Error loading settings: $ERROR$",
+    "description": "Error shown if settings fail to load; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorLoadingTabs": {
+    "message": "Error loading tabs: $ERROR$",
+    "description": "Error shown if tabs fail to load; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorCreatingTab": {
+    "message": "Error creating tab: $ERROR$",
+    "description": "Error shown if tab creation fails; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorUpdatingTab": {
+    "message": "Error updating tab: $ERROR$",
+    "description": "Error shown if tab update fails; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorUpdatingDropdownItem": {
+    "message": "Error updating dropdown item: $ERROR$",
+    "description": "Error shown if dropdown item update fails; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorCreateNotAvailable": {
+    "message": "Error: Create function not available",
+    "description": "Internal error shown if the tab create function is missing"
+  },
+  "errorUpdateNotAvailable": {
+    "message": "Error: Update function not available",
+    "description": "Internal error shown if the tab update function is missing"
+  },
+  "dragToReorderTitle": {
+    "message": "Drag to reorder",
+    "description": "Title attribute on the drag handle element for reordering tabs"
+  },
+  "editTabButtonTitle": {
+    "message": "Edit tab",
+    "description": "Title attribute on the edit/pencil icon button in the tab list"
+  },
+  "opensInNewTabTitle": {
+    "message": "Opens in new tab (click to change)",
+    "description": "Title on the new-tab toggle button when the tab opens in a new tab"
+  },
+  "opensInSameTabTitle": {
+    "message": "Opens in same tab (click to change)",
+    "description": "Title on the new-tab toggle button when the tab opens in the same tab"
+  },
+  "removeTabButtonTitle": {
+    "message": "Remove tab",
+    "description": "Title attribute on the delete/trash icon button in the tab list"
+  },
+  "addNewTabFormTitle": {
+    "message": "Add New Tab",
+    "description": "Form title displayed when adding a new tab"
+  },
+  "editTabFormTitle": {
+    "message": "Edit Tab",
+    "description": "Form title displayed when editing an existing tab"
+  },
+  "noTabSelectedForEditing": {
+    "message": "No tab selected for editing",
+    "description": "Error when save is attempted in the dropdown form without a tab selected"
+  },
+  "errorSavingChanges": {
+    "message": "Error saving changes: $ERROR$",
+    "description": "Error shown when saving drag-drop changes to dropdown items fails; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorTooManyDropdownLevels": {
+    "message": "Error: Too many dropdown levels",
+    "description": "Error when a drag-and-drop creates more than 3 nesting levels"
+  },
+  "tabDropdownAdded": {
+    "message": "Added \"$DRAGGED$\" as dropdown item to \"$TARGET$\"",
+    "description": "{$DRAGGED$}=dragged tab label; {$TARGET$}=target tab label",
+    "placeholders": {
+      "dragged": {
+        "content": "$1"
+      },
+      "target": {
+        "content": "$2"
+      }
+    }
+  },
+  "dropdownItemCollapseTitle": {
+    "message": "Collapse",
+    "description": "Title on the collapse button for dropdown items that have children"
+  },
+  "dropdownItemExpandTitle": {
+    "message": "Expand",
+    "description": "Title on the expand button for collapsed dropdown items with children"
+  },
+  "editDropdownItemTitle": {
+    "message": "Edit this dropdown item",
+    "description": "Title on the Edit button for dropdown items in the manage dropdown panel"
+  },
+  "promoteToMainListTitle": {
+    "message": "Promote to main tab list",
+    "description": "Title on the Promote button for dropdown items"
+  },
+  "deleteDropdownItemTitle": {
+    "message": "Delete this item",
+    "description": "Title on the Delete button for dropdown items"
+  },
+  "editDropdownItemPanelTitle": {
+    "message": "Edit Dropdown Item",
+    "description": "Title displayed in the action panel header when editing a dropdown item"
+  },
+  "newTabPanelTitle": {
+    "message": "New Tab",
+    "description": "Title displayed in the action panel header when adding a new tab"
+  },
+  "promotedWithNested": {
+    "message": "Promoted \"$NAME$\" with $COUNT$ nested items to main tab list",
+    "description": "{$NAME$}=item label; {$COUNT$}=number of nested items promoted with it",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "promoted": {
+    "message": "Promoted \"$NAME$\" to main tab list",
+    "description": "{$NAME$}=item label",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorPromotingItem": {
+    "message": "Error promoting item: $ERROR$",
+    "description": "Error shown when promoting a dropdown item to the main list fails; {$ERROR$}=error message",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteDropdownItemConfirm": {
+    "message": "Delete \"$NAME$\"?",
+    "description": "Confirm dialog text when deleting a dropdown item; {$NAME$}=item label",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemWillBeDeleted": {
+    "message": "\"$NAME$\" will be deleted when you click Save",
+    "description": "Status shown when an item is staged for deletion; {$NAME$}=item label",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemWillBePromoted": {
+    "message": "\"$NAME$\" will be promoted when you click Save",
+    "description": "Status shown when an item is staged for promotion; {$NAME$}=item label",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemWithNestedWillBePromoted": {
+    "message": "\"$NAME$\" with $COUNT$ nested items will be promoted when you click Save",
+    "description": "{$NAME$}=item label; {$COUNT$}=number of nested items",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
   }
 }

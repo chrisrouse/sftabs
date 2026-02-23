@@ -144,3 +144,76 @@ addButton,Add,,,Add action button label (short form)
 learnMoreLink,Learn More,,,Link text to open more information
 sponsorLink,Sponsor on Github,,,Link in settings sidebar footer to the GitHub sponsors page
 buyMeCoffeeLink,Buy Me a Coffee,,,Link in settings sidebar footer to the Buy Me a Coffee page
+quickAddButtonTitle,Add tab for current page,,,Title attribute on the Quick Add button in the popup header
+addNewTabButtonTitle,Add new tab,,,Title attribute on the Add New Tab button in the popup header
+profilesButtonTitle,Profiles,,,Title attribute on the Profiles button in the popup header
+settingsButtonTitle,Settings,,,Title attribute on the Settings button in the popup header
+emptyStateText,No custom tabs yet. Add your first tab below.,,,Text shown in the popup when no tabs have been added yet
+objectManagerDropdownLabel,Object Manager Dropdown,,,Label for the Object Manager dropdown section in the tab form
+setupAsObjectDropdownButton,Setup as Object Dropdown,,,Button to set up a tab as an Object Manager dropdown
+setupAsObjectDropdownHelp,Create a dropdown menu with navigation items from the current Object Manager page,,,Help text for the Setup as Object Dropdown button
+refreshListButton,Refresh List,,,Button to refresh the dropdown items list in the tab form
+createDropdownMenuLabel,Create Dropdown Menu,,,Label for the manual dropdown creation section in the tab form
+tabSettingsHeader,Tab Settings,,,Header for the tab settings section in the action panel
+tabNamePlaceholder,"e.g., User Management",,,Placeholder text for the tab name input
+tabPathLabel,Page URL (Optional),,,Label for the page URL input in the action panel
+tabPathPlaceholder,"e.g., ManageUsers",,,Placeholder text for the tab path input
+tabPathHelp,Just add the page name from the URL. Leave blank to create a folder-style tab that acts as a menu container.,,,Help text for the tab path input
+tabIsObjectLabel,Object,,,Label for the Object checkbox in the tab form
+tabIsObjectHelp,Check this if the page is an object page instead of a setup page,,,Help text for the Object checkbox
+tabIsCustomUrlLabel,Custom URL,,,Label for the Custom URL checkbox in the tab form
+tabIsCustomUrlHelp,"Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)",,,Help text for the Custom URL checkbox
+confirmModalTitle,Reset to Default Tabs,,,Title of the confirm reset modal dialog
+confirmModalBody,Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.,,,Body text of the confirm reset modal dialog
+resetConfirmButton,Reset,,,Confirm button text in the reset to defaults modal
+deleteModalTitle,Remove Tab,,,Title of the delete tab confirmation modal dialog
+deleteModalBody,Are you sure you want to remove this tab?,,,Body text of the delete tab confirmation modal dialog
+notSalesforcePage,Not a Salesforce page,,,Status message shown when Quick Add is clicked on a non-Salesforce page
+notSalesforceSetupPage,Not a recognized Salesforce setup or object page,,,Status message shown when Quick Add cannot identify the Salesforce page type
+tabAdded,"Added $PAGETYPE$ tab for ""$NAME$""",,,"{$PAGETYPE$}=setup/object/custom; {$NAME$}=tab label"
+errorAccessingTab,Error accessing current tab: $ERROR$,,,Error shown when Quick Add fails to access the current tab; {$ERROR$}=error message
+tabRemoved,Tab removed,,,Status message shown after deleting a tab
+resetToDefaultTabsStatus,Reset to default tabs,,,Status message shown after resetting tabs to defaults
+tabNotFound,Tab not found,,,Error shown when a tab cannot be found by its ID
+tabDuplicated,"Duplicated tab ""$NAME$""",,,Status shown after duplicating a tab; {$NAME$}=tab label
+noTabSelected,No tab selected,,,Error when the save action is triggered without a tab selected
+tabNameRequired,Tab name is required,,,Validation error shown when the tab name field is empty
+tabCannotBeBoth,Tab cannot be both Object and Custom URL,,,Validation error when both Object and Custom URL checkboxes are checked
+parentTabNotFound,Parent tab not found,,,Error when the parent tab of a dropdown item cannot be found
+dropdownItemNotFound,Dropdown item not found,,,Error when a specific dropdown item cannot be found
+dropdownItemUpdated,Dropdown item updated successfully,,,Status shown after successfully updating a dropdown item
+tabCreated,Tab created successfully,,,Status shown after successfully creating a new tab
+tabUpdated,Tab updated successfully,,,Status shown after successfully updating an existing tab
+errorInitializingPopup,Error initializing popup: $ERROR$,,,Error shown if the popup fails to initialize; {$ERROR$}=error message
+errorLoadingSettings,Error loading settings: $ERROR$,,,Error shown if settings fail to load; {$ERROR$}=error message
+errorLoadingTabs,Error loading tabs: $ERROR$,,,Error shown if tabs fail to load; {$ERROR$}=error message
+errorCreatingTab,Error creating tab: $ERROR$,,,Error shown if tab creation fails; {$ERROR$}=error message
+errorUpdatingTab,Error updating tab: $ERROR$,,,Error shown if tab update fails; {$ERROR$}=error message
+errorUpdatingDropdownItem,Error updating dropdown item: $ERROR$,,,Error shown if dropdown item update fails; {$ERROR$}=error message
+errorCreateNotAvailable,Error: Create function not available,,,Internal error shown if the tab create function is missing
+errorUpdateNotAvailable,Error: Update function not available,,,Internal error shown if the tab update function is missing
+dragToReorderTitle,Drag to reorder,,,Title attribute on the drag handle element for reordering tabs
+editTabButtonTitle,Edit tab,,,Title attribute on the edit/pencil icon button in the tab list
+opensInNewTabTitle,Opens in new tab (click to change),,,Title on the new-tab toggle button when the tab opens in a new tab
+opensInSameTabTitle,Opens in same tab (click to change),,,Title on the new-tab toggle button when the tab opens in the same tab
+removeTabButtonTitle,Remove tab,,,Title attribute on the delete/trash icon button in the tab list
+addNewTabFormTitle,Add New Tab,,,Form title displayed when adding a new tab
+editTabFormTitle,Edit Tab,,,Form title displayed when editing an existing tab
+noTabSelectedForEditing,No tab selected for editing,,,Error when save is attempted in the dropdown form without a tab selected
+errorSavingChanges,Error saving changes: $ERROR$,,,Error shown when saving drag-drop changes to dropdown items fails; {$ERROR$}=error message
+errorTooManyDropdownLevels,Error: Too many dropdown levels,,,Error when a drag-and-drop creates more than 3 nesting levels
+tabDropdownAdded,"Added ""$DRAGGED$"" as dropdown item to ""$TARGET$""",,,"{$DRAGGED$}=dragged tab label; {$TARGET$}=target tab label"
+dropdownItemCollapseTitle,Collapse,,,Title on the collapse button for dropdown items that have children
+dropdownItemExpandTitle,Expand,,,Title on the expand button for collapsed dropdown items with children
+editDropdownItemTitle,Edit this dropdown item,,,Title on the Edit button for dropdown items in the manage dropdown panel
+promoteToMainListTitle,Promote to main tab list,,,Title on the Promote button for dropdown items
+deleteDropdownItemTitle,Delete this item,,,Title on the Delete button for dropdown items
+editDropdownItemPanelTitle,Edit Dropdown Item,,,Title displayed in the action panel header when editing a dropdown item
+newTabPanelTitle,New Tab,,,Title displayed in the action panel header when adding a new tab
+promotedWithNested,"Promoted ""$NAME$"" with $COUNT$ nested items to main tab list",,,"{$NAME$}=item label; {$COUNT$}=number of nested items promoted with it"
+promoted,"Promoted ""$NAME$"" to main tab list",,,"{$NAME$}=item label"
+errorPromotingItem,Error promoting item: $ERROR$,,,Error shown when promoting a dropdown item to the main list fails; {$ERROR$}=error message
+deleteDropdownItemConfirm,"Delete ""$NAME$""?",,,Confirm dialog text when deleting a dropdown item; {$NAME$}=item label
+itemWillBeDeleted,"""$NAME$"" will be deleted when you click Save",,,Status shown when an item is staged for deletion; {$NAME$}=item label
+itemWillBePromoted,"""$NAME$"" will be promoted when you click Save",,,Status shown when an item is staged for promotion; {$NAME$}=item label
+itemWithNestedWillBePromoted,"""$NAME$"" with $COUNT$ nested items will be promoted when you click Save",,,"{$NAME$}=item label; {$COUNT$}=number of nested items"
