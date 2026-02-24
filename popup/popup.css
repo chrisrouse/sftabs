@@ -300,7 +300,18 @@
 	height: 24px;
 	display: block;
   }
-  
+
+  .version-badge {
+	font-size: 10px;
+	font-weight: 500;
+	padding: 2px 6px;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, 0.2);
+	color: var(--color-header-text);
+	letter-spacing: 0.02em;
+	white-space: nowrap;
+  }
+
   h2 {
 	font-size: 14px;
 	font-weight: 600;
