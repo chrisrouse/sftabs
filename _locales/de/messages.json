@@ -4,7 +4,7 @@
     "description": "Name of the extension"
   },
   "extensionDescription": {
-    "message": "Add custom tabs to the Salesforce setup menu.",
+    "message": "Fügen Sie benutzerdefinierte Registerkarten zum Salesforce-Setup-Menü hinzu.",
     "description": "Description of the extension"
   },
   "popupTitle": {
@@ -12,35 +12,27 @@
     "description": "Popup title"
   },
   "tabsHeader": {
-    "message": "Tabs",
+    "message": "Registerkarten",
     "description": "Tabs section header"
   },
   "addNewTab": {
-    "message": "Add New Tab",
+    "message": "Neue Registerkarte hinzufügen",
     "description": "Add new tab button"
   },
   "settingsHeader": {
-    "message": "Settings",
+    "message": "Einstellungen",
     "description": "Settings section header"
   },
-  "openFullSettingsButton": {
-    "message": "Open Full Settings Page",
-    "description": "Button to open standalone settings page"
-  },
-  "openFullSettingsHelp": {
-    "message": "Try the new standalone settings page with a better layout and all configuration options in one place",
-    "description": "Help text for full settings button"
-  },
   "themeMode": {
-    "message": "Theme Mode",
+    "message": "Design-Modus",
     "description": "Theme mode setting label"
   },
   "themeLight": {
-    "message": "Light",
+    "message": "Hell",
     "description": "Light theme option"
   },
   "themeDark": {
-    "message": "Dark",
+    "message": "Dunkel",
     "description": "Dark theme option"
   },
   "themeSystem": {
@@ -48,35 +40,35 @@
     "description": "System theme option"
   },
   "compactMode": {
-    "message": "Compact Mode",
+    "message": "Kompaktmodus",
     "description": "Compact mode setting label"
   },
   "compactModeDescription": {
-    "message": "Display tabs in a more condensed layout",
+    "message": "Registerkarten in einem kompakteren Layout anzeigen",
     "description": "Compact mode description"
   },
   "skipDeleteConfirmation": {
-    "message": "Skip Delete Confirmation",
+    "message": "Löschbestätigung überspringen",
     "description": "Skip delete confirmation setting label"
   },
   "skipDeleteConfirmationDescription": {
-    "message": "Don't ask for confirmation when deleting tabs",
+    "message": "Keine Bestätigung beim Löschen von Registerkarten anfordern",
     "description": "Skip delete confirmation description"
   },
   "manageConfig": {
-    "message": "Manage Configuration",
+    "message": "Konfiguration verwalten",
     "description": "Manage configuration button"
   },
   "resetToDefaults": {
-    "message": "Reset to Defaults",
+    "message": "Auf Standardwerte zurücksetzen",
     "description": "Reset to defaults button"
   },
   "settingsPageTitle": {
-    "message": "SF Tabs Settings",
+    "message": "SF Tabs Einstellungen",
     "description": "Settings page title"
   },
   "settingsSubtitle": {
-    "message": "Customize your SF Tabs experience",
+    "message": "Passen Sie Ihre SF Tabs-Erfahrung an",
     "description": "Settings page subtitle"
   },
   "versionInfo": {
@@ -89,79 +81,79 @@
     }
   },
   "changelog": {
-    "message": "Changelog",
+    "message": "Änderungsprotokoll",
     "description": "Changelog link text"
   },
   "appearanceSection": {
-    "message": "Appearance",
+    "message": "Erscheinungsbild",
     "description": "Appearance section heading"
   },
   "appearanceDescription": {
-    "message": "Customize the look and feel of your extension",
+    "message": "Das Aussehen und Verhalten Ihrer Erweiterung anpassen",
     "description": "Appearance section description"
   },
   "behaviorSection": {
-    "message": "Behavior",
+    "message": "Verhalten",
     "description": "Behavior section heading"
   },
   "behaviorDescription": {
-    "message": "Control how the extension behaves",
+    "message": "Steuern Sie, wie sich die Erweiterung verhält",
     "description": "Behavior section description"
   },
   "syncStorageSection": {
-    "message": "Sync & Storage",
+    "message": "Sync & Speicher",
     "description": "Sync & Storage section heading"
   },
   "syncStorageDescription": {
-    "message": "Manage how your tabs are stored and synced",
+    "message": "Verwalten Sie, wie Ihre Registerkarten gespeichert und synchronisiert werden",
     "description": "Sync & Storage section description"
   },
   "useSyncStorage": {
-    "message": "Cross-Device Sync",
+    "message": "Geräteübergreifende Synchronisierung",
     "description": "Cross-device sync setting label"
   },
   "useSyncStorageDescription": {
-    "message": "Sync your tabs across all devices using browser sync",
+    "message": "Synchronisieren Sie Ihre Registerkarten über die Browser-Synchronisierung auf allen Geräten",
     "description": "Cross-device sync description"
   },
   "profilesSection": {
-    "message": "Profiles",
+    "message": "Profile",
     "description": "Profiles section heading"
   },
   "profilesDescription": {
-    "message": "Organize tabs into different profiles for different Salesforce orgs",
+    "message": "Registerkarten in verschiedenen Profilen für verschiedene Salesforce-Organisationen organisieren",
     "description": "Profiles section description"
   },
   "enableProfiles": {
-    "message": "Enable Profiles",
+    "message": "Profile aktivieren",
     "description": "Enable profiles setting label"
   },
   "enableProfilesDescription": {
-    "message": "Create separate sets of tabs for different Salesforce orgs",
+    "message": "Separate Registerkartensätze für verschiedene Salesforce-Organisationen erstellen",
     "description": "Enable profiles description"
   },
   "autoSwitchProfiles": {
-    "message": "Auto-Switch Profiles",
+    "message": "Profile automatisch wechseln",
     "description": "Auto-switch profiles setting label"
   },
   "autoSwitchProfilesDescription": {
-    "message": "Automatically switch to the appropriate profile based on the current Salesforce org's URL",
+    "message": "Automatisch zum entsprechenden Profil wechseln, basierend auf der URL der aktuellen Salesforce-Organisation",
     "description": "Auto-switch profiles description"
   },
   "keyboardShortcutsSection": {
-    "message": "Keyboard Shortcuts",
+    "message": "Tastenkombinationen",
     "description": "Keyboard shortcuts section heading"
   },
   "keyboardShortcutsDescription": {
-    "message": "Set up keyboard shortcuts to quickly access your tabs",
+    "message": "Tastenkombinationen einrichten, um schnell auf Ihre Registerkarten zuzugreifen",
     "description": "Keyboard shortcuts section description"
   },
   "configureKeyboardShortcuts": {
-    "message": "Configure Keyboard Shortcuts",
+    "message": "Tastenkombinationen konfigurieren",
     "description": "Configure keyboard shortcuts button"
   },
   "keyboardShortcutsHelp": {
-    "message": "Set keyboard shortcuts to quickly open tabs 1-10 by position",
+    "message": "Tastenkombinationen festlegen, um Registerkarten 1–10 nach Position schnell zu öffnen",
     "description": "Keyboard shortcuts help text"
   },
   "importExportSection": {
@@ -169,195 +161,195 @@
     "description": "Import & Export section heading"
   },
   "importExportDescription": {
-    "message": "Backup and restore your configuration",
+    "message": "Ihre Konfiguration sichern und wiederherstellen",
     "description": "Import & Export section description"
   },
   "exportButton": {
-    "message": "Export",
+    "message": "Exportieren",
     "description": "Export button text"
   },
   "exportActionTitle": {
-    "message": "Export",
+    "message": "Exportieren",
     "description": "Export action title"
   },
   "exportActionDescription": {
-    "message": "Save to file",
+    "message": "In Datei speichern",
     "description": "Export action description"
   },
   "importButton": {
-    "message": "Import",
+    "message": "Importieren",
     "description": "Import button text"
   },
   "importActionTitle": {
-    "message": "Import",
+    "message": "Importieren",
     "description": "Import action title"
   },
   "importActionDescription": {
-    "message": "Restore from backup",
+    "message": "Aus Sicherung wiederherstellen",
     "description": "Import action description"
   },
   "dangerZoneSection": {
-    "message": "Danger Zone",
+    "message": "Gefahrenbereich",
     "description": "Danger zone section heading"
   },
   "dangerZoneDescription": {
-    "message": "Irreversible actions that will affect your data",
+    "message": "Nicht umkehrbare Aktionen, die sich auf Ihre Daten auswirken",
     "description": "Danger zone section description"
   },
   "resetButton": {
-    "message": "Reset to Defaults",
+    "message": "Auf Standardwerte zurücksetzen",
     "description": "Reset to defaults button"
   },
   "resetButtonDescription": {
-    "message": "This will remove all custom tabs and reset all settings to their default values. This action cannot be undone.",
+    "message": "Hierdurch werden alle benutzerdefinierten Registerkarten entfernt und alle Einstellungen auf ihre Standardwerte zurückgesetzt. Diese Aktion kann nicht rückgängig gemacht werden.",
     "description": "Reset button description"
   },
   "exportModalTitle": {
-    "message": "Export Configuration",
+    "message": "Konfiguration exportieren",
     "description": "Export modal title"
   },
   "exportModalPrompt": {
-    "message": "Select what you want to export:",
+    "message": "Wählen Sie aus, was Sie exportieren möchten:",
     "description": "Export modal prompt"
   },
   "exportEverything": {
-    "message": "Everything",
+    "message": "Alles",
     "description": "Export everything option"
   },
   "exportEverythingDescription": {
-    "message": "Export all settings and profiles",
+    "message": "Alle Einstellungen und Profile exportieren",
     "description": "Export everything description"
   },
   "exportSettingsOnly": {
-    "message": "Settings",
+    "message": "Einstellungen",
     "description": "Export settings option"
   },
   "cancelButton": {
-    "message": "Cancel",
+    "message": "Abbrechen",
     "description": "Cancel button"
   },
   "confirmButton": {
-    "message": "Confirm",
+    "message": "Bestätigen",
     "description": "Confirm button"
   },
   "exportConfirmButton": {
-    "message": "Export",
+    "message": "Exportieren",
     "description": "Export confirm button"
   },
   "importConfirmButton": {
-    "message": "Import",
+    "message": "Importieren",
     "description": "Import confirm button"
   },
   "importModalTitle": {
-    "message": "Import Configuration",
+    "message": "Konfiguration importieren",
     "description": "Import modal title"
   },
   "importModalPrompt": {
-    "message": "Where would you like to import this configuration?",
+    "message": "Wohin möchten Sie diese Konfiguration importieren?",
     "description": "Import modal prompt"
   },
   "importOverwriteProfile": {
-    "message": "Overwrite existing profile",
+    "message": "Vorhandenes Profil überschreiben",
     "description": "Import overwrite profile option"
   },
   "importCreateProfile": {
-    "message": "Create new profile",
+    "message": "Neues Profil erstellen",
     "description": "Import create profile option"
   },
   "selectProfile": {
-    "message": "Select profile:",
+    "message": "Profil auswählen:",
     "description": "Select profile label"
   },
   "selectProfilePlaceholder": {
-    "message": "Choose a profile...",
+    "message": "Profil auswählen...",
     "description": "Select profile placeholder"
   },
   "newProfileName": {
-    "message": "Profile name:",
+    "message": "Profilname:",
     "description": "New profile name label"
   },
   "newProfileNamePlaceholder": {
-    "message": "Enter profile name",
+    "message": "Profilnamen eingeben",
     "description": "New profile name placeholder"
   },
   "resetModalTitle": {
-    "message": "Reset to Defaults",
+    "message": "Auf Standardwerte zurücksetzen",
     "description": "Reset modal title"
   },
   "resetModalPrompt": {
-    "message": "Are you sure you want to reset to default tabs and settings? This will:",
+    "message": "Möchten Sie wirklich auf die Standard-Registerkarten und -Einstellungen zurücksetzen? Dabei wird Folgendes ausgeführt:",
     "description": "Reset modal prompt"
   },
   "resetModalItem1": {
-    "message": "Remove all custom tabs",
+    "message": "Alle benutzerdefinierten Registerkarten entfernen",
     "description": "Reset modal item 1"
   },
   "resetModalItem2": {
-    "message": "Remove all profiles",
+    "message": "Alle Profile entfernen",
     "description": "Reset modal item 2"
   },
   "resetModalItem3": {
-    "message": "Reset all settings to defaults",
+    "message": "Alle Einstellungen auf Standardwerte zurücksetzen",
     "description": "Reset modal item 3"
   },
   "resetModalWarning": {
-    "message": "This action cannot be undone!",
+    "message": "Diese Aktion kann nicht rückgängig gemacht werden!",
     "description": "Reset modal warning"
   },
   "enableSyncConfirmTitle": {
-    "message": "Enable cross-device sync?",
+    "message": "Geräteübergreifende Synchronisierung aktivieren?",
     "description": "Enable sync confirmation title"
   },
   "enableSyncConfirmMessage": {
-    "message": "Your tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you're signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.",
+    "message": "Ihre Registerkarten werden über die Browser-Synchronisierung auf allen Ihren Computern synchronisiert. So können Sie auf jedem Gerät, auf dem Sie angemeldet sind, auf Ihre benutzerdefinierten Registerkarten zugreifen.\n\nHinweis: Große Konfigurationen (>100 KB) werden möglicherweise nicht korrekt synchronisiert. Klicken Sie auf OK, um fortzufahren.",
     "description": "Enable sync confirmation message"
   },
   "disableSyncConfirmTitle": {
-    "message": "Disable cross-device sync?",
+    "message": "Geräteübergreifende Synchronisierung deaktivieren?",
     "description": "Disable sync confirmation title"
   },
   "disableSyncConfirmMessage": {
-    "message": "Your tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.",
+    "message": "Ihre Registerkarten werden nur auf diesem Computer gespeichert. Sie werden nicht mit anderen Geräten synchronisiert.\n\nKlicken Sie auf OK, um fortzufahren.",
     "description": "Disable sync confirmation message"
   },
   "disableProfilesConfirmMessage": {
-    "message": "Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.",
+    "message": "Profile deaktivieren?\n\nDadurch werden alle Registerkarten aus allen Profilen in einer einzigen Registerkartenliste zusammengeführt. Sie können Profile später wieder aktivieren.\n\nKlicken Sie auf OK, um fortzufahren.",
     "description": "Disable profiles confirmation message"
   },
   "settingsSaved": {
-    "message": "Settings saved",
+    "message": "Einstellungen gespeichert",
     "description": "Settings saved status message"
   },
   "settingsReset": {
-    "message": "All settings and tabs reset to defaults",
+    "message": "Alle Einstellungen und Registerkarten auf Standardwerte zurückgesetzt",
     "description": "Settings reset status message"
   },
   "configExported": {
-    "message": "Configuration exported successfully",
+    "message": "Konfiguration erfolgreich exportiert",
     "description": "Configuration exported status message"
   },
   "configImported": {
-    "message": "Configuration imported successfully",
+    "message": "Konfiguration erfolgreich importiert",
     "description": "Configuration imported status message"
   },
   "tabsImportedToProfile": {
-    "message": "Tabs imported to selected profile",
+    "message": "Registerkarten in ausgewähltes Profil importiert",
     "description": "Tabs imported to profile status message"
   },
   "profileCreated": {
-    "message": "New profile created with imported tabs",
+    "message": "Neues Profil mit importierten Registerkarten erstellt",
     "description": "Profile created status message"
   },
   "syncEnabled": {
-    "message": "Sync enabled - tabs will now sync across devices",
+    "message": "Synchronisierung aktiviert – Registerkarten werden jetzt geräteübergreifend synchronisiert",
     "description": "Sync enabled status message"
   },
   "syncDisabled": {
-    "message": "Sync disabled - tabs stored locally only",
+    "message": "Synchronisierung deaktiviert – Registerkarten werden nur lokal gespeichert",
     "description": "Sync disabled status message"
   },
   "errorSavingSettings": {
-    "message": "Error saving settings: $ERROR$",
+    "message": "Fehler beim Speichern der Einstellungen: $ERROR$",
     "description": "Error saving settings",
     "placeholders": {
       "error": {
@@ -366,7 +358,7 @@
     }
   },
   "errorExport": {
-    "message": "Export failed: $ERROR$",
+    "message": "Export fehlgeschlagen: $ERROR$",
     "description": "Export error message",
     "placeholders": {
       "error": {
@@ -375,7 +367,7 @@
     }
   },
   "errorImport": {
-    "message": "Import failed: $ERROR$",
+    "message": "Import fehlgeschlagen: $ERROR$",
     "description": "Import error message",
     "placeholders": {
       "error": {
@@ -384,7 +376,7 @@
     }
   },
   "errorReset": {
-    "message": "Reset failed: $ERROR$",
+    "message": "Zurücksetzen fehlgeschlagen: $ERROR$",
     "description": "Reset error message",
     "placeholders": {
       "error": {
@@ -393,131 +385,131 @@
     }
   },
   "errorInvalidConfig": {
-    "message": "Invalid configuration file - missing required fields",
+    "message": "Ungültige Konfigurationsdatei – erforderliche Felder fehlen",
     "description": "Invalid configuration error"
   },
   "selectProfileError": {
-    "message": "Please select a profile",
+    "message": "Bitte wählen Sie ein Profil aus",
     "description": "Select profile error"
   },
   "profileNameError": {
-    "message": "Please enter a profile name",
+    "message": "Bitte geben Sie einen Profilnamen ein",
     "description": "Profile name error"
   },
   "couldNotOpenShortcuts": {
-    "message": "Could not open shortcuts page",
+    "message": "Tastenkombinationsseite konnte nicht geöffnet werden",
     "description": "Could not open shortcuts error"
   },
   "couldNotDetectBrowser": {
-    "message": "Could not detect browser type",
+    "message": "Browsertyp konnte nicht erkannt werden",
     "description": "Could not detect browser error"
   },
   "tabName": {
-    "message": "Tab Name",
+    "message": "Name der Registerkarte",
     "description": "Tab name label"
   },
   "tabPath": {
-    "message": "Tab Path",
+    "message": "Pfad der Registerkarte",
     "description": "Tab path label"
   },
   "addTab": {
-    "message": "Add Tab",
+    "message": "Registerkarte hinzufügen",
     "description": "Add tab button"
   },
   "editTab": {
-    "message": "Edit Tab",
+    "message": "Registerkarte bearbeiten",
     "description": "Edit tab button"
   },
   "deleteTab": {
-    "message": "Delete Tab",
+    "message": "Registerkarte löschen",
     "description": "Delete tab button"
   },
   "saveTab": {
-    "message": "Save",
+    "message": "Speichern",
     "description": "Save tab button"
   },
   "moveTabUp": {
-    "message": "Move Up",
+    "message": "Nach oben verschieben",
     "description": "Move tab up button"
   },
   "moveTabDown": {
-    "message": "Move Down",
+    "message": "Nach unten verschieben",
     "description": "Move tab down button"
   },
   "commandTab1": {
-    "message": "Tab 1",
+    "message": "Registerkarte 1",
     "description": "Keyboard command for tab 1"
   },
   "commandTab2": {
-    "message": "Tab 2",
+    "message": "Registerkarte 2",
     "description": "Keyboard command for tab 2"
   },
   "commandTab3": {
-    "message": "Tab 3",
+    "message": "Registerkarte 3",
     "description": "Keyboard command for tab 3"
   },
   "commandTab4": {
-    "message": "Tab 4",
+    "message": "Registerkarte 4",
     "description": "Keyboard command for tab 4"
   },
   "commandTab5": {
-    "message": "Tab 5",
+    "message": "Registerkarte 5",
     "description": "Keyboard command for tab 5"
   },
   "commandTab6": {
-    "message": "Tab 6",
+    "message": "Registerkarte 6",
     "description": "Keyboard command for tab 6"
   },
   "commandTab7": {
-    "message": "Tab 7",
+    "message": "Registerkarte 7",
     "description": "Keyboard command for tab 7"
   },
   "commandTab8": {
-    "message": "Tab 8",
+    "message": "Registerkarte 8",
     "description": "Keyboard command for tab 8"
   },
   "commandTab9": {
-    "message": "Tab 9",
+    "message": "Registerkarte 9",
     "description": "Keyboard command for tab 9"
   },
   "commandTab10": {
-    "message": "Tab 10",
+    "message": "Registerkarte 10",
     "description": "Keyboard command for tab 10"
   },
   "firstLaunchWelcomeTitle": {
-    "message": "Thanks for installing SF Tabs!",
+    "message": "Danke, dass Sie SF Tabs installiert haben!",
     "description": "First launch modal header"
   },
   "firstLaunchSetupDefaultTitle": {
-    "message": "Start with default tabs",
+    "message": "Mit Standard-Registerkarten beginnen",
     "description": "Setup option title for starting with default tabs"
   },
   "firstLaunchSetupDefaultDescription": {
-    "message": "Start with the standard set of tabs",
+    "message": "Mit dem Standardsatz von Registerkarten beginnen",
     "description": "Setup option description for starting with default tabs"
   },
   "firstLaunchSetupEmptyTitle": {
-    "message": "Start with no tabs",
+    "message": "Ohne Registerkarten beginnen",
     "description": "Setup option title for starting with an empty profile"
   },
   "firstLaunchSetupEmptyDescription": {
-    "message": "Begin with an empty profile and add tabs manually",
+    "message": "Mit einem leeren Profil beginnen und Registerkarten manuell hinzufügen",
     "description": "Setup option description for starting with an empty profile"
   },
   "firstLaunchSetupImportTitle": {
-    "message": "Import existing configuration",
+    "message": "Vorhandene Konfiguration importieren",
     "description": "Setup option title for importing an existing configuration"
   },
   "firstLaunchSetupImportDescription": {
-    "message": "Import an SF Tabs configuration file",
+    "message": "Eine SF Tabs-Konfigurationsdatei importieren",
     "description": "Setup option description for importing an existing configuration"
   },
   "firstLaunchEnableProfilesTitle": {
-    "message": "Enable Profiles",
+    "message": "Profile aktivieren",
     "description": "Profiles toggle option title"
   },
   "firstLaunchEnableProfilesDescription": {
-    "message": "Profiles let you manage different tab configurations",
+    "message": "Mit Profilen können Sie verschiedene Registerkartenkonfigurationen verwalten",
     "description": "Profiles toggle option description"
   },
   "firstLaunchSyncStorageTitle": {
@@ -525,7 +517,7 @@
     "description": "Sync storage option title"
   },
   "firstLaunchSyncStorageDescription": {
-    "message": "Tabs can sync between computers",
+    "message": "Registerkarten können zwischen Computern synchronisiert werden",
     "description": "Sync storage option description"
   },
   "firstLaunchLocalStorageTitle": {
@@ -533,23 +525,23 @@
     "description": "Local storage option title"
   },
   "firstLaunchLocalStorageDescription": {
-    "message": "Tabs don't sync between computers",
+    "message": "Registerkarten werden nicht zwischen Computern synchronisiert",
     "description": "Local storage option description"
   },
   "firstLaunchGuideButton": {
-    "message": "User Guide",
+    "message": "Benutzerhandbuch",
     "description": "Button that opens the user guide"
   },
   "firstLaunchGetStartedButton": {
-    "message": "Get Started",
+    "message": "Jetzt starten",
     "description": "Primary button to complete first-launch setup"
   },
   "firstLaunchSyncFoundTitle": {
-    "message": "Synced Configuration Found",
+    "message": "Synchronisierte Konfiguration gefunden",
     "description": "Heading shown when existing sync data is detected on a new device"
   },
   "firstLaunchSyncFoundMessage": {
-    "message": "We found existing SF Tabs data in your browser sync$PROFILES$.",
+    "message": "Wir haben vorhandene SF Tabs-Daten in Ihrer Browser-Synchronisierung gefunden$PROFILES$.",
     "description": "Message shown when sync data is detected. $PROFILES$ is replaced with ' (X profiles with tabs)' when profiles exist, or omitted.",
     "placeholders": {
       "profiles": {
@@ -558,19 +550,19 @@
     }
   },
   "firstLaunchSyncFoundQuestion": {
-    "message": "Would you like to use it or start fresh?",
+    "message": "Möchten Sie diese verwenden oder neu beginnen?",
     "description": "Question shown below the sync data detected message"
   },
   "firstLaunchUseSyncedButton": {
-    "message": "Use Synced Configuration (Recommended)",
+    "message": "Synchronisierte Konfiguration verwenden (Empfohlen)",
     "description": "Button to use the existing synced configuration"
   },
   "firstLaunchStartFreshButton": {
-    "message": "Start Fresh with New Setup",
+    "message": "Neu beginnen mit neuer Einrichtung",
     "description": "Button to discard synced data and run the normal setup wizard"
   },
   "firstLaunchErrorLoadingSync": {
-    "message": "Error loading synced data: $ERROR$",
+    "message": "Fehler beim Laden der synchronisierten Daten: $ERROR$",
     "description": "Error shown when loading synced configuration fails",
     "placeholders": {
       "error": {
@@ -579,7 +571,7 @@
     }
   },
   "firstLaunchErrorClearingSync": {
-    "message": "Error clearing sync data: $ERROR$",
+    "message": "Fehler beim Löschen der Synchronisierungsdaten: $ERROR$",
     "description": "Error shown when clearing sync data before starting fresh fails",
     "placeholders": {
       "error": {
@@ -588,7 +580,7 @@
     }
   },
   "firstLaunchErrorSetup": {
-    "message": "Error during setup: $ERROR$",
+    "message": "Fehler während der Einrichtung: $ERROR$",
     "description": "Error shown when the Get Started initialization fails",
     "placeholders": {
       "error": {
@@ -597,23 +589,23 @@
     }
   },
   "closeButton": {
-    "message": "Close",
+    "message": "Schließen",
     "description": "Close/dismiss button used in panels and modals"
   },
   "editButton": {
-    "message": "Edit",
+    "message": "Bearbeiten",
     "description": "Edit action button label (short form used in lists)"
   },
   "removeButton": {
-    "message": "Remove",
+    "message": "Entfernen",
     "description": "Remove/delete action button label"
   },
   "addButton": {
-    "message": "Add",
+    "message": "Hinzufügen",
     "description": "Add action button label (short form)"
   },
   "learnMoreLink": {
-    "message": "Learn More",
+    "message": "Mehr erfahren",
     "description": "Link text to open more information"
   },
   "sponsorLink": {
@@ -625,111 +617,111 @@
     "description": "Link in settings sidebar footer to the Buy Me a Coffee page"
   },
   "quickAddButtonTitle": {
-    "message": "Add tab for current page",
+    "message": "Tab für aktuelle Seite hinzufügen",
     "description": "Title attribute on the Quick Add button in the popup header"
   },
   "addNewTabButtonTitle": {
-    "message": "Add new tab",
+    "message": "Neuen Tab hinzufügen",
     "description": "Title attribute on the Add New Tab button in the popup header"
   },
   "profilesButtonTitle": {
-    "message": "Profiles",
+    "message": "Profile",
     "description": "Title attribute on the Profiles button in the popup header"
   },
   "settingsButtonTitle": {
-    "message": "Settings",
+    "message": "Einstellungen",
     "description": "Title attribute on the Settings button in the popup header"
   },
   "emptyStateText": {
-    "message": "No custom tabs yet. Add your first tab below.",
+    "message": "Noch keine benutzerdefinierten Tabs. Fügen Sie unten Ihren ersten Tab hinzu.",
     "description": "Text shown in the popup when no tabs have been added yet"
   },
   "objectManagerDropdownLabel": {
-    "message": "Object Manager Dropdown",
+    "message": "Object Manager-Dropdown",
     "description": "Label for the Object Manager dropdown section in the tab form"
   },
   "setupAsObjectDropdownButton": {
-    "message": "Setup as Object Dropdown",
+    "message": "Als Objekt-Dropdown einrichten",
     "description": "Button to set up a tab as an Object Manager dropdown"
   },
   "setupAsObjectDropdownHelp": {
-    "message": "Create a dropdown menu with navigation items from the current Object Manager page",
+    "message": "Erstellen Sie ein Dropdown-Menü mit Navigationselementen der aktuellen Object Manager-Seite",
     "description": "Help text for the Setup as Object Dropdown button"
   },
   "refreshListButton": {
-    "message": "Refresh List",
+    "message": "Liste aktualisieren",
     "description": "Button to refresh the dropdown items list in the tab form"
   },
   "createDropdownMenuLabel": {
-    "message": "Create Dropdown Menu",
+    "message": "Dropdown-Menü erstellen",
     "description": "Label for the manual dropdown creation section in the tab form"
   },
   "tabSettingsHeader": {
-    "message": "Tab Settings",
+    "message": "Tab-Einstellungen",
     "description": "Header for the tab settings section in the action panel"
   },
   "tabNamePlaceholder": {
-    "message": "e.g., User Management",
+    "message": "z. B. Benutzerverwaltung",
     "description": "Placeholder text for the tab name input"
   },
   "tabPathLabel": {
-    "message": "Page URL (Optional)",
+    "message": "Seiten-URL (optional)",
     "description": "Label for the page URL input in the action panel"
   },
   "tabPathPlaceholder": {
-    "message": "e.g., ManageUsers",
+    "message": "z. B. ManageUsers",
     "description": "Placeholder text for the tab path input"
   },
   "tabPathHelp": {
-    "message": "Just add the page name from the URL. Leave blank to create a folder-style tab that acts as a menu container.",
+    "message": "Geben Sie nur den Seitennamen aus der URL an. Leer lassen, um einen ordnerähnlichen Tab als Menü-Container zu erstellen.",
     "description": "Help text for the tab path input"
   },
   "tabIsObjectLabel": {
-    "message": "Object",
+    "message": "Objekt",
     "description": "Label for the Object checkbox in the tab form"
   },
   "tabIsObjectHelp": {
-    "message": "Check this if the page is an object page instead of a setup page",
+    "message": "Aktivieren Sie diese Option, wenn es sich um eine Objektseite und nicht um eine Setup-Seite handelt",
     "description": "Help text for the Object checkbox"
   },
   "tabIsCustomUrlLabel": {
-    "message": "Custom URL",
+    "message": "Benutzerdefinierte URL",
     "description": "Label for the Custom URL checkbox in the tab form"
   },
   "tabIsCustomUrlHelp": {
-    "message": "Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)",
+    "message": "Aktivieren Sie diese Option für spezielle Seiten, die nicht dem Setup- oder Objektmuster folgen (z. B. Flow Trigger Explorer)",
     "description": "Help text for the Custom URL checkbox"
   },
   "confirmModalTitle": {
-    "message": "Reset to Default Tabs",
+    "message": "Auf Standard-Tabs zurücksetzen",
     "description": "Title of the confirm reset modal dialog"
   },
   "confirmModalBody": {
-    "message": "Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.",
+    "message": "Möchten Sie wirklich auf die Standard-Tabs zurücksetzen? Dabei werden alle benutzerdefinierten Tabs entfernt, die Sie hinzugefügt haben.",
     "description": "Body text of the confirm reset modal dialog"
   },
   "resetConfirmButton": {
-    "message": "Reset",
+    "message": "Zurücksetzen",
     "description": "Confirm button text in the reset to defaults modal"
   },
   "deleteModalTitle": {
-    "message": "Remove Tab",
+    "message": "Tab entfernen",
     "description": "Title of the delete tab confirmation modal dialog"
   },
   "deleteModalBody": {
-    "message": "Are you sure you want to remove this tab?",
+    "message": "Möchten Sie diesen Tab wirklich entfernen?",
     "description": "Body text of the delete tab confirmation modal dialog"
   },
   "notSalesforcePage": {
-    "message": "Not a Salesforce page",
+    "message": "Keine Salesforce-Seite",
     "description": "Status message shown when Quick Add is clicked on a non-Salesforce page"
   },
   "notSalesforceSetupPage": {
-    "message": "Not a recognized Salesforce setup or object page",
+    "message": "Keine erkannte Salesforce-Setup- oder Objektseite",
     "description": "Status message shown when Quick Add cannot identify the Salesforce page type"
   },
   "tabAdded": {
-    "message": "Added $PAGETYPE$ tab for \"$NAME$\"",
+    "message": "$PAGETYPE$-Tab für \"$NAME$\" hinzugefügt",
     "description": "{$PAGETYPE$}=setup/object/custom; {$NAME$}=tab label",
     "placeholders": {
       "pagetype": {
@@ -741,7 +733,7 @@
     }
   },
   "errorAccessingTab": {
-    "message": "Error accessing current tab: $ERROR$",
+    "message": "Fehler beim Zugriff auf den aktuellen Tab: $ERROR$",
     "description": "Error shown when Quick Add fails to access the current tab; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -750,19 +742,19 @@
     }
   },
   "tabRemoved": {
-    "message": "Tab removed",
+    "message": "Tab entfernt",
     "description": "Status message shown after deleting a tab"
   },
   "resetToDefaultTabsStatus": {
-    "message": "Reset to default tabs",
+    "message": "Auf Standard-Tabs zurückgesetzt",
     "description": "Status message shown after resetting tabs to defaults"
   },
   "tabNotFound": {
-    "message": "Tab not found",
+    "message": "Tab nicht gefunden",
     "description": "Error shown when a tab cannot be found by its ID"
   },
   "tabDuplicated": {
-    "message": "Duplicated tab \"$NAME$\"",
+    "message": "Tab \"$NAME$\" dupliziert",
     "description": "Status shown after duplicating a tab; {$NAME$}=tab label",
     "placeholders": {
       "name": {
@@ -771,39 +763,39 @@
     }
   },
   "noTabSelected": {
-    "message": "No tab selected",
+    "message": "Kein Tab ausgewählt",
     "description": "Error when the save action is triggered without a tab selected"
   },
   "tabNameRequired": {
-    "message": "Tab name is required",
+    "message": "Tab-Name ist erforderlich",
     "description": "Validation error shown when the tab name field is empty"
   },
   "tabCannotBeBoth": {
-    "message": "Tab cannot be both Object and Custom URL",
+    "message": "Ein Tab kann nicht gleichzeitig Objekt und benutzerdefinierte URL sein",
     "description": "Validation error when both Object and Custom URL checkboxes are checked"
   },
   "parentTabNotFound": {
-    "message": "Parent tab not found",
+    "message": "Übergeordneter Tab nicht gefunden",
     "description": "Error when the parent tab of a dropdown item cannot be found"
   },
   "dropdownItemNotFound": {
-    "message": "Dropdown item not found",
+    "message": "Dropdown-Element nicht gefunden",
     "description": "Error when a specific dropdown item cannot be found"
   },
   "dropdownItemUpdated": {
-    "message": "Dropdown item updated successfully",
+    "message": "Dropdown-Element erfolgreich aktualisiert",
     "description": "Status shown after successfully updating a dropdown item"
   },
   "tabCreated": {
-    "message": "Tab created successfully",
+    "message": "Tab erfolgreich erstellt",
     "description": "Status shown after successfully creating a new tab"
   },
   "tabUpdated": {
-    "message": "Tab updated successfully",
+    "message": "Tab erfolgreich aktualisiert",
     "description": "Status shown after successfully updating an existing tab"
   },
   "errorInitializingPopup": {
-    "message": "Error initializing popup: $ERROR$",
+    "message": "Fehler beim Initialisieren des Popups: $ERROR$",
     "description": "Error shown if the popup fails to initialize; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -812,7 +804,7 @@
     }
   },
   "errorLoadingSettings": {
-    "message": "Error loading settings: $ERROR$",
+    "message": "Fehler beim Laden der Einstellungen: $ERROR$",
     "description": "Error shown if settings fail to load; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -821,7 +813,7 @@
     }
   },
   "errorLoadingTabs": {
-    "message": "Error loading tabs: $ERROR$",
+    "message": "Fehler beim Laden der Tabs: $ERROR$",
     "description": "Error shown if tabs fail to load; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -830,7 +822,7 @@
     }
   },
   "errorCreatingTab": {
-    "message": "Error creating tab: $ERROR$",
+    "message": "Fehler beim Erstellen des Tabs: $ERROR$",
     "description": "Error shown if tab creation fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -839,7 +831,7 @@
     }
   },
   "errorUpdatingTab": {
-    "message": "Error updating tab: $ERROR$",
+    "message": "Fehler beim Aktualisieren des Tabs: $ERROR$",
     "description": "Error shown if tab update fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -848,7 +840,7 @@
     }
   },
   "errorUpdatingDropdownItem": {
-    "message": "Error updating dropdown item: $ERROR$",
+    "message": "Fehler beim Aktualisieren des Dropdown-Elements: $ERROR$",
     "description": "Error shown if dropdown item update fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -857,47 +849,47 @@
     }
   },
   "errorCreateNotAvailable": {
-    "message": "Error: Create function not available",
+    "message": "Fehler: Erstellungsfunktion nicht verfügbar",
     "description": "Internal error shown if the tab create function is missing"
   },
   "errorUpdateNotAvailable": {
-    "message": "Error: Update function not available",
+    "message": "Fehler: Aktualisierungsfunktion nicht verfügbar",
     "description": "Internal error shown if the tab update function is missing"
   },
   "dragToReorderTitle": {
-    "message": "Drag to reorder",
+    "message": "Zum Neuanordnen ziehen",
     "description": "Title attribute on the drag handle element for reordering tabs"
   },
   "editTabButtonTitle": {
-    "message": "Edit tab",
+    "message": "Tab bearbeiten",
     "description": "Title attribute on the edit/pencil icon button in the tab list"
   },
   "opensInNewTabTitle": {
-    "message": "Opens in new tab (click to change)",
+    "message": "Wird in neuem Tab geöffnet (zum Ändern klicken)",
     "description": "Title on the new-tab toggle button when the tab opens in a new tab"
   },
   "opensInSameTabTitle": {
-    "message": "Opens in same tab (click to change)",
+    "message": "Wird im gleichen Tab geöffnet (zum Ändern klicken)",
     "description": "Title on the new-tab toggle button when the tab opens in the same tab"
   },
   "removeTabButtonTitle": {
-    "message": "Remove tab",
+    "message": "Tab entfernen",
     "description": "Title attribute on the delete/trash icon button in the tab list"
   },
   "addNewTabFormTitle": {
-    "message": "Add New Tab",
+    "message": "Neuen Tab hinzufügen",
     "description": "Form title displayed when adding a new tab"
   },
   "editTabFormTitle": {
-    "message": "Edit Tab",
+    "message": "Tab bearbeiten",
     "description": "Form title displayed when editing an existing tab"
   },
   "noTabSelectedForEditing": {
-    "message": "No tab selected for editing",
+    "message": "Kein Tab zum Bearbeiten ausgewählt",
     "description": "Error when save is attempted in the dropdown form without a tab selected"
   },
   "errorSavingChanges": {
-    "message": "Error saving changes: $ERROR$",
+    "message": "Fehler beim Speichern der Änderungen: $ERROR$",
     "description": "Error shown when saving drag-drop changes to dropdown items fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -906,11 +898,11 @@
     }
   },
   "errorTooManyDropdownLevels": {
-    "message": "Error: Too many dropdown levels",
+    "message": "Fehler: Zu viele Dropdown-Ebenen",
     "description": "Error when a drag-and-drop creates more than 3 nesting levels"
   },
   "tabDropdownAdded": {
-    "message": "Added \"$DRAGGED$\" as dropdown item to \"$TARGET$\"",
+    "message": "\"$DRAGGED$\" als Dropdown-Element zu \"$TARGET$\" hinzugefügt",
     "description": "{$DRAGGED$}=dragged tab label; {$TARGET$}=target tab label",
     "placeholders": {
       "dragged": {
@@ -922,35 +914,35 @@
     }
   },
   "dropdownItemCollapseTitle": {
-    "message": "Collapse",
+    "message": "Reduzieren",
     "description": "Title on the collapse button for dropdown items that have children"
   },
   "dropdownItemExpandTitle": {
-    "message": "Expand",
+    "message": "Erweitern",
     "description": "Title on the expand button for collapsed dropdown items with children"
   },
   "editDropdownItemTitle": {
-    "message": "Edit this dropdown item",
+    "message": "Dieses Dropdown-Element bearbeiten",
     "description": "Title on the Edit button for dropdown items in the manage dropdown panel"
   },
   "promoteToMainListTitle": {
-    "message": "Promote to main tab list",
+    "message": "In die Hauptliste hochstufen",
     "description": "Title on the Promote button for dropdown items"
   },
   "deleteDropdownItemTitle": {
-    "message": "Delete this item",
+    "message": "Dieses Element löschen",
     "description": "Title on the Delete button for dropdown items"
   },
   "editDropdownItemPanelTitle": {
-    "message": "Edit Dropdown Item",
+    "message": "Dropdown-Element bearbeiten",
     "description": "Title displayed in the action panel header when editing a dropdown item"
   },
   "newTabPanelTitle": {
-    "message": "New Tab",
+    "message": "Neuer Tab",
     "description": "Title displayed in the action panel header when adding a new tab"
   },
   "promotedWithNested": {
-    "message": "Promoted \"$NAME$\" with $COUNT$ nested items to main tab list",
+    "message": "\"$NAME$\" mit $COUNT$ verschachtelten Elementen in die Hauptliste hochgestuft",
     "description": "{$NAME$}=item label; {$COUNT$}=number of nested items promoted with it",
     "placeholders": {
       "name": {
@@ -962,7 +954,7 @@
     }
   },
   "promoted": {
-    "message": "Promoted \"$NAME$\" to main tab list",
+    "message": "\"$NAME$\" in die Hauptliste hochgestuft",
     "description": "{$NAME$}=item label",
     "placeholders": {
       "name": {
@@ -971,7 +963,7 @@
     }
   },
   "errorPromotingItem": {
-    "message": "Error promoting item: $ERROR$",
+    "message": "Fehler beim Hochstufen des Elements: $ERROR$",
     "description": "Error shown when promoting a dropdown item to the main list fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -980,7 +972,7 @@
     }
   },
   "deleteDropdownItemConfirm": {
-    "message": "Delete \"$NAME$\"?",
+    "message": "\"$NAME$\" löschen?",
     "description": "Confirm dialog text when deleting a dropdown item; {$NAME$}=item label",
     "placeholders": {
       "name": {
@@ -989,7 +981,7 @@
     }
   },
   "itemWillBeDeleted": {
-    "message": "\"$NAME$\" will be deleted when you click Save",
+    "message": "\"$NAME$\" wird gelöscht, wenn Sie auf Speichern klicken",
     "description": "Status shown when an item is staged for deletion; {$NAME$}=item label",
     "placeholders": {
       "name": {
@@ -998,7 +990,7 @@
     }
   },
   "itemWillBePromoted": {
-    "message": "\"$NAME$\" will be promoted when you click Save",
+    "message": "\"$NAME$\" wird hochgestuft, wenn Sie auf Speichern klicken",
     "description": "Status shown when an item is staged for promotion; {$NAME$}=item label",
     "placeholders": {
       "name": {
@@ -1007,7 +999,7 @@
     }
   },
   "itemWithNestedWillBePromoted": {
-    "message": "\"$NAME$\" with $COUNT$ nested items will be promoted when you click Save",
+    "message": "\"$NAME$\" mit $COUNT$ verschachtelten Elementen wird hochgestuft, wenn Sie auf Speichern klicken",
     "description": "{$NAME$}=item label; {$COUNT$}=number of nested items",
     "placeholders": {
       "name": {
@@ -1019,187 +1011,187 @@
     }
   },
   "profileInitTitle": {
-    "message": "Initialize Profile",
+    "message": "Profil initialisieren",
     "description": "Heading in the profile initialization options panel shown for new empty profiles"
   },
   "profileInitDesc": {
-    "message": "Choose how to set up this profile:",
+    "message": "Wählen Sie, wie dieses Profil eingerichtet werden soll:",
     "description": "Subtitle in the profile initialization panel"
   },
   "cloneAnotherProfileTitle": {
-    "message": "Clone another profile",
+    "message": "Ein anderes Profil klonen",
     "description": "Title for the clone option in profile init panel"
   },
   "cloneAnotherProfileDesc": {
-    "message": "Copy tabs from an existing profile",
+    "message": "Tabs aus einem vorhandenen Profil kopieren",
     "description": "Description for the clone option in profile init panel"
   },
   "selectProfileToCloneLabel": {
-    "message": "Select profile to clone:",
+    "message": "Zu klonendes Profil auswählen:",
     "description": "Label for the clone source profile selector"
   },
   "cloneProfileButton": {
-    "message": "Clone Profile",
+    "message": "Profil klonen",
     "description": "Button to confirm cloning a profile"
   },
   "activeProfileLabel": {
-    "message": "Active Profile",
+    "message": "Aktives Profil",
     "description": "Label for the active profile selector dropdown in the profile list panel"
   },
   "switchProfileHelp": {
-    "message": "Switch to a different profile to view and manage its tabs.",
+    "message": "Wechseln Sie zu einem anderen Profil, um dessen Tabs anzuzeigen und zu verwalten.",
     "description": "Help text below the active profile selector"
   },
   "createNewProfileButton": {
-    "message": "Create New Profile",
+    "message": "Neues Profil erstellen",
     "description": "Button to create a new profile in the profile list panel"
   },
   "editProfilePanelTitle": {
-    "message": "Edit Profile",
+    "message": "Profil bearbeiten",
     "description": "Heading shown when editing an existing profile (initial HTML value; JS overrides it)"
   },
   "profileNameLabel": {
-    "message": "Profile Name",
+    "message": "Profilname",
     "description": "Label for the profile name input in profile edit panel"
   },
   "profileNamePlaceholder": {
-    "message": "e.g., Work - SmartBot",
+    "message": "z. B. Arbeit - SmartBot",
     "description": "Placeholder for the profile name input"
   },
   "urlPatternsLabel": {
-    "message": "URL Patterns",
+    "message": "URL-Muster",
     "description": "Label for the URL patterns section in profile edit"
   },
   "urlPatternsHelp": {
-    "message": "Add MyDomain patterns to automatically switch to this profile when visiting matching Salesforce orgs.",
+    "message": "Fügen Sie MyDomain-Muster hinzu, um automatisch zu diesem Profil zu wechseln, wenn Sie übereinstimmende Salesforce-Orgs besuchen.",
     "description": "Help text for URL patterns section"
   },
   "urlPatternInputPlaceholder": {
-    "message": "e.g., smartbottechnology-dev-ed",
+    "message": "z. B. smartbottechnology-dev-ed",
     "description": "Placeholder for the URL pattern input field"
   },
   "captureCurrentDomainButton": {
-    "message": "Capture Current Domain",
+    "message": "Aktuelle Domain erfassen",
     "description": "Button to capture the current browser tab's Salesforce domain as a URL pattern"
   },
   "saveProfileButton": {
-    "message": "Save Profile",
+    "message": "Profil speichern",
     "description": "Button to save profile changes"
   },
   "disableProfilesTitle": {
-    "message": "Disable Profiles",
+    "message": "Profile deaktivieren",
     "description": "Title of the disable profiles confirmation modal"
   },
   "disableProfilesBody": {
-    "message": "Disabling profiles will keep one profile and remove all others.",
+    "message": "Beim Deaktivieren der Profile wird ein Profil beibehalten und alle anderen entfernt.",
     "description": "Body text of the disable profiles modal"
   },
   "disableProfilesQuestion": {
-    "message": "Which profile would you like to keep?",
+    "message": "Welches Profil möchten Sie behalten?",
     "description": "Question in the disable profiles modal"
   },
   "selectProfileToKeepLabel": {
-    "message": "Select profile to keep:",
+    "message": "Zu behaltendes Profil auswählen:",
     "description": "Label for the keep-profile selector in disable profiles modal"
   },
   "disableProfilesButton": {
-    "message": "Disable Profiles",
+    "message": "Profile deaktivieren",
     "description": "Confirm button in the disable profiles modal"
   },
   "migrationNewFeaturesTitle": {
-    "message": "New in v2.0",
+    "message": "Neu in v2.0",
     "description": "Title of the new features card in the migration welcome screen"
   },
   "migrationNewFeaturesDesc": {
-    "message": "Profiles, dropdown menus, and flexible storage options—all new features!",
+    "message": "Profile, Dropdown-Menüs und flexible Speicheroptionen – alles neue Funktionen!",
     "description": "Description of new features in the migration welcome screen"
   },
   "migrationSyncStorageDesc": {
-    "message": "Your tabs can sync across devices",
+    "message": "Ihre Tabs können geräteübergreifend synchronisiert werden",
     "description": "Description for sync storage option in the migration modal"
   },
   "migrationLocalStorageDesc": {
-    "message": "Stored on this device only",
+    "message": "Nur auf diesem Gerät gespeichert",
     "description": "Description for local storage option in the migration modal"
   },
   "migrationProgressTitle": {
-    "message": "Migrating your data...",
+    "message": "Daten werden migriert...",
     "description": "Title shown during migration progress (also set by JS)"
   },
   "migrationProgressMessage": {
-    "message": "This will only take a moment.",
+    "message": "Dies dauert nur einen Moment.",
     "description": "Message shown during migration progress (also set by JS)"
   },
   "migrationStep1": {
-    "message": "Reading existing data",
+    "message": "Vorhandene Daten lesen",
     "description": "First step label in migration progress steps"
   },
   "migrationStep2": {
-    "message": "Creating Default profile",
+    "message": "Standardprofil erstellen",
     "description": "Second step label in migration progress"
   },
   "migrationStep3": {
-    "message": "Saving new format",
+    "message": "Neues Format speichern",
     "description": "Third step label in migration progress"
   },
   "migrationSuccessTitle": {
-    "message": "Migration Complete!",
+    "message": "Migration abgeschlossen!",
     "description": "Heading on the migration success screen"
   },
   "migrationSuccessMessage": {
-    "message": "Your tabs have been successfully migrated to the new profile system.",
+    "message": "Ihre Tabs wurden erfolgreich in das neue Profilsystem migriert.",
     "description": "Description on the migration success screen"
   },
   "migrationWhatsNext": {
-    "message": "What's next:",
+    "message": "Was kommt als Nächstes:",
     "description": "Heading for the what's next section on migration success screen"
   },
   "migrationDefaultProfileNote": {
-    "message": "All your tabs are now in the \"Default\" profile",
+    "message": "Alle Ihre Tabs befinden sich jetzt im Profil \"Standard\"",
     "description": "First bullet point in the what's next section on migration success"
   },
   "migrationProfilesEnabledNote": {
-    "message": "Profiles feature is now enabled",
+    "message": "Die Profilefunktion ist jetzt aktiviert",
     "description": "Second bullet in what's next (shown when user enabled profiles)"
   },
   "migrationCanEnableLaterNote": {
-    "message": "You can enable profiles in Settings anytime",
+    "message": "Sie können Profile jederzeit in den Einstellungen aktivieren",
     "description": "Third bullet in what's next (shown when user did not enable profiles)"
   },
   "migrationCreateProfilesNote": {
-    "message": "Create additional profiles for different orgs",
+    "message": "Erstellen Sie zusätzliche Profile für verschiedene Orgs",
     "description": "Fourth bullet in the what's next section"
   },
   "migrationErrorTitle": {
-    "message": "Migration Failed",
+    "message": "Migration fehlgeschlagen",
     "description": "Heading on the migration error screen"
   },
   "migrationErrorMessage": {
-    "message": "An error occurred during migration. Your original data is still intact.",
+    "message": "Während der Migration ist ein Fehler aufgetreten. Ihre ursprünglichen Daten sind noch vorhanden.",
     "description": "Message on the migration error screen"
   },
   "migrationErrorDetailsLabel": {
-    "message": "Error details:",
+    "message": "Fehlerdetails:",
     "description": "Label for the error details section on the migration error screen"
   },
   "exportBackupButton": {
-    "message": "Export Backup",
+    "message": "Sicherung exportieren",
     "description": "Button to export a backup before migrating"
   },
   "migrateNowButton": {
-    "message": "Migrate Now",
+    "message": "Jetzt migrieren",
     "description": "Button to start the migration process"
   },
   "retryMigrationButton": {
-    "message": "Retry Migration",
+    "message": "Migration wiederholen",
     "description": "Button to retry a failed migration"
   },
   "continueWithoutMigratingButton": {
-    "message": "Continue Without Migrating",
+    "message": "Ohne Migration fortfahren",
     "description": "Button to skip migration and continue with existing data"
   },
   "profilesUiDisabledKept": {
-    "message": "Profiles UI disabled. Kept \"$NAME$\" profile",
+    "message": "Profile-UI deaktiviert. Profil \"$NAME$\" beibehalten",
     "description": "Status after disabling profiles UI while keeping one; {$NAME$}=kept profile name",
     "placeholders": {
       "name": {
@@ -1208,7 +1200,7 @@
     }
   },
   "switchedToProfile": {
-    "message": "Switched to profile: $NAME$",
+    "message": "Zu Profil gewechselt: $NAME$",
     "description": "Status shown after switching the active profile; {$NAME$}=profile name",
     "placeholders": {
       "name": {
@@ -1217,7 +1209,7 @@
     }
   },
   "errorSwitchingProfile": {
-    "message": "Error switching profile: $ERROR$",
+    "message": "Fehler beim Wechseln des Profils: $ERROR$",
     "description": "Error when switching the active profile fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1226,19 +1218,19 @@
     }
   },
   "setAsDefaultProfileTitle": {
-    "message": "Set as default profile",
+    "message": "Als Standardprofil festlegen",
     "description": "Title attribute on the set-default button in the profile list item"
   },
   "editProfileTitle": {
-    "message": "Edit this profile",
+    "message": "Dieses Profil bearbeiten",
     "description": "Title attribute on the edit button in the profile list item"
   },
   "deleteProfileTitle": {
-    "message": "Delete this profile",
+    "message": "Dieses Profil löschen",
     "description": "Title attribute on the delete button in the profile list item"
   },
   "profileSetAsDefault": {
-    "message": "\"$NAME$\" set as default profile",
+    "message": "\"$NAME$\" als Standardprofil festgelegt",
     "description": "Status after marking a profile as default; {$NAME$}=profile name",
     "placeholders": {
       "name": {
@@ -1247,7 +1239,7 @@
     }
   },
   "errorSettingDefaultProfile": {
-    "message": "Error setting default profile: $ERROR$",
+    "message": "Fehler beim Festlegen des Standardprofils: $ERROR$",
     "description": "Error when setting default profile fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1256,7 +1248,7 @@
     }
   },
   "editProfileTitleWithName": {
-    "message": "Edit Profile: $NAME$",
+    "message": "Profil bearbeiten: $NAME$",
     "description": "Title shown in profile edit panel header when editing; {$NAME$}=profile name",
     "placeholders": {
       "name": {
@@ -1265,31 +1257,31 @@
     }
   },
   "newProfileTitle": {
-    "message": "New Profile",
+    "message": "Neues Profil",
     "description": "Title shown when creating a new profile (panel heading and action panel)"
   },
   "noUrlPatternsYet": {
-    "message": "No URL patterns yet. Add one above.",
+    "message": "Noch keine URL-Muster. Fügen Sie oben eines hinzu.",
     "description": "Empty-state text in the URL pattern list"
   },
   "editUrlPatternTitle": {
-    "message": "Edit this URL pattern",
+    "message": "Dieses URL-Muster bearbeiten",
     "description": "Title attribute on the edit button in the URL pattern list item"
   },
   "deleteUrlPatternTitle": {
-    "message": "Delete this URL pattern",
+    "message": "Dieses URL-Muster löschen",
     "description": "Title attribute on the delete button in the URL pattern list item"
   },
   "selectProfileToKeepError": {
-    "message": "Please select a profile to keep",
+    "message": "Bitte wählen Sie ein zu behaltendes Profil aus",
     "description": "Error when no profile is selected in disable profiles dropdown"
   },
   "selectedProfileNotFound": {
-    "message": "Selected profile not found",
+    "message": "Ausgewähltes Profil nicht gefunden",
     "description": "Error when the selected profile ID cannot be found"
   },
   "disableProfilesConfirm": {
-    "message": "Disable profiles and keep \"$NAME$\"?\n\nThis will remove all other profiles and their tabs. This action cannot be undone.",
+    "message": "Profile deaktivieren und \"$NAME$\" behalten?\n\nDies entfernt alle anderen Profile und deren Tabs. Diese Aktion kann nicht rückgängig gemacht werden.",
     "description": "Confirm dialog before disabling profiles; {$NAME$}=profile to keep",
     "placeholders": {
       "name": {
@@ -1298,7 +1290,7 @@
     }
   },
   "profilesDisabledKept": {
-    "message": "Profiles disabled. Kept \"$NAME$\" profile",
+    "message": "Profile deaktiviert. Profil \"$NAME$\" beibehalten",
     "description": "Status after disabling profiles; {$NAME$}=kept profile name",
     "placeholders": {
       "name": {
@@ -1307,11 +1299,11 @@
     }
   },
   "urlPatternRequired": {
-    "message": "Please enter a URL pattern",
+    "message": "Bitte geben Sie ein URL-Muster ein",
     "description": "Validation error when URL pattern input is empty"
   },
   "urlPatternAlreadyUsed": {
-    "message": "URL already used by $NAME$",
+    "message": "URL wird bereits von $NAME$ verwendet",
     "description": "Validation error when URL pattern is assigned to another profile; {$NAME$}=that profile's name",
     "placeholders": {
       "name": {
@@ -1320,7 +1312,7 @@
     }
   },
   "domainCaptured": {
-    "message": "Domain captured: $DOMAIN$",
+    "message": "Domain erfasst: $DOMAIN$",
     "description": "Status after capturing the current Salesforce domain; {$DOMAIN$}=the captured identifier",
     "placeholders": {
       "domain": {
@@ -1329,7 +1321,7 @@
     }
   },
   "errorCapturingDomain": {
-    "message": "Error: $ERROR$",
+    "message": "Fehler: $ERROR$",
     "description": "Error when capturing domain fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1338,19 +1330,19 @@
     }
   },
   "profileNameRequired": {
-    "message": "Profile name is required",
+    "message": "Profilname ist erforderlich",
     "description": "Validation error when the profile name field is empty"
   },
   "profileCreatedStatus": {
-    "message": "Profile created",
+    "message": "Profil erstellt",
     "description": "Status after a new profile is successfully created"
   },
   "profileSaved": {
-    "message": "Profile saved",
+    "message": "Profil gespeichert",
     "description": "Status after an existing profile is successfully updated"
   },
   "errorSavingProfile": {
-    "message": "Error saving profile: $ERROR$",
+    "message": "Fehler beim Speichern des Profils: $ERROR$",
     "description": "Error when saveProfile fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1359,7 +1351,7 @@
     }
   },
   "deleteProfileConfirm": {
-    "message": "Are you sure you want to delete the profile \"$NAME$\"? This cannot be undone.",
+    "message": "Möchten Sie das Profil \"$NAME$\" wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
     "description": "Confirm dialog before deleting a profile; {$NAME$}=profile name",
     "placeholders": {
       "name": {
@@ -1368,7 +1360,7 @@
     }
   },
   "profileDeleted": {
-    "message": "\"$NAME$\" deleted",
+    "message": "\"$NAME$\" gelöscht",
     "description": "Status after successfully deleting a profile; {$NAME$}=profile name",
     "placeholders": {
       "name": {
@@ -1377,7 +1369,7 @@
     }
   },
   "errorDeletingProfile": {
-    "message": "Error deleting profile: $ERROR$",
+    "message": "Fehler beim Löschen des Profils: $ERROR$",
     "description": "Error when deleteProfile fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1386,11 +1378,11 @@
     }
   },
   "profileInitializedWithDefaults": {
-    "message": "Profile initialized with default tabs",
+    "message": "Profil mit Standard-Tabs initialisiert",
     "description": "Status after initializing a profile with built-in default tabs"
   },
   "errorInitializingProfile": {
-    "message": "Error initializing profile: $ERROR$",
+    "message": "Fehler beim Initialisieren des Profils: $ERROR$",
     "description": "Error when profile initialization fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1399,11 +1391,11 @@
     }
   },
   "profileInitializedEmpty": {
-    "message": "Profile initialized (empty)",
+    "message": "Profil initialisiert (leer)",
     "description": "Status after initializing a profile with no tabs"
   },
   "errorShowingProfileSelector": {
-    "message": "Error showing profile selector: $ERROR$",
+    "message": "Fehler beim Anzeigen der Profilauswahl: $ERROR$",
     "description": "Error when showCloneProfileSelector fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1412,7 +1404,7 @@
     }
   },
   "profileCloned": {
-    "message": "Cloned $COUNT$ tabs from \"$SOURCE$\"",
+    "message": "$COUNT$ Tabs aus \"$SOURCE$\" geklont",
     "description": "Status after cloning tabs from another profile; {$COUNT$}=number of tabs; {$SOURCE$}=source profile name",
     "placeholders": {
       "count": {
@@ -1424,7 +1416,7 @@
     }
   },
   "errorCloningProfile": {
-    "message": "Error cloning profile: $ERROR$",
+    "message": "Fehler beim Klonen des Profils: $ERROR$",
     "description": "Error when cloning a profile fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1433,39 +1425,39 @@
     }
   },
   "migrationSyncStorageCurrent": {
-    "message": "Sync Storage (Current)",
+    "message": "Sync Storage (Aktuell)",
     "description": "Label shown when sync storage is the user's current storage type in migration modal"
   },
   "migrationLocalStorageNew": {
-    "message": "Local Storage (New)",
+    "message": "Local Storage (Neu)",
     "description": "Label for local storage when sync storage is currently active in migration modal"
   },
   "migrationLocalStorageCurrent": {
-    "message": "Local Storage (Current)",
+    "message": "Local Storage (Aktuell)",
     "description": "Label when local storage is the user's current storage type in migration modal"
   },
   "migrationExporting": {
-    "message": "Exporting...",
+    "message": "Wird exportiert...",
     "description": "Temporary button text while backup export is in progress"
   },
   "migrationBackupExported": {
-    "message": "✓ Backup Exported",
+    "message": "✓ Sicherung exportiert",
     "description": "Temporary button text after a backup has been successfully exported"
   },
   "migrationExportBackup": {
-    "message": "Export Backup",
+    "message": "Sicherung exportieren",
     "description": "Default label on the Export Backup button in the migration modal"
   },
   "migrationExportFailed": {
-    "message": "Export Failed",
+    "message": "Export fehlgeschlagen",
     "description": "Temporary button text when a backup export fails"
   },
   "migrationUnknownError": {
-    "message": "Unknown error occurred",
+    "message": "Unbekannter Fehler aufgetreten",
     "description": "Fallback error message in migration error screen when no specific error is available"
   },
   "firstLaunchSyncProfileCountSingular": {
-    "message": "$COUNT$ profile with tabs",
+    "message": "$COUNT$ Profil mit Tabs",
     "description": "Singular form used inside the sync-found message placeholder; {$COUNT$}=number (always 1)",
     "placeholders": {
       "count": {
@@ -1474,7 +1466,7 @@
     }
   },
   "firstLaunchSyncProfileCountPlural": {
-    "message": "$COUNT$ profiles with tabs",
+    "message": "$COUNT$ Profile mit Tabs",
     "description": "Plural form used inside the sync-found message placeholder; {$COUNT$}=number (2+)",
     "placeholders": {
       "count": {
@@ -1483,19 +1475,19 @@
     }
   },
   "firstLaunchSyncSettingsOnly": {
-    "message": "settings",
+    "message": "Einstellungen",
     "description": "Fallback fragment in sync-found message when only settings were synced"
   },
   "floatingModalToggleAriaLabel": {
-    "message": "Toggle SF Tabs",
+    "message": "SF Tabs ein-/ausblenden",
     "description": "Aria-label on the floating modal toggle button that opens/closes the SF Tabs panel"
   },
   "floatingModalEmptyState": {
-    "message": "No tabs available. Add tabs in the extension popup.",
+    "message": "Keine Tabs vorhanden. Fügen Sie Tabs im Erweiterungs-Popup hinzu.",
     "description": "Empty state message shown in the floating modal when no tabs have been configured"
   },
   "settingsPageTabTitle": {
-    "message": "SF Tabs - Settings",
+    "message": "SF Tabs - Einstellungen",
     "description": "Browser tab title for the settings page"
   },
   "settingsNavLabel": {
@@ -1503,91 +1495,91 @@
     "description": "Sidebar navigation section header label"
   },
   "settingsNavGeneral": {
-    "message": "General",
+    "message": "Allgemein",
     "description": "Navigation item and section heading for General settings"
   },
   "settingsNavButton": {
-    "message": "Button",
+    "message": "Schaltfläche",
     "description": "Navigation item label for Floating Button settings section"
   },
   "settingsNavShortcuts": {
-    "message": "Shortcuts",
+    "message": "Tastenkürzel",
     "description": "Navigation item label for Keyboard Shortcuts section"
   },
   "settingsNavData": {
-    "message": "Data",
+    "message": "Daten",
     "description": "Navigation item label and heading for Data section"
   },
   "generalSectionDescription": {
-    "message": "Customize the look, feel, and behavior of SF Tabs",
+    "message": "Erscheinungsbild und Verhalten von SF Tabs anpassen",
     "description": "Description below the General section heading"
   },
   "themeDescription": {
-    "message": "Choose between light mode, dark mode, or automatic based on your system preferences",
+    "message": "Wählen Sie zwischen hellem Modus, dunklem Modus oder automatisch basierend auf Ihren Systemeinstellungen",
     "description": "Description under the theme mode selector"
   },
   "displayDensitySection": {
-    "message": "Display Density",
+    "message": "Anzeigedichte",
     "description": "Card heading for the compact mode setting"
   },
   "compactModeAltDescription": {
-    "message": "Condenses tabs by hiding URLs to show more tabs at once",
+    "message": "Komprimiert Tabs durch Ausblenden von URLs, um mehr Tabs gleichzeitig anzuzeigen",
     "description": "Description under compact mode checkbox"
   },
   "deleteConfirmationSection": {
-    "message": "Delete Confirmation",
+    "message": "Löschbestätigung",
     "description": "Card heading for the delete confirmation setting"
   },
   "skipDeleteConfirmationAlt": {
-    "message": "Don't prompt when deleting",
+    "message": "Beim Löschen nicht nachfragen",
     "description": "Checkbox label for skip delete confirmation in settings"
   },
   "skipDeleteConfirmationAltDescription": {
-    "message": "Skip confirmation dialogs when removing tabs",
+    "message": "Bestätigungsdialoge beim Entfernen von Tabs überspringen",
     "description": "Description under skip delete confirmation checkbox"
   },
   "floatingButtonSection": {
-    "message": "Floating Button",
+    "message": "Schwebende Schaltfläche",
     "description": "Section heading for the floating button settings"
   },
   "floatingButtonDescription": {
-    "message": "Access SF Tabs from anywhere in Salesforce with a floating button",
+    "message": "Greifen Sie von überall in Salesforce mit einer schwebenden Schaltfläche auf SF Tabs zu",
     "description": "Description below the Floating Button section heading"
   },
   "floatingButtonEnabled": {
-    "message": "Enable floating button",
+    "message": "Schwebende Schaltfläche aktivieren",
     "description": "Checkbox label to enable/disable the floating button"
   },
   "floatingButtonEnabledDescription": {
-    "message": "Show a floating button on Salesforce pages for quick tab access",
+    "message": "Auf Salesforce-Seiten eine schwebende Schaltfläche für schnellen Tab-Zugriff anzeigen",
     "description": "Description under the enable floating button checkbox"
   },
   "floatingButtonLocationSection": {
-    "message": "Location",
+    "message": "Position",
     "description": "Card heading for floating button location setting"
   },
   "floatingButtonLocationEverywhere": {
-    "message": "Everywhere",
+    "message": "Überall",
     "description": "Radio label: show floating button on all Salesforce pages"
   },
   "floatingButtonLocationEverywhereDescription": {
-    "message": "Show floating button on all Salesforce pages",
+    "message": "Schwebende Schaltfläche auf allen Salesforce-Seiten anzeigen",
     "description": "Description for the Everywhere location radio option"
   },
   "floatingButtonLocationSetupOnly": {
-    "message": "Only in Setup",
+    "message": "Nur in Setup",
     "description": "Radio label: show floating button only on Setup pages"
   },
   "floatingButtonLocationSetupOnlyDescription": {
-    "message": "Show floating button only on Setup pages",
+    "message": "Schwebende Schaltfläche nur auf Setup-Seiten anzeigen",
     "description": "Description for the Only in Setup location radio option"
   },
   "floatingButtonLocationOutsideSetup": {
-    "message": "Outside Setup",
+    "message": "Außerhalb von Setup",
     "description": "Radio label: show floating button everywhere except Setup pages"
   },
   "floatingButtonLocationOutsideSetupDescription": {
-    "message": "Show floating button everywhere except Setup pages",
+    "message": "Schwebende Schaltfläche überall außer auf Setup-Seiten anzeigen",
     "description": "Description for the Outside Setup location radio option"
   },
   "floatingButtonPositionSection": {
@@ -1595,31 +1587,31 @@
     "description": "Card heading for floating button vertical position setting"
   },
   "floatingButtonPositionLabel": {
-    "message": "Vertical Position (%)",
+    "message": "Vertikale Position (%)",
     "description": "Label for the floating button position range slider"
   },
   "floatingButtonPositionDescription": {
-    "message": "Vertical position along the right edge (0% = top, 100% = bottom)",
+    "message": "Vertikale Position am rechten Rand (0 % = oben, 100 % = unten)",
     "description": "Description under the floating button position slider"
   },
   "profilesSectionAltDescription": {
-    "message": "Create multiple profiles with different tab sets for different Salesforce orgs or responsibilities",
+    "message": "Erstellen Sie mehrere Profile mit verschiedenen Tab-Sets für unterschiedliche Salesforce-Organisationen oder Aufgabenbereiche",
     "description": "Description below the Profiles section heading"
   },
   "enableProfilesAltDescription": {
-    "message": "Create and manage multiple profiles with different tab configurations",
+    "message": "Mehrere Profile mit unterschiedlichen Tab-Konfigurationen erstellen und verwalten",
     "description": "Description under enable profiles checkbox"
   },
   "disableProfilesWarning": {
-    "message": "This will remove all profiles except the one you select. This action cannot be undone.",
+    "message": "Alle Profile außer dem ausgewählten werden entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.",
     "description": "Warning text below the Disable Profiles button"
   },
   "tipLabel": {
-    "message": "Tip:",
+    "message": "Tipp:",
     "description": "Bold prefix for tip paragraphs"
   },
   "keyboardShortcutsInfo": {
-    "message": "SF Tabs supports up to 10 custom shortcuts that can be configured in your browser.",
+    "message": "SF Tabs unterstützt bis zu 10 benutzerdefinierte Tastenkürzel, die in Ihrem Browser konfiguriert werden können.",
     "description": "Introductory sentence in the keyboard shortcuts section"
   },
   "firefoxHeading": {
@@ -1627,7 +1619,7 @@
     "description": "Bold heading before Firefox keyboard shortcut instructions"
   },
   "firefoxShortcutsInstructions": {
-    "message": "Type about:addons in the address bar and press Enter. Click on the gear icon at the top of the page and select \"Manage Extension Shortcuts\".",
+    "message": "Geben Sie about:addons in die Adressleiste ein und drücken Sie Enter. Klicken Sie auf das Zahnrad-Symbol oben auf der Seite und wählen Sie \"Tastaturkürzel für Erweiterungen verwalten\".",
     "description": "Instructions for configuring keyboard shortcuts in Firefox"
   },
   "chromeEdgeHeading": {
@@ -1635,103 +1627,103 @@
     "description": "Bold heading before Chrome/Edge keyboard shortcut instructions"
   },
   "chromeEdgeShortcutsInstructions": {
-    "message": "Type chrome://extensions/shortcuts in the address bar to go directly to keyboard shortcuts for all installed extensions.",
+    "message": "Geben Sie chrome://extensions/shortcuts in die Adressleiste ein, um direkt zu den Tastaturkürzeln aller installierten Erweiterungen zu gelangen.",
     "description": "Instructions for configuring keyboard shortcuts in Chrome or Edge"
   },
   "dataSectionDescription": {
-    "message": "Manage how your tabs are stored and reset your configuration",
+    "message": "Verwalten Sie die Speicherung Ihrer Tabs und setzen Sie Ihre Konfiguration zurück",
     "description": "Description below the Data section heading"
   },
   "dataStorageSection": {
-    "message": "Data Storage",
+    "message": "Datenspeicherung",
     "description": "Card heading for the data storage type selector"
   },
   "dataStorageDescription": {
-    "message": "Choose where your tabs are stored. You can switch between storage types at any time. Tabs and Profiles can be stored in Local Storage to prevent syncing between devices. Other settings will sync between devices if enabled in the browser. Your Data Storage option is always stored locally.",
+    "message": "Wählen Sie, wo Ihre Tabs gespeichert werden. Sie können jederzeit zwischen Speichertypen wechseln. Tabs und Profile können in Local Storage gespeichert werden, um die Synchronisierung zwischen Geräten zu verhindern. Andere Einstellungen werden zwischen Geräten synchronisiert, sofern im Browser aktiviert. Ihre Datenspeicheroption wird immer lokal gespeichert.",
     "description": "Detailed description for the data storage options"
   },
   "localStorageTitle": {
-    "message": "Local Storage",
+    "message": "Lokaler Speicher",
     "description": "Title for the local storage option card in settings"
   },
   "localStorageDescription": {
-    "message": "Stored on this device only (default, privacy-first)",
+    "message": "Nur auf diesem Gerät gespeichert (Standard, datenschutzorientiert)",
     "description": "Description for the local storage option card in settings"
   },
   "syncStorageTitle": {
-    "message": "Sync Storage",
+    "message": "Synchronisierter Speicher",
     "description": "Title for the sync storage option card in settings"
   },
   "syncStorageOptionDescription": {
-    "message": "Your tabs can sync across all your devices",
+    "message": "Ihre Tabs können auf all Ihren Geräten synchronisiert werden",
     "description": "Description for the sync storage option card in settings"
   },
   "resetSection": {
-    "message": "Reset",
+    "message": "Zurücksetzen",
     "description": "Card heading for the reset to defaults danger zone"
   },
   "resetHelp": {
-    "message": "Reset all tabs and settings to their default values.",
+    "message": "Alle Tabs und Einstellungen auf die Standardwerte zurücksetzen.",
     "description": "Introductory sentence in the reset danger zone card"
   },
   "importExportAltDescription": {
-    "message": "Backup and restore your tabs and settings",
+    "message": "Sichern und wiederherstellen Sie Ihre Tabs und Einstellungen",
     "description": "Description below the Import & Export section heading"
   },
   "exportPrompt": {
-    "message": "What would you like to export?",
+    "message": "Was möchten Sie exportieren?",
     "description": "Prompt text above the export mode radio buttons"
   },
   "exportEverythingRecommended": {
-    "message": "Everything (Recommended)",
+    "message": "Alles (Empfohlen)",
     "description": "Radio label for exporting all settings and profiles"
   },
   "exportCustomSelection": {
-    "message": "Custom Selection",
+    "message": "Benutzerdefinierte Auswahl",
     "description": "Radio label for choosing specific items to export"
   },
   "exportCustomSelectionDescription": {
-    "message": "Choose specific settings and profiles",
+    "message": "Bestimmte Einstellungen und Profile auswählen",
     "description": "Description for the custom selection export radio option"
   },
   "settingsLabel": {
-    "message": "Settings:",
+    "message": "Einstellungen:",
     "description": "Section label in export and import custom options panels"
   },
   "exportSettingsLabel": {
-    "message": "Preferences, theme, and options",
+    "message": "Einstellungen, Design und Optionen",
     "description": "Checkbox label for including settings in a custom export"
   },
   "profilesLabel": {
-    "message": "Profiles:",
+    "message": "Profile:",
     "description": "Section label in export and import options panels"
   },
   "exportConfigurationButton": {
-    "message": "Export Configuration",
+    "message": "Konfiguration exportieren",
     "description": "Primary action button in the Export Configuration card"
   },
   "importFromFileHelp": {
-    "message": "Restore your tabs and settings from a backup file.",
+    "message": "Stellen Sie Ihre Tabs und Einstellungen aus einer Sicherungsdatei wieder her.",
     "description": "Introductory text in the Import Configuration card"
   },
   "chooseFileToImport": {
-    "message": "Choose File to Import",
+    "message": "Datei zum Importieren auswählen",
     "description": "Button label to trigger the file picker for import"
   },
   "importSelectedFile": {
-    "message": "Selected file",
+    "message": "Ausgewählte Datei",
     "description": "Default placeholder in the import filename display"
   },
   "importPrompt": {
-    "message": "What would you like to import?",
+    "message": "Was möchten Sie importieren?",
     "description": "Heading above the import options checkboxes"
   },
   "importProfilesWillBeEnabled": {
-    "message": "Profiles will be enabled",
+    "message": "Profile werden aktiviert",
     "description": "Warning heading shown when importing a file that contains profiles"
   },
   "importProfilesWillBeEnabledDescription": {
-    "message": "This file contains profiles. Importing will automatically enable the Profiles feature in your settings.",
+    "message": "Diese Datei enthält Profile. Der Import aktiviert automatisch die Profil-Funktion in Ihren Einstellungen.",
     "description": "Warning description when importing a file with profiles"
   },
   "tabsLabel": {
@@ -1739,83 +1731,83 @@
     "description": "Section label above the tab count display in import options"
   },
   "importModeLabel": {
-    "message": "Import mode:",
+    "message": "Importmodus:",
     "description": "Heading above the import mode radio buttons"
   },
   "importModeAdd": {
-    "message": "Add to existing tabs",
+    "message": "Zu vorhandenen Tabs hinzufügen",
     "description": "Radio label for adding imported tabs to current tabs"
   },
   "importModeAddDescription": {
-    "message": "Keep current tabs and add imported tabs",
+    "message": "Aktuelle Tabs beibehalten und importierte Tabs hinzufügen",
     "description": "Description for the add-to-existing import mode"
   },
   "importModeReplace": {
-    "message": "Replace all tabs",
+    "message": "Alle Tabs ersetzen",
     "description": "Radio label for replacing current tabs with imported tabs"
   },
   "importModeReplaceDescription": {
-    "message": "Remove current tabs and use only imported tabs",
+    "message": "Aktuelle Tabs entfernen und nur importierte Tabs verwenden",
     "description": "Description for the replace-all import mode"
   },
   "importHybridPrompt": {
-    "message": "How would you like to import this profile?",
+    "message": "Wie möchten Sie dieses Profil importieren?",
     "description": "Heading in the hybrid import mode panel"
   },
   "importHybridAsProfile": {
-    "message": "Import as profile and enable Profiles",
+    "message": "Als Profil importieren und Profile aktivieren",
     "description": "Radio label to import as a new profile and enable Profiles feature"
   },
   "importHybridAsProfileDescription": {
-    "message": "Create a new profile and enable the Profiles feature",
+    "message": "Ein neues Profil erstellen und die Profil-Funktion aktivieren",
     "description": "Description for the import-as-profile hybrid option"
   },
   "importHybridAddTabs": {
-    "message": "Add tabs to existing tabs",
+    "message": "Tabs zu vorhandenen Tabs hinzufügen",
     "description": "Radio label for adding tabs from imported profile to existing tabs"
   },
   "importHybridAddTabsDescription": {
-    "message": "Keep current tabs and add tabs from this profile",
+    "message": "Aktuelle Tabs beibehalten und Tabs aus diesem Profil hinzufügen",
     "description": "Description for the add-tabs hybrid option"
   },
   "importHybridReplaceDescription": {
-    "message": "Remove current tabs and use tabs from this profile",
+    "message": "Aktuelle Tabs entfernen und Tabs aus diesem Profil verwenden",
     "description": "Description for the replace-tabs hybrid option"
   },
   "importDestinationLabel": {
-    "message": "Import to:",
+    "message": "Importieren nach:",
     "description": "Heading above the destination radio buttons for profile-mode imports"
   },
   "importDestinationAdd": {
-    "message": "Add to existing profile",
+    "message": "Zu vorhandenem Profil hinzufügen",
     "description": "Radio label to add imported tabs into an existing profile"
   },
   "importDestinationOverwrite": {
-    "message": "Overwrite existing profile",
+    "message": "Vorhandenes Profil überschreiben",
     "description": "Radio label to replace all tabs in an existing profile"
   },
   "importDestinationOverwriteDescription": {
-    "message": "Replace all tabs in the profile",
+    "message": "Alle Tabs im Profil ersetzen",
     "description": "Description for the overwrite existing profile import destination"
   },
   "importDestinationNew": {
-    "message": "Create new profile",
+    "message": "Neues Profil erstellen",
     "description": "Radio label to import tabs into a brand new profile"
   },
   "chooseProfileOption": {
-    "message": "Choose a profile...",
+    "message": "Profil auswählen...",
     "description": "Default disabled option in profile selector dropdowns"
   },
   "importConfigurationButton": {
-    "message": "Import Configuration",
+    "message": "Konfiguration importieren",
     "description": "Primary action button in the Import Configuration card"
   },
   "noProfilesConfigured": {
-    "message": "No profiles configured",
+    "message": "Keine Profile konfiguriert",
     "description": "Message shown when no profiles exist in the export profiles list"
   },
   "tabCountSingular": {
-    "message": "$COUNT$ tab",
+    "message": "$COUNT$ Tab",
     "description": "Singular form for tab count (e.g. \"1 tab\"); {$COUNT$}=number",
     "placeholders": {
       "count": {
@@ -1824,7 +1816,7 @@
     }
   },
   "tabCountPlural": {
-    "message": "$COUNT$ tabs",
+    "message": "$COUNT$ Tabs",
     "description": "Plural form for tab count (e.g. \"5 tabs\"); {$COUNT$}=number",
     "placeholders": {
       "count": {
@@ -1833,7 +1825,7 @@
     }
   },
   "tabsFromProfile": {
-    "message": "$COUNT$ from \"$PROFILE$\"",
+    "message": "$COUNT$ aus \"$PROFILE$\"",
     "description": "Tab count from a named profile; {$COUNT$}=formatted count, {$PROFILE$}=profile name",
     "placeholders": {
       "count": {
@@ -1845,11 +1837,11 @@
     }
   },
   "selectImportOptionError": {
-    "message": "Please select at least one option to import",
+    "message": "Bitte wählen Sie mindestens eine Option zum Importieren aus",
     "description": "Error when user tries to import without selecting any items"
   },
   "errorMigrateTabs": {
-    "message": "Failed to migrate tabs: $ERROR$",
+    "message": "Migration der Tabs fehlgeschlagen: $ERROR$",
     "description": "Error thrown when storage migration fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1858,11 +1850,11 @@
     }
   },
   "syncConflictTitle": {
-    "message": "Sync Conflict Detected!",
+    "message": "Synchronisierungskonflikt erkannt!",
     "description": "Title line in the sync conflict confirmation dialog"
   },
   "syncConflictLocalData": {
-    "message": "Local (this computer): $PROFILES$ profile(s), $TABS$ tab(s)",
+    "message": "Lokal (dieser Computer): $PROFILES$ Profil(e), $TABS$ Tab(s)",
     "description": "Line in sync conflict dialog showing local data counts; {$PROFILES$}=profile count; {$TABS$}=tab count",
     "placeholders": {
       "profiles": {
@@ -1874,7 +1866,7 @@
     }
   },
   "syncConflictSyncedData": {
-    "message": "Synced (from another device): $PROFILES$ profile(s), $TABS$ tab(s)",
+    "message": "Synchronisiert (von einem anderen Gerät): $PROFILES$ Profil(e), $TABS$ Tab(s)",
     "description": "Line in sync conflict dialog showing synced data counts; {$PROFILES$}=profile count; {$TABS$}=tab count",
     "placeholders": {
       "profiles": {
@@ -1886,15 +1878,15 @@
     }
   },
   "syncConflictPrompt": {
-    "message": "What would you like to do? Click OK to merge (keep both local and synced data, use synced settings). Click Cancel to stop and review your data first.",
+    "message": "Was möchten Sie tun? Klicken Sie auf OK, um zusammenzuführen (lokale und synchronisierte Daten beibehalten, synchronisierte Einstellungen verwenden). Klicken Sie auf Abbrechen, um den Vorgang abzubrechen und Ihre Daten zuerst zu prüfen.",
     "description": "Full prompt text in the sync conflict confirmation dialog"
   },
   "dataMergedSyncEnabled": {
-    "message": "Data merged successfully - sync enabled",
+    "message": "Daten erfolgreich zusammengeführt – Synchronisierung aktiviert",
     "description": "Success status shown after merging local and synced data"
   },
   "errorMerge": {
-    "message": "Merge failed: $ERROR$",
+    "message": "Zusammenführung fehlgeschlagen: $ERROR$",
     "description": "Error status when data merge fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -1903,7 +1895,7 @@
     }
   },
   "mergedProfilesSuccess": {
-    "message": "Merged $COUNT$ profiles and settings successfully",
+    "message": "$COUNT$ Profile und Einstellungen erfolgreich zusammengeführt",
     "description": "Success status in mergeSyncData function; {$COUNT$}=number of merged profiles",
     "placeholders": {
       "count": {
@@ -1912,7 +1904,7 @@
     }
   },
   "navigateToSection": {
-    "message": "Navigate to $SECTION$ section",
+    "message": "Zum Abschnitt $SECTION$ navigieren",
     "description": "Aria-label for sidebar navigation items; {$SECTION$}=section name",
     "placeholders": {
       "section": {
@@ -1921,35 +1913,39 @@
     }
   },
   "untitledTab": {
-    "message": "Untitled Tab",
+    "message": "Tab ohne Titel",
     "description": "Fallback label for a tab with no title during export processing"
   },
   "tipRecommendExport": {
-    "message": "We recommend",
+    "message": "Wir empfehlen,",
     "description": "Text before the export link in tip paragraphs in settings"
   },
   "exportingYourConfiguration": {
-    "message": "exporting your configuration",
+    "message": "Ihre Konfiguration zu exportieren",
     "description": "Link text in settings tip paragraphs pointing to export functionality"
   },
   "exportBeforeDisableHint": {
-    "message": "before disabling profiles so you can restore it later if needed.",
+    "message": "bevor Sie Profile deaktivieren, damit Sie diese bei Bedarf später wiederherstellen können.",
     "description": "Text after the export link in the disable profiles tip"
   },
   "exportBeforeResetHint": {
-    "message": "before resetting so you can restore it later if needed.",
+    "message": "bevor Sie zurücksetzen, damit Sie diese bei Bedarf später wiederherstellen können.",
     "description": "Text after the export link in the reset tip"
   },
   "syncConflictSettingsDiffer": {
-    "message": "Settings differ:",
+    "message": "Einstellungen weichen ab:",
     "description": "Label in sync conflict dialog when settings differ between local and synced"
   },
   "syncConflictLocal": {
-    "message": "Local",
+    "message": "Lokal",
     "description": "Label for local data in the sync conflict dialog"
   },
   "syncConflictSynced": {
-    "message": "Synced",
+    "message": "Synchronisiert",
     "description": "Label for synced data in the sync conflict dialog"
+  },
+  "userGuideLink": {
+    "message": "Benutzerhandbuch",
+    "description": "Navigation link to the user guide documentation"
   }
 }
