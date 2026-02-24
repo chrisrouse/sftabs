@@ -409,3 +409,16 @@ syncConflictSettingsDiffer,Settings differ:,Einstellungen weichen ab:,La configu
 syncConflictLocal,Local,Lokal,Local,Label for local data in the sync conflict dialog
 syncConflictSynced,Synced,Synchronisiert,Sincronizado,Label for synced data in the sync conflict dialog
 userGuideLink,User Guide,Benutzerhandbuch,Guía del usuario,Navigation link to the user guide documentation
+translationsNavLabel,Translations,Übersetzungen,Traducciones,Translations nav item in settings sidebar
+translationsSectionDescription,Language support for SF Tabs,Sprachunterstützung für SF Tabs,Soporte de idiomas para SF Tabs,Subtitle under the Translations section heading
+translationsBetaTitle,Beta — Machine-Generated Translations,Beta – Maschinell generierte Übersetzungen,Beta — Traducciones generadas por IA,Title of the beta disclaimer notice card
+translationsBetaDescription,Translations are currently in beta. All non-English text was generated using AI and may contain errors or unnatural phrasing. We recommend treating them as a starting point rather than a finished product.,Übersetzungen befinden sich derzeit in der Beta-Phase. Alle nicht-englischen Texte wurden mithilfe von KI generiert und können Fehler oder unnatürliche Formulierungen enthalten. Wir empfehlen sie als Ausgangspunkt zu betrachten und nicht als fertiges Produkt.,"Las traducciones se encuentran actualmente en fase beta. Todo el texto no inglés fue generado mediante IA y puede contener errores o formulaciones poco naturales. Le recomendamos considerarlas como un punto de partida, no como un producto terminado."
+translationsAvailableTitle,Available Languages,Verfügbare Sprachen,Idiomas disponibles,Heading for the available languages list
+translationsLanguageEnglish,English,Englisch (English),Inglés (English),English language name in the list
+translationsLanguageGerman,Deutsch (German),Deutsch,Alemán (Deutsch),German language name in the list
+translationsLanguageSpanish,Español (Spanish),Spanisch (Español),Español,Spanish language name in the list
+translationsStatusDefault,Default,Standard,Predeterminado,Badge shown next to the default language
+translationsStatusBeta,Beta,Beta,Beta,Badge shown next to beta languages
+translationsContributeTitle,Help Improve Translations,Helfen Sie uns Übersetzungen zu verbessern,Ayude a mejorar las traducciones,Heading for the GitHub contribution card
+translationsContributeDescription,"Found an error? Want to contribute a new language or improve an existing one? Open an issue on GitHub — we'd love your help.","Haben Sie einen Fehler gefunden? Möchten Sie eine neue Sprache beitragen oder eine vorhandene verbessern? Eröffnen Sie ein Issue auf GitHub – wir freuen uns über Ihre Hilfe.","¿Encontró un error? ¿Desea contribuir con un nuevo idioma o mejorar uno existente? Abra un issue en GitHub — nos encantaría su ayuda."
+translationsGithubLink,Open an issue on GitHub,Ein Issue auf GitHub öffnen,Abrir un issue en GitHub,Text for the GitHub issues link button

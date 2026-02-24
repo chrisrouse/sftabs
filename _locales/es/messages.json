@@ -1947,5 +1947,55 @@
   "userGuideLink": {
     "message": "Guía del usuario",
     "description": "Navigation link to the user guide documentation"
+  },
+  "translationsNavLabel": {
+    "message": "Traducciones",
+    "description": "Translations nav item in settings sidebar"
+  },
+  "translationsSectionDescription": {
+    "message": "Soporte de idiomas para SF Tabs",
+    "description": "Subtitle under the Translations section heading"
+  },
+  "translationsBetaTitle": {
+    "message": "Beta — Traducciones generadas por IA",
+    "description": "Title of the beta disclaimer notice card"
+  },
+  "translationsBetaDescription": {
+    "message": "Las traducciones se encuentran actualmente en fase beta. Todo el texto no inglés fue generado mediante IA y puede contener errores o formulaciones poco naturales. Le recomendamos considerarlas como un punto de partida, no como un producto terminado."
+  },
+  "translationsAvailableTitle": {
+    "message": "Idiomas disponibles",
+    "description": "Heading for the available languages list"
+  },
+  "translationsLanguageEnglish": {
+    "message": "Inglés (English)",
+    "description": "English language name in the list"
+  },
+  "translationsLanguageGerman": {
+    "message": "Alemán (Deutsch)",
+    "description": "German language name in the list"
+  },
+  "translationsLanguageSpanish": {
+    "message": "Español",
+    "description": "Spanish language name in the list"
+  },
+  "translationsStatusDefault": {
+    "message": "Predeterminado",
+    "description": "Badge shown next to the default language"
+  },
+  "translationsStatusBeta": {
+    "message": "Beta",
+    "description": "Badge shown next to beta languages"
+  },
+  "translationsContributeTitle": {
+    "message": "Ayude a mejorar las traducciones",
+    "description": "Heading for the GitHub contribution card"
+  },
+  "translationsContributeDescription": {
+    "message": "¿Encontró un error? ¿Desea contribuir con un nuevo idioma o mejorar uno existente? Abra un issue en GitHub — nos encantaría su ayuda."
+  },
+  "translationsGithubLink": {
+    "message": "Abrir un issue en GitHub",
+    "description": "Text for the GitHub issues link button"
   }
 }

@@ -1947,5 +1947,55 @@
   "userGuideLink": {
     "message": "Benutzerhandbuch",
     "description": "Navigation link to the user guide documentation"
+  },
+  "translationsNavLabel": {
+    "message": "Übersetzungen",
+    "description": "Translations nav item in settings sidebar"
+  },
+  "translationsSectionDescription": {
+    "message": "Sprachunterstützung für SF Tabs",
+    "description": "Subtitle under the Translations section heading"
+  },
+  "translationsBetaTitle": {
+    "message": "Beta – Maschinell generierte Übersetzungen",
+    "description": "Title of the beta disclaimer notice card"
+  },
+  "translationsBetaDescription": {
+    "message": "Übersetzungen befinden sich derzeit in der Beta-Phase. Alle nicht-englischen Texte wurden mithilfe von KI generiert und können Fehler oder unnatürliche Formulierungen enthalten. Wir empfehlen sie als Ausgangspunkt zu betrachten und nicht als fertiges Produkt."
+  },
+  "translationsAvailableTitle": {
+    "message": "Verfügbare Sprachen",
+    "description": "Heading for the available languages list"
+  },
+  "translationsLanguageEnglish": {
+    "message": "Englisch (English)",
+    "description": "English language name in the list"
+  },
+  "translationsLanguageGerman": {
+    "message": "Deutsch",
+    "description": "German language name in the list"
+  },
+  "translationsLanguageSpanish": {
+    "message": "Spanisch (Español)",
+    "description": "Spanish language name in the list"
+  },
+  "translationsStatusDefault": {
+    "message": "Standard",
+    "description": "Badge shown next to the default language"
+  },
+  "translationsStatusBeta": {
+    "message": "Beta",
+    "description": "Badge shown next to beta languages"
+  },
+  "translationsContributeTitle": {
+    "message": "Helfen Sie uns Übersetzungen zu verbessern",
+    "description": "Heading for the GitHub contribution card"
+  },
+  "translationsContributeDescription": {
+    "message": "Haben Sie einen Fehler gefunden? Möchten Sie eine neue Sprache beitragen oder eine vorhandene verbessern? Eröffnen Sie ein Issue auf GitHub – wir freuen uns über Ihre Hilfe."
+  },
+  "translationsGithubLink": {
+    "message": "Ein Issue auf GitHub öffnen",
+    "description": "Text for the GitHub issues link button"
   }
 }
