@@ -513,7 +513,7 @@
     "description": "Profiles toggle option description"
   },
   "firstLaunchSyncStorageTitle": {
-    "message": "Sync Storage",
+    "message": "Almacenamiento sincronizado",
     "description": "Sync storage option title"
   },
   "firstLaunchSyncStorageDescription": {
@@ -521,7 +521,7 @@
     "description": "Sync storage option description"
   },
   "firstLaunchLocalStorageTitle": {
-    "message": "Local Storage",
+    "message": "Almacenamiento local",
     "description": "Local storage option title"
   },
   "firstLaunchLocalStorageDescription": {
@@ -1425,15 +1425,15 @@
     }
   },
   "migrationSyncStorageCurrent": {
-    "message": "Sync Storage (Actual)",
+    "message": "Almacenamiento sincronizado (Actual)",
     "description": "Label shown when sync storage is the user's current storage type in migration modal"
   },
   "migrationLocalStorageNew": {
-    "message": "Local Storage (Nuevo)",
+    "message": "Almacenamiento local (Nuevo)",
     "description": "Label for local storage when sync storage is currently active in migration modal"
   },
   "migrationLocalStorageCurrent": {
-    "message": "Local Storage (Actual)",
+    "message": "Almacenamiento local (Actual)",
     "description": "Label when local storage is the user's current storage type in migration modal"
   },
   "migrationExporting": {
@@ -1639,7 +1639,7 @@
     "description": "Card heading for the data storage type selector"
   },
   "dataStorageDescription": {
-    "message": "Elija dónde se almacenan sus pestañas. Puede cambiar entre tipos de almacenamiento en cualquier momento. Las pestañas y los perfiles se pueden almacenar en Local Storage para evitar la sincronización entre dispositivos. Otras configuraciones se sincronizarán entre dispositivos si está activado en el navegador. Su opción de almacenamiento de datos siempre se guarda localmente.",
+    "message": "Elija dónde se almacenan sus pestañas. Puede cambiar entre tipos de almacenamiento en cualquier momento. Las pestañas y los perfiles se pueden almacenar en el almacenamiento local para evitar la sincronización entre dispositivos. Otras configuraciones se sincronizarán entre dispositivos si está activado en el navegador. Su opción de almacenamiento de datos siempre se guarda localmente.",
     "description": "Detailed description for the data storage options"
   },
   "localStorageTitle": {
