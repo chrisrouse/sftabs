@@ -513,7 +513,7 @@
     "description": "Profiles toggle option description"
   },
   "firstLaunchSyncStorageTitle": {
-    "message": "Sync Storage",
+    "message": "Synchronisierter Speicher",
     "description": "Sync storage option title"
   },
   "firstLaunchSyncStorageDescription": {
@@ -521,7 +521,7 @@
     "description": "Sync storage option description"
   },
   "firstLaunchLocalStorageTitle": {
-    "message": "Local Storage",
+    "message": "Lokaler Speicher",
     "description": "Local storage option title"
   },
   "firstLaunchLocalStorageDescription": {
@@ -1425,15 +1425,15 @@
     }
   },
   "migrationSyncStorageCurrent": {
-    "message": "Sync Storage (Aktuell)",
+    "message": "Synchronisierter Speicher (Aktuell)",
     "description": "Label shown when sync storage is the user's current storage type in migration modal"
   },
   "migrationLocalStorageNew": {
-    "message": "Local Storage (Neu)",
+    "message": "Lokaler Speicher (Neu)",
     "description": "Label for local storage when sync storage is currently active in migration modal"
   },
   "migrationLocalStorageCurrent": {
-    "message": "Local Storage (Aktuell)",
+    "message": "Lokaler Speicher (Aktuell)",
     "description": "Label when local storage is the user's current storage type in migration modal"
   },
   "migrationExporting": {
@@ -1639,7 +1639,7 @@
     "description": "Card heading for the data storage type selector"
   },
   "dataStorageDescription": {
-    "message": "Wählen Sie, wo Ihre Tabs gespeichert werden. Sie können jederzeit zwischen Speichertypen wechseln. Tabs und Profile können in Local Storage gespeichert werden, um die Synchronisierung zwischen Geräten zu verhindern. Andere Einstellungen werden zwischen Geräten synchronisiert, sofern im Browser aktiviert. Ihre Datenspeicheroption wird immer lokal gespeichert.",
+    "message": "Wählen Sie, wo Ihre Tabs gespeichert werden. Sie können jederzeit zwischen Speichertypen wechseln. Tabs und Profile können im Lokalen Speicher gespeichert werden, um die Synchronisierung zwischen Geräten zu verhindern. Andere Einstellungen werden zwischen Geräten synchronisiert, sofern im Browser aktiviert. Ihre Datenspeicheroption wird immer lokal gespeichert.",
     "description": "Detailed description for the data storage options"
   },
   "localStorageTitle": {
