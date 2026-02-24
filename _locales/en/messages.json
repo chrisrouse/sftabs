@@ -23,14 +23,6 @@
     "message": "Settings",
     "description": "Settings section header"
   },
-  "openFullSettingsButton": {
-    "message": "Open Full Settings Page",
-    "description": "Button to open standalone settings page"
-  },
-  "openFullSettingsHelp": {
-    "message": "Try the new standalone settings page with a better layout and all configuration options in one place",
-    "description": "Help text for full settings button"
-  },
   "themeMode": {
     "message": "Theme Mode",
     "description": "Theme mode setting label"
@@ -1951,5 +1943,9 @@
   "syncConflictSynced": {
     "message": "Synced",
     "description": "Label for synced data in the sync conflict dialog"
+  },
+  "userGuideLink": {
+    "message": "User Guide",
+    "description": "Navigation link to the user guide documentation"
   }
 }
