@@ -1997,5 +1997,25 @@
   "translationsGithubLink": {
     "message": "Open an issue on GitHub",
     "description": "Text for the GitHub issues link button"
+  },
+  "releaseNotesButtonTitle": {
+    "message": "What's New",
+    "description": "Tooltip for the What's New header button"
+  },
+  "releaseNotesPanelTitle": {
+    "message": "What's New",
+    "description": "Heading inside the release notes panel"
+  },
+  "releaseNotesGotIt": {
+    "message": "Got it",
+    "description": "Close button at the bottom of the release notes panel"
+  },
+  "translationsStatusAvailable": {
+    "message": "Available",
+    "description": "Badge shown next to languages with community-reviewed translations"
+  },
+  "translationsContributedBy": {
+    "message": "Contributed by",
+    "description": "Attribution prefix shown before a contributor name in the language list"
   }
 }
