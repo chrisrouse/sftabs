@@ -500,10 +500,30 @@
 		.language-item {
 			display: flex;
 			align-items: center;
+			flex-wrap: wrap;
 			gap: 12px;
 			padding: 10px 12px;
 			border-radius: 6px;
 			background: var(--color-background);
+		}
+
+		.language-contributors {
+			flex-basis: 100%;
+			padding-left: 32px;
+			font-size: 12px;
+			color: var(--color-text-weak);
+			margin-top: -4px;
+			padding-bottom: 2px;
+		}
+
+		.language-contributor-link {
+			color: var(--color-primary);
+			text-decoration: none;
+			font-weight: 500;
+		}
+
+		.language-contributor-link:hover {
+			text-decoration: underline;
 		}
 
 		.language-flag {
@@ -543,6 +563,18 @@
 			background: rgba(255, 193, 7, 0.15);
 			color: #ffc107;
 			border-color: rgba(255, 193, 7, 0.4);
+		}
+
+		.language-status.available {
+			background: #d1fae5;
+			color: #065f46;
+			border: 1px solid #34d399;
+		}
+
+		[data-theme="dark"] .language-status.available {
+			background: rgba(52, 211, 153, 0.15);
+			color: #34d399;
+			border-color: rgba(52, 211, 153, 0.4);
 		}
 
 		.translation-github-link {
@@ -1190,7 +1222,10 @@
 							<div class="language-item">
 								<span class="language-flag">🇩🇪</span>
 								<span class="language-name">__MSG_translationsLanguageGerman__</span>
-								<span class="language-status beta">__MSG_translationsStatusBeta__</span>
+								<span class="language-status available">__MSG_translationsStatusAvailable__</span>
+								<div class="language-contributors">
+									<span>__MSG_translationsContributedBy__ </span><a href="https://www.linkedin.com/in/andreasbruchwitz/" target="_blank" class="language-contributor-link">Andreas Bruchwitz</a>
+								</div>
 							</div>
 							<div class="language-item">
 								<span class="language-flag">🇪🇸</span>

@@ -15,6 +15,14 @@
                 <span class="version-badge">v2.0.1.0 beta</span>
             </h1>
             <div class="header-actions">
+                <!-- What's New button (hidden until JS confirms unseen release notes) -->
+                <button id="release-notes-button" class="icon-button" title="__MSG_releaseNotesButtonTitle__" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                </button>
+
                 <!-- Quick Add button with cloud-lightning icon -->
                 <button id="quick-add-button" class="icon-button" title="__MSG_quickAddButtonTitle__">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-cloud-lightning">
@@ -303,6 +311,35 @@
                     <button id="profile-save-button" class="primary-button" style="width: 100%;">__MSG_saveProfileButton__</button>
                     <button id="profile-cancel-button" class="secondary-button" style="width: 100%; margin: 8px 0 0 0;">__MSG_cancelButton__</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Release Notes Panel -->
+        <div id="release-notes-panel" class="action-panel">
+            <div class="section-header">
+                <h2>Release Notes: v2.0.1.0 Beta</h2>
+            </div>
+            <div class="action-panel-content">
+                <!-- Items synced from CHANGELOG.md [2.0.1.0] -->
+                <div class="release-notes-items">
+                    <div class="release-notes-item">
+                        <div class="release-notes-item-title">German Translation</div>
+                        <div class="release-notes-item-desc">SF Tabs has been translated to German! Thanks to Andreas Bruchwitz for reviewing the AI translations and making human corrections.</div>
+                    </div>
+
+                    <div class="release-notes-item">
+                        <div class="release-notes-item-title">Spanish Translation</div>
+                        <div class="release-notes-item-desc">The Spanish translation is AI-generated and still needs a human to review it.</div>
+                    </div>
+
+                    <div class="release-notes-item">
+                        <div class="release-notes-item-title">Release Notes</div>
+                        <div class="release-notes-item-desc">You found them!</div>
+                    </div>
+                </div>
+
+                <!-- Button anchored to bottom -->
+                <button id="release-notes-close-button" class="primary-button release-notes-close-btn">__MSG_releaseNotesGotIt__</button>
             </div>
         </div>
 
@@ -615,6 +652,7 @@
     <script src="js/popup-profiles.js"></script>
     <script src="js/popup-first-launch.js"></script>
     <script src="js/popup-migration.js"></script>
+    <script src="js/popup-release-notes.js"></script>
 
     <!-- Load main entry point LAST -->
     <script src="js/popup-main.js"></script>

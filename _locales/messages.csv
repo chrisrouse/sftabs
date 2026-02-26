@@ -422,3 +422,8 @@ translationsStatusBeta,Beta,Beta,Beta,Badge shown next to beta languages
 translationsContributeTitle,Help Improve Translations,Helfen Sie uns Übersetzungen zu verbessern,Ayude a mejorar las traducciones,Heading for the GitHub contribution card
 translationsContributeDescription,"Found an error? Want to contribute a new language or improve an existing one? Open an issue on GitHub — we'd love your help.","Haben Sie einen Fehler gefunden? Möchten Sie eine neue Sprache beitragen oder eine vorhandene verbessern? Eröffnen Sie ein Issue auf GitHub – wir freuen uns über Ihre Hilfe.","¿Encontró un error? ¿Desea contribuir con un nuevo idioma o mejorar uno existente? Abra un issue en GitHub — nos encantaría su ayuda."
 translationsGithubLink,Open an issue on GitHub,Ein Issue auf GitHub öffnen,Abrir un issue en GitHub,Text for the GitHub issues link button
+releaseNotesButtonTitle,What's New,Was ist neu,¿Qué hay de nuevo?,Tooltip for the What's New header button
+releaseNotesPanelTitle,What's New,Was ist neu,¿Qué hay de nuevo?,Heading inside the release notes panel
+releaseNotesGotIt,Got it,Verstanden,Entendido,Close button at the bottom of the release notes panel
+translationsStatusAvailable,Available,Verfügbar,Disponible,Badge shown next to languages with community-reviewed translations
+translationsContributedBy,Contributed by,Beitrag von,Aportado por,Attribution prefix shown before a contributor name in the language list

@@ -109,6 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
         SFTabs.ui.renderTabList();
       }
 
+      // Show "What's New" button if this version's notes haven't been seen
+      if (typeof SFTabsReleaseNotes !== 'undefined') {
+        SFTabsReleaseNotes.init();
+      }
+
     } catch (error) {
       showStatus(chrome.i18n.getMessage('errorInitializingPopup', [error.message]), true);
     }

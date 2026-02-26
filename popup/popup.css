@@ -280,7 +280,8 @@
 
   /* Adjust main content margin and height when banner is visible */
   #main-content.with-banner,
-  #action-panel.with-banner {
+  #action-panel.with-banner,
+  #release-notes-panel.with-banner {
 	margin-top: 82px !important;
 	height: calc(100% - 82px) !important;
   }
@@ -310,6 +311,64 @@
 	color: var(--color-header-text);
 	letter-spacing: 0.02em;
 	white-space: nowrap;
+  }
+
+  /* Release Notes notification dot on the header button */
+  .release-notes-dot {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #ff4b4b;
+	border: 1.5px solid var(--color-header);
+	pointer-events: none;
+  }
+
+  /* Items in normal flow with spacing */
+  .release-notes-items {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-bottom: 16px;
+  }
+
+  .release-notes-item {
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+  }
+
+  .release-notes-item-icon {
+	font-size: 18px;
+	line-height: 1.3;
+	flex-shrink: 0;
+  }
+
+  .release-notes-item-title {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--color-text);
+	margin-bottom: 3px;
+  }
+
+  .release-notes-item-desc {
+	font-size: 12px;
+	color: var(--color-text-weak);
+	line-height: 1.5;
+  }
+
+  .release-notes-item-desc code {
+	font-family: monospace;
+	font-size: 11px;
+	background: var(--color-input-background);
+	padding: 1px 4px;
+	border-radius: 3px;
+  }
+
+  .release-notes-close-btn {
+	width: 100%;
   }
 
   h2 {
@@ -359,7 +418,8 @@
   
   /* Panel Visibility */
   #main-content,
-  #action-panel {
+  #action-panel,
+  #release-notes-panel {
 	flex: 1;
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -376,7 +436,8 @@
   }
 
   /* Action Panel */
-  #action-panel .section-header {
+  #action-panel .section-header,
+  #release-notes-panel .section-header {
 	margin-left: 8px;
 	margin-top: 8px;
   }
