@@ -1,11 +1,11 @@
 // popup/js/popup-release-notes.js
 // Manages the "What's New" release notes panel
 
-const RELEASE_NOTES_VERSION = '2.0.1.0';
+const RELEASE_NOTES_VERSION = '2.1.0';
 
 const SFTabsReleaseNotes = {
   /**
-   * Initialize release notes: show the header button if unseen.
+   * Initialize release notes: show the header button if not dismissed for this version.
    */
   async init() {
     const result = await chrome.storage.local.get('seenReleaseNotesVersion');
@@ -18,16 +18,13 @@ const SFTabsReleaseNotes = {
   },
 
   /**
-   * Show the release notes panel and mark this version as seen.
+   * Show the release notes panel. The button is hidden while the panel is open
+   * but will reappear on close unless the user checks "Don't show again".
    */
-  async show() {
-    // Persist that user has seen this version's notes
-    await chrome.storage.local.set({ seenReleaseNotesVersion: RELEASE_NOTES_VERSION });
+  show() {
+    // Reset the checkbox each time the panel opens
+    document.getElementById('release-notes-dismiss-checkbox').checked = false;
 
-    // Hide the button (won't come back until a new version ships)
-    document.getElementById('release-notes-button').style.display = 'none';
-
-    // Use the same inline-style pattern as showMainContent()/showActionPanel()
     const mainContent = document.getElementById('main-content');
     const actionPanel = document.getElementById('action-panel');
     const panel = document.getElementById('release-notes-panel');
@@ -37,20 +34,30 @@ const SFTabsReleaseNotes = {
     actionPanel.classList.remove('active');
     actionPanel.style.display = 'none';
 
-    // Expand popup to max height and show panel
     document.querySelector('.container').classList.add('release-notes-open');
     panel.style.display = 'block';
     panel.scrollTop = 0;
   },
 
   /**
-   * Close the release notes panel and return to main content.
+   * Close the release notes panel.
+   * If the "Don't show again" checkbox is checked, persist the dismissal so
+   * the button won't reappear for this version. Otherwise the button comes back.
    */
-  hide() {
+  async hide() {
+    const dismissed = document.getElementById('release-notes-dismiss-checkbox').checked;
+
+    if (dismissed) {
+      await chrome.storage.local.set({ seenReleaseNotesVersion: RELEASE_NOTES_VERSION });
+    } else {
+      // Put the button back so they can re-open the notes
+      document.getElementById('release-notes-button').style.display = '';
+    }
+
     const panel = document.getElementById('release-notes-panel');
     panel.style.display = 'none';
     document.querySelector('.container').classList.remove('release-notes-open');
-    // Delegate back to the shared showMainContent so all state is cleaned up correctly
+
     if (window.SFTabs && window.SFTabs.main && window.SFTabs.main.showMainContent) {
       window.SFTabs.main.showMainContent();
     }

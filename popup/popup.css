@@ -367,6 +367,27 @@
 	border-radius: 3px;
   }
 
+  .release-notes-footer {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+  }
+
+  .release-notes-dismiss-label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	color: var(--color-text-weak);
+	cursor: pointer;
+	user-select: none;
+  }
+
+  .release-notes-dismiss-label input[type="checkbox"] {
+	cursor: pointer;
+	flex-shrink: 0;
+  }
+
   .release-notes-close-btn {
 	width: 100%;
   }

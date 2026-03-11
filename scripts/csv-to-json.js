@@ -37,7 +37,7 @@ const LOCALE_MAP = {
   'en-US': 'en',
   'en':    'en',
   'de':    'de',
-  'es-ES': 'es_ES',
+  'es-ES': 'es',
   'es':    'es',
   'fr':    'fr',
   'fr-FR': 'fr',

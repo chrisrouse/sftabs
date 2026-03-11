@@ -2010,6 +2010,10 @@
     "message": "Verstanden",
     "description": "Close button at the bottom of the release notes panel"
   },
+  "releaseNotesDontShowAgain": {
+    "message": "Für diese Version nicht mehr anzeigen",
+    "description": "Checkbox label to dismiss release notes for the current version"
+  },
   "translationsStatusAvailable": {
     "message": "Verfügbar",
     "description": "Badge shown next to languages with community-reviewed translations"

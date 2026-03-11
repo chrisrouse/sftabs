@@ -24,15 +24,15 @@
     "description": "Settings section header"
   },
   "themeMode": {
-    "message": "Modo de tema",
+    "message": "Modo",
     "description": "Theme mode setting label"
   },
   "themeLight": {
-    "message": "Claro",
+    "message": "Modo Claro",
     "description": "Light theme option"
   },
   "themeDark": {
-    "message": "Oscuro",
+    "message": "Modo Oscuro",
     "description": "Dark theme option"
   },
   "themeSystem": {
@@ -44,7 +44,7 @@
     "description": "Compact mode setting label"
   },
   "compactModeDescription": {
-    "message": "Mostrar pestañas en un diseño más compacto",
+    "message": "Mostrar pestañas en una disposición más compacta",
     "description": "Compact mode description"
   },
   "skipDeleteConfirmation": {
@@ -60,7 +60,7 @@
     "description": "Manage configuration button"
   },
   "resetToDefaults": {
-    "message": "Restablecer valores predeterminados",
+    "message": "Restablecer a valores predeterminados",
     "description": "Reset to defaults button"
   },
   "settingsPageTitle": {
@@ -113,7 +113,7 @@
     "description": "Cross-device sync setting label"
   },
   "useSyncStorageDescription": {
-    "message": "Sincronice sus pestañas en todos los dispositivos mediante la sincronización del navegador",
+    "message": "Sincronice sus pestañas en todos los dispositivos mediante el navegador",
     "description": "Cross-device sync description"
   },
   "profilesSection": {
@@ -157,7 +157,7 @@
     "description": "Keyboard shortcuts help text"
   },
   "importExportSection": {
-    "message": "Importar y exportar",
+    "message": "Importar y Exportar",
     "description": "Import & Export section heading"
   },
   "importExportDescription": {
@@ -197,7 +197,7 @@
     "description": "Danger zone section description"
   },
   "resetButton": {
-    "message": "Restablecer valores predeterminados",
+    "message": "Restablecer a valores predeterminados",
     "description": "Reset to defaults button"
   },
   "resetButtonDescription": {
@@ -249,7 +249,7 @@
     "description": "Import modal prompt"
   },
   "importOverwriteProfile": {
-    "message": "Sobrescribir perfil existente",
+    "message": "Sobrescribir el perfil existente",
     "description": "Import overwrite profile option"
   },
   "importCreateProfile": {
@@ -273,7 +273,7 @@
     "description": "New profile name placeholder"
   },
   "resetModalTitle": {
-    "message": "Restablecer valores predeterminados",
+    "message": "Restablecer a valores predeterminados",
     "description": "Reset modal title"
   },
   "resetModalPrompt": {
@@ -281,15 +281,15 @@
     "description": "Reset modal prompt"
   },
   "resetModalItem1": {
-    "message": "Eliminar todas las pestañas personalizadas",
+    "message": "Eliminará todas las pestañas personalizadas",
     "description": "Reset modal item 1"
   },
   "resetModalItem2": {
-    "message": "Eliminar todos los perfiles",
+    "message": "Eliminará todos los perfiles",
     "description": "Reset modal item 2"
   },
   "resetModalItem3": {
-    "message": "Restablecer todos los ajustes a sus valores predeterminados",
+    "message": "Restablecerá todos los ajustes a sus valores predeterminados",
     "description": "Reset modal item 3"
   },
   "resetModalWarning": {
@@ -301,7 +301,7 @@
     "description": "Enable sync confirmation title"
   },
   "enableSyncConfirmMessage": {
-    "message": "Sus pestañas se sincronizarán en todos sus equipos mediante la sincronización del navegador. Esto le permite acceder a sus pestañas personalizadas en cualquier dispositivo en el que haya iniciado sesión.\n\nNota: Las configuraciones grandes (>100 KB) pueden no sincronizarse correctamente. Haga clic en Aceptar para continuar.",
+    "message": "Sus pestañas se sincronizarán en todos sus equipos mediante la sincronización del navegador. Esto le permite acceder a sus pestañas personalizadas en cualquier dispositivo en el que haya iniciado sesión.\n\nNota: Las configuraciones grandes (>100 KB) podrían no sincronizarse correctamente. Haga clic en Aceptar para continuar.",
     "description": "Enable sync confirmation message"
   },
   "disableSyncConfirmTitle": {
@@ -313,7 +313,7 @@
     "description": "Disable sync confirmation message"
   },
   "disableProfilesConfirmMessage": {
-    "message": "¿Deshabilitar perfiles?\n\nEsto fusionará todas las pestañas de todos los perfiles en una única lista de pestañas. Puede volver a habilitar los perfiles más adelante.\n\nHaga clic en Aceptar para continuar.",
+    "message": "¿Deshabilitar perfiles?\n\nEsto fusionará todas las pestañas de todos los perfiles en una única lista. Puede volver a habilitar los perfiles más adelante.\n\nHaga clic en Aceptar para continuar.",
     "description": "Disable profiles confirmation message"
   },
   "settingsSaved": {
@@ -325,11 +325,11 @@
     "description": "Settings reset status message"
   },
   "configExported": {
-    "message": "Configuración exportada correctamente",
+    "message": "Configuración exportada satisfactoriamente",
     "description": "Configuration exported status message"
   },
   "configImported": {
-    "message": "Configuración importada correctamente",
+    "message": "Configuración importada satisfactoriamente",
     "description": "Configuration imported status message"
   },
   "tabsImportedToProfile": {
@@ -529,7 +529,7 @@
     "description": "Local storage option description"
   },
   "firstLaunchGuideButton": {
-    "message": "Guía del usuario",
+    "message": "Manual de usuario",
     "description": "Button that opens the user guide"
   },
   "firstLaunchGetStartedButton": {
@@ -554,7 +554,7 @@
     "description": "Question shown below the sync data detected message"
   },
   "firstLaunchUseSyncedButton": {
-    "message": "Usar configuración sincronizada (Recomendado)",
+    "message": "Usar Configuración Sincronizada (Recomendado)",
     "description": "Button to use the existing synced configuration"
   },
   "firstLaunchStartFreshButton": {
@@ -621,7 +621,7 @@
     "description": "Title attribute on the Quick Add button in the popup header"
   },
   "addNewTabButtonTitle": {
-    "message": "Agregar nuevo tab",
+    "message": "Agregar nueva pestaña",
     "description": "Title attribute on the Add New Tab button in the popup header"
   },
   "profilesButtonTitle": {
@@ -633,15 +633,15 @@
     "description": "Title attribute on the Settings button in the popup header"
   },
   "emptyStateText": {
-    "message": "Aún no hay tabs personalizados. Agregue su primer tab a continuación.",
+    "message": "Aún no hay tabs personalizados. Agregue su primer prestaña a continuación.",
     "description": "Text shown in the popup when no tabs have been added yet"
   },
   "objectManagerDropdownLabel": {
-    "message": "Desplegable del Object Manager",
+    "message": "Menú desplegable del Object Manager",
     "description": "Label for the Object Manager dropdown section in the tab form"
   },
   "setupAsObjectDropdownButton": {
-    "message": "Configurar como desplegable de objeto",
+    "message": "Configurar como menú desplegable de objeto",
     "description": "Button to set up a tab as an Object Manager dropdown"
   },
   "setupAsObjectDropdownHelp": {
@@ -657,7 +657,7 @@
     "description": "Label for the manual dropdown creation section in the tab form"
   },
   "tabSettingsHeader": {
-    "message": "Configuración del tab",
+    "message": "Configuración de la pestaña",
     "description": "Header for the tab settings section in the action panel"
   },
   "tabNamePlaceholder": {
@@ -673,7 +673,7 @@
     "description": "Placeholder text for the tab path input"
   },
   "tabPathHelp": {
-    "message": "Introduzca únicamente el nombre de la página de la URL. Déjelo en blanco para crear un tab tipo carpeta que actúe como contenedor de menú.",
+    "message": "Introduzca únicamente el nombre de la página de la URL. Déjelo en blanco para crear unq pestaña tipo carpeta que actúe como contenedor.",
     "description": "Help text for the tab path input"
   },
   "tabIsObjectLabel": {
@@ -681,7 +681,7 @@
     "description": "Label for the Object checkbox in the tab form"
   },
   "tabIsObjectHelp": {
-    "message": "Marque esta opción si la página es una página de objeto en lugar de una página de Setup",
+    "message": "Marque esta opción si la página es una página de objeto en lugar de una página de configuración.",
     "description": "Help text for the Object checkbox"
   },
   "tabIsCustomUrlLabel": {
@@ -689,15 +689,15 @@
     "description": "Label for the Custom URL checkbox in the tab form"
   },
   "tabIsCustomUrlHelp": {
-    "message": "Marque esta opción para páginas especiales que no siguen los patrones de Setup ni de objeto (p. ej., Flow Trigger Explorer)",
+    "message": "Marque esta opción para páginas especiales que no siguen los patrones de Setup ni del objeto (p. ej., Flow Trigger Explorer)",
     "description": "Help text for the Custom URL checkbox"
   },
   "confirmModalTitle": {
-    "message": "Restablecer tabs predeterminados",
+    "message": "Restablecer pestañas a valores predeterminados.",
     "description": "Title of the confirm reset modal dialog"
   },
   "confirmModalBody": {
-    "message": "¿Está seguro de que desea restablecer los tabs predeterminados? Esto eliminará todos los tabs personalizados que haya agregado.",
+    "message": "¿Está seguro de que desea restablecer las pestañas a los valores predeterminados? Esto eliminará todos las pestañas personalizadas que haya agregado.",
     "description": "Body text of the confirm reset modal dialog"
   },
   "resetConfirmButton": {
@@ -705,11 +705,11 @@
     "description": "Confirm button text in the reset to defaults modal"
   },
   "deleteModalTitle": {
-    "message": "Eliminar tab",
+    "message": "Eliminar pestaña",
     "description": "Title of the delete tab confirmation modal dialog"
   },
   "deleteModalBody": {
-    "message": "¿Está seguro de que desea eliminar este tab?",
+    "message": "¿Está seguro de que desea eliminar esta pestaña?",
     "description": "Body text of the delete tab confirmation modal dialog"
   },
   "notSalesforcePage": {
@@ -721,7 +721,7 @@
     "description": "Status message shown when Quick Add cannot identify the Salesforce page type"
   },
   "tabAdded": {
-    "message": "Tab $PAGETYPE$ agregado para \"$NAME$\"",
+    "message": "Pestaña $PAGETYPE$ agregada para \"$NAME$\"",
     "description": "{$PAGETYPE$}=setup/object/custom; {$NAME$}=tab label",
     "placeholders": {
       "pagetype": {
@@ -733,7 +733,7 @@
     }
   },
   "errorAccessingTab": {
-    "message": "Error al acceder al tab actual: $ERROR$",
+    "message": "Error al acceder a la pestaña actual: $ERROR$",
     "description": "Error shown when Quick Add fails to access the current tab; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -742,19 +742,19 @@
     }
   },
   "tabRemoved": {
-    "message": "Tab eliminado",
+    "message": "Pestaña eliminada",
     "description": "Status message shown after deleting a tab"
   },
   "resetToDefaultTabsStatus": {
-    "message": "Restablecidos los tabs predeterminados",
+    "message": "Restabler pestañas a los valores predeterminados",
     "description": "Status message shown after resetting tabs to defaults"
   },
   "tabNotFound": {
-    "message": "Tab no encontrado",
+    "message": "Pestaña no encontrada",
     "description": "Error shown when a tab cannot be found by its ID"
   },
   "tabDuplicated": {
-    "message": "Tab \"$NAME$\" duplicado",
+    "message": "Pestaña duplicada \"$NAME$\"",
     "description": "Status shown after duplicating a tab; {$NAME$}=tab label",
     "placeholders": {
       "name": {
@@ -763,19 +763,19 @@
     }
   },
   "noTabSelected": {
-    "message": "Ningún tab seleccionado",
+    "message": "Ninguna pestaña seleccionada",
     "description": "Error when the save action is triggered without a tab selected"
   },
   "tabNameRequired": {
-    "message": "El nombre del tab es obligatorio",
+    "message": "El nombre de la pestaña es obligatorio",
     "description": "Validation error shown when the tab name field is empty"
   },
   "tabCannotBeBoth": {
-    "message": "El tab no puede ser a la vez Objeto y URL personalizada",
+    "message": "La pestaña no puede ser a la vez Objeto y URL personalizada",
     "description": "Validation error when both Object and Custom URL checkboxes are checked"
   },
   "parentTabNotFound": {
-    "message": "Tab padre no encontrado",
+    "message": "Pestaña padre no encontrada",
     "description": "Error when the parent tab of a dropdown item cannot be found"
   },
   "dropdownItemNotFound": {
@@ -787,11 +787,11 @@
     "description": "Status shown after successfully updating a dropdown item"
   },
   "tabCreated": {
-    "message": "Tab creado correctamente",
+    "message": "Pestaña creada satisfactoriamente",
     "description": "Status shown after successfully creating a new tab"
   },
   "tabUpdated": {
-    "message": "Tab actualizado correctamente",
+    "message": "Pestaña actualizada satisfactoriamente",
     "description": "Status shown after successfully updating an existing tab"
   },
   "errorInitializingPopup": {
@@ -813,7 +813,7 @@
     }
   },
   "errorLoadingTabs": {
-    "message": "Error al cargar los tabs: $ERROR$",
+    "message": "Error al cargar las pestañas: $ERROR$",
     "description": "Error shown if tabs fail to load; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -822,7 +822,7 @@
     }
   },
   "errorCreatingTab": {
-    "message": "Error al crear el tab: $ERROR$",
+    "message": "Error al crear la pestaña: $ERROR$",
     "description": "Error shown if tab creation fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -831,7 +831,7 @@
     }
   },
   "errorUpdatingTab": {
-    "message": "Error al actualizar el tab: $ERROR$",
+    "message": "Error al actualizar la pestaña: $ERROR$",
     "description": "Error shown if tab update fails; {$ERROR$}=error message",
     "placeholders": {
       "error": {
@@ -861,31 +861,31 @@
     "description": "Title attribute on the drag handle element for reordering tabs"
   },
   "editTabButtonTitle": {
-    "message": "Editar tab",
+    "message": "Editar pestaña",
     "description": "Title attribute on the edit/pencil icon button in the tab list"
   },
   "opensInNewTabTitle": {
-    "message": "Se abre en un nuevo tab (haga clic para cambiar)",
+    "message": "Se abre en una nueva pestaña (haga clic para cambiar)",
     "description": "Title on the new-tab toggle button when the tab opens in a new tab"
   },
   "opensInSameTabTitle": {
-    "message": "Se abre en el mismo tab (haga clic para cambiar)",
+    "message": "Se abre en la misma pestaña (haga clic para cambiar)",
     "description": "Title on the new-tab toggle button when the tab opens in the same tab"
   },
   "removeTabButtonTitle": {
-    "message": "Eliminar tab",
+    "message": "Eliminar pestaña",
     "description": "Title attribute on the delete/trash icon button in the tab list"
   },
   "addNewTabFormTitle": {
-    "message": "Agregar nuevo tab",
+    "message": "Agregar nueva pestaña",
     "description": "Form title displayed when adding a new tab"
   },
   "editTabFormTitle": {
-    "message": "Editar tab",
+    "message": "Editar pestaña",
     "description": "Form title displayed when editing an existing tab"
   },
   "noTabSelectedForEditing": {
-    "message": "Ningún tab seleccionado para editar",
+    "message": "Ninguna pestaña seleccionada para editar",
     "description": "Error when save is attempted in the dropdown form without a tab selected"
   },
   "errorSavingChanges": {
@@ -926,7 +926,7 @@
     "description": "Title on the Edit button for dropdown items in the manage dropdown panel"
   },
   "promoteToMainListTitle": {
-    "message": "Promover a la lista principal",
+    "message": "Promover a la lista de pestañas principal",
     "description": "Title on the Promote button for dropdown items"
   },
   "deleteDropdownItemTitle": {
@@ -938,7 +938,7 @@
     "description": "Title displayed in the action panel header when editing a dropdown item"
   },
   "newTabPanelTitle": {
-    "message": "Nuevo tab",
+    "message": "Nueva pestaña",
     "description": "Title displayed in the action panel header when adding a new tab"
   },
   "promotedWithNested": {
@@ -1023,7 +1023,7 @@
     "description": "Title for the clone option in profile init panel"
   },
   "cloneAnotherProfileDesc": {
-    "message": "Copiar tabs de un perfil existente",
+    "message": "Copiar pestañas de un perfil existente",
     "description": "Description for the clone option in profile init panel"
   },
   "selectProfileToCloneLabel": {
@@ -1039,7 +1039,7 @@
     "description": "Label for the active profile selector dropdown in the profile list panel"
   },
   "switchProfileHelp": {
-    "message": "Cambie a un perfil diferente para ver y administrar sus tabs.",
+    "message": "Cambie a un perfil diferente para ver y administrar sus tpestañas.",
     "description": "Help text below the active profile selector"
   },
   "createNewProfileButton": {
@@ -1075,11 +1075,11 @@
     "description": "Button to capture the current browser tab's Salesforce domain as a URL pattern"
   },
   "saveProfileButton": {
-    "message": "Guardar perfil",
+    "message": "Guardar Perfil",
     "description": "Button to save profile changes"
   },
   "disableProfilesTitle": {
-    "message": "Deshabilitar perfiles",
+    "message": "Deshabilitar Perfiles",
     "description": "Title of the disable profiles confirmation modal"
   },
   "disableProfilesBody": {
@@ -1107,7 +1107,7 @@
     "description": "Description of new features in the migration welcome screen"
   },
   "migrationSyncStorageDesc": {
-    "message": "Sus tabs pueden sincronizarse entre dispositivos",
+    "message": "Sus pestañas pueden sincronizarse entre dispositivos",
     "description": "Description for sync storage option in the migration modal"
   },
   "migrationLocalStorageDesc": {
@@ -1139,7 +1139,7 @@
     "description": "Heading on the migration success screen"
   },
   "migrationSuccessMessage": {
-    "message": "Sus tabs se han migrado correctamente al nuevo sistema de perfiles.",
+    "message": "Sus pestañas se han migrado correctamente al nuevo sistema de perfiles.",
     "description": "Description on the migration success screen"
   },
   "migrationWhatsNext": {
@@ -1147,7 +1147,7 @@
     "description": "Heading for the what's next section on migration success screen"
   },
   "migrationDefaultProfileNote": {
-    "message": "Todos sus tabs están ahora en el perfil \"Predeterminado\"",
+    "message": "Todos sus pestañas están ahora en el perfil \"Predeterminado\"",
     "description": "First bullet point in the what's next section on migration success"
   },
   "migrationProfilesEnabledNote": {
@@ -1159,7 +1159,7 @@
     "description": "Third bullet in what's next (shown when user did not enable profiles)"
   },
   "migrationCreateProfilesNote": {
-    "message": "Cree perfiles adicionales para distintas orgs",
+    "message": "Cree perfiles adicionales para distintas organizaciones",
     "description": "Fourth bullet in the what's next section"
   },
   "migrationErrorTitle": {
@@ -1191,7 +1191,7 @@
     "description": "Button to skip migration and continue with existing data"
   },
   "profilesUiDisabledKept": {
-    "message": "Interfaz de perfiles deshabilitada. Perfil \"$NAME$\" conservado",
+    "message": "Interfaz de perfiles deshabilitada. Conservar \"$NAME$\" del perfil",
     "description": "Status after disabling profiles UI while keeping one; {$NAME$}=kept profile name",
     "placeholders": {
       "name": {
@@ -1281,7 +1281,7 @@
     "description": "Error when the selected profile ID cannot be found"
   },
   "disableProfilesConfirm": {
-    "message": "¿Deshabilitar perfiles y conservar \"$NAME$\"?\n\nEsto eliminará todos los demás perfiles y sus tabs. Esta acción no se puede deshacer.",
+    "message": "¿Deshabilitar perfiles y conservar \"$NAME$\"?\n\nEsto eliminará todos los demás perfiles y sus pestañas. Esta acción no se puede deshacer.",
     "description": "Confirm dialog before disabling profiles; {$NAME$}=profile to keep",
     "placeholders": {
       "name": {
@@ -1449,7 +1449,7 @@
     "description": "Default label on the Export Backup button in the migration modal"
   },
   "migrationExportFailed": {
-    "message": "Error en la exportación",
+    "message": "Error al exportar",
     "description": "Temporary button text when a backup export fails"
   },
   "migrationUnknownError": {
@@ -1567,19 +1567,19 @@
     "description": "Description for the Everywhere location radio option"
   },
   "floatingButtonLocationSetupOnly": {
-    "message": "Solo en Setup",
+    "message": "Solo en Configuración",
     "description": "Radio label: show floating button only on Setup pages"
   },
   "floatingButtonLocationSetupOnlyDescription": {
-    "message": "Mostrar el botón flotante solo en las páginas de Setup",
+    "message": "Mostrar el botón flotante solo en las páginas de Configuración",
     "description": "Description for the Only in Setup location radio option"
   },
   "floatingButtonLocationOutsideSetup": {
-    "message": "Fuera de Setup",
+    "message": "AFuera de Configuración",
     "description": "Radio label: show floating button everywhere except Setup pages"
   },
   "floatingButtonLocationOutsideSetupDescription": {
-    "message": "Mostrar el botón flotante en todas partes excepto en las páginas de Setup",
+    "message": "Mostrar el botón flotante en todas partes excepto en las páginas de Configuración",
     "description": "Description for the Outside Setup location radio option"
   },
   "floatingButtonPositionSection": {
@@ -1703,7 +1703,7 @@
     "description": "Primary action button in the Export Configuration card"
   },
   "importFromFileHelp": {
-    "message": "Restaure sus pestañas y configuraciones desde un archivo de copia de seguridad.",
+    "message": "Restaure sus pestañas y configuraciones desde un archivo de su copia de seguridad.",
     "description": "Introductory text in the Import Configuration card"
   },
   "chooseFileToImport": {
@@ -1779,7 +1779,7 @@
     "description": "Heading above the destination radio buttons for profile-mode imports"
   },
   "importDestinationAdd": {
-    "message": "A��adir a perfil existente",
+    "message": "Añadir a perfil existente",
     "description": "Radio label to add imported tabs into an existing profile"
   },
   "importDestinationOverwrite": {
@@ -1961,7 +1961,7 @@
     "description": "Title of the beta disclaimer notice card"
   },
   "translationsBetaDescription": {
-    "message": "Las traducciones se encuentran actualmente en fase beta. Todo el texto no inglés fue generado mediante IA y puede contener errores o formulaciones poco naturales. Le recomendamos considerarlas como un punto de partida, no como un producto terminado."
+    "message": "Las traducciones se encuentran actualmente en fase beta. Todo el texto que no es inglés fue generado mediante IA y puede contener errores o formulaciones poco naturales. Le recomendamos considerarlas como un punto de partida, no como un producto terminado."
   },
   "translationsAvailableTitle": {
     "message": "Idiomas disponibles",
@@ -2009,6 +2009,10 @@
   "releaseNotesGotIt": {
     "message": "Entendido",
     "description": "Close button at the bottom of the release notes panel"
+  },
+  "releaseNotesDontShowAgain": {
+    "message": "No volver a mostrar para esta versión",
+    "description": "Checkbox label to dismiss release notes for the current version"
   },
   "translationsStatusAvailable": {
     "message": "Disponible",
