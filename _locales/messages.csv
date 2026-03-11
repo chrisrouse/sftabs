@@ -5,16 +5,16 @@ popupTitle,SF Tabs,SF Tabs,SF Tabs,Popup title
 tabsHeader,Tabs,Registerkarten,Pestañas,Tabs section header
 addNewTab,Add New Tab,Neue Registerkarte hinzufügen,Agregar nueva pestaña,Add new tab button
 settingsHeader,Settings,Einstellungen,Configuración,Settings section header
-themeMode,Theme Mode,Design-Modus,Modo de tema,Theme mode setting label
-themeLight,Light,Hell,Claro,Light theme option
-themeDark,Dark,Dunkel,Oscuro,Dark theme option
+themeMode,Theme Mode,Design-Modus,Modo ,Theme mode setting label
+themeLight,Light,Hell,Modo Claro,Light theme option
+themeDark,Dark,Dunkel,Modo Oscuro,Dark theme option
 themeSystem,System,System,Sistema,System theme option
 compactMode,Compact Mode,Kompaktmodus,Modo compacto,Compact mode setting label
-compactModeDescription,Display tabs in a more condensed layout,Registerkarten in einem kompakteren Layout anzeigen,Mostrar pestañas en un diseño más compacto,Compact mode description
+compactModeDescription,Display tabs in a more condensed layout,Registerkarten in einem kompakteren Layout anzeigen,Mostrar pestañas en una disposición más compacta,Compact mode description
 skipDeleteConfirmation,Skip Delete Confirmation,Löschbestätigung überspringen,Omitir confirmación de eliminación,Skip delete confirmation setting label
 skipDeleteConfirmationDescription,Don't ask for confirmation when deleting tabs,Keine Bestätigung beim Löschen von Registerkarten anfordern,No solicitar confirmación al eliminar pestañas,Skip delete confirmation description
 manageConfig,Manage Configuration,Konfiguration verwalten,Administrar configuración,Manage configuration button
-resetToDefaults,Reset to Defaults,Auf Standardwerte zurücksetzen,Restablecer valores predeterminados,Reset to defaults button
+resetToDefaults,Reset to Defaults,Auf Standardwerte zurücksetzen,Restablecer a valores predeterminados,Reset to defaults button
 settingsPageTitle,SF Tabs Settings,SF Tabs Einstellungen,Configuración de SF Tabs,Settings page title
 settingsSubtitle,Customize your SF Tabs experience,Passen Sie Ihre SF Tabs-Erfahrung an,Personalice su experiencia con SF Tabs,Settings page subtitle
 versionInfo,SF Tabs v$VERSION$,SF Tabs v$VERSION$,SF Tabs v$VERSION$,Version information
@@ -26,7 +26,7 @@ behaviorDescription,Control how the extension behaves,"Steuern Sie, wie sich die
 syncStorageSection,Sync & Storage,Sync & Speicher,Sincronización y almacenamiento,Sync & Storage section heading
 syncStorageDescription,Manage how your tabs are stored and synced,"Verwalten Sie, wie Ihre Registerkarten gespeichert und synchronisiert werden",Administre cómo se almacenan y sincronizan sus pestañas,Sync & Storage section description
 useSyncStorage,Cross-Device Sync,Geräteübergreifende Synchronisierung,Sincronización entre dispositivos,Cross-device sync setting label
-useSyncStorageDescription,Sync your tabs across all devices using browser sync,Synchronisieren Sie Ihre Registerkarten über die Browser-Synchronisierung auf allen Geräten,Sincronice sus pestañas en todos los dispositivos mediante la sincronización del navegador,Cross-device sync description
+useSyncStorageDescription,Sync your tabs across all devices using browser sync,Synchronisieren Sie Ihre Registerkarten über die Browser-Synchronisierung auf allen Geräten,Sincronice sus pestañas en todos los dispositivos mediante el navegador,Cross-device sync description
 profilesSection,Profiles,Profile,Perfiles,Profiles section heading
 profilesDescription,Organize tabs into different profiles for different Salesforce orgs,Registerkarten in verschiedenen Profilen für verschiedene Salesforce-Organisationen organisieren,Organice las pestañas en distintos perfiles para diferentes organizaciones de Salesforce,Profiles section description
 enableProfiles,Enable Profiles,Profile aktivieren,Habilitar perfiles,Enable profiles setting label
@@ -37,7 +37,7 @@ keyboardShortcutsSection,Keyboard Shortcuts,Tastenkombinationen,Atajos de teclad
 keyboardShortcutsDescription,Set up keyboard shortcuts to quickly access your tabs,"Tastenkombinationen einrichten, um schnell auf Ihre Registerkarten zuzugreifen",Configure atajos de teclado para acceder rápidamente a sus pestañas,Keyboard shortcuts section description
 configureKeyboardShortcuts,Configure Keyboard Shortcuts,Tastenkombinationen konfigurieren,Configurar atajos de teclado,Configure keyboard shortcuts button
 keyboardShortcutsHelp,Set keyboard shortcuts to quickly open tabs 1-10 by position,"Tastenkombinationen festlegen, um Registerkarten 1–10 nach Position schnell zu öffnen",Establezca atajos de teclado para abrir rápidamente las pestañas 1 a 10 por posición,Keyboard shortcuts help text
-importExportSection,Import & Export,Import & Export,Importar y exportar,Import & Export section heading
+importExportSection,Import & Export,Import & Export,Importar y Exportar,Import & Export section heading
 importExportDescription,Backup and restore your configuration,Ihre Konfiguration sichern und wiederherstellen,Haga una copia de seguridad y restaure su configuración,Import & Export section description
 exportButton,Export,Exportieren,Exportar,Export button text
 exportActionTitle,Export,Exportieren,Exportar,Export action title
@@ -47,7 +47,7 @@ importActionTitle,Import,Importieren,Importar,Import action title
 importActionDescription,Restore from backup,Aus Sicherung wiederherstellen,Restaurar desde copia de seguridad,Import action description
 dangerZoneSection,Danger Zone,Gefahrenbereich,Zona de peligro,Danger zone section heading
 dangerZoneDescription,Irreversible actions that will affect your data,"Nicht umkehrbare Aktionen, die sich auf Ihre Daten auswirken",Acciones irreversibles que afectarán sus datos,Danger zone section description
-resetButton,Reset to Defaults,Auf Standardwerte zurücksetzen,Restablecer valores predeterminados,Reset to defaults button
+resetButton,Reset to Defaults,Auf Standardwerte zurücksetzen,Restablecer a valores predeterminados,Reset to defaults button
 resetButtonDescription,This will remove all custom tabs and reset all settings to their default values. This action cannot be undone.,Hierdurch werden alle benutzerdefinierten Registerkarten entfernt und alle Einstellungen auf ihre Standardwerte zurückgesetzt. Diese Aktion kann nicht rückgängig gemacht werden.,Esto eliminará todas las pestañas personalizadas y restablecerá todos los ajustes a sus valores predeterminados. Esta acción no se puede deshacer.,Reset button description
 exportModalTitle,Export Configuration,Konfiguration exportieren,Exportar configuración,Export modal title
 exportModalPrompt,Select what you want to export:,"Wählen Sie aus, was Sie exportieren möchten:",Seleccione lo que desea exportar:,Export modal prompt
@@ -60,27 +60,27 @@ exportConfirmButton,Export,Exportieren,Exportar,Export confirm button
 importConfirmButton,Import,Importieren,Importar,Import confirm button
 importModalTitle,Import Configuration,Konfiguration importieren,Importar configuración,Import modal title
 importModalPrompt,Where would you like to import this configuration?,Wohin möchten Sie diese Konfiguration importieren?,¿Dónde desea importar esta configuración?,Import modal prompt
-importOverwriteProfile,Overwrite existing profile,Vorhandenes Profil überschreiben,Sobrescribir perfil existente,Import overwrite profile option
+importOverwriteProfile,Overwrite existing profile,Vorhandenes Profil überschreiben,Sobrescribir el perfil existente,Import overwrite profile option
 importCreateProfile,Create new profile,Neues Profil erstellen,Crear nuevo perfil,Import create profile option
 selectProfile,Select profile:,Profil auswählen:,Seleccionar perfil:,Select profile label
 selectProfilePlaceholder,Choose a profile...,Profil auswählen...,Elija un perfil...,Select profile placeholder
 newProfileName,Profile name:,Profilname:,Nombre del perfil:,New profile name label
 newProfileNamePlaceholder,Enter profile name,Profilnamen eingeben,Ingrese el nombre del perfil,New profile name placeholder
-resetModalTitle,Reset to Defaults,Auf Standardwerte zurücksetzen,Restablecer valores predeterminados,Reset modal title
+resetModalTitle,Reset to Defaults,Auf Standardwerte zurücksetzen,Restablecer a valores predeterminados,Reset modal title
 resetModalPrompt,Are you sure you want to reset to default tabs and settings? This will:,Möchten Sie wirklich auf die Standard-Registerkarten und -Einstellungen zurücksetzen? Dabei wird Folgendes ausgeführt:,¿Está seguro de que desea restablecer las pestañas y ajustes predeterminados? Esto hará lo siguiente:,Reset modal prompt
-resetModalItem1,Remove all custom tabs,Alle benutzerdefinierten Registerkarten entfernen,Eliminar todas las pestañas personalizadas,Reset modal item 1
-resetModalItem2,Remove all profiles,Alle Profile entfernen,Eliminar todos los perfiles,Reset modal item 2
-resetModalItem3,Reset all settings to defaults,Alle Einstellungen auf Standardwerte zurücksetzen,Restablecer todos los ajustes a sus valores predeterminados,Reset modal item 3
+resetModalItem1,Remove all custom tabs,Alle benutzerdefinierten Registerkarten entfernen,Eliminará todas las pestañas personalizadas,Reset modal item 1
+resetModalItem2,Remove all profiles,Alle Profile entfernen,Eliminará todos los perfiles,Reset modal item 2
+resetModalItem3,Reset all settings to defaults,Alle Einstellungen auf Standardwerte zurücksetzen,Restablecerá todos los ajustes a sus valores predeterminados,Reset modal item 3
 resetModalWarning,This action cannot be undone!,Diese Aktion kann nicht rückgängig gemacht werden!,¡Esta acción no se puede deshacer!,Reset modal warning
 enableSyncConfirmTitle,Enable cross-device sync?,Geräteübergreifende Synchronisierung aktivieren?,¿Habilitar la sincronización entre dispositivos?,Enable sync confirmation title
-enableSyncConfirmMessage,Your tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you're signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.,"Ihre Registerkarten werden über die Browser-Synchronisierung auf allen Ihren Computern synchronisiert. So können Sie auf jedem Gerät, auf dem Sie angemeldet sind, auf Ihre benutzerdefinierten Registerkarten zugreifen.\n\nHinweis: Große Konfigurationen (>100 KB) werden möglicherweise nicht korrekt synchronisiert. Klicken Sie auf OK, um fortzufahren.",Sus pestañas se sincronizarán en todos sus equipos mediante la sincronización del navegador. Esto le permite acceder a sus pestañas personalizadas en cualquier dispositivo en el que haya iniciado sesión.\n\nNota: Las configuraciones grandes (>100 KB) pueden no sincronizarse correctamente. Haga clic en Aceptar para continuar.,Enable sync confirmation message
+enableSyncConfirmMessage,Your tabs will be synced across all your computers using browser sync. This allows you to access your custom tabs on any device where you're signed in.\n\nNote: Large configurations (>100KB) may not sync properly. Click OK to continue.,"Ihre Registerkarten werden über die Browser-Synchronisierung auf allen Ihren Computern synchronisiert. So können Sie auf jedem Gerät, auf dem Sie angemeldet sind, auf Ihre benutzerdefinierten Registerkarten zugreifen.\n\nHinweis: Große Konfigurationen (>100 KB) werden möglicherweise nicht korrekt synchronisiert. Klicken Sie auf OK, um fortzufahren.",Sus pestañas se sincronizarán en todos sus equipos mediante la sincronización del navegador. Esto le permite acceder a sus pestañas personalizadas en cualquier dispositivo en el que haya iniciado sesión.\n\nNota: Las configuraciones grandes (>100 KB) podrían no sincronizarse correctamente. Haga clic en Aceptar para continuar.,Enable sync confirmation message
 disableSyncConfirmTitle,Disable cross-device sync?,Geräteübergreifende Synchronisierung deaktivieren?,¿Deshabilitar la sincronización entre dispositivos?,Disable sync confirmation title
 disableSyncConfirmMessage,Your tabs will only be stored on this computer. They will not sync to other devices.\n\nClick OK to continue.,"Ihre Registerkarten werden nur auf diesem Computer gespeichert. Sie werden nicht mit anderen Geräten synchronisiert.\n\nKlicken Sie auf OK, um fortzufahren.",Sus pestañas solo se almacenarán en este equipo. No se sincronizarán con otros dispositivos.\n\nHaga clic en Aceptar para continuar.,Disable sync confirmation message
-disableProfilesConfirmMessage,Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.,"Profile deaktivieren?\n\nDadurch werden alle Registerkarten aus allen Profilen in einer einzigen Registerkartenliste zusammengeführt. Sie können Profile später wieder aktivieren.\n\nKlicken Sie auf OK, um fortzufahren.",¿Deshabilitar perfiles?\n\nEsto fusionará todas las pestañas de todos los perfiles en una única lista de pestañas. Puede volver a habilitar los perfiles más adelante.\n\nHaga clic en Aceptar para continuar.,Disable profiles confirmation message
+disableProfilesConfirmMessage,Disable profiles?\n\nThis will merge all tabs from all profiles into a single tab list. You can re-enable profiles later.\n\nClick OK to continue.,"Profile deaktivieren?\n\nDadurch werden alle Registerkarten aus allen Profilen in einer einzigen Registerkartenliste zusammengeführt. Sie können Profile später wieder aktivieren.\n\nKlicken Sie auf OK, um fortzufahren.",¿Deshabilitar perfiles?\n\nEsto fusionará todas las pestañas de todos los perfiles en una única lista. Puede volver a habilitar los perfiles más adelante.\n\nHaga clic en Aceptar para continuar.,Disable profiles confirmation message
 settingsSaved,Settings saved,Einstellungen gespeichert,Configuración guardada,Settings saved status message
 settingsReset,All settings and tabs reset to defaults,Alle Einstellungen und Registerkarten auf Standardwerte zurückgesetzt,Todos los ajustes y pestañas restablecidos a sus valores predeterminados,Settings reset status message
-configExported,Configuration exported successfully,Konfiguration erfolgreich exportiert,Configuración exportada correctamente,Configuration exported status message
-configImported,Configuration imported successfully,Konfiguration erfolgreich importiert,Configuración importada correctamente,Configuration imported status message
+configExported,Configuration exported successfully,Konfiguration erfolgreich exportiert,Configuración exportada satisfactoriamente,Configuration exported status message
+configImported,Configuration imported successfully,Konfiguration erfolgreich importiert,Configuración importada satisfactoriamente ,Configuration imported status message
 tabsImportedToProfile,Tabs imported to selected profile,Registerkarten in ausgewähltes Profil importiert,Pestañas importadas al perfil seleccionado,Tabs imported to profile status message
 profileCreated,New profile created with imported tabs,Neues Profil mit importierten Registerkarten erstellt,Nuevo perfil creado con las pestañas importadas,Profile created status message
 syncEnabled,Sync enabled - tabs will now sync across devices,Synchronisierung aktiviert – Registerkarten werden jetzt geräteübergreifend synchronisiert,Sincronización habilitada: las pestañas ahora se sincronizarán entre dispositivos,Sync enabled status message
@@ -125,12 +125,12 @@ firstLaunchSyncStorageTitle,Sync Storage,Synchronisierter Speicher,Almacenamient
 firstLaunchSyncStorageDescription,Tabs can sync between computers,Registerkarten können zwischen Computern synchronisiert werden,Las pestañas pueden sincronizarse entre equipos,Sync storage option description
 firstLaunchLocalStorageTitle,Local Storage,Lokaler Speicher,Almacenamiento local,Local storage option title
 firstLaunchLocalStorageDescription,Tabs don't sync between computers,Registerkarten werden nicht zwischen Computern synchronisiert,Las pestañas no se sincronizan entre equipos,Local storage option description
-firstLaunchGuideButton,User Guide,Benutzerhandbuch,Guía del usuario,Button that opens the user guide
+firstLaunchGuideButton,User Guide,Benutzerhandbuch,Manual de usuario,Button that opens the user guide
 firstLaunchGetStartedButton,Get Started,Jetzt starten,Comenzar,Primary button to complete first-launch setup
 firstLaunchSyncFoundTitle,Synced Configuration Found,Synchronisierte Konfiguration gefunden,Se encontró una configuración sincronizada,Heading shown when existing sync data is detected on a new device
 firstLaunchSyncFoundMessage,We found existing SF Tabs data in your browser sync$PROFILES$.,Wir haben vorhandene SF Tabs-Daten in Ihrer Browser-Synchronisierung gefunden$PROFILES$.,Encontramos datos existentes de SF Tabs en la sincronización de su navegador$PROFILES$.,"Message shown when sync data is detected. $PROFILES$ is replaced with ' (X profiles with tabs)' when profiles exist, or omitted."
 firstLaunchSyncFoundQuestion,Would you like to use it or start fresh?,Möchten Sie diese verwenden oder neu beginnen?,¿Desea usarla o comenzar desde cero?,Question shown below the sync data detected message
-firstLaunchUseSyncedButton,Use Synced Configuration (Recommended),Synchronisierte Konfiguration verwenden (Empfohlen),Usar configuración sincronizada (Recomendado),Button to use the existing synced configuration
+firstLaunchUseSyncedButton,Use Synced Configuration (Recommended),Synchronisierte Konfiguration verwenden (Empfohlen),Usar Configuración Sincronizada (Recomendado),Button to use the existing synced configuration
 firstLaunchStartFreshButton,Start Fresh with New Setup,Neu beginnen mit neuer Einrichtung,Comenzar desde cero con nueva configuración,Button to discard synced data and run the normal setup wizard
 firstLaunchErrorLoadingSync,Error loading synced data: $ERROR$,Fehler beim Laden der synchronisierten Daten: $ERROR$,Error al cargar los datos sincronizados: $ERROR$,Error shown when loading synced configuration fails
 firstLaunchErrorClearingSync,Error clearing sync data: $ERROR$,Fehler beim Löschen der Synchronisierungsdaten: $ERROR$,Error al borrar los datos de sincronización: $ERROR$,Error shown when clearing sync data before starting fresh fails
@@ -143,71 +143,71 @@ learnMoreLink,Learn More,Mehr erfahren,Más información,Link text to open more 
 sponsorLink,Sponsor on Github,Sponsor on Github,Sponsor on Github,Link in settings sidebar footer to the GitHub sponsors page
 buyMeCoffeeLink,Buy Me a Coffee,Buy Me a Coffee,Buy Me a Coffee,Link in settings sidebar footer to the Buy Me a Coffee page
 quickAddButtonTitle,Add tab for current page,Tab für aktuelle Seite hinzufügen,Agregar pestaña para la página actual,Title attribute on the Quick Add button in the popup header
-addNewTabButtonTitle,Add new tab,Neuen Tab hinzufügen,Agregar nuevo tab,Title attribute on the Add New Tab button in the popup header
+addNewTabButtonTitle,Add new tab,Neuen Tab hinzufügen,Agregar nueva pestaña,Title attribute on the Add New Tab button in the popup header
 profilesButtonTitle,Profiles,Profile,Perfiles,Title attribute on the Profiles button in the popup header
 settingsButtonTitle,Settings,Einstellungen,Configuración,Title attribute on the Settings button in the popup header
-emptyStateText,No custom tabs yet. Add your first tab below.,Noch keine benutzerdefinierten Tabs. Fügen Sie unten Ihren ersten Tab hinzu.,Aún no hay tabs personalizados. Agregue su primer tab a continuación.,Text shown in the popup when no tabs have been added yet
-objectManagerDropdownLabel,Object Manager Dropdown,Object Manager-Dropdown,Desplegable del Object Manager,Label for the Object Manager dropdown section in the tab form
-setupAsObjectDropdownButton,Setup as Object Dropdown,Als Objekt-Dropdown einrichten,Configurar como desplegable de objeto,Button to set up a tab as an Object Manager dropdown
+emptyStateText,No custom tabs yet. Add your first tab below.,Noch keine benutzerdefinierten Tabs. Fügen Sie unten Ihren ersten Tab hinzu.,Aún no hay tabs personalizados. Agregue su primer prestaña a continuación.,Text shown in the popup when no tabs have been added yet
+objectManagerDropdownLabel,Object Manager Dropdown,Object Manager-Dropdown,Menú desplegable del Object Manager,Label for the Object Manager dropdown section in the tab form
+setupAsObjectDropdownButton,Setup as Object Dropdown,Als Objekt-Dropdown einrichten,Configurar como menú desplegable de objeto,Button to set up a tab as an Object Manager dropdown
 setupAsObjectDropdownHelp,Create a dropdown menu with navigation items from the current Object Manager page,Erstellen Sie ein Dropdown-Menü mit Navigationselementen der aktuellen Object Manager-Seite,Cree un menú desplegable con los elementos de navegación de la página actual del Object Manager,Help text for the Setup as Object Dropdown button
 refreshListButton,Refresh List,Liste aktualisieren,Actualizar lista,Button to refresh the dropdown items list in the tab form
 createDropdownMenuLabel,Create Dropdown Menu,Dropdown-Menü erstellen,Crear menú desplegable,Label for the manual dropdown creation section in the tab form
-tabSettingsHeader,Tab Settings,Tab-Einstellungen,Configuración del tab,Header for the tab settings section in the action panel
+tabSettingsHeader,Tab Settings,Tab-Einstellungen,Configuración de la pestaña,Header for the tab settings section in the action panel
 tabNamePlaceholder,"e.g., User Management",z. B. Benutzerverwaltung,"p. ej., Gestión de usuarios",Placeholder text for the tab name input
 tabPathLabel,Page URL (Optional),Seiten-URL (optional),URL de la página (opcional),Label for the page URL input in the action panel
 tabPathPlaceholder,"e.g., ManageUsers",z. B. ManageUsers,"p. ej., ManageUsers",Placeholder text for the tab path input
-tabPathHelp,Just add the page name from the URL. Leave blank to create a folder-style tab that acts as a menu container.,"Geben Sie nur den Seitennamen aus der URL an. Leer lassen, um einen ordnerähnlichen Tab als Menü-Container zu erstellen.",Introduzca únicamente el nombre de la página de la URL. Déjelo en blanco para crear un tab tipo carpeta que actúe como contenedor de menú.,Help text for the tab path input
+tabPathHelp,Just add the page name from the URL. Leave blank to create a folder-style tab that acts as a menu container.,"Geben Sie nur den Seitennamen aus der URL an. Leer lassen, um einen ordnerähnlichen Tab als Menü-Container zu erstellen.",Introduzca únicamente el nombre de la página de la URL. Déjelo en blanco para crear unq pestaña tipo carpeta que actúe como contenedor.,Help text for the tab path input
 tabIsObjectLabel,Object,Objekt,Objeto,Label for the Object checkbox in the tab form
-tabIsObjectHelp,Check this if the page is an object page instead of a setup page,"Aktivieren Sie diese Option, wenn es sich um eine Objektseite und nicht um eine Setup-Seite handelt",Marque esta opción si la página es una página de objeto en lugar de una página de Setup,Help text for the Object checkbox
+tabIsObjectHelp,Check this if the page is an object page instead of a setup page,"Aktivieren Sie diese Option, wenn es sich um eine Objektseite und nicht um eine Setup-Seite handelt",Marque esta opción si la página es una página de objeto en lugar de una página de configuración.,Help text for the Object checkbox
 tabIsCustomUrlLabel,Custom URL,Benutzerdefinierte URL,URL personalizada,Label for the Custom URL checkbox in the tab form
-tabIsCustomUrlHelp,"Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)","Aktivieren Sie diese Option für spezielle Seiten, die nicht dem Setup- oder Objektmuster folgen (z. B. Flow Trigger Explorer)","Marque esta opción para páginas especiales que no siguen los patrones de Setup ni de objeto (p. ej., Flow Trigger Explorer)",Help text for the Custom URL checkbox
-confirmModalTitle,Reset to Default Tabs,Auf Standard-Tabs zurücksetzen,Restablecer tabs predeterminados,Title of the confirm reset modal dialog
-confirmModalBody,Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.,"Möchten Sie wirklich auf die Standard-Tabs zurücksetzen? Dabei werden alle benutzerdefinierten Tabs entfernt, die Sie hinzugefügt haben.",¿Está seguro de que desea restablecer los tabs predeterminados? Esto eliminará todos los tabs personalizados que haya agregado.,Body text of the confirm reset modal dialog
+tabIsCustomUrlHelp,"Check this for special pages that don't follow setup or object patterns (e.g., Flow Trigger Explorer)","Aktivieren Sie diese Option für spezielle Seiten, die nicht dem Setup- oder Objektmuster folgen (z. B. Flow Trigger Explorer)","Marque esta opción para páginas especiales que no siguen los patrones de Setup ni del objeto (p. ej., Flow Trigger Explorer)",Help text for the Custom URL checkbox
+confirmModalTitle,Reset to Default Tabs,Auf Standard-Tabs zurücksetzen,Restablecer pestañas a valores predeterminados.,Title of the confirm reset modal dialog
+confirmModalBody,Are you sure you want to reset to default tabs? This will remove any custom tabs you have added.,"Möchten Sie wirklich auf die Standard-Tabs zurücksetzen? Dabei werden alle benutzerdefinierten Tabs entfernt, die Sie hinzugefügt haben.",¿Está seguro de que desea restablecer las pestañas a los valores predeterminados? Esto eliminará todos las pestañas personalizadas que haya agregado.,Body text of the confirm reset modal dialog
 resetConfirmButton,Reset,Zurücksetzen,Restablecer,Confirm button text in the reset to defaults modal
-deleteModalTitle,Remove Tab,Tab entfernen,Eliminar tab,Title of the delete tab confirmation modal dialog
-deleteModalBody,Are you sure you want to remove this tab?,Möchten Sie diesen Tab wirklich entfernen?,¿Está seguro de que desea eliminar este tab?,Body text of the delete tab confirmation modal dialog
+deleteModalTitle,Remove Tab,Tab entfernen,Eliminar pestaña,Title of the delete tab confirmation modal dialog
+deleteModalBody,Are you sure you want to remove this tab?,Möchten Sie diesen Tab wirklich entfernen?,¿Está seguro de que desea eliminar esta pestaña?,Body text of the delete tab confirmation modal dialog
 notSalesforcePage,Not a Salesforce page,Keine Salesforce-Seite,No es una página de Salesforce,Status message shown when Quick Add is clicked on a non-Salesforce page
 notSalesforceSetupPage,Not a recognized Salesforce setup or object page,Keine erkannte Salesforce-Setup- oder Objektseite,No es una página de Setup u objeto de Salesforce reconocida,Status message shown when Quick Add cannot identify the Salesforce page type
-tabAdded,"Added $PAGETYPE$ tab for ""$NAME$""","$PAGETYPE$-Tab für ""$NAME$"" hinzugefügt","Tab $PAGETYPE$ agregado para ""$NAME$""",{$PAGETYPE$}=setup/object/custom; {$NAME$}=tab label
-errorAccessingTab,Error accessing current tab: $ERROR$,Fehler beim Zugriff auf den aktuellen Tab: $ERROR$,Error al acceder al tab actual: $ERROR$,Error shown when Quick Add fails to access the current tab; {$ERROR$}=error message
-tabRemoved,Tab removed,Tab entfernt,Tab eliminado,Status message shown after deleting a tab
-resetToDefaultTabsStatus,Reset to default tabs,Auf Standard-Tabs zurückgesetzt,Restablecidos los tabs predeterminados,Status message shown after resetting tabs to defaults
-tabNotFound,Tab not found,Tab nicht gefunden,Tab no encontrado,Error shown when a tab cannot be found by its ID
-tabDuplicated,"Duplicated tab ""$NAME$""","Tab ""$NAME$"" dupliziert","Tab ""$NAME$"" duplicado",Status shown after duplicating a tab; {$NAME$}=tab label
-noTabSelected,No tab selected,Kein Tab ausgewählt,Ningún tab seleccionado,Error when the save action is triggered without a tab selected
-tabNameRequired,Tab name is required,Tab-Name ist erforderlich,El nombre del tab es obligatorio,Validation error shown when the tab name field is empty
-tabCannotBeBoth,Tab cannot be both Object and Custom URL,Ein Tab kann nicht gleichzeitig Objekt und benutzerdefinierte URL sein,El tab no puede ser a la vez Objeto y URL personalizada,Validation error when both Object and Custom URL checkboxes are checked
-parentTabNotFound,Parent tab not found,Übergeordneter Tab nicht gefunden,Tab padre no encontrado,Error when the parent tab of a dropdown item cannot be found
+tabAdded,"Added $PAGETYPE$ tab for ""$NAME$""","$PAGETYPE$-Tab für ""$NAME$"" hinzugefügt","Pestaña $PAGETYPE$ agregada para ""$NAME$""",{$PAGETYPE$}=setup/object/custom; {$NAME$}=tab label
+errorAccessingTab,Error accessing current tab: $ERROR$,Fehler beim Zugriff auf den aktuellen Tab: $ERROR$,Error al acceder a la pestaña actual: $ERROR$,Error shown when Quick Add fails to access the current tab; {$ERROR$}=error message
+tabRemoved,Tab removed,Tab entfernt,Pestaña eliminada,Status message shown after deleting a tab
+resetToDefaultTabsStatus,Reset to default tabs,Auf Standard-Tabs zurückgesetzt,Restabler pestañas a los valores predeterminados,Status message shown after resetting tabs to defaults
+tabNotFound,Tab not found,Tab nicht gefunden,Pestaña no encontrada,Error shown when a tab cannot be found by its ID
+tabDuplicated,"Duplicated tab ""$NAME$""","Tab ""$NAME$"" dupliziert"," Pestaña duplicada ""$NAME$"" ",Status shown after duplicating a tab; {$NAME$}=tab label
+noTabSelected,No tab selected,Kein Tab ausgewählt,Ninguna pestaña seleccionada,Error when the save action is triggered without a tab selected
+tabNameRequired,Tab name is required,Tab-Name ist erforderlich,El nombre de la pestaña es obligatorio,Validation error shown when the tab name field is empty
+tabCannotBeBoth,Tab cannot be both Object and Custom URL,Ein Tab kann nicht gleichzeitig Objekt und benutzerdefinierte URL sein,La pestaña no puede ser a la vez Objeto y URL personalizada,Validation error when both Object and Custom URL checkboxes are checked
+parentTabNotFound,Parent tab not found,Übergeordneter Tab nicht gefunden,Pestaña padre no encontrada,Error when the parent tab of a dropdown item cannot be found
 dropdownItemNotFound,Dropdown item not found,Dropdown-Element nicht gefunden,Elemento desplegable no encontrado,Error when a specific dropdown item cannot be found
 dropdownItemUpdated,Dropdown item updated successfully,Dropdown-Element erfolgreich aktualisiert,Elemento desplegable actualizado correctamente,Status shown after successfully updating a dropdown item
-tabCreated,Tab created successfully,Tab erfolgreich erstellt,Tab creado correctamente,Status shown after successfully creating a new tab
-tabUpdated,Tab updated successfully,Tab erfolgreich aktualisiert,Tab actualizado correctamente,Status shown after successfully updating an existing tab
+tabCreated,Tab created successfully,Tab erfolgreich erstellt,Pestaña creada satisfactoriamente,Status shown after successfully creating a new tab
+tabUpdated,Tab updated successfully,Tab erfolgreich aktualisiert,Pestaña actualizada satisfactoriamente,Status shown after successfully updating an existing tab
 errorInitializingPopup,Error initializing popup: $ERROR$,Fehler beim Initialisieren des Popups: $ERROR$,Error al inicializar el popup: $ERROR$,Error shown if the popup fails to initialize; {$ERROR$}=error message
 errorLoadingSettings,Error loading settings: $ERROR$,Fehler beim Laden der Einstellungen: $ERROR$,Error al cargar la configuración: $ERROR$,Error shown if settings fail to load; {$ERROR$}=error message
-errorLoadingTabs,Error loading tabs: $ERROR$,Fehler beim Laden der Tabs: $ERROR$,Error al cargar los tabs: $ERROR$,Error shown if tabs fail to load; {$ERROR$}=error message
-errorCreatingTab,Error creating tab: $ERROR$,Fehler beim Erstellen des Tabs: $ERROR$,Error al crear el tab: $ERROR$,Error shown if tab creation fails; {$ERROR$}=error message
-errorUpdatingTab,Error updating tab: $ERROR$,Fehler beim Aktualisieren des Tabs: $ERROR$,Error al actualizar el tab: $ERROR$,Error shown if tab update fails; {$ERROR$}=error message
+errorLoadingTabs,Error loading tabs: $ERROR$,Fehler beim Laden der Tabs: $ERROR$,Error al cargar las pestañas: $ERROR$,Error shown if tabs fail to load; {$ERROR$}=error message
+errorCreatingTab,Error creating tab: $ERROR$,Fehler beim Erstellen des Tabs: $ERROR$,Error al crear la pestaña: $ERROR$,Error shown if tab creation fails; {$ERROR$}=error message
+errorUpdatingTab,Error updating tab: $ERROR$,Fehler beim Aktualisieren des Tabs: $ERROR$,Error al actualizar la pestaña: $ERROR$,Error shown if tab update fails; {$ERROR$}=error message
 errorUpdatingDropdownItem,Error updating dropdown item: $ERROR$,Fehler beim Aktualisieren des Dropdown-Elements: $ERROR$,Error al actualizar el elemento desplegable: $ERROR$,Error shown if dropdown item update fails; {$ERROR$}=error message
 errorCreateNotAvailable,Error: Create function not available,Fehler: Erstellungsfunktion nicht verfügbar,Error: función de creación no disponible,Internal error shown if the tab create function is missing
 errorUpdateNotAvailable,Error: Update function not available,Fehler: Aktualisierungsfunktion nicht verfügbar,Error: función de actualización no disponible,Internal error shown if the tab update function is missing
 dragToReorderTitle,Drag to reorder,Zum Neuanordnen ziehen,Arrastre para reordenar,Title attribute on the drag handle element for reordering tabs
-editTabButtonTitle,Edit tab,Tab bearbeiten,Editar tab,Title attribute on the edit/pencil icon button in the tab list
-opensInNewTabTitle,Opens in new tab (click to change),Wird in neuem Tab geöffnet (zum Ändern klicken),Se abre en un nuevo tab (haga clic para cambiar),Title on the new-tab toggle button when the tab opens in a new tab
-opensInSameTabTitle,Opens in same tab (click to change),Wird im gleichen Tab geöffnet (zum Ändern klicken),Se abre en el mismo tab (haga clic para cambiar),Title on the new-tab toggle button when the tab opens in the same tab
-removeTabButtonTitle,Remove tab,Tab entfernen,Eliminar tab,Title attribute on the delete/trash icon button in the tab list
-addNewTabFormTitle,Add New Tab,Neuen Tab hinzufügen,Agregar nuevo tab,Form title displayed when adding a new tab
-editTabFormTitle,Edit Tab,Tab bearbeiten,Editar tab,Form title displayed when editing an existing tab
-noTabSelectedForEditing,No tab selected for editing,Kein Tab zum Bearbeiten ausgewählt,Ningún tab seleccionado para editar,Error when save is attempted in the dropdown form without a tab selected
+editTabButtonTitle,Edit tab,Tab bearbeiten,Editar pestaña,Title attribute on the edit/pencil icon button in the tab list
+opensInNewTabTitle,Opens in new tab (click to change),Wird in neuem Tab geöffnet (zum Ändern klicken),Se abre en una nueva pestaña (haga clic para cambiar),Title on the new-tab toggle button when the tab opens in a new tab
+opensInSameTabTitle,Opens in same tab (click to change),Wird im gleichen Tab geöffnet (zum Ändern klicken),Se abre en la misma pestaña (haga clic para cambiar),Title on the new-tab toggle button when the tab opens in the same tab
+removeTabButtonTitle,Remove tab,Tab entfernen,Eliminar pestaña,Title attribute on the delete/trash icon button in the tab list
+addNewTabFormTitle,Add New Tab,Neuen Tab hinzufügen,Agregar nueva pestaña,Form title displayed when adding a new tab
+editTabFormTitle,Edit Tab,Tab bearbeiten,Editar pestaña,Form title displayed when editing an existing tab
+noTabSelectedForEditing,No tab selected for editing,Kein Tab zum Bearbeiten ausgewählt,Ninguna pestaña seleccionada para editar,Error when save is attempted in the dropdown form without a tab selected
 errorSavingChanges,Error saving changes: $ERROR$,Fehler beim Speichern der Änderungen: $ERROR$,Error al guardar los cambios: $ERROR$,Error shown when saving drag-drop changes to dropdown items fails; {$ERROR$}=error message
 errorTooManyDropdownLevels,Error: Too many dropdown levels,Fehler: Zu viele Dropdown-Ebenen,Error: demasiados niveles de desplegable,Error when a drag-and-drop creates more than 3 nesting levels
 tabDropdownAdded,"Added ""$DRAGGED$"" as dropdown item to ""$TARGET$""","""$DRAGGED$"" als Dropdown-Element zu ""$TARGET$"" hinzugefügt","""$DRAGGED$"" agregado como elemento desplegable a ""$TARGET$""",{$DRAGGED$}=dragged tab label; {$TARGET$}=target tab label
 dropdownItemCollapseTitle,Collapse,Reduzieren,Contraer,Title on the collapse button for dropdown items that have children
 dropdownItemExpandTitle,Expand,Erweitern,Expandir,Title on the expand button for collapsed dropdown items with children
 editDropdownItemTitle,Edit this dropdown item,Dieses Dropdown-Element bearbeiten,Editar este elemento desplegable,Title on the Edit button for dropdown items in the manage dropdown panel
-promoteToMainListTitle,Promote to main tab list,In die Hauptliste hochstufen,Promover a la lista principal,Title on the Promote button for dropdown items
+promoteToMainListTitle,Promote to main tab list,In die Hauptliste hochstufen,Promover a la lista de pestañas principal,Title on the Promote button for dropdown items
 deleteDropdownItemTitle,Delete this item,Dieses Element löschen,Eliminar este elemento,Title on the Delete button for dropdown items
 editDropdownItemPanelTitle,Edit Dropdown Item,Dropdown-Element bearbeiten,Editar elemento desplegable,Title displayed in the action panel header when editing a dropdown item
-newTabPanelTitle,New Tab,Neuer Tab,Nuevo tab,Title displayed in the action panel header when adding a new tab
+newTabPanelTitle,New Tab,Neuer Tab,Nueva pestaña,Title displayed in the action panel header when adding a new tab
 promotedWithNested,"Promoted ""$NAME$"" with $COUNT$ nested items to main tab list","""$NAME$"" mit $COUNT$ verschachtelten Elementen in die Hauptliste hochgestuft","""$NAME$"" con $COUNT$ elementos anidados promovido a la lista principal",{$NAME$}=item label; {$COUNT$}=number of nested items promoted with it
 promoted,"Promoted ""$NAME$"" to main tab list","""$NAME$"" in die Hauptliste hochgestuft","""$NAME$"" promovido a la lista principal",{$NAME$}=item label
 errorPromotingItem,Error promoting item: $ERROR$,Fehler beim Hochstufen des Elements: $ERROR$,Error al promover el elemento: $ERROR$,Error shown when promoting a dropdown item to the main list fails; {$ERROR$}=error message
@@ -218,11 +218,11 @@ itemWithNestedWillBePromoted,"""$NAME$"" with $COUNT$ nested items will be promo
 profileInitTitle,Initialize Profile,Profil initialisieren,Inicializar perfil,Heading in the profile initialization options panel shown for new empty profiles
 profileInitDesc,Choose how to set up this profile:,"Wählen Sie, wie dieses Profil eingerichtet werden soll:",Elija cómo configurar este perfil:,Subtitle in the profile initialization panel
 cloneAnotherProfileTitle,Clone another profile,Ein anderes Profil klonen,Clonar otro perfil,Title for the clone option in profile init panel
-cloneAnotherProfileDesc,Copy tabs from an existing profile,Tabs aus einem vorhandenen Profil kopieren,Copiar tabs de un perfil existente,Description for the clone option in profile init panel
+cloneAnotherProfileDesc,Copy tabs from an existing profile,Tabs aus einem vorhandenen Profil kopieren,Copiar pestañas de un perfil existente,Description for the clone option in profile init panel
 selectProfileToCloneLabel,Select profile to clone:,Zu klonendes Profil auswählen:,Seleccione el perfil a clonar:,Label for the clone source profile selector
 cloneProfileButton,Clone Profile,Profil klonen,Clonar perfil,Button to confirm cloning a profile
 activeProfileLabel,Active Profile,Aktives Profil,Perfil activo,Label for the active profile selector dropdown in the profile list panel
-switchProfileHelp,Switch to a different profile to view and manage its tabs.,"Wechseln Sie zu einem anderen Profil, um dessen Tabs anzuzeigen und zu verwalten.",Cambie a un perfil diferente para ver y administrar sus tabs.,Help text below the active profile selector
+switchProfileHelp,Switch to a different profile to view and manage its tabs.,"Wechseln Sie zu einem anderen Profil, um dessen Tabs anzuzeigen und zu verwalten.",Cambie a un perfil diferente para ver y administrar sus tpestañas.,Help text below the active profile selector
 createNewProfileButton,Create New Profile,Neues Profil erstellen,Crear nuevo perfil,Button to create a new profile in the profile list panel
 editProfilePanelTitle,Edit Profile,Profil bearbeiten,Editar perfil,Heading shown when editing an existing profile (initial HTML value; JS overrides it)
 profileNameLabel,Profile Name,Profilname,Nombre del perfil,Label for the profile name input in profile edit panel
@@ -231,15 +231,15 @@ urlPatternsLabel,URL Patterns,URL-Muster,Patrones de URL,Label for the URL patte
 urlPatternsHelp,Add MyDomain patterns to automatically switch to this profile when visiting matching Salesforce orgs.,"Fügen Sie MyDomain-Muster hinzu, um automatisch zu diesem Profil zu wechseln, wenn Sie übereinstimmende Salesforce-Orgs besuchen.",Agregue patrones de MyDomain para cambiar automáticamente a este perfil al visitar orgs de Salesforce que coincidan.,Help text for URL patterns section
 urlPatternInputPlaceholder,"e.g., smartbottechnology-dev-ed",z. B. smartbottechnology-dev-ed,"p. ej., smartbottechnology-dev-ed",Placeholder for the URL pattern input field
 captureCurrentDomainButton,Capture Current Domain,Aktuelle Domain erfassen,Capturar dominio actual,Button to capture the current browser tab's Salesforce domain as a URL pattern
-saveProfileButton,Save Profile,Profil speichern,Guardar perfil,Button to save profile changes
-disableProfilesTitle,Disable Profiles,Profile deaktivieren,Deshabilitar perfiles,Title of the disable profiles confirmation modal
+saveProfileButton,Save Profile,Profil speichern,Guardar Perfil,Button to save profile changes
+disableProfilesTitle,Disable Profiles,Profile deaktivieren,Deshabilitar Perfiles,Title of the disable profiles confirmation modal
 disableProfilesBody,Disabling profiles will keep one profile and remove all others.,Beim Deaktivieren der Profile wird ein Profil beibehalten und alle anderen entfernt.,Al deshabilitar los perfiles se conservará un perfil y se eliminarán todos los demás.,Body text of the disable profiles modal
 disableProfilesQuestion,Which profile would you like to keep?,Welches Profil möchten Sie behalten?,¿Qué perfil desea conservar?,Question in the disable profiles modal
 selectProfileToKeepLabel,Select profile to keep:,Zu behaltendes Profil auswählen:,Seleccione el perfil a conservar:,Label for the keep-profile selector in disable profiles modal
 disableProfilesButton,Disable Profiles,Profile deaktivieren,Deshabilitar perfiles,Confirm button in the disable profiles modal
 migrationNewFeaturesTitle,New in v2.0,Neu in v2.0,Novedades en v2.0,Title of the new features card in the migration welcome screen
 migrationNewFeaturesDesc,"Profiles, dropdown menus, and flexible storage options—all new features!","Profile, Dropdown-Menüs und flexible Speicheroptionen – alles neue Funktionen!","Perfiles, menús desplegables y opciones de almacenamiento flexibles, ¡todas nuevas funciones!",Description of new features in the migration welcome screen
-migrationSyncStorageDesc,Your tabs can sync across devices,Ihre Tabs können geräteübergreifend synchronisiert werden,Sus tabs pueden sincronizarse entre dispositivos,Description for sync storage option in the migration modal
+migrationSyncStorageDesc,Your tabs can sync across devices,Ihre Tabs können geräteübergreifend synchronisiert werden,Sus pestañas pueden sincronizarse entre dispositivos,Description for sync storage option in the migration modal
 migrationLocalStorageDesc,Stored on this device only,Nur auf diesem Gerät gespeichert,Almacenado solo en este dispositivo,Description for local storage option in the migration modal
 migrationProgressTitle,Migrating your data...,Daten werden migriert...,Migrando sus datos...,Title shown during migration progress (also set by JS)
 migrationProgressMessage,This will only take a moment.,Dies dauert nur einen Moment.,Esto tardará solo un momento.,Message shown during migration progress (also set by JS)
@@ -247,12 +247,12 @@ migrationStep1,Reading existing data,Vorhandene Daten lesen,Leyendo datos existe
 migrationStep2,Creating Default profile,Standardprofil erstellen,Creando perfil predeterminado,Second step label in migration progress
 migrationStep3,Saving new format,Neues Format speichern,Guardando nuevo formato,Third step label in migration progress
 migrationSuccessTitle,Migration Complete!,Migration abgeschlossen!,¡Migración completada!,Heading on the migration success screen
-migrationSuccessMessage,Your tabs have been successfully migrated to the new profile system.,Ihre Tabs wurden erfolgreich in das neue Profilsystem migriert.,Sus tabs se han migrado correctamente al nuevo sistema de perfiles.,Description on the migration success screen
+migrationSuccessMessage,Your tabs have been successfully migrated to the new profile system.,Ihre Tabs wurden erfolgreich in das neue Profilsystem migriert.,Sus pestañas se han migrado correctamente al nuevo sistema de perfiles.,Description on the migration success screen
 migrationWhatsNext,What's next:,Was kommt als Nächstes:,Próximos pasos:,Heading for the what's next section on migration success screen
-migrationDefaultProfileNote,"All your tabs are now in the ""Default"" profile","Alle Ihre Tabs befinden sich jetzt im Profil ""Standard""","Todos sus tabs están ahora en el perfil ""Predeterminado""",First bullet point in the what's next section on migration success
+migrationDefaultProfileNote,"All your tabs are now in the ""Default"" profile","Alle Ihre Tabs befinden sich jetzt im Profil ""Standard""","Todos sus pestañas están ahora en el perfil ""Predeterminado""",First bullet point in the what's next section on migration success
 migrationProfilesEnabledNote,Profiles feature is now enabled,Die Profilefunktion ist jetzt aktiviert,La función de perfiles está ahora habilitada,Second bullet in what's next (shown when user enabled profiles)
 migrationCanEnableLaterNote,You can enable profiles in Settings anytime,Sie können Profile jederzeit in den Einstellungen aktivieren,Puede habilitar los perfiles en cualquier momento desde Configuración,Third bullet in what's next (shown when user did not enable profiles)
-migrationCreateProfilesNote,Create additional profiles for different orgs,Erstellen Sie zusätzliche Profile für verschiedene Orgs,Cree perfiles adicionales para distintas orgs,Fourth bullet in the what's next section
+migrationCreateProfilesNote,Create additional profiles for different orgs,Erstellen Sie zusätzliche Profile für verschiedene Orgs,Cree perfiles adicionales para distintas organizaciones,Fourth bullet in the what's next section
 migrationErrorTitle,Migration Failed,Migration fehlgeschlagen,Error en la migración,Heading on the migration error screen
 migrationErrorMessage,An error occurred during migration. Your original data is still intact.,Während der Migration ist ein Fehler aufgetreten. Ihre ursprünglichen Daten sind noch vorhanden.,Se produjo un error durante la migración. Sus datos originales siguen intactos.,Message on the migration error screen
 migrationErrorDetailsLabel,Error details:,Fehlerdetails:,Detalles del error:,Label for the error details section on the migration error screen
@@ -260,7 +260,7 @@ exportBackupButton,Export Backup,Sicherung exportieren,Exportar copia de segurid
 migrateNowButton,Migrate Now,Jetzt migrieren,Migrar ahora,Button to start the migration process
 retryMigrationButton,Retry Migration,Migration wiederholen,Reintentar migración,Button to retry a failed migration
 continueWithoutMigratingButton,Continue Without Migrating,Ohne Migration fortfahren,Continuar sin migrar,Button to skip migration and continue with existing data
-profilesUiDisabledKept,"Profiles UI disabled. Kept ""$NAME$"" profile","Profile-UI deaktiviert. Profil ""$NAME$"" beibehalten","Interfaz de perfiles deshabilitada. Perfil ""$NAME$"" conservado",Status after disabling profiles UI while keeping one; {$NAME$}=kept profile name
+profilesUiDisabledKept,"Profiles UI disabled. Kept ""$NAME$"" profile","Profile-UI deaktiviert. Profil ""$NAME$"" beibehalten","Interfaz de perfiles deshabilitada. Conservar ""$NAME$"" del perfil",Status after disabling profiles UI while keeping one; {$NAME$}=kept profile name
 switchedToProfile,Switched to profile: $NAME$,Zu Profil gewechselt: $NAME$,Cambiado al perfil: $NAME$,Status shown after switching the active profile; {$NAME$}=profile name
 errorSwitchingProfile,Error switching profile: $ERROR$,Fehler beim Wechseln des Profils: $ERROR$,Error al cambiar de perfil: $ERROR$,Error when switching the active profile fails; {$ERROR$}=error message
 setAsDefaultProfileTitle,Set as default profile,Als Standardprofil festlegen,Establecer como perfil predeterminado,Title attribute on the set-default button in the profile list item
@@ -275,7 +275,7 @@ editUrlPatternTitle,Edit this URL pattern,Dieses URL-Muster bearbeiten,Editar es
 deleteUrlPatternTitle,Delete this URL pattern,Dieses URL-Muster löschen,Eliminar este patrón de URL,Title attribute on the delete button in the URL pattern list item
 selectProfileToKeepError,Please select a profile to keep,Bitte wählen Sie ein zu behaltendes Profil aus,Seleccione un perfil para conservar,Error when no profile is selected in disable profiles dropdown
 selectedProfileNotFound,Selected profile not found,Ausgewähltes Profil nicht gefunden,Perfil seleccionado no encontrado,Error when the selected profile ID cannot be found
-disableProfilesConfirm,"Disable profiles and keep ""$NAME$""?\n\nThis will remove all other profiles and their tabs. This action cannot be undone.","Profile deaktivieren und ""$NAME$"" behalten?\n\nDies entfernt alle anderen Profile und deren Tabs. Diese Aktion kann nicht rückgängig gemacht werden.","¿Deshabilitar perfiles y conservar ""$NAME$""?\n\nEsto eliminará todos los demás perfiles y sus tabs. Esta acción no se puede deshacer.",Confirm dialog before disabling profiles; {$NAME$}=profile to keep
+disableProfilesConfirm,"Disable profiles and keep ""$NAME$""?\n\nThis will remove all other profiles and their tabs. This action cannot be undone.","Profile deaktivieren und ""$NAME$"" behalten?\n\nDies entfernt alle anderen Profile und deren Tabs. Diese Aktion kann nicht rückgängig gemacht werden.","¿Deshabilitar perfiles y conservar ""$NAME$""?\n\nEsto eliminará todos los demás perfiles y sus pestañas. Esta acción no se puede deshacer.",Confirm dialog before disabling profiles; {$NAME$}=profile to keep
 profilesDisabledKept,"Profiles disabled. Kept ""$NAME$"" profile","Profile deaktiviert. Profil ""$NAME$"" beibehalten","Perfiles desactivados. Se conservó el perfil ""$NAME$""",Status after disabling profiles; {$NAME$}=kept profile name
 urlPatternRequired,Please enter a URL pattern,Bitte geben Sie ein URL-Muster ein,"Por favor, introduzca un patrón de URL",Validation error when URL pattern input is empty
 urlPatternAlreadyUsed,URL already used by $NAME$,URL wird bereits von $NAME$ verwendet,La URL ya está en uso por $NAME$,Validation error when URL pattern is assigned to another profile; {$NAME$}=that profile's name
@@ -300,7 +300,7 @@ migrationLocalStorageCurrent,Local Storage (Current),Lokaler Speicher (Aktuell),
 migrationExporting,Exporting...,Wird exportiert...,Exportando...,Temporary button text while backup export is in progress
 migrationBackupExported,✓ Backup Exported,✓ Sicherung exportiert,✓ Copia de seguridad exportada,Temporary button text after a backup has been successfully exported
 migrationExportBackup,Export Backup,Sicherung exportieren,Exportar copia de seguridad,Default label on the Export Backup button in the migration modal
-migrationExportFailed,Export Failed,Export fehlgeschlagen,Error en la exportación,Temporary button text when a backup export fails
+migrationExportFailed,Export Failed,Export fehlgeschlagen,Error al exportar,Temporary button text when a backup export fails
 migrationUnknownError,Unknown error occurred,Unbekannter Fehler aufgetreten,Se produjo un error desconocido,Fallback error message in migration error screen when no specific error is available
 firstLaunchSyncProfileCountSingular,$COUNT$ profile with tabs,$COUNT$ Profil mit Tabs,$COUNT$ perfil con pestañas,Singular form used inside the sync-found message placeholder; {$COUNT$}=number (always 1)
 firstLaunchSyncProfileCountPlural,$COUNT$ profiles with tabs,$COUNT$ Profile mit Tabs,$COUNT$ perfiles con pestañas,Plural form used inside the sync-found message placeholder; {$COUNT$}=number (2+)
@@ -327,10 +327,10 @@ floatingButtonEnabledDescription,Show a floating button on Salesforce pages for 
 floatingButtonLocationSection,Location,Position,Ubicación,Card heading for floating button location setting
 floatingButtonLocationEverywhere,Everywhere,Überall,En todas partes,Radio label: show floating button on all Salesforce pages
 floatingButtonLocationEverywhereDescription,Show floating button on all Salesforce pages,Schwebende Schaltfläche auf allen Salesforce-Seiten anzeigen,Mostrar el botón flotante en todas las páginas de Salesforce,Description for the Everywhere location radio option
-floatingButtonLocationSetupOnly,Only in Setup,Nur in Setup,Solo en Setup,Radio label: show floating button only on Setup pages
-floatingButtonLocationSetupOnlyDescription,Show floating button only on Setup pages,Schwebende Schaltfläche nur auf Setup-Seiten anzeigen,Mostrar el botón flotante solo en las páginas de Setup,Description for the Only in Setup location radio option
-floatingButtonLocationOutsideSetup,Outside Setup,Außerhalb von Setup,Fuera de Setup,Radio label: show floating button everywhere except Setup pages
-floatingButtonLocationOutsideSetupDescription,Show floating button everywhere except Setup pages,Schwebende Schaltfläche überall außer auf Setup-Seiten anzeigen,Mostrar el botón flotante en todas partes excepto en las páginas de Setup,Description for the Outside Setup location radio option
+floatingButtonLocationSetupOnly,Only in Setup,Nur in Setup,Solo en Configuración,Radio label: show floating button only on Setup pages
+floatingButtonLocationSetupOnlyDescription,Show floating button only on Setup pages,Schwebende Schaltfläche nur auf Setup-Seiten anzeigen,Mostrar el botón flotante solo en las páginas de Configuración,Description for the Only in Setup location radio option
+floatingButtonLocationOutsideSetup,Outside Setup,Außerhalb von Setup,AFuera de Configuración,Radio label: show floating button everywhere except Setup pages
+floatingButtonLocationOutsideSetupDescription,Show floating button everywhere except Setup pages,Schwebende Schaltfläche überall außer auf Setup-Seiten anzeigen,Mostrar el botón flotante en todas partes excepto en las páginas de Configuración,Description for the Outside Setup location radio option
 floatingButtonPositionSection,Position,Position,Posición,Card heading for floating button vertical position setting
 floatingButtonPositionLabel,Vertical Position (%),Vertikale Position (%),Posición vertical (%),Label for the floating button position range slider
 floatingButtonPositionDescription,"Vertical position along the right edge (0% = top, 100% = bottom)","Vertikale Position am rechten Rand (0 % = oben, 100 % = unten)","Posición vertical a lo largo del borde derecho (0 % = arriba, 100 % = abajo)",Description under the floating button position slider
@@ -361,7 +361,7 @@ settingsLabel,Settings:,Einstellungen:,Configuración:,Section label in export a
 exportSettingsLabel,"Preferences, theme, and options","Einstellungen, Design und Optionen","Preferencias, tema y opciones",Checkbox label for including settings in a custom export
 profilesLabel,Profiles:,Profile:,Perfiles:,Section label in export and import options panels
 exportConfigurationButton,Export Configuration,Konfiguration exportieren,Exportar configuración,Primary action button in the Export Configuration card
-importFromFileHelp,Restore your tabs and settings from a backup file.,Stellen Sie Ihre Tabs und Einstellungen aus einer Sicherungsdatei wieder her.,Restaure sus pestañas y configuraciones desde un archivo de copia de seguridad.,Introductory text in the Import Configuration card
+importFromFileHelp,Restore your tabs and settings from a backup file.,Stellen Sie Ihre Tabs und Einstellungen aus einer Sicherungsdatei wieder her.,Restaure sus pestañas y configuraciones desde un archivo de su copia de seguridad.,Introductory text in the Import Configuration card
 chooseFileToImport,Choose File to Import,Datei zum Importieren auswählen,Elegir archivo para importar,Button label to trigger the file picker for import
 importSelectedFile,Selected file,Ausgewählte Datei,Archivo seleccionado,Default placeholder in the import filename display
 importPrompt,What would you like to import?,Was möchten Sie importieren?,¿Qué desea importar?,Heading above the import options checkboxes
@@ -380,7 +380,7 @@ importHybridAddTabs,Add tabs to existing tabs,Tabs zu vorhandenen Tabs hinzufüg
 importHybridAddTabsDescription,Keep current tabs and add tabs from this profile,Aktuelle Tabs beibehalten und Tabs aus diesem Profil hinzufügen,Conservar las pestañas actuales y añadir las pestañas de este perfil,Description for the add-tabs hybrid option
 importHybridReplaceDescription,Remove current tabs and use tabs from this profile,Aktuelle Tabs entfernen und Tabs aus diesem Profil verwenden,Eliminar las pestañas actuales y usar las pestañas de este perfil,Description for the replace-tabs hybrid option
 importDestinationLabel,Import to:,Importieren nach:,Importar a:,Heading above the destination radio buttons for profile-mode imports
-importDestinationAdd,Add to existing profile,Zu vorhandenem Profil hinzufügen,A��adir a perfil existente,Radio label to add imported tabs into an existing profile
+importDestinationAdd,Add to existing profile,Zu vorhandenem Profil hinzufügen,Añadir a perfil existente,Radio label to add imported tabs into an existing profile
 importDestinationOverwrite,Overwrite existing profile,Vorhandenes Profil überschreiben,Sobrescribir perfil existente,Radio label to replace all tabs in an existing profile
 importDestinationOverwriteDescription,Replace all tabs in the profile,Alle Tabs im Profil ersetzen,Reemplazar todas las pestañas del perfil,Description for the overwrite existing profile import destination
 importDestinationNew,Create new profile,Neues Profil erstellen,Crear nuevo perfil,Radio label to import tabs into a brand new profile
@@ -412,7 +412,7 @@ userGuideLink,User Guide,Benutzerhandbuch,Guía del usuario,Navigation link to t
 translationsNavLabel,Translations,Übersetzungen,Traducciones,Translations nav item in settings sidebar
 translationsSectionDescription,Language support for SF Tabs,Sprachunterstützung für SF Tabs,Soporte de idiomas para SF Tabs,Subtitle under the Translations section heading
 translationsBetaTitle,Beta — Machine-Generated Translations,Beta – Maschinell generierte Übersetzungen,Beta — Traducciones generadas por IA,Title of the beta disclaimer notice card
-translationsBetaDescription,Translations are currently in beta. All non-English text was generated using AI and may contain errors or unnatural phrasing. We recommend treating them as a starting point rather than a finished product.,Übersetzungen befinden sich derzeit in der Beta-Phase. Alle nicht-englischen Texte wurden mithilfe von KI generiert und können Fehler oder unnatürliche Formulierungen enthalten. Wir empfehlen sie als Ausgangspunkt zu betrachten und nicht als fertiges Produkt.,"Las traducciones se encuentran actualmente en fase beta. Todo el texto no inglés fue generado mediante IA y puede contener errores o formulaciones poco naturales. Le recomendamos considerarlas como un punto de partida, no como un producto terminado."
+translationsBetaDescription,Translations are currently in beta. All non-English text was generated using AI and may contain errors or unnatural phrasing. We recommend treating them as a starting point rather than a finished product.,Übersetzungen befinden sich derzeit in der Beta-Phase. Alle nicht-englischen Texte wurden mithilfe von KI generiert und können Fehler oder unnatürliche Formulierungen enthalten. Wir empfehlen sie als Ausgangspunkt zu betrachten und nicht als fertiges Produkt.,"Las traducciones se encuentran actualmente en fase beta. Todo el texto que no es inglés fue generado mediante IA y puede contener errores o formulaciones poco naturales. Le recomendamos considerarlas como un punto de partida, no como un producto terminado.",
 translationsAvailableTitle,Available Languages,Verfügbare Sprachen,Idiomas disponibles,Heading for the available languages list
 translationsLanguageEnglish,English,Englisch (English),Inglés (English),English language name in the list
 translationsLanguageGerman,Deutsch (German),Deutsch,Alemán (Deutsch),German language name in the list
@@ -420,10 +420,11 @@ translationsLanguageSpanish,Español (Spanish),Spanisch (Español),Español,Span
 translationsStatusDefault,Default,Standard,Predeterminado,Badge shown next to the default language
 translationsStatusBeta,Beta,Beta,Beta,Badge shown next to beta languages
 translationsContributeTitle,Help Improve Translations,Helfen Sie uns Übersetzungen zu verbessern,Ayude a mejorar las traducciones,Heading for the GitHub contribution card
-translationsContributeDescription,"Found an error? Want to contribute a new language or improve an existing one? Open an issue on GitHub — we'd love your help.","Haben Sie einen Fehler gefunden? Möchten Sie eine neue Sprache beitragen oder eine vorhandene verbessern? Eröffnen Sie ein Issue auf GitHub – wir freuen uns über Ihre Hilfe.","¿Encontró un error? ¿Desea contribuir con un nuevo idioma o mejorar uno existente? Abra un issue en GitHub — nos encantaría su ayuda."
+translationsContributeDescription,Found an error? Want to contribute a new language or improve an existing one? Open an issue on GitHub — we'd love your help.,Haben Sie einen Fehler gefunden? Möchten Sie eine neue Sprache beitragen oder eine vorhandene verbessern? Eröffnen Sie ein Issue auf GitHub – wir freuen uns über Ihre Hilfe.,¿Encontró un error? ¿Desea contribuir con un nuevo idioma o mejorar uno existente? Abra un issue en GitHub — nos encantaría su ayuda.,
 translationsGithubLink,Open an issue on GitHub,Ein Issue auf GitHub öffnen,Abrir un issue en GitHub,Text for the GitHub issues link button
 releaseNotesButtonTitle,What's New,Was ist neu,¿Qué hay de nuevo?,Tooltip for the What's New header button
 releaseNotesPanelTitle,What's New,Was ist neu,¿Qué hay de nuevo?,Heading inside the release notes panel
 releaseNotesGotIt,Got it,Verstanden,Entendido,Close button at the bottom of the release notes panel
+releaseNotesDontShowAgain,Don't show again for this version,Für diese Version nicht mehr anzeigen,No volver a mostrar para esta versión,Checkbox label to dismiss release notes for the current version
 translationsStatusAvailable,Available,Verfügbar,Disponible,Badge shown next to languages with community-reviewed translations
 translationsContributedBy,Contributed by,Beitrag von,Aportado por,Attribution prefix shown before a contributor name in the language list

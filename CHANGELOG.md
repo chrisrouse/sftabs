@@ -10,22 +10,19 @@ All notable changes to SF Tabs are documented here. This file is the canonical s
 
 ---
 
-## [2.0.1.0] — Beta
+## 2.1.0
 
 ### What's New
 
-- **German Translation** - SF Tabs has been translated to German! Thanks to Andreas Bruchwitz for reviewing the AI translations and making human corrections.
-- **Spanish Translation** - The Spanish translation is AI-generated and still needs a human to review it.
-- **Release Notes** - You found them!
+**German Translation**
+SF Tabs has been translated to German! Thanks to Andreas Bruchwitz for reviewing the AI translations and making human corrections.
 
----
+**Spanish Translation**
+SF Tabs has been translated to Spanish! Thanks to Lucas Lorenzi for reviewing the AI translations and making human corrections. 
 
-## [2.0.0] — Production Release
+**Chrome, Firefox, and Edge extensions updated**
+The latest version of SF Tabs is available for Chrome, Firefox, and Edge.
 
-### What's New
+**Release Notes**
+You found them! New releases will now have release notes published on [github](https://github.com/chrisrouse/sftabs/releases) and available in the extension. After you've had a chance to read the release notes, check the box to hide them. The next time there is an update, you'll be shown the new notes.
 
-- **Profiles** — Create multiple tab sets and switch between them. Ideal if you work across multiple Salesforce orgs or have different role-based workflows.
-- **Sync Storage** — Improved synced options and data handling.
-- **Import / Export** — Improved Import/Export functionality. Import JSON configuration from Why Salesforce.
-- **Keyboard Shortcuts** — Open any of your first 10 tabs with a configurable keyboard shortcut.
-- **Dropdown Menus** — Drag one tab onto another to create a dropdown group, perfect for consolidating related Setup pages.

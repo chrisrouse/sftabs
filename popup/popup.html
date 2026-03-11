@@ -317,10 +317,10 @@
         <!-- Release Notes Panel -->
         <div id="release-notes-panel" class="action-panel">
             <div class="section-header">
-                <h2>Release Notes: v2.0.1.0 Beta</h2>
+                <h2>Release Notes: v2.1.0</h2>
             </div>
             <div class="action-panel-content">
-                <!-- Items synced from CHANGELOG.md [2.0.1.0] -->
+                <!-- Items synced from CHANGELOG.md [2.1.0] -->
                 <div class="release-notes-items">
                     <div class="release-notes-item">
                         <div class="release-notes-item-title">German Translation</div>
@@ -329,17 +329,28 @@
 
                     <div class="release-notes-item">
                         <div class="release-notes-item-title">Spanish Translation</div>
-                        <div class="release-notes-item-desc">The Spanish translation is AI-generated and still needs a human to review it.</div>
+                        <div class="release-notes-item-desc">SF Tabs has been translated to Spanish! Thanks to Lucas Lorenzi for reviewing the AI translations and making human corrections.</div>
+                    </div>
+
+                    <div class="release-notes-item">
+                        <div class="release-notes-item-title">Chrome, Firefox, and Edge extensions updated</div>
+                        <div class="release-notes-item-desc">The latest version of SF Tabs is available for Chrome, Firefox, and Edge.</div>
                     </div>
 
                     <div class="release-notes-item">
                         <div class="release-notes-item-title">Release Notes</div>
-                        <div class="release-notes-item-desc">You found them!</div>
+                        <div class="release-notes-item-desc">You found them! New releases will now have release notes published on <a href="https://github.com/chrisrouse/sftabs/releases" target="_blank">GitHub</a> and available in the extension. After you've had a chance to read the release notes, check the box to hide them. The next time there is an update, you'll be shown the new notes.</div>
                     </div>
                 </div>
 
-                <!-- Button anchored to bottom -->
-                <button id="release-notes-close-button" class="primary-button release-notes-close-btn">__MSG_releaseNotesGotIt__</button>
+                <!-- Footer: dismiss checkbox + close button -->
+                <div class="release-notes-footer">
+                    <label class="release-notes-dismiss-label">
+                        <input type="checkbox" id="release-notes-dismiss-checkbox">
+                        <span>__MSG_releaseNotesDontShowAgain__</span>
+                    </label>
+                    <button id="release-notes-close-button" class="primary-button release-notes-close-btn">__MSG_releaseNotesGotIt__</button>
+                </div>
             </div>
         </div>
 
