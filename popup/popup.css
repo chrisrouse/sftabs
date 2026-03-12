@@ -336,8 +336,8 @@
 
   .release-notes-item {
 	display: flex;
-	gap: 10px;
-	align-items: flex-start;
+	flex-direction: column;
+	gap: 4px;
   }
 
   .release-notes-item-icon {
@@ -390,6 +390,24 @@
 
   .release-notes-close-btn {
 	width: 100%;
+  }
+
+  .release-notes-review {
+	font-size: 12px;
+	color: var(--color-text-weak);
+	text-align: center;
+	padding: 10px 0;
+	border-top: 1px solid var(--border-subtle);
+	margin-bottom: 14px;
+  }
+
+  .release-notes-review a {
+	color: var(--color-primary);
+	text-decoration: none;
+  }
+
+  .release-notes-review a:hover {
+	text-decoration: underline;
   }
 
   h2 {

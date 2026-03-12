@@ -3,6 +3,16 @@
 
 const RELEASE_NOTES_VERSION = '2.1.0';
 
+function getStoreUrl() {
+  if (navigator.userAgent.includes('Edg/')) {
+    return 'https://microsoftedge.microsoft.com/addons/detail/sf-tabs/kchadlkjcefbnojjnmmpcnfnhcfbdjbb';
+  }
+  if (navigator.userAgent.includes('Firefox/')) {
+    return 'https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/';
+  }
+  return 'https://chromewebstore.google.com/detail/sf-tabs/lkimhffllnjkacnhjfehaihcjilcmdlo';
+}
+
 const SFTabsReleaseNotes = {
   /**
    * Initialize release notes: show the header button if not dismissed for this version.
@@ -15,6 +25,7 @@ const SFTabsReleaseNotes = {
 
     document.getElementById('release-notes-button').addEventListener('click', () => this.show());
     document.getElementById('release-notes-close-button').addEventListener('click', () => this.hide());
+    document.getElementById('review-link').href = getStoreUrl();
   },
 
   /**

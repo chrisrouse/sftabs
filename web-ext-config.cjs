@@ -54,10 +54,12 @@ module.exports = {
     'scripts/**',
     // Salesforce CLI config
     '.sfdx/**',
-    // Standard icons (replaced by beta icons for this beta release)
-    'icons/sftabs-icon-16.png',
-    'icons/sftabs-icon-48.png',
-    'icons/sftabs-icon-96.png'
+    // Beta icons (not included in production release)
+    'icons/sftabs-beta-icon-16.png',
+    'icons/sftabs-beta-icon-48.png',
+    'icons/sftabs-beta-icon-96.png',
+    'icons/sftabs-beta.png',
+    'icons/sftabs_beta.svg'
   ],
 
   // Build configuration
