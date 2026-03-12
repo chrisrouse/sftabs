@@ -31,8 +31,8 @@ title: Home
         <div class="feature-icon mb-3">
           <i class="bi bi-stars display-4 text-primary"></i>
         </div>
-        <h3 class="h5 mb-3">New in v2.0</h3>
-        <p class="text-muted mb-3">Profiles, dropdown menus, and flexible storage options—all new features!</p>
+        <h3 class="h5 mb-3">New in v2.1</h3>
+        <p class="text-muted mb-3">German and Spanish translations, release notes, and more.</p>
         <a href="new-features" class="btn btn-outline-primary">Learn More</a>
       </div>
     </div>
@@ -79,8 +79,8 @@ title: Home
       <p class="text-muted">Quick access to your first 10 tabs via configurable keyboard shortcuts for power users.</p>
     </div>
     <div class="col-md-6">
-      <h5><i class="bi bi-translate text-primary me-2"></i>Translations <span class="badge bg-success">Coming Soon</span></h5>
-      <p class="text-muted">Help translate SF Tabs into your language and make it accessible to everyone.</p>
+      <h5><i class="bi bi-translate text-primary me-2"></i>Translations</h5>
+      <p class="text-muted">SF Tabs is available in English, German, and Spanish.</p>
     </div>
   </div>
 </div>
