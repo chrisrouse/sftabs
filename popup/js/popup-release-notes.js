@@ -1,7 +1,7 @@
 // popup/js/popup-release-notes.js
 // Manages the "What's New" release notes panel
 
-const RELEASE_NOTES_VERSION = '2.1.0';
+const RELEASE_NOTES_VERSION = '2.1.1';
 
 function getStoreUrl() {
   if (navigator.userAgent.includes('Edg/')) {

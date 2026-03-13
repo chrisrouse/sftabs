@@ -9,6 +9,12 @@ All notable changes to SF Tabs are documented here. This file is the canonical s
 4. Paste this version's section into the GitHub Release body
 
 ---
+## 2.1.1
+**Import didn't work**
+Fixed a bug where importing data wasn't working as expected in v2.x.x.
+
+**Importing didn't create unique IDs**
+If a duplicate tab existed in an import file, it wasn't guaranteed to import with a unique ID, which meant deleting one instance of the tab would delete all instances of that same tab.
 
 ## 2.1.0
 

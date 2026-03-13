@@ -12,7 +12,7 @@
             <h1>
                 <img src="../icons/invert.png" alt="SF Tabs Logo" class="header-logo">
                 SF Tabs
-                <span class="version-badge">v2.1.0</span>
+                <span class="version-badge">v2.1.1</span>
             </h1>
             <div class="header-actions">
                 <!-- What's New button (hidden until JS confirms unseen release notes) -->
@@ -317,10 +317,25 @@
         <!-- Release Notes Panel -->
         <div id="release-notes-panel" class="action-panel">
             <div class="section-header">
-                <h2>Release Notes: v2.1.0</h2>
+                <h2>Release Notes</h2>
             </div>
             <div class="action-panel-content">
+                <!-- Items synced from CHANGELOG.md [2.1.1] -->
+                <div class="release-notes-section-header">v2.1.1</div>
+                <div class="release-notes-items">
+                    <div class="release-notes-item">
+                        <div class="release-notes-item-title">Import didn't work</div>
+                        <div class="release-notes-item-desc">Fixed a bug where importing data wasn't working as expected in v2.x.x.</div>
+                    </div>
+
+                    <div class="release-notes-item">
+                        <div class="release-notes-item-title">Importing didn't create unique IDs</div>
+                        <div class="release-notes-item-desc">If a duplicate tab existed in an import file, it wasn't guaranteed to import with a unique ID, which meant deleting one instance of the tab would delete all instances of that same tab.</div>
+                    </div>
+                </div>
+
                 <!-- Items synced from CHANGELOG.md [2.1.0] -->
+                <div class="release-notes-section-header">v2.1.0</div>
                 <div class="release-notes-items">
                     <div class="release-notes-item">
                         <div class="release-notes-item-title">German Translation</div>

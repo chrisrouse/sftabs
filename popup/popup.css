@@ -326,6 +326,21 @@
 	pointer-events: none;
   }
 
+  .release-notes-section-header {
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--color-text-weak);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 4px 0 4px;
+  }
+
+  .release-notes-items + .release-notes-section-header {
+	border-top: 1px solid var(--color-border);
+	margin-top: 4px;
+	padding-top: 12px;
+  }
+
   /* Items in normal flow with spacing */
   .release-notes-items {
 	display: flex;
