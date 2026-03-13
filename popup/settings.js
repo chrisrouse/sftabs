@@ -1322,15 +1322,17 @@ async function importFromHybridMode(importData, importSettings) {
 			await browser.storage.sync.set({ userSettings: mergedSettings });
 		}
 
-		// Add to existing tabs
+		// Add to existing tabs in the active profile's storage key
 		const useSyncStorage = await SFTabs.storage.getStoragePreference();
+		const activeProfileId = userSettings.activeProfileId;
+		const storageKey = `profile_${activeProfileId}_tabs`;
 		let existingTabs = [];
 
 		if (useSyncStorage) {
-			existingTabs = await SFTabs.storageChunking.readChunkedSync('customTabs') || [];
+			existingTabs = await SFTabs.storageChunking.readChunkedSync(storageKey) || [];
 		} else {
-			const localResult = await browser.storage.local.get('customTabs');
-			existingTabs = localResult.customTabs || [];
+			const localResult = await browser.storage.local.get(storageKey);
+			existingTabs = localResult[storageKey] || [];
 		}
 
 		// Merge tabs - imported tabs get new positions after existing ones
@@ -1346,9 +1348,9 @@ async function importFromHybridMode(importData, importSettings) {
 
 		// Save merged tabs
 		if (useSyncStorage) {
-			await SFTabs.storageChunking.saveChunkedSync('customTabs', mergedTabs);
+			await SFTabs.storageChunking.saveChunkedSync(storageKey, mergedTabs);
 		} else {
-			await browser.storage.local.set({ customTabs: mergedTabs });
+			await browser.storage.local.set({ [storageKey]: mergedTabs });
 		}
 	} else if (hybridMode === 'replace-tabs') {
 		// Replace all tabs without enabling profiles
@@ -1364,13 +1366,15 @@ async function importFromHybridMode(importData, importSettings) {
 			await browser.storage.sync.set({ userSettings: mergedSettings });
 		}
 
-		// Replace all tabs
+		// Replace tabs in the active profile's storage key
 		const useSyncStorage = await SFTabs.storage.getStoragePreference();
+		const activeProfileId = userSettings.activeProfileId;
+		const storageKey = `profile_${activeProfileId}_tabs`;
 
 		if (useSyncStorage) {
-			await SFTabs.storageChunking.saveChunkedSync('customTabs', tabs);
+			await SFTabs.storageChunking.saveChunkedSync(storageKey, tabs);
 		} else {
-			await browser.storage.local.set({ customTabs: tabs });
+			await browser.storage.local.set({ [storageKey]: tabs });
 		}
 	}
 
