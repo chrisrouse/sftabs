@@ -1337,11 +1337,16 @@ async function importFromHybridMode(importData, importSettings) {
 
 		// Merge tabs - imported tabs get new positions after existing ones
 		const maxPosition = existingTabs.length > 0 ? Math.max(...existingTabs.map(t => t.position || 0)) : -1;
+		const existingIds = new Set(existingTabs.map(t => t.id));
 		const mergedTabs = [...existingTabs];
 
 		tabs.forEach((tab, index) => {
+			const id = existingIds.has(tab.id)
+				? `tab_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+				: tab.id;
 			mergedTabs.push({
 				...tab,
+				id,
 				position: maxPosition + index + 1
 			});
 		});
@@ -1424,11 +1429,16 @@ async function importTabsToDestination(importData, importSettings) {
 
 			// Merge tabs - imported tabs get new positions after existing ones
 			const maxPosition = existingTabs.length > 0 ? Math.max(...existingTabs.map(t => t.position || 0)) : -1;
+			const existingIds = new Set(existingTabs.map(t => t.id));
 			const mergedTabs = [...existingTabs];
 
 			tabs.forEach((tab, index) => {
+				const id = existingIds.has(tab.id)
+					? `tab_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+					: tab.id;
 				mergedTabs.push({
 					...tab,
+					id,
 					position: maxPosition + index + 1
 				});
 			});
