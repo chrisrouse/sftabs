@@ -107,48 +107,22 @@ let handlerReady = false;
  */
 async function getStoragePreference() {
   try {
-    // Check BOTH storages to find the preference
-    const [syncResult, localResult] = await Promise.all([
-      browser.storage.sync.get('userSettings'),
-      browser.storage.local.get('userSettings')
-    ]);
+    const localResult = await browser.storage.local.get(['deviceSettings', 'userSettings']);
 
-    // Priority 1: If sync storage has useSyncStorage=true, sync is enabled
-    if (syncResult.userSettings && syncResult.userSettings.useSyncStorage === true) {
-      return true;
+    // Priority 1: Check deviceSettings (most authoritative, written by popup before migration)
+    if (localResult.deviceSettings && typeof localResult.deviceSettings.useSyncStorage === 'boolean') {
+      return localResult.deviceSettings.useSyncStorage;
     }
 
-    // Priority 2: Check local storage for the preference (most authoritative)
+    // Priority 2: Backward compat - check cached userSettings in local storage
     if (localResult.userSettings && typeof localResult.userSettings.useSyncStorage === 'boolean') {
-      // If local says to use local storage, clean up ALL stale sync storage
-      if (localResult.userSettings.useSyncStorage === false) {
-        try {
-          // Get all sync storage keys to clean up
-          const allSyncData = await browser.storage.sync.get(null);
-          const keysToRemove = Object.keys(allSyncData);
-
-          if (keysToRemove.length > 0) {
-            await browser.storage.sync.remove(keysToRemove);
-          }
-        } catch (e) {
-          // Silently fail - sync cleanup is not critical
-        }
-      }
-
       return localResult.userSettings.useSyncStorage;
     }
 
-    // Priority 3: If userSettings exists in sync but useSyncStorage is not set,
-    // this is an existing user from before v2.1 when sync was the default
-    if (syncResult.userSettings) {
-      return true;
-    }
-
-    // Priority 4: No userSettings found - new installation, use default (local storage)
-    return false;
+    // Priority 3: Default to sync storage
+    return true;
   } catch (error) {
-    // On error, default to local storage for privacy
-    return false;
+    return true;
   }
 }
 

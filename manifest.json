@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SF Tabs",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Add custom navigation tabs to the Salesforce Setup menu for quick access to the pages you use most.",
   "author": "Chris Rouse",
   "homepage_url": "https://github.com/chrisrouse/sftabs",
@@ -134,8 +134,6 @@
     }
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "service_worker": "background.js"
   }
 }

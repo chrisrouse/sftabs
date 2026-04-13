@@ -1787,7 +1787,7 @@ async function mergeSyncData(conflict) {
 			userSettings: mergedSettings
 		});
 
-		// Migrate all profile tabs to sync
+		// Migrate all profile tabs to sync, then remove from local
 		for (const profile of mergedProfiles) {
 			const tabsKey = `profile_${profile.id}_tabs`;
 
@@ -1802,6 +1802,18 @@ async function mergeSyncData(conflict) {
 			if (tabs.length > 0) {
 				await SFTabs.storageChunking.saveChunkedSync(tabsKey, tabs);
 			}
+
+			// Remove from local regardless of whether tabs existed
+			await browser.storage.local.remove([tabsKey]);
+		}
+
+		// Safety sweep: remove any remaining profile tab keys from local
+		const allLocalData = await browser.storage.local.get(null);
+		const remainingLocalTabKeys = Object.keys(allLocalData).filter(key =>
+			key.startsWith('profile_') && key.includes('_tabs')
+		);
+		if (remainingLocalTabKeys.length > 0) {
+			await browser.storage.local.remove(remainingLocalTabKeys);
 		}
 
 		// Cache merged data in local storage
@@ -1863,6 +1875,16 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
 		if (profiles.length > 0) {
 			await destStorage.set({ profiles });
 			// Note: Don't remove profiles from source yet - settings page will handle that
+		}
+
+		// Safety sweep: remove any remaining profile tab keys from source.
+		// This catches orphaned keys and any edge case where the per-profile remove didn't complete.
+		const allSourceData = await sourceStorage.get(null);
+		const remainingTabKeys = Object.keys(allSourceData).filter(key =>
+			key.startsWith('profile_') && key.includes('_tabs')
+		);
+		if (remainingTabKeys.length > 0) {
+			await sourceStorage.remove(remainingTabKeys);
 		}
 	} catch (error) {
 		throw new Error(chrome.i18n.getMessage('errorMigrateTabs', [error.message]));

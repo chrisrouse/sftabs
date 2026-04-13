@@ -199,6 +199,17 @@ async function getUserSettings() {
  */
 async function saveUserSettings(settings, skipMigration = false, showToast = true) {
   try {
+    // Split settings into device-specific and synced
+    const { useSyncStorage, ...syncedSettings } = settings;
+
+    // Write the new preference and local cache BEFORE migrating so that content
+    // scripts reading storage during migration see the correct preference and do
+    // not destructively clear the destination storage.
+    await browser.storage.local.set({
+      deviceSettings: { useSyncStorage },
+      userSettings: settings  // Full settings including useSyncStorage
+    });
+
     // Check if useSyncStorage preference changed and migration is needed
     if (!skipMigration && SFTabs.main && SFTabs.main.getUserSettings) {
       const currentSettings = SFTabs.main.getUserSettings();
@@ -208,21 +219,8 @@ async function saveUserSettings(settings, skipMigration = false, showToast = tru
       }
     }
 
-    // Split settings into device-specific and synced
-    const { useSyncStorage, ...syncedSettings } = settings;
-
-    // Save device-specific setting (useSyncStorage) to local storage only
-    await browser.storage.local.set({
-      deviceSettings: { useSyncStorage }
-    });
-
     // Save all other settings to sync storage (cross-device)
     await browser.storage.sync.set({ userSettings: syncedSettings });
-
-    // Cache the full merged settings in local for quick access
-    await browser.storage.local.set({
-      userSettings: settings  // Full settings including useSyncStorage
-    });
 
     // Update the main state (only in popup context)
     if (SFTabs.main && SFTabs.main.setUserSettings) {
