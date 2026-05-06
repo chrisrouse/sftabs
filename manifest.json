@@ -3,6 +3,7 @@
   "name": "SF Tabs v2 (UI Preview)",
   "version": "2.2.0",
   "description": "SF Tabs UI overhaul preview — mock data only, no storage reads.",
+  "default_locale": "en",
 
   "action": {
     "default_popup": "popup.html",
