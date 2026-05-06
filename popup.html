@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SF Tabs</title>
+  <link rel="stylesheet" href="css/popup.css" />
+</head>
+<body>
+
+  <a class="skip-link" href="#panel-tray">Skip to main content</a>
+
+  <div class="app-shell">
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <header class="app-header" role="banner">
+
+      <div class="header-brand">
+        <svg class="brand-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+          <path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/>
+        </svg>
+        <span class="brand-name">SF Tabs</span>
+        <span class="brand-version" aria-label="Version 2.1.2">v2.1.2</span>
+      </div>
+
+      <div class="header-center">
+        <button class="profile-chip" id="btn-profile-switcher"
+          aria-haspopup="listbox" aria-expanded="false"
+          aria-label="Active profile: Production — click to switch">
+          <span class="profile-chip-dot" id="profile-chip-dot" aria-hidden="true"></span>
+          <span class="profile-chip-name" id="profile-chip-name">Production</span>
+          <svg class="profile-chip-chevron" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="header-actions">
+        <button class="header-btn" id="btn-release-notes" aria-label="View release notes — new update available">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+          </svg>
+          <span class="notif-dot" aria-hidden="true"></span>
+        </button>
+      </div>
+
+    </header>
+
+    <!-- ═══════════════ BODY ═══════════════ -->
+    <div class="app-body">
+
+      <!-- ── Left Panel ── -->
+      <aside class="panel-left" aria-label="Tab list">
+
+        <div class="panel-toolbar" role="toolbar" aria-label="Tab actions">
+          <button class="btn-add-tab" id="btn-add-tab" aria-label="Add new tab">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+              <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"/>
+            </svg>
+            <span>Add Tab</span>
+          </button>
+          <button class="btn-icon-sm" id="btn-quick-add" aria-label="Quick add from current Salesforce page" title="Quick add from current page">
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
+            </svg>
+          </button>
+        </div>
+
+        <nav aria-label="Custom tabs">
+          <ul class="tab-list" id="tab-list" role="list">
+            <!-- Populated by popup.js -->
+          </ul>
+        </nav>
+
+      </aside>
+
+      <!-- ── Tray (expands to the right on demand) ── -->
+      <div class="panel-tray" id="panel-tray" role="region" aria-label="Details panel">
+
+        <!-- View: Edit / Add tab -->
+        <div class="panel-view" id="view-edit-tab" hidden>
+          <div class="panel-view-header">
+            <div class="panel-view-heading">
+              <h2 class="panel-view-title" id="edit-panel-title">Edit Tab</h2>
+              <p class="panel-view-subtitle" id="edit-panel-subtitle">Update this tab's name and destination.</p>
+            </div>
+            <button class="btn-close" id="btn-close-edit" aria-label="Close edit panel">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/>
+              </svg>
+            </button>
+          </div>
+
+          <form class="edit-form" id="form-edit-tab" novalidate aria-labelledby="edit-panel-title">
+
+            <div class="form-group">
+              <label class="form-label" for="input-tab-name">
+                Tab Name <span class="req" aria-label="required">*</span>
+              </label>
+              <div class="input-row">
+                <input type="text" class="form-input" id="input-tab-name"
+                  maxlength="30" required autocomplete="off"
+                  aria-describedby="tab-name-count tab-name-error" />
+                <span class="char-count" id="tab-name-count" aria-live="polite" aria-atomic="true">0/30</span>
+              </div>
+              <p class="form-error" id="tab-name-error" role="alert" hidden>Tab name is required.</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="input-tab-path">Tab Path</label>
+              <input type="text" class="form-input" id="input-tab-path"
+                placeholder="/lightning/o/Account or full URL"
+                autocomplete="off"
+                aria-describedby="tab-path-hint" />
+              <p class="form-hint" id="tab-path-hint">The Salesforce path or URL this tab navigates to.</p>
+            </div>
+
+            <fieldset class="form-fieldset">
+              <legend class="form-legend">Tab Options</legend>
+
+              <label class="check-row">
+                <input type="checkbox" class="check-input" id="input-is-object" />
+                <span class="check-body">
+                  <span class="check-label">Object tab</span>
+                  <span class="check-desc">Navigates to a Salesforce object list</span>
+                </span>
+              </label>
+
+              <label class="check-row">
+                <input type="checkbox" class="check-input" id="input-is-custom-url" />
+                <span class="check-body">
+                  <span class="check-label">Custom URL</span>
+                  <span class="check-desc">Uses a non-standard Salesforce URL</span>
+                </span>
+              </label>
+
+              <label class="check-row">
+                <input type="checkbox" class="check-input" id="input-open-new-tab" />
+                <span class="check-body">
+                  <span class="check-label">Open in new tab</span>
+                  <span class="check-desc">Always opens in a new browser tab</span>
+                </span>
+              </label>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="btn-cancel-edit">Cancel</button>
+              <button type="submit" class="btn-primary" id="btn-save-tab">Save Tab</button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- View: Settings -->
+        <div class="panel-view" id="view-settings" hidden aria-label="Settings">
+          <div class="panel-view-header">
+            <div class="panel-view-heading">
+              <h2 class="panel-view-title">Settings</h2>
+              <p class="panel-view-subtitle">Customize SF Tabs to your workflow.</p>
+            </div>
+          </div>
+
+          <div class="settings-body">
+
+            <section class="settings-section" aria-labelledby="s-appearance">
+              <h3 class="settings-section-title" id="s-appearance">Appearance</h3>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <span class="settings-label">Theme</span>
+                </div>
+                <div class="settings-row-control">
+                  <div class="seg-ctrl" role="group" aria-label="Theme selection">
+                    <button class="seg-btn active" data-theme-val="light" aria-pressed="true">Light</button>
+                    <button class="seg-btn" data-theme-val="dark" aria-pressed="false">Dark</button>
+                    <button class="seg-btn" data-theme-val="system" aria-pressed="false">System</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="settings-row">
+                <label class="settings-row-label" for="setting-compact">
+                  <span class="settings-label">Compact mode</span>
+                  <span class="settings-desc">Reduces tab item height</span>
+                </label>
+                <div class="settings-row-control">
+                  <label class="toggle" aria-label="Compact mode">
+                    <input type="checkbox" id="setting-compact" role="switch" />
+                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-section" aria-labelledby="s-behavior">
+              <h3 class="settings-section-title" id="s-behavior">Behavior</h3>
+
+              <div class="settings-row">
+                <label class="settings-row-label" for="setting-skip-delete">
+                  <span class="settings-label">Skip delete confirmation</span>
+                  <span class="settings-desc">Delete tabs without a prompt</span>
+                </label>
+                <div class="settings-row-control">
+                  <label class="toggle" aria-label="Skip delete confirmation">
+                    <input type="checkbox" id="setting-skip-delete" role="switch" />
+                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-row">
+                <label class="settings-row-label" for="setting-profiles">
+                  <span class="settings-label">Enable profiles</span>
+                  <span class="settings-desc">Separate tab sets for different orgs</span>
+                </label>
+                <div class="settings-row-control">
+                  <label class="toggle" aria-label="Enable profiles">
+                    <input type="checkbox" id="setting-profiles" role="switch" checked />
+                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <section class="settings-section" aria-labelledby="s-storage">
+              <h3 class="settings-section-title" id="s-storage">Storage</h3>
+              <div class="storage-cards" role="radiogroup" aria-labelledby="s-storage">
+                <label class="storage-card">
+                  <input type="radio" name="storage-type" value="sync" checked />
+                  <div class="storage-card-body">
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+                      <path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"/>
+                    </svg>
+                    <div>
+                      <span class="storage-card-title">Sync storage</span>
+                      <span class="storage-card-desc">Syncs across all your devices</span>
+                    </div>
+                  </div>
+                </label>
+                <label class="storage-card">
+                  <input type="radio" name="storage-type" value="local" />
+                  <div class="storage-card-body">
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+                      <path d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"/>
+                    </svg>
+                    <div>
+                      <span class="storage-card-title">Local storage</span>
+                      <span class="storage-card-desc">This device only</span>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </section>
+
+            <div class="settings-advanced">
+              <a href="#" class="advanced-link" id="btn-advanced-settings" aria-label="Open advanced settings in a new tab">
+                Advanced settings — import, export, danger zone
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+                  <path d="M6.75 2.5a.75.75 0 000 1.5h4.69L2.22 13.22a.75.75 0 101.06 1.06L12.5 5.06v4.69a.75.75 0 001.5 0V2.5H6.75z"/>
+                </svg>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- View: Release Notes -->
+        <div class="panel-view" id="view-release-notes" hidden aria-label="Release notes">
+          <div class="panel-view-header">
+            <div class="panel-view-heading">
+              <h2 class="panel-view-title">What's New</h2>
+              <p class="panel-view-subtitle">Recent updates to SF Tabs</p>
+            </div>
+            <button class="btn-close" id="btn-close-release-notes" aria-label="Close release notes">
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="rn-body">
+            <div class="rn-version">
+              <div class="rn-version-label">v2.1.2</div>
+              <ul class="rn-items">
+                <li class="rn-item">
+                  <span class="rn-item-title">Storage switching fix</span>
+                  <span class="rn-item-desc">Fixed a bug where switching between Sync and Local Storage could leave stale data behind, causing tabs to disappear if you switched storage options more than once.</span>
+                </li>
+                <li class="rn-item">
+                  <span class="rn-item-title">Release notes panel</span>
+                  <span class="rn-item-desc">New releases now show notes right here in the extension. Dismiss them once you've read them.</span>
+                </li>
+              </ul>
+            </div>
+            <div class="rn-version">
+              <div class="rn-version-label">v2.1.1</div>
+              <ul class="rn-items">
+                <li class="rn-item">
+                  <span class="rn-item-title">Import fix</span>
+                  <span class="rn-item-desc">Fixed a bug where importing data wasn't working as expected in v2.x.x.</span>
+                </li>
+                <li class="rn-item">
+                  <span class="rn-item-title">Unique tab IDs on import</span>
+                  <span class="rn-item-desc">Duplicate tabs in an import file now get unique IDs so deleting one doesn't remove all identical tabs.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="rn-footer">
+            <label class="check-row">
+              <input type="checkbox" class="check-input" id="dismiss-release-notes" />
+              <span class="check-body">
+                <span class="check-label">Don't show again for this version</span>
+              </span>
+            </label>
+            <button class="btn-primary" id="btn-got-it">Got it</button>
+          </div>
+        </div>
+
+      </div><!-- /.panel-tray -->
+    </div><!-- /.app-body -->
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <footer class="app-footer" role="contentinfo">
+      <div class="footer-status">
+        <div class="toast-region" role="status" aria-live="polite" aria-atomic="true" id="toast-region"></div>
+      </div>
+      <nav class="footer-nav" aria-label="Extension controls">
+        <button class="footer-btn" id="btn-footer-settings" aria-label="Settings" aria-pressed="false">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+            <path fill-rule="evenodd" d="M7.84 1.804A1 1 0 018.82 1h2.36a1 1 0 01.98.804l.331 1.652a6.993 6.993 0 011.929 1.115l1.598-.54a1 1 0 011.186.447l1.18 2.044a1 1 0 01-.205 1.251l-1.267 1.113a7.047 7.047 0 010 2.228l1.267 1.113a1 1 0 01.206 1.25l-1.18 2.045a1 1 0 01-1.187.447l-1.598-.54a6.993 6.993 0 01-1.929 1.115l-.33 1.652a1 1 0 01-.98.804H8.82a1 1 0 01-.98-.804l-.331-1.652a6.993 6.993 0 01-1.929-1.115l-1.598.54a1 1 0 01-1.186-.447l-1.18-2.044a1 1 0 01.205-1.251l1.267-1.114a7.05 7.05 0 010-2.227L1.821 7.773a1 1 0 01-.206-1.25l1.18-2.045a1 1 0 011.187-.447l1.598.54A6.993 6.993 0 017.51 3.456l.33-1.652zM10 13a3 3 0 100-6 3 3 0 000 6z"/>
+          </svg>
+        </button>
+        <button class="footer-btn" id="btn-toggle-theme" aria-label="Toggle dark mode" aria-pressed="false">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+          </svg>
+        </button>
+      </nav>
+    </footer>
+
+    <!-- ═══════════════ PROFILE DROPDOWN ═══════════════ -->
+    <div class="profile-dropdown" id="profile-dropdown" role="listbox"
+      aria-label="Switch profile" aria-orientation="vertical" hidden>
+      <!-- Populated by popup.js -->
+    </div>
+
+    <!-- ═══════════════ MODAL: Delete tab ═══════════════ -->
+    <div class="modal-overlay" id="modal-delete" role="dialog"
+      aria-modal="true" aria-labelledby="modal-delete-title" hidden>
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-delete-title">Delete Tab?</h3>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete <strong id="modal-delete-name">this tab</strong>? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="modal-delete-cancel">Cancel</button>
+          <button class="btn-danger" id="modal-delete-confirm">Delete Tab</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.app-shell -->
+
+  <script src="js/mock-data.js"></script>
+  <script src="js/popup.js"></script>
+</body>
+</html>
