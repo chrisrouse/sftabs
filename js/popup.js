@@ -471,6 +471,11 @@ function bindEvents() {
     document.querySelector('.header-center').style.visibility = e.target.checked ? 'visible' : 'hidden';
   });
 
+  document.getElementById('btn-advanced-settings').addEventListener('click', e => {
+    e.preventDefault();
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup/settings.html') });
+  });
+
   // Footer theme toggle
   document.getElementById('btn-toggle-theme').addEventListener('click', toggleTheme);
 
