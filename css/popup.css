@@ -4,88 +4,71 @@
    Default: 340px · Tray open: 700px · Height: 540px
    ============================================================ */
 
-/* ── 1. Design tokens ── */
+/* ── 1. Design tokens ──
+   Component aliases bridging onto the --sft-* design system
+   (css/tokens.css, sourced from SLDS 2 Cosmos). Dark mode comes free:
+   every --sft-* color is light-dark(), switched by data-theme via
+   color-scheme in tokens.css — no override block needed here. */
 :root {
   /* Brand */
-  --c-brand:        #1845d4;   /* header background */
-  --c-primary:      #288aff;   /* buttons, links, focus rings */
-  --c-primary-dark: #0f6fd4;
-  --c-primary-light:#e8f2ff;
-  --c-accent:       #7c3aed;   /* custom-URL type only */
-  --c-accent-light: #f0e9ff;
+  --c-brand:        light-dark(#022ac0, #001e5b);  /* header bg: brand-30 / brand-15 raw */
+  --c-primary:      var(--sft-accent);
+  --c-primary-dark: var(--sft-accent-hover);
+  --c-primary-light:var(--sft-accent-container);
+  --c-accent:       var(--sft-type-custom);
+  --c-accent-light: var(--sft-type-custom-bg);
 
   /* Tab type accents */
-  --c-object:       #059669;
-  --c-object-bg:    #d1fae5;
-  --c-setup:        #0284c7;
-  --c-setup-bg:     #dbeafe;
-  --c-custom:       #7c3aed;
-  --c-custom-bg:    #ede9fe;
-  --c-standard:     #64748b;
-  --c-standard-bg:  #f1f5f9;
+  --c-object:       var(--sft-type-object);
+  --c-object-bg:    var(--sft-type-object-bg);
+  --c-setup:        var(--sft-type-setup);
+  --c-setup-bg:     var(--sft-type-setup-bg);
+  --c-custom:       var(--sft-type-custom);
+  --c-custom-bg:    var(--sft-type-custom-bg);
+  --c-standard:     var(--sft-type-standard);
+  --c-standard-bg:  var(--sft-type-standard-bg);
 
   /* Surfaces */
-  --s-base:   #f0f4ff;
-  --s-1:      #ffffff;
-  --s-2:      #f6f8ff;
-  --s-3:      #edf0f7;
+  --s-base:   var(--sft-surface-base);
+  --s-1:      var(--sft-surface-1);
+  --s-2:      var(--sft-surface-2);
+  --s-3:      var(--sft-surface-container-3);
 
   /* Text */
-  --t-base:    #0f172a;
-  --t-muted:   #475569;
-  --t-weak:    #94a3b8;
-  --t-inverse: #ffffff;
+  --t-base:    var(--sft-text);
+  --t-muted:   var(--sft-text-weak);
+  --t-weak:    var(--sft-neutral-60);
+  --t-inverse: var(--sft-text-on-accent);
 
   /* Borders */
-  --b-subtle:  #e2e8f0;
-  --b-medium:  #cbd5e1;
-  --b-strong:  #94a3b8;
+  --b-subtle:  var(--sft-neutral-90);
+  --b-medium:  var(--sft-border);
+  --b-strong:  var(--sft-border-strong);
 
   /* Semantic */
-  --c-error:   #dc2626;
-  --c-error-bg:#fef2f2;
-  --c-success: #059669;
+  --c-error:   var(--sft-error);
+  --c-error-bg:var(--sft-error-container);
+  --c-success: var(--sft-success);
 
-  /* Footer */
-  --footer-bg:       #0f172a;
+  /* Footer (ours — stays dark in both schemes) */
+  --footer-bg:       light-dark(#03234d, #020202);
   --footer-fg:       rgba(255,255,255,0.55);
   --footer-fg-hover: #ffffff;
 
   /* Shadows */
-  --sh-sm:    0 1px 3px rgba(15,23,42,0.08);
-  --sh-md:    0 4px 10px rgba(15,23,42,0.10);
-  --sh-lg:    0 12px 28px rgba(15,23,42,0.14);
-  --sh-modal: 0 20px 48px rgba(15,23,42,0.22);
+  --sh-sm:    var(--sft-shadow-1);
+  --sh-md:    var(--sft-shadow-2);
+  --sh-lg:    var(--sft-shadow-3);
+  --sh-modal: var(--sft-shadow-4);
 
   /* Radii */
-  --r-sm:  4px;
-  --r-md:  8px;
-  --r-lg:  12px;
-  --r-pill:999px;
+  --r-sm:  var(--sft-radius-1);
+  --r-md:  var(--sft-radius-2);
+  --r-lg:  var(--sft-radius-3);
+  --r-pill:var(--sft-radius-pill);
 
   /* Motion */
-  --ease: 0.16s ease;
-}
-
-/* ── Dark mode ── */
-[data-theme="dark"] {
-  --c-brand:    #1338b8;
-  --s-base:     #0c0b1a;
-  --s-1:        #171626;
-  --s-2:        #1d1c2e;
-  --s-3:        #252438;
-  --t-base:     #f1f5f9;
-  --t-muted:    #94a3b8;
-  --t-weak:     #64748b;
-  --b-subtle:   rgba(255,255,255,0.07);
-  --b-medium:   rgba(255,255,255,0.12);
-  --b-strong:   rgba(255,255,255,0.22);
-  --sh-sm:  0 1px 3px rgba(0,0,0,0.35);
-  --sh-md:  0 4px 10px rgba(0,0,0,0.4);
-  --sh-lg:  0 12px 28px rgba(0,0,0,0.45);
-  --c-primary:      #4da3ff;
-  --c-primary-light:rgba(77,163,255,0.12);
-  --footer-bg:      #060510;
+  --ease: var(--sft-duration-promptly) var(--sft-ease);
 }
 
 /* ── 2. Reset ── */
@@ -98,8 +81,8 @@ html, body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  font-size: 14px;
+  font-family: var(--sft-font-family);
+  font-size: var(--sft-font-size-sm); /* 14px today; consider --sft-font-size-base (13px, SLDS default) later */
   line-height: 1.5;
   color: var(--t-base);
   background: var(--s-base);
@@ -362,7 +345,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-item.is-editing {
   border-color: var(--c-primary);
   background: var(--c-primary-light);
-  box-shadow: 0 0 0 2px rgba(40,138,255,0.18), var(--sh-sm);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-primary) 18%, transparent), var(--sh-sm);
   transform: translateY(-1px);
 }
 
@@ -637,7 +620,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .form-input:focus {
   outline: none;
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 3px rgba(40,138,255,0.14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-primary) 14%, transparent);
 }
 .form-input::placeholder { color: var(--t-weak); }
 
@@ -724,7 +707,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 }
 .dropdown-item:focus-within {
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 2px rgba(40,138,255,0.14);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-primary) 14%, transparent);
 }
 
 .dropdown-item-info {
@@ -904,7 +887,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: background var(--ease);
 }
 .storage-card:last-child { border-bottom: none; }
-.storage-card:has(input:checked) { background: #ffcccc; }
+.storage-card:has(input:checked) { background: var(--c-primary-light); }
 
 .storage-card input[type="radio"] {
   accent-color: var(--c-primary);
@@ -1092,7 +1075,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   position: absolute;
   inset: 0;
   z-index: 500;
-  background: rgba(15,23,42,0.5);
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
