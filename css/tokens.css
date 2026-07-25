@@ -200,6 +200,39 @@
   --sft-spacing-8:  3rem;      /* 48px */
 
   /* ════════════════════════════════════════════════════════════════════
+     11b. DENSITY-AWARE SPACING & TYPE          (--slds-g-*-var-* hooks)
+     Components that should adapt to display density use these aliases
+     instead of the fixed tokens above. Comfy (default) = the base scale;
+     [data-density="compact"] on :root swaps in the SLDS compact values.
+     Axes compact differently: all-sides > block (vertical) > inline.
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-spacing-var-1: var(--sft-spacing-1);   /* all sides */
+  --sft-spacing-var-2: var(--sft-spacing-2);
+  --sft-spacing-var-3: var(--sft-spacing-3);
+  --sft-spacing-var-4: var(--sft-spacing-4);
+  --sft-spacing-var-5: var(--sft-spacing-5);
+  --sft-spacing-var-6: var(--sft-spacing-6);
+
+  --sft-spacing-var-block-1: var(--sft-spacing-1);   /* top/bottom */
+  --sft-spacing-var-block-2: var(--sft-spacing-2);
+  --sft-spacing-var-block-3: var(--sft-spacing-3);
+  --sft-spacing-var-block-4: var(--sft-spacing-4);
+  --sft-spacing-var-block-5: var(--sft-spacing-5);
+  --sft-spacing-var-block-6: var(--sft-spacing-6);
+
+  --sft-spacing-var-inline-1: var(--sft-spacing-1);  /* left/right */
+  --sft-spacing-var-inline-2: var(--sft-spacing-2);
+  --sft-spacing-var-inline-3: var(--sft-spacing-3);
+  --sft-spacing-var-inline-4: var(--sft-spacing-4);
+  --sft-spacing-var-inline-5: var(--sft-spacing-5);
+  --sft-spacing-var-inline-6: var(--sft-spacing-6);
+
+  --sft-font-size-var-md: var(--sft-font-size-md);   /* font-scale-var-2 */
+  --sft-font-size-var-lg: var(--sft-font-size-lg);   /* font-scale-var-3 */
+  --sft-font-size-var-xl: var(--sft-font-size-xl);   /* font-scale-var-4 */
+  --sft-line-height-var-base: var(--sft-line-height-base); /* lineheight-var-base */
+
+  /* ════════════════════════════════════════════════════════════════════
      12. SIZING                                        (--slds-g-sizing-*)
      For width/height dimensions ONLY — never margins/padding (use spacing).
      8-point grid; full SLDS scale runs sizing-1…16 (2–480px).
@@ -256,4 +289,34 @@
   --sft-duration-toast:       4.8s;   /* duration-toast-short */
 
   --sft-ease: cubic-bezier(0.4, 0, 0.2, 1);  /* SF Tabs tray easing (ours) */
+}
+
+/* ── Compact density — SLDS compact values for the -var- aliases ──
+   Set data-density="compact" on <html> (compact-mode setting) to apply. */
+:root[data-density="compact"] {
+  --sft-spacing-var-1: 0.125rem;
+  --sft-spacing-var-2: 0.125rem;
+  --sft-spacing-var-3: 0.25rem;
+  --sft-spacing-var-4: 0.5rem;
+  --sft-spacing-var-5: 0.75rem;
+  --sft-spacing-var-6: 1rem;
+
+  --sft-spacing-var-block-1: 0.125rem;
+  --sft-spacing-var-block-2: 0.25rem;
+  --sft-spacing-var-block-3: 0.5rem;
+  --sft-spacing-var-block-4: 0.5rem;
+  --sft-spacing-var-block-5: 0.75rem;
+  --sft-spacing-var-block-6: 1rem;
+
+  --sft-spacing-var-inline-1: 0.125rem;
+  --sft-spacing-var-inline-2: 0.25rem;
+  --sft-spacing-var-inline-3: 0.5rem;
+  --sft-spacing-var-inline-4: 0.75rem;
+  --sft-spacing-var-inline-5: 0.75rem;
+  --sft-spacing-var-inline-6: 1rem;
+
+  --sft-font-size-var-md: 0.875rem;   /* 16px → 14px */
+  --sft-font-size-var-lg: 1rem;       /* 20px → 16px */
+  --sft-font-size-var-xl: 1.25rem;    /* 24px → 20px */
+  --sft-line-height-var-base: 1.2;    /* 1.5 → normal */
 }
