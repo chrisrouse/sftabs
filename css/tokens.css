@@ -187,6 +187,8 @@
 
   /* ════════════════════════════════════════════════════════════════════
      11. SPACING                                      (--slds-g-spacing-N)
+     For margins, padding, and gaps ONLY — never width/height (use sizing).
+     4-point grid. SLDS also defines spacing-9…12 (56–80px); add if needed.
      ════════════════════════════════════════════════════════════════════ */
   --sft-spacing-1:  0.25rem;   /*  4px */
   --sft-spacing-2:  0.5rem;    /*  8px */
@@ -199,6 +201,8 @@
 
   /* ════════════════════════════════════════════════════════════════════
      12. SIZING                                        (--slds-g-sizing-*)
+     For width/height dimensions ONLY — never margins/padding (use spacing).
+     8-point grid; full SLDS scale runs sizing-1…16 (2–480px).
      ════════════════════════════════════════════════════════════════════ */
   --sft-border-width-1: 1px;   /* sizing-border-1 */
   --sft-border-width-2: 2px;   /* sizing-border-2 */
