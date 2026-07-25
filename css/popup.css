@@ -286,10 +286,9 @@ a:hover { text-decoration: underline; }
   font-size: var(--sft-font-size-base);
   font-weight: var(--sft-font-weight-semibold);
   cursor: pointer;
-  box-shadow: var(--sh-sm);
-  transition: background var(--ease), box-shadow var(--ease);
+  transition: background var(--ease);
 }
-.btn-add-tab:hover { background: var(--c-primary-dark); box-shadow: var(--sh-md); }
+.btn-add-tab:hover { background: var(--c-primary-dark); }
 .btn-add-tab:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
 .btn-add-tab svg { width: 15px; height: 15px; }
 
@@ -335,18 +334,16 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   background: var(--s-1);
   border: 1px solid var(--b-subtle);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
   overflow: hidden;
-  transition: box-shadow var(--ease), border-color var(--ease), transform var(--ease), background var(--ease), opacity 0.15s ease;
+  transition: box-shadow var(--ease), border-color var(--ease), background var(--ease), opacity 0.15s ease;
   min-width: 0;
 }
 
-/* Active editing highlight */
+/* Active editing highlight — 2px selected-state ring, SLDS border-2 width */
 .tab-item.is-editing {
   border-color: var(--c-primary);
   background: var(--c-primary-light);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-primary) 18%, transparent), var(--sh-sm);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px var(--c-primary) inset;
 }
 
 /* Dim non-editing tabs when one is active */
@@ -354,14 +351,12 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   opacity: 0.6;
 }
 .tab-item:hover {
-  box-shadow: var(--sh-md);
+  background: var(--s-2);
   border-color: var(--b-medium);
-  transform: translateY(-1px);
 }
 .tab-item:focus-within {
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 2px var(--c-primary-light), var(--sh-sm);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px var(--c-primary) inset;
 }
 
 /* Left accent bar */
@@ -836,7 +831,6 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   background: var(--s-1);
   color: var(--c-primary);
   font-weight: var(--sft-font-weight-semibold);
-  box-shadow: var(--sh-sm);
 }
 .seg-btn:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 1px; }
 
@@ -1028,7 +1022,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   background: var(--s-1);
   border: 1px solid var(--b-medium);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-md); /* SLDS: menus sit at shadow-2 */
   overflow: hidden;
   animation: dropdownIn 0.14s ease;
 }
