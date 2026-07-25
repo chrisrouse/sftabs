@@ -76,10 +76,22 @@
 
   /* ════════════════════════════════════════════════════════════════════
      5. COLOR — Borders                            (--slds-g-color-border-*)
+     Usage: border-1 (subtle) = decorative dividers; border-2 (strong) =
+     interactive controls (inputs, buttons). Width is 1px default, 2px for
+     focus/active/selected. SLDS 2 favors minimal borders on containers —
+     prefer surface contrast + padding over boxing cards in.
      ════════════════════════════════════════════════════════════════════ */
   --sft-border:          light-dark(#c9c9c9, #444);    /* border-1              */
   --sft-border-strong:   light-dark(#5c5c5c, #757575); /* border-2              */
   --sft-border-disabled: #757575;                      /* border-disabled-1     */
+
+  /* State borders (destructive buttons, invalid inputs, callouts) */
+  --sft-border-accent:        var(--sft-accent-1);          /* border-accent-1  */
+  --sft-border-accent-hover:  var(--sft-accent-2);          /* border-accent-2  */
+  --sft-border-error:         light-dark(#b60554, #fe8aa7); /* border-error-1   */
+  --sft-border-error-hover:   light-dark(#8a033e, #fdb6c5); /* border-error-2   */
+  --sft-border-success:       light-dark(#056764, #06a59a); /* border-success-1 */
+  --sft-border-warning:       light-dark(#ca8501, #e4a201); /* border-warning-1 */
 
   /* ════════════════════════════════════════════════════════════════════
      6. COLOR — Accent / actions               (--slds-g-color-accent-*)
@@ -237,9 +249,12 @@
      For width/height dimensions ONLY — never margins/padding (use spacing).
      8-point grid; full SLDS scale runs sizing-1…16 (2–480px).
      ════════════════════════════════════════════════════════════════════ */
+  /* Border widths: 1 = default controls/dividers; 2 = focus/active/selected;
+     3–4 = high-emphasis callouts only. Max two widths per small component. */
   --sft-border-width-1: 1px;   /* sizing-border-1 */
   --sft-border-width-2: 2px;   /* sizing-border-2 */
   --sft-border-width-3: 3px;   /* sizing-border-3 */
+  --sft-border-width-4: 4px;   /* sizing-border-4 */
 
   --sft-size-control:    2rem;     /* sizing-9  — 32px inputs/buttons        */
   --sft-size-control-sm: 1.5rem;   /* sizing-7  — 24px compact controls      */
@@ -258,6 +273,9 @@
 
   /* ════════════════════════════════════════════════════════════════════
      14. ELEVATION                                     (--slds-g-shadow-N)
+     Base-level components get NO shadow (white surface on gray bg, or a
+     border on white bg). SLDS usage: 2 = menus/dropdowns/notifications;
+     3 = panels/tooltips/toasts (our tray); 4 = modals/popovers.
      ════════════════════════════════════════════════════════════════════ */
   --sft-shadow-1: 0px 0px 2px 0px light-dark(#0000002e, #0000005c),
                   0px 2px 2px 0px light-dark(#0000002e, #0000005c),
