@@ -28,6 +28,7 @@
   --sft-brand-30: light-dark(#022ac0, #7cb1fe);
   --sft-brand-40: light-dark(#0250d9, #4992fe);
   --sft-brand-45: light-dark(#045dec, #287efe);
+  --sft-brand-50: #066afe;
   --sft-brand-55: light-dark(#287efe, #045dec);
   --sft-brand-60: light-dark(#4992fe, #0250d9);
   --sft-brand-70: light-dark(#7cb1fe, #022ac0);
@@ -81,14 +82,28 @@
   --sft-border-disabled: #757575;                      /* border-disabled-1     */
 
   /* ════════════════════════════════════════════════════════════════════
-     6. COLOR — Accent / actions          (brand ramp, SLDS accent pattern)
+     6. COLOR — Accent / actions               (--slds-g-color-accent-*)
+     accent-N = text/icon/link emphasis; accent-container-N = filled
+     control backgrounds (brand buttons: 1 rest, 2 hover, 3 active);
+     on-accent-N = content on those containers. border-accent-N = accent-N.
      ════════════════════════════════════════════════════════════════════ */
-  --sft-accent:           var(--sft-brand-45);   /* default actionable        */
-  --sft-accent-hover:     var(--sft-brand-40);   /* hover                     */
-  --sft-accent-active:    var(--sft-brand-30);   /* pressed                   */
-  --sft-accent-container: var(--sft-brand-95);   /* accent-light-1 tint bg    */
+  --sft-accent-1: #066afe;                        /* accent-1: brand-50        */
+  --sft-accent-2: light-dark(#0250d9, #7cb1fe);   /* accent-2: brand-40/70     */
+  --sft-accent-3: light-dark(#022ac0, #a8cbff);   /* accent-3: brand-30/80     */
+  --sft-accent-container-1: #066afe;              /* accent-container-1        */
+  --sft-accent-container-2: light-dark(#0250d9, #d6e6ff); /* accent-container-2 */
+  --sft-accent-container-3: light-dark(#022ac0, #a8cbff); /* accent-container-3 */
+  --sft-on-accent-1: #fff;                        /* on-accent-1               */
+  --sft-on-accent-2: light-dark(#fff, #0250d9);   /* on-accent-2               */
+  --sft-on-accent-3: light-dark(#fff, #022ac0);   /* on-accent-3               */
+
+  /* Component-facing aliases */
+  --sft-accent:           var(--sft-accent-container-1); /* default actionable */
+  --sft-accent-hover:     var(--sft-accent-container-2);
+  --sft-accent-active:    var(--sft-accent-container-3);
+  --sft-accent-container: var(--sft-brand-95);    /* subtle tint bg (accent-light-1) */
   --sft-accent-container-strong: var(--sft-brand-90); /* accent-light-2       */
-  --sft-focus-ring:       var(--sft-brand-15);   /* focus (shadow-outline-focus-1 color) */
+  --sft-focus-ring:       var(--sft-brand-15);    /* focus (shadow-outline-focus-1 color) */
 
   /* ════════════════════════════════════════════════════════════════════
      7. COLOR — Feedback              (--slds-g-color-{error,success,warning,info}-*)
