@@ -37,11 +37,12 @@
   /* Text */
   --t-base:    var(--sft-text);
   --t-muted:   var(--sft-text-weak);
-  --t-weak:    var(--sft-neutral-60);
+  --t-weak:    light-dark(#757575, #939393); /* neutral-50/40-dark — AA on both surfaces */
   --t-inverse: var(--sft-text-on-accent);
 
-  /* Borders */
-  --b-subtle:  var(--sft-neutral-90);
+  /* Borders — dark side must stay lighter than the #242424 card surface,
+     so subtle uses border-1's dark value (neutral-90 dark = #181818 vanishes) */
+  --b-subtle:  light-dark(#e5e5e5, #444);
   --b-medium:  var(--sft-border);
   --b-strong:  var(--sft-border-strong);
 

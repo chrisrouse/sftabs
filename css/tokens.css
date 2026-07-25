@@ -113,7 +113,8 @@
   --sft-accent:           var(--sft-accent-container-1); /* default actionable */
   --sft-accent-hover:     var(--sft-accent-container-2);
   --sft-accent-active:    var(--sft-accent-container-3);
-  --sft-accent-container: var(--sft-brand-95);    /* subtle tint bg (accent-light-1) */
+  --sft-accent-container: light-dark(#edf4ff, #002775); /* subtle tint bg: accent-light-1;
+     dark uses brand-20 raw — brand-95's dark flip (#000314) is invisible on #181818 */
   --sft-accent-container-strong: var(--sft-brand-90); /* accent-light-2       */
   --sft-focus-ring:       var(--sft-brand-15);    /* focus (shadow-outline-focus-1 color) */
 
