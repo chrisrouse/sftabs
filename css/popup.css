@@ -32,11 +32,11 @@
      recipe: bg surface-2 #181818, containers surface-1 #242424), so the
      panel behind the card list gets its own darker surface. */
   --s-base:   var(--sft-surface-base);
-  --s-panel:  light-dark(#ffffff, #181818); /* list/panel background        */
-  --s-1:      var(--sft-surface-1);         /* cards/containers             */
+  --s-panel:  light-dark(#ffffff, #181818); /* list/panel background         */
+  --s-1:      light-dark(#ffffff, #2e2e2e); /* cards: surface-1 / surface-3 dark for separation */
   --s-2:      var(--sft-surface-2);
-  --s-3:      var(--sft-surface-container-3);
-  --s-hover:  light-dark(#f3f3f3, #2e2e2e); /* card hover: one step lighter than card in dark */
+  --s-3:      light-dark(#e5e5e5, #444);    /* control fills on cards: one step above card in dark */
+  --s-hover:  light-dark(#f3f3f3, #444);    /* card hover: one step lighter than card in dark */
 
   /* Text */
   --t-base:    var(--sft-text);
