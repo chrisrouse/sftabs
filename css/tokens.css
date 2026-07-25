@@ -1,0 +1,224 @@
+/* ==========================================================================
+   SF Tabs Design System — Design Tokens
+   --------------------------------------------------------------------------
+   Values sourced from SLDS 2 (Cosmos theme):
+     @salesforce-ux/design-system-2 → dist/css/modular/slds2.theme.cosmos.css
+   Each token's comment names the SLDS 2 styling hook it was taken from.
+
+   Theming: every color token carries both values via light-dark().
+   The active scheme is driven by color-scheme on :root, which follows
+   the data-theme attribute set by JS (applyTheme()).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root {
+  /* ════════════════════════════════════════════════════════════════════
+     1. COLOR — Brand ramp                    (--slds-g-color-brand-base-N)
+     Light value = raw brand-N, dark value = raw brand-(100−N)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-brand-10: light-dark(#001642, #d6e6ff);
+  --sft-brand-15: light-dark(#001e5b, #c2daff);
+  --sft-brand-20: light-dark(#002775, #a8cbff);
+  --sft-brand-30: light-dark(#022ac0, #7cb1fe);
+  --sft-brand-40: light-dark(#0250d9, #4992fe);
+  --sft-brand-45: light-dark(#045dec, #287efe);
+  --sft-brand-55: light-dark(#287efe, #045dec);
+  --sft-brand-60: light-dark(#4992fe, #0250d9);
+  --sft-brand-70: light-dark(#7cb1fe, #022ac0);
+  --sft-brand-80: light-dark(#a8cbff, #002775);
+  --sft-brand-90: light-dark(#d6e6ff, #001642);
+  --sft-brand-95: light-dark(#edf4ff, #000314);
+
+  /* ════════════════════════════════════════════════════════════════════
+     2. COLOR — Neutral ramp                (--slds-g-color-neutral-base-N)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-neutral-0:   light-dark(#000, #fff);
+  --sft-neutral-10:  light-dark(#181818, #e5e5e5);
+  --sft-neutral-20:  light-dark(#2e2e2e, #c9c9c9);
+  --sft-neutral-30:  light-dark(#444444, #aeaeae);
+  --sft-neutral-40:  light-dark(#5c5c5c, #939393);
+  --sft-neutral-50:  #757575;
+  --sft-neutral-60:  light-dark(#939393, #5c5c5c);
+  --sft-neutral-70:  light-dark(#aeaeae, #444444);
+  --sft-neutral-80:  light-dark(#c9c9c9, #2e2e2e);
+  --sft-neutral-90:  light-dark(#e5e5e5, #181818);
+  --sft-neutral-95:  light-dark(#f3f3f3, #020202);
+  --sft-neutral-100: light-dark(#fff, #000);
+
+  /* ════════════════════════════════════════════════════════════════════
+     3. COLOR — Surfaces                          (--slds-g-color-surface-*)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-surface-base: light-dark(#f3f3f3, #181818);  /* surface-2: app background   */
+  --sft-surface-1:    light-dark(#fff,    #242424);  /* surface-1: primary surface  */
+  --sft-surface-2:    light-dark(#f3f3f3, #181818);  /* surface-2: recessed         */
+  --sft-surface-3:    light-dark(#f3f3f3, #2e2e2e);  /* surface-3: raised           */
+  --sft-surface-container-1: light-dark(#fff,    #242424);  /* surface-container-1  */
+  --sft-surface-container-2: light-dark(#f3f3f3, #181818);  /* surface-container-2  */
+  --sft-surface-container-3: light-dark(#e5e5e5, #2e2e2e);  /* surface-container-3  */
+  --sft-surface-inverse: light-dark(#032d60, #aacbff);       /* surface-inverse-1    */
+
+  /* ════════════════════════════════════════════════════════════════════
+     4. COLOR — Text                           (--slds-g-color-on-surface-*)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-text-weak:     light-dark(#5c5c5c, #aeaeae);  /* on-surface-1          */
+  --sft-text:          light-dark(#2e2e2e, #e5e5e5);  /* on-surface-2: body    */
+  --sft-text-strong:   light-dark(#03234d, #d8e6fe);  /* on-surface-3: headings */
+  --sft-text-inverse:  light-dark(#fff,    #181818);  /* on-surface-inverse-1  */
+  --sft-text-disabled: #757575;                       /* on-disabled-1         */
+  --sft-text-on-accent: #fff;                         /* on-accent-1           */
+
+  /* ════════════════════════════════════════════════════════════════════
+     5. COLOR — Borders                            (--slds-g-color-border-*)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-border:          light-dark(#c9c9c9, #444);    /* border-1              */
+  --sft-border-strong:   light-dark(#5c5c5c, #757575); /* border-2              */
+  --sft-border-disabled: #757575;                      /* border-disabled-1     */
+
+  /* ════════════════════════════════════════════════════════════════════
+     6. COLOR — Accent / actions          (brand ramp, SLDS accent pattern)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-accent:           var(--sft-brand-45);   /* default actionable        */
+  --sft-accent-hover:     var(--sft-brand-40);   /* hover                     */
+  --sft-accent-active:    var(--sft-brand-30);   /* pressed                   */
+  --sft-accent-container: var(--sft-brand-95);   /* accent-light-1 tint bg    */
+  --sft-accent-container-strong: var(--sft-brand-90); /* accent-light-2       */
+  --sft-focus-ring:       var(--sft-brand-15);   /* focus (shadow-outline-focus-1 color) */
+
+  /* ════════════════════════════════════════════════════════════════════
+     7. COLOR — Feedback              (--slds-g-color-{error,success,warning,info}-*)
+     "-1" = text-level, "-container-*" = backgrounds
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-error:             light-dark(#b60554, #fe8aa7);  /* error-1             */
+  --sft-error-container:   light-dark(#fddde3, #8a033e);  /* error-container-1   */
+  --sft-error-container-2: light-dark(#fdb6c5, #b60554);  /* error-container-2   */
+
+  --sft-success:             light-dark(#056764, #01c3b3); /* success-1           */
+  --sft-success-container:   light-dark(#acf3e4, #024d4c); /* success-container-1 */
+  --sft-success-container-2: light-dark(#04e1cb, #056764); /* success-container-2 */
+
+  --sft-warning:           light-dark(#8c4b02, #e4a201);  /* warning-1           */
+  --sft-warning-container: light-dark(#f9e3b6, #6f3400);  /* warning-container-1 */
+
+  --sft-info:              light-dark(#0b5cab, #78b0fd);  /* info-1              */
+  --sft-info-container:    light-dark(#d8e6fe, #014486);  /* info-container-1    */
+
+  /* ════════════════════════════════════════════════════════════════════
+     8. COLOR — Disabled                (--slds-g-color-disabled-container-*)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-disabled-container:   light-dark(#e5e5e5, #2e2e2e);
+  --sft-disabled-container-2: light-dark(#c9c9c9, #444);
+
+  /* ════════════════════════════════════════════════════════════════════
+     9. COLOR — SF Tabs extended palette (ours, not SLDS)
+     Tab-type badge hues; SLDS 2 has no purple ramp, values kept from v2
+     mockup and given dark pairs.
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-type-object:      light-dark(#056764, #01c3b3);   /* = success family  */
+  --sft-type-object-bg:   light-dark(#acf3e4, #024d4c);
+  --sft-type-setup:       light-dark(#0b5cab, #78b0fd);   /* = info family     */
+  --sft-type-setup-bg:    light-dark(#d8e6fe, #014486);
+  --sft-type-custom:      light-dark(#7c3aed, #c4b5fd);   /* purple (ours)     */
+  --sft-type-custom-bg:   light-dark(#ede9fe, #3b2d63);
+  --sft-type-standard:    light-dark(#5c5c5c, #aeaeae);   /* = neutral family  */
+  --sft-type-standard-bg: light-dark(#e5e5e5, #2e2e2e);
+
+  /* ════════════════════════════════════════════════════════════════════
+     10. TYPOGRAPHY                                     (--slds-g-font-*)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol';                /* font-family-base   */
+  --sft-font-family-mono: Consolas, Menlo, Monaco, Courier, monospace;
+
+  --sft-font-size-xxs:  0.625rem;   /* scale-neg-2 — 10px  fine print        */
+  --sft-font-size-xs:   0.75rem;    /* scale-neg-1 — 12px  labels, hints     */
+  --sft-font-size-base: 0.8125rem;  /* scale-base  — 13px  body              */
+  --sft-font-size-sm:   0.875rem;   /* scale-1     — 14px  emphasized body   */
+  --sft-font-size-md:   1rem;       /* scale-2     — 16px  small headings    */
+  --sft-font-size-lg:   1.25rem;    /* scale-3     — 20px  panel headings    */
+  --sft-font-size-xl:   1.5rem;     /* scale-4     — 24px  page headings     */
+
+  --sft-font-weight-regular:  400;  /* font-weight-4 */
+  --sft-font-weight-medium:   500;  /* font-weight-5 */
+  --sft-font-weight-semibold: 600;  /* font-weight-6 */
+  --sft-font-weight-bold:     700;  /* font-weight-7 */
+
+  --sft-line-height-none:  1;       /* line-height-1 */
+  --sft-line-height-tight: 1.25;    /* line-height-2 */
+  --sft-line-height-snug:  1.375;   /* line-height-3 */
+  --sft-line-height-base:  1.5;     /* line-height-4 / line-height-base */
+
+  /* ════════════════════════════════════════════════════════════════════
+     11. SPACING                                      (--slds-g-spacing-N)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-spacing-1:  0.25rem;   /*  4px */
+  --sft-spacing-2:  0.5rem;    /*  8px */
+  --sft-spacing-3:  0.75rem;   /* 12px */
+  --sft-spacing-4:  1rem;      /* 16px */
+  --sft-spacing-5:  1.5rem;    /* 24px */
+  --sft-spacing-6:  2rem;      /* 32px */
+  --sft-spacing-7:  2.5rem;    /* 40px */
+  --sft-spacing-8:  3rem;      /* 48px */
+
+  /* ════════════════════════════════════════════════════════════════════
+     12. SIZING                                        (--slds-g-sizing-*)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-border-width-1: 1px;   /* sizing-border-1 */
+  --sft-border-width-2: 2px;   /* sizing-border-2 */
+  --sft-border-width-3: 3px;   /* sizing-border-3 */
+
+  --sft-size-control:    2rem;     /* sizing-9  — 32px inputs/buttons        */
+  --sft-size-control-sm: 1.5rem;   /* sizing-7  — 24px compact controls      */
+  --sft-size-icon:       1rem;     /* sizing-5  — 16px default icon          */
+  --sft-size-icon-sm:    0.75rem;  /* sizing-4  — 12px small icon            */
+
+  /* ════════════════════════════════════════════════════════════════════
+     13. RADIUS                                  (--slds-g-radius-border-N)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-radius-1:      0.25rem;   /*  4px  radius-border-1 */
+  --sft-radius-2:      0.5rem;    /*  8px  radius-border-2 */
+  --sft-radius-3:      0.75rem;   /* 12px  radius-border-3 */
+  --sft-radius-4:      1.25rem;   /* 20px  radius-border-4 */
+  --sft-radius-pill:   15rem;     /*       radius-border-pill */
+  --sft-radius-circle: 100%;      /*       radius-border-circle */
+
+  /* ════════════════════════════════════════════════════════════════════
+     14. ELEVATION                                     (--slds-g-shadow-N)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-shadow-1: 0px 0px 2px 0px light-dark(#0000002e, #0000005c),
+                  0px 2px 2px 0px light-dark(#0000002e, #0000005c),
+                  0px -1px 2px 0px light-dark(#0000001a, #00000033);
+  --sft-shadow-2: 0px 0px 5px 0px light-dark(#00000029, #00000052),
+                  0px 3px 3px 0px light-dark(#00000029, #00000052),
+                  0px -1px 2px 0px light-dark(#00000017, #0000002e);
+  --sft-shadow-3: 0px 0px 7px 0px light-dark(#00000024, #00000047),
+                  0px 5px 5px 0px light-dark(#00000024, #00000047),
+                  0px -1px 2px 0px light-dark(#00000014, #00000029);
+  --sft-shadow-4: 0px 0px 10px 0px light-dark(#0000001f, #0000003d),
+                  0px 7px 7px 0px light-dark(#0000001f, #0000003d),
+                  0px -1px 3px 0px light-dark(#00000012, #00000024);
+
+  /* Focus rings (--slds-g-shadow-*-focus-1) */
+  --sft-shadow-focus:        0px 0px 0px 2px var(--sft-focus-ring);
+  --sft-shadow-focus-inset:  0px 0px 0px 2px var(--sft-focus-ring) inset;
+  --sft-shadow-focus-outset: 0px 0px 0px 2px var(--sft-neutral-100),
+                             0px 0px 0px 4px var(--sft-focus-ring);
+
+  /* ════════════════════════════════════════════════════════════════════
+     15. MOTION                  (--slds-g-duration-*; easing curve is ours)
+     ════════════════════════════════════════════════════════════════════ */
+  --sft-duration-instantly:   0s;     /* duration-instantly   */
+  --sft-duration-immediately: 0.05s;  /* duration-immediately */
+  --sft-duration-quickly:     0.1s;   /* duration-quickly     */
+  --sft-duration-promptly:    0.2s;   /* duration-promptly    */
+  --sft-duration-slowly:      0.4s;   /* duration-slowly      */
+  --sft-duration-toast:       4.8s;   /* duration-toast-short */
+
+  --sft-ease: cubic-bezier(0.4, 0, 0.2, 1);  /* SF Tabs tray easing (ours) */
+}
