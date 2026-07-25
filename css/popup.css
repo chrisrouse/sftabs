@@ -190,7 +190,7 @@ a:hover { text-decoration: underline; }
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10b981;
+  background: var(--c-success); /* active-profile indicator */
   flex-shrink: 0;
 }
 
@@ -239,7 +239,7 @@ a:hover { text-decoration: underline; }
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #f59e0b;
+  background: #fcc003; /* palette-yellow-80 notification accent */
   box-shadow: 0 0 0 1.5px rgba(255,255,255,0.5);
 }
 
@@ -1008,8 +1008,8 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   text-overflow: ellipsis;
   padding-left: 4px;
 }
-.toast-region.toast-success { color: #6ee7b7; }
-.toast-region.toast-error   { color: #fca5a5; }
+.toast-region.toast-success { color: #04e1cb; /* teal-80 on fixed-dark footer */ }
+.toast-region.toast-error   { color: #fe8aa7; /* error-70 on fixed-dark footer */ }
 
 /* ── 18. Profile dropdown ── */
 .profile-dropdown {
