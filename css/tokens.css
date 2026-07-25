@@ -130,18 +130,19 @@
   --sft-disabled-container-2: light-dark(#c9c9c9, #444);
 
   /* ════════════════════════════════════════════════════════════════════
-     9. COLOR — SF Tabs extended palette (ours, not SLDS)
-     Tab-type badge hues; SLDS 2 has no purple ramp, values kept from v2
-     mockup and given dark pairs.
+     9. COLOR — Tab-type badges          (--slds-g-color-palette-*)
+     Sourced from the SLDS 2 expressive palette (sanctioned for data
+     display/categorization) rather than feedback colors, per guidance.
+     Text = palette-N-40 on bg = palette-N-90.
      ════════════════════════════════════════════════════════════════════ */
-  --sft-type-object:      light-dark(#056764, #01c3b3);   /* = success family  */
-  --sft-type-object-bg:   light-dark(#acf3e4, #024d4c);
-  --sft-type-setup:       light-dark(#0b5cab, #78b0fd);   /* = info family     */
-  --sft-type-setup-bg:    light-dark(#d8e6fe, #014486);
-  --sft-type-custom:      light-dark(#7c3aed, #c4b5fd);   /* purple (ours)     */
-  --sft-type-custom-bg:   light-dark(#ede9fe, #3b2d63);
-  --sft-type-standard:    light-dark(#5c5c5c, #aeaeae);   /* = neutral family  */
-  --sft-type-standard-bg: light-dark(#e5e5e5, #2e2e2e);
+  --sft-type-object:      light-dark(#396547, #3ba755);   /* palette-green-40      */
+  --sft-type-object-bg:   light-dark(#cdefc4, #071b12);   /* palette-green-90      */
+  --sft-type-setup:       light-dark(#05628a, #0d9dda);   /* palette-cloud-blue-40 */
+  --sft-type-setup-bg:    light-dark(#cfe9fe, #001a28);   /* palette-cloud-blue-90 */
+  --sft-type-custom:      light-dark(#7526e3, #ad7bee);   /* palette-purple-40     */
+  --sft-type-custom-bg:   light-dark(#ece1f9, #240643);   /* palette-purple-90     */
+  --sft-type-standard:    light-dark(#5c5c5c, #aeaeae);   /* palette-neutral-40/70 */
+  --sft-type-standard-bg: light-dark(#e5e5e5, #2e2e2e);   /* palette-neutral-90/20 */
 
   /* ════════════════════════════════════════════════════════════════════
      10. TYPOGRAPHY                                     (--slds-g-font-*)
