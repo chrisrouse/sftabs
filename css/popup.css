@@ -289,7 +289,7 @@ a:hover { text-decoration: underline; }
   transition: background var(--ease);
 }
 .btn-add-tab:hover { background: var(--c-primary-dark); }
-.btn-add-tab:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.btn-add-tab:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .btn-add-tab svg { width: 15px; height: 15px; }
 
 .btn-icon-sm {
@@ -307,7 +307,7 @@ a:hover { text-decoration: underline; }
   transition: background var(--ease), color var(--ease), border-color var(--ease);
 }
 .btn-icon-sm:hover { background: var(--c-primary-light); color: var(--c-primary); border-color: var(--c-primary); }
-.btn-icon-sm:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.btn-icon-sm:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .btn-icon-sm svg { width: 16px; height: 16px; }
 
 /* ── 9. Tab list ── */
@@ -476,7 +476,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: background var(--ease), color var(--ease);
 }
 .tab-btn:hover { background: var(--s-3); color: var(--t-muted); }
-.tab-btn:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 1px; }
+.tab-btn:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 .tab-btn svg { width: 15px; height: 15px; }
 
 .tab-btn--edit:hover              { background: var(--c-primary-light); color: var(--c-primary); }
@@ -572,7 +572,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: background var(--ease), color var(--ease), border-color var(--ease);
 }
 .btn-close:hover { background: var(--c-error-bg); color: var(--c-error); border-color: var(--c-error); }
-.btn-close:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.btn-close:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .btn-close svg { width: 13px; height: 13px; }
 
 /* ── 14. Edit form ── */
@@ -615,7 +615,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .form-input:focus {
   outline: none;
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-primary) 14%, transparent);
+  box-shadow: var(--sft-shadow-focus);
 }
 .form-input::placeholder { color: var(--t-weak); }
 
@@ -702,7 +702,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 }
 .dropdown-item:focus-within {
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c-primary) 14%, transparent);
+  box-shadow: var(--sft-shadow-focus);
 }
 
 .dropdown-item-info {
@@ -753,7 +753,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   background: var(--s-2);
 }
 .dropdown-item-btn:focus-visible {
-  outline: 2px solid var(--c-primary);
+  outline: 2px solid var(--sft-focus-ring);
   outline-offset: 1px;
 }
 
@@ -832,7 +832,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   color: var(--c-primary);
   font-weight: var(--sft-font-weight-semibold);
 }
-.seg-btn:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 1px; }
+.seg-btn:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 
 /* Toggle switch */
 .toggle { display: inline-flex; cursor: pointer; }
@@ -846,7 +846,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: background 0.2s ease;
 }
 .toggle input:checked + .toggle-track { background: var(--c-primary); }
-.toggle input:focus-visible + .toggle-track { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.toggle input:focus-visible + .toggle-track { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .toggle-thumb {
   position: absolute;
   top: 2px; left: 2px;
@@ -1059,7 +1059,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: background var(--ease);
 }
 .profile-option:hover { background: var(--s-2); }
-.profile-option:focus-visible { outline: 2px solid var(--c-primary); outline-offset: -2px; }
+.profile-option:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: -2px; }
 .profile-option[aria-selected="true"] { color: var(--c-primary); }
 .profile-option-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .profile-option-check { margin-left: auto; color: var(--c-primary); font-size: var(--sft-font-size-base); }
@@ -1128,7 +1128,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: background var(--ease);
 }
 .btn-primary:hover { background: var(--c-primary-dark); }
-.btn-primary:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.btn-primary:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .btn-primary svg { width: 14px; height: 14px; }
 
 .btn-secondary {
@@ -1146,7 +1146,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: background var(--ease), border-color var(--ease), color var(--ease);
 }
 .btn-secondary:hover { background: var(--s-3); border-color: var(--b-strong); color: var(--t-base); }
-.btn-secondary:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.btn-secondary:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 
 .btn-danger {
   display: inline-flex;
@@ -1163,7 +1163,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   transition: opacity var(--ease);
 }
 .btn-danger:hover { opacity: 0.88; }
-.btn-danger:focus-visible { outline: 2px solid var(--c-error); outline-offset: 2px; }
+.btn-danger:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 
 /* ── 21. Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
@@ -1182,7 +1182,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 /* ── 23. Focus visible (global) ── */
 :focus-visible {
-  outline: 2px solid var(--c-primary);
+  outline: 2px solid var(--sft-focus-ring);
   outline-offset: 2px;
   border-radius: var(--r-sm);
 }
