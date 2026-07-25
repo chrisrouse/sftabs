@@ -698,6 +698,87 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   padding-bottom: 4px;
 }
 
+/* ── Dropdown items list ── */
+.dropdown-items-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--s-1);
+  border: 1.5px solid var(--b-subtle);
+  border-radius: var(--r-md);
+  transition: border-color var(--ease), background var(--ease);
+}
+.dropdown-item:hover {
+  border-color: var(--b-medium);
+  background: var(--s-2);
+}
+.dropdown-item:focus-within {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 2px rgba(40,138,255,0.14);
+}
+
+.dropdown-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-item-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t-base);
+  word-break: break-word;
+}
+
+.dropdown-item-path {
+  font-size: 11px;
+  color: var(--t-weak);
+  word-break: break-word;
+}
+
+.dropdown-item-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.dropdown-item-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--b-subtle);
+  border-radius: var(--r-md);
+  color: var(--t-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--ease);
+  font-size: 13px;
+}
+.dropdown-item-btn:hover {
+  border-color: var(--b-medium);
+  color: var(--t-base);
+  background: var(--s-2);
+}
+.dropdown-item-btn:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 1px;
+}
+
 /* ── 15. Settings ── */
 .settings-body {
   flex: 1;

@@ -124,7 +124,7 @@ function renderProfileDropdown() {
 
 function showView(viewName) {
   const tray  = document.getElementById('panel-tray');
-  const views = ['edit-tab', 'settings', 'release-notes'];
+  const views = ['edit-tab', 'settings', 'release-notes', 'dropdowns'];
 
   if (viewName === 'empty') {
     tray.classList.remove('is-open');
@@ -140,8 +140,8 @@ function showView(viewName) {
     tray.classList.add('is-open');
   }
 
-  // Clear editing highlight unless we're showing the edit form
-  if (viewName !== 'edit-tab') {
+  // Clear editing highlight unless we're showing the edit form or dropdowns
+  if (viewName !== 'edit-tab' && viewName !== 'dropdowns') {
     clearEditingHighlight();
   }
 
@@ -161,6 +161,11 @@ function clearEditingHighlight() {
 function openEditTab(tabId) {
   const tab = state.tabs.find(t => t.id === tabId);
   if (!tab) return;
+
+  if (tab.hasDropdown) {
+    openDropdownManagement(tabId);
+    return;
+  }
 
   state.editingTabId = tabId;
 
@@ -197,6 +202,60 @@ function openAddTab() {
 
   showView('edit-tab');
   document.getElementById('input-tab-name').focus();
+}
+
+function openDropdownManagement(tabId) {
+  const tab = state.tabs.find(t => t.id === tabId);
+  if (!tab || !tab.hasDropdown) return;
+
+  state.editingTabId = tabId;
+
+  // Highlight the tab being edited
+  document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('is-editing'));
+  document.getElementById('tab-list').classList.add('has-editing');
+  const tabEl = document.querySelector(`.tab-item[data-id="${tabId}"]`);
+  if (tabEl) tabEl.classList.add('is-editing');
+
+  document.getElementById('dropdown-title').textContent = 'Manage Items';
+  document.getElementById('dropdown-subtitle').textContent = `Items in "${tab.label}"`;
+
+  renderDropdownItems(tabId);
+  showView('dropdowns');
+}
+
+function renderDropdownItems(tabId) {
+  const tab = state.tabs.find(t => t.id === tabId);
+  if (!tab) return;
+
+  const list = document.getElementById('dropdown-items-list');
+  list.innerHTML = '';
+
+  if (!tab.dropdownItems || tab.dropdownItems.length === 0) {
+    list.innerHTML = `<li style="padding: 16px 12px; text-align: center; color: var(--t-weak); font-size: 12px;">No items yet</li>`;
+    return;
+  }
+
+  tab.dropdownItems.forEach((item, idx) => {
+    const li = document.createElement('li');
+    li.className = 'dropdown-item';
+    li.setAttribute('role', 'listitem');
+    li.setAttribute('data-index', idx);
+    li.innerHTML = `
+      <div class="dropdown-item-info">
+        <div class="dropdown-item-label">${esc(item.label)}</div>
+        <div class="dropdown-item-path">${esc(item.path)}</div>
+      </div>
+      <div class="dropdown-item-actions" role="group" aria-label="Actions for ${esc(item.label)}">
+        <button class="dropdown-item-btn" data-action="edit-dropdown" data-index="${idx}" aria-label="Edit ${esc(item.label)}" title="Edit">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M11.013 1.427a1.75 1.75 0 012.474 0l1.086 1.086a1.75 1.75 0 010 2.474l-8.61 8.61c-.21.21-.497.364-.809.464l-3.14.734a.75.75 0 01-.927-.928l.734-3.142c.1-.312.254-.599.464-.809l8.61-8.61z"/></svg>
+        </button>
+        <button class="dropdown-item-btn" data-action="delete-dropdown" data-index="${idx}" aria-label="Delete ${esc(item.label)}" title="Delete">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118z"/></svg>
+        </button>
+      </div>
+    `;
+    list.appendChild(li);
+  });
 }
 
 function saveTab(e) {
@@ -488,6 +547,32 @@ function bindEvents() {
     document.getElementById('btn-release-notes').style.display = 'none';
     showView('empty');
     showToast('Release notes dismissed');
+  });
+
+  // Dropdown management
+  document.getElementById('btn-close-dropdowns').addEventListener('click', () => {
+    showView('empty');
+  });
+
+  document.getElementById('btn-add-dropdown-item').addEventListener('click', () => {
+    showToast('Add dropdown item: Coming soon in Phase 3', 'info');
+  });
+
+  document.getElementById('dropdown-items-list').addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const { action, index } = btn.dataset;
+    if (action === 'edit-dropdown') {
+      showToast(`Edit dropdown item #${index}: Coming soon in Phase 3`, 'info');
+    }
+    if (action === 'delete-dropdown') {
+      const tab = state.tabs.find(t => t.id === state.editingTabId);
+      if (tab && tab.dropdownItems) {
+        tab.dropdownItems.splice(parseInt(index), 1);
+        renderDropdownItems(state.editingTabId);
+        showToast('Dropdown item deleted');
+      }
+    }
   });
 
   // Modal: delete
