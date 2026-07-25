@@ -156,19 +156,34 @@
   --sft-font-size-xs:   0.75rem;    /* scale-neg-1 — 12px  labels, hints     */
   --sft-font-size-base: 0.8125rem;  /* scale-base  — 13px  body              */
   --sft-font-size-sm:   0.875rem;   /* scale-1     — 14px  emphasized body   */
-  --sft-font-size-md:   1rem;       /* scale-2     — 16px  small headings    */
-  --sft-font-size-lg:   1.25rem;    /* scale-3     — 20px  panel headings    */
-  --sft-font-size-xl:   1.5rem;     /* scale-4     — 24px  page headings     */
+  --sft-font-size-md:   1rem;       /* scale-2     — 16px  large body        */
+  --sft-font-size-lg:   1.25rem;    /* scale-3     — 20px  titles            */
+  --sft-font-size-xl:   1.5rem;     /* scale-4     — 24px  large titles      */
 
-  --sft-font-weight-regular:  400;  /* font-weight-4 */
+  --sft-font-weight-light:    300;  /* font-weight-3 — display type only */
+  --sft-font-weight-regular:  400;  /* font-weight-4 — default           */
   --sft-font-weight-medium:   500;  /* font-weight-5 */
   --sft-font-weight-semibold: 600;  /* font-weight-6 */
-  --sft-font-weight-bold:     700;  /* font-weight-7 */
+  --sft-font-weight-bold:     700;  /* font-weight-7 — emphasis only, never headings */
 
   --sft-line-height-none:  1;       /* line-height-1 */
   --sft-line-height-tight: 1.25;    /* line-height-2 */
   --sft-line-height-snug:  1.375;   /* line-height-3 */
   --sft-line-height-base:  1.5;     /* line-height-4 / line-height-base */
+
+  /* ── Type styles — SLDS recipes (body / title / display) ──
+     Body   = scales neg-2…2, Regular (Semibold/Bold for emphasis only),
+              color --sft-text / --sft-text-weak.
+     Title  = scale-3 Regular|Semibold (color --sft-text or --sft-text-strong);
+              scale-4+ Regular, color --sft-text-strong only.
+     Display (scale-7/8, Light, --sft-text-strong) is omitted — no use in a
+              compact popup; compose from primitives if ever needed.
+     Usage: font: var(--sft-type-style-*); set color separately. */
+  --sft-type-style-body-xs: var(--sft-font-weight-regular) var(--sft-font-size-xs)/var(--sft-line-height-base) var(--sft-font-family);
+  --sft-type-style-body:    var(--sft-font-weight-regular) var(--sft-font-size-base)/var(--sft-line-height-base) var(--sft-font-family);
+  --sft-type-style-body-lg: var(--sft-font-weight-regular) var(--sft-font-size-sm)/var(--sft-line-height-base) var(--sft-font-family);
+  --sft-type-style-title-sm: var(--sft-font-weight-semibold) var(--sft-font-size-lg)/var(--sft-line-height-tight) var(--sft-font-family);
+  --sft-type-style-title:    var(--sft-font-weight-regular) var(--sft-font-size-xl)/var(--sft-line-height-tight) var(--sft-font-family);
 
   /* ════════════════════════════════════════════════════════════════════
      11. SPACING                                      (--slds-g-spacing-N)
