@@ -1107,7 +1107,9 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 /* ── 17. Footer ── */
 .app-footer {
-  min-height: 42px;              /* grows when a status message wraps */
+  /* Fixed at two lines of status text (2 x 16.5px + 12px padding + border)
+     so a wrapping message never shifts the layout */
+  height: 46px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -1161,12 +1163,12 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   line-height: var(--sft-line-height-snug);
   padding-left: 4px;
   min-width: 0;
-  /* Wrap rather than truncate; cap at 3 lines so a long error can't
-     push the footer over the tab list */
+  /* Wrap rather than truncate, clamped to the two lines the footer is
+     sized for */
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
 }
 /* Fixed light values: the footer stays dark in both themes. 7-12.5:1 on it. */
 .status-region.status-success { color: #04e1cb; /* teal-80  */ }
