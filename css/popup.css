@@ -15,7 +15,9 @@
   --c-primary:      var(--sft-accent);
   --c-primary-dark: var(--sft-accent-hover);
   --c-primary-light:var(--sft-accent-container);
-  --c-primary-tint: light-dark(#d6e6ff, #002775); /* brand-90 — icon-button hover fill */
+  --c-primary-tint: light-dark(#d6e6ff, #022ac0); /* brand-90/30 — icon-button hover fill,
+     tuned to match the delete tint's separation from the card in both themes */
+  --c-primary-on-tint: var(--sft-accent-2);       /* icon color on that fill (4.6-5.3:1) */
   --c-accent:       var(--sft-type-custom);
   --c-accent-light: var(--sft-type-custom-bg);
 
@@ -480,8 +482,8 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 /* Action hovers: matched tint strength across the three variants —
    brand-90 / error-container so each reads clearly on a white card */
-.tab-btn--edit:hover         { background: var(--c-primary-tint); color: var(--c-primary); }
-.tab-btn--newtab:hover       { background: var(--c-primary-tint); color: var(--c-primary); }
+.tab-btn--edit:hover         { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
+.tab-btn--newtab:hover       { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
 .tab-btn--newtab.is-on       { color: var(--c-primary); }
 .tab-btn--delete:hover       { background: var(--c-error-bg); color: var(--c-error); }
 
