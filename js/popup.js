@@ -265,10 +265,12 @@ function saveTab(e) {
 
   if (!name) {
     document.getElementById('tab-name-error').hidden = false;
+    nameInput.setAttribute('aria-invalid', 'true');
     nameInput.focus();
     return;
   }
   document.getElementById('tab-name-error').hidden = true;
+  nameInput.removeAttribute('aria-invalid');
 
   const updates = {
     label:       name,
@@ -489,9 +491,10 @@ function bindEvents() {
   document.getElementById('form-edit-tab').addEventListener('submit', saveTab);
   document.getElementById('btn-close-edit').addEventListener('click', () => showView('empty'));
   document.getElementById('btn-cancel-edit').addEventListener('click', () => showView('empty'));
-  document.getElementById('input-tab-name').addEventListener('input', () => {
+  document.getElementById('input-tab-name').addEventListener('input', (e) => {
     updateCharCount('input-tab-name', 'tab-name-count', 30);
     document.getElementById('tab-name-error').hidden = true;
+    e.target.removeAttribute('aria-invalid');
   });
 
   // Settings

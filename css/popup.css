@@ -597,34 +597,46 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 .form-group { display: flex; flex-direction: column; gap: 4px; }
 
+/* SLDS form labels are sentence case at body size, not uppercase micro-caps */
 .form-label {
-  font-size: var(--sft-font-size-xs);
-  font-weight: var(--sft-font-weight-semibold);
+  font-size: var(--sft-font-size-base);
+  font-weight: var(--sft-font-weight-regular);
   color: var(--t-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .req { color: var(--c-error); margin-left: 2px; }
 
 .input-row { position: relative; }
 
+/* SLDS input: 32px tall (1.875rem line-height + 1px borders), 1px border-2
+   stroke, radius-2, spacing-2 inline padding */
 .form-input {
   width: 100%;
-  padding: 8px 12px;
-  background: var(--s-1);
-  border: 1.5px solid var(--b-medium);
-  border-radius: var(--r-md);
+  padding: 0 var(--sft-spacing-2);
+  line-height: 1.875rem;
+  background: var(--sft-surface-container-1);
+  border: var(--sft-border-width-1) solid var(--sft-border-strong);
+  border-radius: var(--sft-radius-2);
   font-size: var(--sft-font-size-base);
   color: var(--t-base);
   transition: border-color var(--ease), box-shadow var(--ease);
 }
 .form-input:focus {
   outline: none;
-  border-color: var(--c-primary);
+  border-color: transparent;
   box-shadow: var(--sft-shadow-focus);
 }
-.form-input::placeholder { color: var(--t-weak); }
+.form-input::placeholder { color: var(--t-muted); }
+.form-input[aria-invalid="true"] {
+  border-color: var(--sft-border-error);
+  background: var(--sft-error-container);
+}
+.form-input:disabled {
+  background: var(--sft-disabled-container);
+  border-color: var(--sft-border-disabled);
+  color: var(--sft-text-disabled);
+  cursor: not-allowed;
+}
 
 .char-count {
   position: absolute;
@@ -640,19 +652,17 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .form-error { font-size: var(--sft-font-size-xs); color: var(--c-error); font-weight: var(--sft-font-weight-medium); }
 
 .form-fieldset {
-  border: 1.5px solid var(--b-subtle);
-  border-radius: var(--r-md);
+  border: var(--sft-border-width-1) solid var(--b-subtle);
+  border-radius: var(--sft-radius-2);
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 .form-legend {
-  font-size: var(--sft-font-size-xs);
-  font-weight: var(--sft-font-weight-semibold);
+  font-size: var(--sft-font-size-base);
+  font-weight: var(--sft-font-weight-regular);
   color: var(--t-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   padding: 0 4px;
 }
 
@@ -662,14 +672,43 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   gap: 8px;
   cursor: pointer;
 }
+/* SLDS checkbox: 16px faux box, 1px border-2, radius-1, accent fill +
+   rotated-border check when on (drawn on the native input, no extra markup) */
 .check-input {
-  width: 15px;
-  height: 15px;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: var(--sft-size-icon);
+  height: var(--sft-size-icon);
   flex-shrink: 0;
   margin-top: 1px;
-  accent-color: var(--c-primary);
+  background: var(--sft-surface-container-1);
+  border: var(--sft-border-width-1) solid var(--sft-border-strong);
+  border-radius: var(--sft-radius-1);
+  transition: background-color 0.1s linear, border-color 0.1s linear;
   cursor: pointer;
 }
+.check-input::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  width: 5px;
+  height: 9px;
+  border-right: var(--sft-border-width-2) solid var(--sft-on-accent-1);
+  border-bottom: var(--sft-border-width-2) solid var(--sft-on-accent-1);
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.1s linear;
+}
+.check-input:checked {
+  background: var(--sft-accent-container-1);
+  border-color: var(--sft-border-accent);
+}
+.check-input:checked::after { opacity: 1; }
+.check-row:hover .check-input:not(:checked) { border-color: var(--sft-neutral-50); }
+.check-input:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+
 .check-body { display: flex; flex-direction: column; gap: 1px; }
 .check-label { font-size: var(--sft-font-size-base); font-weight: var(--sft-font-weight-medium); color: var(--t-base); }
 .check-desc  { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
