@@ -452,7 +452,6 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   min-width: 0;
 }
 
-
 /* Dropdown-item count. Comfy shows the "▾ N dropdown items" note; compact
    swaps it for a filled circle after the tab name. */
 .tab-dropdown-note {
@@ -584,7 +583,6 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   overflow: hidden;
 }
 .panel-view[hidden] { display: none; }
-
 
 /* ── 13. Tray header ── */
 .panel-view-header {
@@ -869,75 +867,23 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   padding: var(--sft-spacing-var-block-3) var(--sft-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: var(--sft-spacing-var-block-2);
+  gap: var(--sft-spacing-var-block-5);
 }
 .settings-body::-webkit-scrollbar { width: 3px; }
 .settings-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
 
+/* Settings groups follow the SLDS form-element pattern: no container
+   chrome, a label-spec heading, and whitespace between groups. */
 .settings-section {
-  border: 1px solid var(--b-subtle);
-  border-radius: var(--r-lg);
-  background: var(--s-1);
+  background: none;
+  border: none;
 }
 
 .settings-section-title {
-  font-size: var(--sft-font-size-xxs);
-  font-weight: var(--sft-font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--t-weak);
-  padding: 8px 12px 4px;
-  border-bottom: 1px solid var(--b-subtle);
-}
-
-/* ── TRIAL: full SLDS card treatment (Appearance section only) ──
-   Card = surface-container-1, radius-4, border-1, and a header at
-   scale-2 regular in the heading color with no divider rule. */
-.settings-section--card {
-  background: var(--sft-surface-container-1);
-  border: var(--sft-border-width-1) solid var(--sft-border);
-  border-radius: var(--sft-radius-4);
-}
-.settings-section--card .settings-section-title {
-  font-size: var(--sft-font-size-md);
-  font-weight: var(--sft-font-weight-regular);
-  text-transform: none;
-  letter-spacing: normal;
-  color: var(--sft-text-strong);
-  padding: var(--sft-spacing-3) var(--sft-spacing-4) var(--sft-spacing-2);
-  border-bottom: none;
-}
-/* Card body padding: spacing-3 block / spacing-4 inline */
-.settings-section--card .settings-row {
-  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-4);
-}
-.settings-section--card .settings-row:last-child {
-  padding-bottom: var(--sft-spacing-4);
-}
-
-/* ── TRIAL: form-element treatment (Behavior section only) ──
-   No container chrome. Group heading uses the SLDS label spec — base
-   size, semibold, on-surface-2 — with rows divided by hairlines. */
-.settings-section--form {
-  background: none;
-  border: none;
-  border-radius: 0;
-}
-.settings-section--form .settings-section-title {
   font-size: var(--sft-font-size-base);
   font-weight: var(--sft-font-weight-semibold);
-  text-transform: none;
-  letter-spacing: normal;
   color: var(--t-base);
   padding: 0 0 var(--sft-spacing-1);
-  border-bottom: none;
-}
-.settings-section--form .settings-row {
-  padding-inline: 0;
-  border-bottom: var(--sft-border-width-1) solid var(--b-subtle);
-}
-.settings-section--form .settings-row:first-of-type {
-  border-top: var(--sft-border-width-1) solid var(--b-subtle);
 }
 
 .settings-row {
@@ -945,10 +891,8 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-3);
-  border-bottom: 1px solid var(--b-subtle);
+  padding: var(--sft-spacing-var-block-2) 0;
 }
-.settings-row:last-child { border-bottom: none; }
 
 .settings-row-label {
   display: flex;
@@ -1056,7 +1000,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   flex-direction: column;
   gap: 0;
   padding: 0;
-  margin: 8px 12px;
+  margin: var(--sft-spacing-2) 0 0;
   background: var(--s-1);
 }
 
@@ -1093,7 +1037,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .storage-card-title { font-size: var(--sft-font-size-base); font-weight: var(--sft-font-weight-medium); color: var(--t-base); }
 .storage-card-desc  { font-size: var(--sft-font-size-xs); color: var(--t-weak); margin-top: 1px; }
 
-.settings-advanced { padding: 2px 2px 4px; }
+.settings-advanced { padding: 0; }
 .advanced-link {
   display: flex;
   align-items: center;
