@@ -1124,17 +1124,15 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   flex: 1;
   min-width: 0;
   display: flex;
-  align-items: flex-start;  /* keep the version pinned to the first line */
-  gap: 8px;
+  align-items: center;
 }
 
 .footer-version {
   font-size: var(--sft-font-size-xs);
   font-weight: var(--sft-font-weight-medium);
-  line-height: var(--sft-line-height-snug); /* share the status baseline */
+  line-height: var(--sft-line-height-snug);
   color: var(--footer-fg);
   flex-shrink: 0;
-  padding-left: 4px;
 }
 
 .footer-nav { display: flex; align-items: center; gap: 2px; }
