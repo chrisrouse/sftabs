@@ -1153,7 +1153,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .footer-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.55); outline-offset: 2px; }
 .footer-btn svg { width: 15px; height: 15px; }
 
-.toast-region {
+.status-region {
   font-size: var(--sft-font-size-xs);
   color: rgba(255,255,255,0.55);
   white-space: nowrap;
@@ -1162,9 +1162,9 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   padding-left: 4px;
 }
 /* Fixed light values: the footer stays dark in both themes. 7-12.5:1 on it. */
-.toast-region.toast-success { color: #04e1cb; /* teal-80  */ }
-.toast-region.toast-error   { color: #fe8f7d; /* red-70 — matches the destructive palette */ }
-.toast-region.toast-info    { color: #78b0fd; /* info-70  */ }
+.status-region.status-success { color: #04e1cb; /* teal-80  */ }
+.status-region.status-error   { color: #fe8f7d; /* red-70 — matches the destructive palette */ }
+.status-region.status-info    { color: #78b0fd; /* info-70  */ }
 
 /* ── 18. Profile dropdown ── */
 .profile-dropdown {

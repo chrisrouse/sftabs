@@ -287,7 +287,7 @@ function saveTab(e) {
     state.tabs = state.tabs.map(t =>
       t.id === state.editingTabId ? { ...t, ...updates } : t
     );
-    showToast(`"${name}" saved`);
+    showStatus(`"${name}" saved`);
   } else {
     // Create new
     const newTab = {
@@ -299,7 +299,7 @@ function saveTab(e) {
       ...updates,
     };
     state.tabs = [...state.tabs, newTab];
-    showToast(`"${name}" added`);
+    showStatus(`"${name}" added`);
   }
 
   renderTabList();
@@ -332,7 +332,7 @@ function confirmDelete(tabId) {
   renderTabList();
   bindTabListEvents();
   if (state.editingTabId === id) showView('empty');
-  showToast('Tab deleted');
+  showStatus('Tab deleted');
 }
 
 function toggleNewTab(tabId) {
@@ -371,7 +371,7 @@ function switchProfile(profileId) {
   renderProfileChip();
   renderProfileDropdown();
   closeProfileDropdown();
-  showToast(`Switched to ${state.profiles.find(p => p.id === profileId)?.name || 'profile'}`);
+  showStatus(`Switched to ${state.profiles.find(p => p.id === profileId)?.name || 'profile'}`);
 }
 
 function openProfileDropdown() {
@@ -429,15 +429,15 @@ function syncSettingsPanel() {
 
 // ── Toast ──────────────────────────────────────────────────────
 
-let toastTimer = null;
-function showToast(msg, type = 'success') {
-  const region = document.getElementById('toast-region');
+let statusTimer = null;
+function showStatus(msg, type = 'success') {
+  const region = document.getElementById('status-region');
   region.textContent = msg;
-  region.className = `toast-region toast-${type}`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
+  region.className = `status-region status-${type}`;
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => {
     region.textContent = '';
-    region.className = 'toast-region';
+    region.className = 'status-region';
   }, 4800); // SLDS duration-toast-short
 }
 
@@ -485,7 +485,7 @@ function bindEvents() {
   // Toolbar
   document.getElementById('btn-add-tab').addEventListener('click', openAddTab);
   document.getElementById('btn-quick-add').addEventListener('click', () => {
-    showToast('Quick add: no active Salesforce page detected in mock mode.', 'error');
+    showStatus('Quick add: no active Salesforce page detected in mock mode.', 'error');
   });
   // btn-empty-add-tab no longer in DOM (empty state moved to left panel)
 
@@ -550,7 +550,7 @@ function bindEvents() {
   document.getElementById('btn-got-it').addEventListener('click', () => {
     document.getElementById('btn-release-notes').style.display = 'none';
     showView('empty');
-    showToast('Release notes dismissed');
+    showStatus('Release notes dismissed');
   });
 
   // Dropdown management
@@ -559,7 +559,7 @@ function bindEvents() {
   });
 
   document.getElementById('btn-add-dropdown-item').addEventListener('click', () => {
-    showToast('Add dropdown item: Coming soon in Phase 3', 'info');
+    showStatus('Add dropdown item: Coming soon in Phase 3', 'info');
   });
 
   document.getElementById('dropdown-items-list').addEventListener('click', e => {
@@ -567,14 +567,14 @@ function bindEvents() {
     if (!btn) return;
     const { action, index } = btn.dataset;
     if (action === 'edit-dropdown') {
-      showToast(`Edit dropdown item #${index}: Coming soon in Phase 3`, 'info');
+      showStatus(`Edit dropdown item #${index}: Coming soon in Phase 3`, 'info');
     }
     if (action === 'delete-dropdown') {
       const tab = state.tabs.find(t => t.id === state.editingTabId);
       if (tab && tab.dropdownItems) {
         tab.dropdownItems.splice(parseInt(index), 1);
         renderDropdownItems(state.editingTabId);
-        showToast('Dropdown item deleted');
+        showStatus('Dropdown item deleted');
       }
     }
   });
