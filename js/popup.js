@@ -438,7 +438,7 @@ function showToast(msg, type = 'success') {
   toastTimer = setTimeout(() => {
     region.textContent = '';
     region.className = 'toast-region';
-  }, 3000);
+  }, 4800); // SLDS duration-toast-short
 }
 
 // ── Char counter ───────────────────────────────────────────────
