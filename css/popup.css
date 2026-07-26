@@ -98,6 +98,10 @@ body {
 }
 
 button, input, select, textarea { font: inherit; color: inherit; }
+
+/* Vendored SLDS icons carry width/height="52"; default every button icon to
+   the 16px icon token so a missing per-component rule can't blow up a control */
+button svg, a svg { width: var(--sft-size-icon); height: var(--sft-size-icon); flex-shrink: 0; }
 ul { list-style: none; }
 a  { color: var(--c-primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -757,6 +761,19 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .dropdown-item-btn:focus-visible {
   outline: 2px solid var(--sft-focus-ring);
   outline-offset: 1px;
+}
+.dropdown-item-btn svg { width: 14px; height: 14px; }
+
+/* Match the tab-row action semantics: neutral by default, tinted per action */
+.dropdown-item-btn[data-action^="edit"]:hover {
+  background: var(--c-primary-tint);
+  color: var(--c-primary-on-tint);
+  border-color: transparent;
+}
+.dropdown-item-btn[data-action^="delete"]:hover {
+  background: var(--c-error-bg);
+  color: var(--c-error);
+  border-color: transparent;
 }
 
 /* ── 15. Settings ── */
