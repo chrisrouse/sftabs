@@ -53,9 +53,14 @@
   --b-medium:  var(--sft-border);
   --b-strong:  var(--sft-border-strong);
 
-  /* Semantic */
-  --c-error:   var(--sft-error);
-  --c-error-bg:var(--sft-error-container);
+  /* Semantic — destructive/error uses the SLDS red palette (palette-red-40)
+     rather than the pink feedback ramp, matching Salesforce's own delete UI */
+  --c-error:        light-dark(#ba0517, #fe5c4c); /* red-40  — error text, asterisk */
+  --c-error-bg:     light-dark(#feded8, #8e030f); /* red-90/30 — destructive hover tint */
+  --c-error-on-bg:  light-dark(#ba0517, #fe8f7d); /* icon/text on that tint */
+  --c-error-fill:   #ba0517;                      /* filled destructive button */
+  --c-error-fill-hover:  #8e030f;                 /* red-30 */
+  --c-error-fill-active: #640103;                 /* red-20 */
   --c-success: var(--sft-success);
 
   /* Footer (ours — stays dark in both schemes) */
@@ -489,7 +494,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-btn--edit:hover         { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
 .tab-btn--newtab:hover       { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
 .tab-btn--newtab.is-on       { color: var(--c-primary); }
-.tab-btn--delete:hover       { background: var(--c-error-bg); color: var(--c-error); }
+.tab-btn--delete:hover       { background: var(--c-error-bg); color: var(--c-error-on-bg); }
 
 /* Move buttons: only on keyboard focus */
 .tab-btn--move {
@@ -628,8 +633,8 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 }
 .form-input::placeholder { color: var(--t-muted); }
 .form-input[aria-invalid="true"] {
-  border-color: var(--sft-border-error);
-  background: var(--sft-error-container);
+  border-color: var(--c-error);
+  background: var(--c-error-bg);
 }
 .form-input:disabled {
   background: var(--sft-disabled-container);
@@ -811,7 +816,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 }
 .dropdown-item-btn[data-action^="delete"]:hover {
   background: var(--c-error-bg);
-  color: var(--c-error);
+  color: var(--c-error-on-bg);
   border-color: transparent;
 }
 
@@ -1274,13 +1279,13 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .btn-secondary:active { background: var(--s-3); }
 
 .btn-danger {
-  background: var(--sft-error);
+  background: var(--c-error-fill);
   border: var(--sft-border-width-1) solid transparent;
   color: var(--sft-on-accent-1);
   font-weight: var(--sft-font-weight-semibold);
 }
-.btn-danger:hover  { background: var(--sft-border-error-hover); }
-.btn-danger:active { background: var(--sft-border-error-hover); }
+.btn-danger:hover  { background: var(--c-error-fill-hover); }
+.btn-danger:active { background: var(--c-error-fill-active); }
 .btn-danger:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 
 /* ── 21. Reduced motion ── */
