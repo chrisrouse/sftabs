@@ -1107,12 +1107,13 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 /* ── 17. Footer ── */
 .app-footer {
-  height: 42px;
+  min-height: 42px;              /* grows when a status message wraps */
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
+  gap: 8px;
+  padding: 6px 12px;
   background: var(--footer-bg);
   border-top: 1px solid rgba(255,255,255,0.05);
 }
@@ -1121,13 +1122,14 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   flex: 1;
   min-width: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;  /* keep the version pinned to the first line */
   gap: 8px;
 }
 
 .footer-version {
   font-size: var(--sft-font-size-xs);
   font-weight: var(--sft-font-weight-medium);
+  line-height: var(--sft-line-height-snug); /* share the status baseline */
   color: var(--footer-fg);
   flex-shrink: 0;
   padding-left: 4px;
@@ -1156,10 +1158,15 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .status-region {
   font-size: var(--sft-font-size-xs);
   color: rgba(255,255,255,0.55);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: var(--sft-line-height-snug);
   padding-left: 4px;
+  min-width: 0;
+  /* Wrap rather than truncate; cap at 3 lines so a long error can't
+     push the footer over the tab list */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 /* Fixed light values: the footer stays dark in both themes. 7-12.5:1 on it. */
 .status-region.status-success { color: #04e1cb; /* teal-80  */ }
