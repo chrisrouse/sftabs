@@ -1192,9 +1192,9 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 .modal {
   width: 320px;
-  background: var(--s-1);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-modal);
+  background: var(--sft-surface-container-1);
+  border-radius: var(--sft-radius-4); /* SLDS container radius */
+  box-shadow: var(--sh-modal);        /* shadow-4 */
   overflow: hidden;
   animation: modalIn 0.18s ease;
 }
@@ -1204,19 +1204,33 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+/* SLDS modal header: neutral surface, centered title, 2px bottom rule */
 .modal-header {
-  padding: 16px 16px 12px;
-  border-bottom: 1px solid var(--b-subtle);
-  background: var(--c-brand);
+  padding: var(--sft-spacing-4);
+  border-bottom: var(--sft-border-width-2) solid var(--sft-border);
+  background: var(--sft-surface-container-1);
+  text-align: center;
 }
-.modal-title { font-size: var(--sft-font-size-sm); font-weight: var(--sft-font-weight-semibold); color: #fff; }
-.modal-body  { padding: 16px; font-size: var(--sft-font-size-base); color: var(--t-muted); line-height: 1.6; }
+.modal-title {
+  font-size: var(--sft-font-size-lg);
+  font-weight: var(--sft-font-weight-regular);
+  line-height: var(--sft-line-height-tight);
+  color: var(--sft-text-strong);
+}
+.modal-body {
+  padding: var(--sft-spacing-4);
+  font-size: var(--sft-font-size-base);
+  color: var(--t-muted);
+  line-height: var(--sft-line-height-base);
+  background: var(--sft-surface-container-1);
+}
 .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  padding: 12px 16px 16px;
-  border-top: 1px solid var(--b-subtle);
+  padding: var(--sft-spacing-4);
+  border-top: var(--sft-border-width-1) solid var(--sft-border);
+  background: var(--sft-surface-container-1);
 }
 
 /* ── 20. Buttons — SLDS 2 anatomy: pill radius, 32px (sizing-9) height,
