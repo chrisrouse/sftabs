@@ -218,7 +218,7 @@ a:hover { text-decoration: underline; }
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--sft-radius-circle);
   color: rgba(255,255,255,0.8);
   cursor: pointer;
   transition: background var(--ease), color var(--ease);
@@ -273,35 +273,38 @@ a:hover { text-decoration: underline; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: var(--c-primary);
-  border: none;
-  border-radius: var(--r-md);
-  color: #fff;
+  min-height: var(--sft-size-control);
+  padding: 0 16px;
+  background: var(--sft-accent-container-1);
+  border: var(--sft-border-width-1) solid transparent;
+  border-radius: var(--sft-radius-pill);
+  color: var(--sft-on-accent-1);
   font-size: var(--sft-font-size-base);
   font-weight: var(--sft-font-weight-semibold);
   cursor: pointer;
   transition: background var(--ease);
 }
-.btn-add-tab:hover { background: var(--c-primary-dark); }
+.btn-add-tab:hover  { background: var(--sft-accent-container-2); }
+.btn-add-tab:active { background: var(--sft-accent-container-3); }
 .btn-add-tab:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .btn-add-tab svg { width: 15px; height: 15px; }
 
+/* SLDS icon button: circular, 32px, neutral stroke */
 .btn-icon-sm {
-  width: 34px;
-  height: 34px;
+  width: var(--sft-size-control);
+  height: var(--sft-size-control);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--s-hover);
-  border: 1px solid var(--b-subtle);
-  border-radius: var(--r-md);
+  background: var(--s-1);
+  border: var(--sft-border-width-1) solid var(--sft-border-strong);
+  border-radius: var(--sft-radius-circle);
   color: var(--t-muted);
   cursor: pointer;
   transition: background var(--ease), color var(--ease), border-color var(--ease);
 }
-.btn-icon-sm:hover { background: var(--c-primary-light); color: var(--c-primary); border-color: var(--c-primary); }
+.btn-icon-sm:hover { background: var(--s-hover); color: var(--t-base); }
 .btn-icon-sm:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .btn-icon-sm svg { width: 16px; height: 16px; }
 
@@ -465,12 +468,12 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--sft-radius-circle);
   color: var(--t-weak);
   cursor: pointer;
   transition: background var(--ease), color var(--ease);
 }
-.tab-btn:hover { background: var(--s-3); color: var(--t-muted); }
+.tab-btn:hover { background: var(--s-hover); color: var(--t-base); }
 .tab-btn:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 .tab-btn svg { width: 15px; height: 15px; }
 
@@ -558,15 +561,15 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--s-3);
-  border: 1px solid var(--b-subtle);
-  border-radius: var(--r-sm);
+  background: transparent;
+  border: var(--sft-border-width-1) solid var(--sft-border-strong);
+  border-radius: var(--sft-radius-circle);
   color: var(--t-muted);
   cursor: pointer;
   margin-top: 2px;
   transition: background var(--ease), color var(--ease), border-color var(--ease);
 }
-.btn-close:hover { background: var(--c-error-bg); color: var(--c-error); border-color: var(--c-error); }
+.btn-close:hover { background: var(--s-hover); color: var(--t-base); }
 .btn-close:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 .btn-close svg { width: 13px; height: 13px; }
 
@@ -732,8 +735,8 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   height: 28px;
   padding: 0;
   background: transparent;
-  border: 1px solid var(--b-subtle);
-  border-radius: var(--r-md);
+  border: var(--sft-border-width-1) solid var(--sft-border-strong);
+  border-radius: var(--sft-radius-circle);
   color: var(--t-muted);
   cursor: pointer;
   display: flex;
@@ -743,9 +746,8 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   font-size: var(--sft-font-size-base);
 }
 .dropdown-item-btn:hover {
-  border-color: var(--b-medium);
   color: var(--t-base);
-  background: var(--s-2);
+  background: var(--s-hover);
 }
 .dropdown-item-btn:focus-visible {
   outline: 2px solid var(--sft-focus-ring);
@@ -999,7 +1001,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--sft-radius-circle);
   color: var(--footer-fg);
   cursor: pointer;
   transition: background var(--ease), color var(--ease);
@@ -1121,57 +1123,54 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   border-top: 1px solid var(--b-subtle);
 }
 
-/* ── 20. Buttons ── */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--c-primary);
-  border: none;
-  border-radius: var(--r-md);
-  color: #fff;
-  font-size: var(--sft-font-size-base);
-  font-weight: var(--sft-font-weight-semibold);
-  cursor: pointer;
-  transition: background var(--ease);
-}
-.btn-primary:hover { background: var(--c-primary-dark); }
-.btn-primary:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
-.btn-primary svg { width: 14px; height: 14px; }
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--s-1);
-  border: 1.5px solid var(--b-medium);
-  border-radius: var(--r-md);
-  color: var(--t-muted);
-  font-size: var(--sft-font-size-base);
-  font-weight: var(--sft-font-weight-medium);
-  cursor: pointer;
-  transition: background var(--ease), border-color var(--ease), color var(--ease);
-}
-.btn-secondary:hover { background: var(--s-3); border-color: var(--b-strong); color: var(--t-base); }
-.btn-secondary:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
-
+/* ── 20. Buttons — SLDS 2 anatomy: pill radius, 32px (sizing-9) height,
+   filled variants use accent-container 1/2/3 for rest/hover/active ── */
+.btn-primary,
+.btn-secondary,
 .btn-danger {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: var(--c-error);
-  border: none;
-  border-radius: var(--r-md);
-  color: #fff;
+  min-height: var(--sft-size-control);
+  padding: 0 16px;
+  border-radius: var(--sft-radius-pill);
   font-size: var(--sft-font-size-base);
-  font-weight: var(--sft-font-weight-semibold);
   cursor: pointer;
-  transition: opacity var(--ease);
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
 }
-.btn-danger:hover { opacity: 0.88; }
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-danger:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+
+.btn-primary {
+  background: var(--sft-accent-container-1);
+  border: var(--sft-border-width-1) solid transparent;
+  color: var(--sft-on-accent-1);
+  font-weight: var(--sft-font-weight-semibold);
+}
+.btn-primary:hover  { background: var(--sft-accent-container-2); }
+.btn-primary:active { background: var(--sft-accent-container-3); }
+.btn-primary svg { width: 14px; height: 14px; }
+
+/* Neutral: SLDS outline button — 1px border-2 stroke, surface fill */
+.btn-secondary {
+  background: var(--s-1);
+  border: var(--sft-border-width-1) solid var(--sft-border-strong);
+  color: var(--t-base);
+  font-weight: var(--sft-font-weight-medium);
+}
+.btn-secondary:hover  { background: var(--s-hover); }
+.btn-secondary:active { background: var(--s-3); }
+
+.btn-danger {
+  background: var(--sft-error);
+  border: var(--sft-border-width-1) solid transparent;
+  color: var(--sft-on-accent-1);
+  font-weight: var(--sft-font-weight-semibold);
+}
+.btn-danger:hover  { background: var(--sft-border-error-hover); }
+.btn-danger:active { background: var(--sft-border-error-hover); }
 .btn-danger:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 
 /* ── 21. Reduced motion ── */
