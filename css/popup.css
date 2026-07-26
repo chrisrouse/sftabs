@@ -890,6 +890,31 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   border-bottom: 1px solid var(--b-subtle);
 }
 
+/* ── TRIAL: full SLDS card treatment (Appearance section only) ──
+   Card = surface-container-1, radius-4, border-1, and a header at
+   scale-2 regular in the heading color with no divider rule. */
+.settings-section--card {
+  background: var(--sft-surface-container-1);
+  border: var(--sft-border-width-1) solid var(--sft-border);
+  border-radius: var(--sft-radius-4);
+}
+.settings-section--card .settings-section-title {
+  font-size: var(--sft-font-size-md);
+  font-weight: var(--sft-font-weight-regular);
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--sft-text-strong);
+  padding: var(--sft-spacing-3) var(--sft-spacing-4) var(--sft-spacing-2);
+  border-bottom: none;
+}
+/* Card body padding: spacing-3 block / spacing-4 inline */
+.settings-section--card .settings-row {
+  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-4);
+}
+.settings-section--card .settings-row:last-child {
+  padding-bottom: var(--sft-spacing-4);
+}
+
 .settings-row {
   display: flex;
   align-items: center;
