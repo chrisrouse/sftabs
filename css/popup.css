@@ -453,6 +453,47 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 }
 
 
+/* Dropdown-item count. Comfy shows the "▾ N dropdown items" note; compact
+   swaps it for a filled circle after the tab name. */
+.tab-dropdown-note {
+  font-size: var(--sft-font-size-xxs);
+  color: var(--c-accent);
+  display: block;
+  margin-top: 1px;
+}
+
+.tab-count {
+  display: none;
+  flex-shrink: 0;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 4px;
+  align-items: center;
+  justify-content: center;
+  background: #7526e3;              /* palette-purple-40, fixed for white text */
+  color: #fff;
+  border-radius: var(--sft-radius-circle);
+  font-size: var(--sft-font-size-xxs);
+  font-weight: var(--sft-font-weight-semibold);
+  line-height: 1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Compact density: drop badges and secondary text, show the count circle ── */
+:root[data-density="compact"] .tab-badge,
+:root[data-density="compact"] .tab-path,
+:root[data-density="compact"] .tab-dropdown-note { display: none; }
+:root[data-density="compact"] .tab-count { display: inline-flex; }
+
 .tab-path {
   font-size: var(--sft-font-size-xs);
   color: var(--t-weak);

@@ -67,9 +67,10 @@ function tabItemHTML(tab) {
       <div class="tab-info-top">
         <span class="tab-badge tab-badge--${type}" aria-label="${badge} tab">${badge}</span>
         <span class="tab-name">${name}</span>
+        ${tab.hasDropdown ? `<span class="tab-count">${tab.dropdownItems.length}<span class="sr-only"> dropdown items</span></span>` : ''}
       </div>
       ${path ? `<span class="tab-path">${path}</span>` : ''}
-      ${tab.hasDropdown ? `<span class="tab-path" style="color:var(--c-accent);font-size:10px;">▾ ${tab.dropdownItems.length} dropdown items</span>` : ''}
+      ${tab.hasDropdown ? `<span class="tab-dropdown-note">▾ ${tab.dropdownItems.length} dropdown items</span>` : ''}
     </div>
     <div class="tab-actions" role="group" aria-label="Actions for ${name} tab">
       <button class="tab-btn tab-btn--move tab-btn--up"
