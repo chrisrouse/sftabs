@@ -273,7 +273,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
+  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-3);
   border-bottom: 1px solid var(--b-subtle);
   flex-shrink: 0;
   background: var(--s-panel);
@@ -330,10 +330,10 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar { width: 3px; }
 nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
 
 .tab-list {
-  padding: 8px;
+  padding: var(--sft-spacing-var-block-2) var(--sft-spacing-2);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sft-spacing-var-block-1);
 }
 
 /* ── 10. Tab items ── */
@@ -416,7 +416,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-info {
   flex: 1;
   min-width: 0;
-  padding: 8px;
+  padding: var(--sft-spacing-var-block-2) var(--sft-spacing-2);
 }
 
 .tab-info-top {
@@ -551,7 +551,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
-  padding: 16px 16px 12px;
+  padding: var(--sft-spacing-var-block-4) var(--sft-spacing-4) var(--sft-spacing-var-block-3);
   border-bottom: 1px solid var(--b-subtle);
   flex-shrink: 0;
   background: var(--s-1);
@@ -592,10 +592,10 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px;
+  padding: var(--sft-spacing-var-block-4) var(--sft-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--sft-spacing-var-block-4);
 }
 .edit-form::-webkit-scrollbar { width: 3px; }
 .edit-form::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
@@ -741,7 +741,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
+  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-3);
   background: var(--s-1);
   border: 1.5px solid var(--b-subtle);
   border-radius: var(--r-md);
@@ -825,10 +825,10 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 12px 16px;
+  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sft-spacing-var-block-2);
 }
 .settings-body::-webkit-scrollbar { width: 3px; }
 .settings-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
@@ -854,7 +854,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px;
+  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-3);
   border-bottom: 1px solid var(--b-subtle);
 }
 .settings-row:last-child { border-bottom: none; }

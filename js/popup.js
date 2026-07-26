@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProfileChip();
   renderProfileDropdown();
   applyTheme(state.settings.theme);
+  applyDensity(state.settings.compactMode);
   showView('empty');
   bindEvents();
 });
@@ -398,15 +399,15 @@ function applyTheme(theme) {
     root.setAttribute('data-theme', theme);
   }
   state.settings.theme = theme;
-
-  // Keep theme footer button appearance in sync
-  const btn = document.getElementById('btn-toggle-theme');
-  if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
 }
 
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  applyTheme(current === 'dark' ? 'light' : 'dark');
+/**
+ * Display density. Sets data-density on <html>; the --sft-*-var-* hooks in
+ * tokens.css resolve to SLDS compact values, so components that use those
+ * hooks reflow without any per-component overrides.
+ */
+function applyDensity(isCompact) {
+  document.documentElement.setAttribute('data-density', isCompact ? 'compact' : 'comfy');
 }
 
 // ── Settings panel ─────────────────────────────────────────────
@@ -521,7 +522,7 @@ function bindEvents() {
 
   document.getElementById('setting-compact').addEventListener('change', e => {
     state.settings.compactMode = e.target.checked;
-    document.querySelector('.tab-list').classList.toggle('compact', e.target.checked);
+    applyDensity(e.target.checked);
   });
 
   document.getElementById('setting-skip-delete').addEventListener('change', e => {
@@ -539,7 +540,6 @@ function bindEvents() {
   });
 
   // Footer theme toggle
-  document.getElementById('btn-toggle-theme').addEventListener('click', toggleTheme);
 
   // Release notes
   document.getElementById('btn-close-release-notes').addEventListener('click', () => {
