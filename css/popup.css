@@ -15,6 +15,7 @@
   --c-primary:      var(--sft-accent);
   --c-primary-dark: var(--sft-accent-hover);
   --c-primary-light:var(--sft-accent-container);
+  --c-primary-tint: light-dark(#d6e6ff, #002775); /* brand-90 — icon-button hover fill */
   --c-accent:       var(--sft-type-custom);
   --c-accent-light: var(--sft-type-custom-bg);
 
@@ -477,10 +478,12 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-btn:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 .tab-btn svg { width: 15px; height: 15px; }
 
-.tab-btn--edit:hover              { background: var(--c-primary-light); color: var(--c-primary); }
-.tab-btn--newtab.is-on            { color: var(--c-primary); }
-.tab-btn--newtab.is-on:hover      { background: var(--c-primary-light); }
-.tab-btn--delete:hover            { background: var(--c-error-bg); color: var(--c-error); }
+/* Action hovers: matched tint strength across the three variants —
+   brand-90 / error-container so each reads clearly on a white card */
+.tab-btn--edit:hover         { background: var(--c-primary-tint); color: var(--c-primary); }
+.tab-btn--newtab:hover       { background: var(--c-primary-tint); color: var(--c-primary); }
+.tab-btn--newtab.is-on       { color: var(--c-primary); }
+.tab-btn--delete:hover       { background: var(--c-error-bg); color: var(--c-error); }
 
 /* Move buttons: only on keyboard focus */
 .tab-btn--move {
