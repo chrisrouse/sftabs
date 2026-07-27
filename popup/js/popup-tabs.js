@@ -86,16 +86,11 @@ function enhancedAddTabForCurrentPage() {
           if (urlParts.length > 1) {
             const fullPath = urlParts[1].split('?')[0]; 
             
-            // ObjectManager: normalize to the object's canonical landing page so
-            // the tab is identical no matter which section was open when it was
-            // added, and so it doesn't collide with a sub-item for that section.
-            // The bare /ObjectManager/<Object> URL does not resolve, hence
-            // /Details/view.
+            // ObjectManager: keep the full path so the tab lands on the exact
+            // section that was open, and mark it as a setup object so it can
+            // carry a dropdown of the object's other sections.
             if (fullPath.startsWith('ObjectManager/')) {
-              const objectSegment = fullPath.split('/')[1];
-              path = objectSegment
-                ? `ObjectManager/${objectSegment}/Details/view`
-                : fullPath; // the Object Manager list page itself
+              path = fullPath;
               isObject = false;
               isSetupObject = true; // Mark as setup object for dropdown
               urlBase = '/lightning/setup/';
@@ -209,39 +204,34 @@ function generateTabName(path, pageTitle, isObject, isCustomUrl, isSetupObject) 
       }
     }
   } else if (path.startsWith('ObjectManager/')) {
-    // Try to get object name from page title first (handles custom objects with IDs in URL)
-    if (pageTitle) {
-      let cleanTitle = pageTitle.split(' | ')[0];
-      // Remove "Setup: " prefix if present
-      if (cleanTitle.includes('Setup: ')) {
-        cleanTitle = cleanTitle.split('Setup: ')[1];
+    // Name as "<Object> - <Section>" so tabs for different sections of the same
+    // object stay distinguishable. The page title is only consulted for the
+    // object itself, and only when the URL carries a record ID instead of a
+    // readable API name (custom objects).
+    const pathSegments = path.split('/').filter(segment => segment.length > 0);
+
+    let objectName = 'Object Manager';
+    if (pathSegments.length >= 2) {
+      const segment = pathSegments[1];
+      const looksLikeId = /^[a-zA-Z0-9]{15,18}$/.test(segment) && !segment.includes('_');
+      if (looksLikeId && pageTitle) {
+        let cleanTitle = pageTitle.split(' | ')[0];
+        if (cleanTitle.includes('Setup: ')) {
+          cleanTitle = cleanTitle.split('Setup: ')[1];
+        }
+        objectName = cleanTitle || formatObjectNameFromURL(segment);
+      } else {
+        objectName = formatObjectNameFromURL(segment);
       }
-      name = cleanTitle;
     }
 
-    // Fallback to extracting from path if title not available
-    if (!name || name.length === 0) {
-      const pathSegments = path.split('/').filter(segment => segment.length > 0);
-
-      let objectName = "";
-      if (pathSegments.length >= 2) {
-        objectName = formatObjectNameFromURL(pathSegments[1]);
-      } else {
-        objectName = "Object Manager";
-      }
-
-      let sectionName = "";
-      if (pathSegments.length >= 3) {
-        let pathSection = pathSegments[2];
-        sectionName = pathSection.replace(/([A-Z])/g, ' $1').trim();
-      }
-
-      if (sectionName) {
-        name = `${objectName} - ${sectionName}`;
-      } else {
-        name = objectName;
-      }
+    // Section names arrive camel-cased: RelatedLookupFilters -> Related Lookup Filters
+    let sectionName = '';
+    if (pathSegments.length >= 3 && pathSegments[2].toLowerCase() !== 'details') {
+      sectionName = pathSegments[2].replace(/([A-Z])/g, ' $1').trim();
     }
+
+    name = sectionName ? `${objectName} - ${sectionName}` : objectName;
   } else {
     if (pageTitle) {
       let titleParts = pageTitle.split(' | ');
