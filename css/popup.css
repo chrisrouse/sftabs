@@ -459,10 +459,23 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   color: var(--c-accent);
   display: block;
   margin-top: 1px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--sft-radius-1);
 }
+.tab-dropdown-note:hover { text-decoration: underline; }
+.tab-dropdown-note:focus-visible,
+.tab-count:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 
 .tab-count {
   display: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
   flex-shrink: 0;
   min-width: 1rem;
   height: 1rem;

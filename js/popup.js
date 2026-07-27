@@ -281,10 +281,13 @@ function tabItemHTML(tab) {
       <div class="tab-info-top">
         <span class="tab-badge tab-badge--${type}" aria-label="${badge} tab">${badge}</span>
         <span class="tab-name">${name}</span>
-        ${hasDropdown(tab) ? `<span class="tab-count">${tab.dropdownItems.length}<span class="sr-only"> dropdown items</span></span>` : ''}
+        ${hasDropdown(tab) ? `<button class="tab-count" data-action="manage-items" data-id="${tab.id}"
+          aria-label="Manage ${countItems(tab.dropdownItems)} sub-items in ${name}"
+          title="Manage sub-items">${countItems(tab.dropdownItems)}</button>` : ''}
       </div>
       ${path ? `<span class="tab-path">${path}</span>` : ''}
-      ${hasDropdown(tab) ? `<span class="tab-dropdown-note">▾ ${tab.dropdownItems.length} dropdown items</span>` : ''}
+      ${hasDropdown(tab) ? `<button class="tab-dropdown-note" data-action="manage-items" data-id="${tab.id}"
+        >▾ ${countItems(tab.dropdownItems)} sub-item${countItems(tab.dropdownItems) === 1 ? '' : 's'}</button>` : ''}
     </div>
     <div class="tab-actions" role="group" aria-label="Actions for ${name} tab">
       <button class="tab-btn tab-btn--move tab-btn--up"
@@ -378,11 +381,6 @@ function openEditTab(tabId) {
   const tab = state.tabs.find(t => t.id === tabId);
   if (!tab) return;
 
-  if (hasDropdown(tab)) {
-    openDropdownManagement(tabId);
-    return;
-  }
-
   state.editingTabId = tabId;
 
   // Highlight the tab being edited, dim the others
@@ -399,6 +397,11 @@ function openEditTab(tabId) {
   document.getElementById('input-is-custom-url').checked = !!tab.isCustomUrl;
   document.getElementById('input-open-new-tab').checked  = !!tab.openInNewTab;
   updateCharCount('input-tab-name', 'tab-name-count', 30);
+  document.getElementById('group-sub-items').hidden = false;
+
+  const count = countItems(tab.dropdownItems);
+  document.getElementById('manage-items-label').textContent =
+    count ? `Manage ${count} sub-item${count === 1 ? '' : 's'}` : 'Add sub-items';
 
   showView('edit-tab');
   document.getElementById('input-tab-name').focus();
@@ -415,6 +418,8 @@ function openAddTab() {
   document.getElementById('input-is-custom-url').checked = false;
   document.getElementById('input-open-new-tab').checked  = false;
   updateCharCount('input-tab-name', 'tab-name-count', 30);
+  // A new tab has no id yet, so there is nothing to attach sub-items to
+  document.getElementById('group-sub-items').hidden = true;
 
   showView('edit-tab');
   document.getElementById('input-tab-name').focus();
@@ -948,6 +953,10 @@ function bindEvents() {
     showView('empty');
   });
 
+  document.getElementById('btn-manage-items').addEventListener('click', () => {
+    if (state.editingTabId) openDropdownManagement(state.editingTabId);
+  });
+
   document.getElementById('btn-add-dropdown-item').addEventListener('click', () => {
     state.addingItemUnder = [];
     state.editingItemPath = null;
@@ -1056,6 +1065,7 @@ const handleTabListClick = e => {
     if (action === 'toggle-newtab') toggleNewTab(id);
     if (action === 'move-up')     moveTab(id, 'up');
     if (action === 'move-down')   moveTab(id, 'down');
+    if (action === 'manage-items') openDropdownManagement(id);
     return;
   }
   // Clicking the row body (not an action button) navigates
