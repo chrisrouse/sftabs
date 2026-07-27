@@ -863,7 +863,8 @@ function toggleInlineDropdown(dropdown, dropdownButton) {
  * Navigate to main tab
  */
 function navigateToMainTab(tab) {
-  
+  rememberClickedTab(tab.id);
+
   const currentUrl = window.location.href;
   const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
   const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
@@ -1090,6 +1091,57 @@ function lightningNavigate(details, fallbackURL) {
   window.location.href = fallbackURL;
 }
 
+const LAST_CLICKED_TAB_KEY = 'sftabs_last_clicked_tab_id';
+
+/** Remember which tab the user actually clicked, so identical URLs stay distinguishable. */
+function rememberClickedTab(tabId) {
+  try { sessionStorage.setItem(LAST_CLICKED_TAB_KEY, tabId); } catch (e) { /* private mode */ }
+}
+
+/**
+ * Pick the tab matching the current URL.
+ *
+ * Two tabs can legitimately resolve to the same URL — e.g. an object tab
+ * pointing at Account/Details plus a promoted "Details" tab — so URL matching
+ * alone cannot tell them apart. The tab the user clicked wins whenever it is
+ * still a valid match; otherwise the most specific match does.
+ *
+ * Specificity replaces an older `tabUrl.split('/Details')[0]` truncation,
+ * which made any object tab claim every page under that object.
+ */
+function findMatchingTab(topLevelTabs, currentUrl) {
+  const candidates = [];
+
+  for (const tab of topLevelTabs) {
+    const el = document.querySelector(`li[data-tab-id="${tab.id}"]`);
+    const tabUrl = el && el.getAttribute('data-url');
+    if (!tabUrl) continue;
+
+    if (currentUrl.startsWith(tabUrl)) {
+      candidates.push({ tab, score: tabUrl.length, exact: true });
+      continue;
+    }
+    // An ObjectManager tab still counts while browsing that object's sections
+    const objectRoot = tabUrl.match(/^.*\/ObjectManager\/[^/]+/);
+    if (objectRoot && currentUrl.startsWith(objectRoot[0])) {
+      candidates.push({ tab, score: objectRoot[0].length, exact: false });
+    }
+  }
+
+  if (!candidates.length) return null;
+
+  // Only honour the click when the page is genuinely under that tab's own URL —
+  // otherwise a remembered tab would keep the highlight after navigating to a
+  // sibling section it merely covers via the object-root fallback.
+  let remembered = null;
+  try { remembered = sessionStorage.getItem(LAST_CLICKED_TAB_KEY); } catch (e) { /* ignore */ }
+  const clicked = remembered && candidates.find(c => c.tab.id === remembered && c.exact);
+  if (clicked) return clicked.tab;
+
+  return candidates.sort((a, b) =>
+    (b.exact - a.exact) || (b.score - a.score))[0].tab;
+}
+
 /**
  * Highlight active custom tab and show current section
  */
@@ -1099,20 +1151,7 @@ async function highlightActiveTab() {
   try {
     const tabs = await getTabsFromStorage();
     const topLevelTabs = getTopLevelTabs(tabs);
-    let matchedTab = null;
-
-    for (const tab of topLevelTabs) {
-      const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
-      if (tabElement) {
-        const tabUrl = tabElement.getAttribute('data-url');
-        const baseTabUrl = tabUrl ? tabUrl.split('/Details')[0] : null;
-        const matches = tabUrl && currentUrl.startsWith(baseTabUrl);
-        if (matches) { // Match base ObjectManager URL
-          matchedTab = tab;
-          break;
-        }
-      }
-    }
+    const matchedTab = findMatchingTab(topLevelTabs, currentUrl);
 
     if (matchedTab) {
 
@@ -1156,21 +1195,7 @@ async function monitorNativeTabActiveState() {
   try {
     const tabs = await getTabsFromStorage();
     const topLevelTabs = getTopLevelTabs(tabs);
-    let customTabIsActive = false;
-
-    // Check if any custom tab matches the current URL
-    for (const tab of topLevelTabs) {
-      const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
-      if (tabElement) {
-        const tabUrl = tabElement.getAttribute('data-url');
-        const baseTabUrl = tabUrl ? tabUrl.split('/Details')[0] : null;
-        const matches = tabUrl && currentUrl.startsWith(baseTabUrl);
-        if (matches) {
-          customTabIsActive = true;
-          break;
-        }
-      }
-    }
+    const customTabIsActive = !!findMatchingTab(topLevelTabs, currentUrl);
 
     // If a custom tab is active, watch native tabs and remove their active state
     if (customTabIsActive) {
