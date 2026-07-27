@@ -690,6 +690,11 @@ function renderDropdownItems(tabId) {
   document.getElementById('dropdown-subtitle').textContent =
     `${countItems(items)} item${countItems(items) === 1 ? '' : 's'} in "${tab.label}"`;
 
+  const scrapeBtn = document.getElementById('btn-scrape-object');
+  scrapeBtn.hidden = !isObjectManagerTab(tab);
+  document.getElementById('scrape-object-label').textContent =
+    items.length ? 'Refresh items from this page' : 'Load items from this page';
+
   if (!items.length && !state.addingItemUnder) {
     list.innerHTML = `<li class="dropdown-empty">No items yet</li>`;
   }
@@ -765,6 +770,95 @@ function itemRow(item, path, level) {
       </button>
     </div>`;
   return li;
+}
+
+// ── ObjectManager auto-population ──────────────────────────────
+// Asks the content script to parse the object's left-hand Setup nav and
+// turns those links into sub-items. Ported from popup-dropdown.js; the
+// tab-resolution guesswork isn't needed here because the panel already
+// knows which tab it's editing.
+
+/** Object API name from a tab path like "ObjectManager/Account/details". */
+function objectNameFromPath(path = '') {
+  const m = path.match(/ObjectManager\/([^/]+)/i);
+  return m ? m[1] : null;
+}
+
+function isObjectManagerTab(tab) {
+  return !!objectNameFromPath(tab?.path || '');
+}
+
+async function scrapeObjectNavigation() {
+  const tab = state.tabs.find(t => t.id === state.editingTabId);
+  if (!tab) return;
+
+  const wantedObject = objectNameFromPath(tab.path);
+  const btn = document.getElementById('btn-scrape-object');
+  const label = document.getElementById('scrape-object-label');
+  const original = label.textContent;
+  btn.disabled = true;
+  label.textContent = 'Loading…';
+
+  try {
+    const [active] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (!active) {
+      showStatus('No active browser tab detected.', 'error');
+      return;
+    }
+
+    // The shim resolves to null instead of rejecting when no receiver exists
+    const res = await browser.tabs.sendMessage(active.id, { action: 'parse_navigation' });
+    if (!res) {
+      showStatus(`Open the ${wantedObject} Object Manager page in Setup, then try again.`, 'error');
+      return;
+    }
+    if (res.success === false) {
+      showStatus(res.error || 'Could not read the page navigation.', 'error');
+      return;
+    }
+
+    const items = res.items || res.navigation || [];
+    if (!items.length) {
+      showStatus('No navigation items found on this page.', 'error');
+      return;
+    }
+    if (res.pageInfo && res.pageInfo.type !== 'objectManager') {
+      showStatus(`Go to ${wantedObject} in Setup to load its list.`, 'error');
+      return;
+    }
+    // Guard against pulling Contact's nav into the Account tab
+    if (wantedObject && res.objectName &&
+        wantedObject.toLowerCase() !== res.objectName.toLowerCase()) {
+      showStatus(
+        `This tab is for "${wantedObject}" but you're viewing "${res.objectName}".`, 'error');
+      return;
+    }
+
+    // Store only canonical fields — the parser also returns id/dataList/
+    // isActive/order, which production leaks into storage.
+    const previous = countItems(tab.dropdownItems);
+    tab.dropdownItems = items.map(i => ({
+      label: i.label,
+      path: i.path || i.url || '',
+      isObject: false,
+      isCustomUrl: false
+    }));
+
+    state.expandedPaths.clear();
+    showStatus(previous
+      ? `Replaced ${previous} item${previous === 1 ? '' : 's'} with ${items.length} from ${res.objectName || wantedObject}`
+      : `Added ${items.length} items from ${res.objectName || wantedObject}`);
+
+    renderDropdownItems(state.editingTabId);
+    renderTabList();
+    bindTabListEvents();
+    persistTabs();
+  } catch (err) {
+    showStatus(`Could not load navigation: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    label.textContent = original;
+  }
 }
 
 // ── Dropdown item actions ──────────────────────────────────────
@@ -1205,6 +1299,8 @@ function bindEvents() {
   document.getElementById('btn-close-dropdowns').addEventListener('click', () => {
     showView('empty');
   });
+
+  document.getElementById('btn-scrape-object').addEventListener('click', scrapeObjectNavigation);
 
   document.getElementById('btn-add-dropdown-item').addEventListener('click', () => {
     state.addingItemUnder = [];
