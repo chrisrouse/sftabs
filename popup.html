@@ -364,7 +364,14 @@
 
   </div><!-- /.app-shell -->
 
-  <script src="js/mock-data.js"></script>
+  <!-- Production storage layer, loaded in the same order as popup/popup.html.
+       These are shared with the existing UI — do not fork them. -->
+  <script src="popup/js/shared/browser-compat.js"></script>
+  <script src="popup/js/shared/constants.js"></script>
+  <script src="popup/js/shared/utils.js"></script>
+  <script src="popup/js/storage-chunking.js"></script>
+  <script src="popup/js/popup-storage.js"></script>
+
   <script src="js/popup.js"></script>
 </body>
 </html>

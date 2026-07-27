@@ -11,7 +11,9 @@
       "id": "sftabs@github.chrisrouse",
       "strict_min_version": "142.0",
       "data_collection_permissions": {
-        "required": ["none"]
+        "required": [
+          "none"
+        ]
       }
     }
   },
@@ -34,7 +36,7 @@
       "96": "icons/sftabs-icon-96.png"
     },
     "default_title": "SF Tabs",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup.html"
   },
   "content_scripts": [
     {
@@ -53,7 +55,9 @@
         "content/floating-button.js",
         "content/floating-modal.js"
       ],
-      "css": ["content/floating-button.css"],
+      "css": [
+        "content/floating-button.css"
+      ],
       "run_at": "document_idle"
     },
     {
@@ -74,7 +78,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["content/inject.js", "icons/invert.svg", "icons/sftabs-icon-16.png"],
+      "resources": [
+        "content/inject.js",
+        "icons/invert.svg",
+        "icons/sftabs-icon-16.png"
+      ],
       "matches": [
         "*://*.lightning.force.com/*",
         "*://*.salesforce-setup.com/*",

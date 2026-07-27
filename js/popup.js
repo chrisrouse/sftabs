@@ -1,31 +1,87 @@
 /**
- * popup.js — Phase 1 interactive mockup
- * Uses MOCK_DATA to drive all UI. No real browser.storage calls.
- * All behaviour mirrors the real popup so Phase 2 wiring is a
- * data-source swap, not a structural rewrite.
+ * popup.js — UI v2
+ *
+ * PHASE 0: READ-ONLY. Reads real data through the production storage layer
+ * (SFTabs.storage) but never writes. Mutations stay in memory and are lost
+ * on close — persistence lands in Phase 1.
+ *
+ * Data-safety rules for every later phase:
+ *   1. Production shapes are canonical. Adapt this UI to them, never the
+ *      reverse (see settings.themeMode, derived profile colors).
+ *   2. Never write an object built from this UI's model. Read the stored
+ *      object, patch only the keys we own, write it back — otherwise keys
+ *      this UI doesn't know about (settings.floatingButton, autoSwitchProfiles,
+ *      per-tab fields) get silently dropped.
+ *   3. Tabs live in profile-scoped storage (getProfileTabs), not the legacy
+ *      `customTabs` key, even when the profiles UI is switched off.
  */
 
 // ── State ──────────────────────────────────────────────────────
 let state = {
-  tabs:            [...MOCK_DATA.tabs],
-  profiles:        [...MOCK_DATA.profiles],
-  settings:        { ...MOCK_DATA.settings },
+  tabs:            [],
+  profiles:        [],
+  settings:        {},
   activeView:      'empty',   // 'empty' | 'edit' | 'settings' | 'release-notes'
   editingTabId:    null,
   profileDropdownOpen: false,
   pendingDeleteId: null,
+  loadError:       null,
 };
 
 // ── Init ───────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadFromStorage();
   renderTabList();
   renderProfileChip();
   renderProfileDropdown();
-  applyTheme(state.settings.theme);
+  applyTheme(state.settings.themeMode);
   applyDensity(state.settings.compactMode);
   showView('empty');
   bindEvents();
+  if (state.loadError) showStatus(state.loadError, 'error');
 });
+
+/**
+ * Load settings, profiles and tabs through the production storage layer.
+ * Read-only: nothing here writes, so it cannot damage existing data.
+ */
+async function loadFromStorage() {
+  try {
+    state.settings = await SFTabs.storage.getUserSettings();
+    state.profiles = await SFTabs.storage.getProfiles() || [];
+
+    // Production keeps tabs in profile-scoped storage even when the profiles
+    // UI is off. A null activeProfileId means first-launch/migration hasn't
+    // run — surface that instead of rendering an empty list, which would
+    // look like data loss.
+    if (state.settings.activeProfileId) {
+      state.tabs = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
+    } else {
+      state.tabs = [];
+      state.loadError = 'No active profile — open the previous UI once to finish setup.';
+    }
+  } catch (err) {
+    state.tabs = [];
+    state.settings = { ...(window.SFTabs?.constants?.DEFAULT_SETTINGS || {}) };
+    state.loadError = `Could not read saved data: ${err.message}`;
+  }
+}
+
+/**
+ * Profile chip/dot color. Production profiles have no color field, so derive
+ * a stable one from the id rather than inventing stored data.
+ */
+/** Production derives this from the items array; it is not a stored field. */
+function hasDropdown(tab) {
+  return Array.isArray(tab?.dropdownItems) && tab.dropdownItems.length > 0;
+}
+
+const PROFILE_DOT_COLORS = ['#04e1cb', '#78b0fd', '#ad7bee', '#fcc003', '#fe8f7d', '#45c65a'];
+function profileColor(profileId = '') {
+  let hash = 0;
+  for (let i = 0; i < profileId.length; i++) hash = (hash * 31 + profileId.charCodeAt(i)) >>> 0;
+  return PROFILE_DOT_COLORS[hash % PROFILE_DOT_COLORS.length];
+}
 
 // ── Rendering ──────────────────────────────────────────────────
 
@@ -67,10 +123,10 @@ function tabItemHTML(tab) {
       <div class="tab-info-top">
         <span class="tab-badge tab-badge--${type}" aria-label="${badge} tab">${badge}</span>
         <span class="tab-name">${name}</span>
-        ${tab.hasDropdown ? `<span class="tab-count">${tab.dropdownItems.length}<span class="sr-only"> dropdown items</span></span>` : ''}
+        ${hasDropdown(tab) ? `<span class="tab-count">${tab.dropdownItems.length}<span class="sr-only"> dropdown items</span></span>` : ''}
       </div>
       ${path ? `<span class="tab-path">${path}</span>` : ''}
-      ${tab.hasDropdown ? `<span class="tab-dropdown-note">▾ ${tab.dropdownItems.length} dropdown items</span>` : ''}
+      ${hasDropdown(tab) ? `<span class="tab-dropdown-note">▾ ${tab.dropdownItems.length} dropdown items</span>` : ''}
     </div>
     <div class="tab-actions" role="group" aria-label="Actions for ${name} tab">
       <button class="tab-btn tab-btn--move tab-btn--up"
@@ -102,7 +158,7 @@ function renderProfileChip() {
   const active = state.profiles.find(p => p.id === state.settings.activeProfileId);
   if (!active) return;
   document.getElementById('profile-chip-name').textContent = active.name;
-  document.getElementById('profile-chip-dot').style.background = active.color;
+  document.getElementById('profile-chip-dot').style.background = profileColor(active.id);
 }
 
 function renderProfileDropdown() {
@@ -115,7 +171,7 @@ function renderProfileDropdown() {
       <button class="profile-option" role="option"
         aria-selected="${p.id === active}"
         data-profile-id="${p.id}">
-        <span class="profile-option-dot" style="background:${p.color}"></span>
+        <span class="profile-option-dot" style="background:${profileColor(p.id)}"></span>
         <span>${esc(p.name)}</span>
         ${p.id === active ? `<span class="profile-option-check" aria-hidden="true">✓</span>` : ''}
       </button>
@@ -164,7 +220,7 @@ function openEditTab(tabId) {
   const tab = state.tabs.find(t => t.id === tabId);
   if (!tab) return;
 
-  if (tab.hasDropdown) {
+  if (hasDropdown(tab)) {
     openDropdownManagement(tabId);
     return;
   }
@@ -208,7 +264,7 @@ function openAddTab() {
 
 function openDropdownManagement(tabId) {
   const tab = state.tabs.find(t => t.id === tabId);
-  if (!tab || !tab.hasDropdown) return;
+  if (!tab || !hasDropdown(tab)) return;
 
   state.editingTabId = tabId;
 
@@ -291,9 +347,8 @@ function saveTab(e) {
   } else {
     // Create new
     const newTab = {
-      id:           `tab_${Date.now()}`,
+      id:           SFTabs.utils.generateId(),
       position:     state.tabs.length,
-      hasDropdown:  false,
       dropdownItems:[],
       isSetupObject:false,
       ...updates,
@@ -399,7 +454,7 @@ function applyTheme(theme) {
   } else {
     root.setAttribute('data-theme', theme);
   }
-  state.settings.theme = theme;
+  state.settings.themeMode = theme;
 }
 
 /**
@@ -416,7 +471,7 @@ function applyDensity(isCompact) {
 function syncSettingsPanel() {
   const themeButtons = document.querySelectorAll('.seg-btn[data-theme-val]');
   themeButtons.forEach(btn => {
-    const active = btn.dataset.themeVal === state.settings.theme;
+    const active = btn.dataset.themeVal === state.settings.themeMode;
     btn.classList.toggle('active', active);
     btn.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
@@ -629,14 +684,64 @@ function bindEvents() {
 
 const handleTabListClick = e => {
   const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  const { action, id } = btn.dataset;
-  if (action === 'edit')        openEditTab(id);
-  if (action === 'delete')      deleteTab(id);
-  if (action === 'toggle-newtab') toggleNewTab(id);
-  if (action === 'move-up')     moveTab(id, 'up');
-  if (action === 'move-down')   moveTab(id, 'down');
+  if (btn) {
+    const { action, id } = btn.dataset;
+    if (action === 'edit')        openEditTab(id);
+    if (action === 'delete')      deleteTab(id);
+    if (action === 'toggle-newtab') toggleNewTab(id);
+    if (action === 'move-up')     moveTab(id, 'up');
+    if (action === 'move-down')   moveTab(id, 'down');
+    return;
+  }
+  // Clicking the row body (not an action button) navigates
+  const row = e.target.closest('.tab-item');
+  if (row) navigateToTab(state.tabs.find(t => t.id === row.dataset.id));
 };
+
+/**
+ * Build the destination URL from the ACTIVE tab's org URL and navigate.
+ * (The production popup derives this from its own window.location, which in
+ * a popup is the extension URL — that produces a broken destination.)
+ */
+async function navigateToTab(tab) {
+  if (!tab) return;
+  try {
+    const [active] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (!active || !active.url) {
+      showStatus('No active browser tab detected.', 'error');
+      return;
+    }
+    const origin = active.url.split('/lightning/')[0];
+    const path   = tab.path || '';
+    let url;
+
+    if (tab.isCustomUrl) {
+      url = /^https?:\/\//i.test(path) ? path : origin + (path.startsWith('/') ? path : `/${path}`);
+    } else if (tab.isObject) {
+      url = `${origin}/lightning/o/${path}`;
+    } else if (path.includes('ObjectManager/')) {
+      url = `${origin}/lightning/setup/${path}`;
+    } else {
+      url = `${origin}/lightning/setup/${path}/home`;
+    }
+
+    if (tab.openInNewTab) {
+      await browser.tabs.create({ url });
+    } else {
+      try {
+        await browser.tabs.sendMessage(active.id, {
+          action: 'navigate_to_url', url, useLightning: true
+        });
+      } catch {
+        // Content script not present on this page — navigate directly
+        await browser.tabs.update(active.id, { url });
+      }
+    }
+    window.close();
+  } catch (err) {
+    showStatus(`Could not navigate: ${err.message}`, 'error');
+  }
+}
 
 function bindTabListEvents() {
   const tabList = document.getElementById('tab-list');
