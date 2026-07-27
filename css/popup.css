@@ -470,6 +470,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-dropdown-note:hover { text-decoration: underline; }
 .tab-dropdown-note:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 
+.tab-count.is-static { display: inline-flex; }
 .tab-count {
   display: none;
   flex-shrink: 0;
@@ -789,24 +790,11 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   gap: 8px;
 }
 
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-3);
-  background: var(--s-1);
-  border: 1.5px solid var(--b-subtle);
-  border-radius: var(--r-md);
-  transition: border-color var(--ease), background var(--ease);
-}
-.dropdown-item:hover {
-  border-color: var(--b-medium);
-  background: var(--s-hover);
-}
-.dropdown-item:focus-within {
-  border-color: var(--c-primary);
-  box-shadow: var(--sft-shadow-focus);
-}
+/* .dropdown-item also carries .tab-item, inheriting that anatomy. */
+.dropdown-item { transition: border-color var(--ease), background var(--ease); }
+.dropdown-item .tab-info { padding-left: 0; }
+/* No type accent bar on sub-items */
+.dropdown-item::before { display: none; }
 
 /* ── Drag and drop ── */
 .drag-indicator {
@@ -829,7 +817,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 body.is-dragging-active,
 body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 
-.dropdown-item[data-path] { cursor: grab; }
+
 
 /* ── Nested item tree ── */
 .dropdown-empty {

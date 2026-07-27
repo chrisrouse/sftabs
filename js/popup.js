@@ -177,9 +177,9 @@ function hasDropdown(tab) {
 
 // ── Dropdown item tree ─────────────────────────────────────────
 // Items are addressed by index path, e.g. [0,2] = items[0].dropdownItems[2].
-// Levels 0-2 are renderable (production MAX_DEPTH = 3); the page nav only
-// draws flyouts that deep.
-const MAX_DROPDOWN_DEPTH = 3;
+// The tab itself is the parent, so the item tree may be two levels deep:
+// child and grandchild. The injected nav only draws flyouts that far.
+const MAX_ITEM_DEPTH = 2;
 
 const pathKey = path => path.join('.');
 
@@ -346,7 +346,7 @@ function canNestTab(sourceId, targetId) {
   if (!src || !tgt) return false;
   const incoming = 1 + itemsDepth(src.dropdownItems);       // src becomes a child
   const existing = itemsDepth(tgt.dropdownItems);
-  return Math.max(incoming, existing) <= MAX_DROPDOWN_DEPTH;
+  return Math.max(incoming, existing) <= MAX_ITEM_DEPTH;
 }
 
 function reorderTab(sourceId, targetId, before) {
@@ -373,7 +373,7 @@ function nestTabIntoTab(sourceId, targetId) {
   if (!src || !tgt) return;
 
   if (!canNestTab(sourceId, targetId)) {
-    showStatus(`Too many levels — sub-items can only nest ${MAX_DROPDOWN_DEPTH} deep.`, 'error');
+    showStatus('Too many levels — nesting stops at parent, child, grandchild.', 'error');
     return;
   }
 
@@ -407,9 +407,9 @@ function nestTabIntoTab(sourceId, targetId) {
 
 function bindItemDrag() {
   const list = document.getElementById('dropdown-items-list');
-  list.querySelectorAll('.dropdown-item[data-path]').forEach(row => {
-    row.addEventListener('mousedown', e => {
-      if (e.target.closest('button, input')) return; // let controls work
+  list.querySelectorAll('.dropdown-item[data-path] .drag-handle').forEach(handle => {
+    const row = handle.closest('.dropdown-item');
+    handle.addEventListener('mousedown', e => {
       startDrag(e, row, {
         container: list,
         itemSelector: '.dropdown-item[data-path]',
@@ -435,7 +435,7 @@ function canNestItem(fromPath, toPath) {
   const moving = getItemByPath(tab.dropdownItems, fromPath);
   if (!moving) return false;
   // toPath.length is the target's depth; the moved subtree lands one below it
-  return toPath.length + 1 + itemsDepth(moving.dropdownItems) <= MAX_DROPDOWN_DEPTH;
+  return toPath.length + 1 + itemsDepth(moving.dropdownItems) <= MAX_ITEM_DEPTH;
 }
 
 function moveDropdownItem(fromPath, toPath, zone) {
@@ -444,7 +444,7 @@ function moveDropdownItem(fromPath, toPath, zone) {
   if (isDescendantPath(toPath, fromPath)) return;
 
   if (zone === 'nest' && !canNestItem(fromPath, toPath)) {
-    showStatus(`Too many levels — sub-items can only nest ${MAX_DROPDOWN_DEPTH} deep.`, 'error');
+    showStatus('Too many levels — nesting stops at parent, child, grandchild.', 'error');
     return;
   }
 
@@ -714,48 +714,52 @@ function renderDropdownItems(tabId) {
   bindItemDrag();
 }
 
-/** A single item row. `path` is its index path; `level` drives indentation. */
+/** A single item row — same anatomy as a tab row so the two lists read alike. */
 function itemRow(item, path, level) {
   const li = document.createElement('li');
-  li.className = 'dropdown-item';
+  li.className = 'tab-item dropdown-item';
   li.style.marginLeft = `${level * 20}px`;
   li.dataset.path = pathKey(path);
 
   const children  = item.dropdownItems || [];
   const expanded  = state.expandedPaths.has(pathKey(path));
   const numbering = path.map(i => i + 1).join('.');
-  // Depth is 1-based for levels: level 0 items sit at depth 1
-  const canNest   = level + 2 <= MAX_DROPDOWN_DEPTH;
+  // level is 0-based: a level-0 row is a child, so it may still take grandchildren
+  const canNest   = level + 2 <= MAX_ITEM_DEPTH;
+  const label     = esc(item.label);
 
   li.innerHTML = `
+    <div class="drag-handle" aria-hidden="true" title="Drag to reorder">
+      <div class="drag-dots"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
     ${children.length
       ? `<button class="dropdown-twisty" data-action="toggle-item" data-path="${pathKey(path)}"
-           aria-expanded="${expanded}" aria-label="${expanded ? 'Collapse' : 'Expand'} ${esc(item.label)}">
+           aria-expanded="${expanded}" aria-label="${expanded ? 'Collapse' : 'Expand'} ${label}">
            <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M476 178 271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21"/></svg>
          </button>`
       : `<span class="dropdown-twisty-spacer" aria-hidden="true"></span>`}
-    <div class="dropdown-item-info">
-      <div class="dropdown-item-label">
-        <span class="dropdown-item-num">${numbering}.</span> ${esc(item.label)}
-        ${children.length ? `<span class="dropdown-child-count">${children.length}</span>` : ''}
+    <div class="tab-info">
+      <div class="tab-info-top">
+        <span class="tab-name"><span class="dropdown-item-num">${numbering}.</span> ${label}</span>
+        ${children.length ? `<span class="tab-count is-static">${children.length}<span class="sr-only"> sub-items</span></span>` : ''}
       </div>
-      <div class="dropdown-item-path">${esc(item.path || '')}</div>
+      ${item.path ? `<span class="tab-path">${esc(item.path)}</span>` : ''}
     </div>
-    <div class="dropdown-item-actions" role="group" aria-label="Actions for ${esc(item.label)}">
-      ${canNest ? `<button class="dropdown-item-btn" data-action="add-child" data-path="${pathKey(path)}"
-        aria-label="Add item under ${esc(item.label)}" title="Add sub-item">
+    <div class="tab-actions" role="group" aria-label="Actions for ${label}">
+      ${canNest ? `<button class="tab-btn tab-btn--group" data-action="add-child" data-path="${pathKey(path)}"
+        aria-label="Add an item under ${label}" title="Add sub-item">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
       </button>` : ''}
-      <button class="dropdown-item-btn" data-action="edit-item" data-path="${pathKey(path)}"
-        aria-label="Edit ${esc(item.label)}" title="Edit">
+      <button class="tab-btn tab-btn--edit" data-action="edit-item" data-path="${pathKey(path)}"
+        aria-label="Edit ${label}" title="Edit">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
       </button>
-      <button class="dropdown-item-btn" data-action="promote-item" data-path="${pathKey(path)}"
-        aria-label="Promote ${esc(item.label)} to its own tab" title="Promote to top-level tab">
+      <button class="tab-btn tab-btn--move" data-action="promote-item" data-path="${pathKey(path)}"
+        aria-label="Promote ${label} to its own tab" title="Promote to top-level tab">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M414 210c8-8 8-19 0-27L264 36a20 20 0 0 0-28 0L86 183c-8 8-8 19 0 27l28 27c8 8 20 8 28 0l47-46c8-8 22-2 22 9v270c0 10 9 20 20 20h40c11 0 20-11 20-20V200c0-12 14-17 22-9l47 46c8 8 20 8 28 0z"/></svg>
       </button>
-      <button class="dropdown-item-btn" data-action="delete-item" data-path="${pathKey(path)}"
-        aria-label="Delete ${esc(item.label)}" title="Delete">
+      <button class="tab-btn tab-btn--delete" data-action="delete-item" data-path="${pathKey(path)}"
+        aria-label="Delete ${label}" title="Delete">
         <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
       </button>
     </div>`;
