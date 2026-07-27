@@ -1,7 +1,7 @@
 /* ============================================================
    SF Tabs UI v2 — Design System & Layout
    Flat color aesthetic · WCAG 2.1 AA · Expanding tray layout
-   Default: 340px · Tray open: 700px · Height: 540px
+   Default: 390px · Tray open: 770px · Height: 540px
    ============================================================ */
 
 /* ── 1. Design tokens ──
@@ -90,7 +90,7 @@
 html, body {
   /* width is driven by content — Chrome popup sizes to fit */
   width: fit-content;
-  min-width: 340px;
+  min-width: 390px;
 }
 
 body {
@@ -130,7 +130,7 @@ a:hover { text-decoration: underline; }
 /* ── 4. App shell ── */
 .app-shell {
   width: fit-content;
-  min-width: 340px;
+  min-width: 390px;
   height: 540px;
   display: flex;
   flex-direction: column;
@@ -260,7 +260,7 @@ a:hover { text-decoration: underline; }
 
 /* ── 7. Left panel ── */
 .panel-left {
-  width: 340px;
+  width: 390px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -551,6 +551,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-btn--move {
   display: none;
 }
+.tab-item:hover .tab-btn--move,
 .tab-item:focus-within .tab-btn--move {
   display: flex;
 }

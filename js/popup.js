@@ -400,11 +400,6 @@ function openEditTab(tabId) {
   document.getElementById('input-is-custom-url').checked = !!tab.isCustomUrl;
   document.getElementById('input-open-new-tab').checked  = !!tab.openInNewTab;
   updateCharCount('input-tab-name', 'tab-name-count', 30);
-  document.getElementById('group-sub-items').hidden = false;
-
-  const count = countItems(tab.dropdownItems);
-  document.getElementById('manage-items-label').textContent =
-    count ? `Manage ${count} sub-item${count === 1 ? '' : 's'}` : 'Add sub-items';
 
   showView('edit-tab');
   document.getElementById('input-tab-name').focus();
@@ -421,8 +416,6 @@ function openAddTab() {
   document.getElementById('input-is-custom-url').checked = false;
   document.getElementById('input-open-new-tab').checked  = false;
   updateCharCount('input-tab-name', 'tab-name-count', 30);
-  // A new tab has no id yet, so there is nothing to attach sub-items to
-  document.getElementById('group-sub-items').hidden = true;
 
   showView('edit-tab');
   document.getElementById('input-tab-name').focus();
@@ -956,10 +949,6 @@ function bindEvents() {
     showView('empty');
   });
 
-  document.getElementById('btn-manage-items').addEventListener('click', () => {
-    if (state.editingTabId) openDropdownManagement(state.editingTabId);
-  });
-
   document.getElementById('btn-add-dropdown-item').addEventListener('click', () => {
     state.addingItemUnder = [];
     state.editingItemPath = null;
@@ -1068,7 +1057,11 @@ const handleTabListClick = e => {
     if (action === 'toggle-newtab') toggleNewTab(id);
     if (action === 'move-up')     moveTab(id, 'up');
     if (action === 'move-down')   moveTab(id, 'down');
-    if (action === 'manage-items') openDropdownManagement(id);
+    if (action === 'manage-items') {
+      // Toggle: clicking the same tab's icon again closes the panel
+      if (state.activeView === 'dropdowns' && state.editingTabId === id) showView('empty');
+      else openDropdownManagement(id);
+    }
     return;
   }
   // Clicking the row body (not an action button) navigates
