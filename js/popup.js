@@ -35,6 +35,7 @@ let state = {
 
 // ── Init ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  installProductionHooks();
   await loadFromStorage();
   renderTabList();
   renderProfileChip();
@@ -150,6 +151,23 @@ async function patchSettings(partial) {
 }
 
 /**
+ * Shim the hooks production modules expect, so we can reuse them instead of
+ * re-deriving their logic. popup-tabs.js's quick-add needs exactly these
+ * three; saveTabs() also calls setTabs/renderTabList when present.
+ */
+function installProductionHooks() {
+  window.SFTabs = window.SFTabs || {};
+  SFTabs.main = {
+    getTabs: () => state.tabs,
+    setTabs: tabs => { state.tabs = tabs; },
+    showStatus: (message, isError) => showStatus(message, isError ? 'error' : 'success')
+  };
+  SFTabs.ui = {
+    renderTabList: () => { renderTabList(); bindTabListEvents(); }
+  };
+}
+
+/**
  * Report the first missing dependency by name instead of letting a generic
  * "cannot read properties of undefined" surface. The usual cause is a stale
  * manifest: the extension must be reloaded after permissions change.
@@ -163,6 +181,7 @@ function preflight() {
   if (!window.SFTabs?.storage?.getUserSettings) return `popup-storage.js did not load. ${reload}`;
   if (!window.SFTabs?.storageChunking) return `storage-chunking.js did not load. ${reload}`;
   if (!window.SFTabs?.constants) return `constants.js did not load. ${reload}`;
+  if (!window.SFTabs?.tabs?.enhancedAddTabForCurrentPage) return `popup-tabs.js did not load. ${reload}`;
   return null;
 }
 
@@ -1226,7 +1245,9 @@ function bindEvents() {
   // Toolbar
   document.getElementById('btn-add-tab').addEventListener('click', openAddTab);
   document.getElementById('btn-quick-add').addEventListener('click', () => {
-    showStatus('Quick add: no active Salesforce page detected in mock mode.', 'error');
+    // Production's parser handles setup pages, ObjectManager, object lists and
+    // custom URLs, and derives the tab name from the page title.
+    SFTabs.tabs.enhancedAddTabForCurrentPage();
   });
   // btn-empty-add-tab no longer in DOM (empty state moved to left panel)
 
