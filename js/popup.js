@@ -1,19 +1,21 @@
 /**
  * popup.js — UI v2
  *
- * PHASE 0: READ-ONLY. Reads real data through the production storage layer
- * (SFTabs.storage) but never writes. Mutations stay in memory and are lost
- * on close — persistence lands in Phase 1.
+ * Reads and writes real data through the production storage layer
+ * (SFTabs.storage) — the same modules the previous UI uses. No forked
+ * storage code.
  *
- * Data-safety rules for every later phase:
+ * Data-safety rules — keep these true:
  *   1. Production shapes are canonical. Adapt this UI to them, never the
  *      reverse (see settings.themeMode, derived profile colors).
  *   2. Never write an object built from this UI's model. Read the stored
  *      object, patch only the keys we own, write it back — otherwise keys
  *      this UI doesn't know about (settings.floatingButton, autoSwitchProfiles,
  *      per-tab fields) get silently dropped.
- *   3. Tabs live in profile-scoped storage (getProfileTabs), not the legacy
- *      `customTabs` key, even when the profiles UI is switched off.
+ *   3. Tabs live in profile-scoped storage (getProfileTabs/saveTabs), not the
+ *      legacy `customTabs` key, even when the profiles UI is switched off.
+ *   4. Only seed defaults into genuinely empty storage. Pre-existing data
+ *      means migration, which belongs to the production first-launch flow.
  */
 
 // ── State ──────────────────────────────────────────────────────
@@ -46,25 +48,119 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Read-only: nothing here writes, so it cannot damage existing data.
  */
 async function loadFromStorage() {
+  const missing = preflight();
+  if (missing) {
+    state.tabs = [];
+    state.settings = { ...(window.SFTabs?.constants?.DEFAULT_SETTINGS || {}) };
+    state.loadError = missing;
+    return;
+  }
   try {
+    await initializeIfEmpty();
+
     state.settings = await SFTabs.storage.getUserSettings();
     state.profiles = await SFTabs.storage.getProfiles() || [];
 
     // Production keeps tabs in profile-scoped storage even when the profiles
-    // UI is off. A null activeProfileId means first-launch/migration hasn't
-    // run — surface that instead of rendering an empty list, which would
-    // look like data loss.
+    // UI is off. A null activeProfileId here means initialization was skipped
+    // because pre-existing data was found — surface that instead of rendering
+    // an empty list, which would look like data loss.
     if (state.settings.activeProfileId) {
       state.tabs = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
     } else {
       state.tabs = [];
-      state.loadError = 'No active profile — open the previous UI once to finish setup.';
+      state.loadError = state.loadError
+        || 'No active profile — open the previous UI once to finish setup.';
     }
   } catch (err) {
     state.tabs = [];
     state.settings = { ...(window.SFTabs?.constants?.DEFAULT_SETTINGS || {}) };
     state.loadError = `Could not read saved data: ${err.message}`;
   }
+}
+
+/**
+ * First-run setup: create the default profile and seed DEFAULT_TABS.
+ *
+ * Deliberately conservative — it runs ONLY when storage is completely empty.
+ * If a profile, an activeProfileId, or v1-era `customTabs` already exists, it
+ * bails without writing, because that case is a migration and belongs to the
+ * production first-launch/migration flow, not to us.
+ */
+async function initializeIfEmpty() {
+  const settings = await SFTabs.storage.getUserSettings();
+  const profiles = await SFTabs.storage.getProfiles() || [];
+  if (settings.activeProfileId || profiles.length) return false;
+
+  const localLegacy = await browser.storage.local.get('customTabs');
+  const syncLegacy  = await SFTabs.storageChunking.readChunkedSync('customTabs');
+  if (localLegacy?.customTabs?.length || syncLegacy?.length) {
+    state.loadError = 'Tabs from a previous version found — open the previous UI once to migrate them.';
+    return false;
+  }
+
+  // Same id format and profile shape as production's initializeExtension()
+  const profile = {
+    id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    name: 'Default',
+    isDefault: true,
+    urlPatterns: [],
+    createdAt: new Date().toISOString(),
+    lastActive: null
+  };
+
+  await SFTabs.storage.saveProfiles([profile]);
+  await SFTabs.storage.saveUserSettings(
+    { ...settings, activeProfileId: profile.id, defaultProfileId: profile.id },
+    false, false
+  );
+  await SFTabs.storage.saveProfileTabs(profile.id, [...SFTabs.constants.DEFAULT_TABS]);
+  return true;
+}
+
+/**
+ * Persist the current tab list. saveTabs() handles sorting, stripping staging
+ * fields via cleanTabForStorage, chunking, and profile routing.
+ */
+async function persistTabs() {
+  try {
+    await SFTabs.storage.saveTabs(state.tabs);
+  } catch (err) {
+    showStatus(`Could not save: ${err.message}`, 'error');
+  }
+}
+
+/**
+ * Patch settings without clobbering keys this UI doesn't model.
+ * Re-reads stored settings so fields like floatingButton and
+ * autoSwitchProfiles survive — never write state.settings wholesale.
+ */
+async function patchSettings(partial) {
+  try {
+    const stored = await SFTabs.storage.getUserSettings();
+    const merged = { ...stored, ...partial };
+    await SFTabs.storage.saveUserSettings(merged, false, false);
+    state.settings = merged;
+  } catch (err) {
+    showStatus(`Could not save setting: ${err.message}`, 'error');
+  }
+}
+
+/**
+ * Report the first missing dependency by name instead of letting a generic
+ * "cannot read properties of undefined" surface. The usual cause is a stale
+ * manifest: the extension must be reloaded after permissions change.
+ */
+function preflight() {
+  const reload = 'Reload the extension at chrome://extensions.';
+  if (typeof chrome === 'undefined' || !chrome.runtime) return `No extension APIs. ${reload}`;
+  if (!chrome.storage) return `Storage permission not granted — stale manifest. ${reload}`;
+  if (typeof browser === 'undefined') return `browser-compat.js did not load. ${reload}`;
+  if (!browser.storage || !browser.storage.local) return `browser.storage shim missing. ${reload}`;
+  if (!window.SFTabs?.storage?.getUserSettings) return `popup-storage.js did not load. ${reload}`;
+  if (!window.SFTabs?.storageChunking) return `storage-chunking.js did not load. ${reload}`;
+  if (!window.SFTabs?.constants) return `constants.js did not load. ${reload}`;
+  return null;
 }
 
 /**
@@ -360,6 +456,7 @@ function saveTab(e) {
   renderTabList();
   bindTabListEvents();
   showView('empty');
+  persistTabs();
 }
 
 // ── Tab actions ────────────────────────────────────────────────
@@ -388,6 +485,7 @@ function confirmDelete(tabId) {
   bindTabListEvents();
   if (state.editingTabId === id) showView('empty');
   showStatus('Tab deleted');
+  persistTabs();
 }
 
 function toggleNewTab(tabId) {
@@ -396,6 +494,7 @@ function toggleNewTab(tabId) {
   );
   renderTabList();
   bindTabListEvents();
+  persistTabs();
 }
 
 function moveTab(tabId, direction) {
@@ -417,12 +516,16 @@ function moveTab(tabId, direction) {
   // Restore focus to the moved tab
   const movedTab = document.querySelector(`[data-id="${tabId}"]`);
   if (movedTab) movedTab.focus();
+  persistTabs();
 }
 
 // ── Profile switching ──────────────────────────────────────────
 
-function switchProfile(profileId) {
-  state.settings.activeProfileId = profileId;
+async function switchProfile(profileId) {
+  await patchSettings({ activeProfileId: profileId });
+  state.tabs = await SFTabs.storage.getProfileTabs(profileId) || [];
+  renderTabList();
+  bindTabListEvents();
   renderProfileChip();
   renderProfileDropdown();
   closeProfileDropdown();
@@ -573,20 +676,21 @@ function bindEvents() {
       btn.classList.add('active');
       btn.setAttribute('aria-pressed', 'true');
       applyTheme(btn.dataset.themeVal);
+      patchSettings({ themeMode: btn.dataset.themeVal });
     });
   });
 
   document.getElementById('setting-compact').addEventListener('change', e => {
-    state.settings.compactMode = e.target.checked;
     applyDensity(e.target.checked);
+    patchSettings({ compactMode: e.target.checked });
   });
 
   document.getElementById('setting-skip-delete').addEventListener('change', e => {
-    state.settings.skipDeleteConfirmation = e.target.checked;
+    patchSettings({ skipDeleteConfirmation: e.target.checked });
   });
 
   document.getElementById('setting-profiles').addEventListener('change', e => {
-    state.settings.profilesEnabled = e.target.checked;
+    patchSettings({ profilesEnabled: e.target.checked });
     document.querySelector('.header-center').style.visibility = e.target.checked ? 'visible' : 'hidden';
   });
 
