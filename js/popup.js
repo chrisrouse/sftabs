@@ -241,6 +241,243 @@ function profileColor(profileId = '') {
   return PROFILE_DOT_COLORS[hash % PROFILE_DOT_COLORS.length];
 }
 
+// ── Drag and drop ──────────────────────────────────────────────
+// One engine drives both lists. Drop zones are positional rather than
+// production's 500ms hover delay: the top/bottom thirds of a row mean
+// "place before/after", the middle third means "nest inside".
+
+let dragIndicatorEl = null;
+
+function getDragIndicator() {
+  if (!dragIndicatorEl) {
+    dragIndicatorEl = document.createElement('div');
+    dragIndicatorEl.className = 'drag-indicator';
+    dragIndicatorEl.hidden = true;
+    document.body.appendChild(dragIndicatorEl);
+  }
+  return dragIndicatorEl;
+}
+
+function showDropIndicator(rect, zone) {
+  const el = getDragIndicator();
+  el.hidden = false;
+  el.classList.toggle('is-nest', zone === 'nest');
+  if (zone === 'nest') {
+    el.style.cssText =
+      `top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;height:${rect.height}px`;
+  } else {
+    const y = zone === 'before' ? rect.top : rect.bottom;
+    el.style.cssText = `top:${y - 1}px;left:${rect.left}px;width:${rect.width}px;height:2px`;
+  }
+}
+
+function hideDropIndicator() {
+  if (dragIndicatorEl) dragIndicatorEl.hidden = true;
+}
+
+/**
+ * Begin a drag. `opts.canNest(sourceEl, targetEl)` gates the middle zone;
+ * `opts.onDrop(sourceEl, targetEl, zone)` commits it.
+ */
+function startDrag(event, sourceEl, opts) {
+  event.preventDefault();
+  const { container, itemSelector, canNest, onDrop } = opts;
+  let targetEl = null, zone = null;
+
+  sourceEl.classList.add('is-dragging');
+  document.body.classList.add('is-dragging-active');
+
+  const onMove = ev => {
+    hideDropIndicator(); // never let the indicator win the hit test
+    const under = document.elementFromPoint(ev.clientX, ev.clientY);
+    const row = under && under.closest(itemSelector);
+
+    if (!row || row === sourceEl || !container.contains(row) || sourceEl.contains(row)) {
+      targetEl = zone = null;
+      return;
+    }
+    const rect = row.getBoundingClientRect();
+    const offset = ev.clientY - rect.top;
+    const nestOk = canNest(sourceEl, row);
+    zone = (nestOk && offset > rect.height / 3 && offset < (rect.height * 2) / 3)
+      ? 'nest'
+      : (offset < rect.height / 2 ? 'before' : 'after');
+    targetEl = row;
+    showDropIndicator(rect, zone);
+  };
+
+  const onUp = () => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    hideDropIndicator();
+    sourceEl.classList.remove('is-dragging');
+    document.body.classList.remove('is-dragging-active');
+    if (targetEl && zone) onDrop(sourceEl, targetEl, zone);
+  };
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ── Tab list: reorder, or drop onto a tab to nest it as a sub-item ──
+
+function bindTabDrag() {
+  const list = document.getElementById('tab-list');
+  list.querySelectorAll('.drag-handle').forEach(handle => {
+    handle.addEventListener('mousedown', e => {
+      const row = handle.closest('.tab-item');
+      if (!row) return;
+      startDrag(e, row, {
+        container: list,
+        itemSelector: '.tab-item',
+        canNest: (srcEl, tgtEl) => canNestTab(srcEl.dataset.id, tgtEl.dataset.id),
+        onDrop: (srcEl, tgtEl, zone) => zone === 'nest'
+          ? nestTabIntoTab(srcEl.dataset.id, tgtEl.dataset.id)
+          : reorderTab(srcEl.dataset.id, tgtEl.dataset.id, zone === 'before')
+      });
+    });
+  });
+}
+
+/** Nesting is blocked when the combined tree would exceed the depth limit. */
+function canNestTab(sourceId, targetId) {
+  const src = state.tabs.find(t => t.id === sourceId);
+  const tgt = state.tabs.find(t => t.id === targetId);
+  if (!src || !tgt) return false;
+  const incoming = 1 + itemsDepth(src.dropdownItems);       // src becomes a child
+  const existing = itemsDepth(tgt.dropdownItems);
+  return Math.max(incoming, existing) <= MAX_DROPDOWN_DEPTH;
+}
+
+function reorderTab(sourceId, targetId, before) {
+  const sorted = state.tabs.slice().sort((a, b) => a.position - b.position);
+  const from = sorted.findIndex(t => t.id === sourceId);
+  const to   = sorted.findIndex(t => t.id === targetId);
+  if (from === -1 || to === -1) return;
+
+  const [moved] = sorted.splice(from, 1);
+  const insertAt = sorted.findIndex(t => t.id === targetId) + (before ? 0 : 1);
+  sorted.splice(insertAt, 0, moved);
+  sorted.forEach((t, i) => { t.position = i; });
+
+  state.tabs = sorted;
+  renderTabList();
+  bindTabListEvents();
+  persistTabs();
+}
+
+/** Move a whole tab under another tab, keeping its own sub-items. */
+function nestTabIntoTab(sourceId, targetId) {
+  const src = state.tabs.find(t => t.id === sourceId);
+  const tgt = state.tabs.find(t => t.id === targetId);
+  if (!src || !tgt) return;
+
+  if (!canNestTab(sourceId, targetId)) {
+    showStatus(`Too many levels — sub-items can only nest ${MAX_DROPDOWN_DEPTH} deep.`, 'error');
+    return;
+  }
+
+  const item = {
+    label: src.label,
+    path: src.path || '',
+    url: src.isCustomUrl ? src.path : null,
+    isObject: !!src.isObject,
+    isCustomUrl: !!src.isCustomUrl,
+    isSetupObject: !!src.isSetupObject
+  };
+  if (src.dropdownItems?.length) {
+    item.dropdownItems = JSON.parse(JSON.stringify(src.dropdownItems));
+  }
+
+  tgt.dropdownItems = tgt.dropdownItems || [];
+  tgt.dropdownItems.push(item);
+  state.tabs = state.tabs.filter(t => t.id !== sourceId);
+  state.tabs.sort((a, b) => a.position - b.position).forEach((t, i) => { t.position = i; });
+
+  showStatus(`"${src.label}" moved under "${tgt.label}"`);
+  renderTabList();
+  bindTabListEvents();
+  if (state.activeView === 'dropdowns' && state.editingTabId === targetId) {
+    renderDropdownItems(targetId);
+  }
+  persistTabs();
+}
+
+// ── Sub-item list: reorder and re-nest within the tree ──
+
+function bindItemDrag() {
+  const list = document.getElementById('dropdown-items-list');
+  list.querySelectorAll('.dropdown-item[data-path]').forEach(row => {
+    row.addEventListener('mousedown', e => {
+      if (e.target.closest('button, input')) return; // let controls work
+      startDrag(e, row, {
+        container: list,
+        itemSelector: '.dropdown-item[data-path]',
+        canNest: (srcEl, tgtEl) => canNestItem(parsePath(srcEl), parsePath(tgtEl)),
+        onDrop: (srcEl, tgtEl, zone) => moveDropdownItem(parsePath(srcEl), parsePath(tgtEl), zone)
+      });
+    });
+  });
+}
+
+const parsePath = el => el.dataset.path.split('.').map(Number);
+
+/** True when `maybeChild` sits inside `maybeParent`. */
+function isDescendantPath(maybeChild, maybeParent) {
+  return maybeParent.length < maybeChild.length &&
+         maybeParent.every((v, i) => maybeChild[i] === v);
+}
+
+function canNestItem(fromPath, toPath) {
+  if (isDescendantPath(toPath, fromPath)) return false; // no dropping into own subtree
+  const tab = state.tabs.find(t => t.id === state.editingTabId);
+  if (!tab) return false;
+  const moving = getItemByPath(tab.dropdownItems, fromPath);
+  if (!moving) return false;
+  // toPath.length is the target's depth; the moved subtree lands one below it
+  return toPath.length + 1 + itemsDepth(moving.dropdownItems) <= MAX_DROPDOWN_DEPTH;
+}
+
+function moveDropdownItem(fromPath, toPath, zone) {
+  const tab = state.tabs.find(t => t.id === state.editingTabId);
+  if (!tab) return;
+  if (isDescendantPath(toPath, fromPath)) return;
+
+  if (zone === 'nest' && !canNestItem(fromPath, toPath)) {
+    showStatus(`Too many levels — sub-items can only nest ${MAX_DROPDOWN_DEPTH} deep.`, 'error');
+    return;
+  }
+
+  const moving = JSON.parse(JSON.stringify(getItemByPath(tab.dropdownItems, fromPath)));
+  removeItemByPath(tab.dropdownItems, fromPath);
+
+  // Removing an earlier sibling shifts the target index down by one
+  const adjusted = [...toPath];
+  const sameParent = fromPath.length === toPath.length &&
+    fromPath.slice(0, -1).every((v, i) => toPath[i] === v);
+  if (sameParent && fromPath[fromPath.length - 1] < toPath[toPath.length - 1]) {
+    adjusted[adjusted.length - 1] -= 1;
+  }
+
+  if (zone === 'nest') {
+    const parent = getItemByPath(tab.dropdownItems, adjusted);
+    if (!parent) return;
+    parent.dropdownItems = parent.dropdownItems || [];
+    parent.dropdownItems.push(moving);
+    state.expandedPaths.add(pathKey(adjusted));
+  } else {
+    const list = getParentList(tab.dropdownItems, adjusted);
+    if (!list) return;
+    const at = adjusted[adjusted.length - 1] + (zone === 'before' ? 0 : 1);
+    list.splice(at, 0, moving);
+  }
+
+  renderDropdownItems(state.editingTabId);
+  renderTabList();
+  bindTabListEvents();
+  persistTabs();
+}
+
 // ── Rendering ──────────────────────────────────────────────────
 
 function renderTabList() {
@@ -473,6 +710,8 @@ function renderDropdownItems(tabId) {
   if (state.addingItemUnder && !state.addingItemUnder.length) {
     list.appendChild(itemEditRow({ label: '', path: '' }, null, 0));
   }
+
+  bindItemDrag();
 }
 
 /** A single item row. `path` is its index path; `level` drives indentation. */
@@ -1118,4 +1357,5 @@ function bindTabListEvents() {
   const tabList = document.getElementById('tab-list');
   tabList.removeEventListener('click', handleTabListClick);
   tabList.addEventListener('click', handleTabListClick);
+  bindTabDrag();
 }

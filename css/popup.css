@@ -540,6 +540,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 /* Action hovers: matched tint strength across the three variants —
    brand-90 / error-container so each reads clearly on a white card */
+.tab-btn--move:hover         { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
 .tab-btn--group.is-on        { color: var(--c-accent); }
 .tab-btn--group:hover        { background: var(--c-accent-light); color: var(--c-accent); }
 .tab-btn--edit:hover         { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
@@ -806,6 +807,29 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   border-color: var(--c-primary);
   box-shadow: var(--sft-shadow-focus);
 }
+
+/* ── Drag and drop ── */
+.drag-indicator {
+  position: fixed;
+  z-index: 900;
+  pointer-events: none;
+  background: var(--c-primary);
+  border-radius: var(--sft-radius-1);
+}
+.drag-indicator.is-nest {
+  background: color-mix(in srgb, var(--c-accent) 22%, transparent);
+  border: var(--sft-border-width-2) solid var(--c-accent);
+}
+.drag-indicator[hidden] { display: none; }
+
+.tab-item.is-dragging,
+.dropdown-item.is-dragging { opacity: 0.4; }
+
+/* Keep the whole window in "grabbing" while a drag is in flight */
+body.is-dragging-active,
+body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
+
+.dropdown-item[data-path] { cursor: grab; }
 
 /* ── Nested item tree ── */
 .dropdown-empty {
