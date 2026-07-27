@@ -157,14 +157,24 @@ async function patchSettings(partial) {
  */
 function installProductionHooks() {
   window.SFTabs = window.SFTabs || {};
-  SFTabs.main = {
+  // Proxy so a module reaching for an unshimmed hook logs instead of failing
+  // silently — popup-storage guards its calls with `if (SFTabs.main && ...)`.
+  const warnOnMissing = obj => new Proxy(obj, {
+    get(target, prop) {
+      if (!(prop in target) && typeof prop === 'string') {
+        console.warn(`[SF Tabs] production module wants SFTabs hook "${String(prop)}" which the v2 popup does not shim`);
+      }
+      return target[prop];
+    }
+  });
+  SFTabs.main = warnOnMissing({
     getTabs: () => state.tabs,
     setTabs: tabs => { state.tabs = tabs; },
     showStatus: (message, isError) => showStatus(message, isError ? 'error' : 'success')
-  };
-  SFTabs.ui = {
+  });
+  SFTabs.ui = warnOnMissing({
     renderTabList: () => { renderTabList(); bindTabListEvents(); }
-  };
+  });
 }
 
 /**
@@ -1063,7 +1073,7 @@ function saveTab(e) {
 
 // ── Tab actions ────────────────────────────────────────────────
 
-function deleteTab(tabId) {
+function promptDeleteTab(tabId) {
   const tab = state.tabs.find(t => t.id === tabId);
   if (!tab) return;
 
@@ -1427,7 +1437,7 @@ const handleTabListClick = e => {
   if (btn) {
     const { action, id } = btn.dataset;
     if (action === 'edit')        openEditTab(id);
-    if (action === 'delete')      deleteTab(id);
+    if (action === 'delete')      promptDeleteTab(id);
     if (action === 'toggle-newtab') toggleNewTab(id);
     if (action === 'move-up')     moveTab(id, 'up');
     if (action === 'move-down')   moveTab(id, 'down');
