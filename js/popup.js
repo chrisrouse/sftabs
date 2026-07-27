@@ -998,6 +998,30 @@ function commitDropdownItem(path) {
 }
 
 /**
+ * Sub-items and tabs store paths differently: an item keeps the parser's full
+ * "/lightning/setup/..." path and is navigated as origin+path, while a tab
+ * stores a bare "ObjectManager/..." path that the navigator prefixes with
+ * "/lightning/setup/". Promoting has to translate, or the prefix doubles up.
+ */
+function itemPathToTabFields(item) {
+  const path = item.path || '';
+
+  if (item.isCustomUrl) return { path, isObject: false, isCustomUrl: true };
+  if (item.isObject)    return { path, isObject: true,  isCustomUrl: false };
+
+  if (path.startsWith('/lightning/setup/')) {
+    return { path: path.slice('/lightning/setup/'.length), isObject: false, isCustomUrl: false };
+  }
+  if (path.startsWith('/lightning/o/')) {
+    return { path: path.slice('/lightning/o/'.length), isObject: true, isCustomUrl: false };
+  }
+  // Any other absolute path (/lightning/n/..., /apex/...) is a custom URL
+  if (path.startsWith('/')) return { path, isObject: false, isCustomUrl: true };
+
+  return { path, isObject: false, isCustomUrl: false };
+}
+
+/**
  * Move an item out one level, carrying its own children with it.
  *   grandchild -> becomes a sibling of its parent, just below it
  *   child      -> becomes its own top-level tab
@@ -1018,14 +1042,15 @@ function promoteDropdownItem(path) {
 
   if (path.length === 1) {
     // Already a direct child — the next level up is the tab list itself
+    const asTab = itemPathToTabFields(moving);
     state.tabs.push({
       id: SFTabs.utils.generateId(),
       label: moving.label,
-      path: moving.path || '',
+      path: asTab.path,
       openInNewTab: false,
-      isObject: !!moving.isObject,
-      isCustomUrl: !!moving.isCustomUrl,
-      isSetupObject: false,
+      isObject: asTab.isObject,
+      isCustomUrl: asTab.isCustomUrl,
+      isSetupObject: asTab.path.startsWith('ObjectManager/'),
       dropdownItems: moving.dropdownItems || [],
       position: state.tabs.length
     });
@@ -1537,6 +1562,8 @@ async function navigateToTab(tab) {
 
     if (tab.isCustomUrl) {
       url = /^https?:\/\//i.test(path) ? path : origin + (path.startsWith('/') ? path : `/${path}`);
+    } else if (path.startsWith('/lightning/')) {
+      url = origin + path;            // already fully qualified
     } else if (tab.isObject) {
       url = `${origin}/lightning/o/${path}`;
     } else if (path.includes('ObjectManager/')) {
