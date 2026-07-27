@@ -28,6 +28,9 @@ let state = {
   profileDropdownOpen: false,
   pendingDeleteId: null,
   loadError:       null,
+  expandedPaths:   new Set(), // UI-only; never written to storage
+  editingItemPath: null,      // dropdown item currently open for inline edit
+  addingItemUnder: null,      // parent path for a pending add ([] = root)
 };
 
 // ── Init ───────────────────────────────────────────────────────
@@ -170,6 +173,65 @@ function preflight() {
 /** Production derives this from the items array; it is not a stored field. */
 function hasDropdown(tab) {
   return Array.isArray(tab?.dropdownItems) && tab.dropdownItems.length > 0;
+}
+
+// ── Dropdown item tree ─────────────────────────────────────────
+// Items are addressed by index path, e.g. [0,2] = items[0].dropdownItems[2].
+// Levels 0-2 are renderable (production MAX_DEPTH = 3); the page nav only
+// draws flyouts that deep.
+const MAX_DROPDOWN_DEPTH = 3;
+
+const pathKey = path => path.join('.');
+
+function getItemByPath(items, path) {
+  let list = items, item = null;
+  for (const idx of path) {
+    if (!Array.isArray(list) || !list[idx]) return null;
+    item = list[idx];
+    list = item.dropdownItems;
+  }
+  return item;
+}
+
+function getParentList(items, path) {
+  if (path.length === 1) return items;
+  const parent = getItemByPath(items, path.slice(0, -1));
+  return parent ? parent.dropdownItems : null;
+}
+
+function removeItemByPath(items, path) {
+  const list = getParentList(items, path);
+  if (!list) return null;
+  const [removed] = list.splice(path[path.length - 1], 1);
+  // Production drops the key entirely rather than leaving an empty array
+  if (path.length > 1 && list.length === 0) {
+    const parent = getItemByPath(items, path.slice(0, -1));
+    if (parent) delete parent.dropdownItems;
+  }
+  return removed || null;
+}
+
+function countItems(items) {
+  if (!Array.isArray(items)) return 0;
+  return items.reduce((n, i) => n + 1 + countItems(i.dropdownItems), 0);
+}
+
+/** Depth of an items array: 1 for a flat list, +1 per nested level. */
+function itemsDepth(items) {
+  if (!Array.isArray(items) || !items.length) return 0;
+  return 1 + Math.max(...items.map(i => itemsDepth(i.dropdownItems)));
+}
+
+/** Flatten the tree honoring collapsed branches, for rendering. */
+function walkVisibleItems(items, level = 0, path = [], out = []) {
+  (items || []).forEach((item, idx) => {
+    const p = [...path, idx];
+    out.push({ item, path: p, level });
+    if (state.expandedPaths.has(pathKey(p))) {
+      walkVisibleItems(item.dropdownItems, level + 1, p, out);
+    }
+  });
+  return out;
 }
 
 const PROFILE_DOT_COLORS = ['#04e1cb', '#78b0fd', '#ad7bee', '#fcc003', '#fe8f7d', '#45c65a'];
@@ -360,7 +422,7 @@ function openAddTab() {
 
 function openDropdownManagement(tabId) {
   const tab = state.tabs.find(t => t.id === tabId);
-  if (!tab || !hasDropdown(tab)) return;
+  if (!tab) return;
 
   state.editingTabId = tabId;
 
@@ -370,6 +432,8 @@ function openDropdownManagement(tabId) {
   const tabEl = document.querySelector(`.tab-item[data-id="${tabId}"]`);
   if (tabEl) tabEl.classList.add('is-editing');
 
+  state.editingItemPath = null;
+  state.addingItemUnder = null;
   document.getElementById('dropdown-title').textContent = 'Manage Items';
   document.getElementById('dropdown-subtitle').textContent = `Items in "${tab.label}"`;
 
@@ -382,34 +446,201 @@ function renderDropdownItems(tabId) {
   if (!tab) return;
 
   const list = document.getElementById('dropdown-items-list');
+  const items = tab.dropdownItems || [];
   list.innerHTML = '';
 
-  if (!tab.dropdownItems || tab.dropdownItems.length === 0) {
-    list.innerHTML = `<li style="padding: 16px 12px; text-align: center; color: var(--t-weak); font-size: 12px;">No items yet</li>`;
+  document.getElementById('dropdown-subtitle').textContent =
+    `${countItems(items)} item${countItems(items) === 1 ? '' : 's'} in "${tab.label}"`;
+
+  if (!items.length && !state.addingItemUnder) {
+    list.innerHTML = `<li class="dropdown-empty">No items yet</li>`;
+  }
+
+  walkVisibleItems(items).forEach(({ item, path, level }) => {
+    list.appendChild(
+      pathKey(path) === pathKey(state.editingItemPath || [])
+        ? itemEditRow(item, path, level)
+        : itemRow(item, path, level)
+    );
+    // Inline "add child" form directly under its parent
+    if (state.addingItemUnder && pathKey(state.addingItemUnder) === pathKey(path)) {
+      list.appendChild(itemEditRow({ label: '', path: '' }, null, level + 1));
+    }
+  });
+
+  // Root-level add form
+  if (state.addingItemUnder && !state.addingItemUnder.length) {
+    list.appendChild(itemEditRow({ label: '', path: '' }, null, 0));
+  }
+}
+
+/** A single item row. `path` is its index path; `level` drives indentation. */
+function itemRow(item, path, level) {
+  const li = document.createElement('li');
+  li.className = 'dropdown-item';
+  li.style.marginLeft = `${level * 20}px`;
+  li.dataset.path = pathKey(path);
+
+  const children  = item.dropdownItems || [];
+  const expanded  = state.expandedPaths.has(pathKey(path));
+  const numbering = path.map(i => i + 1).join('.');
+  // Depth is 1-based for levels: level 0 items sit at depth 1
+  const canNest   = level + 2 <= MAX_DROPDOWN_DEPTH;
+
+  li.innerHTML = `
+    ${children.length
+      ? `<button class="dropdown-twisty" data-action="toggle-item" data-path="${pathKey(path)}"
+           aria-expanded="${expanded}" aria-label="${expanded ? 'Collapse' : 'Expand'} ${esc(item.label)}">
+           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M476 178 271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21"/></svg>
+         </button>`
+      : `<span class="dropdown-twisty-spacer" aria-hidden="true"></span>`}
+    <div class="dropdown-item-info">
+      <div class="dropdown-item-label">
+        <span class="dropdown-item-num">${numbering}.</span> ${esc(item.label)}
+        ${children.length ? `<span class="dropdown-child-count">${children.length}</span>` : ''}
+      </div>
+      <div class="dropdown-item-path">${esc(item.path || '')}</div>
+    </div>
+    <div class="dropdown-item-actions" role="group" aria-label="Actions for ${esc(item.label)}">
+      ${canNest ? `<button class="dropdown-item-btn" data-action="add-child" data-path="${pathKey(path)}"
+        aria-label="Add item under ${esc(item.label)}" title="Add sub-item">
+        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
+      </button>` : ''}
+      <button class="dropdown-item-btn" data-action="edit-item" data-path="${pathKey(path)}"
+        aria-label="Edit ${esc(item.label)}" title="Edit">
+        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
+      </button>
+      <button class="dropdown-item-btn" data-action="promote-item" data-path="${pathKey(path)}"
+        aria-label="Promote ${esc(item.label)} to its own tab" title="Promote to top-level tab">
+        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M414 210c8-8 8-19 0-27L264 36a20 20 0 0 0-28 0L86 183c-8 8-8 19 0 27l28 27c8 8 20 8 28 0l47-46c8-8 22-2 22 9v270c0 10 9 20 20 20h40c11 0 20-11 20-20V200c0-12 14-17 22-9l47 46c8 8 20 8 28 0z"/></svg>
+      </button>
+      <button class="dropdown-item-btn" data-action="delete-item" data-path="${pathKey(path)}"
+        aria-label="Delete ${esc(item.label)}" title="Delete">
+        <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
+      </button>
+    </div>`;
+  return li;
+}
+
+// ── Dropdown item actions ──────────────────────────────────────
+
+/** Save an inline edit, or add a new item when `path` is null. */
+function commitDropdownItem(path) {
+  const tab = state.tabs.find(t => t.id === state.editingTabId);
+  if (!tab) return;
+
+  const label = document.getElementById('item-label').value.trim();
+  const itemPath = document.getElementById('item-path').value.trim();
+  if (!label) {
+    showStatus('Item label is required.', 'error');
+    document.getElementById('item-label').focus();
     return;
   }
 
-  tab.dropdownItems.forEach((item, idx) => {
-    const li = document.createElement('li');
-    li.className = 'dropdown-item';
-    li.setAttribute('role', 'listitem');
-    li.setAttribute('data-index', idx);
-    li.innerHTML = `
-      <div class="dropdown-item-info">
-        <div class="dropdown-item-label">${esc(item.label)}</div>
-        <div class="dropdown-item-path">${esc(item.path)}</div>
-      </div>
-      <div class="dropdown-item-actions" role="group" aria-label="Actions for ${esc(item.label)}">
-        <button class="dropdown-item-btn" data-action="edit-dropdown" data-index="${idx}" aria-label="Edit ${esc(item.label)}" title="Edit">
-          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
-        </button>
-        <button class="dropdown-item-btn" data-action="delete-dropdown" data-index="${idx}" aria-label="Delete ${esc(item.label)}" title="Delete">
-          <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
-        </button>
-      </div>
-    `;
-    list.appendChild(li);
+  if (path) {
+    const item = getItemByPath(tab.dropdownItems, path);
+    if (item) { item.label = label; item.path = itemPath; }
+    showStatus(`"${label}" saved`);
+  } else {
+    const parentPath = state.addingItemUnder || [];
+    const newItem = { label, path: itemPath, isObject: false, isCustomUrl: false };
+    if (!parentPath.length) {
+      tab.dropdownItems = tab.dropdownItems || [];
+      tab.dropdownItems.push(newItem);
+    } else {
+      const parent = getItemByPath(tab.dropdownItems, parentPath);
+      if (!parent) return;
+      parent.dropdownItems = parent.dropdownItems || [];
+      parent.dropdownItems.push(newItem);
+    }
+    showStatus(`"${label}" added`);
+  }
+
+  state.editingItemPath = null;
+  state.addingItemUnder = null;
+  renderDropdownItems(state.editingTabId);
+  renderTabList();
+  bindTabListEvents();
+  persistTabs();
+}
+
+/**
+ * Move a nested item out to its own top-level tab, keeping its children.
+ * Mirrors production's promote, but commits immediately.
+ */
+function promoteDropdownItem(path) {
+  const tab = state.tabs.find(t => t.id === state.editingTabId);
+  if (!tab) return;
+
+  const item = getItemByPath(tab.dropdownItems, path);
+  if (!item) return;
+
+  const children = item.dropdownItems ? JSON.parse(JSON.stringify(item.dropdownItems)) : [];
+  removeItemByPath(tab.dropdownItems, path);
+
+  state.tabs.push({
+    id: SFTabs.utils.generateId(),
+    label: item.label,
+    path: item.path || '',
+    openInNewTab: false,
+    isObject: !!item.isObject,
+    isCustomUrl: !!item.isCustomUrl,
+    isSetupObject: false,
+    dropdownItems: children,
+    position: state.tabs.length
   });
+
+  state.expandedPaths.clear(); // paths shifted underneath us
+  showStatus(children.length
+    ? `"${item.label}" promoted with ${children.length} item${children.length === 1 ? '' : 's'}`
+    : `"${item.label}" promoted to a tab`);
+
+  renderDropdownItems(state.editingTabId);
+  renderTabList();
+  bindTabListEvents();
+  persistTabs();
+}
+
+function deleteDropdownItem(path) {
+  const tab = state.tabs.find(t => t.id === state.editingTabId);
+  if (!tab) return;
+  const item = getItemByPath(tab.dropdownItems, path);
+  if (!item) return;
+
+  const childCount = countItems(item.dropdownItems);
+  if (!state.settings.skipDeleteConfirmation) {
+    const extra = childCount ? ` and its ${childCount} nested item${childCount === 1 ? '' : 's'}` : '';
+    if (!confirm(`Delete "${item.label}"${extra}?`)) return;
+  }
+
+  removeItemByPath(tab.dropdownItems, path);
+  state.expandedPaths.clear();
+  showStatus('Item deleted');
+
+  renderDropdownItems(state.editingTabId);
+  renderTabList();
+  bindTabListEvents();
+  persistTabs();
+}
+
+/** Inline editor. `path` null means this is a new item being added. */
+function itemEditRow(item, path, level) {
+  const li = document.createElement('li');
+  li.className = 'dropdown-item dropdown-item--editing';
+  li.style.marginLeft = `${level * 20}px`;
+  li.innerHTML = `
+    <div class="dropdown-item-fields">
+      <input type="text" class="form-input" id="item-label" placeholder="Label"
+             value="${esc(item.label || '')}" maxlength="30" autocomplete="off" />
+      <input type="text" class="form-input" id="item-path" placeholder="Path or URL"
+             value="${esc(item.path || '')}" autocomplete="off" />
+      <div class="dropdown-item-fields-actions">
+        <button class="btn-secondary" data-action="cancel-item">Cancel</button>
+        <button class="btn-primary" data-action="commit-item"
+                data-path="${path ? pathKey(path) : ''}">${path ? 'Save' : 'Add'}</button>
+      </div>
+    </div>`;
+  return li;
 }
 
 function saveTab(e) {
@@ -718,23 +949,53 @@ function bindEvents() {
   });
 
   document.getElementById('btn-add-dropdown-item').addEventListener('click', () => {
-    showStatus('Add dropdown item: Coming soon in Phase 3', 'info');
+    state.addingItemUnder = [];
+    state.editingItemPath = null;
+    renderDropdownItems(state.editingTabId);
+    document.getElementById('item-label')?.focus();
   });
 
   document.getElementById('dropdown-items-list').addEventListener('click', e => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
-    const { action, index } = btn.dataset;
-    if (action === 'edit-dropdown') {
-      showStatus(`Edit dropdown item #${index}: Coming soon in Phase 3`, 'info');
-    }
-    if (action === 'delete-dropdown') {
-      const tab = state.tabs.find(t => t.id === state.editingTabId);
-      if (tab && tab.dropdownItems) {
-        tab.dropdownItems.splice(parseInt(index), 1);
+    const path = btn.dataset.path ? btn.dataset.path.split('.').map(Number) : [];
+
+    switch (btn.dataset.action) {
+      case 'toggle-item': {
+        const key = pathKey(path);
+        state.expandedPaths.has(key)
+          ? state.expandedPaths.delete(key)
+          : state.expandedPaths.add(key);
         renderDropdownItems(state.editingTabId);
-        showStatus('Dropdown item deleted');
+        break;
       }
+      case 'add-child':
+        state.addingItemUnder = path;
+        state.editingItemPath = null;
+        state.expandedPaths.add(pathKey(path)); // reveal where it will land
+        renderDropdownItems(state.editingTabId);
+        document.getElementById('item-label')?.focus();
+        break;
+      case 'edit-item':
+        state.editingItemPath = path;
+        state.addingItemUnder = null;
+        renderDropdownItems(state.editingTabId);
+        document.getElementById('item-label')?.focus();
+        break;
+      case 'cancel-item':
+        state.editingItemPath = null;
+        state.addingItemUnder = null;
+        renderDropdownItems(state.editingTabId);
+        break;
+      case 'commit-item':
+        commitDropdownItem(btn.dataset.path ? path : null);
+        break;
+      case 'promote-item':
+        promoteDropdownItem(path);
+        break;
+      case 'delete-item':
+        deleteDropdownItem(path);
+        break;
     }
   });
 
