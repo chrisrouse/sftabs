@@ -468,14 +468,10 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   border-radius: var(--sft-radius-1);
 }
 .tab-dropdown-note:hover { text-decoration: underline; }
-.tab-dropdown-note:focus-visible,
-.tab-count:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
+.tab-dropdown-note:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 
 .tab-count {
   display: none;
-  border: none;
-  font-family: inherit;
-  cursor: pointer;
   flex-shrink: 0;
   min-width: 1rem;
   height: 1rem;
@@ -544,6 +540,8 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 
 /* Action hovers: matched tint strength across the three variants —
    brand-90 / error-container so each reads clearly on a white card */
+.tab-btn--group.is-on        { color: var(--c-accent); }
+.tab-btn--group:hover        { background: var(--c-accent-light); color: var(--c-accent); }
 .tab-btn--edit:hover         { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
 .tab-btn--newtab:hover       { background: var(--c-primary-tint); color: var(--c-primary-on-tint); }
 .tab-btn--newtab.is-on       { color: var(--c-primary); }

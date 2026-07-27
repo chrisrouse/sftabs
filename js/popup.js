@@ -281,9 +281,7 @@ function tabItemHTML(tab) {
       <div class="tab-info-top">
         <span class="tab-badge tab-badge--${type}" aria-label="${badge} tab">${badge}</span>
         <span class="tab-name">${name}</span>
-        ${hasDropdown(tab) ? `<button class="tab-count" data-action="manage-items" data-id="${tab.id}"
-          aria-label="Manage ${countItems(tab.dropdownItems)} sub-items in ${name}"
-          title="Manage sub-items">${countItems(tab.dropdownItems)}</button>` : ''}
+        ${hasDropdown(tab) ? `<span class="tab-count">${countItems(tab.dropdownItems)}<span class="sr-only"> sub-items</span></span>` : ''}
       </div>
       ${path ? `<span class="tab-path">${path}</span>` : ''}
       ${hasDropdown(tab) ? `<button class="tab-dropdown-note" data-action="manage-items" data-id="${tab.id}"
@@ -297,6 +295,11 @@ function tabItemHTML(tab) {
       <button class="tab-btn tab-btn--move tab-btn--down"
         aria-label="Move ${name} down" title="Move down" data-action="move-down" data-id="${tab.id}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M96 310c-8 8-8 19 0 27l150 147c8 8 20 8 28 0l151-147c8-8 8-19 0-27l-28-27a20 20 0 0 0-28 0l-47 46c-8 8-22 3-22-9V50c0-10-9-20-20-20h-40c-11 0-20 11-20 20v270c0 12-14 17-22 9l-47-46a20 20 0 0 0-28 0z"/></svg>
+      </button>
+      <button class="tab-btn tab-btn--group ${hasDropdown(tab) ? 'is-on' : ''}"
+        aria-label="${hasDropdown(tab) ? `Manage ${countItems(tab.dropdownItems)} sub-items in ` : 'Add sub-items to '}${name}"
+        title="Sub-items" data-action="manage-items" data-id="${tab.id}">
+        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M231 230H108c-7 0-14 6-14 13v105H53c-7 0-14 7-14 14v100c0 7 7 14 14 14h137c7 0 14-7 14-14V362c0-7-7-14-14-14h-41v-64h219v64h-41c-7 0-14 7-14 14v100c0 7 7 14 14 14h137c7 0 13-7 13-14V362c0-7-6-14-13-14h-42V243c0-7-7-13-14-13H286v-64h41c7 0 13-7 13-14V52c0-7-6-14-13-14H190c-7 0-14 7-14 14v100c0 7 7 14 14 14h42v64z"/></svg>
       </button>
       <button class="tab-btn tab-btn--edit"
         aria-label="Edit ${name}" title="Edit" data-action="edit" data-id="${tab.id}">
