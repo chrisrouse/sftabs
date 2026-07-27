@@ -755,8 +755,9 @@ function itemRow(item, path, level) {
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
       </button>
       <button class="tab-btn tab-btn--move" data-action="promote-item" data-path="${pathKey(path)}"
-        aria-label="Promote ${label} to its own tab" title="Promote to top-level tab">
-        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M414 210c8-8 8-19 0-27L264 36a20 20 0 0 0-28 0L86 183c-8 8-8 19 0 27l28 27c8 8 20 8 28 0l47-46c8-8 22-2 22 9v270c0 10 9 20 20 20h40c11 0 20-11 20-20V200c0-12 14-17 22-9l47 46c8 8 20 8 28 0z"/></svg>
+        aria-label="${path.length === 1 ? `Move ${label} out to its own tab` : `Move ${label} up one level`}"
+        title="${path.length === 1 ? 'Move out to its own tab' : 'Move up one level'}">
+        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M35 440c-7 0-15 7-15 15v30c0 8 8 15 15 15h239c8 0 16-8 16-15V153c0-9 10-13 17-7l56 56c6 6 15 6 21 0l21-21c6-6 6-15 0-21L270 24c-6-6-15-6-21 0L114 159c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l56-56c6-6 18-2 18 7v273c0 16-16 15-16 15z"/></svg>
       </button>
       <button class="tab-btn tab-btn--delete" data-action="delete-item" data-path="${pathKey(path)}"
         aria-label="Delete ${label}" title="Delete">
@@ -809,8 +810,10 @@ function commitDropdownItem(path) {
 }
 
 /**
- * Move a nested item out to its own top-level tab, keeping its children.
- * Mirrors production's promote, but commits immediately.
+ * Move an item out one level, carrying its own children with it.
+ *   grandchild -> becomes a sibling of its parent, just below it
+ *   child      -> becomes its own top-level tab
+ * Depth never increases here, so no limit check is needed.
  */
 function promoteDropdownItem(path) {
   const tab = state.tabs.find(t => t.id === state.editingTabId);
@@ -819,25 +822,36 @@ function promoteDropdownItem(path) {
   const item = getItemByPath(tab.dropdownItems, path);
   if (!item) return;
 
-  const children = item.dropdownItems ? JSON.parse(JSON.stringify(item.dropdownItems)) : [];
+  const moving = JSON.parse(JSON.stringify(item));
+  const childCount = countItems(moving.dropdownItems);
+  const withKids = childCount ? ` with ${childCount} item${childCount === 1 ? '' : 's'}` : '';
+
   removeItemByPath(tab.dropdownItems, path);
 
-  state.tabs.push({
-    id: SFTabs.utils.generateId(),
-    label: item.label,
-    path: item.path || '',
-    openInNewTab: false,
-    isObject: !!item.isObject,
-    isCustomUrl: !!item.isCustomUrl,
-    isSetupObject: false,
-    dropdownItems: children,
-    position: state.tabs.length
-  });
+  if (path.length === 1) {
+    // Already a direct child — the next level up is the tab list itself
+    state.tabs.push({
+      id: SFTabs.utils.generateId(),
+      label: moving.label,
+      path: moving.path || '',
+      openInNewTab: false,
+      isObject: !!moving.isObject,
+      isCustomUrl: !!moving.isCustomUrl,
+      isSetupObject: false,
+      dropdownItems: moving.dropdownItems || [],
+      position: state.tabs.length
+    });
+    showStatus(`"${moving.label}" moved out to its own tab${withKids}`);
+  } else {
+    // Insert directly after the former parent, in the parent's own list
+    const parentPath = path.slice(0, -1);
+    const list = getParentList(tab.dropdownItems, parentPath);
+    if (!list) return;
+    list.splice(parentPath[parentPath.length - 1] + 1, 0, moving);
+    showStatus(`"${moving.label}" moved up a level${withKids}`);
+  }
 
   state.expandedPaths.clear(); // paths shifted underneath us
-  showStatus(children.length
-    ? `"${item.label}" promoted with ${children.length} item${children.length === 1 ? '' : 's'}`
-    : `"${item.label}" promoted to a tab`);
 
   renderDropdownItems(state.editingTabId);
   renderTabList();
