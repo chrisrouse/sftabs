@@ -754,7 +754,7 @@ function itemRow(item, path, level) {
         aria-label="Edit ${label}" title="Edit">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
       </button>
-      <button class="tab-btn tab-btn--move" data-action="promote-item" data-path="${pathKey(path)}"
+      <button class="tab-btn tab-btn--promote" data-action="promote-item" data-path="${pathKey(path)}"
         aria-label="${path.length === 1 ? `Move ${label} out to its own tab` : `Move ${label} up one level`}"
         title="${path.length === 1 ? 'Move out to its own tab' : 'Move up one level'}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M35 440c-7 0-15 7-15 15v30c0 8 8 15 15 15h239c8 0 16-8 16-15V153c0-9 10-13 17-7l56 56c6 6 15 6 21 0l21-21c6-6 6-15 0-21L270 24c-6-6-15-6-21 0L114 159c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l56-56c6-6 18-2 18 7v273c0 16-16 15-16 15z"/></svg>
