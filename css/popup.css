@@ -872,6 +872,24 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .settings-body::-webkit-scrollbar { width: 3px; }
 .settings-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
 
+/* Settings panel: the header shares the panel surface and scrolls with
+   the content, so the whole view is the scroll container rather than
+   just the body. */
+#view-settings {
+  overflow-y: auto;
+}
+#view-settings::-webkit-scrollbar { width: 3px; }
+#view-settings::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
+
+#view-settings .panel-view-header {
+  background: none;
+  border-bottom: none;
+}
+#view-settings .settings-body {
+  overflow: visible;
+  flex: none;
+}
+
 /* Settings groups follow the SLDS form-element pattern: no container
    chrome, a label-spec heading, and whitespace between groups. */
 .settings-section {
