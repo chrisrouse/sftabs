@@ -86,9 +86,16 @@ function enhancedAddTabForCurrentPage() {
           if (urlParts.length > 1) {
             const fullPath = urlParts[1].split('?')[0]; 
             
-            // Special case for ObjectManager: keep the full path and mark as setup object
+            // ObjectManager: normalize to the object's canonical landing page so
+            // the tab is identical no matter which section was open when it was
+            // added, and so it doesn't collide with a sub-item for that section.
+            // The bare /ObjectManager/<Object> URL does not resolve, hence
+            // /Details/view.
             if (fullPath.startsWith('ObjectManager/')) {
-              path = fullPath;
+              const objectSegment = fullPath.split('/')[1];
+              path = objectSegment
+                ? `ObjectManager/${objectSegment}/Details/view`
+                : fullPath; // the Object Manager list page itself
               isObject = false;
               isSetupObject = true; // Mark as setup object for dropdown
               urlBase = '/lightning/setup/';
