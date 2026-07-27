@@ -229,7 +229,13 @@ function installProductionHooks() {
   SFTabs.main = warnOnMissing({
     getTabs: () => state.tabs,
     setTabs: tabs => { state.tabs = tabs; },
-    showStatus: (message, isError) => showStatus(message, isError ? 'error' : 'success')
+    showStatus: (message, isError) => showStatus(message, isError ? 'error' : 'success'),
+    // saveUserSettings needs these three. getUserSettings in particular gates
+    // its sync<->local comparison: without it, flipping useSyncStorage would
+    // save the preference but never move the data.
+    getUserSettings: () => state.settings,
+    setUserSettings: settings => { state.settings = settings; },
+    applyTheme: () => applyTheme(state.settings.themeMode)
   });
   SFTabs.ui = warnOnMissing({
     renderTabList: () => { renderTabList(); bindTabListEvents(); }
