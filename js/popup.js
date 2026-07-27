@@ -14,8 +14,9 @@
  *      per-tab fields) get silently dropped.
  *   3. Tabs live in profile-scoped storage (getProfileTabs/saveTabs), not the
  *      legacy `customTabs` key, even when the profiles UI is switched off.
- *   4. Only seed defaults into genuinely empty storage. Pre-existing data
- *      means migration, which belongs to the production first-launch flow.
+ *   4. Never overwrite existing data on load. ensureUsableState() only
+ *      repairs (adopt a profile), migrates v1 `customTabs` into a profile,
+ *      or seeds defaults into genuinely empty storage.
  */
 
 // ── State ──────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ async function loadFromStorage() {
     return;
   }
   try {
-    await initializeIfEmpty();
+    await ensureUsableState();
 
     state.settings = await SFTabs.storage.getUserSettings();
     state.profiles = await SFTabs.storage.getProfiles() || [];
@@ -73,8 +74,7 @@ async function loadFromStorage() {
       state.tabs = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
     } else {
       state.tabs = [];
-      state.loadError = state.loadError
-        || 'No active profile — open the previous UI once to finish setup.';
+      state.loadError = state.loadError || 'Could not establish an active profile.';
     }
   } catch (err) {
     state.tabs = [];
@@ -91,19 +91,80 @@ async function loadFromStorage() {
  * bails without writing, because that case is a migration and belongs to the
  * production first-launch/migration flow, not to us.
  */
-async function initializeIfEmpty() {
+async function ensureUsableState() {
   const settings = await SFTabs.storage.getUserSettings();
   const profiles = await SFTabs.storage.getProfiles() || [];
-  if (settings.activeProfileId || profiles.length) return false;
 
-  const localLegacy = await browser.storage.local.get('customTabs');
-  const syncLegacy  = await SFTabs.storageChunking.readChunkedSync('customTabs');
-  if (localLegacy?.customTabs?.length || syncLegacy?.length) {
-    state.loadError = 'Tabs from a previous version found — open the previous UI once to migrate them.';
-    return false;
+  // Healthy: an active profile that actually exists
+  if (settings.activeProfileId && profiles.some(p => p.id === settings.activeProfileId)) {
+    return;
   }
 
-  // Same id format and profile shape as production's initializeExtension()
+  // Repair: profiles exist but nothing is active, or the active id is stale
+  // (also the landing spot if a migration was interrupted part-way).
+  if (profiles.length) {
+    const fallback = profiles.find(p => p.isDefault) || profiles[0];
+    await SFTabs.storage.saveUserSettings(
+      { ...settings, activeProfileId: fallback.id,
+        defaultProfileId: settings.defaultProfileId || fallback.id },
+      true, false
+    );
+    return;
+  }
+
+  // No profiles at all — either a v1 install to migrate, or a fresh one to seed
+  const legacyTabs = await readLegacyTabs();
+  if (legacyTabs.length) {
+    await migrateLegacyTabs(legacyTabs, settings);
+  } else {
+    await seedDefaults(settings);
+  }
+}
+
+/** v1 stored tabs under `customTabs`; check both areas, preferred first. */
+async function readLegacyTabs() {
+  const preferSync = await SFTabs.storage.getStoragePreference();
+  const fromSync  = async () => (await SFTabs.storageChunking.readChunkedSync('customTabs')) || [];
+  const fromLocal = async () => (await browser.storage.local.get('customTabs'))?.customTabs || [];
+  const first = preferSync ? await fromSync() : await fromLocal();
+  if (first.length) return first;
+  return preferSync ? await fromLocal() : await fromSync();
+}
+
+/**
+ * Move v1 tabs into a Default profile — the headless equivalent of
+ * production's migration modal, which is unreachable now that the manifest
+ * points at this popup. The legacy `customTabs` key is deliberately left in
+ * place as a backup, exactly as production leaves it.
+ */
+async function migrateLegacyTabs(tabs, settings) {
+  const profileId = 'profile_' + Date.now() + '_default';
+  await SFTabs.storage.saveProfiles([{
+    id: profileId,
+    name: 'Default',
+    isDefault: true,
+    urlPatterns: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }], false);
+
+  await SFTabs.storage.saveProfileTabs(profileId, tabs);
+  await SFTabs.storage.saveUserSettings(
+    { ...settings, activeProfileId: profileId, defaultProfileId: profileId },
+    true, false
+  );
+
+  const version = browser.runtime.getManifest().version;
+  await browser.storage.local.set({
+    extensionVersion: version,
+    migrationCompleted: version,
+    migrationPending: false
+  });
+
+  showStatus(`Brought ${tabs.length} existing tab${tabs.length === 1 ? '' : 's'} forward`);
+}
+
+async function seedDefaults(settings) {
   const profile = {
     id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
     name: 'Default',
@@ -112,14 +173,12 @@ async function initializeIfEmpty() {
     createdAt: new Date().toISOString(),
     lastActive: null
   };
-
   await SFTabs.storage.saveProfiles([profile]);
   await SFTabs.storage.saveUserSettings(
     { ...settings, activeProfileId: profile.id, defaultProfileId: profile.id },
     false, false
   );
   await SFTabs.storage.saveProfileTabs(profile.id, [...SFTabs.constants.DEFAULT_TABS]);
-  return true;
 }
 
 /**
