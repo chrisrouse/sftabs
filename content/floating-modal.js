@@ -269,9 +269,16 @@
       let offset = Number(fb.offset) || 0;
 
       if (!offset) {
-        const pct = Number(fb.position);
-        const legacy = Number.isFinite(pct) ? pct : 25;
-        offset = Math.round((legacy / 100) * window.innerHeight);
+        // Convert the legacy percentage ONCE per page load and cache it.
+        // Recomputing per call would reintroduce the original bug, since
+        // updatePosition() also runs on resize — the moment devtools opens,
+        // window.innerHeight shrinks and the button would move again.
+        if (this._legacyOffset == null) {
+          const pct = Number(fb.position);
+          const legacy = Number.isFinite(pct) ? pct : 25;
+          this._legacyOffset = Math.round((legacy / 100) * window.innerHeight);
+        }
+        offset = this._legacyOffset;
       }
       const [vertical, horizontal] = anchor.split('-');
       return { anchor, vertical, horizontal, offset, layout: fb.layout || 'handle' };
