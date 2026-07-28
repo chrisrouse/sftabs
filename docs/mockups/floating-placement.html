@@ -105,15 +105,19 @@
   /* the thing being placed */
   .fb { position: absolute; z-index: 5; display: flex; align-items: flex-start; }
 
-  /* Edge drawer mirrors on the left: handle leads, panel follows, radii flip */
-  .fb[data-layout="handle"][data-side="right"] { flex-direction: row-reverse; }
-  .fb[data-layout="handle"][data-side="left"]  { flex-direction: row; }
+  /* Edge drawer: the panel goes flush to the screen edge and the handle always
+     sits on its page-content side, so the handle stays reachable and never
+     ends up pinched between the panel and the edge. DOM order is
+     handle-then-panel; flex-direction decides which side each lands on. */
+  .fb[data-layout="handle"][data-side="right"] { flex-direction: row; }
+  .fb[data-layout="handle"][data-side="left"]  { flex-direction: row-reverse; }
   .fb[data-layout="handle"][data-side="right"] .fb-handle {
     border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
   }
   .fb[data-layout="handle"][data-side="left"] .fb-handle {
     border-radius: 0 var(--sft-radius-2) var(--sft-radius-2) 0;
   }
+  /* Panel is flat against the screen edge, rounded on the page side */
   .fb[data-layout="handle"][data-side="right"] .fb-panel {
     border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
   }
@@ -373,7 +377,7 @@ function report() {
   meta.textContent = `stage height ${h}px`;
   readout.innerHTML =
     `Stored as <code>{ anchor: "${state.anchor}", offset: ${state.offset}px }</code>` +
-    ` &nbsp;·&nbsp; drawer opens <code>${fb.dataset.side === 'left' ? 'rightward' : 'leftward'}</code>` +
+    ` &nbsp;·&nbsp; panel flush <code>${fb.dataset.side}</code>, handle on its page side` +
     (state.nudged ? ` &nbsp;·&nbsp; nudged <code>+${state.nudged}px</code> to clear another extension` : '') +
     `<br>Today's equivalent would be <code>top: ${pct}%</code>, which is what shifts when the viewport resizes.` +
     (fb.classList.contains('is-colliding')
