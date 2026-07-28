@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — floating placement &amp; layout choice</title>
+<link rel="stylesheet" href="../../css/tokens.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sft-font-family); font-size: var(--sft-font-size-base);
+    color: var(--sft-text); background: var(--sft-surface-2); padding: 32px;
+  }
+  h1 { font: var(--sft-type-style-title); color: var(--sft-text-strong); }
+  .lede { color: var(--sft-text-weak); margin-top: 8px; max-width: 78ch; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .cols { display: grid; grid-template-columns: 300px 1fr; gap: 24px; margin-top: 24px; }
+
+  /* ── settings mock ─────────────────────────────────────── */
+  .panel {
+    background: var(--sft-surface-container-1);
+    border: 1px solid var(--sft-border);
+    border-radius: var(--sft-radius-2);
+    padding: 16px;
+    align-self: start;
+  }
+  .panel h2 {
+    font-size: var(--sft-font-size-base); font-weight: var(--sft-font-weight-semibold);
+    margin-bottom: 4px;
+  }
+  .panel .hint { font-size: var(--sft-font-size-xs); color: var(--sft-text-weak); margin-bottom: 16px; }
+  .group { margin-bottom: 20px; }
+  .group > label { display: block; font-weight: var(--sft-font-weight-semibold); margin-bottom: 8px; }
+
+  .layouts { display: flex; flex-direction: column; gap: 6px; }
+  .layouts label {
+    display: flex; gap: 8px; align-items: flex-start; cursor: pointer;
+    padding: 8px; border: 1px solid var(--sft-border); border-radius: var(--sft-radius-1);
+  }
+  .layouts label:has(input:checked) {
+    border-color: var(--sft-accent-container-1);
+    background: light-dark(#edf4ff, #002775);
+  }
+  .layouts b { font-weight: var(--sft-font-weight-medium); }
+  .layouts span { display: block; font-size: var(--sft-font-size-xxs); color: var(--sft-text-weak); }
+
+  /* 3x3 anchor grid */
+  .anchors {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    width: 168px;
+  }
+  .anchors button {
+    height: 46px; cursor: pointer; font: inherit; font-size: 10px;
+    border: 1px solid var(--sft-border); border-radius: var(--sft-radius-1);
+    background: var(--sft-surface-container-2); color: var(--sft-text-weak);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .anchors button[aria-pressed="true"] {
+    background: var(--sft-accent-container-1); border-color: transparent; color: #fff;
+  }
+  .anchors button:disabled { opacity: .35; cursor: not-allowed; }
+
+  .slider { display: flex; align-items: center; gap: 10px; }
+  .slider input { flex: 1; }
+  .slider output { font-size: var(--sft-font-size-xs); color: var(--sft-text-weak); min-width: 44px; }
+
+  .toggles label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; margin-bottom: 10px; }
+  .toggles span { display: block; font-size: var(--sft-font-size-xxs); color: var(--sft-text-weak); }
+
+  /* ── stage ─────────────────────────────────────────────── */
+  .stage-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .stage-head button {
+    font: inherit; font-size: var(--sft-font-size-xs); padding: 5px 14px; cursor: pointer;
+    border: 1px solid var(--sft-border-strong); border-radius: var(--sft-radius-pill);
+    background: var(--sft-surface-container-1); color: var(--sft-text);
+  }
+  .stage-head button[aria-pressed="true"] { background: var(--sft-error-container); border-color: var(--c-err, transparent); }
+  .stage-meta { font-size: var(--sft-font-size-xxs); color: var(--sft-text-weak); }
+
+  .stage {
+    position: relative; overflow: hidden;
+    height: 520px; transition: height .25s var(--sft-ease);
+    border: 1px solid var(--sft-border); border-radius: var(--sft-radius-2);
+    background: var(--sft-surface-2);
+  }
+  .stage.devtools { height: 300px; }
+  .stage-topbar { height: 38px; background: #032d60; }
+  .stage-subbar {
+    height: 32px; background: var(--sft-surface-container-1);
+    border-bottom: 1px solid var(--sft-border);
+    display: flex; align-items: center; gap: 18px; padding: 0 14px;
+    font-size: var(--sft-font-size-xxs); color: var(--sft-text-weak);
+  }
+  .stage-body { padding: 18px 14px; }
+  .skel { height: 11px; border-radius: 4px; background: var(--sft-neutral-90); margin-bottom: 9px; }
+
+  /* a competing extension's edge drawer, to show collisions */
+  .rival {
+    position: absolute; right: 0; top: 120px; width: 22px; height: 60px;
+    background: #b45309; color: #fff; border-radius: 4px 0 0 4px;
+    display: none; align-items: center; justify-content: center;
+    font-size: 9px; writing-mode: vertical-rl;
+  }
+  .stage.show-rival .rival { display: flex; }
+
+  /* the thing being placed */
+  .fb { position: absolute; z-index: 5; transition: none; }
+  .fb.is-colliding { outline: 2px dashed var(--sft-error); outline-offset: 3px; }
+
+  .fb-handle {
+    width: 24px; height: 56px; border: none; cursor: grab;
+    border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
+    background: var(--sft-surface-container-1); box-shadow: var(--sft-shadow-3);
+    color: var(--sft-accent-container-1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fb-fab {
+    width: 44px; height: 44px; border: none; cursor: grab;
+    border-radius: var(--sft-radius-circle);
+    background: var(--sft-accent-container-1); color: #fff; box-shadow: var(--sft-shadow-3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fb-pill {
+    height: 36px; padding: 0 14px 0 10px; border: none; cursor: grab;
+    border-radius: var(--sft-radius-pill);
+    background: var(--sft-accent-container-1); color: #fff; box-shadow: var(--sft-shadow-3);
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-weight: var(--sft-font-weight-medium);
+  }
+  .fb svg { width: 16px; height: 16px; }
+  .fb-fab svg { width: 20px; height: 20px; }
+
+  .readout {
+    margin-top: 12px; padding: 12px; font-size: var(--sft-font-size-xs);
+    background: var(--sft-surface-container-1); border: 1px solid var(--sft-border);
+    border-radius: var(--sft-radius-2); color: var(--sft-text-weak);
+  }
+  .readout code { color: var(--sft-text); }
+  .readout .warn { color: var(--sft-error); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Floating placement &amp; layout choice</h1>
+  <p class="lede">
+    Today the container is <code>position: fixed</code> with <code>top: 25%</code>, so
+    the button is positioned as a share of <em>viewport height</em> — open devtools and
+    the viewport shrinks, so 25% of a smaller number moves the button up. Here it is
+    anchored to a corner or edge with a pixel offset instead. Hit
+    <b>Simulate devtools</b> and compare.
+  </p>
+
+  <div class="cols">
+    <!-- ── settings ── -->
+    <div class="panel">
+      <h2>Floating button</h2>
+      <p class="hint">Mock of the settings this would need.</p>
+
+      <div class="group">
+        <label>Layout</label>
+        <div class="layouts">
+          <label><input type="radio" name="layout" value="handle" checked />
+            <b>Edge drawer<span>Docked handle, panel slides from the edge</span></b></label>
+          <label><input type="radio" name="layout" value="fab" />
+            <b>Round button<span>Inset circle, card opens beneath</span></b></label>
+          <label><input type="radio" name="layout" value="pill" />
+            <b>Labelled pill<span>Shows “SF Tabs”, widest target</span></b></label>
+        </div>
+      </div>
+
+      <div class="group">
+        <label>Placement</label>
+        <div class="anchors" id="anchors">
+          <button data-a="top-left">↖</button>
+          <button data-a="top-center">↑</button>
+          <button data-a="top-right">↗</button>
+          <button data-a="middle-left">←</button>
+          <button data-a="center" disabled>·</button>
+          <button data-a="middle-right" aria-pressed="true">→</button>
+          <button data-a="bottom-left">↙</button>
+          <button data-a="bottom-center">↓</button>
+          <button data-a="bottom-right">↘</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <label id="offset-label">Offset from top</label>
+        <div class="slider">
+          <input type="range" id="offset" min="0" max="400" value="120" />
+          <output id="offset-out">120px</output>
+        </div>
+      </div>
+
+      <div class="group toggles">
+        <label><input type="checkbox" id="avoid" checked />
+          <b>Avoid other extensions<span>Nudge along the edge if something already sits there</span></b></label>
+        <label><input type="checkbox" id="draggable" checked />
+          <b>Drag to reposition<span>Snaps to the nearest anchor and remembers it</span></b></label>
+      </div>
+    </div>
+
+    <!-- ── stage ── -->
+    <div>
+      <div class="stage-head">
+        <button id="btn-devtools" aria-pressed="false">Simulate devtools</button>
+        <button id="btn-rival" aria-pressed="false">Show a rival edge drawer</button>
+        <button id="btn-theme" aria-pressed="false">Dark</button>
+        <span class="stage-meta" id="meta"></span>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="stage-topbar"></div>
+        <div class="stage-subbar"><span>Setup</span><span>Object Manager</span><span>Home</span></div>
+        <div class="stage-body">
+          <div class="skel" style="width:42%"></div>
+          <div class="skel" style="width:58%"></div>
+          <div class="skel" style="width:50%"></div>
+          <div class="skel" style="width:64%"></div>
+        </div>
+        <div class="rival">OTHER EXT</div>
+
+        <div class="fb" id="fb">
+          <button class="fb-handle" id="fb-btn" aria-label="Open SF Tabs">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="readout" id="readout"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const stage = document.getElementById('stage');
+const fb = document.getElementById('fb');
+const readout = document.getElementById('readout');
+const meta = document.getElementById('meta');
+const offset = document.getElementById('offset');
+const offsetOut = document.getElementById('offset-out');
+const offsetLabel = document.getElementById('offset-label');
+const anchors = document.getElementById('anchors');
+
+let state = { layout: 'handle', anchor: 'middle-right', offset: 120, nudged: 0 };
+
+const ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>';
+
+function renderTrigger() {
+  const cls = { handle: 'fb-handle', fab: 'fb-fab', pill: 'fb-pill' }[state.layout];
+  const label = state.layout === 'pill' ? ICON + 'SF Tabs' : ICON;
+  fb.innerHTML = `<button class="${cls}" aria-label="Open SF Tabs">${label}</button>`;
+}
+
+// Edge drawers only make sense flush to a side edge
+function allowedAnchors() {
+  return state.layout === 'handle'
+    ? ['middle-left','middle-right','top-left','top-right','bottom-left','bottom-right']
+    : ['top-left','top-center','top-right','middle-left','middle-right','bottom-left','bottom-center','bottom-right'];
+}
+
+function place() {
+  const allowed = allowedAnchors();
+  if (!allowed.includes(state.anchor)) state.anchor = 'middle-right';
+
+  [...anchors.children].forEach(b => {
+    const a = b.dataset.a;
+    b.disabled = a === 'center' || !allowed.includes(a);
+    b.setAttribute('aria-pressed', String(a === state.anchor));
+  });
+
+  const [vert, horiz] = state.anchor.split('-');
+  const inset = state.layout === 'handle' ? 0 : 16;
+  const off = state.offset + state.nudged;
+
+  fb.style.top = fb.style.bottom = fb.style.left = fb.style.right = '';
+  fb.style.transform = '';
+
+  // Horizontal
+  if (horiz === 'left')  fb.style.left = inset + 'px';
+  if (horiz === 'right') fb.style.right = inset + 'px';
+  if (horiz === 'center') { fb.style.left = '50%'; fb.style.transform = 'translateX(-50%)'; }
+
+  // Vertical — the important part: a pixel offset from the anchored edge,
+  // never a share of viewport height
+  if (vert === 'top')    fb.style.top = off + 'px';
+  if (vert === 'bottom') fb.style.bottom = off + 'px';
+  if (vert === 'middle') { fb.style.top = off + 'px'; }
+
+  offsetLabel.textContent = vert === 'bottom' ? 'Offset from bottom' : 'Offset from top';
+  detectCollision();
+  report();
+}
+
+// Heuristic used by the "avoid other extensions" option: ask the browser what
+// is actually on top at our spot. If it isn't us, step along the edge.
+function detectCollision() {
+  fb.classList.remove('is-colliding');
+  state.nudged = 0;
+  if (!document.getElementById('avoid').checked) return;
+  if (!stage.classList.contains('show-rival')) return;
+
+  const rival = stage.querySelector('.rival');
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const a = fb.getBoundingClientRect(), b = rival.getBoundingClientRect();
+    const hit = !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+    if (!hit) return;
+    state.nudged += 34;
+    const vert = state.anchor.split('-')[0];
+    const off = state.offset + state.nudged;
+    if (vert === 'bottom') fb.style.bottom = off + 'px'; else fb.style.top = off + 'px';
+  }
+  fb.classList.add('is-colliding');
+}
+
+function report() {
+  const h = stage.clientHeight;
+  const pct = ((state.offset / h) * 100).toFixed(1);
+  meta.textContent = `stage height ${h}px`;
+  readout.innerHTML =
+    `Stored as <code>{ anchor: "${state.anchor}", offset: ${state.offset}px }</code>` +
+    (state.nudged ? ` &nbsp;·&nbsp; nudged <code>+${state.nudged}px</code> to clear another extension` : '') +
+    `<br>Today's equivalent would be <code>top: ${pct}%</code>, which is what shifts when the viewport resizes.` +
+    (fb.classList.contains('is-colliding')
+      ? `<br><span class="warn">Could not find clear space along this edge — the user needs a different placement.</span>` : '');
+}
+
+// ── wiring ──
+document.querySelectorAll('input[name=layout]').forEach(r =>
+  r.onchange = () => { state.layout = r.value; renderTrigger(); place(); });
+
+anchors.onclick = e => {
+  const b = e.target.closest('button');
+  if (!b || b.disabled) return;
+  state.anchor = b.dataset.a; place();
+};
+
+offset.oninput = () => {
+  state.offset = +offset.value;
+  offsetOut.textContent = state.offset + 'px';
+  place();
+};
+
+document.getElementById('avoid').onchange = place;
+
+document.getElementById('btn-devtools').onclick = e => {
+  const on = stage.classList.toggle('devtools');
+  e.target.setAttribute('aria-pressed', String(on));
+  setTimeout(report, 300);
+};
+document.getElementById('btn-rival').onclick = e => {
+  const on = stage.classList.toggle('show-rival');
+  e.target.setAttribute('aria-pressed', String(on));
+  place();
+};
+document.getElementById('btn-theme').onclick = e => {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  e.target.setAttribute('aria-pressed', String(!dark));
+  e.target.textContent = dark ? 'Dark' : 'Light';
+};
+
+renderTrigger();
+place();
+</script>
+</body>
+</html>
