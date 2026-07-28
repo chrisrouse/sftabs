@@ -258,23 +258,107 @@
       this.attachEvents();
     }
 
+    /**
+     * Resolve the stored anchor/offset, falling back to the legacy percentage.
+     * Legacy `position` is a share of viewport height, which is exactly why the
+     * button drifted when devtools opened — convert it once to pixels.
+     */
+    getPlacement() {
+      const fb = this.settings?.floatingButton || {};
+      const anchor = fb.anchor || 'middle-right';
+      let offset = Number(fb.offset) || 0;
+
+      if (!offset) {
+        const pct = Number(fb.position);
+        const legacy = Number.isFinite(pct) ? pct : 25;
+        offset = Math.round((legacy / 100) * window.innerHeight);
+      }
+      const [vertical, horizontal] = anchor.split('-');
+      return { anchor, vertical, horizontal, offset, layout: fb.layout || 'handle' };
+    }
+
     updatePosition() {
       if (!this.modal) return;
 
       try {
-        const position = this.settings?.floatingButton?.position ?? 25;
+        const { vertical, horizontal, offset, layout } = this.getPlacement();
 
-        // Use simple percentage positioning
-        // This automatically adjusts during window resize
-        this.modal.style.top = `${position}%`;
+        // These drive every mirrored rule in CSS: handle radii, which side the
+        // panel opens on, and flyout direction.
+        this.modal.dataset.layout = layout;
+        this.modal.dataset.side = horizontal;
+        this.modal.dataset.vert = vertical;
 
-        // Determine if panel should open upward or downward
+        // Detached layouts sit inside the edge; the drawer stays flush to it
+        const inset = layout === 'handle' ? 0 : 16;
+
+        // Clear anything a previous placement set
+        this.modal.style.top = '';
+        this.modal.style.bottom = '';
+        this.modal.style.left = '';
+        this.modal.style.right = '';
+        this.modal.style.transform = '';
+
+        if (horizontal === 'left') {
+          this.modal.style.left = `${inset}px`;
+          this.modal.style.right = 'auto';   // override the stylesheet's right: 0
+        }
+        if (horizontal === 'right') {
+          this.modal.style.right = `${inset}px`;
+          this.modal.style.left = 'auto';
+        }
+        if (horizontal === 'center') {
+          this.modal.style.left = '50%';
+          this.modal.style.right = 'auto';
+          this.modal.style.transform = 'translateX(-50%)';
+        }
+
+        // Pixels from the anchored edge, never a percentage of the viewport
+        const clamped = Math.max(0, Math.min(offset, Math.max(0, window.innerHeight - 80)));
+        if (vertical === 'bottom') this.modal.style.bottom = `${clamped}px`;
+        else this.modal.style.top = `${clamped}px`;
+
+        if (this.settings?.floatingButton?.avoidCollisions !== false) {
+          this.avoidOverlap(vertical, clamped);
+        }
+
         this.updatePanelDirection();
       } catch (error) {
-        // Fail gracefully
         if (this.modal) {
-          this.modal.style.top = '25%';
+          this.modal.style.top = '120px';
+          this.modal.style.right = '0px';
         }
+      }
+    }
+
+    /**
+     * Other extensions inject edge drawers into the same page, and we cannot
+     * enumerate them. Ask the browser what is actually on top at the trigger's
+     * midpoint instead; if it is not ours, step along the edge and retry.
+     * Heuristic, so it gives up rather than fighting for space.
+     */
+    avoidOverlap(vertical, startOffset) {
+      const trigger = this.modal.querySelector('.modal-toggle-button');
+      if (!trigger) return;
+
+      const STEP = 34;
+      const MAX_TRIES = 8;
+
+      for (let attempt = 0; attempt <= MAX_TRIES; attempt++) {
+        const rect = trigger.getBoundingClientRect();
+        if (!rect.width || !rect.height) return; // not laid out yet
+
+        const x = Math.round(rect.left + rect.width / 2);
+        const y = Math.round(rect.top + rect.height / 2);
+        const onTop = document.elementFromPoint(x, y);
+
+        // Clear if the topmost element at that point belongs to us
+        if (!onTop || this.modal.contains(onTop) || onTop === this.modal) return;
+
+        const next = startOffset + STEP * (attempt + 1);
+        if (next > window.innerHeight - 80) return; // ran out of edge
+        if (vertical === 'bottom') this.modal.style.bottom = `${next}px`;
+        else this.modal.style.top = `${next}px`;
       }
     }
 

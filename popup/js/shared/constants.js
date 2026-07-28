@@ -97,7 +97,11 @@ const DEFAULT_SETTINGS = {
   defaultProfileId: null, // Default profile to use when auto-switch doesn't match
   floatingButton: {
     enabled: false, // Disabled by default (opt-in feature)
-    position: 25, // Vertical position along right edge (0 = top, 100 = bottom)
+    layout: 'handle', // 'handle' (edge drawer) | 'fab' (round) | 'pill' (labelled)
+    anchor: 'middle-right', // {top|middle|bottom}-{left|center|right}
+    offset: 0, // Pixels from the anchored edge. 0 = derive from legacy `position`
+    avoidCollisions: true, // Step along the edge if another extension is already there
+    position: 25, // LEGACY percentage down the edge; still read when offset is 0
     location: 'everywhere', // 'everywhere' | 'setup-only' | 'outside-setup'
     defaultVisibility: true, // Show on all pages by default
     visibilityRules: [], // URL pattern rules (advanced)

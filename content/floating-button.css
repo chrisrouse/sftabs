@@ -459,3 +459,94 @@
 .sftabs-floating-button {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Placement, mirroring and layout variants
+   Driven by data-side / data-vert / data-layout, set in updatePosition().
+   The rules above remain the right-edge drawer default.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Edge drawer ──
+   The panel sits flush against the screen edge and the handle stays on its
+   page-content side, so the handle is never pinched against the edge. DOM
+   order is handle-then-panel; flex-direction decides the visual order. */
+.sftabs-floating-modal[data-layout="handle"][data-side="right"] .modal-content { flex-direction: row; }
+.sftabs-floating-modal[data-layout="handle"][data-side="left"]  .modal-content { flex-direction: row-reverse; }
+
+/* Closed state slides the panel out toward its own edge */
+.sftabs-floating-modal[data-side="left"] .modal-content { transform: translateX(-280px); }
+.sftabs-floating-modal[data-side="left"].open .modal-content { transform: translateX(0); }
+
+/* Handle: rounded on the face pointing at the page, flat where it meets the panel */
+.sftabs-floating-modal[data-layout="handle"][data-side="left"] .modal-toggle-button {
+  border-radius: 0 4px 4px 0;
+}
+/* Panel: flat against the screen edge, rounded on the page side */
+.sftabs-floating-modal[data-layout="handle"][data-side="left"] .modal-panel {
+  border-radius: 0 8px 8px 0;
+}
+.sftabs-floating-modal[data-layout="handle"][data-side="right"] .modal-panel {
+  border-radius: 8px 0 0 8px;
+}
+
+/* Nested flyouts open away from the anchored edge */
+.sftabs-floating-modal[data-side="left"] .dropdown-indicator { order: 0; }
+
+/* ── Detached layouts (round + pill) ──
+   Trigger and panel stack vertically, edge-aligned to the anchor side. */
+.sftabs-floating-modal[data-layout="fab"] .modal-content,
+.sftabs-floating-modal[data-layout="pill"] .modal-content {
+  flex-direction: column;
+  gap: 10px;
+  transform: none;              /* no slide; visibility handles open/closed */
+}
+.sftabs-floating-modal[data-layout="fab"][data-vert="bottom"] .modal-content,
+.sftabs-floating-modal[data-layout="pill"][data-vert="bottom"] .modal-content {
+  flex-direction: column-reverse;
+}
+.sftabs-floating-modal[data-layout="fab"][data-side="right"] .modal-content,
+.sftabs-floating-modal[data-layout="pill"][data-side="right"] .modal-content { align-items: flex-end; }
+.sftabs-floating-modal[data-layout="fab"][data-side="left"] .modal-content,
+.sftabs-floating-modal[data-layout="pill"][data-side="left"] .modal-content { align-items: flex-start; }
+.sftabs-floating-modal[data-layout="fab"][data-side="center"] .modal-content,
+.sftabs-floating-modal[data-layout="pill"][data-side="center"] .modal-content { align-items: center; }
+
+/* Detached panels are hidden outright rather than slid off-screen */
+.sftabs-floating-modal[data-layout="fab"] .modal-panel,
+.sftabs-floating-modal[data-layout="pill"] .modal-panel {
+  display: none;
+  border-radius: 12px;
+}
+.sftabs-floating-modal[data-layout="fab"].open .modal-panel,
+.sftabs-floating-modal[data-layout="pill"].open .modal-panel {
+  display: block;
+}
+
+/* Round trigger */
+.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #066afe;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button:hover { background: #0250d9; }
+.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button img { width: 20px; height: 20px; }
+
+/* Labelled pill */
+.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button {
+  width: auto;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  gap: 8px;
+  border-radius: 999px;
+  background: #066afe;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button:hover { background: #0250d9; }
+.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button::after {
+  content: 'SF Tabs';
+}
