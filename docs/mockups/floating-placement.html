@@ -103,7 +103,51 @@
   .stage.show-rival .rival { display: flex; }
 
   /* the thing being placed */
-  .fb { position: absolute; z-index: 5; transition: none; }
+  .fb { position: absolute; z-index: 5; display: flex; align-items: flex-start; }
+
+  /* Edge drawer mirrors on the left: handle leads, panel follows, radii flip */
+  .fb[data-layout="handle"][data-side="right"] { flex-direction: row-reverse; }
+  .fb[data-layout="handle"][data-side="left"]  { flex-direction: row; }
+  .fb[data-layout="handle"][data-side="right"] .fb-handle {
+    border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
+  }
+  .fb[data-layout="handle"][data-side="left"] .fb-handle {
+    border-radius: 0 var(--sft-radius-2) var(--sft-radius-2) 0;
+  }
+  .fb[data-layout="handle"][data-side="right"] .fb-panel {
+    border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
+  }
+  .fb[data-layout="handle"][data-side="left"] .fb-panel {
+    border-radius: 0 var(--sft-radius-2) var(--sft-radius-2) 0;
+  }
+
+  /* Detached layouts stack, with the card edge-aligned to the anchor side */
+  .fb[data-layout="fab"], .fb[data-layout="pill"] { flex-direction: column; gap: 10px; }
+  .fb[data-layout="fab"][data-side="right"], .fb[data-layout="pill"][data-side="right"] { align-items: flex-end; }
+  .fb[data-layout="fab"][data-side="left"],  .fb[data-layout="pill"][data-side="left"]  { align-items: flex-start; }
+  .fb[data-layout="fab"][data-side="center"],.fb[data-layout="pill"][data-side="center"]{ align-items: center; }
+  .fb[data-layout="fab"] .fb-panel, .fb[data-layout="pill"] .fb-panel { border-radius: var(--sft-radius-3); }
+  /* Bottom anchors open upward: panel above the trigger */
+  .fb[data-vert="bottom"][data-layout="fab"], .fb[data-vert="bottom"][data-layout="pill"] { flex-direction: column-reverse; }
+
+  .fb-panel {
+    width: 240px; background: var(--sft-surface-container-1);
+    box-shadow: var(--sft-shadow-3); overflow: hidden;
+  }
+  .fb-panel-head {
+    padding: 8px 10px; border-bottom: 1px solid var(--sft-border);
+    font-size: var(--sft-font-size-xs); font-weight: var(--sft-font-weight-semibold);
+  }
+  .fb-panel-row {
+    display: flex; align-items: center; gap: 6px; padding: 7px 10px;
+    font-size: var(--sft-font-size-xs);
+  }
+  .fb-panel-row + .fb-panel-row { border-top: 1px solid var(--sft-border); }
+  /* Sub-menu flyouts open away from the anchored edge */
+  .fb-flyout-dir { margin-left: auto; color: var(--sft-text-weak); }
+  .fb[data-side="left"] .fb-flyout-dir::after  { content: '›'; }
+  .fb[data-side="right"] .fb-flyout-dir::after { content: '‹'; }
+  .fb[data-side="center"] .fb-flyout-dir::after { content: '›'; }
   .fb.is-colliding { outline: 2px dashed var(--sft-error); outline-offset: 3px; }
 
   .fb-handle {
@@ -202,6 +246,7 @@
     <div>
       <div class="stage-head">
         <button id="btn-devtools" aria-pressed="false">Simulate devtools</button>
+        <button id="btn-open" aria-pressed="true">Panel open</button>
         <button id="btn-rival" aria-pressed="false">Show a rival edge drawer</button>
         <button id="btn-theme" aria-pressed="false">Dark</button>
         <span class="stage-meta" id="meta"></span>
@@ -218,11 +263,7 @@
         </div>
         <div class="rival">OTHER EXT</div>
 
-        <div class="fb" id="fb">
-          <button class="fb-handle" id="fb-btn" aria-label="Open SF Tabs">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
-          </button>
-        </div>
+        <div class="fb" id="fb"></div>
       </div>
 
       <div class="readout" id="readout"></div>
@@ -240,14 +281,25 @@ const offsetOut = document.getElementById('offset-out');
 const offsetLabel = document.getElementById('offset-label');
 const anchors = document.getElementById('anchors');
 
-let state = { layout: 'handle', anchor: 'middle-right', offset: 120, nudged: 0 };
+let state = { layout: 'handle', anchor: 'middle-right', offset: 120, nudged: 0, open: true };
 
 const ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>';
+
+const PANEL = `
+  <div class="fb-panel">
+    <div class="fb-panel-head">SF Tabs</div>
+    <div class="fb-panel-row">Flows</div>
+    <div class="fb-panel-row">Users <span class="fb-flyout-dir"></span></div>
+    <div class="fb-panel-row">Accounts</div>
+    <div class="fb-panel-row">Help Portal</div>
+  </div>`;
 
 function renderTrigger() {
   const cls = { handle: 'fb-handle', fab: 'fb-fab', pill: 'fb-pill' }[state.layout];
   const label = state.layout === 'pill' ? ICON + 'SF Tabs' : ICON;
-  fb.innerHTML = `<button class="${cls}" aria-label="Open SF Tabs">${label}</button>`;
+  // Trigger first in the DOM; CSS decides which visual side it sits on
+  fb.innerHTML = `<button class="${cls}" aria-label="Open SF Tabs">${label}</button>`
+               + (state.open ? PANEL : '');
 }
 
 // Edge drawers only make sense flush to a side edge
@@ -268,6 +320,10 @@ function place() {
   });
 
   const [vert, horiz] = state.anchor.split('-');
+  // Drives every mirrored rule: handle radii, panel side, flyout arrows
+  fb.dataset.layout = state.layout;
+  fb.dataset.side = horiz === 'center' ? 'center' : horiz;
+  fb.dataset.vert = vert;
   const inset = state.layout === 'handle' ? 0 : 16;
   const off = state.offset + state.nudged;
 
@@ -317,6 +373,7 @@ function report() {
   meta.textContent = `stage height ${h}px`;
   readout.innerHTML =
     `Stored as <code>{ anchor: "${state.anchor}", offset: ${state.offset}px }</code>` +
+    ` &nbsp;·&nbsp; drawer opens <code>${fb.dataset.side === 'left' ? 'rightward' : 'leftward'}</code>` +
     (state.nudged ? ` &nbsp;·&nbsp; nudged <code>+${state.nudged}px</code> to clear another extension` : '') +
     `<br>Today's equivalent would be <code>top: ${pct}%</code>, which is what shifts when the viewport resizes.` +
     (fb.classList.contains('is-colliding')
@@ -340,6 +397,13 @@ offset.oninput = () => {
 };
 
 document.getElementById('avoid').onchange = place;
+
+document.getElementById('btn-open').onclick = e => {
+  state.open = !state.open;
+  e.target.setAttribute('aria-pressed', String(state.open));
+  e.target.textContent = state.open ? 'Panel open' : 'Panel closed';
+  renderTrigger(); place();
+};
 
 document.getElementById('btn-devtools').onclick = e => {
   const on = stage.classList.toggle('devtools');
