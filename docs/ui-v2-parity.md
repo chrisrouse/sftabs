@@ -28,7 +28,7 @@ Reverting is always one line: `manifest.base.json` → `action.default_popup`.
 | Add tab | Done | |
 | Edit tab (name, path, options) | Done | |
 | Delete tab, honouring skip-confirmation | Done | |
-| Duplicate tab | **Gap** | Exists in production (`SFTabs.tabs.duplicateTab`); no v2 entry point |
+| Duplicate tab | **Dropped** | `SFTabs.tabs.duplicateTab` exists but is unreachable in the shipped UI — no control, no caller, no i18n key. Not a parity gap; adding it would be new scope |
 | Reorder via keyboard buttons | Done | Move up/down, visible on hover and focus |
 | Reorder via drag | Done | Positional drop zones instead of production's 500ms hover delay |
 | Reset to defaults | **Delegated** | Settings page, Data section |
@@ -114,8 +114,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 4. **Release-notes gating** — bell shows unread forever.
 5. **`storage.onChanged`** — stale popup after background profile switch.
 6. **Profile switch broadcast** — open SF pages keep the previous nav until reload.
-7. **Duplicate tab** — smallest; only missing an entry point.
 
 Deliberately deferred: first-launch wizard, sync-data-detected screen, staged
-sub-item edits. Everything marked **Delegated** needs no work — it is reachable
+sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked **Delegated** needs no work — it is reachable
 through the advanced settings page.
