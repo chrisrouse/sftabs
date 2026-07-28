@@ -620,3 +620,10 @@
 .sftabs-floating-modal[data-theme="dark"] .tab-badge--setup { background: #001a28; color: #0d9dda; }
 .sftabs-floating-modal[data-theme="dark"] .tab-badge--obj   { background: #071b12; color: #3ba755; }
 .sftabs-floating-modal[data-theme="dark"] .tab-badge--url   { background: #240643; color: #ad7bee; }
+
+/* The closed-state slide is a hardcoded 280px, so the panel must stay exactly
+   280px wide despite the border added above. */
+.sftabs-floating-modal .modal-panel,
+.sftabs-floating-modal .modal-toggle-button {
+  box-sizing: border-box;
+}

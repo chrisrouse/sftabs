@@ -358,24 +358,64 @@
       if (!trigger) return;
 
       const STEP = 34;
-      const MAX_TRIES = 8;
+      const MAX_TRIES = 10;
+
+      // Drop any escalation from a previous run, so we only sit above other
+      // extensions for as long as we genuinely have to
+      this.modal.style.zIndex = '';
 
       for (let attempt = 0; attempt <= MAX_TRIES; attempt++) {
-        const rect = trigger.getBoundingClientRect();
-        if (!rect.width || !rect.height) return; // not laid out yet
-
-        const x = Math.round(rect.left + rect.width / 2);
-        const y = Math.round(rect.top + rect.height / 2);
-        const onTop = document.elementFromPoint(x, y);
-
-        // Clear if the topmost element at that point belongs to us
-        if (!onTop || this.modal.contains(onTop) || onTop === this.modal) return;
+        if (this.isTriggerClear(trigger)) return;
 
         const next = startOffset + STEP * (attempt + 1);
-        if (next > window.innerHeight - 80) return; // ran out of edge
+        if (next > window.innerHeight - 100) break; // ran out of edge
         if (vertical === 'bottom') this.modal.style.bottom = `${next}px`;
         else this.modal.style.top = `${next}px`;
       }
+
+      // Nothing along this edge is free. Go back to the user's own anchor
+      // rather than parking in an arbitrary nudged spot, and come to the front
+      // so the button stays clickable — the closed z-index of 500 deliberately
+      // sits below other extensions, which is what makes an overlapped button
+      // impossible to click.
+      if (vertical === 'bottom') this.modal.style.bottom = `${startOffset}px`;
+      else this.modal.style.top = `${startOffset}px`;
+      this.modal.style.zIndex = '9000';
+      console.warn('[SF Tabs] Floating button overlaps another element and no clear space was found on this edge; raising it to stay clickable. Try a different placement in Settings.');
+    }
+
+    /**
+     * Is our trigger actually clickable, or is something covering it?
+     *
+     * A single centre-point test is not enough: our own button is usually
+     * topmost at its own centre even when a neighbour overlaps an edge. Sample
+     * several points and inspect the whole stack at each, since anything
+     * painted above us intercepts the click.
+     */
+    isTriggerClear(trigger) {
+      const rect = trigger.getBoundingClientRect();
+      if (!rect.width || !rect.height) return true; // not laid out yet; leave it alone
+
+      const inset = 2;
+      const points = [
+        [rect.left + rect.width / 2, rect.top + rect.height / 2],
+        [rect.left + inset,          rect.top + inset],
+        [rect.right - inset,         rect.top + inset],
+        [rect.left + inset,          rect.bottom - inset],
+        [rect.right - inset,         rect.bottom - inset]
+      ];
+
+      for (const [x, y] of points) {
+        if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) continue;
+
+        const stack = document.elementsFromPoint(Math.round(x), Math.round(y));
+        const ours = stack.findIndex(el => el === this.modal || this.modal.contains(el));
+
+        // Not in the stack at all, or something foreign sits above us
+        if (ours === -1) return false;
+        if (ours > 0) return false;
+      }
+      return true;
     }
 
     updatePanelDirection() {
