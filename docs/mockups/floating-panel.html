@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — Floating button & panel mockups</title>
+<link rel="stylesheet" href="../../css/tokens.css" />
+<style>
+  /* ── Mockup page chrome (not part of the design) ───────────────── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sft-font-family);
+    font-size: var(--sft-font-size-base);
+    color: var(--sft-text);
+    background: var(--sft-surface-2);
+    padding: 32px;
+  }
+  .page-head { max-width: 1100px; margin: 0 auto 32px; }
+  .page-head h1 { font: var(--sft-type-style-title); color: var(--sft-text-strong); }
+  .page-head p { color: var(--sft-text-weak); margin-top: 8px; max-width: 70ch; }
+  .controls { display: flex; gap: 8px; margin-top: 16px; }
+  .controls button {
+    font: inherit; padding: 6px 16px; cursor: pointer;
+    border: 1px solid var(--sft-border-strong);
+    border-radius: var(--sft-radius-pill);
+    background: var(--sft-surface-container-1); color: var(--sft-text);
+  }
+  .controls button[aria-pressed="true"] {
+    background: var(--sft-accent-container-1); color: #fff; border-color: transparent;
+  }
+
+  .variant { max-width: 1100px; margin: 0 auto 40px; }
+  .variant > h2 {
+    font-size: var(--sft-font-size-lg); font-weight: var(--sft-font-weight-regular);
+    color: var(--sft-text-strong); margin-bottom: 4px;
+  }
+  .variant > .why { color: var(--sft-text-weak); font-size: var(--sft-font-size-xs); margin-bottom: 16px; max-width: 80ch; }
+
+  /* Fake Salesforce page so the overlay reads in context */
+  .stage {
+    position: relative; height: 420px; overflow: hidden;
+    border-radius: var(--sft-radius-2);
+    border: 1px solid var(--sft-border);
+    background: var(--sft-surface-2);
+  }
+  .stage-topbar { height: 40px; background: #032d60; }
+  .stage-subbar {
+    height: 34px; background: var(--sft-surface-container-1);
+    border-bottom: 1px solid var(--sft-border);
+    display: flex; align-items: center; gap: 20px; padding: 0 16px;
+    font-size: var(--sft-font-size-xs); color: var(--sft-text-weak);
+  }
+  .stage-body { padding: 20px 16px; }
+  .skel { height: 12px; border-radius: 4px; background: var(--sft-neutral-90); margin-bottom: 10px; }
+
+  /* ── Shared panel anatomy ──────────────────────────────────────── */
+  .fp { position: absolute; right: 0; top: 70px; display: flex; align-items: flex-start; }
+
+  .fp-panel {
+    width: 300px;
+    background: var(--sft-surface-container-1);
+    box-shadow: var(--sft-shadow-3);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .fp-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--sft-border);
+  }
+  .fp-head-title {
+    font-weight: var(--sft-font-weight-semibold);
+    flex: 1; min-width: 0;
+  }
+  .fp-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: var(--sft-font-size-xxs);
+    padding: 2px 8px; border-radius: var(--sft-radius-pill);
+    background: var(--sft-surface-container-3); color: var(--sft-text-weak);
+  }
+  .fp-chip::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: #ad7bee;
+  }
+  .fp-list { padding: 6px; overflow-y: auto; max-height: 260px; }
+
+  .fp-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 8px; border-radius: var(--sft-radius-1);
+    cursor: pointer; text-decoration: none; color: inherit;
+  }
+  .fp-row:hover { background: var(--sft-surface-container-2); }
+  .fp-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fp-badge {
+    flex-shrink: 0; font-size: 9px; font-weight: var(--sft-font-weight-semibold);
+    letter-spacing: .04em; text-transform: uppercase;
+    padding: 2px 5px; border-radius: var(--sft-radius-pill); line-height: 1.3;
+  }
+  .fp-badge.obj   { background: light-dark(#cdefc4,#071b12); color: light-dark(#396547,#3ba755); }
+  .fp-badge.setup { background: light-dark(#cfe9fe,#001a28); color: light-dark(#05628a,#0d9dda); }
+  .fp-badge.url   { background: light-dark(#ece1f9,#240643); color: light-dark(#7526e3,#ad7bee); }
+  .fp-count {
+    flex-shrink: 0; min-width: 16px; height: 16px; padding: 0 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #7526e3; color: #fff; border-radius: var(--sft-radius-pill);
+    font-size: 10px; font-weight: var(--sft-font-weight-semibold);
+  }
+  .fp-caret { flex-shrink: 0; width: 12px; color: var(--sft-text-weak); }
+  .fp-sub { padding-left: 18px; }
+  .fp-path {
+    display: block; font-size: var(--sft-font-size-xxs); color: var(--sft-text-weak);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ── A. Edge drawer ────────────────────────────────────────────── */
+  .a-handle {
+    width: 24px; height: 56px; flex-shrink: 0;
+    border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
+    background: var(--sft-surface-container-1);
+    box-shadow: var(--sft-shadow-3);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sft-accent-container-1);
+  }
+  .a-handle svg { width: 14px; height: 14px; }
+  .variant-a .fp-panel { border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2); }
+
+  /* ── B. Detached card + FAB ────────────────────────────────────── */
+  .variant-b .fp { right: 16px; top: 70px; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .b-fab {
+    width: 44px; height: 44px; border-radius: var(--sft-radius-circle);
+    background: var(--sft-accent-container-1); color: #fff;
+    border: none; cursor: pointer; box-shadow: var(--sft-shadow-3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .b-fab svg { width: 20px; height: 20px; }
+  .variant-b .fp-panel { border-radius: var(--sft-radius-3); }
+
+  /* ── C. Command palette ────────────────────────────────────────── */
+  .variant-c .fp { right: 16px; top: 60px; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .variant-c .fp-panel { width: 340px; border-radius: var(--sft-radius-3); }
+  .c-search {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; border-bottom: 1px solid var(--sft-border);
+    color: var(--sft-text-weak);
+  }
+  .c-search input {
+    flex: 1; border: none; outline: none; background: none;
+    font: inherit; color: var(--sft-text);
+  }
+  .c-search svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .c-kbd {
+    font-size: 10px; padding: 1px 5px; border-radius: 3px;
+    border: 1px solid var(--sft-border); color: var(--sft-text-weak);
+  }
+  .variant-c .fp-row.is-sel { background: var(--sft-accent-container-1); color: #fff; }
+  .variant-c .fp-row.is-sel .fp-path,
+  .variant-c .fp-row.is-sel .fp-caret { color: rgba(255,255,255,.75); }
+  .variant-c .fp-row.is-sel .fp-badge { background: rgba(255,255,255,.22); color: #fff; }
+  .c-foot {
+    display: flex; gap: 12px; padding: 8px 12px;
+    border-top: 1px solid var(--sft-border);
+    font-size: var(--sft-font-size-xxs); color: var(--sft-text-weak);
+  }
+
+  /* Button-size row */
+  .sizes { display: flex; align-items: center; gap: 28px; padding: 20px;
+           background: var(--sft-surface-container-1); border: 1px solid var(--sft-border);
+           border-radius: var(--sft-radius-2); }
+  .sizes figure { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sizes figcaption { font-size: var(--sft-font-size-xxs); color: var(--sft-text-weak); }
+  .lozenge {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 14px 0 10px;
+    border-radius: var(--sft-radius-pill);
+    background: var(--sft-accent-container-1); color: #fff;
+    box-shadow: var(--sft-shadow-3); border: none; cursor: pointer;
+    font: inherit; font-weight: var(--sft-font-weight-medium);
+  }
+  .lozenge svg { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Floating button &amp; panel</h1>
+  <p>
+    Three directions for the on-page overlay, built on the SLDS-sourced
+    <code>--sft-*</code> tokens so they match the popup. Today the trigger is a
+    20×36px edge tab and the panel is a flush 300px list showing every tab's
+    full path. Toggle the theme to check both.
+  </p>
+  <div class="controls">
+    <button id="btn-light" aria-pressed="true">Light</button>
+    <button id="btn-dark" aria-pressed="false">Dark</button>
+  </div>
+</div>
+
+<!-- ══════════════ A ══════════════ -->
+<section class="variant variant-a">
+  <h2>A · Edge drawer (evolution of today)</h2>
+  <p class="why">
+    Keeps the docked-to-the-edge model, but the handle grows to 24×56 for a
+    real hit target, the panel gets a radius and shadow so it reads as a
+    surface, and paths drop to a badge plus name. Least disruptive; still
+    competes with Salesforce's own right-edge utilities.
+  </p>
+  <div class="stage">
+    <div class="stage-topbar"></div>
+    <div class="stage-subbar"><span>Setup</span><span>Object Manager</span><span>Home</span></div>
+    <div class="stage-body">
+      <div class="skel" style="width:38%"></div>
+      <div class="skel" style="width:62%"></div>
+      <div class="skel" style="width:52%"></div>
+    </div>
+    <div class="fp">
+      <button class="a-handle" aria-label="Open SF Tabs">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
+      </button>
+      <div class="fp-panel">
+        <div class="fp-head">
+          <span class="fp-head-title">SF Tabs</span>
+          <span class="fp-chip">Default</span>
+        </div>
+        <div class="fp-list">
+          <a class="fp-row"><span class="fp-badge setup">Setup</span><span class="fp-name">Flows</span></a>
+          <a class="fp-row"><span class="fp-badge setup">Setup</span><span class="fp-name">Users</span><span class="fp-count">3</span><span class="fp-caret">›</span></a>
+          <a class="fp-row"><span class="fp-badge setup">Setup</span><span class="fp-name">Profiles</span></a>
+          <a class="fp-row"><span class="fp-badge setup">Setup</span><span class="fp-name">Permission Sets</span></a>
+          <a class="fp-row"><span class="fp-badge obj">Obj</span><span class="fp-name">Accounts</span></a>
+          <a class="fp-row"><span class="fp-badge url">URL</span><span class="fp-name">Help Portal</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ B ══════════════ -->
+<section class="variant variant-b">
+  <h2>B · Detached card with a round trigger</h2>
+  <p class="why">
+    A conventional floating action button, inset from the edge, opening a fully
+    rounded card beneath it. Reads unmistakably as "our thing" rather than part
+    of Salesforce, and the branded trigger is far easier to find. Costs more
+    screen space and can overlap page content.
+  </p>
+  <div class="stage">
+    <div class="stage-topbar"></div>
+    <div class="stage-subbar"><span>Setup</span><span>Object Manager</span><span>Home</span></div>
+    <div class="stage-body">
+      <div class="skel" style="width:44%"></div>
+      <div class="skel" style="width:58%"></div>
+      <div class="skel" style="width:35%"></div>
+    </div>
+    <div class="fp">
+      <button class="b-fab" aria-label="Open SF Tabs">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
+      </button>
+      <div class="fp-panel">
+        <div class="fp-head">
+          <span class="fp-head-title">SF Tabs</span>
+          <span class="fp-chip">Default</span>
+        </div>
+        <div class="fp-list">
+          <a class="fp-row"><span class="fp-badge setup">Setup</span><span class="fp-name">Flows</span></a>
+          <a class="fp-row"><span class="fp-badge setup">Setup</span><span class="fp-name">Users</span><span class="fp-count">3</span><span class="fp-caret">›</span></a>
+          <div class="fp-sub">
+            <a class="fp-row"><span class="fp-name">Manage Users</span></a>
+            <a class="fp-row"><span class="fp-name">Roles</span></a>
+          </div>
+          <a class="fp-row"><span class="fp-badge obj">Obj</span><span class="fp-name">Accounts</span></a>
+          <a class="fp-row"><span class="fp-badge url">URL</span><span class="fp-name">Help Portal</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ C ══════════════ -->
+<section class="variant variant-c">
+  <h2>C · Command palette</h2>
+  <p class="why">
+    Search-first. Type to filter, arrow keys to move, Enter to go — the fastest
+    option once you have many tabs, and the only one that scales past a
+    screenful. Paths appear only on the highlighted row, so the list stays quiet.
+    Biggest departure, and the trigger still needs to exist for mouse users.
+  </p>
+  <div class="stage">
+    <div class="stage-topbar"></div>
+    <div class="stage-subbar"><span>Setup</span><span>Object Manager</span><span>Home</span></div>
+    <div class="stage-body">
+      <div class="skel" style="width:40%"></div>
+      <div class="skel" style="width:55%"></div>
+    </div>
+    <div class="fp">
+      <button class="lozenge" aria-label="Open SF Tabs">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
+        SF Tabs
+      </button>
+      <div class="fp-panel">
+        <div class="c-search">
+          <svg viewBox="0 0 520 520" fill="currentColor"><path d="M496 456 368 329a181 181 0 0 0 38-111 182 182 0 1 0-182 182c41 0 79-14 110-38l127 128c6 6 15 6 21 0l14-14c6-6 6-15 0-20M224 340a117 117 0 1 1 117-116 117 117 0 0 1-117 116"/></svg>
+          <input placeholder="Search tabs…" value="acc" />
+          <span class="c-kbd">esc</span>
+        </div>
+        <div class="fp-list">
+          <a class="fp-row is-sel">
+            <span class="fp-badge obj">Obj</span>
+            <span class="fp-name">Accounts<span class="fp-path">Account</span></span>
+          </a>
+          <a class="fp-row">
+            <span class="fp-badge setup">Setup</span>
+            <span class="fp-name">Account – Limits</span>
+          </a>
+          <a class="fp-row">
+            <span class="fp-badge setup">Setup</span>
+            <span class="fp-name">Account – Record Types</span>
+          </a>
+        </div>
+        <div class="c-foot">
+          <span><span class="c-kbd">↑↓</span> move</span>
+          <span><span class="c-kbd">↵</span> open</span>
+          <span><span class="c-kbd">⇧↵</span> new tab</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ trigger sizes ══════════════ -->
+<section class="variant">
+  <h2>Trigger options at a glance</h2>
+  <p class="why">
+    Current size for reference, then the three candidates. The existing 20×36
+    handle is below the 24px minimum that's comfortable to hit.
+  </p>
+  <div class="sizes">
+    <figure>
+      <div style="width:20px;height:36px;border-radius:4px 0 0 4px;background:var(--sft-surface-container-1);box-shadow:var(--sft-shadow-2);display:flex;align-items:center;justify-content:center;color:var(--sft-accent-container-1)">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
+      </div>
+      <figcaption>Today · 20×36</figcaption>
+    </figure>
+    <figure>
+      <button class="a-handle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg></button>
+      <figcaption>A · 24×56 handle</figcaption>
+    </figure>
+    <figure>
+      <button class="b-fab"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg></button>
+      <figcaption>B · 44px round</figcaption>
+    </figure>
+    <figure>
+      <button class="lozenge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>SF Tabs</button>
+      <figcaption>C · labelled pill</figcaption>
+    </figure>
+  </div>
+</section>
+
+<script>
+  const root = document.documentElement;
+  const bl = document.getElementById('btn-light');
+  const bd = document.getElementById('btn-dark');
+  const set = t => {
+    root.setAttribute('data-theme', t);
+    bl.setAttribute('aria-pressed', String(t === 'light'));
+    bd.setAttribute('aria-pressed', String(t === 'dark'));
+  };
+  bl.onclick = () => set('light');
+  bd.onclick = () => set('dark');
+</script>
+</body>
+</html>
