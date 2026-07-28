@@ -2370,3 +2370,48 @@ select:focus-visible {
   background-color: rgba(15, 107, 174, 0.2);
   border-color: var(--color-header);
 }
+/* ── Floating button placement controls (settings page) ── */
+.fb-layouts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fb-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border, #c9c9c9);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.fb-layout:has(input:checked) {
+  border-color: #066afe;
+  background: rgba(6, 106, 254, 0.06);
+}
+.fb-layout-body { display: flex; flex-direction: column; gap: 2px; }
+.fb-layout-title { font-weight: 500; }
+.fb-layout-desc { font-size: 12px; color: var(--color-text-weak, #5c5c5c); }
+
+.fb-anchors {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+.fb-anchors button {
+  height: 44px;
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--color-border, #c9c9c9);
+  border-radius: 4px;
+  background: var(--color-surface-2, #f3f3f3);
+  color: var(--color-text-weak, #5c5c5c);
+}
+.fb-anchors button:hover:not(:disabled) { border-color: #066afe; color: #066afe; }
+.fb-anchors button[aria-pressed="true"] {
+  background: #066afe;
+  border-color: #066afe;
+  color: #fff;
+}
+.fb-anchors button:disabled { opacity: 0.35; cursor: not-allowed; }

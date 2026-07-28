@@ -849,14 +849,68 @@
 						</div>
 
 						<div class="setting-card">
-							<h3>__MSG_floatingButtonPositionSection__</h3>
+							<h3>Style</h3>
 							<div class="setting-item">
-								<label class="setting-label">__MSG_floatingButtonPositionLabel__</label>
-								<div style="display: flex; align-items: center; gap: 12px;">
-									<input type="range" id="floating-button-position" min="0" max="100" value="25" step="1" style="flex: 1;">
-									<span id="floating-button-position-value" style="min-width: 45px; text-align: right; font-weight: 500; color: var(--color-text);">25%</span>
+								<div class="fb-layouts">
+									<label class="fb-layout">
+										<input type="radio" name="floating-button-layout" value="handle" id="floating-layout-handle">
+										<span class="fb-layout-body">
+											<span class="fb-layout-title">Edge drawer</span>
+											<span class="fb-layout-desc">Docked handle; the panel slides out from the edge</span>
+										</span>
+									</label>
+									<label class="fb-layout">
+										<input type="radio" name="floating-button-layout" value="fab" id="floating-layout-fab">
+										<span class="fb-layout-body">
+											<span class="fb-layout-title">Round button</span>
+											<span class="fb-layout-desc">Inset circle; a card opens next to it</span>
+										</span>
+									</label>
+									<label class="fb-layout">
+										<input type="radio" name="floating-button-layout" value="pill" id="floating-layout-pill">
+										<span class="fb-layout-body">
+											<span class="fb-layout-title">Labelled pill</span>
+											<span class="fb-layout-desc">Shows “SF Tabs”; the largest target</span>
+										</span>
+									</label>
 								</div>
-								<div class="setting-description">__MSG_floatingButtonPositionDescription__</div>
+							</div>
+						</div>
+
+						<div class="setting-card">
+							<h3>__MSG_floatingButtonPositionSection__</h3>
+
+							<div class="setting-item">
+								<label class="setting-label">Placement</label>
+								<div class="fb-anchors" id="floating-button-anchors" role="group" aria-label="Placement">
+									<button type="button" data-anchor="top-left"      aria-label="Top left">↖</button>
+									<button type="button" data-anchor="top-center"    aria-label="Top centre">↑</button>
+									<button type="button" data-anchor="top-right"     aria-label="Top right">↗</button>
+									<button type="button" data-anchor="middle-left"   aria-label="Middle left">←</button>
+									<button type="button" disabled aria-hidden="true">·</button>
+									<button type="button" data-anchor="middle-right"  aria-label="Middle right">→</button>
+									<button type="button" data-anchor="bottom-left"   aria-label="Bottom left">↙</button>
+									<button type="button" data-anchor="bottom-center" aria-label="Bottom centre">↓</button>
+									<button type="button" data-anchor="bottom-right"  aria-label="Bottom right">↘</button>
+								</div>
+								<div class="setting-description">The edge drawer can only dock to a left or right edge.</div>
+							</div>
+
+							<div class="setting-item">
+								<label class="setting-label" id="floating-button-offset-label" for="floating-button-offset">Offset from top</label>
+								<div style="display: flex; align-items: center; gap: 12px;">
+									<input type="range" id="floating-button-offset" min="0" max="800" value="200" step="4" style="flex: 1;">
+									<span id="floating-button-offset-value" style="min-width: 52px; text-align: right; font-weight: 500; color: var(--color-text);">200px</span>
+								</div>
+								<div class="setting-description">Distance from the anchored edge, in pixels — so it stays put when the window resizes or devtools opens.</div>
+							</div>
+
+							<div class="setting-item">
+								<label class="checkbox-group">
+									<input type="checkbox" id="floating-button-avoid-collisions">
+									<span>Avoid other extensions</span>
+								</label>
+								<div class="setting-description">If another extension already occupies that spot, step along the edge to find clear space.</div>
 							</div>
 						</div>
 					</div>

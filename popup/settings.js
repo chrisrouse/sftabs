@@ -224,8 +224,7 @@ function updateUI() {
 		locationRadio.checked = true;
 	}
 
-	document.getElementById('floating-button-position').value = userSettings.floatingButton.position || 25;
-	document.getElementById('floating-button-position-value').textContent = `${userSettings.floatingButton.position || 25}%`;
+	loadFloatingPlacement();
 
 	// Show/hide auto-switch option based on profiles enabled
 	toggleAutoSwitchVisibility();
@@ -237,6 +236,112 @@ function updateUI() {
 /**
  * Toggle auto-switch profiles visibility and disable profiles section
  */
+/**
+ * Which anchors each layout allows. A docked drawer only makes sense against a
+ * left or right edge, so the top/bottom-centre anchors are disabled for it.
+ */
+const FLOATING_LAYOUT_ANCHORS = {
+	handle: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
+	fab:    ['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right'],
+	pill:   ['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right']
+};
+
+function floatingButtonSettings() {
+	if (!userSettings.floatingButton) {
+		userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
+	}
+	return userSettings.floatingButton;
+}
+
+function loadFloatingPlacement() {
+	const fb = floatingButtonSettings();
+	const layout = fb.layout || 'handle';
+
+	const layoutRadio = document.getElementById(`floating-layout-${layout}`);
+	if (layoutRadio) layoutRadio.checked = true;
+
+	// A legacy install has only the percentage; show its pixel equivalent so the
+	// slider is not misleading, and persist nothing until the user moves it.
+	let offset = Number(fb.offset) || 0;
+	if (!offset) {
+		const pct = Number.isFinite(Number(fb.position)) ? Number(fb.position) : 25;
+		offset = Math.round((pct / 100) * (window.screen?.availHeight || 900));
+	}
+
+	const slider = document.getElementById('floating-button-offset');
+	slider.value = offset;
+	document.getElementById('floating-button-offset-value').textContent = `${offset}px`;
+
+	document.getElementById('floating-button-avoid-collisions').checked =
+		fb.avoidCollisions !== false;
+
+	renderFloatingAnchors(fb.anchor || 'middle-right', layout);
+	updateFloatingOffsetLabel(fb.anchor || 'middle-right');
+}
+
+function renderFloatingAnchors(selected, layout) {
+	const allowed = FLOATING_LAYOUT_ANCHORS[layout] || FLOATING_LAYOUT_ANCHORS.fab;
+	document.querySelectorAll('#floating-button-anchors button[data-anchor]').forEach(btn => {
+		const anchor = btn.dataset.anchor;
+		const ok = allowed.includes(anchor);
+		btn.disabled = !ok;
+		btn.setAttribute('aria-pressed', String(ok && anchor === selected));
+	});
+}
+
+function updateFloatingOffsetLabel(anchor) {
+	const fromBottom = anchor.startsWith('bottom');
+	document.getElementById('floating-button-offset-label').textContent =
+		fromBottom ? 'Offset from bottom' : 'Offset from top';
+}
+
+function bindFloatingPlacement() {
+	// Layout — may invalidate the current anchor, so re-resolve it
+	document.querySelectorAll('input[name="floating-button-layout"]').forEach(radio => {
+		radio.addEventListener('change', async (e) => {
+			const fb = floatingButtonSettings();
+			fb.layout = e.target.value;
+
+			const allowed = FLOATING_LAYOUT_ANCHORS[fb.layout];
+			if (!allowed.includes(fb.anchor || 'middle-right')) {
+				fb.anchor = 'middle-right';
+			}
+			renderFloatingAnchors(fb.anchor || 'middle-right', fb.layout);
+			updateFloatingOffsetLabel(fb.anchor || 'middle-right');
+			await saveUserSettings();
+		});
+	});
+
+	// Placement grid
+	document.getElementById('floating-button-anchors').addEventListener('click', async (e) => {
+		const btn = e.target.closest('button[data-anchor]');
+		if (!btn || btn.disabled) return;
+		const fb = floatingButtonSettings();
+		fb.anchor = btn.dataset.anchor;
+		renderFloatingAnchors(fb.anchor, fb.layout || 'handle');
+		updateFloatingOffsetLabel(fb.anchor);
+		await saveUserSettings();
+	});
+
+	// Offset — live label, persist on release
+	const slider = document.getElementById('floating-button-offset');
+	const readout = document.getElementById('floating-button-offset-value');
+	slider.addEventListener('input', (e) => {
+		readout.textContent = `${e.target.value}px`;
+	});
+	slider.addEventListener('change', async (e) => {
+		const fb = floatingButtonSettings();
+		fb.offset = parseInt(e.target.value, 10);
+		delete fb.position; // superseded; stops the legacy fallback re-engaging
+		await saveUserSettings();
+	});
+
+	document.getElementById('floating-button-avoid-collisions').addEventListener('change', async (e) => {
+		floatingButtonSettings().avoidCollisions = e.target.checked;
+		await saveUserSettings();
+	});
+}
+
 function toggleAutoSwitchVisibility() {
 	const autoSwitchContainer = document.getElementById('auto-switch-container');
 	const disableProfilesContainer = document.getElementById('disable-profiles-container');
@@ -460,21 +565,7 @@ function setupEventListeners() {
 		});
 	});
 
-	// Floating button position
-	const positionSlider = document.getElementById('floating-button-position');
-	const positionValue = document.getElementById('floating-button-position-value');
-
-	positionSlider.addEventListener('input', (e) => {
-		positionValue.textContent = `${e.target.value}%`;
-	});
-
-	positionSlider.addEventListener('change', async (e) => {
-		if (!userSettings.floatingButton) {
-			userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
-		}
-		userSettings.floatingButton.position = parseInt(e.target.value);
-		await saveUserSettings();
-	});
+	bindFloatingPlacement();
 
 	// Export mode radio buttons
 	document.getElementById('export-everything-radio').addEventListener('change', () => {
