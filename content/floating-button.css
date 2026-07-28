@@ -550,3 +550,73 @@
 .sftabs-floating-modal[data-layout="pill"] .modal-toggle-button::after {
   content: 'SF Tabs';
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Visual lift — the drawer previously blended into the Salesforce page:
+   a 20x36 handle with no elevation and a flush, borderless panel.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Handle: bigger target, real elevation, and a brand edge so it reads as
+   an affordance rather than part of the page. */
+.sftabs-floating-modal[data-layout="handle"] .modal-toggle-button {
+  width: 26px;
+  height: 56px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+.sftabs-floating-modal[data-layout="handle"][data-side="right"] .modal-toggle-button {
+  border-left: 3px solid #066afe;
+}
+.sftabs-floating-modal[data-layout="handle"][data-side="left"] .modal-toggle-button {
+  border-right: 3px solid #066afe;
+}
+.sftabs-floating-modal[data-layout="handle"] .modal-toggle-button img {
+  width: 15px;
+  height: 15px;
+}
+
+/* Panel: lift it off the page and give it a boundary */
+.sftabs-floating-modal .modal-panel {
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.14), 0 5px 5px rgba(0, 0, 0, 0.14);
+  border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+}
+
+/* Panel header — anchors the surface and identifies the extension */
+.sftabs-floating-modal .modal-panel-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+.sftabs-floating-modal .modal-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slds-g-color-on-surface-3, #03234d);
+}
+
+/* Type badges replace reading a raw path on every row */
+.sftabs-floating-modal .tab-badge {
+  flex-shrink: 0;
+  margin-right: 8px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.sftabs-floating-modal .tab-badge--setup { background: #cfe9fe; color: #05628a; }
+.sftabs-floating-modal .tab-badge--obj   { background: #cdefc4; color: #396547; }
+.sftabs-floating-modal .tab-badge--url   { background: #ece1f9; color: #7526e3; }
+
+/* Dark theme equivalents */
+.sftabs-floating-modal[data-theme="dark"] .modal-panel-header {
+  background: #1d1c2e;
+  border-bottom-color: #444;
+}
+.sftabs-floating-modal[data-theme="dark"] .modal-panel-title { color: #d8e6fe; }
+.sftabs-floating-modal[data-theme="dark"] .modal-panel { border-color: #444; }
+.sftabs-floating-modal[data-theme="dark"] .tab-badge--setup { background: #001a28; color: #0d9dda; }
+.sftabs-floating-modal[data-theme="dark"] .tab-badge--obj   { background: #071b12; color: #3ba755; }
+.sftabs-floating-modal[data-theme="dark"] .tab-badge--url   { background: #240643; color: #ad7bee; }

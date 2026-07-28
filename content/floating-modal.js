@@ -237,6 +237,15 @@
       const modalPanel = document.createElement('div');
       modalPanel.className = 'modal-panel';
 
+      const panelHeader = document.createElement('div');
+      panelHeader.className = 'modal-panel-header';
+      const panelTitle = document.createElement('span');
+      panelTitle.className = 'modal-panel-title';
+      panelTitle.id = 'sftabs-modal-title';
+      panelTitle.textContent = chrome.i18n.getMessage('extensionName');
+      panelHeader.appendChild(panelTitle);
+      modalPanel.appendChild(panelHeader);
+
       const tabListContainer = document.createElement('div');
       tabListContainer.className = 'tab-list-container';
       tabListContainer.setAttribute('role', 'list');
@@ -441,6 +450,7 @@
       const container = this.modal.querySelector('.tab-list-container');
       if (!container) return;
 
+
       container.innerHTML = '';
 
       // Show only top-level tabs (no parentId) - matches primary navigation
@@ -486,9 +496,17 @@
       const rowEl = document.createElement('div');
       rowEl.className = 'tab-row';
 
+      // Type badge — same classification the popup uses, so the two agree
+      const badge = document.createElement('span');
+      const type = tab.isCustomUrl ? 'url' : (tab.isObject ? 'obj' : 'setup');
+      badge.className = `tab-badge tab-badge--${type}`;
+      badge.textContent = type === 'url' ? 'URL' : (type === 'obj' ? 'OBJ' : 'SETUP');
+      rowEl.appendChild(badge);
+
       // Label container
       const labelContainer = document.createElement('div');
       labelContainer.style.flex = '1';
+      labelContainer.style.minWidth = '0';
 
       // Tab name
       const labelEl = document.createElement('div');
@@ -590,9 +608,17 @@
       const rowEl = document.createElement('div');
       rowEl.className = 'dropdown-child-row';
 
+      // Type badge — same classification the popup uses, so the two agree
+      const badge = document.createElement('span');
+      const type = tab.isCustomUrl ? 'url' : (tab.isObject ? 'obj' : 'setup');
+      badge.className = `tab-badge tab-badge--${type}`;
+      badge.textContent = type === 'url' ? 'URL' : (type === 'obj' ? 'OBJ' : 'SETUP');
+      rowEl.appendChild(badge);
+
       // Label container
       const labelContainer = document.createElement('div');
       labelContainer.style.flex = '1';
+      labelContainer.style.minWidth = '0';
 
       const labelEl = document.createElement('div');
       labelEl.className = 'dropdown-child-label';
@@ -687,9 +713,17 @@
         nestedEl.classList.add('navigable');
       }
 
+      // Type badge — same classification the popup uses, so the two agree
+      const badge = document.createElement('span');
+      const type = tab.isCustomUrl ? 'url' : (tab.isObject ? 'obj' : 'setup');
+      badge.className = `tab-badge tab-badge--${type}`;
+      badge.textContent = type === 'url' ? 'URL' : (type === 'obj' ? 'OBJ' : 'SETUP');
+      rowEl.appendChild(badge);
+
       // Label container
       const labelContainer = document.createElement('div');
       labelContainer.style.flex = '1';
+      labelContainer.style.minWidth = '0';
 
       const labelEl = document.createElement('div');
       labelEl.className = 'dropdown-nested-label';
