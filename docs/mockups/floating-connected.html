@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — connecting the handle to the menu</title>
+<link rel="stylesheet" href="../../css/tokens.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sft-font-family); font-size: var(--sft-font-size-base);
+    color: var(--sft-text); background: var(--sft-surface-2); padding: 32px;
+  }
+  h1 { font: var(--sft-type-style-title); color: var(--sft-text-strong); }
+  .lede { color: var(--sft-text-weak); margin-top: 8px; max-width: 80ch; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .bar { display: flex; gap: 8px; margin: 20px 0 8px; }
+  .bar button {
+    font: inherit; font-size: var(--sft-font-size-xs); padding: 5px 14px; cursor: pointer;
+    border: 1px solid var(--sft-border-strong); border-radius: var(--sft-radius-pill);
+    background: var(--sft-surface-container-1); color: var(--sft-text);
+  }
+  .bar button[aria-pressed="true"] { background: var(--sft-accent-container-1); color: #fff; border-color: transparent; }
+
+  .variant { margin-bottom: 36px; }
+  .variant h2 { font-size: var(--sft-font-size-lg); font-weight: var(--sft-font-weight-regular); color: var(--sft-text-strong); }
+  .variant .why { color: var(--sft-text-weak); font-size: var(--sft-font-size-xs); margin: 4px 0 14px; max-width: 84ch; }
+
+  /* Salesforce-ish page: white content on pale blue, which is what the panel
+     has to separate itself from */
+  .stage { position: relative; height: 300px; overflow: hidden; border-radius: var(--sft-radius-2); border: 1px solid var(--sft-border); }
+  .sf-top { height: 34px; background: #032d60; }
+  .sf-sub { height: 44px; background: #fff; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center; gap: 22px; padding: 0 18px; font-size: var(--sft-font-size-xs); color: #5c5c5c; }
+  .sf-sub b { color: #032d60; }
+  .sf-body { height: calc(100% - 78px); background: #eef4fb; padding: 16px; }
+  .sf-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 6px; height: 100%; padding: 14px; }
+  .skel { height: 11px; border-radius: 4px; background: #eef1f6; margin-bottom: 9px; }
+
+  /* ── Shared assembly ───────────────────────────────────────────
+     One flex container holds handle + panel. Anything that makes the two
+     read as a single object is set on the CONTAINER, not the children. */
+  .fx {
+    position: absolute; right: 0; top: 54px;
+    display: flex; align-items: stretch;   /* stretch: handle matches panel edge */
+  }
+  .fx-handle {
+    width: 26px; flex-shrink: 0; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--sft-surface-container-1);
+    color: var(--sft-accent-container-1);
+  }
+  .fx-handle svg { width: 15px; height: 15px; }
+  .fx-panel { width: 230px; background: var(--sft-surface-container-1); }
+  .fx-row { padding: 9px 14px; font-size: var(--sft-font-size-xs); display: flex; align-items: center; }
+  .fx-row + .fx-row { border-top: 1px solid light-dark(#f0f0f0, #333); }
+  .fx-row .car { margin-left: auto; color: var(--sft-text-weak); }
+  .closed .fx-panel { display: none; }
+  .closed .fx-handle { height: 56px; align-self: flex-start; }
+
+  /* ── 1. Seamless tab ── */
+  .v1 .fx {
+    box-shadow: var(--sft-shadow-3);
+    border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
+    overflow: hidden;
+  }
+  .v1 .fx-handle { border-right: 1px solid light-dark(#ececec, #3a3a3a); }
+  .v1.closed .fx { border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2); }
+
+  /* ── 2. Nubbin ── */
+  .v2 .fx { box-shadow: var(--sft-shadow-4); border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2); }
+  .v2 .fx-handle {
+    border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
+    position: relative; margin-right: 6px;
+  }
+  .v2 .fx-handle::after {           /* pointer into the panel */
+    content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+    border: 6px solid transparent; border-left-color: var(--sft-surface-container-1);
+  }
+  .v2 .fx-panel { border-radius: var(--sft-radius-2); }
+  .v2.closed .fx-handle { margin-right: 0; }
+  .v2.closed .fx-handle::after { display: none; }
+
+  /* ── 3. Active handle ── */
+  .v3 .fx { box-shadow: var(--sft-shadow-3); border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2); overflow: hidden; }
+  .v3:not(.closed) .fx-handle { background: var(--sft-accent-container-1); color: #fff; }
+  .v3 .fx-panel { border-top: 3px solid var(--sft-accent-container-1); }
+  .v3.closed .fx-handle { border-right: 3px solid var(--sft-accent-container-1); }
+
+  /* ── 4. Framed ── */
+  .v4 .fx {
+    box-shadow: var(--sft-shadow-4);
+    border: 1px solid var(--sft-border-strong);
+    border-right: none;
+    border-radius: var(--sft-radius-2) 0 0 var(--sft-radius-2);
+    overflow: hidden;
+  }
+  .v4 .fx-panel { background: light-dark(#fbfbfb, #2e2e2e); }
+  .v4 .fx-handle { border-right: 1px solid var(--sft-border); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Connecting the handle to the menu</h1>
+  <p class="lede">
+    Today the handle and the panel are separate surfaces, each with its own
+    border and shadow, so they read as two objects that happen to touch. And a
+    white panel on a white Salesforce card needs more than a hairline to
+    separate from it. Each option below puts the elevation on the whole
+    assembly instead of the parts. Toggle open/closed to compare.
+  </p>
+  <div class="bar">
+    <button id="b-open" aria-pressed="true">Open</button>
+    <button id="b-closed" aria-pressed="false">Closed</button>
+    <button id="b-theme" aria-pressed="false">Dark</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="variant">
+    <h2>1 · Seamless tab</h2>
+    <p class="why">
+      One surface, one shadow, corners rounded only on the outside of the whole
+      unit. The seam between handle and panel is a single hairline, so the
+      handle reads as a tab protruding from the menu rather than a separate
+      chip. Most subtle; relies on the shadow alone to lift off the page.
+    </p>
+    <div class="stage v1" data-v>
+      <div class="sf-top"></div>
+      <div class="sf-sub"><b>Setup</b><span>Home</span><span>Object Manager</span></div>
+      <div class="sf-body"><div class="sf-card"><div class="skel" style="width:44%"></div><div class="skel" style="width:60%"></div></div></div>
+      <div class="fx">
+        <button class="fx-handle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg></button>
+        <div class="fx-panel">
+          <div class="fx-row">Flows</div>
+          <div class="fx-row">Users <span class="car">›</span></div>
+          <div class="fx-row">Profiles</div>
+          <div class="fx-row">Permission Sets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <h2>2 · Nubbin</h2>
+    <p class="why">
+      The handle stays its own rounded shape but grows a pointer into the panel,
+      the way a tooltip or popover attaches to its trigger. The strongest
+      "these belong together" signal, and it makes clear which control opened
+      the menu. Slightly more decoration to maintain across four anchor sides.
+    </p>
+    <div class="stage v2" data-v>
+      <div class="sf-top"></div>
+      <div class="sf-sub"><b>Setup</b><span>Home</span><span>Object Manager</span></div>
+      <div class="sf-body"><div class="sf-card"><div class="skel" style="width:52%"></div><div class="skel" style="width:38%"></div></div></div>
+      <div class="fx">
+        <button class="fx-handle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg></button>
+        <div class="fx-panel">
+          <div class="fx-row">Flows</div>
+          <div class="fx-row">Users <span class="car">›</span></div>
+          <div class="fx-row">Profiles</div>
+          <div class="fx-row">Permission Sets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <h2>3 · Active handle</h2>
+    <p class="why">
+      The handle fills with brand blue while the menu is open and the panel
+      carries a matching accent edge, so the pair share an obvious "on" state.
+      Also gives the clearest closed/open feedback of the four. The blue is a
+      strong note on a Salesforce page — worth judging in context.
+    </p>
+    <div class="stage v3" data-v>
+      <div class="sf-top"></div>
+      <div class="sf-sub"><b>Setup</b><span>Home</span><span>Object Manager</span></div>
+      <div class="sf-body"><div class="sf-card"><div class="skel" style="width:48%"></div><div class="skel" style="width:56%"></div></div></div>
+      <div class="fx">
+        <button class="fx-handle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg></button>
+        <div class="fx-panel">
+          <div class="fx-row">Flows</div>
+          <div class="fx-row">Users <span class="car">›</span></div>
+          <div class="fx-row">Profiles</div>
+          <div class="fx-row">Permission Sets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="variant">
+    <h2>4 · Framed</h2>
+    <p class="why">
+      Aimed squarely at the blending problem: a full border in the stronger
+      border tone wraps the whole unit, the panel surface sits a shade off pure
+      white, and the elevation steps up to modal level. The most clearly
+      separated from the page, at the cost of looking heavier than SLDS
+      normally does.
+    </p>
+    <div class="stage v4" data-v>
+      <div class="sf-top"></div>
+      <div class="sf-sub"><b>Setup</b><span>Home</span><span>Object Manager</span></div>
+      <div class="sf-body"><div class="sf-card"><div class="skel" style="width:40%"></div><div class="skel" style="width:62%"></div></div></div>
+      <div class="fx">
+        <button class="fx-handle"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg></button>
+        <div class="fx-panel">
+          <div class="fx-row">Flows</div>
+          <div class="fx-row">Users <span class="car">›</span></div>
+          <div class="fx-row">Profiles</div>
+          <div class="fx-row">Permission Sets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const stages = [...document.querySelectorAll('[data-v]')];
+  const bo = document.getElementById('b-open');
+  const bc = document.getElementById('b-closed');
+  const bt = document.getElementById('b-theme');
+
+  const setOpen = open => {
+    stages.forEach(s => s.classList.toggle('closed', !open));
+    bo.setAttribute('aria-pressed', String(open));
+    bc.setAttribute('aria-pressed', String(!open));
+  };
+  bo.onclick = () => setOpen(true);
+  bc.onclick = () => setOpen(false);
+  bt.onclick = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    bt.setAttribute('aria-pressed', String(!dark));
+    bt.textContent = dark ? 'Dark' : 'Light';
+  };
+</script>
+</body>
+</html>
