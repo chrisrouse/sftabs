@@ -4,6 +4,30 @@
 (function() {
   'use strict';
 
+  // Same guard as floating-button.js: a duplicate copy in one document builds a
+  // second modal and races the shared globals.
+  if (window.__sftabsFloatingModalLoaded) return;
+  window.__sftabsFloatingModalLoaded = true;
+
+  /**
+   * Tabs + settings, without depending on the FloatingButton *instance*.
+   * Previously the modal was only built if window.SFTabsFloating.button.settings
+   * happened to exist, and it gave up silently after 2s — so if that instance
+   * was ever missing, no modal was created and nothing could open.
+   */
+  async function resolveFloatingData() {
+    const btn = window.SFTabsFloating?.button;
+    if (btn?.settings) {
+      return { tabs: btn.tabs || [], settings: btn.settings };
+    }
+    if (typeof window.SFTabsFloating?.loadTabsAndSettings === 'function') {
+      try {
+        return await window.SFTabsFloating.loadTabsAndSettings();
+      } catch (e) { /* fall through */ }
+    }
+    return { tabs: [], settings: {} };
+  }
+
   /**
    * Build full URL for a tab (matches tab-renderer.js buildFullUrl logic)
    */
@@ -164,13 +188,9 @@
 
     async loadData() {
       try {
-        // Use the same loading function from floating-button.js
-        // We need to access it from the button instance
-        const floatingButton = window.SFTabsFloating?.button;
-        if (floatingButton) {
-          this.tabs = floatingButton.tabs || [];
-          this.settings = floatingButton.settings || {};
-        }
+        const data = await resolveFloatingData();
+        this.tabs = data.tabs || [];
+        this.settings = data.settings || {};
       } catch (error) {
         this.tabs = [];
         this.settings = {};
@@ -963,29 +983,14 @@
     // is no longer the one on screen.
     if (window.SFTabsFloating.modal && typeof window.SFTabsFloating.modal.destroy === 'function') {
       window.SFTabsFloating.modal.destroy();
-      window.SFTabsFloating.modal = null;
     }
+    window.SFTabsFloating.modal = null;
     document.querySelectorAll('.sftabs-floating-modal').forEach(el => el.remove());
 
-    // Wait for settings to be loaded
-    let attempts = 0;
-    const maxAttempts = 20;
-
-    const checkSettings = () => {
-      if (window.SFTabsFloating.button?.settings) {
-        const settings = window.SFTabsFloating.button.settings;
-
-        // Only create modal if floating button is enabled
-        if (settings.floatingButton?.enabled) {
-          window.SFTabsFloating.modal = new FloatingModal();
-        }
-      } else if (attempts < maxAttempts) {
-        attempts++;
-        setTimeout(checkSettings, 100);
-      }
-    };
-
-    checkSettings();
+    const { settings } = await resolveFloatingData();
+    if (settings?.floatingButton?.enabled) {
+      window.SFTabsFloating.modal = new FloatingModal();
+    }
   }
 
   // Let floating-button.js rebuild us after a settings change
