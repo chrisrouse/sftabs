@@ -81,7 +81,8 @@
       "resources": [
         "content/inject.js",
         "icons/invert.svg",
-        "icons/sftabs-icon-16.png"
+        "icons/sftabs-icon-16.png",
+        "icons/sftabs-logo.svg"
       ],
       "matches": [
         "*://*.lightning.force.com/*",

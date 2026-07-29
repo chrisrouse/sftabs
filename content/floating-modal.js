@@ -253,7 +253,7 @@
       this.modal.setAttribute('data-edge', 'right');
 
       // Get logo URL
-      const logoUrl = browser.runtime.getURL('icons/sftabs-icon-16.png');
+      const logoUrl = browser.runtime.getURL('icons/sftabs-logo.svg');
 
       const modalContent = document.createElement('div');
       modalContent.className = 'modal-content';

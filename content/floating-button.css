@@ -96,10 +96,6 @@
   pointer-events: auto; /* Enable clicks on panel */
 }
 
-.sftabs-floating-modal.open .modal-panel {
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15); /* Subtle left shadow for depth */
-}
-
 /* Scrollbar styling */
 .sftabs-floating-modal .modal-panel::-webkit-scrollbar {
   width: 6px;
@@ -335,20 +331,16 @@
 
 /* Dark Mode Support - Matches popup theme colors */
 .sftabs-floating-modal[data-theme="dark"] .modal-toggle-button {
-  background: #28272C; /* surface-1 from popup */
+  background: #202020; /* surface-2 from popup */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .sftabs-floating-modal[data-theme="dark"] .modal-toggle-button:hover {
-  background: #33323A; /* surface-2 from popup */
+  background: #2e2e2e; /* surface-3 from popup */
 }
 
 .sftabs-floating-modal[data-theme="dark"] .modal-panel {
-  background: #1C1B1F; /* surface-base from popup */
-}
-
-.sftabs-floating-modal[data-theme="dark"].open .modal-panel {
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
+  background: #202020; /* surface-2 from popup — same as the handle */
 }
 
 .sftabs-floating-modal[data-theme="dark"] .modal-panel::-webkit-scrollbar-thumb {
@@ -369,7 +361,7 @@
 
 .sftabs-floating-modal[data-theme="dark"] .dropdown-children,
 .sftabs-floating-modal[data-theme="dark"] .dropdown-nested-children {
-  background: #1C1B1F; /* surface-base from popup */
+  background: #202020; /* surface-2 from popup — same as the handle */
 }
 
 .sftabs-floating-modal[data-theme="dark"] .dropdown-child-label,
@@ -380,7 +372,7 @@
 .sftabs-floating-modal[data-theme="dark"] .tab-row:active:not(.active),
 .sftabs-floating-modal[data-theme="dark"] .dropdown-child-row:active:not(.active),
 .sftabs-floating-modal[data-theme="dark"] .dropdown-nested-item:active:not(.active) {
-  background: #28272C; /* surface-1 from popup */
+  background: #202020; /* surface-2 from popup */
 }
 
 .sftabs-floating-modal[data-theme="dark"] .empty-state {
@@ -451,18 +443,6 @@
 .sftabs-floating-modal[data-side="left"] .modal-content { transform: translateX(-280px); }
 .sftabs-floating-modal[data-side="left"].open .modal-content { transform: translateX(0); }
 
-/* Handle: rounded on the face pointing at the page, flat where it meets the panel */
-.sftabs-floating-modal[data-layout="handle"][data-side="left"] .modal-toggle-button {
-  border-radius: 0 4px 4px 0;
-}
-/* Panel: flat against the screen edge, rounded on the page side */
-.sftabs-floating-modal[data-layout="handle"][data-side="left"] .modal-panel {
-  border-radius: 0 8px 8px 0;
-}
-.sftabs-floating-modal[data-layout="handle"][data-side="right"] .modal-panel {
-  border-radius: 8px 0 0 8px;
-}
-
 /* Nested flyouts open away from the anchored edge */
 .sftabs-floating-modal[data-side="left"] .dropdown-indicator { order: 0; }
 
@@ -501,11 +481,15 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #066afe;
+  background: #288aff;
   box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
-.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button:hover { background: #0250d9; }
-.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button img { width: 20px; height: 20px; }
+.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button:hover { background: #0f6fd4; }
+.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
 
 /* Labelled pill */
 .sftabs-floating-modal[data-layout="pill"] .modal-toggle-button {
@@ -514,52 +498,95 @@
   padding: 0 14px 0 10px;
   gap: 8px;
   border-radius: 999px;
-  background: #066afe;
+  background: #288aff;
   color: #fff;
   font-size: 13px;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
-.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button:hover { background: #0250d9; }
+.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button:hover { background: #0f6fd4; }
 .sftabs-floating-modal[data-layout="pill"] .modal-toggle-button::after {
   content: 'SF Tabs';
 }
-
-/* ═══════════════════════════════════════════════════════════════════
-   Visual lift — the drawer previously blended into the Salesforce page:
-   a 20x36 handle with no elevation and a flush, borderless panel.
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* Handle: bigger target, real elevation, and a brand edge so it reads as
-   an affordance rather than part of the page. */
-.sftabs-floating-modal[data-layout="handle"] .modal-toggle-button {
-  width: 26px;
-  height: 56px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button img {
+  filter: brightness(0) invert(1);
 }
-.sftabs-floating-modal[data-layout="handle"][data-side="right"] .modal-toggle-button {
-  border-left: 3px solid #066afe;
-}
-.sftabs-floating-modal[data-layout="handle"][data-side="left"] .modal-toggle-button {
-  border-right: 3px solid #066afe;
-}
-.sftabs-floating-modal[data-layout="handle"] .modal-toggle-button img {
-  width: 15px;
-  height: 15px;
-}
-
-/* Panel: lift it off the page and give it a boundary */
-.sftabs-floating-modal .modal-panel {
-  box-shadow: 0 0 7px rgba(0, 0, 0, 0.14), 0 5px 5px rgba(0, 0, 0, 0.14);
-  border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
-}
-
-/* Dark theme equivalents */
-.sftabs-floating-modal[data-theme="dark"] .modal-panel { border-color: #444; }
 
 /* The closed-state slide is a hardcoded 280px, so the panel must stay exactly
    280px wide despite the border added above. */
 .sftabs-floating-modal .modal-panel,
 .sftabs-floating-modal .modal-toggle-button {
   box-sizing: border-box;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Active handle — one connected assembly (mockup variant 3)
+
+   Open: elevation, radius and clipping live on .modal-content, the flex
+   parent of handle + panel, so the two read as a single object rather
+   than two surfaces that happen to touch.
+
+   Closed: the panel slides out rather than hiding, so .modal-content stays
+   306px wide and as tall as the panel. A container-level shadow or radius
+   would therefore trail far below the 56px handle — closed state puts both
+   on the handle itself.
+   ═══════════════════════════════════════════════════════════════════ */
+.sftabs-floating-modal[data-layout="handle"] .modal-content { align-items: stretch; }
+
+.sftabs-floating-modal[data-layout="handle"] .modal-toggle-button {
+  width: 26px;
+  height: 56px;
+  align-self: flex-start;
+  transition: background-color 0.15s ease;
+}
+.sftabs-floating-modal[data-layout="handle"] .modal-toggle-button img {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Closed: handle carries the elevation and rounds on its page-facing side,
+      plus an accent edge hinting at the brand ── */
+.sftabs-floating-modal[data-layout="handle"]:not(.open)[data-side="right"] .modal-toggle-button {
+  border-radius: 8px 0 0 8px;
+  border-left: 3px solid #288aff;
+}
+.sftabs-floating-modal[data-layout="handle"]:not(.open)[data-side="left"] .modal-toggle-button {
+  border-radius: 0 8px 8px 0;
+  border-right: 3px solid #288aff;
+}
+
+/* ── Open: the assembly becomes one clipped, elevated surface ── */
+.sftabs-floating-modal[data-layout="handle"].open .modal-content {
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.16), 0 5px 5px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+.sftabs-floating-modal[data-layout="handle"].open[data-side="right"] .modal-content {
+  border-radius: 8px 0 0 8px;
+}
+.sftabs-floating-modal[data-layout="handle"].open[data-side="left"] .modal-content {
+  border-radius: 0 8px 8px 0;
+}
+/* Radius and shadow now belong to the container */
+.sftabs-floating-modal[data-layout="handle"].open .modal-toggle-button {
+  border-radius: 0;
+  box-shadow: none;
+  /* Fills with brand blue and stretches to the panel's height, so handle and
+     panel share one obvious "on" state */
+  background: #288aff;
+  align-self: stretch;
+  height: auto;
+}
+.sftabs-floating-modal[data-layout="handle"].open .modal-toggle-button:hover {
+  background: #0f6fd4;
+}
+.sftabs-floating-modal[data-layout="handle"].open .modal-toggle-button img {
+  /* Single-colour logo, so this is a clean white silhouette on the blue */
+  filter: brightness(0) invert(1);
+}
+.sftabs-floating-modal[data-layout="handle"].open .modal-panel {
+  border-top: 3px solid #288aff;
+}
+
+.sftabs-floating-modal[data-layout="handle"][data-theme="dark"].open .modal-content {
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.45), 0 5px 5px rgba(0, 0, 0, 0.45);
 }
