@@ -100,7 +100,6 @@ const DEFAULT_SETTINGS = {
     layout: 'handle', // 'handle' (edge drawer) | 'fab' (round) | 'pill' (labelled)
     anchor: 'middle-right', // {top|middle|bottom}-{left|center|right}
     offset: 0, // Pixels from the anchored edge. 0 = derive from legacy `position`
-    avoidCollisions: true, // Step along the edge if another extension is already there
     position: 25, // LEGACY percentage down the edge; still read when offset is 0
     location: 'everywhere', // 'everywhere' | 'setup-only' | 'outside-setup'
     defaultVisibility: true, // Show on all pages by default

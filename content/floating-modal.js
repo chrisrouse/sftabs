@@ -4,11 +4,6 @@
 (function() {
   'use strict';
 
-  // Same guard as floating-button.js: a duplicate copy in one document builds a
-  // second modal and races the shared globals.
-  if (window.__sftabsFloatingModalLoaded) return;
-  window.__sftabsFloatingModalLoaded = true;
-
   /**
    * Tabs + settings, without depending on the FloatingButton *instance*.
    * Previously the modal was only built if window.SFTabsFloating.button.settings
@@ -373,10 +368,6 @@
         if (vertical === 'bottom') this.modal.style.bottom = `${clamped}px`;
         else this.modal.style.top = `${clamped}px`;
 
-        if (this.settings?.floatingButton?.avoidCollisions !== false) {
-          this.avoidOverlap(vertical, clamped);
-        }
-
         this.updatePanelDirection();
       } catch (error) {
         if (this.modal) {
@@ -384,77 +375,6 @@
           this.modal.style.right = '0px';
         }
       }
-    }
-
-    /**
-     * Other extensions inject edge drawers into the same page, and we cannot
-     * enumerate them. Ask the browser what is actually on top at the trigger's
-     * midpoint instead; if it is not ours, step along the edge and retry.
-     * Heuristic, so it gives up rather than fighting for space.
-     */
-    avoidOverlap(vertical, startOffset) {
-      const trigger = this.modal.querySelector('.modal-toggle-button');
-      if (!trigger) return;
-
-      const STEP = 34;
-      const MAX_TRIES = 10;
-
-      // Drop any escalation from a previous run, so we only sit above other
-      // extensions for as long as we genuinely have to
-      this.modal.style.zIndex = '';
-
-      for (let attempt = 0; attempt <= MAX_TRIES; attempt++) {
-        if (this.isTriggerClear(trigger)) return;
-
-        const next = startOffset + STEP * (attempt + 1);
-        if (next > window.innerHeight - 100) break; // ran out of edge
-        if (vertical === 'bottom') this.modal.style.bottom = `${next}px`;
-        else this.modal.style.top = `${next}px`;
-      }
-
-      // Nothing along this edge is free. Go back to the user's own anchor
-      // rather than parking in an arbitrary nudged spot, and come to the front
-      // so the button stays clickable — the closed z-index of 500 deliberately
-      // sits below other extensions, which is what makes an overlapped button
-      // impossible to click.
-      if (vertical === 'bottom') this.modal.style.bottom = `${startOffset}px`;
-      else this.modal.style.top = `${startOffset}px`;
-      this.modal.style.zIndex = '9000';
-      console.warn('[SF Tabs] Floating button overlaps another element and no clear space was found on this edge; raising it to stay clickable. Try a different placement in Settings.');
-    }
-
-    /**
-     * Is our trigger actually clickable, or is something covering it?
-     *
-     * A single centre-point test is not enough: our own button is usually
-     * topmost at its own centre even when a neighbour overlaps an edge. Sample
-     * several points and inspect the whole stack at each, since anything
-     * painted above us intercepts the click.
-     */
-    isTriggerClear(trigger) {
-      const rect = trigger.getBoundingClientRect();
-      if (!rect.width || !rect.height) return true; // not laid out yet; leave it alone
-
-      const inset = 2;
-      const points = [
-        [rect.left + rect.width / 2, rect.top + rect.height / 2],
-        [rect.left + inset,          rect.top + inset],
-        [rect.right - inset,         rect.top + inset],
-        [rect.left + inset,          rect.bottom - inset],
-        [rect.right - inset,         rect.bottom - inset]
-      ];
-
-      for (const [x, y] of points) {
-        if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) continue;
-
-        const stack = document.elementsFromPoint(Math.round(x), Math.round(y));
-        const ours = stack.findIndex(el => el === this.modal || this.modal.contains(el));
-
-        // Not in the stack at all, or something foreign sits above us
-        if (ours === -1) return false;
-        if (ours > 0) return false;
-      }
-      return true;
     }
 
     updatePanelDirection() {
@@ -688,13 +608,6 @@
       const rowEl = document.createElement('div');
       rowEl.className = 'dropdown-child-row';
 
-      // Type badge — same classification the popup uses, so the two agree
-      const badge = document.createElement('span');
-      const type = tab.isCustomUrl ? 'url' : (tab.isObject ? 'obj' : 'setup');
-      badge.className = `tab-badge tab-badge--${type}`;
-      badge.textContent = type === 'url' ? 'URL' : (type === 'obj' ? 'OBJ' : 'SETUP');
-      rowEl.appendChild(badge);
-
       // Label container
       const labelContainer = document.createElement('div');
       labelContainer.style.flex = '1';
@@ -792,13 +705,6 @@
       if (nestedUrl) {
         nestedEl.classList.add('navigable');
       }
-
-      // Type badge — same classification the popup uses, so the two agree
-      const badge = document.createElement('span');
-      const type = tab.isCustomUrl ? 'url' : (tab.isObject ? 'obj' : 'setup');
-      badge.className = `tab-badge tab-badge--${type}`;
-      badge.textContent = type === 'url' ? 'URL' : (type === 'obj' ? 'OBJ' : 'SETUP');
-      rowEl.appendChild(badge);
 
       // Label container
       const labelContainer = document.createElement('div');

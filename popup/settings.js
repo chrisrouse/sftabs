@@ -272,9 +272,6 @@ function loadFloatingPlacement() {
 	slider.value = offset;
 	document.getElementById('floating-button-offset-value').textContent = `${offset}px`;
 
-	document.getElementById('floating-button-avoid-collisions').checked =
-		fb.avoidCollisions !== false;
-
 	renderFloatingAnchors(fb.anchor || 'middle-right', layout);
 	updateFloatingOffsetLabel(fb.anchor || 'middle-right');
 }
@@ -333,11 +330,6 @@ function bindFloatingPlacement() {
 		const fb = floatingButtonSettings();
 		fb.offset = parseInt(e.target.value, 10);
 		delete fb.position; // superseded; stops the legacy fallback re-engaging
-		await saveUserSettings();
-	});
-
-	document.getElementById('floating-button-avoid-collisions').addEventListener('change', async (e) => {
-		floatingButtonSettings().avoidCollisions = e.target.checked;
 		await saveUserSettings();
 	});
 }

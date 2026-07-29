@@ -4,12 +4,6 @@
 (function() {
   'use strict';
 
-  // A second copy in the same document would build a second button and race
-  // the shared window.SFTabsFloating globals, leaving orphaned elements whose
-  // listeners point at discarded instances.
-  if (window.__sftabsFloatingButtonLoaded) return;
-  window.__sftabsFloatingButtonLoaded = true;
-
   /**
    * Get storage preference from settings
    * @returns {Promise<boolean>} true for sync storage, false for local
