@@ -134,6 +134,20 @@
       }
     }
 
+    /**
+     * Tear down the rendered UI. The button itself renders nothing — the modal
+     * owns the trigger and panel — so this disposes of the modal. The storage
+     * listener below has always called this; it simply never existed, so every
+     * userSettings change threw here and the re-init never ran.
+     */
+    destroy() {
+      const modal = window.SFTabsFloating?.modal;
+      if (modal && typeof modal.destroy === 'function') {
+        modal.destroy();
+      }
+      window.SFTabsFloating.modal = null;
+    }
+
     shouldShow() {
       if (!this.settings.floatingButton.enabled) {
         return false;
@@ -198,11 +212,16 @@
 
       // Check if settings changed
       if (changes.userSettings) {
-        // Reload button
         if (floatingButton) {
           floatingButton.destroy();
         }
         initFloatingButton();
+
+        // The modal is the rendered artifact, so bring it back with the new
+        // settings applied
+        if (typeof window.SFTabsFloating?.initModal === 'function') {
+          window.SFTabsFloating.initModal();
+        }
       }
     });
   }

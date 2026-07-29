@@ -136,11 +136,29 @@
     }
 
     toggle() {
-      if (this.isOpen) {
+      // Derive state from the DOM rather than trusting this.isOpen. If the flag
+      // ever drifts out of sync — a re-init, an element replaced underneath us —
+      // the toggle silently does the opposite of what the user expects.
+      const openNow = !!this.modal && this.modal.classList.contains('open');
+      this.isOpen = openNow;
+      if (openNow) {
         this.close();
       } else {
         this.open();
       }
+    }
+
+    /** Remove our DOM and listeners so a fresh instance can replace us. */
+    destroy() {
+      if (this.resizeHandler) {
+        window.removeEventListener('resize', this.resizeHandler);
+        this.resizeHandler = null;
+      }
+      if (this.modal && this.modal.parentNode) {
+        this.modal.parentNode.removeChild(this.modal);
+      }
+      this.modal = null;
+      this.isOpen = false;
     }
 
     async loadData() {
@@ -938,6 +956,15 @@
   async function initFloatingModal() {
     window.SFTabsFloating = window.SFTabsFloating || {};
 
+    // Never leave a second copy behind: an orphaned element keeps its click
+    // listener bound to the old instance, so clicking it toggles a modal that
+    // is no longer the one on screen.
+    if (window.SFTabsFloating.modal && typeof window.SFTabsFloating.modal.destroy === 'function') {
+      window.SFTabsFloating.modal.destroy();
+      window.SFTabsFloating.modal = null;
+    }
+    document.querySelectorAll('.sftabs-floating-modal').forEach(el => el.remove());
+
     // Wait for settings to be loaded
     let attempts = 0;
     const maxAttempts = 20;
@@ -958,6 +985,10 @@
 
     checkSettings();
   }
+
+  // Let floating-button.js rebuild us after a settings change
+  window.SFTabsFloating = window.SFTabsFloating || {};
+  window.SFTabsFloating.initModal = initFloatingModal;
 
   // Initialize on page load
   if (document.readyState === 'loading') {
