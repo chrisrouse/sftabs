@@ -177,12 +177,6 @@
   line-height: 1.3;
 }
 
-.sftabs-floating-modal .tab-path {
-  font-size: 11px;
-  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
-  margin-top: 1px;
-}
-
 /* Dropdown Indicator - Chevron on Left */
 .sftabs-floating-modal .dropdown-indicator {
   display: inline-flex;
@@ -275,12 +269,6 @@
   color: var(--slds-g-color-neutral-base-30, var(--lwc-colorTextDefault, #3e3e3c));
 }
 
-.sftabs-floating-modal .dropdown-child-path {
-  font-size: 10px;
-  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
-  margin-top: 1px;
-}
-
 /* Nested Dropdown Children - Third Level */
 .sftabs-floating-modal .dropdown-nested-children {
   display: none;
@@ -333,12 +321,6 @@
   color: var(--slds-g-color-neutral-base-30, var(--lwc-colorTextDefault, #3e3e3c));
 }
 
-.sftabs-floating-modal .dropdown-nested-path {
-  font-size: 10px;
-  color: var(--slds-g-color-neutral-base-50, var(--lwc-colorTextWeak, #706e6b));
-  margin-top: 1px;
-}
-
 /* Empty State */
 .sftabs-floating-modal .empty-state {
   text-align: center;
@@ -379,12 +361,6 @@
 
 .sftabs-floating-modal[data-theme="dark"] .tab-label {
   color: #f3f4f6; /* --color-text from popup */
-}
-
-.sftabs-floating-modal[data-theme="dark"] .tab-path,
-.sftabs-floating-modal[data-theme="dark"] .dropdown-child-path,
-.sftabs-floating-modal[data-theme="dark"] .dropdown-nested-path {
-  color: #9ca3af; /* --color-text-weak from popup */
 }
 
 .sftabs-floating-modal[data-theme="dark"] .dropdown-indicator {
@@ -433,9 +409,7 @@
     font-size: 12px;
   }
 
-  .sftabs-floating-modal .tab-path {
-    font-size: 10px;
-  }
+  
 
   .sftabs-floating-modal .dropdown-child-item {
     padding: 7px 10px 7px 20px;
@@ -580,46 +554,8 @@
   border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
 }
 
-/* Panel header — anchors the surface and identifies the extension */
-.sftabs-floating-modal .modal-panel-header {
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--slds-g-color-border-1, #c9c9c9);
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
-}
-.sftabs-floating-modal .modal-panel-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--slds-g-color-on-surface-3, #03234d);
-}
-
-/* Type badges replace reading a raw path on every row */
-.sftabs-floating-modal .tab-badge {
-  flex-shrink: 0;
-  margin-right: 8px;
-  padding: 2px 5px;
-  border-radius: 999px;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  line-height: 1.3;
-  text-transform: uppercase;
-}
-.sftabs-floating-modal .tab-badge--setup { background: #cfe9fe; color: #05628a; }
-.sftabs-floating-modal .tab-badge--obj   { background: #cdefc4; color: #396547; }
-.sftabs-floating-modal .tab-badge--url   { background: #ece1f9; color: #7526e3; }
-
 /* Dark theme equivalents */
-.sftabs-floating-modal[data-theme="dark"] .modal-panel-header {
-  background: #1d1c2e;
-  border-bottom-color: #444;
-}
-.sftabs-floating-modal[data-theme="dark"] .modal-panel-title { color: #d8e6fe; }
 .sftabs-floating-modal[data-theme="dark"] .modal-panel { border-color: #444; }
-.sftabs-floating-modal[data-theme="dark"] .tab-badge--setup { background: #001a28; color: #0d9dda; }
-.sftabs-floating-modal[data-theme="dark"] .tab-badge--obj   { background: #071b12; color: #3ba755; }
-.sftabs-floating-modal[data-theme="dark"] .tab-badge--url   { background: #240643; color: #ad7bee; }
 
 /* The closed-state slide is a hardcoded 280px, so the panel must stay exactly
    280px wide despite the border added above. */

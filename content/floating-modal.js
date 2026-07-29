@@ -247,7 +247,7 @@
       this.modal.className = 'sftabs-floating-modal';
       this.modal.setAttribute('role', 'dialog');
       this.modal.setAttribute('aria-modal', 'true');
-      this.modal.setAttribute('aria-labelledby', 'sftabs-modal-title');
+      this.modal.setAttribute('aria-label', chrome.i18n.getMessage('extensionName'));
 
       // Always use right edge
       this.modal.setAttribute('data-edge', 'right');
@@ -270,15 +270,6 @@
 
       const modalPanel = document.createElement('div');
       modalPanel.className = 'modal-panel';
-
-      const panelHeader = document.createElement('div');
-      panelHeader.className = 'modal-panel-header';
-      const panelTitle = document.createElement('span');
-      panelTitle.className = 'modal-panel-title';
-      panelTitle.id = 'sftabs-modal-title';
-      panelTitle.textContent = chrome.i18n.getMessage('extensionName');
-      panelHeader.appendChild(panelTitle);
-      modalPanel.appendChild(panelHeader);
 
       const tabListContainer = document.createElement('div');
       tabListContainer.className = 'tab-list-container';
@@ -496,13 +487,6 @@
       const rowEl = document.createElement('div');
       rowEl.className = 'tab-row';
 
-      // Type badge — same classification the popup uses, so the two agree
-      const badge = document.createElement('span');
-      const type = tab.isCustomUrl ? 'url' : (tab.isObject ? 'obj' : 'setup');
-      badge.className = `tab-badge tab-badge--${type}`;
-      badge.textContent = type === 'url' ? 'URL' : (type === 'obj' ? 'OBJ' : 'SETUP');
-      rowEl.appendChild(badge);
-
       // Label container
       const labelContainer = document.createElement('div');
       labelContainer.style.flex = '1';
@@ -513,15 +497,6 @@
       labelEl.className = 'tab-label';
       labelEl.textContent = tab.label;
       labelContainer.appendChild(labelEl);
-
-      // Tab path (only if not in compact mode and has path)
-      const isCompactMode = this.settings.compactMode || false;
-      if (!isCompactMode && tab.path) {
-        const pathEl = document.createElement('div');
-        pathEl.className = 'tab-path';
-        pathEl.textContent = tab.path;
-        labelContainer.appendChild(pathEl);
-      }
 
       rowEl.appendChild(labelContainer);
 
@@ -618,15 +593,6 @@
       labelEl.textContent = childTab.label;
       labelContainer.appendChild(labelEl);
 
-      // Child path (only if not in compact mode and has path)
-      const isCompactMode = this.settings.compactMode || false;
-      if (!isCompactMode && childTab.path) {
-        const pathEl = document.createElement('div');
-        pathEl.className = 'dropdown-child-path';
-        pathEl.textContent = childTab.path;
-        labelContainer.appendChild(pathEl);
-      }
-
       rowEl.appendChild(labelContainer);
 
       // Add dropdown indicator (chevron) if has nested dropdown
@@ -715,15 +681,6 @@
       labelEl.className = 'dropdown-nested-label';
       labelEl.textContent = nestedTab.label;
       labelContainer.appendChild(labelEl);
-
-      // Nested path (only if not in compact mode and has path)
-      const isCompactMode = this.settings.compactMode || false;
-      if (!isCompactMode && nestedTab.path) {
-        const pathEl = document.createElement('div');
-        pathEl.className = 'dropdown-nested-path';
-        pathEl.textContent = nestedTab.path;
-        labelContainer.appendChild(pathEl);
-      }
 
       nestedEl.appendChild(labelContainer);
 
