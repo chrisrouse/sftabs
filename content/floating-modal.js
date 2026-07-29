@@ -105,6 +105,7 @@
     async open() {
       // Refresh tabs in case they changed
       await this.loadData();
+      if (!this.modal) return; // destroyed while awaiting
       this.renderTabs();
 
       // Update position and panel direction in case viewport changed
@@ -505,6 +506,7 @@
     }
 
     renderTabs() {
+      if (!this.modal) return; // destroyed between a storage event and this call
       const container = this.modal.querySelector('.tab-list-container');
       if (!container) return;
 
