@@ -2021,5 +2021,654 @@
   "translationsContributedBy": {
     "message": "Beitrag von",
     "description": "Attribution prefix shown before a contributor name in the language list"
+  },
+  "skipToMainContent": {
+    "message": "Zum Hauptinhalt springen"
+  },
+  "ariaTabList": {
+    "message": "Registerkartenliste"
+  },
+  "ariaCustomTabs": {
+    "message": "Benutzerdefinierte Registerkarten"
+  },
+  "ariaDetailsPanel": {
+    "message": "Detailbereich"
+  },
+  "ariaExtensionControls": {
+    "message": "Erweiterungssteuerung"
+  },
+  "ariaSwitchProfile": {
+    "message": "Profil wechseln"
+  },
+  "ariaSwitchProfileMenu": {
+    "message": "Profil wechseln"
+  },
+  "ariaQuickAdd": {
+    "message": "Registerkarte für die aktuelle Salesforce-Seite schnell hinzufügen"
+  },
+  "quickAddTitle": {
+    "message": "Von dieser Seite schnell hinzufügen"
+  },
+  "ariaAddManually": {
+    "message": "Registerkarte manuell hinzufügen"
+  },
+  "ariaViewReleaseNotes": {
+    "message": "Versionshinweise anzeigen"
+  },
+  "editTabSubtitle": {
+    "message": "Aktualisieren Sie Name und Ziel dieser Registerkarte."
+  },
+  "ariaCloseEditPanel": {
+    "message": "Bearbeitungsbereich schließen"
+  },
+  "ariaRequired": {
+    "message": "erforderlich"
+  },
+  "tabPathHint": {
+    "message": "Der Salesforce-Pfad oder die URL, zu der diese Registerkarte führt."
+  },
+  "tabPathPlaceholderFull": {
+    "message": "/lightning/o/Account oder vollständige URL"
+  },
+  "tabOptionsLegend": {
+    "message": "Registerkartenoptionen"
+  },
+  "tabIsObjectDesc": {
+    "message": "Führt zu einer Salesforce-Objektliste"
+  },
+  "tabIsCustomUrlDesc": {
+    "message": "Verwendet eine Salesforce-fremde URL"
+  },
+  "tabOpenNewTabDesc": {
+    "message": "Wird immer in einem neuen Browser-Tab geöffnet"
+  },
+  "saveTabButton": {
+    "message": "Registerkarte speichern"
+  },
+  "ariaThemeSelection": {
+    "message": "Designauswahl"
+  },
+  "compactModeDesc": {
+    "message": "Verringert die Höhe der Registerkarteneinträge"
+  },
+  "skipDeleteConfirmationDesc": {
+    "message": "Registerkarten ohne Rückfrage löschen"
+  },
+  "enableProfilesDesc": {
+    "message": "Getrennte Registerkartensätze für verschiedene Orgs"
+  },
+  "storageSectionTitle": {
+    "message": "Speicher"
+  },
+  "syncStorageCardDesc": {
+    "message": "Wird auf allen Ihren Geräten synchronisiert"
+  },
+  "localStorageCardDesc": {
+    "message": "Nur auf diesem Gerät"
+  },
+  "debugSectionTitle": {
+    "message": "Debug"
+  },
+  "previewFirstLaunchLabel": {
+    "message": "Assistenten für den ersten Start ansehen"
+  },
+  "previewFirstLaunchDesc": {
+    "message": "Öffnet den Willkommensbildschirm, ohne etwas zu speichern"
+  },
+  "previewButton": {
+    "message": "Vorschau"
+  },
+  "advancedSettingsLink": {
+    "message": "Erweiterte Einstellungen — Import, Export, kritische Aktionen"
+  },
+  "ariaAdvancedSettings": {
+    "message": "Erweiterte Einstellungen in einem neuen Browser-Tab öffnen"
+  },
+  "ariaReleaseNotesPanel": {
+    "message": "Versionshinweise"
+  },
+  "releaseNotesSubtitle": {
+    "message": "Neueste Änderungen an SF Tabs"
+  },
+  "ariaCloseReleaseNotes": {
+    "message": "Versionshinweise schließen"
+  },
+  "manageItemsTitle": {
+    "message": "Einträge verwalten"
+  },
+  "manageItemsSubtitle": {
+    "message": "Verwandte Links organisieren"
+  },
+  "ariaManageItems": {
+    "message": "Dropdown-Einträge verwalten"
+  },
+  "ariaCloseManageItems": {
+    "message": "Dropdown-Verwaltung schließen"
+  },
+  "addItemButton": {
+    "message": "+ Eintrag hinzufügen"
+  },
+  "loadItemsButton": {
+    "message": "Einträge von dieser Seite laden"
+  },
+  "manageItemsHint": {
+    "message": "Untereinträge übernehmen die Einstellung \"In neuem Tab öffnen\" dieser Registerkarte. Die Verschachtelung reicht zwei Ebenen tief: Unterelement und Unter-Unterelement."
+  },
+  "firstLaunchSubtitle": {
+    "message": "Wählen Sie einen Ausgangspunkt."
+  },
+  "firstLaunchPreviewNote": {
+    "message": "Vorschau — Ihre gespeicherten Registerkarten und Einstellungen bleiben unverändert."
+  },
+  "ariaStartingPoint": {
+    "message": "Ausgangspunkt"
+  },
+  "firstLaunchDefaultTabList": {
+    "message": "Flows, Installed Packages, Users, Profiles, Permission Sets"
+  },
+  "firstLaunchEmptyDesc": {
+    "message": "Fügen Sie Ihre eigenen Registerkarten nach Bedarf hinzu"
+  },
+  "firstLaunchImportDesc": {
+    "message": "Öffnet die Einstellungsseite, damit Sie eine Exportdatei laden können"
+  },
+  "firstLaunchProfilesDesc": {
+    "message": "Getrennte Registerkartensätze pro Org, manuell oder per URL gewechselt"
+  },
+  "tabOpenInNewTabLabel": {
+    "message": "In neuem Tab öffnen"
+  },
+  "deleteTabConfirmTitle": {
+    "message": "Registerkarte löschen?"
+  },
+  "deleteTabConfirmBody": {
+    "message": "Möchten Sie \"$NAME$\" wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "migratedTabsForwardOne": {
+    "message": "$COUNT$ vorhandene Registerkarte übernommen",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "migratedTabsForwardMany": {
+    "message": "$COUNT$ vorhandene Registerkarten übernommen",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      }
+    }
+  },
+  "releaseNotesDismissed": {
+    "message": "Versionshinweise ausgeblendet"
+  },
+  "errorCouldNotSave": {
+    "message": "Speichern nicht möglich: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "errorCouldNotSaveSetting": {
+    "message": "Einstellung konnte nicht gespeichert werden: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "nestingDepthLimit": {
+    "message": "Zu viele Ebenen — die Verschachtelung endet bei Element, Unterelement, Unter-Unterelement."
+  },
+  "tabNestedUnder": {
+    "message": "\"$SOURCE$\" wurde unter \"$TARGET$\" verschoben",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "Flows"
+      },
+      "target": {
+        "content": "$2",
+        "example": "Automation"
+      }
+    }
+  },
+  "noActiveTab": {
+    "message": "Kein aktiver Browser-Tab erkannt."
+  },
+  "openObjectManagerFirst": {
+    "message": "Öffnen Sie die Object Manager-Seite für $OBJECT$ im Setup und versuchen Sie es erneut.",
+    "placeholders": {
+      "object": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "errorReadingNavigation": {
+    "message": "Die Navigation der Seite konnte nicht gelesen werden."
+  },
+  "noNavigationItems": {
+    "message": "Auf dieser Seite wurden keine Navigationselemente gefunden."
+  },
+  "goToObjectInSetup": {
+    "message": "Wechseln Sie im Setup zu $OBJECT$, um dessen Liste zu laden.",
+    "placeholders": {
+      "object": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "errorLoadingNavigation": {
+    "message": "Navigation konnte nicht geladen werden: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Receiving end does not exist"
+      }
+    }
+  },
+  "itemLabelRequired": {
+    "message": "Eine Bezeichnung für den Eintrag ist erforderlich."
+  },
+  "itemSaved": {
+    "message": "\"$NAME$\" gespeichert",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields & Relationships"
+      }
+    }
+  },
+  "itemAdded": {
+    "message": "\"$NAME$\" hinzugefügt",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "withSubItemsOne": {
+    "message": " mit $COUNT$ Eintrag",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "withSubItemsMany": {
+    "message": " mit $COUNT$ Einträgen",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "itemPromotedToTab": {
+    "message": "\"$NAME$\" wurde$EXTRA$ in eine eigene Registerkarte verschoben",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      },
+      "extra": {
+        "content": "$2",
+        "example": " with 3 items"
+      }
+    }
+  },
+  "itemPromotedLevel": {
+    "message": "\"$NAME$\" wurde$EXTRA$ eine Ebene nach oben verschoben",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      },
+      "extra": {
+        "content": "$2",
+        "example": " with 3 items"
+      }
+    }
+  },
+  "itemDeleted": {
+    "message": "Eintrag gelöscht"
+  },
+  "tabSavedStatus": {
+    "message": "\"$NAME$\" gespeichert",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "tabAddedStatus": {
+    "message": "\"$NAME$\" hinzugefügt",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "tabDeletedStatus": {
+    "message": "Registerkarte gelöscht"
+  },
+  "errorCouldNotNavigate": {
+    "message": "Navigation nicht möglich: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "No active tab"
+      }
+    }
+  },
+  "emptyStateTitle": {
+    "message": "Noch keine Registerkarten"
+  },
+  "emptyStateDesc": {
+    "message": "Verwenden Sie „Schnell hinzufügen“, um die geöffnete Salesforce-Seite zu übernehmen, oder fügen Sie eine manuell hinzu."
+  },
+  "noItemsYet": {
+    "message": "Noch keine Einträge"
+  },
+  "srSubItems": {
+    "message": "Untereinträge"
+  },
+  "itemLabelPlaceholder": {
+    "message": "Bezeichnung"
+  },
+  "itemPathPlaceholder": {
+    "message": "Pfad oder URL"
+  },
+  "deleteButtonTitle": {
+    "message": "Löschen"
+  },
+  "subItemsTitle": {
+    "message": "Untereinträge"
+  },
+  "addSubItemTitle": {
+    "message": "Untereintrag hinzufügen"
+  },
+  "promoteToTabTitle": {
+    "message": "In eine eigene Registerkarte verschieben"
+  },
+  "promoteLevelTitle": {
+    "message": "Eine Ebene nach oben verschieben"
+  },
+  "ariaTabType": {
+    "message": "Registerkarte vom Typ $TYPE$",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Setup"
+      }
+    }
+  },
+  "ariaTabActions": {
+    "message": "Aktionen für die Registerkarte $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaMoveUpNamed": {
+    "message": "$NAME$ nach oben verschieben",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaMoveDownNamed": {
+    "message": "$NAME$ nach unten verschieben",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaManageSubItems": {
+    "message": "$COUNT$ Untereinträge in $NAME$ verwalten",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaAddSubItems": {
+    "message": "Untereinträge zu $NAME$ hinzufügen",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaEditNamed": {
+    "message": "$NAME$ bearbeiten",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaDeleteNamed": {
+    "message": "$NAME$ löschen",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaOpenInNewTabOn": {
+    "message": "In neuem Tab öffnen: ein — klicken, um auszuschalten"
+  },
+  "ariaOpenInNewTabOff": {
+    "message": "In neuem Tab öffnen: aus — klicken, um einzuschalten"
+  },
+  "ariaCollapseNamed": {
+    "message": "$NAME$ einklappen",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaExpandNamed": {
+    "message": "$NAME$ ausklappen",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaItemActions": {
+    "message": "Aktionen für $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaAddItemUnder": {
+    "message": "Eintrag unter $NAME$ hinzufügen",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaPromoteToTab": {
+    "message": "$NAME$ in eine eigene Registerkarte verschieben",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaPromoteLevel": {
+    "message": "$NAME$ eine Ebene nach oben verschieben",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaVersion": {
+    "message": "Version $VERSION$",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.1.1"
+      }
+    }
+  },
+  "closePreviewButton": {
+    "message": "Vorschau schließen"
+  },
+  "errorSetupDidNotFinish": {
+    "message": "Die Einrichtung wurde nicht abgeschlossen: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "previewOutcomeDefaultCount": {
+    "message": "ein Standardprofil mit $COUNT$ Registerkarten",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "previewOutcomeDefault": {
+    "message": "ein Standardprofil mit den Standard-Registerkarten"
+  },
+  "previewOutcomeEmpty": {
+    "message": "ein leeres Standardprofil"
+  },
+  "previewOutcomeImport": {
+    "message": "ein leeres Standardprofil, danach hätte sich die Einstellungsseite zum Importieren geöffnet"
+  },
+  "previewSummary": {
+    "message": "Nur Vorschau — erstellt worden wäre: $OUTCOME$. Profile $STATE$. Es wurde nichts gespeichert.",
+    "placeholders": {
+      "outcome": {
+        "content": "$1",
+        "example": "an empty Default profile"
+      },
+      "state": {
+        "content": "$2",
+        "example": "off"
+      }
+    }
+  },
+  "stateOn": {
+    "message": "aktiviert"
+  },
+  "stateOff": {
+    "message": "deaktiviert"
+  },
+  "ariaViewReleaseNotesUnread": {
+    "message": "Versionshinweise anzeigen — neues Update verfügbar"
+  },
+  "ariaSwitchProfileNamed": {
+    "message": "Profil: $NAME$ — Profil wechseln",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "editingTabSubtitle": {
+    "message": "\"$NAME$\" wird bearbeitet",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "addTabSubtitle": {
+    "message": "Erstellen Sie eine neue benutzerdefinierte Navigations-Registerkarte."
+  },
+  "itemsInTab": {
+    "message": "Einträge in \"$NAME$\"",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "itemCountInTabOne": {
+    "message": "$COUNT$ Eintrag in \"$NAME$\"",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "itemCountInTabMany": {
+    "message": "$COUNT$ Einträge in \"$NAME$\"",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "refreshItemsButton": {
+    "message": "Einträge von dieser Seite aktualisieren"
+  },
+  "loading": {
+    "message": "Wird geladen…"
   }
 }

@@ -633,7 +633,7 @@
     "description": "Title attribute on the Settings button in the popup header"
   },
   "emptyStateText": {
-    "message": "Aún no hay tabs personalizados. Agregue su primer prestaña a continuación.",
+    "message": "Aún no hay pestañas personalizadas. Agregue su primera pestaña a continuación.",
     "description": "Text shown in the popup when no tabs have been added yet"
   },
   "objectManagerDropdownLabel": {
@@ -697,7 +697,7 @@
     "description": "Title of the confirm reset modal dialog"
   },
   "confirmModalBody": {
-    "message": "¿Está seguro de que desea restablecer las pestañas a los valores predeterminados? Esto eliminará todos las pestañas personalizadas que haya agregado.",
+    "message": "¿Está seguro de que desea restablecer las pestañas a los valores predeterminados? Esto eliminará todas las pestañas personalizadas que haya agregado.",
     "description": "Body text of the confirm reset modal dialog"
   },
   "resetConfirmButton": {
@@ -1039,7 +1039,7 @@
     "description": "Label for the active profile selector dropdown in the profile list panel"
   },
   "switchProfileHelp": {
-    "message": "Cambie a un perfil diferente para ver y administrar sus tpestañas.",
+    "message": "Cambie a un perfil diferente para ver y administrar sus pestañas.",
     "description": "Help text below the active profile selector"
   },
   "createNewProfileButton": {
@@ -1147,7 +1147,7 @@
     "description": "Heading for the what's next section on migration success screen"
   },
   "migrationDefaultProfileNote": {
-    "message": "Todos sus pestañas están ahora en el perfil \"Predeterminado\"",
+    "message": "Todas sus pestañas están ahora en el perfil \"Predeterminado\"",
     "description": "First bullet point in the what's next section on migration success"
   },
   "migrationProfilesEnabledNote": {
@@ -2021,5 +2021,654 @@
   "translationsContributedBy": {
     "message": "Aportado por",
     "description": "Attribution prefix shown before a contributor name in the language list"
+  },
+  "skipToMainContent": {
+    "message": "Saltar al contenido principal"
+  },
+  "ariaTabList": {
+    "message": "Lista de pestañas"
+  },
+  "ariaCustomTabs": {
+    "message": "Pestañas personalizadas"
+  },
+  "ariaDetailsPanel": {
+    "message": "Panel de detalles"
+  },
+  "ariaExtensionControls": {
+    "message": "Controles de la extensión"
+  },
+  "ariaSwitchProfile": {
+    "message": "Cambiar de perfil"
+  },
+  "ariaSwitchProfileMenu": {
+    "message": "Cambiar de perfil"
+  },
+  "ariaQuickAdd": {
+    "message": "Agregar rápidamente una pestaña desde la página de Salesforce actual"
+  },
+  "quickAddTitle": {
+    "message": "Agregar rápidamente desde esta página"
+  },
+  "ariaAddManually": {
+    "message": "Agregar una pestaña manualmente"
+  },
+  "ariaViewReleaseNotes": {
+    "message": "Ver notas de la versión"
+  },
+  "editTabSubtitle": {
+    "message": "Actualice el nombre y el destino de esta pestaña."
+  },
+  "ariaCloseEditPanel": {
+    "message": "Cerrar el panel de edición"
+  },
+  "ariaRequired": {
+    "message": "obligatorio"
+  },
+  "tabPathHint": {
+    "message": "La ruta o URL de Salesforce a la que dirige esta pestaña."
+  },
+  "tabPathPlaceholderFull": {
+    "message": "/lightning/o/Account o URL completa"
+  },
+  "tabOptionsLegend": {
+    "message": "Opciones de la pestaña"
+  },
+  "tabIsObjectDesc": {
+    "message": "Dirige a una lista de objetos de Salesforce"
+  },
+  "tabIsCustomUrlDesc": {
+    "message": "Usa una URL ajena a Salesforce"
+  },
+  "tabOpenNewTabDesc": {
+    "message": "Se abre siempre en una pestaña nueva del navegador"
+  },
+  "saveTabButton": {
+    "message": "Guardar pestaña"
+  },
+  "ariaThemeSelection": {
+    "message": "Selección de tema"
+  },
+  "compactModeDesc": {
+    "message": "Reduce la altura de los elementos de la lista"
+  },
+  "skipDeleteConfirmationDesc": {
+    "message": "Eliminar pestañas sin preguntar"
+  },
+  "enableProfilesDesc": {
+    "message": "Conjuntos de pestañas separados para distintas organizaciones"
+  },
+  "storageSectionTitle": {
+    "message": "Almacenamiento"
+  },
+  "syncStorageCardDesc": {
+    "message": "Se sincroniza en todos sus dispositivos"
+  },
+  "localStorageCardDesc": {
+    "message": "Solo en este dispositivo"
+  },
+  "debugSectionTitle": {
+    "message": "Depuración"
+  },
+  "previewFirstLaunchLabel": {
+    "message": "Ver el asistente de primer inicio"
+  },
+  "previewFirstLaunchDesc": {
+    "message": "Abre la pantalla de bienvenida sin guardar nada"
+  },
+  "previewButton": {
+    "message": "Vista previa"
+  },
+  "advancedSettingsLink": {
+    "message": "Ajustes avanzados: importar, exportar, acciones críticas"
+  },
+  "ariaAdvancedSettings": {
+    "message": "Abrir los ajustes avanzados en una pestaña nueva"
+  },
+  "ariaReleaseNotesPanel": {
+    "message": "Notas de la versión"
+  },
+  "releaseNotesSubtitle": {
+    "message": "Novedades recientes de SF Tabs"
+  },
+  "ariaCloseReleaseNotes": {
+    "message": "Cerrar las notas de la versión"
+  },
+  "manageItemsTitle": {
+    "message": "Administrar elementos"
+  },
+  "manageItemsSubtitle": {
+    "message": "Organice enlaces relacionados"
+  },
+  "ariaManageItems": {
+    "message": "Administrar los elementos del menú desplegable"
+  },
+  "ariaCloseManageItems": {
+    "message": "Cerrar la administración del menú desplegable"
+  },
+  "addItemButton": {
+    "message": "+ Agregar elemento"
+  },
+  "loadItemsButton": {
+    "message": "Cargar elementos de esta página"
+  },
+  "manageItemsHint": {
+    "message": "Los subelementos heredan el ajuste \"Abrir en una pestaña nueva\" de esta pestaña. El anidamiento admite dos niveles: subelemento y sub-subelemento."
+  },
+  "firstLaunchSubtitle": {
+    "message": "Elija un punto de partida."
+  },
+  "firstLaunchPreviewNote": {
+    "message": "Vista previa: sus pestañas y ajustes guardados no se modificarán."
+  },
+  "ariaStartingPoint": {
+    "message": "Punto de partida"
+  },
+  "firstLaunchDefaultTabList": {
+    "message": "Flows, Installed Packages, Users, Profiles, Permission Sets"
+  },
+  "firstLaunchEmptyDesc": {
+    "message": "Agregue sus propias pestañas a medida que avance"
+  },
+  "firstLaunchImportDesc": {
+    "message": "Abre la página de ajustes para que pueda cargar un archivo de exportación"
+  },
+  "firstLaunchProfilesDesc": {
+    "message": "Conjuntos de pestañas separados por organización, con cambio manual o por URL"
+  },
+  "tabOpenInNewTabLabel": {
+    "message": "Abrir en una pestaña nueva"
+  },
+  "deleteTabConfirmTitle": {
+    "message": "¿Eliminar la pestaña?"
+  },
+  "deleteTabConfirmBody": {
+    "message": "¿Está seguro de que desea eliminar \"$NAME$\"? Esta acción no se puede deshacer.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "migratedTabsForwardOne": {
+    "message": "Se trasladó $COUNT$ pestaña existente",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "migratedTabsForwardMany": {
+    "message": "Se trasladaron $COUNT$ pestañas existentes",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      }
+    }
+  },
+  "releaseNotesDismissed": {
+    "message": "Notas de la versión descartadas"
+  },
+  "errorCouldNotSave": {
+    "message": "No se pudo guardar: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "errorCouldNotSaveSetting": {
+    "message": "No se pudo guardar el ajuste: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "nestingDepthLimit": {
+    "message": "Demasiados niveles: el anidamiento llega hasta elemento, subelemento y sub-subelemento."
+  },
+  "tabNestedUnder": {
+    "message": "\"$SOURCE$\" se movió dentro de \"$TARGET$\"",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "Flows"
+      },
+      "target": {
+        "content": "$2",
+        "example": "Automation"
+      }
+    }
+  },
+  "noActiveTab": {
+    "message": "No se detectó ninguna pestaña activa del navegador."
+  },
+  "openObjectManagerFirst": {
+    "message": "Abra la página del Object Manager de $OBJECT$ en Setup y vuelva a intentarlo.",
+    "placeholders": {
+      "object": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "errorReadingNavigation": {
+    "message": "No se pudo leer la navegación de la página."
+  },
+  "noNavigationItems": {
+    "message": "No se encontraron elementos de navegación en esta página."
+  },
+  "goToObjectInSetup": {
+    "message": "Vaya a $OBJECT$ en Setup para cargar su lista.",
+    "placeholders": {
+      "object": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "errorLoadingNavigation": {
+    "message": "No se pudo cargar la navegación: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Receiving end does not exist"
+      }
+    }
+  },
+  "itemLabelRequired": {
+    "message": "La etiqueta del elemento es obligatoria."
+  },
+  "itemSaved": {
+    "message": "\"$NAME$\" guardado",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields & Relationships"
+      }
+    }
+  },
+  "itemAdded": {
+    "message": "\"$NAME$\" agregado",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "withSubItemsOne": {
+    "message": " con $COUNT$ elemento",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "withSubItemsMany": {
+    "message": " con $COUNT$ elementos",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "itemPromotedToTab": {
+    "message": "\"$NAME$\" se movió a su propia pestaña$EXTRA$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      },
+      "extra": {
+        "content": "$2",
+        "example": " with 3 items"
+      }
+    }
+  },
+  "itemPromotedLevel": {
+    "message": "\"$NAME$\" subió un nivel$EXTRA$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      },
+      "extra": {
+        "content": "$2",
+        "example": " with 3 items"
+      }
+    }
+  },
+  "itemDeleted": {
+    "message": "Elemento eliminado"
+  },
+  "tabSavedStatus": {
+    "message": "\"$NAME$\" guardada",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "tabAddedStatus": {
+    "message": "\"$NAME$\" agregada",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "tabDeletedStatus": {
+    "message": "Pestaña eliminada"
+  },
+  "errorCouldNotNavigate": {
+    "message": "No se pudo navegar: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "No active tab"
+      }
+    }
+  },
+  "emptyStateTitle": {
+    "message": "Aún no hay pestañas"
+  },
+  "emptyStateDesc": {
+    "message": "Use «Agregar rápido» para capturar la página de Salesforce en la que está, o agregue una manualmente."
+  },
+  "noItemsYet": {
+    "message": "Aún no hay elementos"
+  },
+  "srSubItems": {
+    "message": "subelementos"
+  },
+  "itemLabelPlaceholder": {
+    "message": "Etiqueta"
+  },
+  "itemPathPlaceholder": {
+    "message": "Ruta o URL"
+  },
+  "deleteButtonTitle": {
+    "message": "Eliminar"
+  },
+  "subItemsTitle": {
+    "message": "Subelementos"
+  },
+  "addSubItemTitle": {
+    "message": "Agregar subelemento"
+  },
+  "promoteToTabTitle": {
+    "message": "Mover a su propia pestaña"
+  },
+  "promoteLevelTitle": {
+    "message": "Subir un nivel"
+  },
+  "ariaTabType": {
+    "message": "Pestaña de tipo $TYPE$",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Setup"
+      }
+    }
+  },
+  "ariaTabActions": {
+    "message": "Acciones para la pestaña $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaMoveUpNamed": {
+    "message": "Subir $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaMoveDownNamed": {
+    "message": "Bajar $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaManageSubItems": {
+    "message": "Administrar $COUNT$ subelementos en $NAME$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaAddSubItems": {
+    "message": "Agregar subelementos a $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaEditNamed": {
+    "message": "Editar $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaDeleteNamed": {
+    "message": "Eliminar $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaOpenInNewTabOn": {
+    "message": "Abrir en una pestaña nueva: activado, haga clic para desactivar"
+  },
+  "ariaOpenInNewTabOff": {
+    "message": "Abrir en una pestaña nueva: desactivado, haga clic para activar"
+  },
+  "ariaCollapseNamed": {
+    "message": "Contraer $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaExpandNamed": {
+    "message": "Expandir $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaItemActions": {
+    "message": "Acciones para $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaAddItemUnder": {
+    "message": "Agregar un elemento dentro de $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaPromoteToTab": {
+    "message": "Mover $NAME$ a su propia pestaña",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaPromoteLevel": {
+    "message": "Subir $NAME$ un nivel",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaVersion": {
+    "message": "Versión $VERSION$",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.1.1"
+      }
+    }
+  },
+  "closePreviewButton": {
+    "message": "Cerrar la vista previa"
+  },
+  "errorSetupDidNotFinish": {
+    "message": "La configuración no se completó: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "previewOutcomeDefaultCount": {
+    "message": "un perfil predeterminado con $COUNT$ pestañas",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "previewOutcomeDefault": {
+    "message": "un perfil predeterminado con las pestañas predeterminadas"
+  },
+  "previewOutcomeEmpty": {
+    "message": "un perfil predeterminado vacío"
+  },
+  "previewOutcomeImport": {
+    "message": "un perfil predeterminado vacío y se habría abierto la página de ajustes para importar"
+  },
+  "previewSummary": {
+    "message": "Solo vista previa: se habría creado $OUTCOME$, perfiles $STATE$. No se guardó nada.",
+    "placeholders": {
+      "outcome": {
+        "content": "$1",
+        "example": "an empty Default profile"
+      },
+      "state": {
+        "content": "$2",
+        "example": "off"
+      }
+    }
+  },
+  "stateOn": {
+    "message": "activados"
+  },
+  "stateOff": {
+    "message": "desactivados"
+  },
+  "ariaViewReleaseNotesUnread": {
+    "message": "Ver notas de la versión: hay una actualización nueva"
+  },
+  "ariaSwitchProfileNamed": {
+    "message": "Perfil: $NAME$. Cambiar de perfil",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "editingTabSubtitle": {
+    "message": "Editando \"$NAME$\"",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "addTabSubtitle": {
+    "message": "Cree una nueva pestaña de navegación personalizada."
+  },
+  "itemsInTab": {
+    "message": "Elementos en \"$NAME$\"",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "itemCountInTabOne": {
+    "message": "$COUNT$ elemento en \"$NAME$\"",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "itemCountInTabMany": {
+    "message": "$COUNT$ elementos en \"$NAME$\"",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "refreshItemsButton": {
+    "message": "Actualizar los elementos de esta página"
+  },
+  "loading": {
+    "message": "Cargando…"
   }
 }
