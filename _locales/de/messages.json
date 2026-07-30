@@ -2843,5 +2843,8 @@
         "example": "Production"
       }
     }
+  },
+  "autoSwitchNeedsOrgs": {
+    "message": "Noch ist keinem Profil eine Org zugeordnet, es gibt also nichts zu vergleichen. Fügen Sie im Feld \"Verknüpfte Orgs\" eines Profils eine hinzu."
   }
 }

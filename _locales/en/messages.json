@@ -3001,5 +3001,9 @@
         "example": "Production"
       }
     }
+  },
+  "autoSwitchNeedsOrgs": {
+    "message": "No profile has a linked org yet, so there is nothing to match. Add one from a profile's Linked orgs field.",
+    "description": "Shown under the auto-switch toggle when it is on but no profile has any linked orgs, so it cannot do anything"
   }
 }

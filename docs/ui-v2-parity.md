@@ -62,7 +62,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 | `skipDeleteConfirmation` | Done | |
 | `profilesEnabled` | Done | Toggle persists |
 | `useSyncStorage` | Done | Confirmed before switching, then `migrateBetweenStorageTypes` runs *before* the preference is persisted — the reverse order silently strands the tabs. Covered by `npm test`. Enabling sync over another device's data refuses and points at the settings page, which has the conflict resolver |
-| `autoSwitchProfiles` | **Delegated** | Settings page, Profiles section |
+| `autoSwitchProfiles` | Done | Toggle in the Profiles sheet, beside the linked orgs it acts on. Warns when it is on but no profile has a linked org |
 | `activeProfileId` / `defaultProfileId` | Done | Switching reloads that profile's tabs |
 | `floatingButton.*` (6 sub-keys) | **Delegated** | Settings page. Preserved on write by `patchSettings` |
 | Advanced settings link | Done | Opens `popup/settings.html` |

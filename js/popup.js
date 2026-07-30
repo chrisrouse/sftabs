@@ -977,6 +977,7 @@ async function persistProfileForm() {
 
   renderProfileChip();
   renderProfileDropdown();
+  syncAutoSwitchRow();
   return { saved, created: !editing };
 }
 
@@ -1069,7 +1070,20 @@ async function removeProfileTabs(profileId) {
 
 function openProfilesList() {
   renderProfilesList();
+  syncAutoSwitchRow();
   showView('profiles');
+}
+
+/**
+ * Auto-switch can only act on linked orgs, so when it is on and no profile has
+ * one, say so — otherwise it looks like a toggle that does nothing.
+ */
+function syncAutoSwitchRow() {
+  const toggle = document.getElementById('setting-auto-switch');
+  if (!toggle) return;
+  toggle.checked = !!state.settings.autoSwitchProfiles;
+  const anyLinked = state.profiles.some(p => (p.urlPatterns || []).length);
+  document.getElementById('auto-switch-hint').hidden = !(toggle.checked && !anyLinked);
 }
 
 function renderProfilesList() {
@@ -2221,6 +2235,10 @@ function bindEvents() {
   document.getElementById('btn-capture-org').addEventListener('click', captureCurrentOrg);
   document.getElementById('btn-close-profiles').addEventListener('click', () => showView('empty'));
   document.getElementById('btn-new-profile-from-list').addEventListener('click', () => openProfileForm(null));
+  document.getElementById('setting-auto-switch').addEventListener('change', async e => {
+    await patchSettings({ autoSwitchProfiles: e.target.checked });
+    syncAutoSwitchRow();
+  });
   document.getElementById('btn-manage-profiles-settings').addEventListener('click', openProfilesList);
 
   document.querySelectorAll('input[name="storage-type"]').forEach(radio => {

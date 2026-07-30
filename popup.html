@@ -197,6 +197,22 @@
           </div>
 
           <div class="edit-form">
+            <!-- Auto-switch lives here rather than in Settings: it acts on the
+                 linked orgs edited in this sheet. -->
+            <div class="settings-row profiles-autoswitch">
+              <label class="settings-row-label" for="setting-auto-switch">
+                <span class="settings-label">__MSG_autoSwitchProfiles__</span>
+                <span class="settings-desc">__MSG_autoSwitchProfilesDescription__</span>
+              </label>
+              <div class="settings-row-control">
+                <label class="toggle" aria-label="__MSG_autoSwitchProfiles__">
+                  <input type="checkbox" id="setting-auto-switch" role="switch" />
+                  <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+            <p class="form-hint" id="auto-switch-hint" hidden>__MSG_autoSwitchNeedsOrgs__</p>
+
             <ul class="dropdown-items-list" role="list" id="profiles-list">
               <!-- Populated by renderProfilesList() -->
             </ul>
