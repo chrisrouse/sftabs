@@ -1487,3 +1487,13 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   font-weight: var(--sft-font-weight-medium);
 }
 .profile-option-new + .profile-option-new { border-top: none; }
+
+/* Profile colour dot in the profiles list. The switcher's dot sits in a
+   text-only menu row; this one is a flex child of a .tab-item row. */
+.profile-dot {
+  width: 8px;
+  height: 8px;
+  margin-left: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

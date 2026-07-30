@@ -1087,9 +1087,10 @@ function renderProfilesList() {
       p.isDefault ? t('defaultBadge') : null,
       p.id === active ? t('activeBadge') : null
     ].filter(Boolean).join(' · ');
+    // .tab-item carries the row layout; .dropdown-item is only a modifier
     return `
-    <li class="dropdown-item" data-profile-id="${p.id}">
-      <span class="profile-option-dot" style="background:${profileColor(p.id)}" aria-hidden="true"></span>
+    <li class="tab-item dropdown-item" data-profile-id="${p.id}">
+      <span class="profile-dot" style="background:${profileColor(p.id)}" aria-hidden="true"></span>
       <div class="tab-info">
         <div class="tab-info-top"><span class="tab-name">${name}</span></div>
         <span class="tab-path">${meta}</span>
@@ -1099,12 +1100,20 @@ function renderProfilesList() {
           aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M60 400v60h60l295-295-60-60zm410-295c6-6 6-15 0-21l-38-38c-6-6-15-6-21 0l-30 30 60 60z"/></svg>
         </button>
+        ${state.profiles.length > 1 ? `
+        <button class="tab-btn tab-btn--delete" data-action="delete-profile" data-id="${p.id}"
+          aria-label="${t('ariaDeleteNamed', name)}" title="${t('deleteButtonTitle')}">
+          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M160 60V40a20 20 0 0 1 20-20h160a20 20 0 0 1 20 20v20h90a20 20 0 0 1 20 20v20a10 10 0 0 1-10 10H60a10 10 0 0 1-10-10V80a20 20 0 0 1 20-20zm-60 120h320l-18 280a30 30 0 0 1-30 28H148a30 30 0 0 1-30-28z"/></svg>
+        </button>` : ''}
       </div>
     </li>`;
   }).join('');
 
   list.querySelectorAll('[data-action="edit-profile"]').forEach(btn => {
     btn.addEventListener('click', () => openProfileForm(btn.dataset.id));
+  });
+  list.querySelectorAll('[data-action="delete-profile"]').forEach(btn => {
+    btn.addEventListener('click', () => deleteProfileFlow(btn.dataset.id));
   });
 }
 
