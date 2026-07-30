@@ -262,8 +262,11 @@
    * and inline styles beat any class rule without needing !important.
    *
    * Prefers aligning the menu's left edge to the button and flips to right-edge
-   * alignment when that would overflow, swapping the nubbin variant to match so
-   * the arrow still points at the button.
+   * alignment when that would overflow. The nubbin itself is Salesforce's, drawn
+   * by menu--nubbin-top at a fixed inset from whichever edge
+   * uiMenuList--left/--right aligns to — so aligning an edge to the button is
+   * what keeps the arrow over it, since the button is 32px wide and its centre
+   * sits about that same inset in.
    */
   function position(menu) {
     const button = document.getElementById(ITEM_ID + '-button');
@@ -284,9 +287,6 @@
     menu.style.top = `${Math.round(rect.bottom + 6)}px`;
     menu.style.left = `${Math.round(left)}px`;
     menu.style.right = 'auto';
-    // Nubbin sits over the button whichever way the menu was aligned
-    menu.style.setProperty('--sftabs-hm-nubbin',
-      `${Math.round(rect.left + rect.width / 2 - left)}px`);
   }
 
   /**

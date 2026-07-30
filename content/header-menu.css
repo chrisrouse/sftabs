@@ -35,23 +35,6 @@
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
 }
 
-/* Nubbin. Salesforce's menu--nubbin-top draws one, but its horizontal offset
-   assumes Aura placed the popup; position() measures the real button and passes
-   the offset through --sftabs-hm-nubbin. */
-#sftabs-header-menu::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: var(--sftabs-hm-nubbin, 1rem);
-  width: 11px;
-  height: 11px;
-  margin-left: -5px;
-  background: #fff;
-  border-left: 1px solid #e5e5e5;
-  border-top: 1px solid #e5e5e5;
-  transform: rotate(45deg);
-}
-
 /* Fallbacks, for pages where the Setup bundle's rules are absent */
 #sftabs-header-menu .menu-header {
   display: flex;
