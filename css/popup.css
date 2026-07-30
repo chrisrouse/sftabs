@@ -160,10 +160,16 @@ a:hover { text-decoration: underline; }
 }
 
 .brand-logo {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   /* Single-color mark, so this is an exact white */
   filter: brightness(0) invert(1);
+}
+
+.brand-name {
+  font-size: var(--sft-font-size-md);
+  font-weight: var(--sft-font-weight-semibold);
+  letter-spacing: -0.3px;
 }
 
 .header-actions {
