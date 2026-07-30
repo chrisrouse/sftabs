@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SF Tabs</title>
+  <title>__MSG_extensionName__</title>
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/popup.css" />
 </head>
 <body>
 
-  <a class="skip-link" href="#panel-tray">Skip to main content</a>
+  <a class="skip-link" href="#panel-tray">__MSG_skipToMainContent__</a>
 
   <div class="app-shell">
 
@@ -20,30 +20,30 @@
         <!-- Single-color mark, so a filter renders it white on the brand bar.
              alt is empty because the wordmark beside it carries the name. -->
         <img class="brand-logo" src="icons/sftabs-logo.svg" alt="" />
-        <span class="brand-name">SF Tabs</span>
+        <span class="brand-name">__MSG_extensionName__</span>
       </div>
 
       <div class="header-actions">
         <!-- Hidden unless profiles are on, and the label carries the active
              profile: applyProfilesVisibility() and renderProfileChip(). -->
         <button class="header-btn" id="btn-profile-switcher" hidden
-          aria-haspopup="listbox" aria-expanded="false" aria-label="Switch profile">
+          aria-haspopup="listbox" aria-expanded="false" aria-label="__MSG_ariaSwitchProfile__">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg>
         </button>
 
         <button class="header-btn" id="btn-quick-add"
-          aria-label="Quick add a tab from the current Salesforce page"
-          title="Quick add from this page">
+          aria-label="__MSG_ariaQuickAdd__"
+          title="__MSG_quickAddTitle__">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
         </button>
 
         <button class="header-btn" id="btn-add-tab"
-          aria-label="Add a tab manually" title="Add a tab manually">
+          aria-label="__MSG_ariaAddManually__" title="__MSG_ariaAddManually__">
           <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M43 9A24.2 24.2 0 0 0 9 9a24.2 24.2 0 0 0 0 34 23.9 23.9 0 0 0 33.9 0c9.4-9.4 9.4-24.6.1-34m-1 19c0 .6-.4 1-1 1H30a1 1 0 0 0-1 1v11c0 .5-.5 1-1 1h-4c-.6 0-1-.4-1-1V30c0-.6-.4-1-1-1H11c-.6 0-1-.4-1-1v-4c0-.5.5-1 1-1h11c.6 0 1-.4 1-1V11c0-.5.5-1 1-1h4c.5 0 1 .4 1 1v11c0 .6.4 1 1 1h11c.5 0 1 .5 1 1z"/></svg>
         </button>
 
         <!-- aria-label and the unread dot are set by initReleaseNotes() -->
-        <button class="header-btn" id="btn-release-notes" aria-label="View release notes">
+        <button class="header-btn" id="btn-release-notes" aria-label="__MSG_ariaViewReleaseNotes__">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M460 330h-5a35 35 0 0 1-35-35V180A160 160 0 0 0 252 20c-86 4-152 78-152 165v111c0 19-16 34-35 34h-5c-22 0-40 19-40 41v15c0 7 7 14 15 14h450c8 0 15-7 15-15v-15a40 40 0 0 0-40-40M309 440h-98a10 10 0 0 0-10 12c5 28 30 48 59 48s54-21 59-48a10 10 0 0 0-10-12"/></svg>
           <span class="notif-dot" id="notif-dot" aria-hidden="true" hidden></span>
         </button>
@@ -55,9 +55,9 @@
     <div class="app-body">
 
       <!-- ── Left Panel ── -->
-      <aside class="panel-left" aria-label="Tab list">
+      <aside class="panel-left" aria-label="__MSG_ariaTabList__">
 
-        <nav aria-label="Custom tabs">
+        <nav aria-label="__MSG_ariaCustomTabs__">
           <ul class="tab-list" id="tab-list" role="list">
             <!-- Populated by popup.js -->
           </ul>
@@ -66,16 +66,16 @@
       </aside>
 
       <!-- ── Tray (expands to the right on demand) ── -->
-      <div class="panel-tray" id="panel-tray" role="region" aria-label="Details panel">
+      <div class="panel-tray" id="panel-tray" role="region" aria-label="__MSG_ariaDetailsPanel__">
 
         <!-- View: Edit / Add tab -->
         <div class="panel-view" id="view-edit-tab" hidden>
           <div class="panel-view-header">
             <div class="panel-view-heading">
-              <h2 class="panel-view-title" id="edit-panel-title">Edit Tab</h2>
-              <p class="panel-view-subtitle" id="edit-panel-subtitle">Update this tab's name and destination.</p>
+              <h2 class="panel-view-title" id="edit-panel-title">__MSG_editTab__</h2>
+              <p class="panel-view-subtitle" id="edit-panel-subtitle">__MSG_editTabSubtitle__</p>
             </div>
-            <button class="btn-close" id="btn-close-edit" aria-label="Close edit panel">
+            <button class="btn-close" id="btn-close-edit" aria-label="__MSG_ariaCloseEditPanel__">
               <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14"/></svg>
             </button>
           </div>
@@ -84,7 +84,7 @@
 
             <div class="form-group">
               <label class="form-label" for="input-tab-name">
-                Tab Name <span class="req" aria-label="required">*</span>
+                __MSG_tabName__ <span class="req" aria-label="__MSG_ariaRequired__">*</span>
               </label>
               <div class="input-row">
                 <input type="text" class="form-input" id="input-tab-name"
@@ -92,87 +92,87 @@
                   aria-describedby="tab-name-count tab-name-error" />
                 <span class="char-count" id="tab-name-count" aria-live="polite" aria-atomic="true">0/30</span>
               </div>
-              <p class="form-error" id="tab-name-error" role="alert" hidden>Tab name is required.</p>
+              <p class="form-error" id="tab-name-error" role="alert" hidden>__MSG_tabNameRequired__</p>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="input-tab-path">Tab Path</label>
+              <label class="form-label" for="input-tab-path">__MSG_tabPath__</label>
               <input type="text" class="form-input" id="input-tab-path"
-                placeholder="/lightning/o/Account or full URL"
+                placeholder="__MSG_tabPathPlaceholderFull__"
                 autocomplete="off"
                 aria-describedby="tab-path-hint" />
-              <p class="form-hint" id="tab-path-hint">The Salesforce path or URL this tab navigates to.</p>
+              <p class="form-hint" id="tab-path-hint">__MSG_tabPathHint__</p>
             </div>
 
             <fieldset class="form-fieldset">
-              <legend class="form-legend">Tab Options</legend>
+              <legend class="form-legend">__MSG_tabOptionsLegend__</legend>
 
               <label class="check-row">
                 <input type="checkbox" class="check-input" id="input-is-object" />
                 <span class="check-body">
-                  <span class="check-label">Object tab</span>
-                  <span class="check-desc">Navigates to a Salesforce object list</span>
+                  <span class="check-label">__MSG_tabIsObjectLabel__</span>
+                  <span class="check-desc">__MSG_tabIsObjectDesc__</span>
                 </span>
               </label>
 
               <label class="check-row">
                 <input type="checkbox" class="check-input" id="input-is-custom-url" />
                 <span class="check-body">
-                  <span class="check-label">Custom URL</span>
-                  <span class="check-desc">Uses a non-standard Salesforce URL</span>
+                  <span class="check-label">__MSG_tabIsCustomUrlLabel__</span>
+                  <span class="check-desc">__MSG_tabIsCustomUrlDesc__</span>
                 </span>
               </label>
 
               <label class="check-row">
                 <input type="checkbox" class="check-input" id="input-open-new-tab" />
                 <span class="check-body">
-                  <span class="check-label">Open in new tab</span>
-                  <span class="check-desc">Always opens in a new browser tab</span>
+                  <span class="check-label">__MSG_tabOpenInNewTabLabel__</span>
+                  <span class="check-desc">__MSG_tabOpenNewTabDesc__</span>
                 </span>
               </label>
             </fieldset>
 
             <div class="form-actions">
-              <button type="button" class="btn-secondary" id="btn-cancel-edit">Cancel</button>
-              <button type="submit" class="btn-primary" id="btn-save-tab">Save Tab</button>
+              <button type="button" class="btn-secondary" id="btn-cancel-edit">__MSG_cancelButton__</button>
+              <button type="submit" class="btn-primary" id="btn-save-tab">__MSG_saveTabButton__</button>
             </div>
 
           </form>
         </div>
 
         <!-- View: Settings -->
-        <div class="panel-view" id="view-settings" hidden aria-label="Settings">
+        <div class="panel-view" id="view-settings" hidden aria-label="__MSG_settingsHeader__">
           <div class="panel-view-header">
             <div class="panel-view-heading">
-              <h2 class="panel-view-title">Settings</h2>
+              <h2 class="panel-view-title">__MSG_settingsHeader__</h2>
             </div>
           </div>
 
           <div class="settings-body">
 
             <section class="settings-section" aria-labelledby="s-appearance">
-              <h3 class="settings-section-title" id="s-appearance">Appearance</h3>
+              <h3 class="settings-section-title" id="s-appearance">__MSG_appearanceSection__</h3>
 
               <div class="settings-row">
                 <div class="settings-row-label">
-                  <span class="settings-label">Theme</span>
+                  <span class="settings-label">__MSG_themeMode__</span>
                 </div>
                 <div class="settings-row-control">
-                  <div class="seg-ctrl" role="group" aria-label="Theme selection">
-                    <button class="seg-btn active" data-theme-val="light" aria-pressed="true">Light</button>
-                    <button class="seg-btn" data-theme-val="dark" aria-pressed="false">Dark</button>
-                    <button class="seg-btn" data-theme-val="system" aria-pressed="false">System</button>
+                  <div class="seg-ctrl" role="group" aria-label="__MSG_ariaThemeSelection__">
+                    <button class="seg-btn active" data-theme-val="light" aria-pressed="true">__MSG_themeLight__</button>
+                    <button class="seg-btn" data-theme-val="dark" aria-pressed="false">__MSG_themeDark__</button>
+                    <button class="seg-btn" data-theme-val="system" aria-pressed="false">__MSG_themeSystem__</button>
                   </div>
                 </div>
               </div>
 
               <div class="settings-row">
                 <label class="settings-row-label" for="setting-compact">
-                  <span class="settings-label">Compact mode</span>
-                  <span class="settings-desc">Reduces tab item height</span>
+                  <span class="settings-label">__MSG_compactMode__</span>
+                  <span class="settings-desc">__MSG_compactModeDesc__</span>
                 </label>
                 <div class="settings-row-control">
-                  <label class="toggle" aria-label="Compact mode">
+                  <label class="toggle" aria-label="__MSG_compactMode__">
                     <input type="checkbox" id="setting-compact" role="switch" />
                     <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
                   </label>
@@ -181,15 +181,15 @@
             </section>
 
             <section class="settings-section" aria-labelledby="s-behavior">
-              <h3 class="settings-section-title" id="s-behavior">Behavior</h3>
+              <h3 class="settings-section-title" id="s-behavior">__MSG_behaviorSection__</h3>
 
               <div class="settings-row">
                 <label class="settings-row-label" for="setting-skip-delete">
-                  <span class="settings-label">Skip delete confirmation</span>
-                  <span class="settings-desc">Delete tabs without a prompt</span>
+                  <span class="settings-label">__MSG_skipDeleteConfirmation__</span>
+                  <span class="settings-desc">__MSG_skipDeleteConfirmationDesc__</span>
                 </label>
                 <div class="settings-row-control">
-                  <label class="toggle" aria-label="Skip delete confirmation">
+                  <label class="toggle" aria-label="__MSG_skipDeleteConfirmation__">
                     <input type="checkbox" id="setting-skip-delete" role="switch" />
                     <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
                   </label>
@@ -198,11 +198,11 @@
 
               <div class="settings-row">
                 <label class="settings-row-label" for="setting-profiles">
-                  <span class="settings-label">Enable profiles</span>
-                  <span class="settings-desc">Separate tab sets for different orgs</span>
+                  <span class="settings-label">__MSG_enableProfiles__</span>
+                  <span class="settings-desc">__MSG_enableProfilesDesc__</span>
                 </label>
                 <div class="settings-row-control">
-                  <label class="toggle" aria-label="Enable profiles">
+                  <label class="toggle" aria-label="__MSG_enableProfiles__">
                     <input type="checkbox" id="setting-profiles" role="switch" checked />
                     <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
                   </label>
@@ -211,7 +211,7 @@
             </section>
 
             <section class="settings-section" aria-labelledby="s-storage">
-              <h3 class="settings-section-title" id="s-storage">Storage</h3>
+              <h3 class="settings-section-title" id="s-storage">__MSG_storageSectionTitle__</h3>
               <div class="storage-cards" role="radiogroup" aria-labelledby="s-storage">
                 <label class="storage-card">
                   <input type="radio" name="storage-type" value="sync" checked />
@@ -220,8 +220,8 @@
                       <path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"/>
                     </svg>
                     <div>
-                      <span class="storage-card-title">Sync storage</span>
-                      <span class="storage-card-desc">Syncs across all your devices</span>
+                      <span class="storage-card-title">__MSG_firstLaunchSyncStorageTitle__</span>
+                      <span class="storage-card-desc">__MSG_syncStorageCardDesc__</span>
                     </div>
                   </div>
                 </label>
@@ -232,8 +232,8 @@
                       <path d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"/>
                     </svg>
                     <div>
-                      <span class="storage-card-title">Local storage</span>
-                      <span class="storage-card-desc">This device only</span>
+                      <span class="storage-card-title">__MSG_firstLaunchLocalStorageTitle__</span>
+                      <span class="storage-card-desc">__MSG_localStorageCardDesc__</span>
                     </div>
                   </div>
                 </label>
@@ -241,21 +241,21 @@
             </section>
 
             <section class="settings-section" aria-labelledby="s-debug">
-              <h3 class="settings-section-title" id="s-debug">Debug</h3>
+              <h3 class="settings-section-title" id="s-debug">__MSG_debugSectionTitle__</h3>
               <div class="settings-row">
                 <div class="settings-row-label">
-                  <span class="settings-label">Preview first-launch wizard</span>
-                  <span class="settings-desc">Opens the welcome screen without writing anything</span>
+                  <span class="settings-label">__MSG_previewFirstLaunchLabel__</span>
+                  <span class="settings-desc">__MSG_previewFirstLaunchDesc__</span>
                 </div>
                 <div class="settings-row-control">
-                  <button class="btn-secondary" id="btn-preview-first-launch">Preview</button>
+                  <button class="btn-secondary" id="btn-preview-first-launch">__MSG_previewButton__</button>
                 </div>
               </div>
             </section>
 
             <div class="settings-advanced">
-              <a href="#" class="advanced-link" id="btn-advanced-settings" aria-label="Open advanced settings in a new tab">
-                Advanced settings — import, export, danger zone
+              <a href="#" class="advanced-link" id="btn-advanced-settings" aria-label="__MSG_ariaAdvancedSettings__">
+                __MSG_advancedSettingsLink__
                 <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg>
               </a>
             </div>
@@ -264,17 +264,19 @@
         </div>
 
         <!-- View: Release Notes -->
-        <div class="panel-view" id="view-release-notes" hidden aria-label="Release notes">
+        <div class="panel-view" id="view-release-notes" hidden aria-label="__MSG_ariaReleaseNotesPanel__">
           <div class="panel-view-header">
             <div class="panel-view-heading">
-              <h2 class="panel-view-title">What's New</h2>
-              <p class="panel-view-subtitle">Recent updates to SF Tabs</p>
+              <h2 class="panel-view-title">__MSG_releaseNotesButtonTitle__</h2>
+              <p class="panel-view-subtitle">__MSG_releaseNotesSubtitle__</p>
             </div>
-            <button class="btn-close" id="btn-close-release-notes" aria-label="Close release notes">
+            <button class="btn-close" id="btn-close-release-notes" aria-label="__MSG_ariaCloseReleaseNotes__">
               <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14"/></svg>
             </button>
           </div>
 
+          <!-- Note bodies are deliberately not localized: /release syncs them
+               verbatim from CHANGELOG.md, same as the shipped popup. -->
           <div class="rn-body">
             <div class="rn-version">
               <div class="rn-version-label">v2.1.2</div>
@@ -308,35 +310,34 @@
             <label class="check-row">
               <input type="checkbox" class="check-input" id="dismiss-release-notes" />
               <span class="check-body">
-                <span class="check-label">Don't show again for this version</span>
+                <span class="check-label">__MSG_releaseNotesDontShowAgain__</span>
               </span>
             </label>
-            <button class="btn-primary" id="btn-got-it">Got it</button>
+            <button class="btn-primary" id="btn-got-it">__MSG_releaseNotesGotIt__</button>
           </div>
         </div>
 
         <!-- View: Manage Dropdowns -->
-        <div class="panel-view" id="view-dropdowns" hidden aria-label="Manage dropdown items">
+        <div class="panel-view" id="view-dropdowns" hidden aria-label="__MSG_ariaManageItems__">
           <div class="panel-view-header">
             <div class="panel-view-heading">
-              <h2 class="panel-view-title" id="dropdown-title">Manage Items</h2>
-              <p class="panel-view-subtitle" id="dropdown-subtitle">Organize related links</p>
+              <h2 class="panel-view-title" id="dropdown-title">__MSG_manageItemsTitle__</h2>
+              <p class="panel-view-subtitle" id="dropdown-subtitle">__MSG_manageItemsSubtitle__</p>
             </div>
-            <button class="btn-close" id="btn-close-dropdowns" aria-label="Close dropdown management">
+            <button class="btn-close" id="btn-close-dropdowns" aria-label="__MSG_ariaCloseManageItems__">
               <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14"/></svg>
             </button>
           </div>
 
           <div class="edit-form">
             <ul class="dropdown-items-list" role="list" id="dropdown-items-list"></ul>
-            <button class="btn-secondary" id="btn-add-dropdown-item" style="margin: 16px 12px 0;">+ Add item</button>
+            <button class="btn-secondary" id="btn-add-dropdown-item" style="margin: 16px 12px 0;">__MSG_addItemButton__</button>
             <button class="btn-secondary" id="btn-scrape-object" hidden style="margin: 8px 12px 0;">
               <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M497 273c-4-5-10-8-17-8h-71c-11 0-21 9-21 20a190 190 0 0 1-330 105l52-51c10-10 3-27-11-27H21c-9 0-16 7-16 16v78c0 14 17 21 27 11l45-44a248 248 0 0 0 425-110c1-7-1-14-5-19M43 240h71c11 0 21-9 21-20a190 190 0 0 1 330-105l-52 51c-10 10-3 27 11 27h78c9 0 16-7 16-16V99c0-14-17-21-27-11l-45 44A248 248 0 0 0 21 242c-1 7 1 14 5 19 4 5 10 8 17 8z"/></svg>
-              <span id="scrape-object-label">Load items from this page</span>
+              <span id="scrape-object-label">__MSG_loadItemsButton__</span>
             </button>
             <p class="form-hint" style="margin: 12px;">
-              Sub-items follow this tab's “Open in new tab” setting. Nesting goes
-              two levels deep: child and grandchild.
+              __MSG_manageItemsHint__
             </p>
           </div>
         </div>
@@ -351,8 +352,8 @@
       </div>
       <!-- Text and aria-label are set from the manifest at init -->
       <span class="footer-version" id="footer-version"></span>
-      <nav class="footer-nav" aria-label="Extension controls">
-        <button class="footer-btn" id="btn-footer-settings" aria-label="Settings" aria-pressed="false">
+      <nav class="footer-nav" aria-label="__MSG_ariaExtensionControls__">
+        <button class="footer-btn" id="btn-footer-settings" aria-label="__MSG_settingsHeader__" aria-pressed="false">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg>
         </button>
       </nav>
@@ -360,7 +361,7 @@
 
     <!-- ═══════════════ PROFILE DROPDOWN ═══════════════ -->
     <div class="profile-dropdown" id="profile-dropdown" role="listbox"
-      aria-label="Switch profile" aria-orientation="vertical" hidden>
+      aria-label="__MSG_ariaSwitchProfileMenu__" aria-orientation="vertical" hidden>
       <!-- Populated by popup.js -->
     </div>
 
@@ -369,14 +370,16 @@
       aria-modal="true" aria-labelledby="modal-delete-title" hidden>
       <div class="modal">
         <div class="modal-header">
-          <h3 class="modal-title" id="modal-delete-title">Delete Tab?</h3>
+          <h3 class="modal-title" id="modal-delete-title">__MSG_deleteTabConfirmTitle__</h3>
         </div>
         <div class="modal-body">
-          <p>Are you sure you want to delete <strong id="modal-delete-name">this tab</strong>? This action cannot be undone.</p>
+          <!-- Filled by promptDeleteTab(): one message, so the tab name can sit
+               anywhere the sentence needs it -->
+          <p id="modal-delete-body"></p>
         </div>
         <div class="modal-footer">
-          <button class="btn-secondary" id="modal-delete-cancel">Cancel</button>
-          <button class="btn-danger" id="modal-delete-confirm">Delete Tab</button>
+          <button class="btn-secondary" id="modal-delete-cancel">__MSG_cancelButton__</button>
+          <button class="btn-danger" id="modal-delete-confirm">__MSG_deleteTab__</button>
         </div>
       </div>
     </div>
@@ -388,21 +391,21 @@
       aria-modal="true" aria-labelledby="modal-fl-title" hidden>
       <div class="modal modal-wizard">
         <div class="modal-header">
-          <h3 class="modal-title" id="modal-fl-title">Welcome to SF Tabs</h3>
-          <p class="modal-subtitle">Pick a starting point.</p>
+          <h3 class="modal-title" id="modal-fl-title">__MSG_firstLaunchWelcomeTitle__</h3>
+          <p class="modal-subtitle">__MSG_firstLaunchSubtitle__</p>
         </div>
 
         <div class="modal-body modal-body-scroll">
           <p class="wizard-preview-note" id="fl-preview-note" hidden>
-            Preview — your saved tabs and settings won't be touched.
+            __MSG_firstLaunchPreviewNote__
           </p>
-          <div class="choice-cards" role="radiogroup" aria-label="Starting point">
+          <div class="choice-cards" role="radiogroup" aria-label="__MSG_ariaStartingPoint__">
             <label class="choice-card">
               <input type="radio" name="fl-setup" value="default" checked />
               <div class="choice-card-body">
                 <div>
-                  <span class="choice-card-title">Start with common tabs</span>
-                  <span class="choice-card-desc">Flows, Installed Packages, Users, Profiles, Permission Sets</span>
+                  <span class="choice-card-title">__MSG_firstLaunchSetupDefaultTitle__</span>
+                  <span class="choice-card-desc">__MSG_firstLaunchDefaultTabList__</span>
                 </div>
               </div>
             </label>
@@ -410,8 +413,8 @@
               <input type="radio" name="fl-setup" value="empty" />
               <div class="choice-card-body">
                 <div>
-                  <span class="choice-card-title">Start empty</span>
-                  <span class="choice-card-desc">Add your own tabs as you go</span>
+                  <span class="choice-card-title">__MSG_firstLaunchSetupEmptyTitle__</span>
+                  <span class="choice-card-desc">__MSG_firstLaunchEmptyDesc__</span>
                 </div>
               </div>
             </label>
@@ -419,8 +422,8 @@
               <input type="radio" name="fl-setup" value="import" />
               <div class="choice-card-body">
                 <div>
-                  <span class="choice-card-title">Import a backup</span>
-                  <span class="choice-card-desc">Opens the settings page so you can load an export file</span>
+                  <span class="choice-card-title">__MSG_firstLaunchSetupImportTitle__</span>
+                  <span class="choice-card-desc">__MSG_firstLaunchImportDesc__</span>
                 </div>
               </div>
             </label>
@@ -429,18 +432,18 @@
           <label class="check-row check-row-standalone">
             <input type="checkbox" class="check-input" id="fl-enable-profiles" />
             <span class="check-body">
-              <span class="check-label">Enable profiles</span>
-              <span class="check-desc">Keep separate tab sets per org, switched manually or by URL</span>
+              <span class="check-label">__MSG_enableProfiles__</span>
+              <span class="check-desc">__MSG_firstLaunchProfilesDesc__</span>
             </span>
           </label>
         </div>
 
         <div class="modal-footer">
           <a href="https://github.com/crouse12/sftabs" class="advanced-link" id="fl-guide" target="_blank" rel="noopener">
-            User guide
+            __MSG_firstLaunchGuideButton__
             <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg>
           </a>
-          <button class="btn-primary" id="fl-start">Get started</button>
+          <button class="btn-primary" id="fl-start">__MSG_firstLaunchGetStartedButton__</button>
         </div>
       </div>
     </div>
@@ -449,6 +452,7 @@
 
   <!-- Production storage layer, loaded in the same order as popup/popup.html.
        These are shared with the existing UI — do not fork them. -->
+  <script src="popup/js/shared/i18n-helper.js"></script>
   <script src="popup/js/shared/browser-compat.js"></script>
   <script src="popup/js/shared/constants.js"></script>
   <script src="popup/js/shared/utils.js"></script>

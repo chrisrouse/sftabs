@@ -19,6 +19,17 @@
  *      or seeds defaults into genuinely empty storage.
  */
 
+// ── i18n ───────────────────────────────────────────────────────
+
+/**
+ * Localized string. Static copy in popup.html is handled by i18n-helper.js;
+ * this is for anything this file builds at runtime, which that DOM pass never
+ * sees. Returns the key when it is missing, so a typo is visible not blank.
+ */
+function t(key, ...subs) {
+  return chrome.i18n.getMessage(key, subs.map(String)) || key;
+}
+
 // ── State ──────────────────────────────────────────────────────
 let state = {
   tabs:            [],
@@ -60,7 +71,7 @@ function renderVersion() {
   if (!el) return;
   const version = browser.runtime.getManifest().version;
   el.textContent = `v${version}`;
-  el.setAttribute('aria-label', `Version ${version}`);
+  el.setAttribute('aria-label', t('ariaVersion', version));
 }
 
 /**
@@ -176,7 +187,7 @@ async function migrateLegacyTabs(tabs, settings) {
     migrationPending: false
   });
 
-  showStatus(`Brought ${tabs.length} existing tab${tabs.length === 1 ? '' : 's'} forward`);
+  showStatus(t(tabs.length === 1 ? 'migratedTabsForwardOne' : 'migratedTabsForwardMany', String(tabs.length)));
 }
 
 async function seedDefaults(settings) {
@@ -244,7 +255,8 @@ function runFirstLaunchWizard({ preview }) {
     if (!overlay) return resolve();
 
     document.getElementById('fl-preview-note').hidden = !preview;
-    document.getElementById('fl-start').textContent = preview ? 'Close preview' : 'Get started';
+    document.getElementById('fl-start').textContent =
+      t(preview ? 'closePreviewButton' : 'firstLaunchGetStartedButton');
     overlay.hidden = false;
 
     document.getElementById('fl-start').addEventListener('click', async () => {
@@ -259,7 +271,7 @@ function runFirstLaunchWizard({ preview }) {
         } catch (err) {
           // Leaving storage empty is recoverable: ensureUsableState() seeds
           // defaults on the next line of init.
-          state.loadError = `Setup didn't finish: ${err.message}`;
+          state.loadError = t('errorSetupDidNotFinish', err.message);
         }
       }
       overlay.hidden = true;
@@ -272,11 +284,11 @@ function runFirstLaunchWizard({ preview }) {
 function describeFirstLaunchChoice(setup, enableProfiles) {
   const count = window.SFTabs?.constants?.DEFAULT_TABS?.length;
   const outcome = {
-    default: `a Default profile with ${count ? `${count} tabs` : 'the default tabs'}`,
-    empty:   'an empty Default profile',
-    import:  'an empty Default profile, then opened the settings page to import'
+    default: count ? t('previewOutcomeDefaultCount', String(count)) : t('previewOutcomeDefault'),
+    empty:   t('previewOutcomeEmpty'),
+    import:  t('previewOutcomeImport')
   }[setup];
-  return `Preview only — would have created ${outcome}, profiles ${enableProfiles ? 'on' : 'off'}. Nothing was saved.`;
+  return t('previewSummary', outcome, t(enableProfiles ? 'stateOn' : 'stateOff'));
 }
 
 /**
@@ -342,7 +354,7 @@ function setReleaseNotesUnread(unread) {
   if (dot) dot.hidden = !unread;
   if (btn) {
     btn.setAttribute('aria-label',
-      unread ? 'View release notes — new update available' : 'View release notes');
+      t(unread ? 'ariaViewReleaseNotesUnread' : 'ariaViewReleaseNotes'));
   }
 }
 
@@ -354,9 +366,9 @@ async function closeReleaseNotes() {
     try {
       await browser.storage.local.set({ seenReleaseNotesVersion: version });
       setReleaseNotesUnread(false);
-      showStatus('Release notes dismissed');
+      showStatus(t('releaseNotesDismissed'));
     } catch (err) {
-      showStatus(`Could not save that: ${err.message}`, 'error');
+      showStatus(t('errorCouldNotSave', err.message), 'error');
     }
   }
   showView('empty');
@@ -370,7 +382,7 @@ async function persistTabs() {
   try {
     await SFTabs.storage.saveTabs(state.tabs);
   } catch (err) {
-    showStatus(`Could not save: ${err.message}`, 'error');
+    showStatus(t('errorCouldNotSave', err.message), 'error');
   }
 }
 
@@ -386,7 +398,7 @@ async function patchSettings(partial) {
     await SFTabs.storage.saveUserSettings(merged, false, false);
     state.settings = merged;
   } catch (err) {
-    showStatus(`Could not save setting: ${err.message}`, 'error');
+    showStatus(t('errorCouldNotSaveSetting', err.message), 'error');
   }
 }
 
@@ -648,7 +660,7 @@ function nestTabIntoTab(sourceId, targetId) {
   if (!src || !tgt) return;
 
   if (!canNestTab(sourceId, targetId)) {
-    showStatus('Too many levels — nesting stops at parent, child, grandchild.', 'error');
+    showStatus(t('nestingDepthLimit'), 'error');
     return;
   }
 
@@ -669,7 +681,7 @@ function nestTabIntoTab(sourceId, targetId) {
   state.tabs = state.tabs.filter(t => t.id !== sourceId);
   state.tabs.sort((a, b) => a.position - b.position).forEach((t, i) => { t.position = i; });
 
-  showStatus(`"${src.label}" moved under "${tgt.label}"`);
+  showStatus(t('tabNestedUnder', src.label, tgt.label));
   renderTabList();
   bindTabListEvents();
   if (state.activeView === 'dropdowns' && state.editingTabId === targetId) {
@@ -719,7 +731,7 @@ function moveDropdownItem(fromPath, toPath, zone) {
   if (isDescendantPath(toPath, fromPath)) return;
 
   if (zone === 'nest' && !canNestItem(fromPath, toPath)) {
-    showStatus('Too many levels — nesting stops at parent, child, grandchild.', 'error');
+    showStatus(t('nestingDepthLimit'), 'error');
     return;
   }
 
@@ -774,8 +786,8 @@ function renderTabList() {
  */
 function emptyStateHTML() {
   return `<div class="empty-state">
-    <h3 class="empty-state-title">No tabs yet</h3>
-    <p class="empty-state-desc">Use Quick Add to capture the Salesforce page you're on, or add one manually.</p>
+    <h3 class="empty-state-title">${t('emptyStateTitle')}</h3>
+    <p class="empty-state-desc">${t('emptyStateDesc')}</p>
   </div>`;
 }
 
@@ -786,12 +798,12 @@ function tabItemHTML(tab) {
   const path   = tab.path ? esc(tab.path) : '';
   const newTabOn = tab.openInNewTab ? 'is-on' : '';
   const newTabAriaLabel = tab.openInNewTab
-    ? `Open in new tab: on — click to toggle off`
-    : `Open in new tab: off — click to toggle on`;
+    ? t('ariaOpenInNewTabOn')
+    : t('ariaOpenInNewTabOff');
 
   return `
   <li class="tab-item" role="listitem" data-id="${tab.id}" data-type="${type}" tabindex="-1">
-    <div class="drag-handle" aria-hidden="true" title="Drag to reorder">
+    <div class="drag-handle" aria-hidden="true" title="${t('dragToReorderTitle')}">
       <div class="drag-dots">
         <span></span><span></span>
         <span></span><span></span>
@@ -800,39 +812,39 @@ function tabItemHTML(tab) {
     </div>
     <div class="tab-info">
       <div class="tab-info-top">
-        <span class="tab-badge tab-badge--${type}" aria-label="${badge} tab">${badge}</span>
+        <span class="tab-badge tab-badge--${type}" aria-label="${t('ariaTabType', badge)}">${badge}</span>
         <span class="tab-name">${name}</span>
-        ${hasDropdown(tab) ? `<span class="tab-count">${countItems(tab.dropdownItems)}<span class="sr-only"> sub-items</span></span>` : ''}
+        ${hasDropdown(tab) ? `<span class="tab-count">${countItems(tab.dropdownItems)}<span class="sr-only"> ${t('srSubItems')}</span></span>` : ''}
       </div>
       ${path ? `<span class="tab-path">${path}</span>` : ''}
       ${hasDropdown(tab) ? `<button class="tab-dropdown-note" data-action="manage-items" data-id="${tab.id}"
         >▾ ${countItems(tab.dropdownItems)} sub-item${countItems(tab.dropdownItems) === 1 ? '' : 's'}</button>` : ''}
     </div>
-    <div class="tab-actions" role="group" aria-label="Actions for ${name} tab">
+    <div class="tab-actions" role="group" aria-label="${t('ariaTabActions', name)}">
       <button class="tab-btn tab-btn--move tab-btn--up"
-        aria-label="Move ${name} up" title="Move up" data-action="move-up" data-id="${tab.id}">
+        aria-label="${t('ariaMoveUpNamed', name)}" title="${t('moveTabUp')}" data-action="move-up" data-id="${tab.id}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M414 210c8-8 8-19 0-27L264 36a20 20 0 0 0-28 0L86 183c-8 8-8 19 0 27l28 27c8 8 20 8 28 0l47-46c8-8 22-2 22 9v270c0 10 9 20 20 20h40c11 0 20-11 20-20V200c0-12 14-17 22-9l47 46c8 8 20 8 28 0z"/></svg>
       </button>
       <button class="tab-btn tab-btn--move tab-btn--down"
-        aria-label="Move ${name} down" title="Move down" data-action="move-down" data-id="${tab.id}">
+        aria-label="${t('ariaMoveDownNamed', name)}" title="${t('moveTabDown')}" data-action="move-down" data-id="${tab.id}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M96 310c-8 8-8 19 0 27l150 147c8 8 20 8 28 0l151-147c8-8 8-19 0-27l-28-27a20 20 0 0 0-28 0l-47 46c-8 8-22 3-22-9V50c0-10-9-20-20-20h-40c-11 0-20 11-20 20v270c0 12-14 17-22 9l-47-46a20 20 0 0 0-28 0z"/></svg>
       </button>
       <button class="tab-btn tab-btn--group ${hasDropdown(tab) ? 'is-on' : ''}"
-        aria-label="${hasDropdown(tab) ? `Manage ${countItems(tab.dropdownItems)} sub-items in ` : 'Add sub-items to '}${name}"
-        title="Sub-items" data-action="manage-items" data-id="${tab.id}">
+        aria-label="${hasDropdown(tab) ? t('ariaManageSubItems', String(countItems(tab.dropdownItems)), name) : t('ariaAddSubItems', name)}"
+        title="${t('subItemsTitle')}" data-action="manage-items" data-id="${tab.id}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M231 230H108c-7 0-14 6-14 13v105H53c-7 0-14 7-14 14v100c0 7 7 14 14 14h137c7 0 14-7 14-14V362c0-7-7-14-14-14h-41v-64h219v64h-41c-7 0-14 7-14 14v100c0 7 7 14 14 14h137c7 0 13-7 13-14V362c0-7-6-14-13-14h-42V243c0-7-7-13-14-13H286v-64h41c7 0 13-7 13-14V52c0-7-6-14-13-14H190c-7 0-14 7-14 14v100c0 7 7 14 14 14h42v64z"/></svg>
       </button>
       <button class="tab-btn tab-btn--edit"
-        aria-label="Edit ${name}" title="Edit" data-action="edit" data-id="${tab.id}">
+        aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}" data-action="edit" data-id="${tab.id}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
       </button>
       <button class="tab-btn tab-btn--newtab ${newTabOn}"
         aria-label="${newTabAriaLabel}" aria-pressed="${!!tab.openInNewTab}"
-        title="Open in new tab" data-action="toggle-newtab" data-id="${tab.id}">
+        title="${t('tabOpenInNewTabLabel')}" data-action="toggle-newtab" data-id="${tab.id}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg>
       </button>
       <button class="tab-btn tab-btn--delete"
-        aria-label="Delete ${name}" title="Delete" data-action="delete" data-id="${tab.id}">
+        aria-label="${t('ariaDeleteNamed', name)}" title="${t('deleteButtonTitle')}" data-action="delete" data-id="${tab.id}">
         <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
       </button>
     </div>
@@ -844,7 +856,7 @@ function renderProfileChip() {
   if (!active) return;
   // Icon-only trigger, so the active profile lives in the label and tooltip
   const btn = document.getElementById('btn-profile-switcher');
-  btn.setAttribute('aria-label', `Profile: ${active.name} — switch profile`);
+  btn.setAttribute('aria-label', t('ariaSwitchProfileNamed', active.name));
   btn.title = active.name;
 }
 
@@ -853,7 +865,7 @@ function renderProfileDropdown() {
   const active   = state.settings.activeProfileId;
 
   dropdown.innerHTML = `
-    <div class="profile-dropdown-header">Profiles</div>
+    <div class="profile-dropdown-header">${t('profilesSection')}</div>
     ${state.profiles.map(p => `
       <button class="profile-option" role="option"
         aria-selected="${p.id === active}"
@@ -916,7 +928,7 @@ function openEditTab(tabId) {
   if (tabEl) tabEl.classList.add('is-editing');
 
   document.getElementById('edit-panel-title').textContent    = 'Edit Tab';
-  document.getElementById('edit-panel-subtitle').textContent = `Editing "${tab.label}"`;
+  document.getElementById('edit-panel-subtitle').textContent = t('editingTabSubtitle', tab.label);
   document.getElementById('input-tab-name').value    = tab.label;
   document.getElementById('input-tab-path').value    = tab.path || '';
   document.getElementById('input-is-object').checked    = !!tab.isObject;
@@ -932,7 +944,7 @@ function openAddTab() {
   state.editingTabId = null;
 
   document.getElementById('edit-panel-title').textContent    = 'Add Tab';
-  document.getElementById('edit-panel-subtitle').textContent = 'Create a new custom navigation tab.';
+  document.getElementById('edit-panel-subtitle').textContent = t('addTabSubtitle');
   document.getElementById('input-tab-name').value    = '';
   document.getElementById('input-tab-path').value    = '';
   document.getElementById('input-is-object').checked    = false;
@@ -958,8 +970,8 @@ function openDropdownManagement(tabId) {
 
   state.editingItemPath = null;
   state.addingItemUnder = null;
-  document.getElementById('dropdown-title').textContent = 'Manage Items';
-  document.getElementById('dropdown-subtitle').textContent = `Items in "${tab.label}"`;
+  document.getElementById('dropdown-title').textContent = t('manageItemsTitle');
+  document.getElementById('dropdown-subtitle').textContent = t('itemsInTab', tab.label);
 
   renderDropdownItems(tabId);
   showView('dropdowns');
@@ -973,16 +985,17 @@ function renderDropdownItems(tabId) {
   const items = tab.dropdownItems || [];
   list.innerHTML = '';
 
+  const itemCount = countItems(items);
   document.getElementById('dropdown-subtitle').textContent =
-    `${countItems(items)} item${countItems(items) === 1 ? '' : 's'} in "${tab.label}"`;
+    t(itemCount === 1 ? 'itemCountInTabOne' : 'itemCountInTabMany', String(itemCount), tab.label);
 
   const scrapeBtn = document.getElementById('btn-scrape-object');
   scrapeBtn.hidden = !isObjectManagerTab(tab);
   document.getElementById('scrape-object-label').textContent =
-    items.length ? 'Refresh items from this page' : 'Load items from this page';
+    t(items.length ? 'refreshItemsButton' : 'loadItemsButton');
 
   if (!items.length && !state.addingItemUnder) {
-    list.innerHTML = `<li class="dropdown-empty">No items yet</li>`;
+    list.innerHTML = `<li class="dropdown-empty">${t('noItemsYet')}</li>`;
   }
 
   walkVisibleItems(items).forEach(({ item, path, level }) => {
@@ -1020,38 +1033,38 @@ function itemRow(item, path, level) {
   const label     = esc(item.label);
 
   li.innerHTML = `
-    <div class="drag-handle" aria-hidden="true" title="Drag to reorder">
+    <div class="drag-handle" aria-hidden="true" title="${t('dragToReorderTitle')}">
       <div class="drag-dots"><span></span><span></span><span></span><span></span><span></span><span></span></div>
     </div>
     ${children.length
       ? `<button class="dropdown-twisty" data-action="toggle-item" data-path="${pathKey(path)}"
-           aria-expanded="${expanded}" aria-label="${expanded ? 'Collapse' : 'Expand'} ${label}">
+           aria-expanded="${expanded}" aria-label="${expanded ? t('ariaCollapseNamed', label) : t('ariaExpandNamed', label)}">
            <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M476 178 271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21"/></svg>
          </button>`
       : `<span class="dropdown-twisty-spacer" aria-hidden="true"></span>`}
     <div class="tab-info">
       <div class="tab-info-top">
         <span class="tab-name"><span class="dropdown-item-num">${numbering}.</span> ${label}</span>
-        ${children.length ? `<span class="tab-count is-static">${children.length}<span class="sr-only"> sub-items</span></span>` : ''}
+        ${children.length ? `<span class="tab-count is-static">${children.length}<span class="sr-only"> ${t('srSubItems')}</span></span>` : ''}
       </div>
       ${item.path ? `<span class="tab-path">${esc(item.path)}</span>` : ''}
     </div>
-    <div class="tab-actions" role="group" aria-label="Actions for ${label}">
+    <div class="tab-actions" role="group" aria-label="${t('ariaItemActions', label)}">
       ${canNest ? `<button class="tab-btn tab-btn--group" data-action="add-child" data-path="${pathKey(path)}"
-        aria-label="Add an item under ${label}" title="Add sub-item">
+        aria-label="${t('ariaAddItemUnder', label)}" title="${t('addSubItemTitle')}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
       </button>` : ''}
       <button class="tab-btn tab-btn--edit" data-action="edit-item" data-path="${pathKey(path)}"
-        aria-label="Edit ${label}" title="Edit">
+        aria-label="${t('ariaEditNamed', label)}" title="${t('editButton')}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
       </button>
       <button class="tab-btn tab-btn--promote" data-action="promote-item" data-path="${pathKey(path)}"
-        aria-label="${path.length === 1 ? `Move ${label} out to its own tab` : `Move ${label} up one level`}"
-        title="${path.length === 1 ? 'Move out to its own tab' : 'Move up one level'}">
+        aria-label="${path.length === 1 ? t('ariaPromoteToTab', label) : t('ariaPromoteLevel', label)}"
+        title="${path.length === 1 ? t('promoteToTabTitle') : t('promoteLevelTitle')}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M35 440c-7 0-15 7-15 15v30c0 8 8 15 15 15h239c8 0 16-8 16-15V153c0-9 10-13 17-7l56 56c6 6 15 6 21 0l21-21c6-6 6-15 0-21L270 24c-6-6-15-6-21 0L114 159c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l56-56c6-6 18-2 18 7v273c0 16-16 15-16 15z"/></svg>
       </button>
       <button class="tab-btn tab-btn--delete" data-action="delete-item" data-path="${pathKey(path)}"
-        aria-label="Delete ${label}" title="Delete">
+        aria-label="${t('ariaDeleteNamed', label)}" title="${t('deleteButtonTitle')}">
         <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
       </button>
     </div>`;
@@ -1083,33 +1096,33 @@ async function scrapeObjectNavigation() {
   const label = document.getElementById('scrape-object-label');
   const original = label.textContent;
   btn.disabled = true;
-  label.textContent = 'Loading…';
+  label.textContent = t('loading');
 
   try {
     const [active] = await browser.tabs.query({ active: true, currentWindow: true });
     if (!active) {
-      showStatus('No active browser tab detected.', 'error');
+      showStatus(t('noActiveTab'), 'error');
       return;
     }
 
     // The shim resolves to null instead of rejecting when no receiver exists
     const res = await browser.tabs.sendMessage(active.id, { action: 'parse_navigation' });
     if (!res) {
-      showStatus(`Open the ${wantedObject} Object Manager page in Setup, then try again.`, 'error');
+      showStatus(t('openObjectManagerFirst', wantedObject), 'error');
       return;
     }
     if (res.success === false) {
-      showStatus(res.error || 'Could not read the page navigation.', 'error');
+      showStatus(res.error || t('errorReadingNavigation'), 'error');
       return;
     }
 
     const items = res.items || res.navigation || [];
     if (!items.length) {
-      showStatus('No navigation items found on this page.', 'error');
+      showStatus(t('noNavigationItems'), 'error');
       return;
     }
     if (res.pageInfo && res.pageInfo.type !== 'objectManager') {
-      showStatus(`Go to ${wantedObject} in Setup to load its list.`, 'error');
+      showStatus(t('goToObjectInSetup', wantedObject), 'error');
       return;
     }
     // Guard against pulling Contact's nav into the Account tab
@@ -1140,7 +1153,7 @@ async function scrapeObjectNavigation() {
     bindTabListEvents();
     persistTabs();
   } catch (err) {
-    showStatus(`Could not load navigation: ${err.message}`, 'error');
+    showStatus(t('errorLoadingNavigation', err.message), 'error');
   } finally {
     btn.disabled = false;
     label.textContent = original;
@@ -1157,7 +1170,7 @@ function commitDropdownItem(path) {
   const label = document.getElementById('item-label').value.trim();
   const itemPath = document.getElementById('item-path').value.trim();
   if (!label) {
-    showStatus('Item label is required.', 'error');
+    showStatus(t('itemLabelRequired'), 'error');
     document.getElementById('item-label').focus();
     return;
   }
@@ -1165,7 +1178,7 @@ function commitDropdownItem(path) {
   if (path) {
     const item = getItemByPath(tab.dropdownItems, path);
     if (item) { item.label = label; item.path = itemPath; }
-    showStatus(`"${label}" saved`);
+    showStatus(t('itemSaved', label));
   } else {
     const parentPath = state.addingItemUnder || [];
     const newItem = { label, path: itemPath, isObject: false, isCustomUrl: false };
@@ -1178,7 +1191,7 @@ function commitDropdownItem(path) {
       parent.dropdownItems = parent.dropdownItems || [];
       parent.dropdownItems.push(newItem);
     }
-    showStatus(`"${label}" added`);
+    showStatus(t('itemAdded', label));
   }
 
   state.editingItemPath = null;
@@ -1228,7 +1241,9 @@ function promoteDropdownItem(path) {
 
   const moving = JSON.parse(JSON.stringify(item));
   const childCount = countItems(moving.dropdownItems);
-  const withKids = childCount ? ` with ${childCount} item${childCount === 1 ? '' : 's'}` : '';
+  const withKids = childCount
+    ? t(childCount === 1 ? 'withSubItemsOne' : 'withSubItemsMany', String(childCount))
+    : '';
 
   removeItemByPath(tab.dropdownItems, path);
 
@@ -1246,14 +1261,14 @@ function promoteDropdownItem(path) {
       dropdownItems: moving.dropdownItems || [],
       position: state.tabs.length
     });
-    showStatus(`"${moving.label}" moved out to its own tab${withKids}`);
+    showStatus(t('itemPromotedToTab', moving.label, withKids));
   } else {
     // Insert directly after the former parent, in the parent's own list
     const parentPath = path.slice(0, -1);
     const list = getParentList(tab.dropdownItems, parentPath);
     if (!list) return;
     list.splice(parentPath[parentPath.length - 1] + 1, 0, moving);
-    showStatus(`"${moving.label}" moved up a level${withKids}`);
+    showStatus(t('itemPromotedLevel', moving.label, withKids));
   }
 
   state.expandedPaths.clear(); // paths shifted underneath us
@@ -1278,7 +1293,7 @@ function deleteDropdownItem(path) {
 
   removeItemByPath(tab.dropdownItems, path);
   state.expandedPaths.clear();
-  showStatus('Item deleted');
+  showStatus(t('itemDeleted'));
 
   renderDropdownItems(state.editingTabId);
   renderTabList();
@@ -1293,14 +1308,14 @@ function itemEditRow(item, path, level) {
   li.style.marginLeft = `${level * 20}px`;
   li.innerHTML = `
     <div class="dropdown-item-fields">
-      <input type="text" class="form-input" id="item-label" placeholder="Label"
+      <input type="text" class="form-input" id="item-label" placeholder="${t('itemLabelPlaceholder')}"
              value="${esc(item.label || '')}" maxlength="30" autocomplete="off" />
-      <input type="text" class="form-input" id="item-path" placeholder="Path or URL"
+      <input type="text" class="form-input" id="item-path" placeholder="${t('itemPathPlaceholder')}"
              value="${esc(item.path || '')}" autocomplete="off" />
       <div class="dropdown-item-fields-actions">
-        <button class="btn-secondary" data-action="cancel-item">Cancel</button>
+        <button class="btn-secondary" data-action="cancel-item">${t('cancelButton')}</button>
         <button class="btn-primary" data-action="commit-item"
-                data-path="${path ? pathKey(path) : ''}">${path ? 'Save' : 'Add'}</button>
+                data-path="${path ? pathKey(path) : ''}">${t(path ? 'saveTab' : 'addButton')}</button>
       </div>
     </div>`;
   return li;
@@ -1333,7 +1348,7 @@ function saveTab(e) {
     state.tabs = state.tabs.map(t =>
       t.id === state.editingTabId ? { ...t, ...updates } : t
     );
-    showStatus(`"${name}" saved`);
+    showStatus(t('tabSavedStatus', name));
   } else {
     // Create new
     const newTab = {
@@ -1344,7 +1359,7 @@ function saveTab(e) {
       ...updates,
     };
     state.tabs = [...state.tabs, newTab];
-    showStatus(`"${name}" added`);
+    showStatus(t('tabAddedStatus', name));
   }
 
   renderTabList();
@@ -1364,7 +1379,8 @@ function promptDeleteTab(tabId) {
     return;
   }
   // Show modal
-  document.getElementById('modal-delete-name').textContent = tab.label;
+  document.getElementById('modal-delete-body').textContent =
+    t('deleteTabConfirmBody', tab.label);
   state.pendingDeleteId = tabId;
   document.getElementById('modal-delete').hidden = false;
   document.getElementById('modal-delete-cancel').focus();
@@ -1378,7 +1394,7 @@ function confirmDelete(tabId) {
   renderTabList();
   bindTabListEvents();
   if (state.editingTabId === id) showView('empty');
-  showStatus('Tab deleted');
+  showStatus(t('tabDeletedStatus'));
   persistTabs();
 }
 
@@ -1423,7 +1439,7 @@ async function switchProfile(profileId) {
   renderProfileChip();
   renderProfileDropdown();
   closeProfileDropdown();
-  showStatus(`Switched to ${state.profiles.find(p => p.id === profileId)?.name || 'profile'}`);
+  showStatus(t('switchedToProfile', state.profiles.find(p => p.id === profileId)?.name || ''));
 }
 
 function openProfileDropdown() {
@@ -1753,7 +1769,7 @@ async function navigateToTab(tab) {
   try {
     const [active] = await browser.tabs.query({ active: true, currentWindow: true });
     if (!active || !active.url) {
-      showStatus('No active browser tab detected.', 'error');
+      showStatus(t('noActiveTab'), 'error');
       return;
     }
     const origin = active.url.split('/lightning/')[0];
@@ -1786,7 +1802,7 @@ async function navigateToTab(tab) {
     }
     window.close();
   } catch (err) {
-    showStatus(`Could not navigate: ${err.message}`, 'error');
+    showStatus(t('errorCouldNotNavigate', err.message), 'error');
   }
 }
 

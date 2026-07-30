@@ -2021,5 +2021,779 @@
   "translationsContributedBy": {
     "message": "Contributed by",
     "description": "Attribution prefix shown before a contributor name in the language list"
+  },
+  "skipToMainContent": {
+    "message": "Skip to main content",
+    "description": "Skip link for keyboard users, first focusable element in the popup"
+  },
+  "ariaTabList": {
+    "message": "Tab list",
+    "description": "Accessible name for the left panel listing the user’s tabs"
+  },
+  "ariaCustomTabs": {
+    "message": "Custom tabs",
+    "description": "Accessible name for the navigation element wrapping the tab list"
+  },
+  "ariaDetailsPanel": {
+    "message": "Details panel",
+    "description": "Accessible name for the panel that expands to the right"
+  },
+  "ariaExtensionControls": {
+    "message": "Extension controls",
+    "description": "Accessible name for the footer navigation"
+  },
+  "ariaSwitchProfile": {
+    "message": "Switch profile",
+    "description": "Accessible name for the profile switcher button before a profile is known"
+  },
+  "ariaSwitchProfileMenu": {
+    "message": "Switch profile",
+    "description": "Accessible name for the open profile menu"
+  },
+  "ariaQuickAdd": {
+    "message": "Quick add a tab from the current Salesforce page",
+    "description": "Accessible name for the Quick Add header button"
+  },
+  "quickAddTitle": {
+    "message": "Quick add from this page",
+    "description": "Tooltip on the Quick Add header button"
+  },
+  "ariaAddManually": {
+    "message": "Add a tab manually",
+    "description": "Accessible name and tooltip for the manual Add button in the header"
+  },
+  "ariaViewReleaseNotes": {
+    "message": "View release notes",
+    "description": "Accessible name for the release-notes bell when there is nothing new"
+  },
+  "editTabSubtitle": {
+    "message": "Update this tab’s name and destination.",
+    "description": "Subtitle under the Edit Tab heading"
+  },
+  "ariaCloseEditPanel": {
+    "message": "Close edit panel",
+    "description": "Accessible name for the X that closes the edit panel"
+  },
+  "ariaRequired": {
+    "message": "required",
+    "description": "Accessible name for the asterisk marking a required field"
+  },
+  "tabPathHint": {
+    "message": "The Salesforce path or URL this tab navigates to.",
+    "description": "Helper text under the Tab Path field"
+  },
+  "tabPathPlaceholderFull": {
+    "message": "/lightning/o/Account or full URL",
+    "description": "Placeholder for the Tab Path field. Leave the path example as-is; translate only \"or full URL\""
+  },
+  "tabOptionsLegend": {
+    "message": "Tab Options",
+    "description": "Legend for the checkbox group of tab flags"
+  },
+  "tabIsObjectDesc": {
+    "message": "Navigates to a Salesforce object list",
+    "description": "Description under the Object tab checkbox"
+  },
+  "tabIsCustomUrlDesc": {
+    "message": "Uses a non-standard Salesforce URL",
+    "description": "Description under the Custom URL checkbox"
+  },
+  "tabOpenNewTabDesc": {
+    "message": "Always opens in a new browser tab",
+    "description": "Description under the Open in new tab checkbox"
+  },
+  "saveTabButton": {
+    "message": "Save Tab",
+    "description": "Submit button in the tab edit form"
+  },
+  "ariaThemeSelection": {
+    "message": "Theme selection",
+    "description": "Accessible name for the light/dark/system segmented control"
+  },
+  "compactModeDesc": {
+    "message": "Reduces tab item height",
+    "description": "Description under the Compact mode toggle"
+  },
+  "skipDeleteConfirmationDesc": {
+    "message": "Delete tabs without a prompt",
+    "description": "Description under the Skip delete confirmation toggle"
+  },
+  "enableProfilesDesc": {
+    "message": "Separate tab sets for different orgs",
+    "description": "Description under the Enable profiles toggle"
+  },
+  "storageSectionTitle": {
+    "message": "Storage",
+    "description": "Settings section heading for where data is kept"
+  },
+  "syncStorageCardDesc": {
+    "message": "Syncs across all your devices",
+    "description": "Description on the Sync storage option"
+  },
+  "localStorageCardDesc": {
+    "message": "This device only",
+    "description": "Description on the Local storage option"
+  },
+  "debugSectionTitle": {
+    "message": "Debug",
+    "description": "Settings section heading for developer tools"
+  },
+  "previewFirstLaunchLabel": {
+    "message": "Preview first-launch wizard",
+    "description": "Label for the debug action that opens the welcome wizard read-only"
+  },
+  "previewFirstLaunchDesc": {
+    "message": "Opens the welcome screen without writing anything",
+    "description": "Description for the preview action, stressing that no data changes"
+  },
+  "previewButton": {
+    "message": "Preview",
+    "description": "Button that opens the first-launch wizard in preview mode"
+  },
+  "advancedSettingsLink": {
+    "message": "Advanced settings — import, export, danger zone",
+    "description": "Link to the full settings page"
+  },
+  "ariaAdvancedSettings": {
+    "message": "Open advanced settings in a new tab",
+    "description": "Accessible name for the advanced settings link"
+  },
+  "ariaReleaseNotesPanel": {
+    "message": "Release notes",
+    "description": "Accessible name for the release-notes panel"
+  },
+  "releaseNotesSubtitle": {
+    "message": "Recent updates to SF Tabs",
+    "description": "Subtitle under the What’s New heading"
+  },
+  "ariaCloseReleaseNotes": {
+    "message": "Close release notes",
+    "description": "Accessible name for the X that closes the release-notes panel"
+  },
+  "manageItemsTitle": {
+    "message": "Manage Items",
+    "description": "Heading of the panel for editing a tab’s sub-items"
+  },
+  "manageItemsSubtitle": {
+    "message": "Organize related links",
+    "description": "Subtitle under the Manage Items heading"
+  },
+  "ariaManageItems": {
+    "message": "Manage dropdown items",
+    "description": "Accessible name for the Manage Items panel"
+  },
+  "ariaCloseManageItems": {
+    "message": "Close dropdown management",
+    "description": "Accessible name for the X that closes Manage Items"
+  },
+  "addItemButton": {
+    "message": "+ Add item",
+    "description": "Button that starts adding a sub-item. Keep the leading plus sign"
+  },
+  "loadItemsButton": {
+    "message": "Load items from this page",
+    "description": "Button that reads navigation links off the current Salesforce page"
+  },
+  "manageItemsHint": {
+    "message": "Sub-items follow this tab's “Open in new tab” setting. Nesting goes two levels deep: child and grandchild.",
+    "description": "Explanatory note at the bottom of the Manage Items panel"
+  },
+  "firstLaunchSubtitle": {
+    "message": "Pick a starting point.",
+    "description": "Subtitle in the welcome wizard"
+  },
+  "firstLaunchPreviewNote": {
+    "message": "Preview — your saved tabs and settings won’t be touched.",
+    "description": "Banner shown when the wizard is opened from Settings > Debug"
+  },
+  "ariaStartingPoint": {
+    "message": "Starting point",
+    "description": "Accessible name for the wizard’s option group"
+  },
+  "firstLaunchDefaultTabList": {
+    "message": "Flows, Installed Packages, Users, Profiles, Permission Sets",
+    "description": "Names of the seeded default tabs. These are Salesforce Setup page names — translate only if Salesforce localizes them in the target language"
+  },
+  "firstLaunchEmptyDesc": {
+    "message": "Add your own tabs as you go",
+    "description": "Description of the start-empty option"
+  },
+  "firstLaunchImportDesc": {
+    "message": "Opens the settings page so you can load an export file",
+    "description": "Description of the import option"
+  },
+  "firstLaunchProfilesDesc": {
+    "message": "Keep separate tab sets per org, switched manually or by URL",
+    "description": "Description of the enable-profiles option in the wizard"
+  },
+  "tabOpenInNewTabLabel": {
+    "message": "Open in new tab",
+    "description": "Checkbox label for the per-tab option that opens the tab in a new browser tab"
+  },
+  "deleteTabConfirmTitle": {
+    "message": "Delete Tab?",
+    "description": "Title of the confirmation dialog shown before deleting a tab"
+  },
+  "deleteTabConfirmBody": {
+    "message": "Are you sure you want to delete $NAME$? This action cannot be undone.",
+    "description": "Body of the delete-tab confirmation. $NAME$ is the tab name, shown in bold.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "migratedTabsForwardOne": {
+    "message": "Brought $COUNT$ existing tab forward",
+    "description": "Status after moving a v1 user’s tabs into a profile, singular",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "migratedTabsForwardMany": {
+    "message": "Brought $COUNT$ existing tabs forward",
+    "description": "Status after moving a v1 user’s tabs into a profile, plural",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      }
+    }
+  },
+  "releaseNotesDismissed": {
+    "message": "Release notes dismissed",
+    "description": "Status after the user checks “Don’t show again” and closes the notes"
+  },
+  "errorCouldNotSave": {
+    "message": "Could not save: $ERROR$",
+    "description": "Status when a write to browser storage fails. $ERROR$ is the browser’s own message",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "errorCouldNotSaveSetting": {
+    "message": "Could not save setting: $ERROR$",
+    "description": "Status when saving a single preference fails",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "nestingDepthLimit": {
+    "message": "Too many levels — nesting stops at parent, child, grandchild.",
+    "description": "Error when a drag or promote would nest deeper than three levels"
+  },
+  "tabNestedUnder": {
+    "message": "“$SOURCE$” moved under “$TARGET$”",
+    "description": "Status after dragging one tab onto another to group it",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "Flows"
+      },
+      "target": {
+        "content": "$2",
+        "example": "Automation"
+      }
+    }
+  },
+  "noActiveTab": {
+    "message": "No active browser tab detected.",
+    "description": "Error when the popup cannot find the tab the user is looking at"
+  },
+  "openObjectManagerFirst": {
+    "message": "Open the $OBJECT$ Object Manager page in Setup, then try again.",
+    "description": "Error when scraping sub-items but the content script is not present. $OBJECT$ is a Salesforce object name",
+    "placeholders": {
+      "object": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "errorReadingNavigation": {
+    "message": "Could not read the page navigation.",
+    "description": "Fallback error when the content script reports a failure with no message"
+  },
+  "noNavigationItems": {
+    "message": "No navigation items found on this page.",
+    "description": "Error when the Salesforce page has no side navigation to import"
+  },
+  "goToObjectInSetup": {
+    "message": "Go to $OBJECT$ in Setup to load its list.",
+    "description": "Error when the open page is not the Object Manager page for this tab",
+    "placeholders": {
+      "object": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "errorLoadingNavigation": {
+    "message": "Could not load navigation: $ERROR$",
+    "description": "Error when importing sub-items throws",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Receiving end does not exist"
+      }
+    }
+  },
+  "itemLabelRequired": {
+    "message": "Item label is required.",
+    "description": "Validation error when saving a sub-item with no label"
+  },
+  "itemSaved": {
+    "message": "“$NAME$” saved",
+    "description": "Status after editing a sub-item",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields & Relationships"
+      }
+    }
+  },
+  "itemAdded": {
+    "message": "“$NAME$” added",
+    "description": "Status after adding a sub-item",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "withSubItemsOne": {
+    "message": " with $COUNT$ item",
+    "description": "Appended to a promote status when the moved item carries one child. Keep the leading space",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "withSubItemsMany": {
+    "message": " with $COUNT$ items",
+    "description": "Appended to a promote status when the moved item carries several children. Keep the leading space",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "itemPromotedToTab": {
+    "message": "“$NAME$” moved out to its own tab$EXTRA$",
+    "description": "Status after promoting a sub-item to a top-level tab. $EXTRA$ is an optional “ with N items” clause",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      },
+      "extra": {
+        "content": "$2",
+        "example": " with 3 items"
+      }
+    }
+  },
+  "itemPromotedLevel": {
+    "message": "“$NAME$” moved up a level$EXTRA$",
+    "description": "Status after promoting a grandchild to a child. $EXTRA$ is an optional “ with N items” clause",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      },
+      "extra": {
+        "content": "$2",
+        "example": " with 3 items"
+      }
+    }
+  },
+  "itemDeleted": {
+    "message": "Item deleted",
+    "description": "Status after deleting a sub-item"
+  },
+  "tabSavedStatus": {
+    "message": "“$NAME$” saved",
+    "description": "Status after editing a tab",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "tabAddedStatus": {
+    "message": "“$NAME$” added",
+    "description": "Status after adding a tab",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "tabDeletedStatus": {
+    "message": "Tab deleted",
+    "description": "Status after deleting a tab"
+  },
+  "errorCouldNotNavigate": {
+    "message": "Could not navigate: $ERROR$",
+    "description": "Error when opening a tab’s destination fails",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "No active tab"
+      }
+    }
+  },
+  "emptyStateTitle": {
+    "message": "No tabs yet",
+    "description": "Heading shown when the user has no tabs"
+  },
+  "emptyStateDesc": {
+    "message": "Use Quick Add to capture the Salesforce page you’re on, or add one manually.",
+    "description": "Description under the empty-tabs heading, naming the two ways to add a tab"
+  },
+  "noItemsYet": {
+    "message": "No items yet",
+    "description": "Shown in the Manage Items panel when a tab has no sub-items"
+  },
+  "srSubItems": {
+    "message": "sub-items",
+    "description": "Screen-reader-only word after a sub-item count badge"
+  },
+  "itemLabelPlaceholder": {
+    "message": "Label",
+    "description": "Placeholder for a sub-item’s display name field"
+  },
+  "itemPathPlaceholder": {
+    "message": "Path or URL",
+    "description": "Placeholder for a sub-item’s destination field"
+  },
+  "deleteButtonTitle": {
+    "message": "Delete",
+    "description": "Tooltip on the delete icon button in a tab or sub-item row"
+  },
+  "subItemsTitle": {
+    "message": "Sub-items",
+    "description": "Tooltip on the button that opens a tab’s sub-item manager"
+  },
+  "addSubItemTitle": {
+    "message": "Add sub-item",
+    "description": "Tooltip on the button that adds a child under a sub-item"
+  },
+  "promoteToTabTitle": {
+    "message": "Move out to its own tab",
+    "description": "Tooltip on the promote button when the item would become a top-level tab"
+  },
+  "promoteLevelTitle": {
+    "message": "Move up one level",
+    "description": "Tooltip on the promote button when the item would move from grandchild to child"
+  },
+  "ariaTabType": {
+    "message": "$TYPE$ tab",
+    "description": "Accessible name for the small type badge on a tab row. $TYPE$ is a short abbreviation such as Obj, Setup, URL or Tab",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Setup"
+      }
+    }
+  },
+  "ariaTabActions": {
+    "message": "Actions for $NAME$ tab",
+    "description": "Accessible name for the row action group",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaMoveUpNamed": {
+    "message": "Move $NAME$ up",
+    "description": "Accessible name for the move-up button on a tab row",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaMoveDownNamed": {
+    "message": "Move $NAME$ down",
+    "description": "Accessible name for the move-down button on a tab row",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaManageSubItems": {
+    "message": "Manage $COUNT$ sub-items in $NAME$",
+    "description": "Accessible name for the sub-items button when the tab already has some",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaAddSubItems": {
+    "message": "Add sub-items to $NAME$",
+    "description": "Accessible name for the sub-items button when the tab has none",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaEditNamed": {
+    "message": "Edit $NAME$",
+    "description": "Accessible name for an edit button, naming what it edits",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaDeleteNamed": {
+    "message": "Delete $NAME$",
+    "description": "Accessible name for a delete button, naming what it deletes",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "ariaOpenInNewTabOn": {
+    "message": "Open in new tab: on — click to toggle off",
+    "description": "Accessible name for the open-in-new-tab toggle while it is on"
+  },
+  "ariaOpenInNewTabOff": {
+    "message": "Open in new tab: off — click to toggle on",
+    "description": "Accessible name for the open-in-new-tab toggle while it is off"
+  },
+  "ariaCollapseNamed": {
+    "message": "Collapse $NAME$",
+    "description": "Accessible name for the disclosure button when a sub-item list is open",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaExpandNamed": {
+    "message": "Expand $NAME$",
+    "description": "Accessible name for the disclosure button when a sub-item list is closed",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaItemActions": {
+    "message": "Actions for $NAME$",
+    "description": "Accessible name for a sub-item row’s action group",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaAddItemUnder": {
+    "message": "Add an item under $NAME$",
+    "description": "Accessible name for the button that nests a new item under this one",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "ariaPromoteToTab": {
+    "message": "Move $NAME$ out to its own tab",
+    "description": "Accessible name for the promote button on a child item",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaPromoteLevel": {
+    "message": "Move $NAME$ up one level",
+    "description": "Accessible name for the promote button on a grandchild item",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Page Layouts"
+      }
+    }
+  },
+  "ariaVersion": {
+    "message": "Version $VERSION$",
+    "description": "Accessible name for the version label in the footer",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.1.1"
+      }
+    }
+  },
+  "closePreviewButton": {
+    "message": "Close preview",
+    "description": "Button that closes the first-launch wizard when it was opened in preview mode"
+  },
+  "errorSetupDidNotFinish": {
+    "message": "Setup didn’t finish: $ERROR$",
+    "description": "Error when the first-launch wizard fails to write initial data",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "QUOTA_BYTES exceeded"
+      }
+    }
+  },
+  "previewOutcomeDefaultCount": {
+    "message": "a Default profile with $COUNT$ tabs",
+    "description": "Fragment describing what the wizard would have created. Used inside previewSummary",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "previewOutcomeDefault": {
+    "message": "a Default profile with the default tabs",
+    "description": "Fragment used when the number of default tabs is unknown. Used inside previewSummary"
+  },
+  "previewOutcomeEmpty": {
+    "message": "an empty Default profile",
+    "description": "Fragment describing the start-empty choice. Used inside previewSummary"
+  },
+  "previewOutcomeImport": {
+    "message": "an empty Default profile, then opened the settings page to import",
+    "description": "Fragment describing the import choice. Used inside previewSummary"
+  },
+  "previewSummary": {
+    "message": "Preview only — would have created $OUTCOME$, profiles $STATE$. Nothing was saved.",
+    "description": "Status shown after closing the wizard in preview mode. $OUTCOME$ is one of the previewOutcome* fragments and $STATE$ is stateOn or stateOff",
+    "placeholders": {
+      "outcome": {
+        "content": "$1",
+        "example": "an empty Default profile"
+      },
+      "state": {
+        "content": "$2",
+        "example": "off"
+      }
+    }
+  },
+  "stateOn": {
+    "message": "on",
+    "description": "The word “on” for a setting’s state, used inside previewSummary"
+  },
+  "stateOff": {
+    "message": "off",
+    "description": "The word “off” for a setting’s state, used inside previewSummary"
+  },
+  "ariaViewReleaseNotesUnread": {
+    "message": "View release notes — new update available",
+    "description": "Accessible name for the release-notes bell when there are unread notes"
+  },
+  "ariaSwitchProfileNamed": {
+    "message": "Profile: $NAME$ — switch profile",
+    "description": "Accessible name for the profile switcher once the active profile is known",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "editingTabSubtitle": {
+    "message": "Editing “$NAME$”",
+    "description": "Subtitle of the edit panel while editing an existing tab",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Flows"
+      }
+    }
+  },
+  "addTabSubtitle": {
+    "message": "Create a new custom navigation tab.",
+    "description": "Subtitle of the edit panel while adding a tab"
+  },
+  "itemsInTab": {
+    "message": "Items in “$NAME$”",
+    "description": "Subtitle of the Manage Items panel before the item count is known",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Account"
+      }
+    }
+  },
+  "itemCountInTabOne": {
+    "message": "$COUNT$ item in “$NAME$”",
+    "description": "Subtitle of the Manage Items panel, singular",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "itemCountInTabMany": {
+    "message": "$COUNT$ items in “$NAME$”",
+    "description": "Subtitle of the Manage Items panel, plural",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      },
+      "name": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "refreshItemsButton": {
+    "message": "Refresh items from this page",
+    "description": "Button label when the tab already has sub-items loaded from a page"
+  },
+  "loading": {
+    "message": "Loading…",
+    "description": "Transient button label while sub-items are being read off the page"
   }
 }

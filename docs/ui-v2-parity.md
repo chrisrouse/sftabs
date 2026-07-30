@@ -97,7 +97,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 
 | Capability | Status | Notes |
 |---|---|---|
-| Localization | **Gap** | Old popup has 113 `__MSG_` tokens; v2 has 0. `de` and `es` would regress to English |
+| Localization | Done | 150 keys: static copy via `__MSG_` tokens and `i18n-helper.js`, runtime strings via a local `t()` helper. 36 keys reused from the shipped popup are already translated; the other 114 fall back to English until de/es land — see `docs/localization-todo.md` |
 | React to external storage changes | **Gap** | No `storage.onChanged` listener, so background auto-switch leaves a stale popup |
 | Keyboard shortcuts (`open-tab-01..10`) | Done | `background.js`, unchanged |
 | Import / export | **Delegated** | Settings page |
@@ -109,16 +109,18 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 
 ## Gaps, in release order
 
-1. **Localization** — the only outright regression from what ships today.
-2. **`storage.onChanged`** — stale popup after background profile switch.
-3. **Profile switch broadcast** — open SF pages keep the previous nav until reload.
-4. **Storage sync/local radios** — a visibly broken setting; risks users
+1. **`storage.onChanged`** — stale popup after background profile switch.
+2. **Profile switch broadcast** — open SF pages keep the previous nav until reload.
+3. **Storage sync/local radios** — a visibly broken setting; risks users
    believing data stopped syncing. *On hold by decision until the rest is done.*
 
 Deliberately deferred: migration wizard, sync-data-detected screen, staged
 sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked
 **Delegated** needs no work — it is reachable through the advanced settings
 page.
+
+Localization is wired but only partly translated; `docs/localization-todo.md`
+tracks the 114 keys still reading English in de/es.
 
 ## Release-process note
 
