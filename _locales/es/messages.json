@@ -2412,15 +2412,6 @@
   "promoteLevelTitle": {
     "message": "Subir un nivel"
   },
-  "ariaTabType": {
-    "message": "Pestaña de tipo $TYPE$",
-    "placeholders": {
-      "type": {
-        "content": "$1",
-        "example": "Setup"
-      }
-    }
-  },
   "ariaTabActions": {
     "message": "Acciones para la pestaña $NAME$",
     "placeholders": {

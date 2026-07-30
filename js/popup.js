@@ -796,7 +796,6 @@ function emptyStateHTML() {
 
 function tabItemHTML(tab) {
   const type   = tabType(tab);
-  const badge  = tabBadgeLabel(type);
   const name   = esc(tab.label);
   const path   = tab.path ? esc(tab.path) : '';
   const newTabOn = tab.openInNewTab ? 'is-on' : '';
@@ -815,7 +814,6 @@ function tabItemHTML(tab) {
     </div>
     <div class="tab-info">
       <div class="tab-info-top">
-        <span class="tab-badge tab-badge--${type}" aria-label="${t('ariaTabType', badge)}">${badge}</span>
         <span class="tab-name">${name}</span>
         ${hasDropdown(tab) ? `<span class="tab-count">${countItems(tab.dropdownItems)}<span class="sr-only"> ${t('srSubItems')}</span></span>` : ''}
       </div>
@@ -2004,15 +2002,12 @@ function updateCharCount(inputId, countId, max) {
 
 // ── Helpers ────────────────────────────────────────────────────
 
+/** Drives data-type, which colours the row's left accent bar. */
 function tabType(tab) {
   if (tab.isCustomUrl)   return 'custom';
   if (tab.isSetupObject) return 'setup';
   if (tab.isObject)      return 'object';
   return 'standard';
-}
-
-function tabBadgeLabel(type) {
-  return { object: 'Obj', setup: 'Setup', custom: 'URL', standard: 'Tab' }[type] || 'Tab';
 }
 
 function esc(str) {

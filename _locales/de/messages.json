@@ -2412,15 +2412,6 @@
   "promoteLevelTitle": {
     "message": "Eine Ebene nach oben verschieben"
   },
-  "ariaTabType": {
-    "message": "Registerkarte vom Typ $TYPE$",
-    "placeholders": {
-      "type": {
-        "content": "$1",
-        "example": "Setup"
-      }
-    }
-  },
   "ariaTabActions": {
     "message": "Aktionen für die Registerkarte $NAME$",
     "placeholders": {

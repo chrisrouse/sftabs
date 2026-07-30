@@ -2502,16 +2502,6 @@
     "message": "Move up one level",
     "description": "Tooltip on the promote button when the item would move from grandchild to child"
   },
-  "ariaTabType": {
-    "message": "$TYPE$ tab",
-    "description": "Accessible name for the small type badge on a tab row. $TYPE$ is a short abbreviation such as Obj, Setup, URL or Tab",
-    "placeholders": {
-      "type": {
-        "content": "$1",
-        "example": "Setup"
-      }
-    }
-  },
   "ariaTabActions": {
     "message": "Actions for $NAME$ tab",
     "description": "Accessible name for the row action group",
