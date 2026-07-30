@@ -69,6 +69,7 @@
         "*://*.my.salesforce.com/lightning/setup/*"
       ],
       "js": [
+        "popup/js/shared/utils.js",
         "content/navigation-parser.js",
         "content/tab-renderer.js",
         "content/content-main.js"

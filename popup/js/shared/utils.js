@@ -227,10 +227,52 @@ function extractOrgIdentifier(url) {
   }
 }
 
+/**
+ * Which profile applies to a given Salesforce URL.
+ *
+ * The point of resolving per URL rather than reading settings.activeProfileId is
+ * that activeProfileId is one global value: with two orgs open, whichever was
+ * activated last governed every page, so two windows — or two tabs — could not
+ * show their own tabs at the same time.
+ *
+ * Matching deliberately mirrors checkAndSwitchProfile in background.js: exact,
+ * case-insensitive equality against the org identifier. If the two ever
+ * disagree, a page renders one profile while the popup claims another.
+ *
+ * When auto-switch is off this returns activeProfileId unchanged, so behaviour
+ * for anyone not using linked orgs is exactly as before.
+ *
+ * @param {string} url        the page being rendered
+ * @param {Array}  profiles
+ * @param {Object} settings   userSettings
+ * @returns {string|null} profile id, or null when there is nothing to use
+ */
+function resolveProfileForUrl(url, profiles, settings) {
+  const list = Array.isArray(profiles) ? profiles : [];
+  const active = settings && settings.activeProfileId ? settings.activeProfileId : null;
+
+  if (!settings || !settings.profilesEnabled || !settings.autoSwitchProfiles) {
+    return active;
+  }
+
+  const org = extractOrgIdentifier(url);
+  if (org) {
+    const match = list.find(p => (p.urlPatterns || []).some(
+      pattern => String(pattern).toLowerCase() === org.toLowerCase()));
+    if (match) return match.id;
+  }
+
+  // No linked org matches, so fall back the same way background.js does
+  const fallback = list.find(p => p.isDefault) ||
+                   list.find(p => p.id === (settings.defaultProfileId || null));
+  return fallback ? fallback.id : active;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
     extractOrgIdentifier,
+    resolveProfileForUrl,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,
@@ -248,6 +290,7 @@ if (typeof module !== 'undefined' && module.exports) {
   window.SFTabs.utils = {
     generateId,
     extractOrgIdentifier,
+    resolveProfileForUrl,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,

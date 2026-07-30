@@ -182,10 +182,22 @@ async function getTabsFromStorage() {
       settings = result[settingsKey] || {};
     }
 
-    // Always load from profile storage if activeProfileId exists
-    // (profiles are used internally even if UI is disabled)
-    if (settings.activeProfileId) {
-      const profileTabsKey = `profile_${settings.activeProfileId}_tabs`;
+    // Which profile applies to THIS page. Resolved from the page's own org
+    // rather than the globally active profile, so two orgs render their own
+    // tabs at the same time whether they sit in one window or two.
+    let profiles = [];
+    if (useSyncStorage) {
+      profiles = await readChunkedSync('profiles') || [];
+    } else {
+      const profilesResult = await browser.storage.local.get('profiles');
+      profiles = profilesResult.profiles || [];
+    }
+    const profileId = window.SFTabs && window.SFTabs.utils && window.SFTabs.utils.resolveProfileForUrl
+      ? window.SFTabs.utils.resolveProfileForUrl(window.location.href, profiles, settings)
+      : settings.activeProfileId;
+
+    if (profileId) {
+      const profileTabsKey = `profile_${profileId}_tabs`;
 
       if (useSyncStorage) {
         const tabs = await readChunkedSync(profileTabsKey);

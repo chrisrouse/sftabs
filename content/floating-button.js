@@ -80,11 +80,22 @@
         settings.floatingButton = window.SFTabs.constants.DEFAULT_SETTINGS.floatingButton;
       }
 
-      // Always load from profile storage if activeProfileId exists
-      // (profiles are used internally even if UI is disabled)
+      // Which profile applies to THIS page — see resolveProfileForUrl. Keyed on
+      // the page's own org, not the globally active profile.
+      let profiles = [];
+      if (useSyncStorage) {
+        profiles = await readChunkedSync('profiles') || [];
+      } else {
+        const profilesResult = await browser.storage.local.get('profiles');
+        profiles = profilesResult.profiles || [];
+      }
+      const profileId = window.SFTabs && window.SFTabs.utils && window.SFTabs.utils.resolveProfileForUrl
+        ? window.SFTabs.utils.resolveProfileForUrl(window.location.href, profiles, settings)
+        : settings.activeProfileId;
+
       let tabs = [];
-      if (settings.activeProfileId) {
-        const profileTabsKey = `profile_${settings.activeProfileId}_tabs`;
+      if (profileId) {
+        const profileTabsKey = `profile_${profileId}_tabs`;
         if (useSyncStorage) {
           tabs = await readChunkedSync(profileTabsKey) || [];
         } else {

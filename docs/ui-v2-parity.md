@@ -75,7 +75,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 | Switch profile, broadcast to open SF tabs | Done | `broadcastTabRefresh()` sends `refresh_tabs` to the same setup-page URL set production uses |
 | Create / rename / delete profile | Done | Profiles list in the tray, reachable from the switcher or Settings > Manage profiles. Delete removes the profile's tabs and refuses on the last one |
 | URL patterns, capture current domain | Done | "Linked orgs" field on the profile form, with a capture action. Patterns are matched by exact equality against the org identifier, so capturing is the only reliable way to fill it |
-| Auto-switch by URL | Done | Handled by `background.js`, unchanged |
+| Auto-switch by URL | Done | `background.js` sets the active profile for the focused window. Separately, each Salesforce page resolves its own profile from its org via `resolveProfileForUrl`, so two orgs open at once each render their own tabs — in one window or two |
 | Disable profiles, keep one | **Delegated** | Settings page |
 
 ## 5. Onboarding, migration, notices
