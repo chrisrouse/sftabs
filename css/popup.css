@@ -671,14 +671,27 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .check-label { font-size: var(--sft-font-size-base); font-weight: var(--sft-font-weight-medium); color: var(--t-base); }
 .check-desc  { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
 
+/* Pinned to the bottom of the scrolling form. It used to sit at the end of the
+   scrollable content, so on any form taller than the panel — the profile form
+   is — Save was below the fold and people lost their input. The negative inline
+   margin lets the bar span the form's padding, so nothing shows through beside
+   it while content scrolls under. */
 .form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  padding-top: 4px;
   margin-top: auto;
-  padding-bottom: 4px;
+  margin-inline: calc(-1 * var(--sft-spacing-4));
+  padding: var(--sft-spacing-2) var(--sft-spacing-4);
+  background: var(--s-2);
+  border-top: var(--sft-border-width-1) solid var(--b-subtle);
 }
+/* Destructive action sits away from the confirming pair */
+.form-actions .btn-danger { margin-right: auto; }
 
 /* ── Dropdown items list ── */
 .dropdown-items-list {
