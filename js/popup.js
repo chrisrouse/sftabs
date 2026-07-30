@@ -35,7 +35,9 @@ let state = {
   tabs:            [],
   profiles:        [],
   settings:        {},
-  activeView:      'empty',   // 'empty' | 'edit-tab' | 'dropdowns' | 'settings' | 'release-notes'
+  activeView:      'empty',   // 'empty' | 'edit-tab' | 'dropdowns' | 'edit-profile'
+                              //         | 'profiles' | 'settings' | 'release-notes'
+  editingProfileId: null,     // profile open in the form; null while creating
   editingTabId:    null,
   profileDropdownOpen: false,
   pendingDeleteId: null,
@@ -875,14 +877,292 @@ function renderProfileDropdown() {
         <span>${esc(p.name)}</span>
         ${p.id === active ? `<span class="profile-option-check" aria-hidden="true">✓</span>` : ''}
       </button>
-    `).join('')}`;
+    `).join('')}
+    <button class="profile-option profile-option-new" id="btn-new-profile">
+      <span aria-hidden="true">+</span>
+      <span>${t('newProfileButton')}</span>
+    </button>
+    <button class="profile-option profile-option-new" id="btn-manage-profiles">
+      <span aria-hidden="true">⚙</span>
+      <span>${t('manageProfilesButton')}</span>
+    </button>`;
+
+  document.getElementById('btn-new-profile').addEventListener('click', () => {
+    closeProfileDropdown();
+    openProfileForm(null);
+  });
+  document.getElementById('btn-manage-profiles').addEventListener('click', () => {
+    closeProfileDropdown();
+    openProfilesList();
+  });
 }
+
+// ── Profile management ─────────────────────────────────────────
+
+/**
+ * Open the profile form. `profileId` null means create.
+ *
+ * Same anatomy as the tab form on purpose — .panel-view / .edit-form /
+ * .form-group / .check-row — so the two read as one pattern.
+ */
+function openProfileForm(profileId) {
+  const profile = profileId ? state.profiles.find(p => p.id === profileId) : null;
+  state.editingProfileId = profile ? profile.id : null;
+
+  document.getElementById('profile-panel-title').textContent =
+    t(profile ? 'editProfileTitle' : 'newProfileTitle');
+  document.getElementById('profile-panel-subtitle').textContent =
+    t(profile ? 'editProfileSubtitle' : 'newProfileSubtitle');
+
+  document.getElementById('input-profile-name').value = profile ? profile.name : '';
+  document.getElementById('input-profile-orgs').value = (profile?.urlPatterns || []).join('\n');
+  document.getElementById('input-profile-default').checked = !!profile?.isDefault;
+  document.getElementById('profile-name-error').hidden = true;
+  document.getElementById('input-profile-name').removeAttribute('aria-invalid');
+  updateCharCount('input-profile-name', 'profile-name-count', 30);
+
+  // Deleting the only profile would leave nothing to fall back to
+  document.getElementById('btn-delete-profile').hidden =
+    !profile || state.profiles.length < 2;
+
+  showView('edit-profile');
+  document.getElementById('input-profile-name').focus();
+}
+
+async function saveProfileForm(e) {
+  e.preventDefault();
+  const nameInput = document.getElementById('input-profile-name');
+  const name = nameInput.value.trim();
+  if (!name) {
+    document.getElementById('profile-name-error').hidden = false;
+    nameInput.setAttribute('aria-invalid', 'true');
+    nameInput.focus();
+    return;
+  }
+
+  // One identifier per line, blanks dropped, de-duplicated case-insensitively
+  const seen = new Set();
+  const urlPatterns = document.getElementById('input-profile-orgs').value
+    .split('\n').map(v => v.trim()).filter(Boolean)
+    .filter(v => { const k = v.toLowerCase(); return seen.has(k) ? false : (seen.add(k), true); });
+
+  const makeDefault = document.getElementById('input-profile-default').checked;
+  const editing = state.editingProfileId
+    ? state.profiles.find(p => p.id === state.editingProfileId)
+    : null;
+
+  const profiles = state.profiles.map(p => ({ ...p }));
+  let saved;
+  if (editing) {
+    saved = profiles.find(p => p.id === editing.id);
+    saved.name = name;
+    saved.urlPatterns = urlPatterns;
+  } else {
+    saved = {
+      id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      name,
+      isDefault: false,
+      urlPatterns,
+      createdAt: new Date().toISOString(),
+      lastActive: null
+    };
+    profiles.push(saved);
+  }
+
+  // isDefault is exclusive, and background.js falls back to it when no pattern
+  // matches, so exactly one profile must carry it
+  if (makeDefault) profiles.forEach(p => { p.isDefault = p.id === saved.id; });
+  else if (saved.isDefault && !profiles.some(p => p.id !== saved.id && p.isDefault)) {
+    saved.isDefault = true;   // refuse to leave the set with no default
+  }
+
+  try {
+    await SFTabs.storage.saveProfiles(profiles, false);
+    state.profiles = profiles;
+
+    const patch = {};
+    if (makeDefault) patch.defaultProfileId = saved.id;
+    // A brand-new profile starts empty; give it a tab list so switching to it
+    // does not look like data loss
+    if (!editing) await SFTabs.storage.saveProfileTabs(saved.id, []);
+    if (Object.keys(patch).length) await patchSettings(patch);
+
+    renderProfileChip();
+    renderProfileDropdown();
+    showStatus(t(editing ? 'profileSavedNamed' : 'profileCreatedNamed', saved.name));
+    if (state.activeView === 'edit-profile') openProfilesList();
+  } catch (err) {
+    showStatus(t('errorSavingProfile', err.message), 'error');
+  }
+}
+
+/**
+ * Delete a profile and its tabs.
+ *
+ * Deliberately different from the shipped settings page, which leaves
+ * `profile_<id>_tabs` behind. Orphaned tab data is invisible, unreachable, and
+ * on sync storage it permanently consumes quota. The confirm names how many
+ * tabs go with it, so the cost is stated rather than hidden.
+ */
+async function deleteProfileFlow(profileId) {
+  const profile = state.profiles.find(p => p.id === profileId);
+  if (!profile) return;
+  if (state.profiles.length < 2) {
+    showStatus(t('cannotDeleteLastProfile'), 'error');
+    return;
+  }
+
+  let tabCount = 0;
+  try {
+    tabCount = (await SFTabs.storage.getProfileTabs(profileId) || []).length;
+  } catch { /* count is advisory */ }
+
+  const ok = await confirmDialog(
+    t('deleteProfileConfirmTitle'),
+    t(tabCount === 1 ? 'deleteProfileConfirmOne' : 'deleteProfileConfirmMany',
+      profile.name, String(tabCount))
+  );
+  if (!ok) return;
+
+  try {
+    const remaining = state.profiles.filter(p => p.id !== profileId);
+    const fallback = remaining.find(p => p.isDefault) || remaining[0];
+    if (!remaining.some(p => p.isDefault)) fallback.isDefault = true;
+
+    await SFTabs.storage.saveProfiles(remaining, false);
+
+    const patch = {};
+    if (state.settings.activeProfileId === profileId) patch.activeProfileId = fallback.id;
+    if (state.settings.defaultProfileId === profileId) patch.defaultProfileId = fallback.id;
+    if (Object.keys(patch).length) await patchSettings(patch);
+
+    // Only after the profile is unreferenced, so a failure above cannot orphan
+    // the tabs of a profile that still exists
+    await removeProfileTabs(profileId);
+
+    state.profiles = remaining;
+    state.tabs = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
+    renderTabList();
+    bindTabListEvents();
+    renderProfileChip();
+    renderProfileDropdown();
+    renderProfilesList();
+    showStatus(t('profileDeleted', profile.name));
+    if (state.activeView === 'edit-profile') openProfilesList();
+    broadcastTabRefresh();
+  } catch (err) {
+    showStatus(t('errorDeletingProfile', err.message), 'error');
+  }
+}
+
+/** Remove a profile's tab data from whichever area holds it, chunks included. */
+async function removeProfileTabs(profileId) {
+  const key = `profile_${profileId}_tabs`;
+  try {
+    await SFTabs.storageChunking.clearChunkedSync(key);
+  } catch { /* not chunked, or sync unavailable */ }
+  try {
+    await browser.storage.sync.remove([key]);
+    await browser.storage.local.remove([key]);
+  } catch { /* nothing to remove */ }
+}
+
+function openProfilesList() {
+  renderProfilesList();
+  showView('profiles');
+}
+
+function renderProfilesList() {
+  const list = document.getElementById('profiles-list');
+  if (!list) return;
+  const active = state.settings.activeProfileId;
+
+  // Same row anatomy as tab and sub-item rows, so this needs no new CSS
+  list.innerHTML = state.profiles.map(p => {
+    const name = esc(p.name);
+    const patterns = (p.urlPatterns || []).length;
+    const meta = [
+      patterns ? t(patterns === 1 ? 'orgCountOne' : 'orgCountMany', String(patterns))
+               : t('noOrgsLinked'),
+      p.isDefault ? t('defaultBadge') : null,
+      p.id === active ? t('activeBadge') : null
+    ].filter(Boolean).join(' · ');
+    return `
+    <li class="dropdown-item" data-profile-id="${p.id}">
+      <span class="profile-option-dot" style="background:${profileColor(p.id)}" aria-hidden="true"></span>
+      <div class="tab-info">
+        <div class="tab-info-top"><span class="tab-name">${name}</span></div>
+        <span class="tab-path">${meta}</span>
+      </div>
+      <div class="tab-actions">
+        <button class="tab-btn tab-btn--edit" data-action="edit-profile" data-id="${p.id}"
+          aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}">
+          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M60 400v60h60l295-295-60-60zm410-295c6-6 6-15 0-21l-38-38c-6-6-15-6-21 0l-30 30 60 60z"/></svg>
+        </button>
+      </div>
+    </li>`;
+  }).join('');
+
+  list.querySelectorAll('[data-action="edit-profile"]').forEach(btn => {
+    btn.addEventListener('click', () => openProfileForm(btn.dataset.id));
+  });
+}
+
+/** Generic confirm on the storage modal's markup. Returns a promise. */
+function confirmDialog(title, body) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('modal-storage');
+    document.getElementById('modal-storage-title').textContent = title;
+    document.getElementById('modal-storage-body').textContent = body;
+    overlay.hidden = false;
+    const cancel = document.getElementById('modal-storage-cancel');
+    const confirm = document.getElementById('modal-storage-confirm');
+    const done = answer => {
+      overlay.hidden = true;
+      cancel.removeEventListener('click', onCancel);
+      confirm.removeEventListener('click', onConfirm);
+      resolve(answer);
+    };
+    const onCancel = () => done(false);
+    const onConfirm = () => done(true);
+    cancel.addEventListener('click', onCancel);
+    confirm.addEventListener('click', onConfirm);
+    cancel.focus();
+  });
+}
+
+/**
+ * Append the current tab's org identifier to the patterns field.
+ *
+ * Patterns are compared by exact equality against this identifier, so typing a
+ * hostname would never match — hence a capture action rather than a free field.
+ */
+async function captureCurrentOrg() {
+  try {
+    const [active] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (!active?.url) return showStatus(t('noActiveTab'), 'error');
+
+    const org = SFTabs.utils.extractOrgIdentifier(active.url);
+    if (!org) return showStatus(t('notASalesforceOrg'), 'error');
+
+    const field = document.getElementById('input-profile-orgs');
+    const existing = field.value.split('\n').map(v => v.trim()).filter(Boolean);
+    if (existing.some(v => v.toLowerCase() === org.toLowerCase())) {
+      return showStatus(t('orgAlreadyLinked', org));
+    }
+    field.value = existing.concat(org).join('\n');
+    showStatus(t('orgCaptured', org));
+  } catch (err) {
+    showStatus(t('errorCouldNotSave', err.message), 'error');
+  }
+}
+
 
 // ── View management ────────────────────────────────────────────
 
 function showView(viewName) {
   const tray  = document.getElementById('panel-tray');
-  const views = ['edit-tab', 'settings', 'release-notes', 'dropdowns'];
+  const views = ['edit-tab', 'settings', 'release-notes', 'dropdowns', 'edit-profile', 'profiles'];
 
   if (viewName === 'empty') {
     tray.classList.remove('is-open');
@@ -1520,6 +1800,7 @@ function installStorageListener() {
 function isEditing() {
   // showView() stores the view id, so this is 'edit-tab' -- not 'edit'
   return state.activeView === 'edit-tab' ||
+         state.activeView === 'edit-profile' ||
          state.activeView === 'dropdowns' ||
          state.editingItemPath !== null ||
          state.addingItemUnder !== null;
@@ -1671,7 +1952,14 @@ function applyDensity(isCompact) {
  */
 function applyProfilesVisibility(enabled) {
   document.getElementById('btn-profile-switcher').hidden = !enabled;
-  if (!enabled) closeProfileDropdown();
+  // Managing profiles is meaningless with the feature off, and the switcher is
+  // the only way back out of the list view
+  const row = document.getElementById('row-manage-profiles');
+  if (row) row.hidden = !enabled;
+  if (!enabled) {
+    closeProfileDropdown();
+    if (state.activeView === 'profiles' || state.activeView === 'edit-profile') showView('empty');
+  }
 }
 
 // ── Settings panel ─────────────────────────────────────────────
@@ -1802,6 +2090,26 @@ function bindEvents() {
     patchSettings({ profilesEnabled: e.target.checked });
     applyProfilesVisibility(e.target.checked);
   });
+
+  // Profiles
+  document.getElementById('form-edit-profile').addEventListener('submit', saveProfileForm);
+  document.getElementById('btn-close-profile').addEventListener('click', () => showView('empty'));
+  document.getElementById('btn-cancel-profile').addEventListener('click', () => {
+    // Cancel returns to the list when we came from it, otherwise closes
+    state.profiles.length ? openProfilesList() : showView('empty');
+  });
+  document.getElementById('btn-delete-profile').addEventListener('click', () => {
+    if (state.editingProfileId) deleteProfileFlow(state.editingProfileId);
+  });
+  document.getElementById('btn-capture-org').addEventListener('click', captureCurrentOrg);
+  document.getElementById('input-profile-name').addEventListener('input', e => {
+    updateCharCount('input-profile-name', 'profile-name-count', 30);
+    document.getElementById('profile-name-error').hidden = true;
+    e.target.removeAttribute('aria-invalid');
+  });
+  document.getElementById('btn-close-profiles').addEventListener('click', () => showView('empty'));
+  document.getElementById('btn-new-profile-from-list').addEventListener('click', () => openProfileForm(null));
+  document.getElementById('btn-manage-profiles-settings').addEventListener('click', openProfilesList);
 
   document.querySelectorAll('input[name="storage-type"]').forEach(radio => {
     radio.addEventListener('change', () => {

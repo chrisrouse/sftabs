@@ -140,6 +140,85 @@
           </form>
         </div>
 
+        <!-- View: Add / Edit profile -->
+        <div class="panel-view" id="view-edit-profile" hidden>
+          <div class="panel-view-header">
+            <div class="panel-view-heading">
+              <h2 class="panel-view-title" id="profile-panel-title">__MSG_newProfileTitle__</h2>
+              <p class="panel-view-subtitle" id="profile-panel-subtitle">__MSG_newProfileSubtitle__</p>
+            </div>
+            <button class="btn-close" id="btn-close-profile" aria-label="__MSG_ariaCloseProfilePanel__">
+              <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14"/></svg>
+            </button>
+          </div>
+
+          <form class="edit-form" id="form-edit-profile" novalidate aria-labelledby="profile-panel-title">
+
+            <div class="form-group">
+              <label class="form-label" for="input-profile-name">
+                __MSG_profileNameLabel__ <span class="req" aria-label="__MSG_ariaRequired__">*</span>
+              </label>
+              <div class="input-row">
+                <input type="text" class="form-input" id="input-profile-name"
+                  maxlength="30" required autocomplete="off"
+                  aria-describedby="profile-name-count profile-name-error" />
+                <span class="char-count" id="profile-name-count" aria-live="polite" aria-atomic="true">0/30</span>
+              </div>
+              <p class="form-error" id="profile-name-error" role="alert" hidden>__MSG_profileNameRequired__</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="input-profile-orgs">__MSG_profileOrgsLabel__</label>
+              <textarea class="form-input" id="input-profile-orgs" rows="3"
+                autocomplete="off" spellcheck="false"
+                aria-describedby="profile-orgs-hint"></textarea>
+              <p class="form-hint" id="profile-orgs-hint">__MSG_profileOrgsHint__</p>
+              <button type="button" class="btn-secondary" id="btn-capture-org" style="margin-top: 8px;">
+                __MSG_captureCurrentOrg__
+              </button>
+            </div>
+
+            <fieldset class="form-fieldset">
+              <legend class="form-legend">__MSG_profileOptionsLegend__</legend>
+              <label class="check-row">
+                <input type="checkbox" class="check-input" id="input-profile-default" />
+                <span class="check-body">
+                  <span class="check-label">__MSG_profileIsDefaultLabel__</span>
+                  <span class="check-desc">__MSG_profileIsDefaultDesc__</span>
+                </span>
+              </label>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="button" class="btn-danger" id="btn-delete-profile" hidden>__MSG_deleteProfileButton__</button>
+              <button type="button" class="btn-secondary" id="btn-cancel-profile">__MSG_cancelButton__</button>
+              <button type="submit" class="btn-primary" id="btn-save-profile">__MSG_saveProfileButton__</button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- View: Profiles list -->
+        <div class="panel-view" id="view-profiles" hidden aria-label="__MSG_profilesSection__">
+          <div class="panel-view-header">
+            <div class="panel-view-heading">
+              <h2 class="panel-view-title">__MSG_profilesSection__</h2>
+              <p class="panel-view-subtitle">__MSG_profilesListSubtitle__</p>
+            </div>
+            <button class="btn-close" id="btn-close-profiles" aria-label="__MSG_ariaCloseProfilesList__">
+              <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14"/></svg>
+            </button>
+          </div>
+
+          <div class="edit-form">
+            <ul class="dropdown-items-list" role="list" id="profiles-list">
+              <!-- Populated by renderProfilesList() -->
+            </ul>
+            <button class="btn-secondary" id="btn-new-profile-from-list" style="margin: 16px 12px 0;">__MSG_newProfileButton__</button>
+            <p class="form-hint" style="margin: 12px;">__MSG_profilesListHint__</p>
+          </div>
+        </div>
+
         <!-- View: Settings -->
         <div class="panel-view" id="view-settings" hidden aria-label="__MSG_settingsHeader__">
           <div class="panel-view-header">
@@ -206,6 +285,16 @@
                     <input type="checkbox" id="setting-profiles" role="switch" checked />
                     <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
                   </label>
+                </div>
+              </div>
+
+              <div class="settings-row" id="row-manage-profiles">
+                <div class="settings-row-label">
+                  <span class="settings-label">__MSG_manageProfilesLabel__</span>
+                  <span class="settings-desc">__MSG_manageProfilesDesc__</span>
+                </div>
+                <div class="settings-row-control">
+                  <button class="btn-secondary" id="btn-manage-profiles-settings">__MSG_manageButton__</button>
                 </div>
               </div>
             </section>

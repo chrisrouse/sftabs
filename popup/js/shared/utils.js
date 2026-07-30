@@ -187,9 +187,50 @@ function deepClone(obj) {
 }
 
 // Export for use in other modules
+/**
+ * Extract the Salesforce org identifier from a URL — the subdomain label that
+ * identifies the org, e.g. "amplify--dev1" from
+ * amplify--dev1.sandbox.my.salesforce-setup.com.
+ *
+ * This is what profile URL patterns are compared against, by exact
+ * case-insensitive equality (checkAndSwitchProfile in background.js). A pattern
+ * holding a full hostname therefore never matches, which is why the profile
+ * form captures this rather than letting it be typed.
+ *
+ * NOTE: background.js carries its own copy, because a service worker cannot
+ * load these popup scripts. Keep the two in step.
+ *
+ * @param {string} url
+ * @returns {string|null} the identifier, or null for a non-Salesforce host
+ */
+function extractOrgIdentifier(url) {
+  try {
+    const hostname = new URL(url).hostname;
+    const patterns = [
+      /^([^.]+)\.sandbox\.my\.salesforce-setup\.com$/i,
+      /^([^.]+)\.sandbox\.my\.salesforce\.com$/i,
+      /^([^.]+)\.sandbox\.lightning\.force\.com$/i,
+      /^([^.]+)\.develop\.my\.salesforce-setup\.com$/i,
+      /^([^.]+)\.develop\.lightning\.force\.com$/i,
+      /^([^.]+)\.lightning\.force\.com$/i,
+      /^([^.]+)\.my\.salesforce\.com$/i,
+      /^([^.]+)\.my\.salesforce-setup\.com$/i,
+      /^([^.]+)\.salesforce\.com$/i
+    ];
+    for (const re of patterns) {
+      const m = hostname.match(re);
+      if (m) return m[1];
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
+    extractOrgIdentifier,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,
@@ -206,6 +247,7 @@ if (typeof module !== 'undefined' && module.exports) {
   window.SFTabs = window.SFTabs || {};
   window.SFTabs.utils = {
     generateId,
+    extractOrgIdentifier,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,

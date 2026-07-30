@@ -1476,3 +1476,14 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   color: var(--t-weak);
   line-height: var(--sft-line-height-base);
 }
+
+/* Create / manage actions pinned under the profile list in the switcher */
+.profile-option-new {
+  border-top: 1px solid var(--b-subtle);
+  color: var(--c-primary);
+  font-weight: var(--sft-font-weight-medium);
+}
+.profile-option-new + .profile-option-new { border-top: none; }
+
+/* display:flex would otherwise beat the hidden attribute */
+.settings-row[hidden] { display: none; }

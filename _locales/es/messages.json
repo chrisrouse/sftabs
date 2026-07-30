@@ -2685,5 +2685,157 @@
   },
   "syncConflictUseSettings": {
     "message": "El almacenamiento de sincronización ya contiene datos de otro dispositivo. Abra los ajustes avanzados para elegir qué copia conservar."
+  },
+  "newProfileSubtitle": {
+    "message": "Asígnele un nombre y vincule las organizaciones a las que se aplica."
+  },
+  "editProfileSubtitle": {
+    "message": "Cámbiele el nombre o modifique a qué organizaciones se aplica."
+  },
+  "ariaCloseProfilePanel": {
+    "message": "Cerrar el panel de perfil"
+  },
+  "profileOrgsLabel": {
+    "message": "Organizaciones vinculadas"
+  },
+  "profileOrgsHint": {
+    "message": "Un identificador de organización por línea: la parte del subdominio, como acme o acme--dev1. Se usa para cambiar de perfil automáticamente."
+  },
+  "captureCurrentOrg": {
+    "message": "Agregar la organización actual"
+  },
+  "profileOptionsLegend": {
+    "message": "Opciones del perfil"
+  },
+  "profileIsDefaultLabel": {
+    "message": "Perfil predeterminado"
+  },
+  "profileIsDefaultDesc": {
+    "message": "Se usa cuando ninguna organización vinculada coincide"
+  },
+  "deleteProfileButton": {
+    "message": "Eliminar perfil"
+  },
+  "profilesListSubtitle": {
+    "message": "Conjuntos de pestañas separados por organización"
+  },
+  "ariaCloseProfilesList": {
+    "message": "Cerrar perfiles"
+  },
+  "newProfileButton": {
+    "message": "Nuevo perfil"
+  },
+  "profilesListHint": {
+    "message": "Cambiar de perfil sustituye toda la lista de pestañas. Al eliminar uno también se eliminan sus pestañas."
+  },
+  "manageProfilesLabel": {
+    "message": "Administrar perfiles"
+  },
+  "manageProfilesDesc": {
+    "message": "Agregar, cambiar el nombre o quitar perfiles"
+  },
+  "manageButton": {
+    "message": "Administrar"
+  },
+  "manageProfilesButton": {
+    "message": "Administrar perfiles"
+  },
+  "cannotDeleteLastProfile": {
+    "message": "No se puede eliminar el último perfil: las pestañas no tendrían dónde estar."
+  },
+  "deleteProfileConfirmTitle": {
+    "message": "¿Eliminar el perfil?"
+  },
+  "deleteProfileConfirmOne": {
+    "message": "Al eliminar \"$NAME$\" también se elimina su $COUNT$ pestaña. Esta acción no se puede deshacer.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      },
+      "count": {
+        "content": "$2",
+        "example": "1"
+      }
+    }
+  },
+  "deleteProfileConfirmMany": {
+    "message": "Al eliminar \"$NAME$\" también se eliminan sus $COUNT$ pestañas. Esta acción no se puede deshacer.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      },
+      "count": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
+  },
+  "orgCountOne": {
+    "message": "$COUNT$ organización",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "orgCountMany": {
+    "message": "$COUNT$ organizaciones",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "noOrgsLinked": {
+    "message": "Sin organizaciones vinculadas"
+  },
+  "defaultBadge": {
+    "message": "Predeterminado"
+  },
+  "activeBadge": {
+    "message": "Activo"
+  },
+  "notASalesforceOrg": {
+    "message": "Esta página no es una organización de Salesforce."
+  },
+  "orgAlreadyLinked": {
+    "message": "$ORG$ ya está vinculada a este perfil.",
+    "placeholders": {
+      "org": {
+        "content": "$1",
+        "example": "acme--dev1"
+      }
+    }
+  },
+  "orgCaptured": {
+    "message": "$ORG$ agregada",
+    "placeholders": {
+      "org": {
+        "content": "$1",
+        "example": "acme--dev1"
+      }
+    }
+  },
+  "profileSavedNamed": {
+    "message": "\"$NAME$\" guardado",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "profileCreatedNamed": {
+    "message": "\"$NAME$\" creado",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Sandbox"
+      }
+    }
   }
 }

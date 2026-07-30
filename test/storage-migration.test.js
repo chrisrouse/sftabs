@@ -93,6 +93,47 @@ async function seedLocal() {
   });
 }
 
+/** Mirrors removeProfileTabs() in js/popup.js. */
+async function removeProfileTabs(profileId) {
+  const key = `profile_${profileId}_tabs`;
+  try { await SFTabs.storageChunking.clearChunkedSync(key); } catch {}
+  try { await sync.remove([key]); await local.remove([key]); } catch {}
+}
+
+/** Mirrors the storage half of deleteProfileFlow() in js/popup.js. */
+async function deleteProfile(profileId, profiles) {
+  if (profiles.length < 2) return { refused: true, profiles };
+  const remaining = profiles.filter(p => p.id !== profileId);
+  const fallback = remaining.find(p => p.isDefault) || remaining[0];
+  if (!remaining.some(p => p.isDefault)) fallback.isDefault = true;
+
+  await S.saveProfiles(remaining, false);
+  const patch = {};
+  if (settings.activeProfileId === profileId) patch.activeProfileId = fallback.id;
+  if (settings.defaultProfileId === profileId) patch.defaultProfileId = fallback.id;
+  if (Object.keys(patch).length) {
+    settings = { ...settings, ...patch };
+    await S.saveUserSettings(settings, true, false);
+  }
+  await removeProfileTabs(profileId);   // only once the profile is unreferenced
+  return { refused: false, profiles: remaining };
+}
+
+async function seedTwoProfiles() {
+  for (const k of Object.keys(local._data)) delete local._data[k];
+  for (const k of Object.keys(sync._data)) delete sync._data[k];
+  settings = { ...SFTabs.constants.DEFAULT_SETTINGS, useSyncStorage: false, activeProfileId: 'p1', defaultProfileId: 'p1' };
+  const second = { id: 'p2', name: 'Sandbox', isDefault: false, urlPatterns: ['acme--dev1'], createdAt: new Date(1).toISOString() };
+  await local.set({
+    deviceSettings: { useSyncStorage: false },
+    userSettings: settings,
+    profiles: [PROFILE, second],
+    profile_p1_tabs: TABS,
+    profile_p2_tabs: [{ id: 's1', label: 'Sandbox tab', path: 'X', position: 0 }],
+  });
+  return [{ ...PROFILE }, second];
+}
+
 const results = [];
 function check(name, pass, detail = '') {
   results.push({ name, pass, detail });
@@ -134,7 +175,29 @@ const counts = async () => ({
   c = await counts();
   check('naive order (persist first) loses the tabs — do not use it', c.tabs === 0, `tabs=${c.tabs}`);
 
-  const failed = results.filter(r => !r.pass);
+  // ── Profile deletion ──
+  let profiles = await seedTwoProfiles();
+  let r = await deleteProfile('p2', profiles);
+  check('deleting a profile removes it from the list', r.profiles.length === 1 && r.profiles[0].id === 'p1');
+  check('deleting a profile removes its tab data',
+    !('profile_p2_tabs' in local._data) && !('profile_p2_tabs' in sync._data));
+  check('the other profile\'s tabs are untouched',
+    JSON.stringify(local._data.profile_p1_tabs) === JSON.stringify(TABS));
+
+  // Deleting the active + default profile must hand both roles over.
+  profiles = await seedTwoProfiles();
+  r = await deleteProfile('p1', profiles);
+  check('deleting the active profile reassigns activeProfileId', settings.activeProfileId === 'p2');
+  check('deleting the default profile reassigns defaultProfileId', settings.defaultProfileId === 'p2');
+  check('a profile always carries isDefault', r.profiles.some(p => p.isDefault));
+  c = await counts();
+  check('the surviving profile still resolves its tabs', c.profiles === 1);
+
+  // The last profile has nowhere to hand off to.
+  r = await deleteProfile('p2', r.profiles);
+  check('deleting the last profile is refused', r.refused === true && r.profiles.length === 1);
+
+  const failed = results.filter(r2 => !r2.pass);
   console.log(`\n${results.length - failed.length}/${results.length} passed`);
   process.exit(failed.length ? 1 : 0);
 })();

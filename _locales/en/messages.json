@@ -2813,5 +2813,189 @@
   "syncConflictUseSettings": {
     "message": "Sync storage already has data from another device. Open advanced settings to choose which copy to keep.",
     "description": "Error shown when enabling sync would overwrite data another device already synced. The advanced settings page has the conflict resolver."
+  },
+  "newProfileSubtitle": {
+    "message": "Name it and link the orgs it should apply to.",
+    "description": "Subtitle of the profile form when creating"
+  },
+  "editProfileSubtitle": {
+    "message": "Rename it or change which orgs it applies to.",
+    "description": "Subtitle of the profile form when editing"
+  },
+  "ariaCloseProfilePanel": {
+    "message": "Close profile panel",
+    "description": "Accessible name for the X that closes the profile form"
+  },
+  "profileOrgsLabel": {
+    "message": "Linked orgs",
+    "description": "Label for the field listing org identifiers this profile applies to"
+  },
+  "profileOrgsHint": {
+    "message": "One org identifier per line — the subdomain part, like acme or acme--dev1. Used to switch profiles automatically.",
+    "description": "Hint under the linked-orgs field. Stresses that it is the identifier, not a full URL, because matching is exact"
+  },
+  "captureCurrentOrg": {
+    "message": "Add the org I’m on",
+    "description": "Button that appends the current tab’s org identifier to the list"
+  },
+  "profileOptionsLegend": {
+    "message": "Profile Options",
+    "description": "Legend for the profile checkbox group"
+  },
+  "profileIsDefaultLabel": {
+    "message": "Default profile",
+    "description": "Checkbox label marking this the fallback profile"
+  },
+  "profileIsDefaultDesc": {
+    "message": "Used when no linked org matches",
+    "description": "Description under the default-profile checkbox"
+  },
+  "deleteProfileButton": {
+    "message": "Delete Profile",
+    "description": "Destructive button in the profile form"
+  },
+  "profilesListSubtitle": {
+    "message": "Separate tab sets per org",
+    "description": "Subtitle of the profiles list panel"
+  },
+  "ariaCloseProfilesList": {
+    "message": "Close profiles",
+    "description": "Accessible name for the X that closes the profiles list"
+  },
+  "newProfileButton": {
+    "message": "New profile",
+    "description": "Action that opens an empty profile form"
+  },
+  "profilesListHint": {
+    "message": "Switching profiles swaps the whole tab list. Deleting one removes its tabs too.",
+    "description": "Explanatory note at the bottom of the profiles list"
+  },
+  "manageProfilesLabel": {
+    "message": "Manage profiles",
+    "description": "Settings row label for the profiles list"
+  },
+  "manageProfilesDesc": {
+    "message": "Add, rename, or remove profiles",
+    "description": "Settings row description for the profiles list"
+  },
+  "manageButton": {
+    "message": "Manage",
+    "description": "Short button label opening a management panel"
+  },
+  "manageProfilesButton": {
+    "message": "Manage profiles",
+    "description": "Action at the bottom of the profile switcher that opens the profiles list"
+  },
+  "cannotDeleteLastProfile": {
+    "message": "The last profile can’t be deleted — there would be nowhere for tabs to live.",
+    "description": "Error when trying to delete the only remaining profile"
+  },
+  "deleteProfileConfirmTitle": {
+    "message": "Delete profile?",
+    "description": "Title of the delete-profile confirmation"
+  },
+  "deleteProfileConfirmOne": {
+    "message": "Deleting \"$NAME$\" also deletes its $COUNT$ tab. This cannot be undone.",
+    "description": "Delete-profile confirmation, singular tab count",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      },
+      "count": {
+        "content": "$2",
+        "example": "1"
+      }
+    }
+  },
+  "deleteProfileConfirmMany": {
+    "message": "Deleting \"$NAME$\" also deletes its $COUNT$ tabs. This cannot be undone.",
+    "description": "Delete-profile confirmation, plural tab count",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      },
+      "count": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
+  },
+  "orgCountOne": {
+    "message": "$COUNT$ org",
+    "description": "Count of orgs linked to a profile, singular",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "orgCountMany": {
+    "message": "$COUNT$ orgs",
+    "description": "Count of orgs linked to a profile, plural",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "noOrgsLinked": {
+    "message": "No orgs linked",
+    "description": "Shown for a profile with no org identifiers"
+  },
+  "defaultBadge": {
+    "message": "Default",
+    "description": "Marks the fallback profile in the list"
+  },
+  "activeBadge": {
+    "message": "Active",
+    "description": "Marks the currently selected profile in the list"
+  },
+  "notASalesforceOrg": {
+    "message": "This page isn’t a Salesforce org.",
+    "description": "Error when capturing the current org from a non-Salesforce page"
+  },
+  "orgAlreadyLinked": {
+    "message": "$ORG$ is already linked to this profile.",
+    "description": "Status when the captured org is already in the list",
+    "placeholders": {
+      "org": {
+        "content": "$1",
+        "example": "acme--dev1"
+      }
+    }
+  },
+  "orgCaptured": {
+    "message": "Added $ORG$",
+    "description": "Status after capturing the current org identifier",
+    "placeholders": {
+      "org": {
+        "content": "$1",
+        "example": "acme--dev1"
+      }
+    }
+  },
+  "profileSavedNamed": {
+    "message": "\"$NAME$\" saved",
+    "description": "Status after editing a profile",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "profileCreatedNamed": {
+    "message": "\"$NAME$\" created",
+    "description": "Status after creating a profile",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Sandbox"
+      }
+    }
   }
 }

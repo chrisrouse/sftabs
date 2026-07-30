@@ -2685,5 +2685,157 @@
   },
   "syncConflictUseSettings": {
     "message": "Der Sync-Speicher enthält bereits Daten von einem anderen Gerät. Öffnen Sie die erweiterten Einstellungen, um zu wählen, welche Kopie erhalten bleibt."
+  },
+  "newProfileSubtitle": {
+    "message": "Benennen Sie es und verknüpfen Sie die Orgs, für die es gelten soll."
+  },
+  "editProfileSubtitle": {
+    "message": "Umbenennen oder ändern, für welche Orgs es gilt."
+  },
+  "ariaCloseProfilePanel": {
+    "message": "Profilbereich schließen"
+  },
+  "profileOrgsLabel": {
+    "message": "Verknüpfte Orgs"
+  },
+  "profileOrgsHint": {
+    "message": "Ein Org-Bezeichner pro Zeile — der Subdomain-Teil, etwa acme oder acme--dev1. Wird für den automatischen Profilwechsel verwendet."
+  },
+  "captureCurrentOrg": {
+    "message": "Aktuelle Org hinzufügen"
+  },
+  "profileOptionsLegend": {
+    "message": "Profiloptionen"
+  },
+  "profileIsDefaultLabel": {
+    "message": "Standardprofil"
+  },
+  "profileIsDefaultDesc": {
+    "message": "Wird verwendet, wenn keine verknüpfte Org passt"
+  },
+  "deleteProfileButton": {
+    "message": "Profil löschen"
+  },
+  "profilesListSubtitle": {
+    "message": "Getrennte Registerkartensätze pro Org"
+  },
+  "ariaCloseProfilesList": {
+    "message": "Profile schließen"
+  },
+  "newProfileButton": {
+    "message": "Neues Profil"
+  },
+  "profilesListHint": {
+    "message": "Ein Profilwechsel tauscht die gesamte Registerkartenliste aus. Beim Löschen werden auch dessen Registerkarten entfernt."
+  },
+  "manageProfilesLabel": {
+    "message": "Profile verwalten"
+  },
+  "manageProfilesDesc": {
+    "message": "Profile hinzufügen, umbenennen oder entfernen"
+  },
+  "manageButton": {
+    "message": "Verwalten"
+  },
+  "manageProfilesButton": {
+    "message": "Profile verwalten"
+  },
+  "cannotDeleteLastProfile": {
+    "message": "Das letzte Profil kann nicht gelöscht werden — es gäbe keinen Ort für die Registerkarten."
+  },
+  "deleteProfileConfirmTitle": {
+    "message": "Profil löschen?"
+  },
+  "deleteProfileConfirmOne": {
+    "message": "Beim Löschen von \"$NAME$\" wird auch dessen $COUNT$ Registerkarte gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      },
+      "count": {
+        "content": "$2",
+        "example": "1"
+      }
+    }
+  },
+  "deleteProfileConfirmMany": {
+    "message": "Beim Löschen von \"$NAME$\" werden auch dessen $COUNT$ Registerkarten gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      },
+      "count": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
+  },
+  "orgCountOne": {
+    "message": "$COUNT$ Org",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "orgCountMany": {
+    "message": "$COUNT$ Orgs",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "noOrgsLinked": {
+    "message": "Keine Orgs verknüpft"
+  },
+  "defaultBadge": {
+    "message": "Standard"
+  },
+  "activeBadge": {
+    "message": "Aktiv"
+  },
+  "notASalesforceOrg": {
+    "message": "Diese Seite ist keine Salesforce-Org."
+  },
+  "orgAlreadyLinked": {
+    "message": "$ORG$ ist bereits mit diesem Profil verknüpft.",
+    "placeholders": {
+      "org": {
+        "content": "$1",
+        "example": "acme--dev1"
+      }
+    }
+  },
+  "orgCaptured": {
+    "message": "$ORG$ hinzugefügt",
+    "placeholders": {
+      "org": {
+        "content": "$1",
+        "example": "acme--dev1"
+      }
+    }
+  },
+  "profileSavedNamed": {
+    "message": "\"$NAME$\" gespeichert",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "profileCreatedNamed": {
+    "message": "\"$NAME$\" erstellt",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Sandbox"
+      }
+    }
   }
 }

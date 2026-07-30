@@ -73,8 +73,8 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 |---|---|---|
 | Active profile chip + switcher | Done | Color derived from id hash; production has no color field |
 | Switch profile, broadcast to open SF tabs | Done | `broadcastTabRefresh()` sends `refresh_tabs` to the same setup-page URL set production uses |
-| Create / rename / delete profile | **Delegated** | Settings page |
-| URL patterns, capture current domain | **Delegated** | Settings page |
+| Create / rename / delete profile | Done | Profiles list in the tray, reachable from the switcher or Settings > Manage profiles. Delete removes the profile's tabs and refuses on the last one |
+| URL patterns, capture current domain | Done | "Linked orgs" field on the profile form, with a capture action. Patterns are matched by exact equality against the org identifier, so capturing is the only reliable way to fill it |
 | Auto-switch by URL | Done | Handled by `background.js`, unchanged |
 | Disable profiles, keep one | **Delegated** | Settings page |
 
