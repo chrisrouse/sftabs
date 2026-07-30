@@ -211,7 +211,7 @@ async function createFirstProfile(settings, tabs) {
  * Show the welcome wizard, but only on a genuinely fresh install.
  *
  * Detection is production's `checkFirstLaunch()` — it reads both storage areas
- * and recognises upgrades, which matters because showing this to an existing
+ * and recognizes upgrades, which matters because showing this to an existing
  * user would offer to overwrite their tabs. Anything other than
  * 'first-install' (upgrade, already completed, synced data from another
  * device, or an error) falls through to the existing headless path.
@@ -289,7 +289,7 @@ async function applyFirstLaunchChoice(setup, enableProfiles) {
   };
 
   // 'import' gets an empty profile too, so the popup has a valid active profile
-  // to import into rather than a half-initialised state.
+  // to import into rather than a half-initialized state.
   const tabs = setup === 'default' ? [...SFTabs.constants.DEFAULT_TABS] : [];
   await createFirstProfile(settings, tabs);
 

@@ -491,7 +491,7 @@
   filter: brightness(0) invert(1);
 }
 
-/* Labelled pill */
+/* Labeled pill */
 .sftabs-floating-modal[data-layout="pill"] .modal-toggle-button {
   width: auto;
   height: 36px;
@@ -580,7 +580,7 @@
   background: #0f6fd4;
 }
 .sftabs-floating-modal[data-layout="handle"].open .modal-toggle-button img {
-  /* Single-colour logo, so this is a clean white silhouette on the blue */
+  /* Single-color logo, so this is a clean white silhouette on the blue */
   filter: brightness(0) invert(1);
 }
 .sftabs-floating-modal[data-layout="handle"].open .modal-panel {

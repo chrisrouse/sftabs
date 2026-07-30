@@ -97,7 +97,7 @@ const DEFAULT_SETTINGS = {
   defaultProfileId: null, // Default profile to use when auto-switch doesn't match
   floatingButton: {
     enabled: false, // Disabled by default (opt-in feature)
-    layout: 'handle', // 'handle' (edge drawer) | 'fab' (round) | 'pill' (labelled)
+    layout: 'handle', // 'handle' (edge drawer) | 'fab' (round) | 'pill' (labeled)
     anchor: 'middle-right', // {top|middle|bottom}-{left|center|right}
     offset: 0, // Pixels from the anchored edge. 0 = derive from legacy `position`
     position: 25, // LEGACY percentage down the edge; still read when offset is 0

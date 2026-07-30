@@ -47,7 +47,7 @@ Reverting is always one line: `manifest.base.json` → `action.default_popup`.
 | Reorder / re-nest via drag | Done | before / after / nest zones |
 | Depth limit | Done | Parent → child → grandchild (`MAX_ITEM_DEPTH = 2`) |
 | Populate from ObjectManager page | Done | Ports production's validation; stores only canonical fields |
-| Refresh from page | Done | Same button, relabelled |
+| Refresh from page | Done | Same button, relabeled |
 | Drag a tab onto a tab to group it | Done | Depth-checked |
 | Staged edits with cancel | **Dropped** | v2 saves immediately, by decision |
 
@@ -71,7 +71,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 
 | Capability | Status | Notes |
 |---|---|---|
-| Active profile chip + switcher | Done | Colour derived from id hash; production has no colour field |
+| Active profile chip + switcher | Done | Color derived from id hash; production has no color field |
 | Switch profile, broadcast to open SF tabs | **Gap** | Switches and reloads tabs, but does not message content scripts (`refresh_tabs`), so an open page keeps the old nav |
 | Create / rename / delete profile | **Delegated** | Settings page |
 | URL patterns, capture current domain | **Delegated** | Settings page |

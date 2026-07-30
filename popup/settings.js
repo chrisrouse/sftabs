@@ -238,7 +238,7 @@ function updateUI() {
  */
 /**
  * Which anchors each layout allows. A docked drawer only makes sense against a
- * left or right edge, so the top/bottom-centre anchors are disabled for it.
+ * left or right edge, so the top/bottom-center anchors are disabled for it.
  */
 const FLOATING_LAYOUT_ANCHORS = {
 	handle: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
