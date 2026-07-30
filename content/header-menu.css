@@ -26,7 +26,13 @@
      never put this next to our button. */
   position: fixed;
   z-index: 9000;
+  /* min-width and max-width are set explicitly because .uiMenuList carries its
+     own min-width, and min-width wins over width no matter the specificity —
+     which is what made this render at double the intended size, and in turn
+     tripped the overflow check in position() into flipping it leftwards. */
   width: 20.625rem;
+  min-width: 0;
+  max-width: 20.625rem;
   cursor: default;
   text-align: left;
   background: #fff;
