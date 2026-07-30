@@ -3005,5 +3005,17 @@
   "autoSwitchNeedsOrgs": {
     "message": "No profile has a linked org yet, so there is nothing to match. Add one from a profile's Linked orgs field.",
     "description": "Shown under the auto-switch toggle when it is on but no profile has any linked orgs, so it cannot do anything"
+  },
+  "headerMenuEnabled": {
+    "message": "Show a menu in the Salesforce header",
+    "description": "Label for the setting that injects an SF Tabs item into Salesforce's global header"
+  },
+  "headerMenuEnabledDescription": {
+    "message": "Adds a bookmark button to Salesforce's own header, beside Favorites, that opens your tabs. Works alongside the floating button or on its own.",
+    "description": "Description under the header-menu setting"
+  },
+  "headerMenuAriaLabel": {
+    "message": "SF Tabs — open your tabs",
+    "description": "Accessible name for the bookmark button injected into the Salesforce header"
   }
 }

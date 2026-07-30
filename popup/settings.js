@@ -216,6 +216,8 @@ function updateUI() {
 	}
 
 	document.getElementById('floating-button-enabled').checked = userSettings.floatingButton.enabled || false;
+	document.getElementById('header-menu-enabled').checked =
+		!!(userSettings.headerMenu && userSettings.headerMenu.enabled);
 
 	// Set the location radio button
 	const location = userSettings.floatingButton.location || 'everywhere';
@@ -543,6 +545,15 @@ function setupEventListeners() {
 		userSettings.floatingButton.enabled = e.target.checked;
 		await saveUserSettings();
 		toggleFloatingButtonSettings();
+	});
+
+	// Header menu enabled — its own setting, not a floating-button layout
+	document.getElementById('header-menu-enabled').addEventListener('change', async (e) => {
+		if (!userSettings.headerMenu) {
+			userSettings.headerMenu = { ...SFTabs.constants.DEFAULT_SETTINGS.headerMenu };
+		}
+		userSettings.headerMenu.enabled = e.target.checked;
+		await saveUserSettings();
 	});
 
 	// Floating button location radio buttons

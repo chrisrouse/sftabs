@@ -53,10 +53,12 @@
         "popup/js/shared/constants.js",
         "popup/js/shared/utils.js",
         "content/floating-button.js",
-        "content/floating-modal.js"
+        "content/floating-modal.js",
+        "content/header-menu.js"
       ],
       "css": [
-        "content/floating-button.css"
+        "content/floating-button.css",
+        "content/header-menu.css"
       ],
       "run_at": "document_idle"
     },

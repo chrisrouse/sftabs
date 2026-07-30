@@ -2846,5 +2846,14 @@
   },
   "autoSwitchNeedsOrgs": {
     "message": "Noch ist keinem Profil eine Org zugeordnet, es gibt also nichts zu vergleichen. Fügen Sie im Feld \"Verknüpfte Orgs\" eines Profils eine hinzu."
+  },
+  "headerMenuEnabled": {
+    "message": "Menü in der Salesforce-Kopfzeile anzeigen"
+  },
+  "headerMenuEnabledDescription": {
+    "message": "Fügt der Salesforce-Kopfzeile neben \"Favoriten\" eine Lesezeichen-Schaltfläche hinzu, die Ihre Registerkarten öffnet. Funktioniert zusammen mit der schwebenden Schaltfläche oder allein."
+  },
+  "headerMenuAriaLabel": {
+    "message": "SF Tabs — Registerkarten öffnen"
   }
 }

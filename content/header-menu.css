@@ -1,0 +1,130 @@
+/* content/header-menu.css
+   The SF Tabs item in Salesforce's global header. The trigger inherits
+   Salesforce's own .slds-global-actions__item-action styling and needs nothing
+   here; these rules are only for the dropdown, which mirrors the Favorites menu.
+
+   Deliberately not using --sft-* tokens: this surface follows Salesforce's
+   theme, not the extension's, so that it reads as native. See
+   docs/mockups/global-header-menu.md. */
+
+.sftabs-hm-menu {
+  position: absolute;
+  top: 42px;
+  left: -6px;
+  z-index: 9000;
+  width: 330px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
+  cursor: default;
+  text-align: left;
+}
+
+/* Nubbin, matching the Favorites menu's */
+.sftabs-hm-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 22px;
+  width: 11px;
+  height: 11px;
+  background: #fff;
+  border-left: 1px solid #e5e5e5;
+  border-top: 1px solid #e5e5e5;
+  transform: rotate(45deg);
+}
+
+.sftabs-hm-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #747474;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.sftabs-hm-close:hover { color: #514f4d; }
+.sftabs-hm-close-icon { width: 13px; height: 13px; }
+
+.sftabs-hm-label {
+  padding: 18px 16px 8px;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #514f4d;
+}
+
+.sftabs-hm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.5rem 0.5rem;
+  max-height: 15.25rem;
+  overflow-y: auto;
+}
+
+.sftabs-hm-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 0.25rem;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: #080707;
+  font: inherit;
+}
+.sftabs-hm-item:hover { background: #f3f2f2; text-decoration: none; }
+.sftabs-hm-item:focus-visible {
+  border-color: #0176d3;
+  outline: none;
+  background: #fff;
+}
+
+.sftabs-hm-text { min-width: 0; }
+.sftabs-hm-name {
+  display: block;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  color: #080707;
+}
+.sftabs-hm-sub {
+  display: block;
+  font-size: 0.8125rem;
+  color: #514f4d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sftabs-hm-count {
+  margin-left: auto;
+  padding-left: 0.5rem;
+  color: #747474;
+  font-size: 0.8125rem;
+  flex-shrink: 0;
+}
+
+.sftabs-hm-empty {
+  padding: 0.25rem 1rem 1rem;
+  font-size: 0.8125rem;
+  color: #514f4d;
+}
+
+/* Sub-items, indented in place rather than cascading into a third floating
+   layer on a page we do not own */
+.sftabs-hm-flyout {
+  list-style: none;
+  margin: 0 0 0.25rem;
+  padding: 0;
+  border-left: 2px solid #e5e5e5;
+}
+.sftabs-hm-item_nested .sftabs-hm-name { font-size: 0.875rem; }

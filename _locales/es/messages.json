@@ -2846,5 +2846,14 @@
   },
   "autoSwitchNeedsOrgs": {
     "message": "Todavía ningún perfil tiene una organización vinculada, así que no hay nada que coincidir. Agregue una en el campo \"Organizaciones vinculadas\" de un perfil."
+  },
+  "headerMenuEnabled": {
+    "message": "Mostrar un menú en el encabezado de Salesforce"
+  },
+  "headerMenuEnabledDescription": {
+    "message": "Agrega un botón de marcador al encabezado de Salesforce, junto a Favoritos, que abre sus pestañas. Funciona junto con el botón flotante o por sí solo."
+  },
+  "headerMenuAriaLabel": {
+    "message": "SF Tabs: abrir sus pestañas"
   }
 }

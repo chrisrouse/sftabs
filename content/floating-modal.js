@@ -859,6 +859,10 @@
   // Let floating-button.js rebuild us after a settings change
   window.SFTabsFloating = window.SFTabsFloating || {};
   window.SFTabsFloating.initModal = initFloatingModal;
+  // Shared with content/header-menu.js so URL building and Lightning navigation
+  // have one implementation rather than a copy per surface.
+  window.SFTabsFloating.buildTabUrl = buildTabUrl;
+  window.SFTabsFloating.navigateToTab = navigateToTab;
 
   // Initialize on page load
   if (document.readyState === 'loading') {
