@@ -16,6 +16,11 @@
   const BOOKMARK = 'm373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7';
   const CLOSE = 'm310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14';
 
+  // Native menus sit 12.8px below their trigger (margin-top on the popup), which
+  // is the space the nubbin occupies. Measured, not guessed — see
+  // docs/snippets/dump-menu-styles.js.
+  const NUBBIN_GAP = 13;
+
   let observer = null;
 
   const msg = (key, subs) => {
@@ -272,7 +277,8 @@
     const button = document.getElementById(ITEM_ID + '-button');
     if (!button) return;
     const rect = button.getBoundingClientRect();
-    const width = menu.offsetWidth || 330;
+    // Width is auto now, matching native, so this has to be the measured value
+    const width = menu.getBoundingClientRect().width || 233;
     const margin = 8;
 
     const flip = rect.left + width + margin > window.innerWidth;
@@ -284,7 +290,7 @@
       : Math.min(rect.left, window.innerWidth - width - margin);
 
     menu.style.position = 'fixed';
-    menu.style.top = `${Math.round(rect.bottom + 6)}px`;
+    menu.style.top = `${Math.round(rect.bottom + NUBBIN_GAP)}px`;
     menu.style.left = `${Math.round(left)}px`;
     menu.style.right = 'auto';
   }
