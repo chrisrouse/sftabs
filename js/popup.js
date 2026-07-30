@@ -882,18 +882,11 @@ function renderProfileDropdown() {
       <span aria-hidden="true">+</span>
       <span>${t('newProfileButton')}</span>
     </button>
-    <button class="profile-option profile-option-new" id="btn-manage-profiles">
-      <span aria-hidden="true">⚙</span>
-      <span>${t('manageProfilesButton')}</span>
-    </button>`;
+`;
 
   document.getElementById('btn-new-profile').addEventListener('click', () => {
     closeProfileDropdown();
     openProfileForm(null);
-  });
-  document.getElementById('btn-manage-profiles').addEventListener('click', () => {
-    closeProfileDropdown();
-    openProfilesList();
   });
 }
 

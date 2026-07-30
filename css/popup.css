@@ -1255,9 +1255,11 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 .profile-dropdown[hidden] { display: none; }
 
+/* No translateX: the menu is right-anchored now. Leaving the old -50% here
+   made it animate in from centre and jump right when the animation ended. */
 @keyframes dropdownIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-5px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .profile-dropdown-header {
@@ -1493,7 +1495,9 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .profile-dot {
   width: 8px;
   height: 8px;
-  margin-left: 12px;
+  margin: 0 2px 0 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
+/* .dropdown-item zeroes this, which leaves the label touching the dot */
+.dropdown-item .profile-dot + .tab-info { padding-left: var(--sft-spacing-2); }

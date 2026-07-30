@@ -2882,10 +2882,6 @@
     "message": "Manage",
     "description": "Short button label opening a management panel"
   },
-  "manageProfilesButton": {
-    "message": "Manage profiles",
-    "description": "Action at the bottom of the profile switcher that opens the profiles list"
-  },
   "cannotDeleteLastProfile": {
     "message": "The last profile can’t be deleted — there would be nowhere for tabs to live.",
     "description": "Error when trying to delete the only remaining profile"

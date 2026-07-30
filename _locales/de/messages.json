@@ -2737,9 +2737,6 @@
   "manageButton": {
     "message": "Verwalten"
   },
-  "manageProfilesButton": {
-    "message": "Profile verwalten"
-  },
   "cannotDeleteLastProfile": {
     "message": "Das letzte Profil kann nicht gelöscht werden — es gäbe keinen Ort für die Registerkarten."
   },

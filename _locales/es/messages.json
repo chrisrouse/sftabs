@@ -2737,9 +2737,6 @@
   "manageButton": {
     "message": "Administrar"
   },
-  "manageProfilesButton": {
-    "message": "Administrar perfiles"
-  },
   "cannotDeleteLastProfile": {
     "message": "No se puede eliminar el último perfil: las pestañas no tendrían dónde estar."
   },
