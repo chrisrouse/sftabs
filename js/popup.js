@@ -1111,12 +1111,12 @@ function renderProfilesList() {
         </button>
         <button class="tab-btn tab-btn--edit" data-action="edit-profile" data-id="${p.id}"
           aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}">
-          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M60 400v60h60l295-295-60-60zm410-295c6-6 6-15 0-21l-38-38c-6-6-15-6-21 0l-30 30 60 60z"/></svg>
+          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
         </button>
         ${state.profiles.length > 1 ? `
         <button class="tab-btn tab-btn--delete" data-action="delete-profile" data-id="${p.id}"
           aria-label="${t('ariaDeleteNamed', name)}" title="${t('deleteButtonTitle')}">
-          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M160 60V40a20 20 0 0 1 20-20h160a20 20 0 0 1 20 20v20h90a20 20 0 0 1 20 20v20a10 10 0 0 1-10 10H60a10 10 0 0 1-10-10V80a20 20 0 0 1 20-20zm-60 120h320l-18 280a30 30 0 0 1-30 28H148a30 30 0 0 1-30-28z"/></svg>
+          <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
         </button>` : ''}
       </div>
     </li>`;
