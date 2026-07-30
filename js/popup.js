@@ -227,25 +227,55 @@ async function maybeRunFirstLaunch() {
   }
   if (status?.reason !== 'first-install') return;
 
-  await new Promise(resolve => {
+  await runFirstLaunchWizard({ preview: false });
+}
+
+/**
+ * Open the wizard and resolve once it closes.
+ *
+ * `preview: true` is the Settings > Debug route — everything is interactive but
+ * the choice is never applied, so it can be opened on a populated install
+ * without touching saved data.
+ */
+function runFirstLaunchWizard({ preview }) {
+  return new Promise(resolve => {
     const overlay = document.getElementById('modal-first-launch');
     if (!overlay) return resolve();
+
+    document.getElementById('fl-preview-note').hidden = !preview;
+    document.getElementById('fl-start').textContent = preview ? 'Close preview' : 'Get started';
     overlay.hidden = false;
 
     document.getElementById('fl-start').addEventListener('click', async () => {
       const setup = document.querySelector('input[name="fl-setup"]:checked')?.value || 'default';
       const enableProfiles = document.getElementById('fl-enable-profiles').checked;
-      try {
-        await applyFirstLaunchChoice(setup, enableProfiles);
-      } catch (err) {
-        // Leaving storage empty is recoverable: ensureUsableState() seeds
-        // defaults on the next line of init.
-        state.loadError = `Setup didn't finish: ${err.message}`;
+
+      if (preview) {
+        showStatus(describeFirstLaunchChoice(setup, enableProfiles));
+      } else {
+        try {
+          await applyFirstLaunchChoice(setup, enableProfiles);
+        } catch (err) {
+          // Leaving storage empty is recoverable: ensureUsableState() seeds
+          // defaults on the next line of init.
+          state.loadError = `Setup didn't finish: ${err.message}`;
+        }
       }
       overlay.hidden = true;
       resolve();
     }, { once: true });
   });
+}
+
+/** What a real run of this choice would have done — preview mode only. */
+function describeFirstLaunchChoice(setup, enableProfiles) {
+  const count = window.SFTabs?.constants?.DEFAULT_TABS?.length;
+  const outcome = {
+    default: `a Default profile with ${count ? `${count} tabs` : 'the default tabs'}`,
+    empty:   'an empty Default profile',
+    import:  'an empty Default profile, then opened the settings page to import'
+  }[setup];
+  return `Preview only — would have created ${outcome}, profiles ${enableProfiles ? 'on' : 'off'}. Nothing was saved.`;
 }
 
 /**
@@ -1548,6 +1578,10 @@ function bindEvents() {
   document.getElementById('setting-profiles').addEventListener('change', e => {
     patchSettings({ profilesEnabled: e.target.checked });
     document.querySelector('.header-center').style.visibility = e.target.checked ? 'visible' : 'hidden';
+  });
+
+  document.getElementById('btn-preview-first-launch').addEventListener('click', () => {
+    runFirstLaunchWizard({ preview: true });
   });
 
   document.getElementById('btn-advanced-settings').addEventListener('click', e => {

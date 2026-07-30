@@ -1500,3 +1500,12 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   background: var(--s-1);
 }
 .check-row-standalone:has(input:checked) { background: var(--c-primary-light); }
+.wizard-preview-note {
+  margin: 0 0 var(--sft-spacing-3);
+  padding: var(--sft-spacing-2) var(--sft-spacing-3);
+  border-radius: var(--r-sm);
+  background: var(--c-primary-tint);
+  color: var(--c-primary-on-tint);
+  font-size: var(--sft-font-size-xs);
+  line-height: var(--sft-line-height-base);
+}

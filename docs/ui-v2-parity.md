@@ -86,7 +86,8 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 | Recover from interrupted migration | Done | Adopts existing profile |
 | Recover stale `activeProfileId` | Done | Falls back to the default profile |
 | Seed defaults on fresh install | Done | |
-| First-launch wizard (setup choice) | Done | Shown only when production's `checkFirstLaunch()` returns `first-install`. Offers common tabs / empty / import, plus enable-profiles. Storage choice deliberately left out for now — `DEFAULT_SETTINGS` sync preference stands |
+| First-launch wizard (setup choice) | Done | Settings > Debug has a Preview button that opens it read-only on a populated install |
+| First-launch wizard — real run | Done | Shown only when production's `checkFirstLaunch()` returns `first-install`. Offers common tabs / empty / import, plus enable-profiles. Storage choice deliberately left out for now — `DEFAULT_SETTINGS` sync preference stands |
 | Sync-data-detected screen | **Dropped** | v2 just reads the synced data |
 | Release notes panel | Done | Content renders |
 | Release notes gating (`seenReleaseNotesVersion`) | Done | Gate version is read from the panel's topmost `.rn-version-label`, so updating the notes updates the check. Same storage key as the old popup, so a dismissal there carries over. Bell stays visible; only the dot clears |

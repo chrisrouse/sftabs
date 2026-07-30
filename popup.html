@@ -245,6 +245,19 @@
               </div>
             </section>
 
+            <section class="settings-section" aria-labelledby="s-debug">
+              <h3 class="settings-section-title" id="s-debug">Debug</h3>
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <span class="settings-label">Preview first-launch wizard</span>
+                  <span class="settings-desc">Opens the welcome screen without writing anything</span>
+                </div>
+                <div class="settings-row-control">
+                  <button class="btn-secondary" id="btn-preview-first-launch">Preview</button>
+                </div>
+              </div>
+            </section>
+
             <div class="settings-advanced">
               <a href="#" class="advanced-link" id="btn-advanced-settings" aria-label="Open advanced settings in a new tab">
                 Advanced settings — import, export, danger zone
@@ -385,6 +398,9 @@
         </div>
 
         <div class="modal-body modal-body-scroll">
+          <p class="wizard-preview-note" id="fl-preview-note" hidden>
+            Preview — your saved tabs and settings won't be touched.
+          </p>
           <div class="choice-cards" role="radiogroup" aria-label="Starting point">
             <label class="choice-card">
               <input type="radio" name="fl-setup" value="default" checked />
