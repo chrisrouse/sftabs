@@ -9,6 +9,7 @@
     window.browser = {
       runtime: {
         getURL: chrome.runtime.getURL.bind(chrome.runtime),
+        getManifest: chrome.runtime.getManifest.bind(chrome.runtime),
         onMessage: chrome.runtime.onMessage,
         lastError: chrome.runtime.lastError,
         openOptionsPage: function() {

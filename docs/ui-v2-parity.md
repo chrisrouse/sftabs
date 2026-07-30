@@ -86,11 +86,11 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 | Recover from interrupted migration | Done | Adopts existing profile |
 | Recover stale `activeProfileId` | Done | Falls back to the default profile |
 | Seed defaults on fresh install | Done | |
-| First-launch wizard (setup choice, storage choice) | **Dropped** | v2 seeds defaults silently. Revisit if the storage choice matters at install time |
+| First-launch wizard (setup choice) | Done | Shown only when production's `checkFirstLaunch()` returns `first-install`. Offers common tabs / empty / import, plus enable-profiles. Storage choice deliberately left out for now — `DEFAULT_SETTINGS` sync preference stands |
 | Sync-data-detected screen | **Dropped** | v2 just reads the synced data |
 | Release notes panel | Done | Content renders |
-| Release notes gating (`seenReleaseNotesVersion`) | **Gap** | Bell dot never clears; "don't show again" unwired |
-| Version label | **Gap** | Hardcoded `v2.1.2` in two places; read `chrome.runtime.getManifest().version` |
+| Release notes gating (`seenReleaseNotesVersion`) | Done | Gate version is read from the panel's topmost `.rn-version-label`, so updating the notes updates the check. Same storage key as the old popup, so a dismissal there carries over. Bell stays visible; only the dot clears |
+| Version label | Done | Footer reads `browser.runtime.getManifest().version`. Required adding `getManifest` to the browser-compat shim, which the v1-migration path was already calling |
 
 ## 6. Cross-cutting
 
@@ -109,12 +109,23 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 ## Gaps, in release order
 
 1. **Localization** — the only outright regression from what ships today.
-2. **Storage sync/local radios** — a visibly broken setting; risks users believing data stopped syncing.
-3. **Version label** — will display the wrong version.
-4. **Release-notes gating** — bell shows unread forever.
-5. **`storage.onChanged`** — stale popup after background profile switch.
-6. **Profile switch broadcast** — open SF pages keep the previous nav until reload.
+2. **`storage.onChanged`** — stale popup after background profile switch.
+3. **Profile switch broadcast** — open SF pages keep the previous nav until reload.
+4. **Storage sync/local radios** — a visibly broken setting; risks users
+   believing data stopped syncing. *On hold by decision until the rest is done.*
 
-Deliberately deferred: first-launch wizard, sync-data-detected screen, staged
-sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked **Delegated** needs no work — it is reachable
-through the advanced settings page.
+Deliberately deferred: migration wizard, sync-data-detected screen, staged
+sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked
+**Delegated** needs no work — it is reachable through the advanced settings
+page.
+
+## Release-process note
+
+`/release` (`.claude/commands/release.md`) still edits
+`popup/js/popup-release-notes.js` and `popup/popup.html` — the *old* popup. Once
+the manifest points at the v2 popup, it must instead rewrite the `.rn-version`
+blocks in root `popup.html`; there is no `RELEASE_NOTES_VERSION` constant to
+bump, because v2 derives the gate from the topmost `.rn-version-label`.
+
+Separately, `manifest.base.json` is at 2.1.1 while CHANGELOG and the notes are
+at 2.1.2, so the footer will read v2.1.1 until the manifest is bumped.

@@ -37,6 +37,10 @@ let state = {
 // ── Init ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   installProductionHooks();
+  renderVersion();
+  // Must precede loadFromStorage: ensureUsableState() would otherwise seed
+  // defaults silently and there would be nothing left to choose.
+  await maybeRunFirstLaunch();
   await loadFromStorage();
   renderTabList();
   renderProfileChip();
@@ -45,8 +49,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyDensity(state.settings.compactMode);
   showView('empty');
   bindEvents();
+  await initReleaseNotes();
   if (state.loadError) showStatus(state.loadError, 'error');
 });
+
+/** Single source of truth for the displayed version: the manifest. */
+function renderVersion() {
+  const el = document.getElementById('footer-version');
+  if (!el) return;
+  const version = browser.runtime.getManifest().version;
+  el.textContent = `v${version}`;
+  el.setAttribute('aria-label', `Version ${version}`);
+}
 
 /**
  * Load settings, profiles and tabs through the production storage layer.
@@ -165,6 +179,15 @@ async function migrateLegacyTabs(tabs, settings) {
 }
 
 async function seedDefaults(settings) {
+  await createFirstProfile(settings, [...SFTabs.constants.DEFAULT_TABS]);
+}
+
+/**
+ * Create the Default profile and give it `tabs`. Shared by the silent seed path
+ * and the first-launch wizard so there is one way to establish initial state.
+ * Writes go through the production storage layer, never raw storage calls.
+ */
+async function createFirstProfile(settings, tabs) {
   const profile = {
     id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
     name: 'Default',
@@ -178,7 +201,134 @@ async function seedDefaults(settings) {
     { ...settings, activeProfileId: profile.id, defaultProfileId: profile.id },
     false, false
   );
-  await SFTabs.storage.saveProfileTabs(profile.id, [...SFTabs.constants.DEFAULT_TABS]);
+  await SFTabs.storage.saveProfileTabs(profile.id, tabs);
+  return profile;
+}
+
+// ── First launch ───────────────────────────────────────────────
+
+/**
+ * Show the welcome wizard, but only on a genuinely fresh install.
+ *
+ * Detection is production's `checkFirstLaunch()` — it reads both storage areas
+ * and recognises upgrades, which matters because showing this to an existing
+ * user would offer to overwrite their tabs. Anything other than
+ * 'first-install' (upgrade, already completed, synced data from another
+ * device, or an error) falls through to the existing headless path.
+ */
+async function maybeRunFirstLaunch() {
+  if (!window.SFTabs?.firstLaunch?.checkFirstLaunch) return;
+
+  let status;
+  try {
+    status = await SFTabs.firstLaunch.checkFirstLaunch();
+  } catch {
+    return; // never block the popup on this check
+  }
+  if (status?.reason !== 'first-install') return;
+
+  await new Promise(resolve => {
+    const overlay = document.getElementById('modal-first-launch');
+    if (!overlay) return resolve();
+    overlay.hidden = false;
+
+    document.getElementById('fl-start').addEventListener('click', async () => {
+      const setup = document.querySelector('input[name="fl-setup"]:checked')?.value || 'default';
+      const enableProfiles = document.getElementById('fl-enable-profiles').checked;
+      try {
+        await applyFirstLaunchChoice(setup, enableProfiles);
+      } catch (err) {
+        // Leaving storage empty is recoverable: ensureUsableState() seeds
+        // defaults on the next line of init.
+        state.loadError = `Setup didn't finish: ${err.message}`;
+      }
+      overlay.hidden = true;
+      resolve();
+    }, { once: true });
+  });
+}
+
+/**
+ * Apply the wizard's answers. Storage location is deliberately not offered
+ * here yet — DEFAULT_SETTINGS' sync preference stands, changeable in Settings.
+ */
+async function applyFirstLaunchChoice(setup, enableProfiles) {
+  const settings = {
+    ...(await SFTabs.storage.getUserSettings()),
+    profilesEnabled: enableProfiles
+  };
+
+  // 'import' gets an empty profile too, so the popup has a valid active profile
+  // to import into rather than a half-initialised state.
+  const tabs = setup === 'default' ? [...SFTabs.constants.DEFAULT_TABS] : [];
+  await createFirstProfile(settings, tabs);
+
+  // Recorded in both areas, as production does, so a second device doesn't
+  // re-run the wizard over synced data.
+  await browser.storage.local.set({ firstLaunchCompleted: true });
+  try {
+    await browser.storage.sync.set({ firstLaunchCompleted: true });
+  } catch {
+    // Sync unavailable or quota-bound; the local flag is enough on this device.
+  }
+
+  if (setup === 'import') {
+    browser.tabs.create({ url: browser.runtime.getURL('popup/settings.html') });
+  }
+}
+
+// ── Release notes ──────────────────────────────────────────────
+
+/**
+ * The version the newest notes describe — read from the panel itself so
+ * updating the notes markup updates the unread check with it. Deliberately not
+ * the manifest version: a build that ships no new notes shouldn't ring the bell.
+ */
+function releaseNotesVersion() {
+  const label = document.querySelector('#view-release-notes .rn-version-label');
+  return label ? label.textContent.trim().replace(/^v/i, '') : null;
+}
+
+async function initReleaseNotes() {
+  const version = releaseNotesVersion();
+  if (!version) return;
+  let seen = null;
+  try {
+    seen = (await browser.storage.local.get('seenReleaseNotesVersion')).seenReleaseNotesVersion;
+  } catch {
+    // Unreadable storage: treat as unread rather than hiding the notes
+  }
+  setReleaseNotesUnread(seen !== version);
+}
+
+/**
+ * The bell stays visible either way — it is the only route back to the notes.
+ * Only the dot and the label reflect whether they've been read.
+ */
+function setReleaseNotesUnread(unread) {
+  const dot = document.getElementById('notif-dot');
+  const btn = document.getElementById('btn-release-notes');
+  if (dot) dot.hidden = !unread;
+  if (btn) {
+    btn.setAttribute('aria-label',
+      unread ? 'View release notes — new update available' : 'View release notes');
+  }
+}
+
+async function closeReleaseNotes() {
+  const dismissed = document.getElementById('dismiss-release-notes')?.checked;
+  const version = releaseNotesVersion();
+
+  if (dismissed && version) {
+    try {
+      await browser.storage.local.set({ seenReleaseNotesVersion: version });
+      setReleaseNotesUnread(false);
+      showStatus('Release notes dismissed');
+    } catch (err) {
+      showStatus(`Could not save that: ${err.message}`, 'error');
+    }
+  }
+  showView('empty');
 }
 
 /**
@@ -1339,6 +1489,8 @@ function bindEvents() {
   });
 
   document.getElementById('btn-release-notes').addEventListener('click', () => {
+    // Fresh decision each time the panel opens
+    document.getElementById('dismiss-release-notes').checked = false;
     showView('release-notes');
   });
 
@@ -1405,16 +1557,9 @@ function bindEvents() {
 
   // Footer theme toggle
 
-  // Release notes
-  document.getElementById('btn-close-release-notes').addEventListener('click', () => {
-    document.getElementById('btn-release-notes').style.display = 'none';
-    showView('empty');
-  });
-  document.getElementById('btn-got-it').addEventListener('click', () => {
-    document.getElementById('btn-release-notes').style.display = 'none';
-    showView('empty');
-    showStatus('Release notes dismissed');
-  });
+  // Release notes — both exits honour the "don't show again" checkbox
+  document.getElementById('btn-close-release-notes').addEventListener('click', closeReleaseNotes);
+  document.getElementById('btn-got-it').addEventListener('click', closeReleaseNotes);
 
   // Dropdown management
   document.getElementById('btn-close-dropdowns').addEventListener('click', () => {

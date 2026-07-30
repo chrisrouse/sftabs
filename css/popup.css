@@ -1103,7 +1103,8 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(1.5rem); }
 
 /* Storage cards as a single option group */
-.storage-cards {
+.storage-cards,
+.choice-cards {
   border: 1.5px solid var(--b-subtle);
   border-radius: var(--r-md);
   overflow: hidden;
@@ -1115,7 +1116,8 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   background: var(--s-1);
 }
 
-.storage-card {
+.storage-card,
+.choice-card {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1124,10 +1126,13 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   border-bottom: 1px solid var(--b-subtle);
   transition: background var(--ease);
 }
-.storage-card:last-child { border-bottom: none; }
-.storage-card:has(input:checked) { background: var(--c-primary-light); }
+.storage-card:last-child,
+.choice-card:last-child { border-bottom: none; }
+.storage-card:has(input:checked),
+.choice-card:has(input:checked) { background: var(--c-primary-light); }
 
-.storage-card input[type="radio"] {
+.storage-card input[type="radio"],
+.choice-card input[type="radio"] {
   accent-color: var(--c-primary);
   cursor: pointer;
   flex-shrink: 0;
@@ -1135,18 +1140,22 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   height: 16px;
 }
 
-.storage-card-body {
+.storage-card-body,
+.choice-card-body {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-width: 0;
 }
 
-.storage-card-body svg {
+.storage-card-body svg,
+.choice-card-body svg {
   display: none;
 }
-.storage-card-title { font-size: var(--sft-font-size-base); font-weight: var(--sft-font-weight-medium); color: var(--t-base); }
-.storage-card-desc  { font-size: var(--sft-font-size-xs); color: var(--t-weak); margin-top: 1px; }
+.storage-card-title,
+.choice-card-title { font-size: var(--sft-font-size-base); font-weight: var(--sft-font-weight-medium); color: var(--t-base); }
+.storage-card-desc,
+.choice-card-desc { font-size: var(--sft-font-size-xs); color: var(--t-weak); margin-top: 1px; }
 
 .settings-advanced { padding: 0; }
 .advanced-link {
@@ -1464,3 +1473,30 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   outline-offset: 2px;
   border-radius: var(--r-sm);
 }
+
+/* ── 27. First-launch wizard ──
+   Reuses .modal / .choice-card / .check-row; only the takeover sizing and the
+   split footer are new. */
+.modal-wizard { width: 358px; }
+.modal-subtitle {
+  margin-top: var(--sft-spacing-1);
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+  line-height: var(--sft-line-height-base);
+}
+/* The shell is 540px tall, so the option list has to be able to scroll */
+.modal-body-scroll {
+  max-height: 340px;
+  overflow-y: auto;
+}
+/* Guide link left, primary action right */
+.modal-wizard .modal-footer { justify-content: space-between; align-items: center; }
+.modal-wizard .choice-cards { margin-top: 0; }
+.check-row-standalone {
+  margin-top: var(--sft-spacing-4);
+  padding: var(--sft-spacing-3);
+  border: 1.5px solid var(--b-subtle);
+  border-radius: var(--r-md);
+  background: var(--s-1);
+}
+.check-row-standalone:has(input:checked) { background: var(--c-primary-light); }

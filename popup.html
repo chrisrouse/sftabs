@@ -34,9 +34,10 @@
       </div>
 
       <div class="header-actions">
-        <button class="header-btn" id="btn-release-notes" aria-label="View release notes — new update available">
+        <!-- aria-label and the unread dot are set by initReleaseNotes() -->
+        <button class="header-btn" id="btn-release-notes" aria-label="View release notes">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M460 330h-5a35 35 0 0 1-35-35V180A160 160 0 0 0 252 20c-86 4-152 78-152 165v111c0 19-16 34-35 34h-5c-22 0-40 19-40 41v15c0 7 7 14 15 14h450c8 0 15-7 15-15v-15a40 40 0 0 0-40-40M309 440h-98a10 10 0 0 0-10 12c5 28 30 48 59 48s54-21 59-48a10 10 0 0 0-10-12"/></svg>
-          <span class="notif-dot" aria-hidden="true"></span>
+          <span class="notif-dot" id="notif-dot" aria-hidden="true" hidden></span>
         </button>
       </div>
 
@@ -340,7 +341,8 @@
       <div class="footer-status">
         <div class="status-region" role="status" aria-live="polite" aria-atomic="true" id="status-region"></div>
       </div>
-      <span class="footer-version" aria-label="Version 2.1.2">v2.1.2</span>
+      <!-- Text and aria-label are set from the manifest at init -->
+      <span class="footer-version" id="footer-version"></span>
       <nav class="footer-nav" aria-label="Extension controls">
         <button class="footer-btn" id="btn-footer-settings" aria-label="Settings" aria-pressed="false">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg>
@@ -371,6 +373,64 @@
       </div>
     </div>
 
+    <!-- ═══════════════ MODAL: First launch ═══════════════
+         Shown only on a genuinely fresh install (see maybeRunFirstLaunch).
+         Upgrades never see this — they go through the headless migration. -->
+    <div class="modal-overlay" id="modal-first-launch" role="dialog"
+      aria-modal="true" aria-labelledby="modal-fl-title" hidden>
+      <div class="modal modal-wizard">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-fl-title">Welcome to SF Tabs</h3>
+          <p class="modal-subtitle">Pick a starting point. You can change any of this later in Settings.</p>
+        </div>
+
+        <div class="modal-body modal-body-scroll">
+          <div class="choice-cards" role="radiogroup" aria-label="Starting point">
+            <label class="choice-card">
+              <input type="radio" name="fl-setup" value="default" checked />
+              <div class="choice-card-body">
+                <div>
+                  <span class="choice-card-title">Start with common tabs</span>
+                  <span class="choice-card-desc">Flows, Installed Packages, Users, Profiles, Permission Sets</span>
+                </div>
+              </div>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="fl-setup" value="empty" />
+              <div class="choice-card-body">
+                <div>
+                  <span class="choice-card-title">Start empty</span>
+                  <span class="choice-card-desc">Add your own tabs as you go</span>
+                </div>
+              </div>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="fl-setup" value="import" />
+              <div class="choice-card-body">
+                <div>
+                  <span class="choice-card-title">Import a backup</span>
+                  <span class="choice-card-desc">Opens the settings page so you can load an export file</span>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <label class="check-row check-row-standalone">
+            <input type="checkbox" class="check-input" id="fl-enable-profiles" />
+            <span class="check-body">
+              <span class="check-label">Enable profiles</span>
+              <span class="check-desc">Keep separate tab sets per org, switched manually or by URL</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <a href="https://github.com/crouse12/sftabs" class="advanced-link" id="fl-guide" target="_blank" rel="noopener">User guide</a>
+          <button class="btn-primary" id="fl-start">Get started</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /.app-shell -->
 
   <!-- Production storage layer, loaded in the same order as popup/popup.html.
@@ -381,6 +441,10 @@
   <script src="popup/js/storage-chunking.js"></script>
   <script src="popup/js/popup-storage.js"></script>
   <script src="popup/js/popup-tabs.js"></script>
+  <!-- Only checkFirstLaunch() is used from this module — its detection logic
+       reads both storage areas and recognises upgrades. Its modal helpers
+       target the old popup's ids and are not called from here. -->
+  <script src="popup/js/popup-first-launch.js"></script>
 
   <script src="js/popup.js"></script>
 </body>
