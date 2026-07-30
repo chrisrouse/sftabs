@@ -1107,16 +1107,16 @@ function renderProfilesList() {
           aria-pressed="${!!p.isDefault}"
           aria-label="${p.isDefault ? t('ariaIsDefaultProfile', name) : t('ariaMakeDefaultProfile', name)}"
           title="${p.isDefault ? t('defaultProfileTitle') : t('makeDefaultProfileTitle')}">
-          ${p.isDefault ? '${STAR_FILLED}' : '${STAR_EMPTY}'}
+          ${p.isDefault ? `<svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m274 31 46 150c2 6 8 9 14 9h150c15 0 21 20 9 29l-122 90c-5 4-7 11-5 17l58 154c4 14-11 26-23 17l-131-98c-5-4-12-4-18 0l-132 98c-12 9-28-3-23-17l56-154c2-6 0-13-5-17L26 219c-12-9-5-29 9-29h150c7 0 12-2 14-9l47-151c4-14 24-13 28 1"/></svg>` : `<svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M493 219c12-9 6-29-9-29H334c-6 0-12-3-14-9L274 31c-4-14-24-15-28-1l-47 151c-2 7-7 9-14 9H36c-14 0-21 20-9 29l122 90c5 4 7 11 5 17L98 480c-5 14 11 26 23 17l132-98c6-4 13-4 18 0l131 98c12 9 27-3 23-17l-58-154c-2-6 0-13 5-17l122-90Zm-146 58h-1a56 56 0 0 0-18 62v1l17 46c3 7-6 14-12 9l-38-28a56 56 0 0 0-65-2l-1 1-42 31c-7 5-16-1-13-9l18-49c7-22 0-47-18-62h-1l-43-32c-6-4-3-14 5-14h50c7 0 18-1 29-8a52 52 0 0 0 24-30l14-45c3-8 13-8 16 0l14 45v1a55 55 0 0 0 52 37h50c8 0 11 10 5 14l-43 32Z"/></svg>`}
         </button>
         <button class="tab-btn tab-btn--edit" data-action="edit-profile" data-id="${p.id}"
           aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}">
-          ${PENCIL}
+          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M60 400v60h60l295-295-60-60zm410-295c6-6 6-15 0-21l-38-38c-6-6-15-6-21 0l-30 30 60 60z"/></svg>
         </button>
         ${state.profiles.length > 1 ? `
         <button class="tab-btn tab-btn--delete" data-action="delete-profile" data-id="${p.id}"
           aria-label="${t('ariaDeleteNamed', name)}" title="${t('deleteButtonTitle')}">
-          ${TRASH}
+          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M160 60V40a20 20 0 0 1 20-20h160a20 20 0 0 1 20 20v20h90a20 20 0 0 1 20 20v20a10 10 0 0 1-10 10H60a10 10 0 0 1-10-10V80a20 20 0 0 1 20-20zm-60 120h320l-18 280a30 30 0 0 1-30 28H148a30 30 0 0 1-30-28z"/></svg>
         </button>` : ''}
       </div>
     </li>`;
