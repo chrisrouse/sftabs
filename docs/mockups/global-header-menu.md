@@ -1,8 +1,7 @@
 # Open question: SF Tabs menu in the Salesforce global header
 
-**Status:** idea to explore, no code. Parked alongside the floating-panel
-mockups (`floating-panel.html`) as a possible replacement for, or alternative
-to, the floating button.
+**Status:** design decided, mockup drawn (`global-header-menu.html`), no code yet.
+Awaiting a choice of position in the header row.
 
 ## The idea
 
@@ -81,8 +80,36 @@ Their dropdowns render as:
    same tabs; decide whether it replaces the floating button only, or also
    serves outside Setup where the tab bar does not appear.
 
-## Open decision
+## Decisions taken
 
-Does this replace the floating button, or coexist with it as a third
-placement option alongside the existing `floatingButton.location` setting
-(`everywhere` / `setup-only` / `outside-setup`)?
+- **Alternative, not a replacement.** The floating button stays.
+- **Own on/off setting**, independent of `floatingButton`. Both surfaces can be
+  on at once, or only the header menu. Not a fourth `floatingButton.layout`
+  value, which would have forced a choice between them.
+- **Native SLDS styling.** Reuse Salesforce's header and menu classes so it is
+  indistinguishable from the Setup gear menu. Consequence, accepted: it follows
+  Salesforce's theme rather than the extension's `themeMode`, so it will not go
+  dark when the popup does. Item 4 above is settled this way.
+- **Scope:** lives with `floating-button.js` in content-script entry 0, which
+  already matches all Lightning pages — the header exists everywhere, unlike the
+  Setup-only tab bar. Item 3 settled.
+
+## Still open
+
+Where in `ul.slds-global-actions` the item sits. The mockup draws all three:
+
+| | Position | Trade |
+|---|---|---|
+| A | Left of Favorites | Reads as ours; furthest from the gear, least discoverable |
+| B | Left of the Setup gear | Best discoverability; may read as native Salesforce |
+| C | Between Notifications and the avatar | Closest to today's floating handle; most exposed to Salesforce adding items |
+
+## Build notes
+
+- Re-injection after Aura re-renders: reuse the MutationObserver pattern from
+  `content/tab-renderer.js`, which already solves this for the Setup nav bar.
+- Menu contents mirror the floating panel, including sub-item flyouts, so the
+  nested rendering in `content/floating-modal.js` should be reused rather than
+  reimplemented.
+- Keep the floating button working as the fallback when the header anchor is not
+  found, per item 5.
