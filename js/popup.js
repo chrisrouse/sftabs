@@ -774,7 +774,7 @@ function renderTabList() {
 function emptyStateHTML() {
   return `<div class="empty-state">
     <h3 class="empty-state-title">No tabs yet</h3>
-    <p class="empty-state-desc">Add your first tab, or use Quick Add to capture the Salesforce page you're on.</p>
+    <p class="empty-state-desc">Use Quick Add to capture the Salesforce page you're on, or add one manually.</p>
   </div>`;
 }
 

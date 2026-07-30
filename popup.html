@@ -50,14 +50,16 @@
       <aside class="panel-left" aria-label="Tab list">
 
         <div class="panel-toolbar" role="toolbar" aria-label="Tab actions">
-          <button class="btn-add-tab" id="btn-add-tab" aria-label="Add new tab">
-            <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
-            <span>Add Tab</span>
-          </button>
-          <button class="btn-icon-sm" id="btn-quick-add" aria-label="Quick add from current Salesforce page" title="Quick add from current page">
+          <!-- Quick Add is the primary action: capturing the page you're on is
+               the common case, and Add Tab is the manual fallback. -->
+          <button class="btn-toolbar-primary" id="btn-quick-add" aria-label="Quick add a tab from the current Salesforce page">
             <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
               <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
             </svg>
+            <span>Quick Add</span>
+          </button>
+          <button class="btn-icon-sm" id="btn-add-tab" aria-label="Add a tab manually" title="Add a tab manually">
+            <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
           </button>
         </div>
 

@@ -279,7 +279,7 @@ a:hover { text-decoration: underline; }
   background: var(--s-panel);
 }
 
-.btn-add-tab {
+.btn-toolbar-primary {
   flex: 1;
   display: flex;
   align-items: center;
@@ -296,10 +296,10 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   transition: background var(--ease);
 }
-.btn-add-tab:hover  { background: var(--sft-accent-container-2); }
-.btn-add-tab:active { background: var(--sft-accent-container-3); }
-.btn-add-tab:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
-.btn-add-tab svg { width: 15px; height: 15px; }
+.btn-toolbar-primary:hover  { background: var(--sft-accent-container-2); }
+.btn-toolbar-primary:active { background: var(--sft-accent-container-3); }
+.btn-toolbar-primary:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+.btn-toolbar-primary svg { width: 16px; height: 16px; }
 
 /* SLDS icon button: circular, 32px, neutral stroke */
 .btn-icon-sm {
