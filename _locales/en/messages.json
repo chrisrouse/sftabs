@@ -2795,5 +2795,19 @@
   "loading": {
     "message": "Loading…",
     "description": "Transient button label while sub-items are being read off the page"
+  },
+  "profileChangedExternally": {
+    "message": "Profile changed to \"$NAME$\"",
+    "description": "Status shown when something outside the popup switched profiles, usually the URL auto-switch",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "tabsUpdatedExternally": {
+    "message": "Tabs updated",
+    "description": "Status shown when the active profile's tabs changed outside this popup, e.g. from another window or a synced device"
   }
 }

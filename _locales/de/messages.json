@@ -2670,5 +2670,17 @@
   },
   "loading": {
     "message": "Wird geladen…"
+  },
+  "profileChangedExternally": {
+    "message": "Profil zu \"$NAME$\" gewechselt",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "tabsUpdatedExternally": {
+    "message": "Registerkarten aktualisiert"
   }
 }

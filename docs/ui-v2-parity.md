@@ -72,7 +72,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 | Capability | Status | Notes |
 |---|---|---|
 | Active profile chip + switcher | Done | Color derived from id hash; production has no color field |
-| Switch profile, broadcast to open SF tabs | **Gap** | Switches and reloads tabs, but does not message content scripts (`refresh_tabs`), so an open page keeps the old nav |
+| Switch profile, broadcast to open SF tabs | Done | `broadcastTabRefresh()` sends `refresh_tabs` to the same setup-page URL set production uses |
 | Create / rename / delete profile | **Delegated** | Settings page |
 | URL patterns, capture current domain | **Delegated** | Settings page |
 | Auto-switch by URL | Done | Handled by `background.js`, unchanged |
@@ -98,7 +98,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 | Capability | Status | Notes |
 |---|---|---|
 | Localization | Done | 163 keys used, all translated. Static copy via `__MSG_` tokens and `i18n-helper.js`, runtime strings via a local `t()` helper. `en`/`de`/`es` are at 554 keys with no gaps — see `docs/localization.md` |
-| React to external storage changes | **Gap** | No `storage.onChanged` listener, so background auto-switch leaves a stale popup |
+| React to external storage changes | Done | `installStorageListener()`. Acts only when the incoming value differs from state, so our own writes don't loop, and defers tab reloads while an edit is open |
 | Keyboard shortcuts (`open-tab-01..10`) | Done | `background.js`, unchanged |
 | Import / export | **Delegated** | Settings page |
 | Floating button on page | Done | Content script, unchanged |
@@ -109,10 +109,8 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 
 ## Gaps, in release order
 
-1. **`storage.onChanged`** — stale popup after background profile switch.
-2. **Profile switch broadcast** — open SF pages keep the previous nav until reload.
-3. **Storage sync/local radios** — a visibly broken setting; risks users
-   believing data stopped syncing. *On hold by decision until the rest is done.*
+1. **Storage sync/local radios** — a visibly broken setting; risks users
+   believing data stopped syncing. The last item on the list.
 
 Deliberately deferred: migration wizard, sync-data-detected screen, staged
 sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked

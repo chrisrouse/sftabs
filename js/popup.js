@@ -35,7 +35,7 @@ let state = {
   tabs:            [],
   profiles:        [],
   settings:        {},
-  activeView:      'empty',   // 'empty' | 'edit' | 'settings' | 'release-notes'
+  activeView:      'empty',   // 'empty' | 'edit-tab' | 'dropdowns' | 'settings' | 'release-notes'
   editingTabId:    null,
   profileDropdownOpen: false,
   pendingDeleteId: null,
@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   showView('empty');
   bindEvents();
   await initReleaseNotes();
+  installStorageListener();
   if (state.loadError) showStatus(state.loadError, 'error');
 });
 
@@ -1439,7 +1440,31 @@ async function switchProfile(profileId) {
   renderProfileChip();
   renderProfileDropdown();
   closeProfileDropdown();
+  broadcastTabRefresh();
   showStatus(t('switchedToProfile', state.profiles.find(p => p.id === profileId)?.name || ''));
+}
+
+/**
+ * Tell open Salesforce pages to rebuild their injected nav. Without this a page
+ * keeps the previous profile's tabs until it is reloaded.
+ *
+ * Same URL set production broadcasts to, and the receivers already exist in
+ * content-main.js and navigation-parser.js. Failures are expected and ignored:
+ * a matching tab may predate the content script, in which case there is nobody
+ * listening and nothing to fix.
+ */
+function broadcastTabRefresh() {
+  const SETUP_PAGES = [
+    '*://*.lightning.force.com/lightning/setup/*',
+    '*://*.salesforce-setup.com/lightning/setup/*',
+    '*://*.my.salesforce-setup.com/lightning/setup/*',
+    '*://*.salesforce.com/lightning/setup/*',
+    '*://*.my.salesforce.com/lightning/setup/*'
+  ];
+  browser.tabs.query({ url: SETUP_PAGES })
+    .then(tabs => tabs.forEach(tab =>
+      browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' }).catch(() => {})))
+    .catch(() => {});
 }
 
 function openProfileDropdown() {
@@ -1455,6 +1480,69 @@ function closeProfileDropdown() {
   const dropdown = document.getElementById('profile-dropdown');
   dropdown.hidden = true;
   document.getElementById('btn-profile-switcher').setAttribute('aria-expanded', 'false');
+}
+
+/**
+ * React to storage written outside this popup — most often background.js
+ * auto-switching profiles by URL, which otherwise leaves the popup showing the
+ * previous profile's tabs.
+ *
+ * Two things make this safe. Our own writes fire this listener too, so it acts
+ * only when the incoming value genuinely differs from what we hold. And a
+ * re-render would discard whatever the user is typing, so an external tab change
+ * is ignored while an edit is open — the next render picks it up. An external
+ * profile switch is not ignored, because the whole context has moved and stale
+ * tabs would be worse than a closed form.
+ */
+function installStorageListener() {
+  if (!browser.storage?.onChanged) return;
+
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local' && area !== 'sync') return;
+
+    const incoming = changes.userSettings?.newValue;
+    if (incoming?.activeProfileId &&
+        incoming.activeProfileId !== state.settings.activeProfileId) {
+      adoptExternalProfileSwitch(incoming);
+      return;
+    }
+
+    const activeId = state.settings.activeProfileId;
+    if (!activeId || isEditing()) return;
+    const tabsKey = `profile_${activeId}_tabs`;
+    const touched = Object.keys(changes)
+      .some(k => k === tabsKey || k.startsWith(`${tabsKey}_chunk_`));
+    if (touched) reloadTabsFromStorage();
+  });
+}
+
+/** True while the user has an edit in progress that a re-render would destroy. */
+function isEditing() {
+  // showView() stores the view id, so this is 'edit-tab' -- not 'edit'
+  return state.activeView === 'edit-tab' ||
+         state.activeView === 'dropdowns' ||
+         state.editingItemPath !== null ||
+         state.addingItemUnder !== null;
+}
+
+async function adoptExternalProfileSwitch(settings) {
+  state.settings = settings;
+  state.profiles = await SFTabs.storage.getProfiles() || [];
+  state.tabs = await SFTabs.storage.getProfileTabs(settings.activeProfileId) || [];
+  if (isEditing()) showView('empty');
+  renderTabList();
+  bindTabListEvents();
+  renderProfileChip();
+  renderProfileDropdown();
+  const name = state.profiles.find(p => p.id === settings.activeProfileId)?.name || '';
+  showStatus(t('profileChangedExternally', name));
+}
+
+async function reloadTabsFromStorage() {
+  state.tabs = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
+  renderTabList();
+  bindTabListEvents();
+  showStatus(t('tabsUpdatedExternally'));
 }
 
 // ── Theme ──────────────────────────────────────────────────────
