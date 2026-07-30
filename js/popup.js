@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderTabList();
   renderProfileChip();
   renderProfileDropdown();
+  applyProfilesVisibility(state.settings.profilesEnabled);
   applyTheme(state.settings.themeMode);
   applyDensity(state.settings.compactMode);
   showView('empty');
@@ -841,8 +842,10 @@ function tabItemHTML(tab) {
 function renderProfileChip() {
   const active = state.profiles.find(p => p.id === state.settings.activeProfileId);
   if (!active) return;
-  document.getElementById('profile-chip-name').textContent = active.name;
-  document.getElementById('profile-chip-dot').style.background = profileColor(active.id);
+  // Icon-only trigger, so the active profile lives in the label and tooltip
+  const btn = document.getElementById('btn-profile-switcher');
+  btn.setAttribute('aria-label', `Profile: ${active.name} — switch profile`);
+  btn.title = active.name;
 }
 
 function renderProfileDropdown() {
@@ -1460,6 +1463,15 @@ function applyDensity(isCompact) {
   document.documentElement.setAttribute('data-density', isCompact ? 'compact' : 'comfy');
 }
 
+/**
+ * With profiles off, the switcher is meaningless, so hide it. The other header
+ * actions keep their places because .header-actions is right-aligned.
+ */
+function applyProfilesVisibility(enabled) {
+  document.getElementById('btn-profile-switcher').hidden = !enabled;
+  if (!enabled) closeProfileDropdown();
+}
+
 // ── Settings panel ─────────────────────────────────────────────
 
 function syncSettingsPanel() {
@@ -1586,7 +1598,7 @@ function bindEvents() {
 
   document.getElementById('setting-profiles').addEventListener('change', e => {
     patchSettings({ profilesEnabled: e.target.checked });
-    document.querySelector('.header-center').style.visibility = e.target.checked ? 'visible' : 'hidden';
+    applyProfilesVisibility(e.target.checked);
   });
 
   document.getElementById('btn-preview-first-launch').addEventListener('click', () => {

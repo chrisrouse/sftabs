@@ -17,23 +17,29 @@
     <header class="app-header" role="banner">
 
       <div class="header-brand">
-        <svg class="brand-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-          <path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/>
-        </svg>
-        <span class="brand-name">SF Tabs</span>
-      </div>
-
-      <div class="header-center">
-        <button class="profile-chip" id="btn-profile-switcher"
-          aria-haspopup="listbox" aria-expanded="false"
-          aria-label="Active profile: Production — click to switch">
-          <span class="profile-chip-dot" id="profile-chip-dot" aria-hidden="true"></span>
-          <span class="profile-chip-name" id="profile-chip-name">Production</span>
-          <svg class="profile-chip-chevron" viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M476 178 271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21"/></svg>
-        </button>
+        <!-- Single-color mark, so a filter renders it white on the brand bar -->
+        <img class="brand-logo" src="icons/sftabs-logo.svg" alt="SF Tabs" />
       </div>
 
       <div class="header-actions">
+        <!-- Hidden unless profiles are on, and the label carries the active
+             profile: applyProfilesVisibility() and renderProfileChip(). -->
+        <button class="header-btn" id="btn-profile-switcher" hidden
+          aria-haspopup="listbox" aria-expanded="false" aria-label="Switch profile">
+          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg>
+        </button>
+
+        <button class="header-btn" id="btn-quick-add"
+          aria-label="Quick add a tab from the current Salesforce page"
+          title="Quick add from this page">
+          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
+        </button>
+
+        <button class="header-btn" id="btn-add-tab"
+          aria-label="Add a tab manually" title="Add a tab manually">
+          <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M43 9A24.2 24.2 0 0 0 9 9a24.2 24.2 0 0 0 0 34 23.9 23.9 0 0 0 33.9 0c9.4-9.4 9.4-24.6.1-34m-1 19c0 .6-.4 1-1 1H30a1 1 0 0 0-1 1v11c0 .5-.5 1-1 1h-4c-.6 0-1-.4-1-1V30c0-.6-.4-1-1-1H11c-.6 0-1-.4-1-1v-4c0-.5.5-1 1-1h11c.6 0 1-.4 1-1V11c0-.5.5-1 1-1h4c.5 0 1 .4 1 1v11c0 .6.4 1 1 1h11c.5 0 1 .5 1 1z"/></svg>
+        </button>
+
         <!-- aria-label and the unread dot are set by initReleaseNotes() -->
         <button class="header-btn" id="btn-release-notes" aria-label="View release notes">
           <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M460 330h-5a35 35 0 0 1-35-35V180A160 160 0 0 0 252 20c-86 4-152 78-152 165v111c0 19-16 34-35 34h-5c-22 0-40 19-40 41v15c0 7 7 14 15 14h450c8 0 15-7 15-15v-15a40 40 0 0 0-40-40M309 440h-98a10 10 0 0 0-10 12c5 28 30 48 59 48s54-21 59-48a10 10 0 0 0-10-12"/></svg>
@@ -48,20 +54,6 @@
 
       <!-- ── Left Panel ── -->
       <aside class="panel-left" aria-label="Tab list">
-
-        <div class="panel-toolbar" role="toolbar" aria-label="Tab actions">
-          <!-- Quick Add is the primary action: capturing the page you're on is
-               the common case, and Add Tab is the manual fallback. -->
-          <button class="btn-toolbar-primary" id="btn-quick-add" aria-label="Quick add a tab from the current Salesforce page">
-            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
-              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
-            </svg>
-            <span>Quick Add</span>
-          </button>
-          <button class="btn-icon-sm" id="btn-add-tab" aria-label="Add a tab manually" title="Add a tab manually">
-            <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>
-          </button>
-        </div>
 
         <nav aria-label="Custom tabs">
           <ul class="tab-list" id="tab-list" role="list">
@@ -137,7 +129,6 @@
                 </span>
               </label>
             </fieldset>
-
 
             <div class="form-actions">
               <button type="button" class="btn-secondary" id="btn-cancel-edit">Cancel</button>

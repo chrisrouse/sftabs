@@ -160,61 +160,14 @@ a:hover { text-decoration: underline; }
 }
 
 .brand-logo {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
+  /* Single-color mark, so this is an exact white */
+  filter: brightness(0) invert(1);
 }
-
-.brand-name {
-  font-size: var(--sft-font-size-md);
-  font-weight: var(--sft-font-weight-semibold);
-  letter-spacing: -0.3px;
-}
-
-.header-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.profile-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px 4px 8px;
-  background: rgba(255,255,255,0.14);
-  border: 1px solid rgba(255,255,255,0.24);
-  border-radius: var(--r-pill);
-  color: #fff;
-  font-size: var(--sft-font-size-base);
-  font-weight: var(--sft-font-weight-medium);
-  cursor: pointer;
-  transition: background var(--ease);
-}
-.profile-chip:hover { background: rgba(255,255,255,0.22); }
-.profile-chip:focus-visible { outline: 2px solid rgba(255,255,255,0.75); outline-offset: 2px; }
-
-.profile-chip-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--c-success); /* active-profile indicator */
-  flex-shrink: 0;
-}
-
-.profile-chip-chevron {
-  width: 13px;
-  height: 13px;
-  opacity: 0.75;
-  transition: transform var(--ease);
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.profile-chip[aria-expanded="true"] .profile-chip-chevron { transform: rotate(180deg); }
 
 .header-actions {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -235,7 +188,12 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   transition: background var(--ease), color var(--ease);
 }
+/* display:flex above would otherwise beat the hidden attribute, and the
+   profile button relies on it */
+.header-btn[hidden] { display: none; }
 .header-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+/* Menu triggers stay lit while their menu is open */
+.header-btn[aria-expanded="true"] { background: rgba(255,255,255,0.2); color: #fff; }
 .header-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.75); outline-offset: 2px; }
 .header-btn svg { width: 18px; height: 18px; }
 
@@ -268,59 +226,7 @@ a:hover { text-decoration: underline; }
   overflow: hidden;
 }
 
-/* ── 8. Toolbar ── */
-.panel-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: var(--sft-spacing-var-block-3) var(--sft-spacing-3);
-  border-bottom: 1px solid var(--b-subtle);
-  flex-shrink: 0;
-  background: var(--s-panel);
-}
-
-.btn-toolbar-primary {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: var(--sft-size-control);
-  padding: 0 16px;
-  background: var(--sft-accent-container-1);
-  border: var(--sft-border-width-1) solid transparent;
-  border-radius: var(--sft-radius-pill);
-  color: var(--sft-on-accent-1);
-  font-size: var(--sft-font-size-base);
-  font-weight: var(--sft-font-weight-semibold);
-  cursor: pointer;
-  transition: background var(--ease);
-}
-.btn-toolbar-primary:hover  { background: var(--sft-accent-container-2); }
-.btn-toolbar-primary:active { background: var(--sft-accent-container-3); }
-.btn-toolbar-primary:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
-.btn-toolbar-primary svg { width: 16px; height: 16px; }
-
-/* SLDS icon button: circular, 32px, neutral stroke */
-.btn-icon-sm {
-  width: var(--sft-size-control);
-  height: var(--sft-size-control);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--s-1);
-  border: var(--sft-border-width-1) solid var(--sft-border-strong);
-  border-radius: var(--sft-radius-circle);
-  color: var(--t-muted);
-  cursor: pointer;
-  transition: background var(--ease), color var(--ease), border-color var(--ease);
-}
-.btn-icon-sm:hover { background: var(--s-hover); color: var(--t-base); }
-.btn-icon-sm:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
-.btn-icon-sm svg { width: 16px; height: 16px; }
-
-/* ── 9. Tab list ── */
+/* ── 8. Tab list ── */
 nav[aria-label="Custom tabs"] {
   flex: 1;
   overflow-y: auto;
@@ -817,8 +723,6 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 /* Keep the whole window in "grabbing" while a drag is in flight */
 body.is-dragging-active,
 body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
-
-
 
 /* ── Nested item tree ── */
 .dropdown-empty {
@@ -1330,8 +1234,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .profile-dropdown {
   position: absolute;
   top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 12px;
   z-index: 200;
   min-width: 190px;
   background: var(--s-1);
