@@ -87,6 +87,12 @@
 /* ── 2. Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* The hidden attribute has to beat any class that sets display, or an element
+   toggled with `el.hidden = true` stays on screen. This has caught us three
+   times — .header-btn, .settings-row, .btn-danger — so enforce it once here
+   rather than adding a per-component override each time. */
+[hidden] { display: none !important; }
+
 html, body {
   /* width is driven by content — Chrome popup sizes to fit */
   width: fit-content;
@@ -194,9 +200,6 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   transition: background var(--ease), color var(--ease);
 }
-/* display:flex above would otherwise beat the hidden attribute, and the
-   profile button relies on it */
-.header-btn[hidden] { display: none; }
 .header-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
 /* Menu triggers stay lit while their menu is open */
 .header-btn[aria-expanded="true"] { background: rgba(255,255,255,0.2); color: #fff; }
@@ -1484,6 +1487,3 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   font-weight: var(--sft-font-weight-medium);
 }
 .profile-option-new + .profile-option-new { border-top: none; }
-
-/* display:flex would otherwise beat the hidden attribute */
-.settings-row[hidden] { display: none; }
