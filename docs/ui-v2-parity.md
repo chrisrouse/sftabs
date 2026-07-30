@@ -33,7 +33,7 @@ Reverting is always one line: `manifest.base.json` → `action.default_popup`.
 | Reorder via drag | Done | Positional drop zones instead of production's 500ms hover delay |
 | Reset to defaults | **Delegated** | Settings page, Data section |
 | Compact mode affects list | Done | Density hooks; also hides badges/paths and shows a count chip |
-| Tab type badge | **Dropped** | Removed: with most tabs being setup pages it read `TAB` on every row. The left accent bar still colours by type. The underlying `isObject`/`isCustomUrl`/`isSetupObject` flags are unchanged — they pick the URL shape, so they are functional, not decorative |
+| Tab type badge | n/a | Not a parity item: the shipped popup has no type badge (`popup-ui.js:210` renders the path "without badge"). It was introduced by this rebuild and has now been removed — it read `TAB` on every row once most tabs were setup pages. The left accent bar still colours by type. The `isObject`/`isCustomUrl`/`isSetupObject` flags are untouched: they pick the URL shape, so they are functional, not decorative |
 
 ## 2. Sub-items (dropdowns)
 
