@@ -2695,15 +2695,6 @@
   "captureCurrentOrg": {
     "message": "Aktuelle Org hinzufügen"
   },
-  "profileOptionsLegend": {
-    "message": "Profiloptionen"
-  },
-  "profileIsDefaultLabel": {
-    "message": "Standardprofil"
-  },
-  "profileIsDefaultDesc": {
-    "message": "Wird verwendet, wenn keine verknüpfte Org passt"
-  },
   "profilesListSubtitle": {
     "message": "Getrennte Registerkartensätze pro Org"
   },
@@ -2778,9 +2769,6 @@
   "noOrgsLinked": {
     "message": "Keine Orgs verknüpft"
   },
-  "defaultBadge": {
-    "message": "Standard"
-  },
   "activeBadge": {
     "message": "Aktiv"
   },
@@ -2820,6 +2808,39 @@
       "name": {
         "content": "$1",
         "example": "Sandbox"
+      }
+    }
+  },
+  "ariaIsDefaultProfile": {
+    "message": "$NAME$ ist das Standardprofil",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "ariaMakeDefaultProfile": {
+    "message": "$NAME$ zum Standardprofil machen",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "defaultProfileTitle": {
+    "message": "Standardprofil"
+  },
+  "makeDefaultProfileTitle": {
+    "message": "Als Standardprofil festlegen"
+  },
+  "defaultProfileSet": {
+    "message": "\"$NAME$\" ist jetzt das Standardprofil",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
       }
     }
   }

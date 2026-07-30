@@ -21,7 +21,8 @@ const PROFILE_STRUCTURE = {
   isDefault: false,
   urlPatterns: [],
   createdAt: '',
-  lastActive: ''
+  lastActive: '',
+  position: 0        // display order; absent on profiles created before v2.2
 };
 
 // Default tabs configuration

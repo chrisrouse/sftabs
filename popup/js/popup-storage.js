@@ -520,8 +520,12 @@ async function getProfiles() {
  */
 async function saveProfiles(profiles, showToast = true) {
   try {
-    // Sort profiles by creation date
+    // Order by explicit position when the caller has assigned one, so a
+    // user-arranged order survives a save. Profiles written before `position`
+    // existed have none, tie at Infinity, and keep their creation order — so
+    // this behaves exactly as before for untouched data.
     const sortedProfiles = [...profiles].sort((a, b) =>
+      (a.position ?? Infinity) - (b.position ?? Infinity) ||
       new Date(a.createdAt) - new Date(b.createdAt)
     );
 

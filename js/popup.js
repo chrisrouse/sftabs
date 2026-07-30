@@ -867,7 +867,7 @@ function renderProfileDropdown() {
 
   dropdown.innerHTML = `
     <div class="profile-dropdown-header">${t('profilesSection')}</div>
-    ${state.profiles.map(p => `
+    ${orderedProfiles().map(p => `
       <button class="profile-option" role="option"
         aria-selected="${p.id === active}"
         data-profile-id="${p.id}">
@@ -907,7 +907,6 @@ function openProfileForm(profileId) {
 
   document.getElementById('input-profile-name').value = profile ? profile.name : '';
   document.getElementById('input-profile-orgs').value = (profile?.urlPatterns || []).join('\n');
-  document.getElementById('input-profile-default').checked = !!profile?.isDefault;
   document.getElementById('profile-name-error').hidden = true;
   document.getElementById('input-profile-name').removeAttribute('aria-invalid');
   updateCharCount('input-profile-name', 'profile-name-count', 30);
@@ -937,7 +936,6 @@ async function persistProfileForm() {
     .split('\n').map(v => v.trim()).filter(Boolean)
     .filter(v => { const k = v.toLowerCase(); return seen.has(k) ? false : (seen.add(k), true); });
 
-  const makeDefault = document.getElementById('input-profile-default').checked;
   const editing = state.editingProfileId
     ? state.profiles.find(p => p.id === state.editingProfileId)
     : null;
@@ -955,17 +953,15 @@ async function persistProfileForm() {
       isDefault: false,
       urlPatterns,
       createdAt: new Date().toISOString(),
-      lastActive: null
+      lastActive: null,
+      position: profiles.length
     };
     profiles.push(saved);
   }
 
-  // isDefault is exclusive, and background.js falls back to it when no pattern
-  // matches, so exactly one profile must carry it
-  if (makeDefault) profiles.forEach(p => { p.isDefault = p.id === saved.id; });
-  else if (saved.isDefault && !profiles.some(p => p.id !== saved.id && p.isDefault)) {
-    saved.isDefault = true;   // refuse to leave the set with no default
-  }
+  // Default is set from the star in the list, not here. Only guarantee that the
+  // set never ends up with none, since background.js falls back to it.
+  if (!profiles.some(p => p.isDefault)) profiles[0].isDefault = true;
 
   await SFTabs.storage.saveProfiles(profiles, false);
   state.profiles = profiles;
@@ -978,7 +974,6 @@ async function persistProfileForm() {
     // does not look like data loss
     await SFTabs.storage.saveProfileTabs(saved.id, []);
   }
-  if (makeDefault) await patchSettings({ defaultProfileId: saved.id });
 
   renderProfileChip();
   renderProfileDropdown();
@@ -1082,33 +1077,46 @@ function renderProfilesList() {
   if (!list) return;
   const active = state.settings.activeProfileId;
 
-  // Same row anatomy as tab and sub-item rows, so this needs no new CSS
-  list.innerHTML = state.profiles.map(p => {
+  // Same anatomy as the tab rows: drag handle, info, action group
+  list.innerHTML = orderedProfiles().map(p => {
     const name = esc(p.name);
     const patterns = (p.urlPatterns || []).length;
     const meta = [
       patterns ? t(patterns === 1 ? 'orgCountOne' : 'orgCountMany', String(patterns))
                : t('noOrgsLinked'),
-      p.isDefault ? t('defaultBadge') : null,
       p.id === active ? t('activeBadge') : null
     ].filter(Boolean).join(' · ');
-    // .tab-item carries the row layout; .dropdown-item is only a modifier
+
     return `
     <li class="tab-item dropdown-item" data-profile-id="${p.id}">
+      <div class="drag-handle" aria-hidden="true" title="${t('dragToReorderTitle')}">
+        <div class="drag-dots">
+          <span></span><span></span>
+          <span></span><span></span>
+          <span></span><span></span>
+        </div>
+      </div>
       <span class="profile-dot" style="background:${profileColor(p.id)}" aria-hidden="true"></span>
       <div class="tab-info">
         <div class="tab-info-top"><span class="tab-name">${name}</span></div>
         <span class="tab-path">${meta}</span>
       </div>
-      <div class="tab-actions">
+      <div class="tab-actions" role="group" aria-label="${t('ariaTabActions', name)}">
+        <button class="tab-btn tab-btn--star ${p.isDefault ? 'is-on' : ''}"
+          data-action="default-profile" data-id="${p.id}"
+          aria-pressed="${!!p.isDefault}"
+          aria-label="${p.isDefault ? t('ariaIsDefaultProfile', name) : t('ariaMakeDefaultProfile', name)}"
+          title="${p.isDefault ? t('defaultProfileTitle') : t('makeDefaultProfileTitle')}">
+          ${p.isDefault ? '${STAR_FILLED}' : '${STAR_EMPTY}'}
+        </button>
         <button class="tab-btn tab-btn--edit" data-action="edit-profile" data-id="${p.id}"
           aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}">
-          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M60 400v60h60l295-295-60-60zm410-295c6-6 6-15 0-21l-38-38c-6-6-15-6-21 0l-30 30 60 60z"/></svg>
+          ${PENCIL}
         </button>
         ${state.profiles.length > 1 ? `
         <button class="tab-btn tab-btn--delete" data-action="delete-profile" data-id="${p.id}"
           aria-label="${t('ariaDeleteNamed', name)}" title="${t('deleteButtonTitle')}">
-          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M160 60V40a20 20 0 0 1 20-20h160a20 20 0 0 1 20 20v20h90a20 20 0 0 1 20 20v20a10 10 0 0 1-10 10H60a10 10 0 0 1-10-10V80a20 20 0 0 1 20-20zm-60 120h320l-18 280a30 30 0 0 1-30 28H148a30 30 0 0 1-30-28z"/></svg>
+          ${TRASH}
         </button>` : ''}
       </div>
     </li>`;
@@ -1120,6 +1128,78 @@ function renderProfilesList() {
   list.querySelectorAll('[data-action="delete-profile"]').forEach(btn => {
     btn.addEventListener('click', () => deleteProfileFlow(btn.dataset.id));
   });
+  list.querySelectorAll('[data-action="default-profile"]').forEach(btn => {
+    btn.addEventListener('click', () => setDefaultProfile(btn.dataset.id));
+  });
+  bindProfileDrag();
+}
+
+/** Display order: explicit position when set, creation order otherwise. */
+function orderedProfiles() {
+  return [...state.profiles].sort((a, b) =>
+    (a.position ?? Infinity) - (b.position ?? Infinity) ||
+    new Date(a.createdAt) - new Date(b.createdAt));
+}
+
+/**
+ * Exactly one profile is the default — background.js falls back to it when no
+ * linked org matches, so the star is a radio, not a checkbox.
+ */
+async function setDefaultProfile(profileId) {
+  const target = state.profiles.find(p => p.id === profileId);
+  if (!target || target.isDefault) return;
+  try {
+    const profiles = state.profiles.map(p => ({ ...p, isDefault: p.id === profileId }));
+    await SFTabs.storage.saveProfiles(profiles, false);
+    state.profiles = profiles;
+    await patchSettings({ defaultProfileId: profileId });
+    renderProfilesList();
+    renderProfileDropdown();
+    showStatus(t('defaultProfileSet', target.name));
+  } catch (err) {
+    showStatus(t('errorSavingProfile', err.message), 'error');
+  }
+}
+
+function bindProfileDrag() {
+  const list = document.getElementById('profiles-list');
+  if (!list) return;
+  list.querySelectorAll('.drag-handle').forEach(handle => {
+    handle.addEventListener('mousedown', e => {
+      const row = handle.closest('.tab-item');
+      if (!row) return;
+      startDrag(e, row, {
+        container: list,
+        itemSelector: '.tab-item',
+        canNest: () => false,           // profiles are a flat list
+        onDrop: (srcEl, tgtEl, zone) =>
+          reorderProfile(srcEl.dataset.profileId, tgtEl.dataset.profileId, zone === 'before')
+      });
+    });
+  });
+}
+
+async function reorderProfile(sourceId, targetId, before) {
+  const ordered = orderedProfiles();
+  const from = ordered.findIndex(p => p.id === sourceId);
+  const to = ordered.findIndex(p => p.id === targetId);
+  if (from === -1 || to === -1 || from === to) return;
+
+  const [moved] = ordered.splice(from, 1);
+  const insertAt = ordered.findIndex(p => p.id === targetId) + (before ? 0 : 1);
+  ordered.splice(insertAt, 0, moved);
+
+  // Renumber the whole list: partial positions would tie at Infinity and fall
+  // back to creation order, which is not what was just dragged.
+  const profiles = ordered.map((p, i) => ({ ...p, position: i }));
+  try {
+    await SFTabs.storage.saveProfiles(profiles, false);
+    state.profiles = profiles;
+    renderProfilesList();
+    renderProfileDropdown();
+  } catch (err) {
+    showStatus(t('errorSavingProfile', err.message), 'error');
+  }
 }
 
 /** Generic confirm on the storage modal's markup. Returns a promise. */
@@ -2127,7 +2207,6 @@ function bindEvents() {
   const orgsEl = document.getElementById('input-profile-orgs');
   orgsEl.addEventListener('input', scheduleProfileSave);
   orgsEl.addEventListener('blur', autosaveProfileForm);
-  document.getElementById('input-profile-default').addEventListener('change', autosaveProfileForm);
 
   // Submitting with Enter should commit now rather than wait for the debounce
   document.getElementById('form-edit-profile').addEventListener('submit', e => {
@@ -2137,7 +2216,7 @@ function bindEvents() {
   // Closing commits any pending debounce first
   document.getElementById('btn-close-profile').addEventListener('click', async () => {
     await autosaveProfileForm();
-    showView('empty');
+    openProfilesList();
   });
   document.getElementById('btn-capture-org').addEventListener('click', captureCurrentOrg);
   document.getElementById('btn-close-profiles').addEventListener('click', () => showView('empty'));

@@ -1496,3 +1496,9 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 /* .dropdown-item zeroes this, which leaves the label touching the dot */
 .dropdown-item .profile-dot + .tab-info { padding-left: var(--sft-spacing-2); }
+
+/* Default-profile star. Off is the outline icon in the usual muted action
+   colour; on is the filled icon in the notification yellow, the same accent
+   the unread dot uses. */
+.tab-btn--star.is-on { color: #fcc003; }
+.tab-btn--star.is-on:hover { background: color-mix(in srgb, #fcc003 18%, transparent); }

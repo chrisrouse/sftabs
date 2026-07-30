@@ -2828,18 +2828,6 @@
     "message": "Add the org I’m on",
     "description": "Button that appends the current tab’s org identifier to the list"
   },
-  "profileOptionsLegend": {
-    "message": "Profile Options",
-    "description": "Legend for the profile checkbox group"
-  },
-  "profileIsDefaultLabel": {
-    "message": "Default profile",
-    "description": "Checkbox label marking this the fallback profile"
-  },
-  "profileIsDefaultDesc": {
-    "message": "Used when no linked org matches",
-    "description": "Description under the default-profile checkbox"
-  },
   "profilesListSubtitle": {
     "message": "Separate tab sets per org",
     "description": "Subtitle of the profiles list panel"
@@ -2928,10 +2916,6 @@
     "message": "No orgs linked",
     "description": "Shown for a profile with no org identifiers"
   },
-  "defaultBadge": {
-    "message": "Default",
-    "description": "Marks the fallback profile in the list"
-  },
   "activeBadge": {
     "message": "Active",
     "description": "Marks the currently selected profile in the list"
@@ -2977,6 +2961,44 @@
       "name": {
         "content": "$1",
         "example": "Sandbox"
+      }
+    }
+  },
+  "ariaIsDefaultProfile": {
+    "message": "$NAME$ is the default profile",
+    "description": "Accessible name for the star when this profile is already the default",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "ariaMakeDefaultProfile": {
+    "message": "Make $NAME$ the default profile",
+    "description": "Accessible name for the star when clicking it would make this profile the default",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "defaultProfileTitle": {
+    "message": "Default profile",
+    "description": "Tooltip on the filled star"
+  },
+  "makeDefaultProfileTitle": {
+    "message": "Set as default profile",
+    "description": "Tooltip on the empty star"
+  },
+  "defaultProfileSet": {
+    "message": "\"$NAME$\" is now the default profile",
+    "description": "Status after clicking the star",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
       }
     }
   }

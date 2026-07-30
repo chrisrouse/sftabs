@@ -2695,15 +2695,6 @@
   "captureCurrentOrg": {
     "message": "Agregar la organización actual"
   },
-  "profileOptionsLegend": {
-    "message": "Opciones del perfil"
-  },
-  "profileIsDefaultLabel": {
-    "message": "Perfil predeterminado"
-  },
-  "profileIsDefaultDesc": {
-    "message": "Se usa cuando ninguna organización vinculada coincide"
-  },
   "profilesListSubtitle": {
     "message": "Conjuntos de pestañas separados por organización"
   },
@@ -2778,9 +2769,6 @@
   "noOrgsLinked": {
     "message": "Sin organizaciones vinculadas"
   },
-  "defaultBadge": {
-    "message": "Predeterminado"
-  },
   "activeBadge": {
     "message": "Activo"
   },
@@ -2820,6 +2808,39 @@
       "name": {
         "content": "$1",
         "example": "Sandbox"
+      }
+    }
+  },
+  "ariaIsDefaultProfile": {
+    "message": "$NAME$ es el perfil predeterminado",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "ariaMakeDefaultProfile": {
+    "message": "Establecer $NAME$ como perfil predeterminado",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
+  "defaultProfileTitle": {
+    "message": "Perfil predeterminado"
+  },
+  "makeDefaultProfileTitle": {
+    "message": "Establecer como perfil predeterminado"
+  },
+  "defaultProfileSet": {
+    "message": "\"$NAME$\" es ahora el perfil predeterminado",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
       }
     }
   }
