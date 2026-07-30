@@ -29,13 +29,15 @@
   /* top/left are written inline by position(); see header-menu.js */
   position: fixed;
   z-index: 9000;
-  /* Native sizes to content between these bounds. Both are set explicitly
-     because .uiMenuList carries its own min-width, and min-width beats width
-     regardless of specificity — forcing a width instead made this render at
-     double the size, which then tripped position() into flipping it leftwards. */
-  width: auto;
-  min-width: 100px;
-  max-width: 400px;
+  /* 230px, matching the Setup menu, which measured 232.78px content-derived.
+     Fixed rather than auto so the menu does not change width with the longest
+     tab name; .slds-truncate ellipsises anything that does not fit.
+
+     All three are set because .uiMenuList carries its own min-width, and
+     min-width beats width regardless of specificity. */
+  width: 230px;
+  min-width: 230px;
+  max-width: 230px;
   padding: 4px 0;
   cursor: default;
   text-align: left;

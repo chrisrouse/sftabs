@@ -308,8 +308,9 @@
     const button = document.getElementById(ITEM_ID + '-button');
     if (!button) return;
     const rect = button.getBoundingClientRect();
-    // Width is auto now, matching native, so this has to be the measured value
-    const width = menu.getBoundingClientRect().width || 233;
+    // Measured rather than assumed: the CSS width is fixed, but reading it back
+    // keeps the flip decision honest if that value ever changes.
+    const width = menu.getBoundingClientRect().width || 230;
     const margin = 8;
 
     const flip = rect.left + width + margin > window.innerWidth;
