@@ -3,10 +3,13 @@
 All notable changes to SF Tabs are documented here. This file is the canonical source of truth for release notes — keep it updated first, then sync the popup HTML.
 
 **Releasing a new version:**
-1. Add a new `## [x.x.x.x]` section below with your changes
-2. Update `RELEASE_NOTES_VERSION` in `popup/js/popup-release-notes.js`
-3. Update the `#release-notes-panel` content in `popup/popup.html` to match
-4. Paste this version's section into the GitHub Release body
+1. Add a new `## x.y.z` section below, newest first, with your changes
+2. Run `/release` — it bumps `manifest.base.json`, regenerates `manifest.json`,
+   and syncs this section into the popup's release-notes panel
+3. Run `/release github` (or ask) to create the GitHub release from this section
+
+The popup derives its "new notes" badge from the newest version block in
+`popup.html`, so there is no version constant to bump by hand.
 
 ---
 ## 2.1.2

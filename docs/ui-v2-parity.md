@@ -117,13 +117,14 @@ sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked
 **Delegated** needs no work — it is reachable through the advanced settings
 page.
 
-## Release-process note
+## Release process
 
-`/release` (`.claude/commands/release.md`) still edits
-`popup/js/popup-release-notes.js` and `popup/popup.html` — the *old* popup. Once
-the manifest points at the v2 popup, it must instead rewrite the `.rn-version`
-blocks in root `popup.html`; there is no `RELEASE_NOTES_VERSION` constant to
-bump, because v2 derives the gate from the topmost `.rn-version-label`.
+`/release` (`.claude/commands/release.md`) targets this popup: it bumps
+`manifest.base.json`, regenerates `manifest.json`, and inserts a new
+`.rn-version` block at the top of `#view-release-notes`. There is no release-notes
+version constant — the unread badge is derived from that newest block, so adding
+it is what arms the notification.
 
-Separately, `manifest.base.json` is at 2.1.1 while CHANGELOG and the notes are
-at 2.1.2, so the footer will read v2.1.1 until the manifest is bumped.
+`popup/popup.html` and `popup/js/popup-release-notes.js` are frozen. They exist
+only as a revert path via `action.default_popup`, and `/release` deliberately
+leaves them alone.

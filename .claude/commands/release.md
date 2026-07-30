@@ -2,71 +2,129 @@ You are helping with the SF Tabs release process. Follow these steps precisely.
 
 ## Your job
 
-Sync the release notes from `CHANGELOG.md` into the extension popup, then update the version constant. Optionally create a GitHub release if the user asks.
+Take the version at the top of `CHANGELOG.md` and make the extension actually
+say that version: bump the manifest, then sync the release notes into the popup.
+Optionally create the GitHub release if the user asks.
+
+`CHANGELOG.md` is the source of truth. Never invent release-note copy.
 
 ---
 
 ## Step 1 — Read CHANGELOG.md
 
-Read `CHANGELOG.md` and identify the **topmost** `## [x.x.x.x]` version section. Extract:
-- The version number (e.g. `2.0.1.0`)
-- All bullet points under `### What's New` for that version
+Read `CHANGELOG.md` and take the **topmost** `## x.y.z` section (no brackets,
+three parts). Extract:
+
+- the version number (e.g. `2.1.2`)
+- the entries beneath it — each is a `**Bold title**` line followed by a
+  paragraph of description
+
+Compare that version against `manifest.base.json`. If the manifest already
+matches, say so and ask whether the user wants to re-sync the notes anyway or
+add a new CHANGELOG section first — do not silently do nothing.
 
 ---
 
-## Step 2 — Update RELEASE_NOTES_VERSION
+## Step 2 — Bump the version
 
-In `popup/js/popup-release-notes.js`, update the `RELEASE_NOTES_VERSION` constant to match the version from Step 1.
+Set `version` in **`manifest.base.json`** to the version from Step 1, then
+regenerate the generated manifest:
 
-Also restore the version check in `init()` if it was commented out for testing — it should look like this:
-
-```js
-async init() {
-  const result = await chrome.storage.local.get('seenReleaseNotesVersion');
-  if (result.seenReleaseNotesVersion !== RELEASE_NOTES_VERSION) {
-    document.getElementById('release-notes-button').style.display = '';
-  }
-
-  document.getElementById('release-notes-button').addEventListener('click', () => this.show());
-  document.getElementById('release-notes-close-button').addEventListener('click', () => this.hide());
-},
+```
+npm run manifest:chrome
 ```
 
+`manifest.json` is generated from `manifest.base.json` and is committed, so it
+must be regenerated or the build ships the old version.
+
+This step did not exist in the earlier version of these instructions, so the bump
+depended on someone remembering it. That is how the repo came to hold 2.1.2 notes
+against a 2.1.1 manifest: harmless while unreleased, but shipping in that state
+would have shown the wrong version in the popup footer, which reads
+`browser.runtime.getManifest().version`.
+
 ---
 
-## Step 3 — Sync popup.html release notes panel
+## Step 3 — Sync the release-notes panel in `popup.html`
 
-In `popup/popup.html`, replace the contents of the `<div class="release-notes-items">` block inside `#release-notes-panel` with new items generated from the CHANGELOG bullet points.
+The shipping popup is the root `popup.html`. Inside `#view-release-notes` →
+`.rn-body` there is one `.rn-version` block per released version, newest first.
 
-Each bullet point `- EMOJI **Title** — Description` becomes:
+Insert a **new** block at the top of `.rn-body` for this version, keeping the
+existing blocks below it:
 
 ```html
-<div class="release-notes-item">
-    <div class="release-notes-item-icon">EMOJI</div>
-    <div>
-        <div class="release-notes-item-title">Title</div>
-        <div class="release-notes-item-desc">Description</div>
-    </div>
+<div class="rn-version">
+  <div class="rn-version-label">vVERSION</div>
+  <ul class="rn-items">
+    <li class="rn-item">
+      <span class="rn-item-title">TITLE</span>
+      <span class="rn-item-desc">DESCRIPTION</span>
+    </li>
+  </ul>
 </div>
 ```
 
-Preserve any `<code>` tags for inline code in descriptions. Keep the existing close button below the items block — do not modify it.
+One `<li class="rn-item">` per CHANGELOG entry. The `**Bold title**` becomes
+`rn-item-title`, its paragraph becomes `rn-item-desc`. Preserve any `<code>`
+tags. Escape `&`, `<` and `>` in the copy.
+
+**There is no version constant to update.** The unread-notes gate in
+`js/popup.js` reads the topmost `.rn-version-label` and compares it to
+`seenReleaseNotesVersion` in local storage, so adding the block above is what
+arms the notification dot. Do not add a constant — that would be a second
+source of truth that can drift.
+
+Keep the `v` prefix in the label (`v2.1.2`); the gate strips it.
+
+### Do not localize the notes
+
+`.rn-item-title` and `.rn-item-desc` stay English, matching the shipped popup.
+They are synced verbatim from `CHANGELOG.md`. Everything else in the panel is
+already localized via `__MSG_` tokens — leave those alone. See
+`docs/localization.md`.
+
+### The old popup is frozen
+
+`popup/popup.html` and `popup/js/popup-release-notes.js` belong to the previous
+UI, which is kept only as a revert path (`manifest.base.json` →
+`action.default_popup`). Do **not** update them. Their notes will lag, which is
+acceptable for an emergency revert.
 
 ---
 
-## Step 4 — Report
+## Step 4 — Verify
 
-After making the changes, tell the user:
-1. What version was synced
-2. How many release note items were written to the popup
-3. Whether the version check was restored in JS
-4. Remind them: if they want a GitHub release, run `/release github` or ask you to create one using the CHANGELOG section as the body
+Run these and report the results:
+
+```
+npm test
+node -e "console.log(require('./manifest.json').version)"
+```
+
+Then confirm the version in `manifest.json` matches the topmost
+`.rn-version-label` in `popup.html` with the `v` stripped. If they differ, the
+notification dot will fire for a version the user is not running.
 
 ---
 
-## Optional: GitHub Release (only if user passes "github" as argument or asks for it)
+## Step 5 — Report
 
-If the user runs `/release github` or explicitly asks to create the GitHub release:
-- Use `gh release create vVERSION --title "v VERSION" --notes "CHANGELOG_SECTION_CONTENT"`
-- Use the full `### What's New` bullet list from the CHANGELOG section as the release notes body
-- Ask the user to confirm the tag name before running the gh command
+Tell the user:
+
+1. the version synced, and that both `manifest.base.json` and `manifest.json`
+   were bumped
+2. how many release-note items were written into `popup.html`
+3. the `npm test` result
+4. that a GitHub release is a separate step — `/release github`, or ask
+
+---
+
+## Optional: GitHub release (only when asked)
+
+Only if the user runs `/release github` or explicitly asks:
+
+- Confirm the tag name with the user before running anything. Existing tags use
+  the `vX.Y.Z` form (`v2.1.1`).
+- `gh release create vVERSION --title "vVERSION" --notes "CHANGELOG_SECTION"`
+- Use the full entry list from that CHANGELOG section as the body.
