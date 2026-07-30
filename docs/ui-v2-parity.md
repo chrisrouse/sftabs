@@ -97,7 +97,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 
 | Capability | Status | Notes |
 |---|---|---|
-| Localization | Done | 150 keys: static copy via `__MSG_` tokens and `i18n-helper.js`, runtime strings via a local `t()` helper. 36 keys reused from the shipped popup are already translated; the other 114 fall back to English until de/es land — see `docs/localization-todo.md` |
+| Localization | Done | 163 keys: static copy via `__MSG_` tokens and `i18n-helper.js`, runtime strings via a local `t()` helper. 38 keys reused from the shipped popup are already translated; the other 125 fall back to English until de/es land — see `docs/localization-todo.md` |
 | React to external storage changes | **Gap** | No `storage.onChanged` listener, so background auto-switch leaves a stale popup |
 | Keyboard shortcuts (`open-tab-01..10`) | Done | `background.js`, unchanged |
 | Import / export | **Delegated** | Settings page |
@@ -120,7 +120,7 @@ sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked
 page.
 
 Localization is wired but only partly translated; `docs/localization-todo.md`
-tracks the 114 keys still reading English in de/es.
+tracks the 125 keys still reading English in de/es.
 
 ## Release-process note
 
