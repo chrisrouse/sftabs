@@ -70,7 +70,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 12px;      /* native; no bottom border */
+  padding: 4px 12px;
+  /* Native has this line. It was removed earlier on bad evidence: the style dump
+     reported the `border` shorthand, which computes empty when the four sides
+     differ, so a bottom-only border was invisible in it. The snippet now reports
+     each side separately. */
+  border-bottom: 1px solid #e5e5e5;
 }
 #sftabs-header-menu .header-text {
   margin: 0;
@@ -105,19 +110,26 @@
 
 /* ── Ours: the path beneath a tab name, and the sub-item count ── */
 
-#sftabs-header-menu .sftabs-hm-path {
-  display: block;
-  font-size: 11px;
-  line-height: 15px;
-  color: #706e6b;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* Shown only while the row is hovered or focused, as Salesforce does it.
+   visibility rather than display, so the row does not reflow. */
+#sftabs-header-menu .sftabs-hm-newtab {
+  visibility: hidden;
+  color: #747474;
+  line-height: 1;
 }
+#sftabs-header-menu li.uiMenuItem:hover .sftabs-hm-newtab,
+#sftabs-header-menu li.uiMenuItem > a:focus .sftabs-hm-newtab { visibility: visible; }
+
 #sftabs-header-menu .sftabs-hm-count {
   color: #706e6b;
   font-size: 11px;
   white-space: nowrap;
+  margin-right: 4px;
+}
+#sftabs-header-menu .slds-size_2-of-12 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 #sftabs-header-menu .sftabs-hm-empty {
   display: block;

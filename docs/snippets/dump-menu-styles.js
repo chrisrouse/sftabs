@@ -17,7 +17,11 @@
 (() => {
   const PROPS = [
     'width', 'minWidth', 'maxWidth', 'height', 'boxSizing',
-    'padding', 'margin', 'border', 'borderRadius', 'boxShadow',
+    'padding', 'margin', 'borderRadius', 'boxShadow',
+    // Per side, not the `border` shorthand: that computes to an empty string when
+    // the four sides differ, which hid a bottom-only border and led to it being
+    // removed from our menu by mistake.
+    'borderTop', 'borderRight', 'borderBottom', 'borderLeft',
     'backgroundColor', 'color',
     'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'textTransform',
     'display', 'alignItems', 'justifyContent', 'position', 'overflowY',

@@ -14,6 +14,9 @@
   // SLDS bookmark, vendored to icons/slds/bookmark.svg. Inlined because the
   // header is Aura-rendered and an <img> here would flicker on every re-inject.
   const BOOKMARK = 'm373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7';
+  // SLDS new_window, the same glyph Salesforce puts on menu items that leave the
+  // page. Shown only on hover or focus, as theirs is.
+  const NEW_WINDOW = 'M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7';
   const CLOSE = 'm310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14';
 
   // Native menus sit 12.8px below their trigger (margin-top on the popup), which
@@ -101,12 +104,37 @@
     if (menu && !menu.contains(event.target) && !event.target.closest(`#${ITEM_ID}`)) closeMenu();
   };
 
+  /**
+   * Keyboard handling, matching the Setup menu: the first item is focused on
+   * open, arrows move the highlight, Home/End jump to the ends, Escape closes and
+   * returns focus to the trigger. The highlight is focus itself, so no separate
+   * selection state is tracked.
+   */
   const onKeydown = event => {
+    const menu = document.getElementById(MENU_ID);
+    if (!menu) return;
+
     if (event.key === 'Escape') {
       closeMenu();
       const button = document.getElementById(`${ITEM_ID}-button`);
       if (button) button.focus();
+      return;
     }
+
+    const KEYS = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
+    if (!KEYS.includes(event.key)) return;
+
+    const items = [...menu.querySelectorAll('a[role="menuitem"]')];
+    if (!items.length) return;
+    event.preventDefault();   // stop the page scrolling under the menu
+
+    const at = items.indexOf(document.activeElement);
+    let next;
+    if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = items.length - 1;
+    else if (event.key === 'ArrowDown') next = at < 0 ? 0 : (at + 1) % items.length;
+    else next = at < 0 ? items.length - 1 : (at - 1 + items.length) % items.length;
+    items[next].focus();      // scrolls itself into view
   };
 
   function toggleMenu(tabs) {
@@ -147,21 +175,26 @@
   function rowHTML(tab, index) {
     const kids = childrenOf(tab);
     const href = urlFor(tab);
-    const path = tab.path ? `<span class="sftabs-hm-path">${esc(tab.path)}</span>` : '';
-    const trailing = kids.length
-      ? `<div class="slds-p-right_small slds-p-left_small slds-no-flex slds-size_2-of-12">
-           <span class="sftabs-hm-count">${kids.length} &rsaquo;</span>
-         </div>`
+    const marks = [
+      kids.length ? `<span class="sftabs-hm-count">${kids.length} &rsaquo;</span>` : '',
+      // Same affordance Salesforce shows on items that leave the page, and on the
+      // same terms: only while the row is hovered or focused.
+      tab.openInNewTab
+        ? `<span class="sftabs-hm-newtab">${svg(NEW_WINDOW, 'slds-icon slds-icon_x-small')}
+             <span class="slds-assistive-text">${esc(msg('opensInNewTabTitle'))}</span></span>`
+        : ''
+    ].filter(Boolean).join('');
+    const trailing = marks
+      ? `<div class="slds-p-right_small slds-p-left_small slds-no-flex slds-size_2-of-12">${marks}</div>`
       : '';
     return `
       <li role="presentation" class="slds-dropdown__item uiMenuItem" data-index="${index}">
         <a role="menuitem" title="${esc(tab.label)}"${href ? ` href="${esc(href)}"` : ''}${
           tab.openInNewTab ? ' target="_blank" rel="noopener"' : ''}>
           <div class="slds-grid">
-            <div class="slds-col slds-size_${kids.length ? '10' : '12'}-of-12">
+            <div class="slds-col slds-size_${marks ? '10' : '12'}-of-12">
               <span class="slds-truncate">
                 <span class="slds-align-middle">${esc(tab.label)}</span>
-                ${path}
               </span>
             </div>
             ${trailing}
