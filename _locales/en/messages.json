@@ -2840,10 +2840,6 @@
     "message": "Used when no linked org matches",
     "description": "Description under the default-profile checkbox"
   },
-  "deleteProfileButton": {
-    "message": "Delete Profile",
-    "description": "Destructive button in the profile form"
-  },
   "profilesListSubtitle": {
     "message": "Separate tab sets per org",
     "description": "Subtitle of the profiles list panel"
@@ -2983,9 +2979,5 @@
         "example": "Sandbox"
       }
     }
-  },
-  "doneButton": {
-    "message": "Done",
-    "description": "Closes the profile form. There is no Save button because the form autosaves."
   }
 }

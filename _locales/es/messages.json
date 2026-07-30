@@ -2704,9 +2704,6 @@
   "profileIsDefaultDesc": {
     "message": "Se usa cuando ninguna organización vinculada coincide"
   },
-  "deleteProfileButton": {
-    "message": "Eliminar perfil"
-  },
   "profilesListSubtitle": {
     "message": "Conjuntos de pestañas separados por organización"
   },
@@ -2825,8 +2822,5 @@
         "example": "Sandbox"
       }
     }
-  },
-  "doneButton": {
-    "message": "Listo"
   }
 }

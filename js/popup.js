@@ -912,10 +912,6 @@ function openProfileForm(profileId) {
   document.getElementById('input-profile-name').removeAttribute('aria-invalid');
   updateCharCount('input-profile-name', 'profile-name-count', 30);
 
-  // Deleting the only profile would leave nothing to fall back to
-  document.getElementById('btn-delete-profile').hidden =
-    !profile || state.profiles.length < 2;
-
   showView('edit-profile');
   document.getElementById('input-profile-name').focus();
 }
@@ -981,7 +977,6 @@ async function persistProfileForm() {
     // A brand-new profile starts empty; give it a tab list so switching to it
     // does not look like data loss
     await SFTabs.storage.saveProfileTabs(saved.id, []);
-    document.getElementById('btn-delete-profile').hidden = state.profiles.length < 2;
   }
   if (makeDefault) await patchSettings({ defaultProfileId: saved.id });
 
@@ -1000,19 +995,10 @@ async function autosaveProfileForm() {
   try {
     const result = await persistProfileForm();
     if (!result) return;
-    setProfileSavedHint(t(result.created ? 'profileCreatedNamed' : 'profileSavedNamed', result.saved.name));
+    showStatus(t(result.created ? 'profileCreatedNamed' : 'profileSavedNamed', result.saved.name));
   } catch (err) {
-    setProfileSavedHint(t('errorSavingProfile', err.message), true);
+    showStatus(t('errorSavingProfile', err.message), 'error');
   }
-}
-
-/** Quiet inline confirmation, so autosave does not hijack the footer status. */
-function setProfileSavedHint(message, isError = false) {
-  const el = document.getElementById('profile-saved-hint');
-  if (!el) return;
-  el.textContent = message;
-  el.classList.toggle('is-error', isError);
-  el.hidden = false;
 }
 
 /**
@@ -2148,17 +2134,10 @@ function bindEvents() {
     e.preventDefault();
     autosaveProfileForm();
   });
-  document.getElementById('btn-done-profile').addEventListener('click', async () => {
-    await autosaveProfileForm();
-    openProfilesList();
-  });
   // Closing commits any pending debounce first
   document.getElementById('btn-close-profile').addEventListener('click', async () => {
     await autosaveProfileForm();
     showView('empty');
-  });
-  document.getElementById('btn-delete-profile').addEventListener('click', () => {
-    if (state.editingProfileId) deleteProfileFlow(state.editingProfileId);
   });
   document.getElementById('btn-capture-org').addEventListener('click', captureCurrentOrg);
   document.getElementById('btn-close-profiles').addEventListener('click', () => showView('empty'));

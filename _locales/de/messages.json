@@ -2704,9 +2704,6 @@
   "profileIsDefaultDesc": {
     "message": "Wird verwendet, wenn keine verknüpfte Org passt"
   },
-  "deleteProfileButton": {
-    "message": "Profil löschen"
-  },
   "profilesListSubtitle": {
     "message": "Getrennte Registerkartensätze pro Org"
   },
@@ -2825,8 +2822,5 @@
         "example": "Sandbox"
       }
     }
-  },
-  "doneButton": {
-    "message": "Fertig"
   }
 }
