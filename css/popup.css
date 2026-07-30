@@ -1563,7 +1563,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 .empty-state-desc {
   margin-top: var(--sft-spacing-1);
-  font-size: var(--sft-font-size-xs);
+  font-size: var(--sft-font-size-sm);
   color: var(--t-weak);
   line-height: var(--sft-line-height-base);
 }
