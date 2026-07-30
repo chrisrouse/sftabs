@@ -920,16 +920,20 @@ function openProfileForm(profileId) {
   document.getElementById('input-profile-name').focus();
 }
 
-async function saveProfileForm(e) {
-  e.preventDefault();
-  const nameInput = document.getElementById('input-profile-name');
-  const name = nameInput.value.trim();
-  if (!name) {
-    document.getElementById('profile-name-error').hidden = false;
-    nameInput.setAttribute('aria-invalid', 'true');
-    nameInput.focus();
-    return;
-  }
+/**
+ * Persist whatever the profile form currently holds.
+ *
+ * Returns false when there is nothing to save yet — an empty name — so the
+ * autosave caller can stay quiet rather than nagging while someone is still
+ * typing the first character.
+ *
+ * The first successful save of a new profile records its id in
+ * state.editingProfileId, which is what stops every subsequent keystroke
+ * creating another profile.
+ */
+async function persistProfileForm() {
+  const name = document.getElementById('input-profile-name').value.trim();
+  if (!name) return false;
 
   // One identifier per line, blanks dropped, de-duplicated case-insensitively
   const seen = new Set();
@@ -967,24 +971,48 @@ async function saveProfileForm(e) {
     saved.isDefault = true;   // refuse to leave the set with no default
   }
 
-  try {
-    await SFTabs.storage.saveProfiles(profiles, false);
-    state.profiles = profiles;
+  await SFTabs.storage.saveProfiles(profiles, false);
+  state.profiles = profiles;
 
-    const patch = {};
-    if (makeDefault) patch.defaultProfileId = saved.id;
+  if (!editing) {
+    // Claim the id before anything can await again, so a fast second keystroke
+    // updates this profile instead of creating a sibling
+    state.editingProfileId = saved.id;
     // A brand-new profile starts empty; give it a tab list so switching to it
     // does not look like data loss
-    if (!editing) await SFTabs.storage.saveProfileTabs(saved.id, []);
-    if (Object.keys(patch).length) await patchSettings(patch);
-
-    renderProfileChip();
-    renderProfileDropdown();
-    showStatus(t(editing ? 'profileSavedNamed' : 'profileCreatedNamed', saved.name));
-    if (state.activeView === 'edit-profile') openProfilesList();
-  } catch (err) {
-    showStatus(t('errorSavingProfile', err.message), 'error');
+    await SFTabs.storage.saveProfileTabs(saved.id, []);
+    document.getElementById('btn-delete-profile').hidden = state.profiles.length < 2;
   }
+  if (makeDefault) await patchSettings({ defaultProfileId: saved.id });
+
+  renderProfileChip();
+  renderProfileDropdown();
+  return { saved, created: !editing };
+}
+
+/**
+ * Save as you type. There is no Save button: the form commits on a pause in
+ * typing and on blur, which is why the panel can be closed at any point
+ * without losing the profile.
+ */
+async function autosaveProfileForm() {
+  if (state.activeView !== 'edit-profile') return;   // panel closed mid-debounce
+  try {
+    const result = await persistProfileForm();
+    if (!result) return;
+    setProfileSavedHint(t(result.created ? 'profileCreatedNamed' : 'profileSavedNamed', result.saved.name));
+  } catch (err) {
+    setProfileSavedHint(t('errorSavingProfile', err.message), true);
+  }
+}
+
+/** Quiet inline confirmation, so autosave does not hijack the footer status. */
+function setProfileSavedHint(message, isError = false) {
+  const el = document.getElementById('profile-saved-hint');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.toggle('is-error', isError);
+  el.hidden = false;
 }
 
 /**
@@ -2089,21 +2117,50 @@ function bindEvents() {
   });
 
   // Profiles
-  document.getElementById('form-edit-profile').addEventListener('submit', saveProfileForm);
-  document.getElementById('btn-close-profile').addEventListener('click', () => showView('empty'));
-  document.getElementById('btn-cancel-profile').addEventListener('click', () => {
-    // Cancel returns to the list when we came from it, otherwise closes
-    state.profiles.length ? openProfilesList() : showView('empty');
+  // Autosave: a pause in typing, plus blur so a quick close still commits
+  const scheduleProfileSave = SFTabs.utils.debounce(autosaveProfileForm, 700);
+  const nameEl = document.getElementById('input-profile-name');
+  const nameErr = document.getElementById('profile-name-error');
+  nameEl.addEventListener('input', () => {
+    updateCharCount('input-profile-name', 'profile-name-count', 30);
+    if (nameEl.value.trim()) {
+      nameErr.hidden = true;
+      nameEl.removeAttribute('aria-invalid');
+    }
+    scheduleProfileSave();
+  });
+  nameEl.addEventListener('blur', () => {
+    // Autosave cannot commit without a name. Say so, rather than saving
+    // nothing and leaving the impression it worked.
+    const empty = !nameEl.value.trim();
+    nameErr.hidden = !empty;
+    if (empty) nameEl.setAttribute('aria-invalid', 'true');
+    else autosaveProfileForm();
+  });
+
+  const orgsEl = document.getElementById('input-profile-orgs');
+  orgsEl.addEventListener('input', scheduleProfileSave);
+  orgsEl.addEventListener('blur', autosaveProfileForm);
+  document.getElementById('input-profile-default').addEventListener('change', autosaveProfileForm);
+
+  // Submitting with Enter should commit now rather than wait for the debounce
+  document.getElementById('form-edit-profile').addEventListener('submit', e => {
+    e.preventDefault();
+    autosaveProfileForm();
+  });
+  document.getElementById('btn-done-profile').addEventListener('click', async () => {
+    await autosaveProfileForm();
+    openProfilesList();
+  });
+  // Closing commits any pending debounce first
+  document.getElementById('btn-close-profile').addEventListener('click', async () => {
+    await autosaveProfileForm();
+    showView('empty');
   });
   document.getElementById('btn-delete-profile').addEventListener('click', () => {
     if (state.editingProfileId) deleteProfileFlow(state.editingProfileId);
   });
   document.getElementById('btn-capture-org').addEventListener('click', captureCurrentOrg);
-  document.getElementById('input-profile-name').addEventListener('input', e => {
-    updateCharCount('input-profile-name', 'profile-name-count', 30);
-    document.getElementById('profile-name-error').hidden = true;
-    e.target.removeAttribute('aria-invalid');
-  });
   document.getElementById('btn-close-profiles').addEventListener('click', () => showView('empty'));
   document.getElementById('btn-new-profile-from-list').addEventListener('click', () => openProfileForm(null));
   document.getElementById('btn-manage-profiles-settings').addEventListener('click', openProfilesList);

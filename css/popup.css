@@ -1497,3 +1497,12 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 /* .dropdown-item zeroes this, which leaves the label touching the dot */
 .dropdown-item .profile-dot + .tab-info { padding-left: var(--sft-spacing-2); }
+
+/* Autosave confirmation, in the pinned action bar. Quiet on purpose: it fires
+   on every pause in typing, so it must not read like an alert. */
+.form-saved-hint {
+  margin-right: 8px;
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+}
+.form-saved-hint.is-error { color: var(--c-error); }

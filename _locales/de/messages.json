@@ -2825,5 +2825,8 @@
         "example": "Sandbox"
       }
     }
+  },
+  "doneButton": {
+    "message": "Fertig"
   }
 }

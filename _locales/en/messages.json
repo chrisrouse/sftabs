@@ -2983,5 +2983,9 @@
         "example": "Sandbox"
       }
     }
+  },
+  "doneButton": {
+    "message": "Done",
+    "description": "Closes the profile form. There is no Save button because the form autosaves."
   }
 }

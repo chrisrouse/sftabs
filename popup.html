@@ -189,10 +189,12 @@
               </label>
             </fieldset>
 
+            <!-- No Save: the form autosaves on pause and on blur. Cancel is gone
+                 too, since by then there is nothing to cancel. -->
             <div class="form-actions">
               <button type="button" class="btn-danger" id="btn-delete-profile" hidden>__MSG_deleteProfileButton__</button>
-              <button type="button" class="btn-secondary" id="btn-cancel-profile">__MSG_cancelButton__</button>
-              <button type="submit" class="btn-primary" id="btn-save-profile">__MSG_saveProfileButton__</button>
+              <span class="form-saved-hint" id="profile-saved-hint" role="status" aria-live="polite" hidden></span>
+              <button type="button" class="btn-primary" id="btn-done-profile">__MSG_doneButton__</button>
             </div>
 
           </form>
