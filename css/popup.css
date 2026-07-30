@@ -1548,3 +1548,31 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   font-size: var(--sft-font-size-xs);
   line-height: var(--sft-line-height-base);
 }
+
+/* ── 28. Empty state ──
+   lightning-empty-state's anatomy and sizing. Its responsive bands are
+   366px+ -> 304px illustration, 256-365px -> 184px, and hidden below 256px.
+   .panel-left is 390px, so this is the top band. */
+.tab-list-empty {
+  list-style: none;
+  padding: var(--sft-spacing-4) var(--sft-spacing-3) 0;
+}
+.empty-state { text-align: center; }
+.empty-state-svg {
+  display: block;
+  width: 100%;
+  max-width: 304px;
+  max-height: 200px;
+  margin: 0 auto var(--sft-spacing-4);
+}
+.empty-state-title {
+  font-size: var(--sft-font-size-md);
+  font-weight: var(--sft-font-weight-semibold);
+  color: var(--t-base);
+}
+.empty-state-desc {
+  margin-top: var(--sft-spacing-1);
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+  line-height: var(--sft-line-height-base);
+}

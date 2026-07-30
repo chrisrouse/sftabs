@@ -757,9 +757,7 @@ function moveDropdownItem(fromPath, toPath, zone) {
 function renderTabList() {
   const list = document.getElementById('tab-list');
   if (!state.tabs.length) {
-    list.innerHTML = `<li class="tab-list-empty" role="listitem">
-      <p style="padding:16px 12px;font-size:12px;color:var(--t-weak);text-align:center;">No tabs yet — add your first one!</p>
-    </li>`;
+    list.innerHTML = `<li class="tab-list-empty">${emptyStateHTML()}</li>`;
     return;
   }
   list.innerHTML = state.tabs
@@ -767,6 +765,55 @@ function renderTabList() {
     .sort((a, b) => a.position - b.position)
     .map(tab => tabItemHTML(tab))
     .join('');
+}
+
+/**
+ * Empty state, following lightning-empty-state's anatomy: illustration, an h3
+ * title, then a description. The artwork is ours — SLDS's illustrations are
+ * fetched from Salesforce at runtime rather than distributed, so they can't ship
+ * in an extension. Only the two illustration tones are SLDS's.
+ *
+ * Illustration is decorative, hence aria-hidden and no alternative text.
+ */
+function emptyStateHTML() {
+  return `<div class="empty-state">
+    ${emptyStateIllustration()}
+    <h3 class="empty-state-title">No tabs yet</h3>
+    <p class="empty-state-desc">Add your first tab, or use Quick Add to capture the Salesforce page you're on.</p>
+  </div>`;
+}
+
+/**
+ * Inline so the artwork can use the illustration tokens and follow the theme.
+ *
+ * To swap in an image file instead, drop it in `icons/` and return
+ * `<img class="empty-state-svg" src="icons/<file>" alt="">` — popup pages can
+ * reference extension files by relative path, so it needs no manifest entry.
+ * A self-colored file won't follow dark mode; that's the tradeoff.
+ */
+function emptyStateIllustration() {
+  return `<svg class="empty-state-svg" viewBox="0 0 304 200" aria-hidden="true" focusable="false">
+      <ellipse cx="152" cy="168" rx="98" ry="9" fill="var(--sft-illustration-3)"/>
+      <g fill="var(--sft-illustration-2)">
+        <rect x="72" y="44" width="160" height="30" rx="15"/>
+        <rect x="72" y="82" width="160" height="30" rx="15"/>
+      </g>
+      <g fill="var(--sft-illustration-1)">
+        <circle cx="91" cy="59" r="7"/>
+        <rect x="108" y="55" width="86" height="8" rx="4"/>
+        <circle cx="91" cy="97" r="7"/>
+        <rect x="108" y="93" width="62" height="8" rx="4"/>
+      </g>
+      <rect x="72" y="120" width="160" height="30" rx="15" fill="none"
+        stroke="var(--sft-illustration-1)" stroke-width="2" stroke-dasharray="7 6"/>
+      <path d="M152 129v12M146 135h12" stroke="var(--sft-illustration-1)"
+        stroke-width="2" stroke-linecap="round"/>
+      <g fill="var(--sft-illustration-1)">
+        <path d="M252 40q2 10 12 12-10 2-12 12-2-10-12-12 10-2 12-12Z"/>
+        <path d="M44 96q1.4 7 8 8-6.6 1-8 8-1.4-7-8-8 6.6-1 8-8Z"/>
+      </g>
+      <path d="M262 84q1 6 7 7-6 1-7 7-1-6-7-7 6-1 7-7Z" fill="var(--sft-illustration-2)"/>
+    </svg>`;
 }
 
 function tabItemHTML(tab) {
