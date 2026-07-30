@@ -109,7 +109,26 @@
       closeMenu();
       return;
     }
+    closeSalesforceMenus();
     openMenu(tabs);
+  }
+
+  /**
+   * Dismiss any open Aura popup before showing ours, so two menus are never up
+   * at once.
+   *
+   * Done by clicking the popup's own trigger — the popup points at it through
+   * aria-labelledby — rather than by hiding the node. Hiding it would leave Aura
+   * believing the menu is still open, and the next click on that trigger would
+   * do nothing.
+   */
+  function closeSalesforceMenus() {
+    document.querySelectorAll('.uiPopupTarget.visible').forEach(popup => {
+      if (popup.id === MENU_ID) return;
+      const triggerId = popup.getAttribute('aria-labelledby');
+      const trigger = triggerId ? document.getElementById(triggerId) : null;
+      if (trigger) trigger.click();
+    });
   }
 
   /**
@@ -167,7 +186,7 @@
     // to the trigger, which keeps it on screen: our item is the leftmost of a
     // cluster that sits at the right of the window.
     menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget ' +
-                     'uiMenuList uiMenuList--right uiMenuList--default visible positioned ' +
+                     'uiMenuList uiMenuList--default visible positioned ' +
                      'sftabs-hm-menu';
     menu.setAttribute('aria-labelledby', ITEM_ID + '-button');
 
@@ -195,6 +214,7 @@
 
     item.appendChild(menu);
     document.getElementById(ITEM_ID + '-button').setAttribute('aria-expanded', 'true');
+    position(menu);
     menu.querySelector('.close-button').addEventListener('click', closeMenu);
 
     menu.querySelectorAll('li.uiMenuItem').forEach(li => {
@@ -230,6 +250,43 @@
 
     const first = menu.querySelector('a[role="menuitem"]');
     if (first) first.focus();
+  }
+
+  /**
+   * Place the menu against the trigger.
+   *
+   * Aura positions its popups by writing inline coordinates from its own
+   * layout engine, which we are not using — so relying on the uiMenuList classes
+   * alone leaves the menu wherever their default rules put it, which is not next
+   * to our button. Fixed positioning from the button's own rect is deterministic,
+   * and inline styles beat any class rule without needing !important.
+   *
+   * Prefers aligning the menu's left edge to the button and flips to right-edge
+   * alignment when that would overflow, swapping the nubbin variant to match so
+   * the arrow still points at the button.
+   */
+  function position(menu) {
+    const button = document.getElementById(ITEM_ID + '-button');
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    const width = menu.offsetWidth || 330;
+    const margin = 8;
+
+    const flip = rect.left + width + margin > window.innerWidth;
+    menu.classList.toggle('uiMenuList--right', flip);
+    menu.classList.toggle('uiMenuList--left', !flip);
+
+    const left = flip
+      ? Math.max(margin, rect.right - width)
+      : Math.min(rect.left, window.innerWidth - width - margin);
+
+    menu.style.position = 'fixed';
+    menu.style.top = `${Math.round(rect.bottom + 6)}px`;
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.right = 'auto';
+    // Nubbin sits over the button whichever way the menu was aligned
+    menu.style.setProperty('--sftabs-hm-nubbin',
+      `${Math.round(rect.left + rect.width / 2 - left)}px`);
   }
 
   /**
@@ -369,6 +426,13 @@
       }
     });
   }
+
+  const reposition = () => {
+    const menu = document.getElementById(MENU_ID);
+    if (menu) position(menu);
+  };
+  window.addEventListener('resize', reposition);
+  window.addEventListener('scroll', reposition, true);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

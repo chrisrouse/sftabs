@@ -21,14 +21,35 @@
    docs/mockups/global-header-menu.md. */
 
 #sftabs-header-menu {
-  position: absolute;
-  top: 2.5rem;
-  right: -0.5rem;
-  left: auto;
+  /* top/left are written inline by position(); see header-menu.js. Aura places
+     its own popups the same way, from its layout engine, so class rules alone
+     never put this next to our button. */
+  position: fixed;
   z-index: 9000;
   width: 20.625rem;
   cursor: default;
   text-align: left;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
+}
+
+/* Nubbin. Salesforce's menu--nubbin-top draws one, but its horizontal offset
+   assumes Aura placed the popup; position() measures the real button and passes
+   the offset through --sftabs-hm-nubbin. */
+#sftabs-header-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: var(--sftabs-hm-nubbin, 1rem);
+  width: 11px;
+  height: 11px;
+  margin-left: -5px;
+  background: #fff;
+  border-left: 1px solid #e5e5e5;
+  border-top: 1px solid #e5e5e5;
+  transform: rotate(45deg);
 }
 
 /* Fallbacks, for pages where the Setup bundle's rules are absent */
@@ -36,13 +57,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem 0.5rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+#sftabs-header-menu .scrollable {
+  margin: 0;
+  padding: 0;
+  max-height: 21rem;
+  overflow-y: auto;
 }
 #sftabs-header-menu .header-text {
+  /* Matches "My Favorites" / "Setup Menu": 17px, near-black, regular weight */
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 1.0625rem;
   font-weight: 400;
-  color: #514f4d;
+  line-height: 1.25;
+  color: #080707;
 }
 #sftabs-header-menu .close-button { flex-shrink: 0; }
 
