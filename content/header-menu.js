@@ -75,7 +75,7 @@
 
     li.querySelector('button').addEventListener('click', event => {
       event.stopPropagation();
-      toggleMenu(tabs, settings);
+      toggleMenu(tabs);
     });
     return true;
   }
@@ -104,130 +104,190 @@
     }
   };
 
-  function toggleMenu(tabs, settings) {
+  function toggleMenu(tabs) {
     if (document.getElementById(MENU_ID)) {
       closeMenu();
       return;
     }
-    openMenu(tabs, settings);
+    openMenu(tabs);
   }
 
+  /**
+   * One menu row, mirroring the Setup menu's item structure:
+   * li.slds-dropdown__item.uiMenuItem > a[role=menuitem] > .slds-grid, with a
+   * 10/12 label column and a 2/12 column for a trailing affordance.
+   *
+   * A real href rather than a button, so middle-click and cmd-click behave the
+   * way they do on Salesforce's own menu items.
+   */
   function rowHTML(tab, index) {
     const kids = childrenOf(tab);
-    const path = tab.path ? `<span class="sftabs-hm-sub">${esc(tab.path)}</span>` : '';
-    const count = kids.length
-      ? `<span class="sftabs-hm-count" aria-hidden="true">${kids.length} &rsaquo;</span>`
+    const href = urlFor(tab);
+    const path = tab.path ? `<span class="sftabs-hm-path">${esc(tab.path)}</span>` : '';
+    const trailing = kids.length
+      ? `<div class="slds-p-right_small slds-p-left_small slds-no-flex slds-size_2-of-12">
+           <span class="sftabs-hm-count">${kids.length} &rsaquo;</span>
+         </div>`
       : '';
     return `
-      <li role="presentation">
-        <button type="button" class="sftabs-hm-item" role="menuitem" data-index="${index}"
-          ${kids.length ? 'aria-haspopup="true" aria-expanded="false"' : ''}>
-          <span class="sftabs-hm-text">
-            <span class="sftabs-hm-name">${esc(tab.label)}</span>
-            ${path}
-          </span>
-          ${count}
-        </button>
+      <li role="presentation" class="slds-dropdown__item uiMenuItem" data-index="${index}">
+        <a role="menuitem" title="${esc(tab.label)}"${href ? ` href="${esc(href)}"` : ''}${
+          tab.openInNewTab ? ' target="_blank" rel="noopener"' : ''}>
+          <div class="slds-grid">
+            <div class="slds-col slds-size_${kids.length ? '10' : '12'}-of-12">
+              <span class="slds-truncate">
+                <span class="slds-align-middle">${esc(tab.label)}</span>
+                ${path}
+              </span>
+            </div>
+            ${trailing}
+          </div>
+        </a>
       </li>`;
   }
 
-  function openMenu(tabs, settings) {
+  /** URL for a tab or sub-item, empty for a folder with no path of its own. */
+  function urlFor(item) {
+    const floating = window.SFTabsFloating;
+    return (floating && typeof floating.buildTabUrl === 'function')
+      ? (floating.buildTabUrl(item) || '')
+      : '';
+  }
+
+  function openMenu(tabs) {
     const item = document.getElementById(ITEM_ID);
     if (!item) return;
 
+    const ordered = tabs.slice().sort((a, b) => (a.position || 0) - (b.position || 0));
+
     const menu = document.createElement('div');
     menu.id = MENU_ID;
-    menu.className = 'sftabs-hm-menu';
-    menu.setAttribute('role', 'dialog');
-    menu.setAttribute('aria-label', msg('extensionName'));
+    // Salesforce's own popup classes, so its CSS supplies the nubbin, radius,
+    // shadow and item treatment. uiMenuList--right aligns the menu's right edge
+    // to the trigger, which keeps it on screen: our item is the leftmost of a
+    // cluster that sits at the right of the window.
+    menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget ' +
+                     'uiMenuList uiMenuList--right uiMenuList--default visible positioned ' +
+                     'sftabs-hm-menu';
+    menu.setAttribute('aria-labelledby', ITEM_ID + '-button');
 
-    const rows = tabs.length
-      ? tabs.slice().sort((a, b) => (a.position || 0) - (b.position || 0))
-          .map((tab, i) => rowHTML(tab, i)).join('')
-      : `<li class="sftabs-hm-empty">${esc(msg('floatingModalEmptyState'))}</li>`;
+    const rows = ordered.length
+      ? ordered.map((tab, i) => rowHTML(tab, i)).join('')
+      : `<li role="presentation" class="slds-dropdown__item">
+           <span class="sftabs-hm-empty">${esc(msg('floatingModalEmptyState'))}</span>
+         </li>`;
 
+    // The header sits inside the scrollable ul, as it does in the Setup menu.
     menu.innerHTML = `
-      <button type="button" class="sftabs-hm-close" aria-label="${esc(msg('closeButton'))}">
-        ${svg(CLOSE, 'sftabs-hm-close-icon')}
-      </button>
-      <div class="sftabs-hm-label">${esc(msg('extensionName'))}</div>
-      <ul class="sftabs-hm-list" role="menu">${rows}</ul>`;
+      <div role="menu">
+        <ul role="presentation" class="scrollable">
+          <div class="menu-header">
+            <h2 class="header-text">${esc(msg('extensionName'))}</h2>
+            <button type="button" title="${esc(msg('closeButton'))}"
+              class="slds-button slds-button_icon close-button slds-button_icon-bare">
+              ${svg(CLOSE, 'slds-button__icon slds-button__icon_small')}
+              <span class="slds-assistive-text">${esc(msg('closeButton'))}</span>
+            </button>
+          </div>
+          ${rows}
+        </ul>
+      </div>`;
 
     item.appendChild(menu);
-    document.getElementById(`${ITEM_ID}-button`).setAttribute('aria-expanded', 'true');
+    document.getElementById(ITEM_ID + '-button').setAttribute('aria-expanded', 'true');
+    menu.querySelector('.close-button').addEventListener('click', closeMenu);
 
-    menu.querySelector('.sftabs-hm-close').addEventListener('click', closeMenu);
-
-    const ordered = tabs.slice().sort((a, b) => (a.position || 0) - (b.position || 0));
-    menu.querySelectorAll('.sftabs-hm-item').forEach(button => {
-      const tab = ordered[Number(button.dataset.index)];
-      button.addEventListener('click', event => {
-        event.stopPropagation();
+    menu.querySelectorAll('li.uiMenuItem').forEach(li => {
+      const tab = ordered[Number(li.dataset.index)];
+      const link = li.querySelector('a');
+      if (!link) return;
+      link.addEventListener('click', event => {
         const kids = childrenOf(tab);
-        // A tab with children and no destination of its own is a folder: it can
-        // only open its flyout.
+        // The count column, or a tab with children and no destination of its
+        // own, expands the sub-items instead of navigating.
         if (kids.length && (event.target.closest('.sftabs-hm-count') || !tab.path)) {
-          toggleFlyout(button, tab);
+          event.preventDefault();
+          event.stopPropagation();
+          toggleSubItems(li, tab);
           return;
         }
+        // Let the browser handle new-tab links and modified clicks natively
+        if (tab.openInNewTab || event.metaKey || event.ctrlKey || event.button === 1) {
+          closeMenu();
+          return;
+        }
+        event.preventDefault();
         closeMenu();
         navigate(tab);
       });
     });
 
-    // Deferred so this click does not immediately close what it just opened
+    // Deferred so the click that opened this does not immediately close it
     setTimeout(() => {
       document.addEventListener('click', onDocumentClick, true);
       document.addEventListener('keydown', onKeydown, true);
     }, 0);
 
-    const first = menu.querySelector('.sftabs-hm-item');
+    const first = menu.querySelector('a[role="menuitem"]');
     if (first) first.focus();
   }
 
   /**
-   * Sub-items open to the left: the menu sits at the right-hand end of the
-   * header, so a flyout to the right would run off screen.
+   * Sub-items expand in place beneath their parent as sibling menu items, with a
+   * divider above, rather than cascading into a second popup. Grandchildren are
+   * indented in the same block: a third floating layer on a page we do not own
+   * is more trouble than it solves, and the depth limit is two anyway.
    */
-  function toggleFlyout(button, tab) {
-    const existing = button.parentElement.querySelector('.sftabs-hm-flyout');
-    button.parentElement.parentElement
-      .querySelectorAll('.sftabs-hm-flyout').forEach(el => el.remove());
-    button.parentElement.parentElement
-      .querySelectorAll('[aria-expanded="true"]').forEach(el => el.setAttribute('aria-expanded', 'false'));
-    if (existing) return;
+  function toggleSubItems(li, tab) {
+    const list = li.parentElement;
+    const key = li.dataset.index;
+    const open = list.querySelector(`[data-sub-of="${key}"]`);
+    list.querySelectorAll('[data-sub-of]').forEach(el => el.remove());
+    if (open) return;                                   // second click collapses
 
-    const flyout = document.createElement('ul');
-    flyout.className = 'sftabs-hm-flyout';
-    flyout.setAttribute('role', 'menu');
-
-    // Grandchildren are indented in the same flyout rather than cascading again;
-    // a third floating layer in a page we do not own is more trouble than it
-    // solves, and the depth limit is two.
     const rows = [];
     childrenOf(tab).forEach(child => {
       rows.push({ item: child, depth: 0 });
       childrenOf(child).forEach(grand => rows.push({ item: grand, depth: 1 }));
     });
+    if (!rows.length) return;
 
-    flyout.innerHTML = rows.map(({ item, depth }, i) => `
-      <li role="presentation">
-        <button type="button" class="sftabs-hm-item sftabs-hm-item_nested" role="menuitem"
-          data-row="${i}" style="padding-left:${12 + depth * 16}px">
-          <span class="sftabs-hm-text"><span class="sftabs-hm-name">${esc(item.label)}</span></span>
-        </button>
-      </li>`).join('');
+    const divider = document.createElement('li');
+    divider.setAttribute('role', 'separator');
+    divider.className = 'slds-has-divider_top-space';
+    divider.dataset.subOf = key;
 
-    button.parentElement.appendChild(flyout);
-    button.setAttribute('aria-expanded', 'true');
-
-    flyout.querySelectorAll('.sftabs-hm-item').forEach(el => {
-      el.addEventListener('click', event => {
-        event.stopPropagation();
+    const items = rows.map(({ item, depth }) => {
+      const el = document.createElement('li');
+      el.setAttribute('role', 'presentation');
+      el.className = 'slds-dropdown__item uiMenuItem sftabs-hm-sub-item';
+      el.dataset.subOf = key;
+      const href = urlFor(item);
+      el.innerHTML = `
+        <a role="menuitem" title="${esc(item.label)}"${href ? ` href="${esc(href)}"` : ''}>
+          <div class="slds-grid">
+            <div class="slds-col slds-size_12-of-12" style="padding-left:${depth * 16}px">
+              <span class="slds-truncate">
+                <span class="slds-align-middle">${esc(item.label)}</span>
+              </span>
+            </div>
+          </div>
+        </a>`;
+      el.querySelector('a').addEventListener('click', event => {
+        if (event.metaKey || event.ctrlKey || event.button === 1) { closeMenu(); return; }
+        event.preventDefault();
         closeMenu();
-        navigate(rows[Number(el.dataset.row)].item, tab);
+        navigate(item, tab);
       });
+      return el;
     });
+
+    // Insert divider then rows, each after the last thing inserted
+    let cursor = li;
+    for (const el of [divider, ...items]) {
+      cursor.insertAdjacentElement('afterend', el);
+      cursor = el;
+    }
   }
 
   /**
