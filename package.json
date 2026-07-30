@@ -13,7 +13,8 @@
     "lint": "web-ext lint",
     "sign:firefox": "web-ext sign",
     "i18n:export": "node scripts/json-to-csv.js",
-    "i18n:build": "node scripts/csv-to-json.js"
+    "i18n:build": "node scripts/csv-to-json.js",
+    "test": "node test/storage-migration.test.js"
   },
   "repository": {
     "type": "git",

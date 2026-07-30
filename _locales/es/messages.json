@@ -2682,5 +2682,8 @@
   },
   "tabsUpdatedExternally": {
     "message": "Pestañas actualizadas"
+  },
+  "syncConflictUseSettings": {
+    "message": "El almacenamiento de sincronización ya contiene datos de otro dispositivo. Abra los ajustes avanzados para elegir qué copia conservar."
   }
 }

@@ -52,6 +52,9 @@ module.exports = {
     // Utility scripts (build/translation tools)
     'scripts',
     'scripts/**',
+    // Tests
+    'test',
+    'test/**',
     // Salesforce CLI config
     '.sfdx/**',
     // Beta icons (not included in production release)

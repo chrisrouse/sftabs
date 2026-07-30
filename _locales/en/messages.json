@@ -2809,5 +2809,9 @@
   "tabsUpdatedExternally": {
     "message": "Tabs updated",
     "description": "Status shown when the active profile's tabs changed outside this popup, e.g. from another window or a synced device"
+  },
+  "syncConflictUseSettings": {
+    "message": "Sync storage already has data from another device. Open advanced settings to choose which copy to keep.",
+    "description": "Error shown when enabling sync would overwrite data another device already synced. The advanced settings page has the conflict resolver."
   }
 }

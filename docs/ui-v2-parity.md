@@ -61,7 +61,7 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 | `compactMode` | Done | |
 | `skipDeleteConfirmation` | Done | |
 | `profilesEnabled` | Done | Toggle persists |
-| `useSyncStorage` | **Gap** | Radios render the current value but changing them does nothing. Shim now restores `saveUserSettings`'s sync↔local migration, so wiring is safe |
+| `useSyncStorage` | Done | Confirmed before switching, then `migrateBetweenStorageTypes` runs *before* the preference is persisted — the reverse order silently strands the tabs. Covered by `npm test`. Enabling sync over another device's data refuses and points at the settings page, which has the conflict resolver |
 | `autoSwitchProfiles` | **Delegated** | Settings page, Profiles section |
 | `activeProfileId` / `defaultProfileId` | Done | Switching reloads that profile's tabs |
 | `floatingButton.*` (6 sub-keys) | **Delegated** | Settings page. Preserved on write by `patchSettings` |
@@ -107,10 +107,10 @@ All `DEFAULT_SETTINGS` keys are accounted for.
 
 ---
 
-## Gaps, in release order
+## Gaps
 
-1. **Storage sync/local radios** — a visibly broken setting; risks users
-   believing data stopped syncing. The last item on the list.
+None. Every capability the shipped popup has is either implemented here or
+reachable through the advanced settings page.
 
 Deliberately deferred: migration wizard, sync-data-detected screen, staged
 sub-item edits, duplicate tab (dead code in the shipped UI). Everything marked

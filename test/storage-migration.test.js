@@ -1,0 +1,140 @@
+#!/usr/bin/env node
+/**
+ * Storage-switch regression test.
+ *
+ * Exercises the real production storage modules against a fake storage backend,
+ * because this is the one code path that can silently destroy a user's tabs.
+ *
+ * What it pins down: migrateBetweenStorageTypes() locates its source by calling
+ * getProfiles(), which reads getStoragePreference(). So the preference must
+ * still hold the OLD value while the migration runs. Persist the new preference
+ * first — the obvious thing to do — and the migration reads the empty
+ * destination, finds no profiles, returns having moved nothing, and the user
+ * opens the popup to an empty list with their tabs stranded in the other area.
+ *
+ * Run: npm test
+ */
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '..');
+
+function makeArea() {
+  const data = {};
+  return {
+    _data: data,
+    get: keys => Promise.resolve(
+      keys == null ? { ...data }
+        : (Array.isArray(keys) ? keys : [keys]).reduce((o, k) => (k in data ? (o[k] = data[k]) : 0, o), {})),
+    set: obj => { Object.assign(data, obj); return Promise.resolve(); },
+    remove: keys => { (Array.isArray(keys) ? keys : [keys]).forEach(k => delete data[k]); return Promise.resolve(); },
+    getBytesInUse: () => Promise.resolve(0),
+  };
+}
+
+const local = makeArea(), sync = makeArea();
+global.window = global;
+global.browser = {
+  storage: { local, sync, onChanged: { addListener() {} } },
+  runtime: { getManifest: () => ({ version: '0.0.0' }) },
+};
+global.chrome = global.browser;
+global.SFTabs = {};
+
+for (const f of ['popup/js/shared/constants.js', 'popup/js/storage-chunking.js', 'popup/js/popup-storage.js']) {
+  new Function(fs.readFileSync(path.join(root, f), 'utf8'))();
+}
+const S = SFTabs.storage;
+
+let settings;
+SFTabs.main = {
+  getUserSettings: () => settings,
+  setUserSettings: s => { settings = s; },
+  showStatus() {}, applyTheme() {},
+};
+
+/** Mirrors changeStorageLocation() in js/popup.js: migrate first, then persist. */
+async function switchStorage(toSync) {
+  const fromSync = !!settings.useSyncStorage;
+  if (fromSync === toSync) return;
+  await S.migrateBetweenStorageTypes(fromSync, toSync);
+  const merged = { ...settings, useSyncStorage: toSync };
+  await S.saveUserSettings(merged, true, false);   // skipMigration: already done above
+  settings = merged;
+}
+
+/** The tempting shortcut: let saveUserSettings do the migrating. */
+async function switchStorageNaive(toSync) {
+  const merged = { ...settings, useSyncStorage: toSync };
+  await S.saveUserSettings(merged, false, false);
+  settings = merged;
+}
+
+/** Mirrors syncAreaHasData() in js/popup.js. */
+async function syncHasForeignTabs() {
+  const all = await sync.get(null);
+  return Object.keys(all).some(k => /^profile_.+_tabs(_metadata|_chunk_\d+)?$/.test(k));
+}
+
+const TABS = [
+  { id: 't1', label: 'Flows', path: 'Flows', position: 0 },
+  { id: 't2', label: 'Users', path: 'ManageUsers', position: 1 },
+];
+const PROFILE = { id: 'p1', name: 'Default', isDefault: true, urlPatterns: [], createdAt: new Date(0).toISOString() };
+
+async function seedLocal() {
+  for (const k of Object.keys(local._data)) delete local._data[k];
+  for (const k of Object.keys(sync._data)) delete sync._data[k];
+  settings = { ...SFTabs.constants.DEFAULT_SETTINGS, useSyncStorage: false, activeProfileId: 'p1', defaultProfileId: 'p1' };
+  await local.set({
+    deviceSettings: { useSyncStorage: false },
+    userSettings: settings,
+    profiles: [PROFILE],
+    profile_p1_tabs: TABS,
+  });
+}
+
+const results = [];
+function check(name, pass, detail = '') {
+  results.push({ name, pass, detail });
+  console.log(`${pass ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`);
+}
+const counts = async () => ({
+  tabs: ((await S.getProfileTabs('p1')) || []).length,
+  profiles: ((await S.getProfiles()) || []).length,
+});
+
+(async () => {
+  // 1. A round trip must preserve everything.
+  await seedLocal();
+  await switchStorage(true);
+  let c = await counts();
+  check('local -> sync keeps 2 tabs and 1 profile', c.tabs === 2 && c.profiles === 1, `tabs=${c.tabs} profiles=${c.profiles}`);
+  await switchStorage(false);
+  c = await counts();
+  check('sync -> local keeps 2 tabs and 1 profile', c.tabs === 2 && c.profiles === 1, `tabs=${c.tabs} profiles=${c.profiles}`);
+
+  // 2. And a second round trip, which is where the stale `profiles` copy that
+  //    migrateBetweenStorageTypes leaves in sync could cause trouble.
+  check('stale profiles left in sync is not mistaken for another device',
+    (await syncHasForeignTabs()) === false);
+  await switchStorage(true);
+  await switchStorage(false);
+  c = await counts();
+  check('two full round trips keep 2 tabs and 1 profile', c.tabs === 2 && c.profiles === 1, `tabs=${c.tabs} profiles=${c.profiles}`);
+
+  // 3. Genuine foreign data must be detected.
+  await seedLocal();
+  await sync.set({ profile_other_tabs: [{ id: 'x', label: 'From another device', path: 'X', position: 0 }] });
+  check('another device\'s tabs in sync are detected', (await syncHasForeignTabs()) === true);
+
+  // 4. The naive order must be shown to lose data, so nobody "simplifies" the
+  //    real one back into it.
+  await seedLocal();
+  await switchStorageNaive(true);
+  c = await counts();
+  check('naive order (persist first) loses the tabs — do not use it', c.tabs === 0, `tabs=${c.tabs}`);
+
+  const failed = results.filter(r => !r.pass);
+  console.log(`\n${results.length - failed.length}/${results.length} passed`);
+  process.exit(failed.length ? 1 : 0);
+})();

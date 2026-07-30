@@ -392,11 +392,11 @@ async function persistTabs() {
  * Re-reads stored settings so fields like floatingButton and
  * autoSwitchProfiles survive — never write state.settings wholesale.
  */
-async function patchSettings(partial) {
+async function patchSettings(partial, { skipMigration = false } = {}) {
   try {
     const stored = await SFTabs.storage.getUserSettings();
     const merged = { ...stored, ...partial };
-    await SFTabs.storage.saveUserSettings(merged, false, false);
+    await SFTabs.storage.saveUserSettings(merged, skipMigration, false);
     state.settings = merged;
   } catch (err) {
     showStatus(t('errorCouldNotSaveSetting', err.message), 'error');
@@ -1545,6 +1545,104 @@ async function reloadTabsFromStorage() {
   showStatus(t('tabsUpdatedExternally'));
 }
 
+// ── Storage location ───────────────────────────────────────────
+
+/**
+ * Move tabs and profiles between sync and local storage.
+ *
+ * Order matters and is the whole reason this is not a one-liner.
+ * migrateBetweenStorageTypes() finds its source by calling getProfiles(),
+ * which reads getStoragePreference() — so the preference must still hold the
+ * OLD value while it runs, or it reads the destination, finds nothing, and
+ * returns having moved no data. The shipped settings page migrates first and
+ * saves the preference second for exactly this reason; we do the same, then
+ * pass skipMigration so saveUserSettings does not run it again against the
+ * flipped preference.
+ */
+async function changeStorageLocation(toSync) {
+  const fromSync = !!state.settings.useSyncStorage;
+  if (fromSync === toSync) return;
+
+  // Enabling sync over data another device already put there would overwrite
+  // it. The settings page has a conflict resolver; we refuse and point at it
+  // rather than shipping a second one.
+  if (toSync && await syncAreaHasData()) {
+    showStatus(t('syncConflictUseSettings'), 'error');
+    syncSettingsPanel();
+    return;
+  }
+
+  if (!await confirmStorageChange(toSync)) {
+    syncSettingsPanel();   // put the radio back
+    return;
+  }
+
+  try {
+    await SFTabs.storage.migrateBetweenStorageTypes(fromSync, toSync);
+    await patchSettings({ useSyncStorage: toSync }, { skipMigration: true });
+
+    // Re-read from the new location: if the move dropped anything, the list
+    // shows it now rather than after the next launch.
+    state.profiles = await SFTabs.storage.getProfiles() || [];
+    state.tabs = state.settings.activeProfileId
+      ? await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || []
+      : [];
+    renderTabList();
+    bindTabListEvents();
+    renderProfileChip();
+    renderProfileDropdown();
+    showStatus(t(toSync ? 'syncEnabled' : 'syncDisabled'));
+  } catch (err) {
+    // The preference is only written after a successful migration, so failing
+    // here leaves the data where it was and the old preference intact.
+    showStatus(t('errorSavingSettings', err.message), 'error');
+  }
+  syncSettingsPanel();
+}
+
+/**
+ * True if sync storage already holds another device's tabs.
+ *
+ * Deliberately looks for `profile_*_tabs` keys rather than `profiles`:
+ * migrateBetweenStorageTypes does not remove the profiles list from sync when
+ * moving to local ("keep for potential future migration"), so a stale profiles
+ * entry is normal after a sync -> local switch and would make this refuse every
+ * switch back. Tab keys are cleared, so their presence means real foreign data.
+ */
+async function syncAreaHasData() {
+  try {
+    const all = await browser.storage.sync.get(null);
+    return Object.keys(all).some(k => /^profile_.+_tabs(_metadata|_chunk_\d+)?$/.test(k));
+  } catch {
+    return false;   // unreadable sync is not a conflict
+  }
+}
+
+function confirmStorageChange(toSync) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('modal-storage');
+    document.getElementById('modal-storage-title').textContent =
+      t(toSync ? 'enableSyncConfirmTitle' : 'disableSyncConfirmTitle');
+    document.getElementById('modal-storage-body').textContent =
+      t(toSync ? 'enableSyncConfirmMessage' : 'disableSyncConfirmMessage');
+    overlay.hidden = false;
+
+    const done = answer => {
+      overlay.hidden = true;
+      cancel.removeEventListener('click', onCancel);
+      confirm.removeEventListener('click', onConfirm);
+      resolve(answer);
+    };
+    const cancel = document.getElementById('modal-storage-cancel');
+    const confirm = document.getElementById('modal-storage-confirm');
+    const onCancel = () => done(false);
+    const onConfirm = () => done(true);
+    cancel.addEventListener('click', onCancel);
+    confirm.addEventListener('click', onConfirm);
+    cancel.focus();
+  });
+}
+
 // ── Theme ──────────────────────────────────────────────────────
 
 function applyTheme(theme) {
@@ -1703,6 +1801,12 @@ function bindEvents() {
   document.getElementById('setting-profiles').addEventListener('change', e => {
     patchSettings({ profilesEnabled: e.target.checked });
     applyProfilesVisibility(e.target.checked);
+  });
+
+  document.querySelectorAll('input[name="storage-type"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) changeStorageLocation(radio.value === 'sync');
+    });
   });
 
   document.getElementById('btn-preview-first-launch').addEventListener('click', () => {

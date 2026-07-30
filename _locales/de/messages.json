@@ -2682,5 +2682,8 @@
   },
   "tabsUpdatedExternally": {
     "message": "Registerkarten aktualisiert"
+  },
+  "syncConflictUseSettings": {
+    "message": "Der Sync-Speicher enthält bereits Daten von einem anderen Gerät. Öffnen Sie die erweiterten Einstellungen, um zu wählen, welche Kopie erhalten bleibt."
   }
 }
