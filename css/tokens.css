@@ -136,14 +136,6 @@
   --sft-info:              light-dark(#0b5cab, #78b0fd);  /* info-1              */
   --sft-info-container:    light-dark(#d8e6fe, #014486);  /* info-container-1    */
 
-  /* Illustration fills. SLDS 2's illustration component styles artwork with
-     exactly two tones — fill/stroke-primary and -secondary — mapped to the
-     cloud-blue palette. The artwork itself is ours (Salesforce's is fetched at
-     runtime by lightning-empty-state, not distributed), but the tones are theirs. */
-  --sft-illustration-1: light-dark(#90d0fe, #023248); /* palette-cloud-blue-80 */
-  --sft-illustration-2: light-dark(#cfe9fe, #001a28); /* palette-cloud-blue-90 */
-  --sft-illustration-3: light-dark(#eaf5fe, #000409); /* palette-cloud-blue-95 */
-
   /* ════════════════════════════════════════════════════════════════════
      8. COLOR — Disabled                (--slds-g-color-disabled-container-*)
      ════════════════════════════════════════════════════════════════════ */
