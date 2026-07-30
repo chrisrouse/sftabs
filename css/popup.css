@@ -1119,7 +1119,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .storage-card,
 .choice-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   padding: 8px 12px;
   cursor: pointer;
@@ -1133,11 +1133,39 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 
 .storage-card input[type="radio"],
 .choice-card input[type="radio"] {
-  accent-color: var(--c-primary);
-  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: var(--sft-size-icon);
+  height: var(--sft-size-icon);
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
+  margin: 1px 0 0;
+  background: var(--sft-surface-container-1);
+  border: var(--sft-border-width-1) solid var(--sft-border-strong);
+  border-radius: 50%;
+  transition: border-color 0.1s linear;
+  cursor: pointer;
+}
+.storage-card input[type="radio"]::after,
+.choice-card input[type="radio"]::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--sft-accent-container-1);
+  opacity: 0;
+  transition: opacity 0.1s linear;
+}
+.storage-card input[type="radio"]:checked,
+.choice-card input[type="radio"]:checked { border-color: var(--sft-border-accent); }
+.storage-card input[type="radio"]:checked::after,
+.choice-card input[type="radio"]:checked::after { opacity: 1; }
+.storage-card:hover input[type="radio"]:not(:checked),
+.choice-card:hover input[type="radio"]:not(:checked) { border-color: var(--sft-neutral-50); }
+.storage-card input[type="radio"]:focus-visible,
+.choice-card input[type="radio"]:focus-visible {
+  outline: 2px solid var(--sft-focus-ring);
+  outline-offset: 2px;
 }
 
 .storage-card-body,
@@ -1153,9 +1181,20 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   display: none;
 }
 .storage-card-title,
-.choice-card-title { font-size: var(--sft-font-size-base); font-weight: var(--sft-font-weight-medium); color: var(--t-base); }
+.choice-card-title {
+  display: block;
+  font-size: var(--sft-font-size-base);
+  font-weight: var(--sft-font-weight-medium);
+  color: var(--t-base);
+}
 .storage-card-desc,
-.choice-card-desc { font-size: var(--sft-font-size-xs); color: var(--t-weak); margin-top: 1px; }
+.choice-card-desc {
+  display: block;
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+  margin-top: 1px;
+  line-height: var(--sft-line-height-base);
+}
 
 .settings-advanced { padding: 0; }
 .advanced-link {
