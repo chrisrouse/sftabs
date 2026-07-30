@@ -78,7 +78,8 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
       }
     },
     commands: chrome.commands,
-    tabs: chrome.tabs
+    tabs: chrome.tabs,
+    windows: chrome.windows
   };
 }
 
@@ -446,28 +447,52 @@ async function checkAndSwitchProfile(url) {
 }
 
 /**
- * Listen for tab activation (user switches tabs)
+ * Re-evaluate the profile for whatever the user is actually looking at.
+ *
+ * activeProfileId is a single global value and switching broadcasts to every
+ * Salesforce tab in every window, so the trigger has to be the focused
+ * window's active tab. Keying off any tab that happens to load lets a
+ * background window switch the profile out from under the window in front —
+ * which is what made two orgs in two windows both fall back to the default.
  */
-browser.tabs.onActivated.addListener(async (activeInfo) => {
+async function evaluateFocusedTab() {
   try {
-    const tab = await browser.tabs.get(activeInfo.tabId);
-    if (tab.url) {
+    const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
+    if (tab && tab.url) {
       await checkAndSwitchProfile(tab.url);
     }
   } catch (error) {
-    // Tab might not be accessible
+    // No focused window, or the tab is not accessible
+  }
+}
+
+/**
+ * Listen for tab activation (user switches tabs)
+ */
+browser.tabs.onActivated.addListener(() => evaluateFocusedTab());
+
+/**
+ * Listen for tab URL updates (user navigates within a tab).
+ * Background tabs are ignored: only the tab in front should drive the profile.
+ */
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (!tab.active) return;
+  if (changeInfo.url || (changeInfo.status === 'complete' && tab.url)) {
+    await evaluateFocusedTab();
   }
 });
 
 /**
- * Listen for tab URL updates (user navigates within a tab)
+ * Listen for window focus. Moving between windows fires this rather than
+ * tabs.onActivated, so without it switching windows never re-evaluated — the
+ * reason two windows worked as tabs but not as windows.
  */
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  // Only process when URL changes and is complete
-  if (changeInfo.url || (changeInfo.status === 'complete' && tab.url)) {
-    await checkAndSwitchProfile(changeInfo.url || tab.url);
-  }
-});
+if (browser.windows && browser.windows.onFocusChanged) {
+  browser.windows.onFocusChanged.addListener(windowId => {
+    if (windowId === browser.windows.WINDOW_ID_NONE) return;  // focus left the browser
+    evaluateFocusedTab();
+  });
+}
 
 /**
  * Handle keyboard shortcuts
