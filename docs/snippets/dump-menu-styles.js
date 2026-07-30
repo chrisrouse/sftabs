@@ -81,3 +81,68 @@
     console.log('Select the JSON above and copy it.');
   }
 })();
+
+/**
+ * Follow-up: why is our menu the wrong width?
+ *
+ * Paste this separately, with OUR menu open. It reports whether our stylesheet
+ * reached the page at all, which of its rules the browser matched to the menu,
+ * and what the box actually resolved to — enough to tell an unloaded stylesheet
+ * apart from an overridden rule.
+ */
+window.sftabsDiagnoseWidth = () => {
+  const menu = document.getElementById('sftabs-header-menu');
+  const button = document.getElementById('sftabs-header-item-button');
+  if (!menu) return console.warn('Open the SF Tabs menu first, then re-run.');
+
+  const cs = getComputedStyle(menu);
+  const out = {
+    menu: {
+      rect: (r => ({ x: Math.round(r.x), w: Math.round(r.width) }))(menu.getBoundingClientRect()),
+      width: cs.width, minWidth: cs.minWidth, maxWidth: cs.maxWidth,
+      position: cs.position, top: cs.top, left: cs.left,
+      inlineStyle: menu.getAttribute('style'),
+      classes: menu.className,
+    },
+    button: button
+      ? (r => ({ x: Math.round(r.x), w: Math.round(r.width), bottom: Math.round(r.bottom) }))(
+          button.getBoundingClientRect())
+      : '(button missing)',
+    // Did our stylesheet load, and did any of its rules match?
+    ourStylesheetFound: false,
+    matchedOurRules: [],
+    // Anything from any sheet that sets a width on this element, so an
+    // overriding rule shows up by name
+    widthRulesFromAnySheet: [],
+  };
+
+  for (const sheet of document.styleSheets) {
+    let rules;
+    try { rules = sheet.cssRules; } catch { continue; }   // cross-origin sheet
+    for (const rule of rules) {
+      if (!rule.selectorText) continue;
+      const ours = rule.selectorText.includes('sftabs-header-menu');
+      if (ours) {
+        out.ourStylesheetFound = true;
+        try { if (menu.matches(rule.selectorText)) out.matchedOurRules.push(rule.cssText); } catch {}
+      }
+      if (/width/.test(rule.style && rule.style.cssText || '')) {
+        try {
+          if (menu.matches(rule.selectorText)) {
+            out.widthRulesFromAnySheet.push({
+              selector: rule.selectorText,
+              width: rule.style.width, minWidth: rule.style.minWidth, maxWidth: rule.style.maxWidth,
+              priority: rule.style.getPropertyPriority('width') ||
+                        rule.style.getPropertyPriority('min-width') || '',
+            });
+          }
+        } catch {}
+      }
+    }
+  }
+
+  const json = JSON.stringify(out, null, 2);
+  console.log(json);
+  try { copy(json); console.log('%cCopied.', 'font-weight:bold'); } catch {}
+};
+console.log('Also available: sftabsDiagnoseWidth() — run with the SF Tabs menu open.');

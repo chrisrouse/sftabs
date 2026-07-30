@@ -190,7 +190,7 @@
     // shadow and item treatment. uiMenuList--right aligns the menu's right edge
     // to the trigger, which keeps it on screen: our item is the leftmost of a
     // cluster that sits at the right of the window.
-    menu.className = 'popupTargetContainer menu--nubbin-top uiPopupTarget ' +
+    menu.className = 'popupTargetContainer uiPopupTarget ' +
                      'uiMenuList uiMenuList--default visible positioned ' +
                      'sftabs-hm-menu';
     menu.setAttribute('aria-labelledby', ITEM_ID + '-button');
@@ -267,11 +267,9 @@
    * and inline styles beat any class rule without needing !important.
    *
    * Prefers aligning the menu's left edge to the button and flips to right-edge
-   * alignment when that would overflow. The nubbin itself is Salesforce's, drawn
-   * by menu--nubbin-top at a fixed inset from whichever edge
-   * uiMenuList--left/--right aligns to — so aligning an edge to the button is
-   * what keeps the arrow over it, since the button is 32px wide and its centre
-   * sits about that same inset in.
+   * alignment when that would overflow. The nubbin is ours, offset to the
+   * button's measured centre, so it points at the button whichever way the menu
+   * was aligned.
    */
   function position(menu) {
     const button = document.getElementById(ITEM_ID + '-button');
@@ -293,6 +291,11 @@
     menu.style.top = `${Math.round(rect.bottom + NUBBIN_GAP)}px`;
     menu.style.left = `${Math.round(left)}px`;
     menu.style.right = 'auto';
+    // Point the arrow at the button's centre. Salesforce's menu--nubbin-top is
+    // not used: its offset assumes Aura placed the popup, so it lands over
+    // whichever control happens to sit at that inset instead of ours.
+    menu.style.setProperty('--sftabs-hm-nubbin',
+      `${Math.round(rect.left + rect.width / 2 - left)}px`);
   }
 
   /**

@@ -2,9 +2,9 @@
    The SF Tabs item in Salesforce's global header.
 
    The menu carries Salesforce's own classes — popupTargetContainer,
-   menu--nubbin-top, uiPopupTarget, uiMenuList, slds-dropdown__item, uiMenuItem,
-   menu-header, header-text, close-button — so the nubbin and item treatment come
-   from Salesforce's CSS rather than from here.
+   uiPopupTarget, uiMenuList, slds-dropdown__item, uiMenuItem, menu-header,
+   header-text, close-button — so the item treatment comes from Salesforce's CSS
+   rather than from here. The nubbin is the exception, and is drawn below.
 
    Every value below was read off a live Setup menu with
    docs/snippets/dump-menu-styles.js rather than estimated from a screenshot.
@@ -44,6 +44,24 @@
   border-radius: 4px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.153);
   font-size: 13px;
+}
+
+/* Nubbin. Ours rather than Salesforce's menu--nubbin-top, whose horizontal
+   offset assumes Aura positioned the popup — with our own placement it landed
+   over a neighbouring control instead of our button. position() measures the
+   button and passes its centre through --sftabs-hm-nubbin. */
+#sftabs-header-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: var(--sftabs-hm-nubbin, 16px);
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  background: #fff;
+  border-left: 1px solid #c9c9c9;
+  border-top: 1px solid #c9c9c9;
+  transform: rotate(45deg);
 }
 
 /* ── Fallbacks, for pages without the Setup bundle's rules ── */
