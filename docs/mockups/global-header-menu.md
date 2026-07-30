@@ -94,15 +94,22 @@ Their dropdowns render as:
   already matches all Lightning pages — the header exists everywhere, unlike the
   Setup-only tab bar. Item 3 settled.
 
-## Still open
+- **Icon:** SLDS `bookmark` (vendored to `icons/slds/bookmark.svg`). Not the SF
+  Tabs mark, which at 17px reads as SLDS `arrow_right`.
+- **Menu treatment:** the Favorites dropdown, not the Setup gear's — nubbin,
+  large uppercase label, close button, and a footer action on a grey band.
+- **Position: first child of `ul.slds-global-actions`.** Implemented as a
+  `prepend`, so it needs no knowledge of its siblings. That matters because the
+  row varies by org: some now carry an Agentforce item, and anchoring relative to
+  Favorites would break wherever the row differs. The mockup draws both an org
+  with the Agentforce item and one without, from the same code path.
 
-Where in `ul.slds-global-actions` the item sits. The mockup draws all three:
+## Row contents
 
-| | Position | Trade |
-|---|---|---|
-| A | Left of Favorites | Reads as ours; furthest from the gear, least discoverable |
-| B | Left of the Setup gear | Best discoverability; may read as native Salesforce |
-| C | Between Notifications and the avatar | Closest to today's floating handle; most exposed to Salesforce adding items |
+Favorites shows a coloured record-type icon per entry. Our tabs have no
+equivalent — the type badge was removed as noise — so each row is the tab name
+over its path, matching the popup. A count and chevron appear where a tab has
+sub-items.
 
 ## Build notes
 

@@ -4,17 +4,17 @@
 <meta charset="UTF-8" />
 <title>SF Tabs — menu in the Salesforce global header</title>
 <style>
-  /* These styles approximate SLDS rather than importing it: the real thing will
-     inherit Salesforce's own classes, so treat colours and metrics here as
-     indicative. Class names on the elements are the real ones we would reuse. */
+  /* Approximates SLDS rather than importing it. The real build inherits
+     Salesforce's own classes; class names on the elements below are the real
+     ones we would hook, so this maps onto the implementation. */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #f3f2f2; color: #181818; padding: 28px;
   }
   h1 { font-size: 20px; font-weight: 600; color: #032d60; }
-  .lede { color: #5c5c5c; margin: 8px 0 20px; max-width: 88ch; }
-  .bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .lede { color: #5c5c5c; margin: 8px 0 20px; max-width: 90ch; }
+  .bar { display: flex; gap: 8px; margin-bottom: 14px; }
   .bar button {
     font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer;
     border: 1px solid #c9c9c9; border-radius: 100px; background: #fff; color: #181818;
@@ -23,29 +23,25 @@
 
   section { margin-bottom: 30px; }
   section > h2 { font-size: 15px; font-weight: 600; color: #032d60; margin-bottom: 4px; }
-  section > .why { color: #5c5c5c; font-size: 12px; margin-bottom: 12px; max-width: 88ch; }
+  section > .why { color: #5c5c5c; font-size: 12px; margin-bottom: 12px; max-width: 90ch; }
 
   /* ── Mock Salesforce chrome ── */
   .stage {
     border: 1px solid #c9c9c9; border-radius: 4px; overflow: hidden; background: #fff;
-    position: relative; min-height: 340px;
+    position: relative; min-height: 420px;
   }
   .slds-global-header {
     display: flex; align-items: center; justify-content: space-between;
     height: 50px; padding: 0 12px; background: #fff; border-bottom: 1px solid #e5e5e5;
   }
   .gh-left { display: flex; align-items: center; gap: 10px; }
-  .gh-logo {
-    width: 26px; height: 18px; border-radius: 3px;
-    background: linear-gradient(#00a1e0, #0176d3);
-  }
+  .gh-logo { width: 26px; height: 18px; border-radius: 3px; background: linear-gradient(#00a1e0, #0176d3); }
   .gh-search {
-    width: 300px; height: 28px; border: 1px solid #c9c9c9; border-radius: 100px;
-    background: #fff; font-size: 12px; color: #949494; padding: 0 12px;
-    display: flex; align-items: center;
+    width: 280px; height: 28px; border: 1px solid #c9c9c9; border-radius: 100px;
+    font-size: 12px; color: #949494; padding: 0 12px; display: flex; align-items: center;
   }
 
-  ul.slds-global-actions { display: flex; align-items: center; gap: 2px; list-style: none; }
+  ul.slds-global-actions { display: flex; align-items: center; gap: 4px; list-style: none; }
   li.slds-global-actions__item { position: relative; }
   .slds-global-actions__item-action {
     width: 32px; height: 32px; border: none; background: transparent; border-radius: 4px;
@@ -53,66 +49,79 @@
     color: #747474; cursor: pointer;
   }
   .slds-global-actions__item-action:hover { background: #f3f2f2; color: #514f4d; }
-  .slds-global-actions__item-action svg { width: 15px; height: 15px; fill: currentColor; }
-  /* Favorites is a split button in the real header */
-  .gh-fav { display: flex; border: 1px solid #dddbda; border-radius: 4px; }
-  .gh-fav .slds-global-actions__item-action { border-radius: 0; width: 30px; height: 26px; }
-  .gh-fav .slds-global-actions__item-action + .slds-global-actions__item-action { border-left: 1px solid #dddbda; }
+  .slds-global-actions__item-action svg { width: 17px; height: 17px; fill: currentColor; }
+  .gh-fav { display: flex; border: 1px solid #747474; border-radius: 4px; }
+  .gh-fav .slds-global-actions__item-action { border-radius: 0; width: 28px; height: 26px; }
+  .gh-fav .slds-global-actions__item-action + .slds-global-actions__item-action {
+    border-left: 1px solid #747474; color: #0176d3;
+  }
   .gh-avatar {
-    width: 26px; height: 26px; border-radius: 50%; margin-left: 4px;
+    width: 30px; height: 30px; border-radius: 50%; margin-left: 4px;
     background: #032d60; color: #fff; font-size: 11px;
     display: flex; align-items: center; justify-content: center;
   }
   .gh-badge {
-    position: absolute; top: -2px; right: -4px; min-width: 17px; height: 15px; padding: 0 4px;
+    position: absolute; top: -1px; right: -3px; min-width: 16px; height: 15px; padding: 0 4px;
     border-radius: 100px; background: #ea001e; color: #fff;
     font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center;
   }
+  /* Ours: same shape as every neighbour, bookmark glyph */
+  .sftabs-item.is-open .slds-global-actions__item-action { background: #f3f2f2; color: #514f4d; }
 
-  /* Ours, mirroring the shape of the buttons beside it */
-  .sftabs-item .slds-global-actions__item-action { color: #747474; }
-  .sftabs-item.is-open .slds-global-actions__item-action { background: #f3f2f2; color: #0176d3; }
-
-  /* ── Dropdown, mirroring uiMenuList / menu--nubbin-top ── */
-  .uiMenuList {
-    position: absolute; top: 40px; right: 0; z-index: 20; width: 262px;
+  /* ── Dropdown, mirroring the Favorites menu ── */
+  .fav-menu {
+    position: absolute; top: 42px; left: -6px; z-index: 20; width: 330px;
     background: #fff; border: 1px solid #e5e5e5; border-radius: 4px;
-    box-shadow: 0 2px 3px rgba(0,0,0,.16); padding: 4px 0;
+    box-shadow: 0 2px 3px rgba(0,0,0,.16);
   }
-  .uiMenuList[hidden] { display: none; }
-  .uiMenuList::before {           /* nubbin */
-    content: ''; position: absolute; top: -6px; right: 12px;
+  .fav-menu[hidden] { display: none; }
+  .fav-menu::before {                     /* nubbin */
+    content: ''; position: absolute; top: -6px; left: 22px;
     width: 11px; height: 11px; background: #fff;
     border-left: 1px solid #e5e5e5; border-top: 1px solid #e5e5e5;
     transform: rotate(45deg);
   }
-  .menu__header {
-    padding: 6px 12px 4px; font-size: 10px; font-weight: 700; letter-spacing: .0625em;
-    text-transform: uppercase; color: #747474;
+  .fav-close {
+    position: absolute; top: 8px; right: 8px; width: 26px; height: 26px;
+    border: none; background: none; cursor: pointer; color: #747474;
+    display: flex; align-items: center; justify-content: center;
   }
-  ul.scrollable { list-style: none; max-height: 232px; overflow-y: auto; }
-  .menu-item {
-    display: flex; align-items: center; gap: 8px; width: 100%;
-    padding: 7px 12px; font-size: 13px; color: #080707;
-    background: none; border: none; text-align: left; cursor: pointer;
+  .fav-close svg { width: 13px; height: 13px; fill: currentColor; }
+  .fav-label {
+    padding: 18px 16px 8px; font-size: 14px; letter-spacing: .05em;
+    text-transform: uppercase; color: #514f4d;
   }
-  .menu-item:hover { background: #f3f2f2; text-decoration: none; }
-  .menu-item .sub { margin-left: auto; color: #747474; font-size: 11px; }
-  .menu-divider { height: 1px; margin: 4px 0; background: #e5e5e5; }
-  .menu-item.is-muted { color: #747474; font-size: 12px; }
+  ul.fav-list { list-style: none; max-height: 244px; overflow-y: auto; padding: 0 8px 8px; }
+  .fav-item {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    padding: 10px 8px; border: 2px solid transparent; border-radius: 4px;
+    background: none; text-align: left; cursor: pointer; color: #080707;
+  }
+  .fav-item:hover { background: #f3f2f2; }
+  .fav-item:focus-visible, .fav-item.is-focused { border-color: #0176d3; outline: none; background: #fff; }
+  .fav-item .t { font-size: 15px; line-height: 1.3; }
+  .fav-item .s { display: block; font-size: 13px; color: #514f4d; }
+  .fav-item .n { margin-left: auto; color: #747474; font-size: 13px; }
+  .fav-footer {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    background: #f3f2f2; border-top: 1px solid #e5e5e5;
+    border-radius: 0 0 4px 4px;
+  }
+  .fav-footer button {
+    display: flex; align-items: center; gap: 10px; background: none; border: none;
+    font: inherit; font-size: 15px; color: #0176d3; cursor: pointer; padding: 0;
+  }
+  .fav-footer svg { width: 15px; height: 15px; fill: #0176d3; }
 
-  /* Page body behind the chrome */
-  .sf-sub {
-    height: 42px; background: #fff; border-bottom: 1px solid #e5e5e5;
-    display: flex; align-items: center; gap: 20px; padding: 0 16px;
-    font-size: 12px; color: #5c5c5c;
-  }
+  .sf-sub { height: 42px; background: #fff; border-bottom: 1px solid #e5e5e5;
+    display: flex; align-items: center; gap: 20px; padding: 0 16px; font-size: 12px; color: #5c5c5c; }
   .sf-sub b { color: #032d60; }
-  .sf-body { background: #f3f2f2; padding: 16px; height: 200px; }
+  .sf-body { background: #f3f2f2; padding: 16px; height: 300px; }
   .sf-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; height: 100%; padding: 14px; }
   .skel { height: 10px; border-radius: 4px; background: #eef1f6; margin-bottom: 9px; }
 
-  .note { font-size: 12px; color: #5c5c5c; margin-top: 10px; }
+  .note { font-size: 12px; color: #5c5c5c; max-width: 90ch; }
+  .note + .note { margin-top: 8px; }
   code { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; background: #eef1f6; padding: 1px 4px; border-radius: 3px; }
 </style>
 </head>
@@ -120,11 +129,10 @@
 
 <h1>SF Tabs in the Salesforce global header</h1>
 <p class="lede">
-  An alternative to the floating drawer: inject one item into Salesforce's own
-  <code>ul.slds-global-actions</code> so it sits with Favorites, Global Actions,
-  Help, Setup and Notifications. Styled with Salesforce's classes, so it should be
-  indistinguishable from the Setup gear menu — which also means it follows
-  Salesforce's theme, not the extension's.
+  One item prepended to Salesforce's own <code>ul.slds-global-actions</code>, using
+  the SLDS <strong>bookmark</strong> glyph and the same dropdown treatment as the
+  Favorites menu — nubbin, uppercase label, close button, and a footer action on a
+  grey band. An alternative to the floating drawer, not a replacement.
 </p>
 
 <div class="bar">
@@ -132,21 +140,16 @@
   <button id="b-closed" aria-pressed="false">Menu closed</button>
 </div>
 
-<!-- ────────────────────────────────────────────────────────────── -->
 <section>
-  <h2>A · Left of Favorites</h2>
+  <h2>First position — org without the Agentforce item</h2>
   <p class="why">
-    First in the row, so it reads as ours rather than as part of Salesforce's
-    cluster. Furthest from the gear, which is where people go for org-level
-    settings, so arguably the least discoverable of the three.
+    Ours is the first child of the list, so it lands left of Favorites without the
+    code needing to know Favorites exists.
   </p>
-  <div class="stage" data-stage>
+  <div class="stage">
     <div class="slds-global-header">
-      <div class="gh-left">
-        <div class="gh-logo"></div>
-        <div class="gh-search">Search…</div>
-      </div>
-      <ul class="slds-global-actions" data-slot="a"></ul>
+      <div class="gh-left"><div class="gh-logo"></div><div class="gh-search">Search…</div></div>
+      <ul class="slds-global-actions" data-slot="plain"></ul>
     </div>
     <div class="sf-sub"><b>Setup</b><span>Home</span><span>Object Manager</span></div>
     <div class="sf-body"><div class="sf-card"><div class="skel" style="width:44%"></div><div class="skel" style="width:62%"></div></div></div>
@@ -154,53 +157,37 @@
 </section>
 
 <section>
-  <h2>B · Immediately left of the Setup gear</h2>
+  <h2>First position — org with the Agentforce item</h2>
   <p class="why">
-    Beside the control people already associate with configuration and metadata.
-    Best discoverability of the three, at the cost of sitting inside Salesforce's
-    own group — a user may not realise it is not native.
+    Same code, same result. Prepending is indifferent to what Salesforce has added
+    to the row, which is the whole point: no anchoring to a sibling that may or may
+    not be present.
   </p>
-  <div class="stage" data-stage>
+  <div class="stage">
     <div class="slds-global-header">
-      <div class="gh-left">
-        <div class="gh-logo"></div>
-        <div class="gh-search">Search…</div>
-      </div>
-      <ul class="slds-global-actions" data-slot="b"></ul>
+      <div class="gh-left"><div class="gh-logo"></div><div class="gh-search">Search…</div></div>
+      <ul class="slds-global-actions" data-slot="agentforce"></ul>
     </div>
     <div class="sf-sub"><b>Setup</b><span>Home</span><span>Object Manager</span></div>
     <div class="sf-body"><div class="sf-card"><div class="skel" style="width:52%"></div><div class="skel" style="width:38%"></div></div></div>
   </div>
 </section>
 
-<section>
-  <h2>C · Between Notifications and the avatar</h2>
-  <p class="why">
-    Last position before the avatar, nearest the right edge — closest to where the
-    floating handle sits today, so it is the smallest change in muscle memory.
-    Also the position most likely to shift if Salesforce adds another item.
-  </p>
-  <div class="stage" data-stage>
-    <div class="slds-global-header">
-      <div class="gh-left">
-        <div class="gh-logo"></div>
-        <div class="gh-search">Search…</div>
-      </div>
-      <ul class="slds-global-actions" data-slot="c"></ul>
-    </div>
-    <div class="sf-sub"><b>Setup</b><span>Home</span><span>Object Manager</span></div>
-    <div class="sf-body"><div class="sf-card"><div class="skel" style="width:40%"></div><div class="skel" style="width:56%"></div></div></div>
-  </div>
-</section>
-
 <p class="note">
-  The menu contents mirror the floating panel: the active profile's tabs, with a
-  count where a tab has sub-items. Sub-item flyouts are not drawn here — the real
-  build would reuse the floating panel's nested rendering.
+  <strong>On the rows.</strong> Favorites shows a coloured record-type icon per
+  entry. Our tabs have no equivalent — we removed the type badge as noise — so each
+  row is the tab name over its path, matching how the popup lists them. A count
+  and chevron appear where a tab has sub-items.
+</p>
+<p class="note">
+  <strong>Not drawn.</strong> Sub-item flyouts. The real build reuses the nested
+  rendering already in <code>content/floating-modal.js</code> rather than
+  reimplementing it.
 </p>
 
 <script>
-  const ICONS = {
+  const P = {
+    bookmark: 'm373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7',
     star:  'M274 31l46 150c2 6 8 9 14 9h150c15 0 21 20 9 29l-122 90c-5 4-7 11-5 17l58 154c4 14-11 26-23 17l-131-98c-5-4-12-4-18 0l-132 98c-12 9-28-3-23-17l56-154c2-6 0-13-5-17L26 219c-12-9-5-29 9-29h150c7 0 12-2 14-9l47-151c4-14 24-13 28 1',
     caret: 'M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21',
     plus:  'M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10',
@@ -208,77 +195,83 @@
     help:  'M260 20a240 240 0 100 480 240 240 0 000-480zm0 390a35 35 0 110-70 35 35 0 010 70zm45-150c-10 8-15 14-15 30 0 10-8 18-18 18h-24c-10 0-18-8-18-20 0-36 16-54 34-68 16-12 22-18 22-32a40 40 0 00-80 0c0 10-8 18-18 18h-24c-10 0-18-8-18-19a100 100 0 01200 1c0 38-24 58-43 72z',
     gear:  'M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 000-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 00-40-14l-46 17a168 168 0 00-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 00-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 000 68l-37 31a34 34 0 00-8 42l16 28a34 34 0 0040 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0033 27h32c16 0 30-12 33-28l8-48a170 170 0 0062-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110',
     bell:  'M460 330h-5a35 35 0 01-35-35V180A160 160 0 00252 20c-86 4-152 78-152 165v111c0 19-16 34-35 34h-5c-22 0-40 19-40 41v15c0 7 7 14 15 14h450c8 0 15-7 15-15v-15a40 40 0 00-40-40M309 440h-98a10 10 0 00-10 12c5 28 30 48 59 48s54-21 59-48a10 10 0 00-10-12',
-    // Our mark: the SF Tabs arrow-into-bar logo, simplified for a 15px slot
-    sftabs: 'M155 70L97 11a5 5 0 00-9 4v34H5a5 5 0 00-5 5v39a5 5 0 005 5h83v34a5 5 0 009 4l58-59a5 5 0 000-7zM196 10h40v127h-40z'
+    close: 'm310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 01-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0114 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 010-14',
+    edit:  'm95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 00-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 000 14l88 88c4 4 10 4 14 0l25-25a38 38 0 000-55l-47-47a40 40 0 00-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 00-5 9z',
+    agent: 'M260 40a220 220 0 100 440 220 220 0 000-440zm-90 300a30 30 0 110-60 30 30 0 010 60zm180 0a30 30 0 110-60 30 30 0 010 60zm-90-120a40 40 0 110-80 40 40 0 010 80z'
   };
-  const svg = (d, box) => `<svg viewBox="${box || '0 0 520 520'}" aria-hidden="true"><path d="${d}"/></svg>`;
+  const svg = d => `<svg viewBox="0 0 520 520" aria-hidden="true"><path d="${d}"/></svg>`;
 
+  // name, path, sub-item count
   const TABS = [
-    ['Flows', 0], ['Installed Packages', 0], ['Users', 3], ['Profiles', 0],
-    ['Permission Sets', 0], ['Failed Flows', 0], ['CMDT', 0], ['Account', 6],
+    ['Flows', 'Flows', 0],
+    ['Installed Packages', 'ImportedPackage', 0],
+    ['Users', 'ManageUsers', 0],
+    ['Account', 'ObjectManager/Account', 6],
+    ['Permission Sets', 'PermSets', 0],
+    ['CMDT', 'CustomMetadata', 0],
   ];
 
   const menu = () => `
-    <div class="uiMenuList" role="presentation">
-      <div role="menu">
-        <div class="menu__header"><span class="text-heading--label">SF Tabs</span></div>
-        <ul class="scrollable">
-          ${TABS.map(([name, subs]) => `
-            <li role="presentation">
-              <button class="menu-item" role="menuitem">
-                ${name}${subs ? `<span class="sub">${subs} ›</span>` : ''}
-              </button>
-            </li>`).join('')}
-        </ul>
-        <div class="menu-divider"></div>
-        <li role="presentation" style="list-style:none">
-          <button class="menu-item is-muted" role="menuitem">Manage tabs…</button>
-        </li>
+    <div class="fav-menu" role="dialog" aria-label="SF Tabs">
+      <button class="fav-close" title="Close">${svg(P.close)}</button>
+      <div class="fav-label">SF Tabs</div>
+      <ul class="fav-list">
+        ${TABS.map(([name, path, subs], i) => `
+          <li>
+            <button class="fav-item ${i === 0 ? 'is-focused' : ''}">
+              <span>
+                <span class="t">${name}</span>
+                <span class="s">${path}</span>
+              </span>
+              ${subs ? `<span class="n">${subs} ›</span>` : ''}
+            </button>
+          </li>`).join('')}
+      </ul>
+      <div class="fav-footer">
+        <button>${svg(P.edit)} Manage tabs</button>
       </div>
     </div>`;
 
-  // Ours, shaped exactly like its neighbours
   const ours = () => `
     <li class="slds-global-actions__item slds-dropdown-trigger slds-dropdown-trigger_click sftabs-item is-open">
       <button type="button" aria-haspopup="true"
         class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__item-action"
-        title="SF Tabs">${svg(ICONS.sftabs, '0 0 240 148')}</button>
+        title="SF Tabs">${svg(P.bookmark)}</button>
       ${menu()}
     </li>`;
 
+  const item = (d, title, extra = '') => `
+    <li class="slds-global-actions__item">
+      <button class="slds-global-actions__item-action" title="${title}">${svg(d)}${extra}</button>
+    </li>`;
   const favorites = `
     <li class="slds-global-actions__item">
       <div class="gh-fav">
-        <button class="slds-global-actions__item-action" title="Favorites">${svg(ICONS.star)}</button>
-        <button class="slds-global-actions__item-action" title="Favorites list">${svg(ICONS.caret)}</button>
+        <button class="slds-global-actions__item-action" title="Favorites">${svg(P.star)}</button>
+        <button class="slds-global-actions__item-action" title="Favorites list">${svg(P.caret)}</button>
       </div>
     </li>`;
-  const plus  = `<li class="slds-global-actions__item"><button class="slds-global-actions__item-action" title="Global Actions">${svg(ICONS.plus)}</button></li>`;
-  const guide = `<li class="slds-global-actions__item"><button class="slds-global-actions__item-action" title="Guidance Center">${svg(ICONS.guide)}</button></li>`;
-  const help  = `<li class="slds-global-actions__item slds-global-actions__item_help"><button class="slds-global-actions__item-action" title="Help">${svg(ICONS.help)}</button></li>`;
-  const gear  = `<li class="slds-global-actions__item"><button class="slds-global-actions__item-action" title="Setup">${svg(ICONS.gear)}</button></li>`;
-  const bell  = `<li class="slds-global-actions__item slds-global-actions__item_notification"><button class="slds-global-actions__item-action" title="Notifications">${svg(ICONS.bell)}<span class="gh-badge">20+</span></button></li>`;
   const avatar = `<li class="slds-global-actions__item"><div class="gh-avatar">CR</div></li>`;
+  const bell = item(P.bell, 'Notifications', '<span class="gh-badge">4</span>');
 
-  const LAYOUTS = {
-    a: [ours(), favorites, plus, guide, help, gear, bell, avatar],
-    b: [favorites, plus, guide, help, ours(), gear, bell, avatar],
-    c: [favorites, plus, guide, help, gear, bell, ours(), avatar],
-  };
-  for (const [slot, items] of Object.entries(LAYOUTS)) {
-    document.querySelector(`[data-slot="${slot}"]`).innerHTML = items.join('');
-  }
+  const BASE = [favorites, item(P.plus, 'Global Actions'), item(P.guide, 'Guidance Center'),
+                item(P.help, 'Help'), item(P.gear, 'Setup'), bell, avatar];
+  const WITH_AGENT = [item(P.agent, 'Agentforce'), ...BASE];
 
-  const bo = document.getElementById('b-open');
-  const bc = document.getElementById('b-closed');
+  // The implementation is exactly this: prepend, whatever else is in the row
+  document.querySelector('[data-slot="plain"]').innerHTML = [ours(), ...BASE].join('');
+  document.querySelector('[data-slot="agentforce"]').innerHTML = [ours(), ...WITH_AGENT].join('');
+
+  const bo = document.getElementById('b-open'), bc = document.getElementById('b-closed');
   const setOpen = open => {
-    document.querySelectorAll('.uiMenuList').forEach(m => { m.hidden = !open; });
+    document.querySelectorAll('.fav-menu').forEach(m => { m.hidden = !open; });
     document.querySelectorAll('.sftabs-item').forEach(i => i.classList.toggle('is-open', open));
     bo.setAttribute('aria-pressed', String(open));
     bc.setAttribute('aria-pressed', String(!open));
   };
   bo.onclick = () => setOpen(true);
   bc.onclick = () => setOpen(false);
+  document.querySelectorAll('.fav-close').forEach(b => b.onclick = () => setOpen(false));
 </script>
 </body>
 </html>
