@@ -893,28 +893,21 @@
 							<h3>__MSG_floatingButtonPositionSection__</h3>
 
 							<div class="setting-item">
-								<label class="setting-label">Placement</label>
-								<div class="fb-anchors" id="floating-button-anchors" role="group" aria-label="Placement">
-									<button type="button" data-anchor="top-left"      aria-label="Top left">↖</button>
-									<button type="button" data-anchor="top-center"    aria-label="Top center">↑</button>
-									<button type="button" data-anchor="top-right"     aria-label="Top right">↗</button>
-									<button type="button" data-anchor="middle-left"   aria-label="Middle left">←</button>
-									<button type="button" disabled aria-hidden="true">·</button>
-									<button type="button" data-anchor="middle-right"  aria-label="Middle right">→</button>
-									<button type="button" data-anchor="bottom-left"   aria-label="Bottom left">↙</button>
-									<button type="button" data-anchor="bottom-center" aria-label="Bottom center">↓</button>
-									<button type="button" data-anchor="bottom-right"  aria-label="Bottom right">↘</button>
+								<label class="setting-label">Edge</label>
+								<div class="fb-sides" id="floating-button-sides" role="group" aria-label="Edge">
+									<button type="button" data-side="left"  aria-label="Left edge">← Left</button>
+									<button type="button" data-side="right" aria-label="Right edge">Right →</button>
 								</div>
-								<div class="setting-description">The edge drawer can only dock to a left or right edge.</div>
+								<div class="setting-description">Which edge the button docks to. Use the offset below to move it up or down.</div>
 							</div>
 
 							<div class="setting-item">
-								<label class="setting-label" id="floating-button-offset-label" for="floating-button-offset">Offset from top</label>
+								<label class="setting-label" for="floating-button-offset">Offset from top</label>
 								<div style="display: flex; align-items: center; gap: 12px;">
 									<input type="range" id="floating-button-offset" min="0" max="800" value="200" step="4" style="flex: 1;">
 									<span id="floating-button-offset-value" style="min-width: 52px; text-align: right; font-weight: 500; color: var(--color-text);">200px</span>
 								</div>
-								<div class="setting-description">Distance from the anchored edge, in pixels — so it stays put when the window resizes or devtools opens.</div>
+								<div class="setting-description">Distance down from the top of the window, in pixels — so it stays put when the window resizes or devtools opens.</div>
 							</div>
 
 						</div>

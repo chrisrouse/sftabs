@@ -374,6 +374,25 @@ function applyTabColor(el, name, style, enabled) {
   el.classList.add('sftabs-tc', `sftabs-tc--${mode}`);
 }
 
+/**
+ * Which edge the floating button docks to.
+ *
+ * Shared because the page and the settings screen must agree: if they disagree,
+ * the preview shows one edge and the button appears on the other.
+ *
+ * `anchor` is read for installs written by an earlier build of the v3 branch,
+ * which stored a nine-way {top|middle|bottom}-{left|center|right} grid. Only the
+ * horizontal half ever reached the page — the vertical half resolved to `top`
+ * for both 'top' and 'middle', and 'center' had no styling under the default
+ * drawer layout. No released version ever wrote the field, so taking the side
+ * and discarding the rest loses nothing a user could have seen.
+ */
+function resolveFloatingSide(floatingButton) {
+  const fb = floatingButton || {};
+  if (fb.side === 'left' || fb.side === 'right') return fb.side;
+  return String(fb.anchor || '').endsWith('-left') ? 'left' : 'right';
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
@@ -382,6 +401,7 @@ if (typeof module !== 'undefined' && module.exports) {
     tabColorVars,
     applyTabColor,
     resolveProfileForUrl,
+    resolveFloatingSide,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,
@@ -403,6 +423,7 @@ if (typeof module !== 'undefined' && module.exports) {
     tabColorVars,
     applyTabColor,
     resolveProfileForUrl,
+    resolveFloatingSide,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,

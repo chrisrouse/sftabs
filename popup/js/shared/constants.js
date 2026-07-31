@@ -111,8 +111,8 @@ const DEFAULT_SETTINGS = {
   floatingButton: {
     enabled: false, // Disabled by default (opt-in feature)
     layout: 'handle', // 'handle' (edge drawer) | 'fab' (round) | 'pill' (labeled)
-    anchor: 'middle-right', // {top|middle|bottom}-{left|center|right}
-    offset: 0, // Pixels from the anchored edge. 0 = derive from legacy `position`
+    side: 'right', // 'left' | 'right' — which edge it docks to
+    offset: 0, // Pixels down from the top. 0 = derive from legacy `position`
     position: 25, // LEGACY percentage down the edge; still read when offset is 0
     location: 'everywhere', // 'everywhere' | 'setup-only' | 'outside-setup'
     defaultVisibility: true, // Show on all pages by default

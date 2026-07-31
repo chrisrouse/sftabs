@@ -293,13 +293,19 @@
     }
 
     /**
-     * Resolve the stored anchor/offset, falling back to the legacy percentage.
-     * Legacy `position` is a share of viewport height, which is exactly why the
-     * button drifted when devtools opened — convert it once to pixels.
+     * Resolve which edge to dock to and how far down, falling back to the
+     * legacy percentage. Legacy `position` is a share of viewport height, which
+     * is exactly why the button drifted when devtools opened — convert it once
+     * to pixels.
+     *
+     * The edge itself is resolved in shared utils, so this and the settings
+     * screen cannot drift apart on how a legacy `anchor` is read.
      */
     getPlacement() {
       const fb = this.settings?.floatingButton || {};
-      const anchor = fb.anchor || 'middle-right';
+      const side = window.SFTabs?.utils?.resolveFloatingSide
+        ? window.SFTabs.utils.resolveFloatingSide(fb)
+        : 'right';
       let offset = Number(fb.offset) || 0;
 
       if (!offset) {
@@ -314,21 +320,19 @@
         }
         offset = this._legacyOffset;
       }
-      const [vertical, horizontal] = anchor.split('-');
-      return { anchor, vertical, horizontal, offset, layout: fb.layout || 'handle' };
+      return { side, offset, layout: fb.layout || 'handle' };
     }
 
     updatePosition() {
       if (!this.modal) return;
 
       try {
-        const { vertical, horizontal, offset, layout } = this.getPlacement();
+        const { side, offset, layout } = this.getPlacement();
 
         // These drive every mirrored rule in CSS: handle radii, which side the
         // panel opens on, and flyout direction.
         this.modal.dataset.layout = layout;
-        this.modal.dataset.side = horizontal;
-        this.modal.dataset.vert = vertical;
+        this.modal.dataset.side = side;
 
         // Detached layouts sit inside the edge; the drawer stays flush to it
         const inset = layout === 'handle' ? 0 : 16;
@@ -340,24 +344,18 @@
         this.modal.style.right = '';
         this.modal.style.transform = '';
 
-        if (horizontal === 'left') {
+        if (side === 'left') {
           this.modal.style.left = `${inset}px`;
           this.modal.style.right = 'auto';   // override the stylesheet's right: 0
-        }
-        if (horizontal === 'right') {
+        } else {
           this.modal.style.right = `${inset}px`;
           this.modal.style.left = 'auto';
         }
-        if (horizontal === 'center') {
-          this.modal.style.left = '50%';
-          this.modal.style.right = 'auto';
-          this.modal.style.transform = 'translateX(-50%)';
-        }
 
-        // Pixels from the anchored edge, never a percentage of the viewport
-        const clamped = Math.max(0, Math.min(offset, Math.max(0, window.innerHeight - 80)));
-        if (vertical === 'bottom') this.modal.style.bottom = `${clamped}px`;
-        else this.modal.style.top = `${clamped}px`;
+        // Pixels down from the top, never a percentage of the viewport. Clamped
+        // so a tall offset cannot push the button off a short window.
+        this.modal.style.top =
+          `${Math.max(0, Math.min(offset, Math.max(0, window.innerHeight - 80)))}px`;
 
         this.updatePanelDirection();
       } catch (error) {

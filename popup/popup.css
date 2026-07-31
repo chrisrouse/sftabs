@@ -2393,14 +2393,17 @@ select:focus-visible {
 .fb-layout-title { font-weight: 500; }
 .fb-layout-desc { font-size: 12px; color: var(--color-text-weak, #5c5c5c); }
 
-.fb-anchors {
-  display: grid;
-  grid-template-columns: repeat(3, 52px);
+/* Two edges, not a nine-cell grid. The vertical axis moved to the offset
+   slider, which expresses it better than three fixed rows ever did. */
+.fb-sides {
+  display: flex;
   gap: 6px;
   margin: 4px 0 8px;
 }
-.fb-anchors button {
-  height: 44px;
+.fb-sides button {
+  flex: 1;
+  max-width: 140px;
+  height: 40px;
   font: inherit;
   cursor: pointer;
   border: 1px solid var(--color-border, #c9c9c9);
@@ -2408,10 +2411,9 @@ select:focus-visible {
   background: var(--color-surface-2, #f3f3f3);
   color: var(--color-text-weak, #5c5c5c);
 }
-.fb-anchors button:hover:not(:disabled) { border-color: #066afe; color: #066afe; }
-.fb-anchors button[aria-pressed="true"] {
+.fb-sides button:hover { border-color: #066afe; color: #066afe; }
+.fb-sides button[aria-pressed="true"] {
   background: #066afe;
   border-color: #066afe;
   color: #fff;
 }
-.fb-anchors button:disabled { opacity: 0.35; cursor: not-allowed; }

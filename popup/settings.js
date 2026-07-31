@@ -238,16 +238,6 @@ function updateUI() {
 /**
  * Toggle auto-switch profiles visibility and disable profiles section
  */
-/**
- * Which anchors each layout allows. A docked drawer only makes sense against a
- * left or right edge, so the top/bottom-center anchors are disabled for it.
- */
-const FLOATING_LAYOUT_ANCHORS = {
-	handle: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right'],
-	fab:    ['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right'],
-	pill:   ['top-left', 'top-center', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right']
-};
-
 function floatingButtonSettings() {
 	if (!userSettings.floatingButton) {
 		userSettings.floatingButton = { ...SFTabs.constants.DEFAULT_SETTINGS.floatingButton };
@@ -274,51 +264,35 @@ function loadFloatingPlacement() {
 	slider.value = offset;
 	document.getElementById('floating-button-offset-value').textContent = `${offset}px`;
 
-	renderFloatingAnchors(fb.anchor || 'middle-right', layout);
-	updateFloatingOffsetLabel(fb.anchor || 'middle-right');
+	renderFloatingSide(SFTabs.utils.resolveFloatingSide(fb));
 }
 
-function renderFloatingAnchors(selected, layout) {
-	const allowed = FLOATING_LAYOUT_ANCHORS[layout] || FLOATING_LAYOUT_ANCHORS.fab;
-	document.querySelectorAll('#floating-button-anchors button[data-anchor]').forEach(btn => {
-		const anchor = btn.dataset.anchor;
-		const ok = allowed.includes(anchor);
-		btn.disabled = !ok;
-		btn.setAttribute('aria-pressed', String(ok && anchor === selected));
+
+
+function renderFloatingSide(selected) {
+	document.querySelectorAll('#floating-button-sides button[data-side]').forEach(btn => {
+		btn.setAttribute('aria-pressed', String(btn.dataset.side === selected));
 	});
 }
 
-function updateFloatingOffsetLabel(anchor) {
-	const fromBottom = anchor.startsWith('bottom');
-	document.getElementById('floating-button-offset-label').textContent =
-		fromBottom ? 'Offset from bottom' : 'Offset from top';
-}
-
 function bindFloatingPlacement() {
-	// Layout — may invalidate the current anchor, so re-resolve it
+	// Layout. Every layout can dock to either edge, so changing it no longer
+	// has to re-validate the placement.
 	document.querySelectorAll('input[name="floating-button-layout"]').forEach(radio => {
 		radio.addEventListener('change', async (e) => {
-			const fb = floatingButtonSettings();
-			fb.layout = e.target.value;
-
-			const allowed = FLOATING_LAYOUT_ANCHORS[fb.layout];
-			if (!allowed.includes(fb.anchor || 'middle-right')) {
-				fb.anchor = 'middle-right';
-			}
-			renderFloatingAnchors(fb.anchor || 'middle-right', fb.layout);
-			updateFloatingOffsetLabel(fb.anchor || 'middle-right');
+			floatingButtonSettings().layout = e.target.value;
 			await saveUserSettings();
 		});
 	});
 
-	// Placement grid
-	document.getElementById('floating-button-anchors').addEventListener('click', async (e) => {
-		const btn = e.target.closest('button[data-anchor]');
-		if (!btn || btn.disabled) return;
+	// Edge
+	document.getElementById('floating-button-sides').addEventListener('click', async (e) => {
+		const btn = e.target.closest('button[data-side]');
+		if (!btn) return;
 		const fb = floatingButtonSettings();
-		fb.anchor = btn.dataset.anchor;
-		renderFloatingAnchors(fb.anchor, fb.layout || 'handle');
-		updateFloatingOffsetLabel(fb.anchor);
+		fb.side = btn.dataset.side;
+		delete fb.anchor; // superseded by the two-way choice
+		renderFloatingSide(fb.side);
 		await saveUserSettings();
 	});
 
