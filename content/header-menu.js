@@ -176,7 +176,9 @@
     const kids = childrenOf(tab);
     const href = urlFor(tab);
     const marks = [
-      kids.length ? `<span class="sftabs-hm-count">${kids.length} &rsaquo;</span>` : '',
+      kids.length
+        ? `<span class="sftabs-hm-count">${kids.length}<span class="sftabs-hm-chev" aria-hidden="true">&rsaquo;</span></span>`
+        : '',
       // Same affordance Salesforce shows on items that leave the page, and on the
       // same terms: only while the row is hovered or focused.
       tab.openInNewTab
@@ -343,8 +345,16 @@
     const key = li.dataset.index;
     const open = list.querySelector(`[data-sub-of="${key}"]`);
     list.querySelectorAll('[data-sub-of]').forEach(el => el.remove());
+    list.querySelectorAll('li.uiMenuItem.is-open').forEach(el => {
+      el.classList.remove('is-open');
+      const a = el.querySelector('a');
+      if (a) a.setAttribute('aria-expanded', 'false');
+    });
     if (open) return;                                   // second click collapses
 
+    // Children first, then their own children, so the flattened order still
+    // reads top-down. Depth drives the indent, which is what makes the nesting
+    // legible — without it a child is indistinguishable from a sibling tab.
     const rows = [];
     childrenOf(tab).forEach(child => {
       rows.push({ item: child, depth: 0 });
@@ -352,21 +362,21 @@
     });
     if (!rows.length) return;
 
-    const divider = document.createElement('li');
-    divider.setAttribute('role', 'separator');
-    divider.className = 'slds-has-divider_top-space';
-    divider.dataset.subOf = key;
+    li.classList.add('is-open');
+    const parentLink = li.querySelector('a');
+    if (parentLink) parentLink.setAttribute('aria-expanded', 'true');
 
-    const items = rows.map(({ item, depth }) => {
+    let cursor = li;
+    rows.forEach(({ item, depth }) => {
       const el = document.createElement('li');
       el.setAttribute('role', 'presentation');
-      el.className = 'slds-dropdown__item uiMenuItem sftabs-hm-sub-item';
+      el.className = `slds-dropdown__item uiMenuItem sftabs-hm-sub-item sftabs-hm-depth-${depth}`;
       el.dataset.subOf = key;
       const href = urlFor(item);
       el.innerHTML = `
         <a role="menuitem" title="${esc(item.label)}"${href ? ` href="${esc(href)}"` : ''}>
           <div class="slds-grid">
-            <div class="slds-col slds-size_12-of-12" style="padding-left:${depth * 16}px">
+            <div class="slds-col slds-size_12-of-12">
               <span class="slds-truncate">
                 <span class="slds-align-middle">${esc(item.label)}</span>
               </span>
@@ -379,15 +389,9 @@
         closeMenu();
         navigate(item, tab);
       });
-      return el;
-    });
-
-    // Insert divider then rows, each after the last thing inserted
-    let cursor = li;
-    for (const el of [divider, ...items]) {
       cursor.insertAdjacentElement('afterend', el);
       cursor = el;
-    }
+    });
   }
 
   /**

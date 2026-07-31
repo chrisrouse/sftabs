@@ -110,7 +110,7 @@
 }
 #sftabs-header-menu li.uiMenuItem > a:hover { background: #f3f2f2; text-decoration: none; }
 
-/* ── Ours: the path beneath a tab name, and the sub-item count ── */
+/* ── Ours: the trailing marks on a row ── */
 
 /* Shown only while the row is hovered or focused, as Salesforce does it.
    visibility rather than display, so the row does not reflow. */
@@ -140,5 +140,32 @@
   color: #706e6b;
 }
 
-/* Expanded sub-items read as subordinate to the tab above them */
-#sftabs-header-menu .sftabs-hm-sub-item > a { font-size: 11px; }
+/* ── Expanded sub-items ──
+   Indentation carries the hierarchy. There is no native nested menu to copy, and
+   a divider alone did not work: a child at the same indent as its parent reads as
+   a sibling, so "Flows > Failed Flows" looked like two unrelated tabs. The rule
+   down the left binds the group to the tab above it. */
+#sftabs-header-menu .sftabs-hm-sub-item > a {
+  position: relative;
+  padding-left: 28px;
+  font-size: 12px;
+}
+#sftabs-header-menu .sftabs-hm-depth-1 > a { padding-left: 44px; }
+
+#sftabs-header-menu .sftabs-hm-sub-item > a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 17px;
+  border-left: 1px solid #dddbda;
+}
+#sftabs-header-menu .sftabs-hm-depth-1 > a::before { left: 33px; }
+
+/* The chevron turns to point down while the group is open */
+#sftabs-header-menu .sftabs-hm-chev {
+  display: inline-block;
+  margin-left: 3px;
+  transition: transform 0.1s linear;
+}
+#sftabs-header-menu li.is-open .sftabs-hm-chev { transform: rotate(90deg); }
