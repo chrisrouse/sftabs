@@ -145,22 +145,27 @@
    a divider alone did not work: a child at the same indent as its parent reads as
    a sibling, so "Flows > Failed Flows" looked like two unrelated tabs. The rule
    down the left binds the group to the tab above it. */
-#sftabs-header-menu .sftabs-hm-sub-item > a {
+/* li.uiMenuItem is repeated in these selectors on purpose. The generic row rule
+   above is #id li.uiMenuItem > a — specificity 1,1,2 — and sets the padding
+   shorthand. Matching only .sftabs-hm-sub-item scores 1,1,1 and loses, so the
+   indent silently never applied while the ::before hairline did, which left the
+   rows looking flat with stray rules beside them. */
+#sftabs-header-menu li.uiMenuItem.sftabs-hm-sub-item > a {
   position: relative;
-  padding-left: 28px;
+  padding-left: 32px;
   font-size: 12px;
 }
-#sftabs-header-menu .sftabs-hm-depth-1 > a { padding-left: 44px; }
+#sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-1 > a { padding-left: 52px; }
 
-#sftabs-header-menu .sftabs-hm-sub-item > a::before {
+#sftabs-header-menu li.uiMenuItem.sftabs-hm-sub-item > a::before {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 17px;
+  left: 20px;
   border-left: 1px solid #dddbda;
 }
-#sftabs-header-menu .sftabs-hm-depth-1 > a::before { left: 33px; }
+#sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-1 > a::before { left: 40px; }
 
 /* The chevron turns to point down while the group is open */
 #sftabs-header-menu .sftabs-hm-chev {
