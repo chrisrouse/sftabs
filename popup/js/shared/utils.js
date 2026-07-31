@@ -320,7 +320,7 @@ function tabColorVars(name) {
  *
  * @param {Element} el
  * @param {string|null} name   colour name, or null/unknown for none
- * @param {string} style       'dot' | 'underline' | 'tint'
+ * @param {string} style       'dot' | 'tint'
  * @param {boolean} enabled    the tabColors.enabled setting
  */
 function applyTabColor(el, name, style, enabled) {

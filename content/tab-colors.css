@@ -8,7 +8,7 @@
      --sftabs-tc        the accent  (palette 40)
      --sftabs-tc-wash   the wash    (palette 90)
 
-   — and adds .sftabs-tc plus one of .sftabs-tc--dot / --underline / --tint.
+   — and adds .sftabs-tc plus one of .sftabs-tc--dot / --tint.
    Keeping the values in JS means the twelve hues are defined once rather than
    restated in each stylesheet that needs them.
 
@@ -40,8 +40,7 @@
 
 /* ── Active indicator ──
    Salesforce marks the active Setup tab with a bar along the top. When a tab has
-   a colour, that bar takes the colour at full strength — so with Underline you
-   get the soft rule below and the strong one above, and the active tab stays
+   a colour, that bar takes the colour at full strength, so the active tab stays
    just as obvious as it is without colours.
 
    Drawn as our own overlay rather than by overriding Salesforce's rule: the
