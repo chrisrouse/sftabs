@@ -63,35 +63,6 @@ function parseCurrentObjectManagerNavigation() {
 }
 
 /**
- * Get current page information for context
- */
-function getCurrentPageInfo() {
-  const currentUrl = window.location.href;
-  
-  // Check if on ObjectManager page
-  const objectManagerMatch = currentUrl.match(/\/lightning\/setup\/ObjectManager\/([^\/]+)/);
-  if (objectManagerMatch) {
-    return {
-      type: 'objectManager',
-      objectName: objectManagerMatch[1],
-      fullPath: currentUrl.split('/lightning/setup/')[1]?.split('?')[0]
-    };
-  }
-  
-  // Check if on general setup page
-  const setupMatch = currentUrl.match(/\/lightning\/setup\/([^\/]+)/);
-  if (setupMatch) {
-    return {
-      type: 'setup',
-      setupPage: setupMatch[1],
-      fullPath: currentUrl.split('/lightning/setup/')[1]?.split('?')[0]
-    };
-  }
-  
-  return null;
-}
-
-/**
  * Enhanced navigation parser with retry logic for dynamic loading
  */
 async function parseNavigationWithRetry(maxRetries = 3, delayMs = 1000) {

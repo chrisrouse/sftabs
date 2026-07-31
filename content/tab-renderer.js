@@ -5,121 +5,11 @@
 let isRenderingTabs = false;
 
 /**
- * Get storage preference from settings
- * @returns {Promise<boolean>} true for sync storage, false for local
- */
-async function getStoragePreference() {
-  try {
-    const result = await browser.storage.sync.get('userSettings');
-    if (result.userSettings && typeof result.userSettings.useSyncStorage === 'boolean') {
-      return result.userSettings.useSyncStorage;
-    }
-    return true; // Default to sync
-  } catch (error) {
-    return true;
-  }
-}
-
-/**
- * Read tabs from chunked sync storage
- */
-async function readChunkedSync(baseKey) {
-  try {
-    const metadataKey = `${baseKey}_metadata`;
-    const metadataResult = await browser.storage.sync.get(metadataKey);
-    const metadata = metadataResult[metadataKey];
-
-    if (!metadata || !metadata.chunked) {
-      const directResult = await browser.storage.sync.get(baseKey);
-      return directResult[baseKey] || null;
-    }
-
-    const chunkCount = metadata.chunkCount;
-    const chunkKeys = [];
-    for (let i = 0; i < chunkCount; i++) {
-      chunkKeys.push(`${baseKey}_chunk_${i}`);
-    }
-
-    const chunksResult = await browser.storage.sync.get(chunkKeys);
-    const chunks = [];
-    for (let i = 0; i < chunkCount; i++) {
-      const chunkKey = `${baseKey}_chunk_${i}`;
-      if (!chunksResult[chunkKey]) {
-        throw new Error(`Missing chunk ${i} of ${chunkCount}`);
-      }
-      chunks.push(chunksResult[chunkKey]);
-    }
-
-    const jsonString = chunks.join('');
-    return JSON.parse(jsonString);
-  } catch (error) {
-    return null;
-  }
-}
-
-/**
  * Color preference, cached from the settings read in getTabsFromStorage().
  * createTabElementWithDropdown() has no settings in scope and runs per row, so
  * reading storage there would mean a round-trip per tab.
  */
 let tabColorPref = { enabled: false, style: 'dot' };
-
-/**
- * Get tabs from storage (sync or local based on preference)
- */
-async function getTabsFromStorage() {
-  try {
-    const useSyncStorage = await getStoragePreference();
-
-    // Get user settings
-    const settingsKey = 'userSettings';
-    let settings;
-    if (useSyncStorage) {
-      const settingsData = await readChunkedSync(settingsKey);
-      settings = settingsData || {};
-    } else {
-      const result = await browser.storage.local.get(settingsKey);
-      settings = result[settingsKey] || {};
-    }
-
-    // Which profile applies to THIS page. Resolved from the page's own org
-    // rather than the globally active profile, so two orgs render their own
-    // tabs at the same time whether they sit in one window or two.
-    let profiles = [];
-    if (useSyncStorage) {
-      profiles = await readChunkedSync('profiles') || [];
-    } else {
-      const profilesResult = await browser.storage.local.get('profiles');
-      profiles = profilesResult.profiles || [];
-    }
-    const profileId = window.SFTabs && window.SFTabs.utils && window.SFTabs.utils.resolveProfileForUrl
-      ? window.SFTabs.utils.resolveProfileForUrl(window.location.href, profiles, settings)
-      : settings.activeProfileId;
-
-    if (profileId) {
-      const profileTabsKey = `profile_${profileId}_tabs`;
-
-      if (useSyncStorage) {
-        const tabs = await readChunkedSync(profileTabsKey);
-        return tabs || [];
-      } else {
-        const result = await browser.storage.local.get(profileTabsKey);
-        return result[profileTabsKey] || [];
-      }
-    }
-
-    // Fallback to legacy customTabs key (for very old installations)
-    if (useSyncStorage) {
-      const tabs = await readChunkedSync('customTabs');
-      return tabs || [];
-    } else {
-      const result = await browser.storage.local.get('customTabs');
-      return result.customTabs || [];
-    }
-  } catch (error) {
-    return [];
-  }
-}
 
 /**
  * Initialize tabs in the given container
@@ -285,7 +175,7 @@ function createTabElementWithDropdown(tab) {
   const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
   
   // Determine the full URL based on tab type
-  const fullUrl = buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
+  const fullUrl = buildTabBarUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
   
   // Create the tab element
   const li = document.createElement('li');
@@ -908,7 +798,7 @@ function navigateToMainTab(tab) {
   const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
   const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
   
-  const fullUrl = buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
+  const fullUrl = buildTabBarUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
   
   if (tab.openInNewTab) {
     window.open(fullUrl, '_blank');
@@ -926,51 +816,9 @@ function navigateToMainTab(tab) {
 }
 
 /**
- * Navigate to a navigation item from dropdown
- */
-function navigateToNavigationItem(navItem, parentTab) {
-  const baseUrl = window.location.origin;
-
-  let fullUrl = '';
-  let path = navItem.path || navItem.url || '';
-
-  // Check if path already includes full Lightning URL (nested navigation items)
-  if (path.startsWith('/lightning/')) {
-    // Path already has full Lightning path, just add origin
-    fullUrl = `${baseUrl}${path}`;
-  } else if (navItem.isObject) {
-    // Object paths: /lightning/o/{objectName}/list or /lightning/o/{objectName}/view/{recordId}
-    fullUrl = `${baseUrl}/lightning/o/${path}`;
-  } else if (navItem.isCustomUrl) {
-    // Custom URLs: ensure leading slash
-    if (!path.startsWith('/')) {
-      path = '/' + path;
-    }
-    fullUrl = `${baseUrl}${path}`;
-  } else {
-    // Setup paths: /lightning/setup/{setupPath}
-    fullUrl = `${baseUrl}/lightning/setup/${path}`;
-  }
-
-  if (parentTab.openInNewTab) {
-    window.open(fullUrl, '_blank');
-  } else {
-    const lightningEnabled = isLightningNavigationEnabled();
-    if (lightningEnabled) {
-      lightningNavigate({
-        navigationType: "url",
-        url: fullUrl
-      }, fullUrl);
-    } else {
-      window.location.href = fullUrl;
-    }
-  }
-}
-
-/**
  * Build full URL from tab configuration
  */
-function buildFullUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject) {
+function buildTabBarUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject) {
   // Check if this is a folder-style tab (no path)
   if (!tab.path || !tab.path.trim()) {
     // For folder tabs, return a javascript:void(0) to prevent navigation
@@ -1092,41 +940,6 @@ function addTabClickListeners(tabs) {
       });
     });
   });
-}
-
-/**
- * Check if Lightning Navigation is enabled
- * Always returns true as Lightning Navigation is now standard
- */
-function isLightningNavigationEnabled() {
-  return true;
-}
-
-/**
- * Lightning navigation function
- */
-function lightningNavigate(details, fallbackURL) {
-  if (!isLightningNavigationEnabled()) {
-    window.location.href = fallbackURL;
-    return;
-  }
-
-  
-  // Try inject.js window function approach first
-  if (window.sfTabsLightningNav) {
-    const success = window.sfTabsLightningNav({
-      navigationType: details.navigationType || "url",
-      url: details.url || fallbackURL,
-      recordId: details.recordId || null
-    });
-    
-    if (success) {
-      return;
-    }
-  }
-  
-  // Final fallback
-  window.location.href = fallbackURL;
 }
 
 const LAST_CLICKED_TAB_KEY = 'sftabs_last_clicked_tab_id';
@@ -1301,20 +1114,6 @@ async function monitorNativeTabActiveState() {
   } catch (error) {
     // Error monitoring native tabs
   }
-}
-
-/**
- * Check if current page matches a tab's path
- */
-function isCurrentPageMatchingTab(tab, currentPageInfo) {
-  if (tab.isSetupObject && currentPageInfo.type === 'objectManager') {
-    if (tab.path.startsWith('ObjectManager/')) {
-      const tabObjectName = tab.path.split('/')[1];
-      return tabObjectName === currentPageInfo.objectName;
-    }
-  }
-
-  return false;
 }
 
 /**
@@ -1874,23 +1673,29 @@ window.addEventListener('resize', () => {
 });
 
 // Export tab renderer functions
+/**
+ * Only what this file actually declares.
+ *
+ * Four names used to appear here that it no longer defines. Two of them —
+ * lightningNavigate and navigateToNavigationItem — live in content-main.js,
+ * which loads after this file, so the object literal would have captured
+ * undefined rather than the function. The other two would have silently
+ * captured utils.js's same-named helpers, one of which takes different
+ * arguments. Nothing outside this file read any of the four.
+ */
 window.SFTabsContent = window.SFTabsContent || {};
 window.SFTabsContent.tabRenderer = {
   initTabs,
   getTopLevelTabs,
   createTabElement: createTabElementWithDropdown,
-  buildFullUrl,
+  buildTabBarUrl,
   addTabClickListeners,
-  isLightningNavigationEnabled,
-  lightningNavigate,
   highlightActiveTab,
-  isCurrentPageMatchingTab,
   removeCustomTabs,
   getTabById,
   areTabsLoaded,
   forceRefreshTabs,
   navigateToMainTab,
-  navigateToNavigationItem,
   createInlineDropdownMenu,
   toggleInlineDropdown,
   handleTabOverflow

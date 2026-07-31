@@ -222,14 +222,6 @@ async function getTabsFromStorage() {
 }
 
 /**
- * Check if Lightning Navigation is enabled
- * Always returns true as Lightning Navigation is now standard
- */
-function isLightningNavigationEnabled() {
-  return true;
-}
-
-/**
  * Lightning navigation function that tries multiple approaches - FROM ORIGINAL
  */
 function lightningNavigate(details, fallbackURL) {
@@ -950,21 +942,6 @@ function setupStorageListeners() {
       }
     });
   }
-}
-
-/**
- * Debounce helper function
- */
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
 }
 
 /**

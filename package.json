@@ -14,7 +14,7 @@
     "sign:firefox": "web-ext sign",
     "i18n:export": "node scripts/json-to-csv.js",
     "i18n:build": "node scripts/csv-to-json.js",
-    "test": "node test/storage-migration.test.js && node test/profile-resolution.test.js && node test/tab-colors.test.js"
+    "test": "node test/storage-migration.test.js && node test/profile-resolution.test.js && node test/tab-colors.test.js && node test/content-scope.test.js"
   },
   "repository": {
     "type": "git",
