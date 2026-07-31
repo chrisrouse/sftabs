@@ -978,6 +978,33 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .settings-desc  { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
 .settings-row-control { flex-shrink: 0; }
 
+/* ── "Start with" on the new-profile form ──
+   Stacked radios rather than a segmented control, because the third option
+   carries a picker and would not fit in a segment. */
+.seed-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+.seed-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--sft-font-size-base);
+  color: var(--t-base);
+  cursor: pointer;
+}
+.seed-choice input[type="radio"] { flex-shrink: 0; margin: 0; accent-color: var(--c-primary); }
+.seed-choice .seed-source {
+  flex: 1;
+  min-width: 0;
+  margin-left: 4px;
+  padding: 3px 6px;
+  font-size: var(--sft-font-size-xs);
+}
+.seed-choice .seed-source:disabled { opacity: 0.45; cursor: not-allowed; }
+
 /* ── Theme cards ──
    The choice is shown rather than named: each card is a miniature browser
    window painted in the surfaces that option produces, and System is split down

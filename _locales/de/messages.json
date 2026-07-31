@@ -2652,15 +2652,6 @@
   "profilesListHint": {
     "message": "Ein Profilwechsel tauscht die gesamte Registerkartenliste aus. Beim Löschen werden auch dessen Registerkarten entfernt."
   },
-  "manageProfilesLabel": {
-    "message": "Profile verwalten"
-  },
-  "manageProfilesDesc": {
-    "message": "Profile hinzufügen, umbenennen oder entfernen"
-  },
-  "manageButton": {
-    "message": "Verwalten"
-  },
   "cannotDeleteLastProfile": {
     "message": "Das letzte Profil kann nicht gelöscht werden — es gäbe keinen Ort für die Registerkarten."
   },
@@ -2888,5 +2879,34 @@
   "ariaBackToSettings": {
     "message": "Zurück zu den Einstellungen",
     "description": "Back button out of a settings section"
+  },
+  "startWithLabel": {
+    "message": "Beginnen mit",
+    "description": "Label for the starting-tabs choice on the new-profile form"
+  },
+  "startWithNone": {
+    "message": "Keine Registerkarten",
+    "description": "New profile starts empty"
+  },
+  "startWithDefault": {
+    "message": "Standardsatz",
+    "description": "New profile starts with the standard tabs"
+  },
+  "startWithCopy": {
+    "message": "Kopieren von",
+    "description": "New profile copies another profile’s tabs"
+  },
+  "startWithHint": {
+    "message": "Sie können dies ändern, solange dieses Formular geöffnet ist.",
+    "description": "Hint under the starting-tabs choice"
+  },
+  "startWithApplied": {
+    "message": "Beginnt mit $COUNT$ Registerkarten",
+    "description": "Toast after re-seeding a new profile",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

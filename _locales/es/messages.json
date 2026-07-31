@@ -2652,15 +2652,6 @@
   "profilesListHint": {
     "message": "Cambiar de perfil sustituye toda la lista de pestañas. Al eliminar uno también se eliminan sus pestañas."
   },
-  "manageProfilesLabel": {
-    "message": "Administrar perfiles"
-  },
-  "manageProfilesDesc": {
-    "message": "Agregar, cambiar el nombre o quitar perfiles"
-  },
-  "manageButton": {
-    "message": "Administrar"
-  },
   "cannotDeleteLastProfile": {
     "message": "No se puede eliminar el último perfil: las pestañas no tendrían dónde estar."
   },
@@ -2888,5 +2879,34 @@
   "ariaBackToSettings": {
     "message": "Volver a Ajustes",
     "description": "Back button out of a settings section"
+  },
+  "startWithLabel": {
+    "message": "Empezar con",
+    "description": "Label for the starting-tabs choice on the new-profile form"
+  },
+  "startWithNone": {
+    "message": "Sin pestañas",
+    "description": "New profile starts empty"
+  },
+  "startWithDefault": {
+    "message": "El conjunto predeterminado",
+    "description": "New profile starts with the standard tabs"
+  },
+  "startWithCopy": {
+    "message": "Copiar de",
+    "description": "New profile copies another profile’s tabs"
+  },
+  "startWithHint": {
+    "message": "Puede cambiarlo mientras este formulario esté abierto.",
+    "description": "Hint under the starting-tabs choice"
+  },
+  "startWithApplied": {
+    "message": "Empieza con $COUNT$ pestañas",
+    "description": "Toast after re-seeding a new profile",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

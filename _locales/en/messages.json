@@ -2776,18 +2776,6 @@
     "message": "Switching profiles swaps the whole tab list. Deleting one removes its tabs too.",
     "description": "Explanatory note at the bottom of the profiles list"
   },
-  "manageProfilesLabel": {
-    "message": "Manage profiles",
-    "description": "Settings row label for the profiles list"
-  },
-  "manageProfilesDesc": {
-    "message": "Add, rename, or remove profiles",
-    "description": "Settings row description for the profiles list"
-  },
-  "manageButton": {
-    "message": "Manage",
-    "description": "Short button label opening a management panel"
-  },
   "cannotDeleteLastProfile": {
     "message": "The last profile can’t be deleted — there would be nowhere for tabs to live.",
     "description": "Error when trying to delete the only remaining profile"
@@ -3057,5 +3045,34 @@
   "ariaBackToSettings": {
     "message": "Back to Settings",
     "description": "Back button out of a settings section"
+  },
+  "startWithLabel": {
+    "message": "Start with",
+    "description": "Label for the starting-tabs choice on the new-profile form"
+  },
+  "startWithNone": {
+    "message": "No tabs",
+    "description": "New profile starts empty"
+  },
+  "startWithDefault": {
+    "message": "The default set",
+    "description": "New profile starts with the standard tabs"
+  },
+  "startWithCopy": {
+    "message": "Copy from",
+    "description": "New profile copies another profile’s tabs"
+  },
+  "startWithHint": {
+    "message": "You can change this while this form is open.",
+    "description": "Hint under the starting-tabs choice"
+  },
+  "startWithApplied": {
+    "message": "Starting with $COUNT$ tabs",
+    "description": "Toast after re-seeding a new profile",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

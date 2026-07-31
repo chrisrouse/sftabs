@@ -94,7 +94,8 @@ if (viewsLine) {
 // They moved between parents in the DOM; their handlers bind by id, so a typo
 // during the move is silent until someone clicks the control.
 ['setting-compact', 'setting-tab-colors', 'row-tab-color-style', 'setting-skip-delete',
- 'setting-profiles', 'row-manage-profiles', 'btn-manage-profiles-settings',
+ 'setting-profiles', 'setting-auto-switch', 'auto-switch-hint', 'profiles-manage',
+ 'profiles-list', 'btn-new-profile-from-list',
  'btn-advanced-settings', 'settings-title', 'settings-hub'].forEach(id => {
   const n = (panel.match(new RegExp(`id="${id}"`, 'g')) || []).length;
   check(`#${id} appears exactly once in the panel`, n === 1, n === 1 ? '' : `found ${n}`);
@@ -104,6 +105,30 @@ check('the theme control survived the move',
   (panel.match(/data-theme-val="/g) || []).length === 3);
 check('the storage radios survived the move',
   (panel.match(/name="storage-type"/g) || []).length === 2);
+
+// ── 6. Profiles is managed in its section, not a sheet of its own ──
+// The list used to live in a separate panel-view reached through a Manage
+// button. Both are gone; if either comes back, the feature has two homes again.
+check('the standalone profiles sheet is gone', !html.includes('id="view-profiles"'));
+check('nothing still routes to it', !/showView\('profiles'\)/.test(js));
+check('the Manage button is gone', !panel.includes('btn-manage-profiles-settings'));
+check('everything below the enable toggle hides as one block',
+  /id="profiles-manage"/.test(panel) && /getElementById\('profiles-manage'\)/.test(js));
+
+// ── 7. "Start with" only ever appears while creating ──
+// Shown when editing, it would offer to replace a profile's existing tabs.
+check('the seed group ships hidden',
+  /id="group-profile-seed"[^>]*\shidden[\s>]/.test(html));
+check('it offers three starting points',
+  (html.match(/name="profile-seed"/g) || []).length === 3);
+check('empty is the preselected starting point',
+  /value="none" checked/.test(html));
+check('the copy picker starts disabled, since copy is not preselected',
+  /id="input-profile-seed-source"[\s\S]{0,120}?disabled/.test(html));
+check('the form tracks creating separately from the autosaved id',
+  /profileFormIsNew/.test(js) && /state\.profileFormIsNew = !profile/.test(js));
+check('editing hides the control rather than disabling it',
+  /group\.hidden = !state\.profileFormIsNew/.test(js));
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

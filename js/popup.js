@@ -36,7 +36,7 @@ let state = {
   profiles:        [],
   settings:        {},
   activeView:      'empty',   // 'empty' | 'edit-tab' | 'dropdowns' | 'edit-profile'
-                              //         | 'profiles' | 'settings' | 'release-notes'
+                              //         | 'settings' | 'release-notes'
   editingProfileId: null,     // profile open in the form; null while creating
   editingColor:     null,     // color chosen in the open edit form
   editingTabId:    null,
@@ -45,6 +45,7 @@ let state = {
   loadError:       null,
   expandedPaths:   new Set(), // UI-only; never written to storage
   settingsSection: null,      // open Settings section id; null = the tile hub
+  profileFormIsNew: false,    // the profile form is creating, not editing
   editingItemPath: null,      // dropdown item currently open for inline edit
   addingItemUnder: null,      // parent path for a pending add ([] = root)
 };
@@ -886,6 +887,10 @@ function renderProfileDropdown() {
 function openProfileForm(profileId) {
   const profile = profileId ? state.profiles.find(p => p.id === profileId) : null;
   state.editingProfileId = profile ? profile.id : null;
+  // Tracked separately from editingProfileId, which the first autosave fills in
+  // even while creating — this stays true for the life of the form.
+  state.profileFormIsNew = !profile;
+  renderSeedChoices();
 
   document.getElementById('profile-panel-title').textContent =
     t(profile ? 'editProfileTitle' : 'newProfileTitle');
@@ -957,9 +962,9 @@ async function persistProfileForm() {
     // Claim the id before anything can await again, so a fast second keystroke
     // updates this profile instead of creating a sibling
     state.editingProfileId = saved.id;
-    // A brand-new profile starts empty; give it a tab list so switching to it
-    // does not look like data loss
-    await SFTabs.storage.saveProfileTabs(saved.id, []);
+    // Give it a tab list immediately, so switching to it never reads as data
+    // loss. What goes in it comes from the form's "Start with" choice.
+    await seedTabsFor(saved.id);
   }
 
   renderProfileChip();
@@ -1055,10 +1060,69 @@ async function removeProfileTabs(profileId) {
   } catch { /* nothing to remove */ }
 }
 
+/**
+ * Reset the "Start with" control for a fresh form.
+ *
+ * Hidden when editing: re-seeding an existing profile would throw away tabs the
+ * person already has, and nothing on this form should be able to do that.
+ */
+function renderSeedChoices() {
+  const group = document.getElementById('group-profile-seed');
+  if (!group) return;
+
+  group.hidden = !state.profileFormIsNew;
+  if (group.hidden) return;
+
+  document.querySelector('input[name="profile-seed"][value="none"]').checked = true;
+
+  // Only profiles that already exist can be copied — not the one being created.
+  const source = document.getElementById('input-profile-seed-source');
+  source.innerHTML = state.profiles
+    .filter(p => p.id !== state.editingProfileId)
+    .map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`)
+    .join('');
+  source.disabled = true;
+}
+
+/** Which starting point the form is currently offering. */
+function readSeedChoice() {
+  const picked = document.querySelector('input[name="profile-seed"]:checked');
+  return {
+    mode: picked ? picked.value : 'none',
+    sourceId: document.getElementById('input-profile-seed-source')?.value || null
+  };
+}
+
+/**
+ * The tabs a new profile begins with.
+ *
+ * Cloned verbatim rather than re-keyed. Tab ids only have to be unique inside a
+ * profile, and they already are in the source; regenerating them would mean
+ * remapping every parentId on nested tabs, which is a good way to orphan one.
+ */
+async function seedTabsFor(profileId) {
+  const { mode, sourceId } = readSeedChoice();
+  let tabs = [];
+
+  if (mode === 'default') {
+    tabs = window.SFTabs?.constants?.DEFAULT_TABS || [];
+  } else if (mode === 'copy' && sourceId) {
+    tabs = (await SFTabs.storage.getProfileTabs(sourceId)) || [];
+  }
+
+  await SFTabs.storage.saveProfileTabs(profileId, JSON.parse(JSON.stringify(tabs)));
+  return tabs.length;
+}
+
+/**
+ * The profile list is the Profiles section of Settings, not a sheet of its own.
+ * Everything that used to open that sheet lands here instead.
+ */
 function openProfilesList() {
   renderProfilesList();
   syncAutoSwitchRow();
-  showView('profiles');
+  showSettingsSection('profiles');
+  showView('settings');
 }
 
 /**
@@ -1257,7 +1321,7 @@ async function captureCurrentOrg() {
 
 function showView(viewName) {
   const tray  = document.getElementById('panel-tray');
-  const views = ['edit-tab', 'settings', 'release-notes', 'dropdowns', 'edit-profile', 'profiles'];
+  const views = ['edit-tab', 'settings', 'release-notes', 'dropdowns', 'edit-profile'];
 
   if (viewName === 'empty') {
     tray.classList.remove('is-open');
@@ -2161,13 +2225,14 @@ function applyDensity(isCompact) {
  */
 function applyProfilesVisibility(enabled) {
   document.getElementById('btn-profile-switcher').hidden = !enabled;
-  // Managing profiles is meaningless with the feature off, and the switcher is
-  // the only way back out of the list view
-  const row = document.getElementById('row-manage-profiles');
-  if (row) row.hidden = !enabled;
+  // Auto-switch, the list and the new-profile button are all meaningless with
+  // the feature off; the enable toggle above them stays, or there would be no
+  // way back on.
+  const manage = document.getElementById('profiles-manage');
+  if (manage) manage.hidden = !enabled;
   if (!enabled) {
     closeProfileDropdown();
-    if (state.activeView === 'profiles' || state.activeView === 'edit-profile') showView('empty');
+    if (state.activeView === 'edit-profile') showView('empty');
   }
 }
 
@@ -2360,13 +2425,30 @@ function bindEvents() {
     openProfilesList();
   });
   document.getElementById('btn-capture-org').addEventListener('click', captureCurrentOrg);
-  document.getElementById('btn-close-profiles').addEventListener('click', () => showView('empty'));
+
+  // Changing the starting point re-seeds, because autosave has usually created
+  // the profile before anyone reaches this control. Only ever fires while
+  // creating — the group is hidden when editing — so no existing tabs are at
+  // risk. Reversible for as long as the form is open.
+  document.querySelectorAll('input[name="profile-seed"]').forEach(radio => {
+    radio.addEventListener('change', async () => {
+      document.getElementById('input-profile-seed-source').disabled = radio.value !== 'copy';
+      if (!state.profileFormIsNew || !state.editingProfileId) return;
+      const count = await seedTabsFor(state.editingProfileId);
+      showStatus(t('startWithApplied', String(count)));
+    });
+  });
+
+  document.getElementById('input-profile-seed-source').addEventListener('change', async () => {
+    if (!state.profileFormIsNew || !state.editingProfileId) return;
+    const count = await seedTabsFor(state.editingProfileId);
+    showStatus(t('startWithApplied', String(count)));
+  });
   document.getElementById('btn-new-profile-from-list').addEventListener('click', () => openProfileForm(null));
   document.getElementById('setting-auto-switch').addEventListener('change', async e => {
     await patchSettings({ autoSwitchProfiles: e.target.checked });
     syncAutoSwitchRow();
   });
-  document.getElementById('btn-manage-profiles-settings').addEventListener('click', openProfilesList);
 
   document.querySelectorAll('input[name="storage-type"]').forEach(radio => {
     radio.addEventListener('change', () => {

@@ -188,48 +188,37 @@
               </button>
             </div>
 
+            <!-- Only while creating. Editing an existing profile hides this,
+                 because re-seeding would silently discard its tabs. -->
+            <div class="form-group" id="group-profile-seed" hidden>
+              <span class="form-label" id="profile-seed-label">__MSG_startWithLabel__</span>
+              <div class="seed-choices" role="radiogroup" aria-labelledby="profile-seed-label">
+                <label class="seed-choice">
+                  <input type="radio" name="profile-seed" value="none" checked />
+                  <span>__MSG_startWithNone__</span>
+                </label>
+                <label class="seed-choice">
+                  <input type="radio" name="profile-seed" value="default" />
+                  <span>__MSG_startWithDefault__</span>
+                </label>
+                <label class="seed-choice">
+                  <input type="radio" name="profile-seed" value="copy" />
+                  <span>__MSG_startWithCopy__</span>
+                  <select class="form-input seed-source" id="input-profile-seed-source"
+                    aria-label="__MSG_startWithCopy__" disabled>
+                    <!-- Populated by openProfileForm() -->
+                  </select>
+                </label>
+              </div>
+              <p class="form-hint" id="profile-seed-hint">__MSG_startWithHint__</p>
+            </div>
+
             <!-- No action bar: the form autosaves, the X closes it, and deleting
                  lives on the row in the profiles list. -->
 
           </form>
         </div>
 
-        <!-- View: Profiles list -->
-        <div class="panel-view" id="view-profiles" hidden aria-label="__MSG_profilesSection__">
-          <div class="panel-view-header">
-            <div class="panel-view-heading">
-              <h2 class="panel-view-title">__MSG_profilesSection__</h2>
-              <p class="panel-view-subtitle">__MSG_profilesListSubtitle__</p>
-            </div>
-            <button class="btn-close" id="btn-close-profiles" aria-label="__MSG_ariaCloseProfilesList__">
-              <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14"/></svg>
-            </button>
-          </div>
-
-          <div class="edit-form">
-            <!-- Auto-switch lives here rather than in Settings: it acts on the
-                 linked orgs edited in this sheet. -->
-            <div class="settings-row profiles-autoswitch">
-              <label class="settings-row-label" for="setting-auto-switch">
-                <span class="settings-label">__MSG_autoSwitchProfiles__</span>
-                <span class="settings-desc">__MSG_autoSwitchProfilesDescription__</span>
-              </label>
-              <div class="settings-row-control">
-                <label class="toggle" aria-label="__MSG_autoSwitchProfiles__">
-                  <input type="checkbox" id="setting-auto-switch" role="switch" />
-                  <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                </label>
-              </div>
-            </div>
-            <p class="form-hint" id="auto-switch-hint" hidden>__MSG_autoSwitchNeedsOrgs__</p>
-
-            <ul class="dropdown-items-list" role="list" id="profiles-list">
-              <!-- Populated by renderProfilesList() -->
-            </ul>
-            <button class="btn-secondary" id="btn-new-profile-from-list" style="margin: 16px 12px 0;">__MSG_newProfileButton__</button>
-            <p class="form-hint" style="margin: 12px;">__MSG_profilesListHint__</p>
-          </div>
-        </div>
 
         <!-- View: Settings -->
         <div class="panel-view" id="view-settings" hidden aria-label="__MSG_settingsHeader__">
@@ -387,14 +376,32 @@
                   </div>
                 </div>
 
-                <div class="settings-row" id="row-manage-profiles">
-                  <div class="settings-row-label">
-                    <span class="settings-label">__MSG_manageProfilesLabel__</span>
-                    <span class="settings-desc">__MSG_manageProfilesDesc__</span>
-                  </div>
+                <!-- Everything below the enable toggle is meaningless with the
+                     feature off, so it hides as one block. -->
+                <div id="profiles-manage">
+
+                <!-- Auto-switch sits with the list because it acts on the linked
+                     orgs edited on each row. -->
+                <div class="settings-row" id="row-auto-switch">
+                  <label class="settings-row-label" for="setting-auto-switch">
+                    <span class="settings-label">__MSG_autoSwitchProfiles__</span>
+                    <span class="settings-desc">__MSG_autoSwitchProfilesDescription__</span>
+                  </label>
                   <div class="settings-row-control">
-                    <button class="btn-secondary" id="btn-manage-profiles-settings">__MSG_manageButton__</button>
+                    <label class="toggle" aria-label="__MSG_autoSwitchProfiles__">
+                      <input type="checkbox" id="setting-auto-switch" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
                   </div>
+                </div>
+                <p class="form-hint" id="auto-switch-hint" hidden>__MSG_autoSwitchNeedsOrgs__</p>
+
+                <ul class="dropdown-items-list" role="list" id="profiles-list">
+                  <!-- Populated by renderProfilesList() -->
+                </ul>
+                <button class="btn-secondary" id="btn-new-profile-from-list">__MSG_newProfileButton__</button>
+                <p class="form-hint">__MSG_profilesListHint__</p>
+
                 </div>
             </section>
 
