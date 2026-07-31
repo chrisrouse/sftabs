@@ -3097,5 +3097,25 @@
   "colorName_pink": {
     "message": "Pink",
     "description": "Palette colour name"
+  },
+  "colorWithShade": {
+    "message": "$COLOR$ ($SHADE$)",
+    "description": "A tab colour named by hue and shade, e.g. \"Teal (light)\"",
+    "placeholders": {
+      "color": {
+        "content": "$1"
+      },
+      "shade": {
+        "content": "$2"
+      }
+    }
+  },
+  "colorShadeDeep": {
+    "message": "deep",
+    "description": "The darkest of the three shades of a tab colour"
+  },
+  "colorShadeLight": {
+    "message": "light",
+    "description": "The lightest of the three shades of a tab colour"
   }
 }

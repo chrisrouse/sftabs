@@ -2073,13 +2073,17 @@ function renderColorPicker(selected) {
   if (group.hidden) return;
 
   const palette = (window.SFTabs?.utils?.TAB_COLORS) || {};
-  const options = [null, ...Object.keys(palette)];
+  // Shade-major, so the grid reads as three rows of the same twelve hues —
+  // deep, base, light — rather than the hues arriving in triplets.
+  const names = Object.keys(palette);
+  const bySuffix = suffix => names.filter(n => colorShade(n) === suffix);
+  const options = [null, ...bySuffix('deep'), ...bySuffix(''), ...bySuffix('light')];
+
   dots.innerHTML = options.map(name => {
     const on = (name || null) === (selected || null);
-    const label = name ? t('colorName_' + name.replace('-', '_')) : t('colorNone');
     return `<button type="button" role="radio" aria-checked="${on}"
       class="color-dot${name ? '' : ' color-dot--none'}" data-color="${name || ''}"
-      title="${esc(label)}" aria-label="${esc(label)}"
+      title="${esc(colorLabel(name))}" aria-label="${esc(colorLabel(name))}"
       ${name ? `style="--dot-color: ${palette[name].accent}"` : ''}></button>`;
   }).join('');
 
@@ -2090,6 +2094,27 @@ function renderColorPicker(selected) {
         d.setAttribute('aria-checked', String(d === dot)));
     });
   });
+}
+
+/** The shade half of a palette key: 'teal-light' -> 'light', 'teal' -> ''. */
+function colorShade(name) {
+  const match = /-(deep|light)$/.exec(name || '');
+  return match ? match[1] : '';
+}
+
+/**
+ * Reads a palette key back as a name. The hue and the shade are separate
+ * strings so translators aren't given thirty-six near-identical phrases, and
+ * the two are joined through a locale key rather than concatenated, since
+ * their order isn't the same in every language.
+ */
+function colorLabel(name) {
+  if (!name) return t('colorNone');
+  const shade = colorShade(name);
+  const hue = t('colorName_' + (shade ? name.slice(0, -(shade.length + 1)) : name)
+    .replace(/-/g, '_'));
+  if (!shade) return hue;
+  return t('colorWithShade', hue, t(shade === 'deep' ? 'colorShadeDeep' : 'colorShadeLight'));
 }
 
 // ── Theme ──────────────────────────────────────────────────────

@@ -340,15 +340,6 @@ function createTabElementWithDropdown(tab) {
       bead.setAttribute('aria-hidden', 'true');
       a.appendChild(bead);
     }
-    if (li.classList.contains('sftabs-tc')) {
-      // The recoloured active indicator. A real element rather than a pseudo,
-      // because Salesforce draws its own with ::before on this same li. CSS
-      // reveals it only while the tab is active.
-      const bar = document.createElement('span');
-      bar.className = 'sftabs-tc-bar';
-      bar.setAttribute('aria-hidden', 'true');
-      li.appendChild(bar);
-    }
   }
 
   // Create span for tab title

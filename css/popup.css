@@ -1507,43 +1507,76 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
    Dots rather than a named grid: it is the most compact of the three layouts
    mocked up, and the form is already close to the fold. */
 .color-dots {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 5px;
   margin-top: var(--sft-spacing-1);
+  justify-items: center;
 }
 .color-dot {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   padding: 0;
-  border: 2px solid transparent;
+  border: 0;
   border-radius: 50%;
   background: var(--dot-color);
   cursor: pointer;
-  transition: border-color var(--ease);
+  transition: box-shadow var(--ease);
+  /* A hairline inside the swatch, so the palest shades still read as a disc
+     against the panel rather than dissolving into it */
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14);
 }
-.color-dot:hover { border-color: var(--b-medium); }
-.color-dot[aria-checked="true"] { border-color: var(--t-base); }
-.color-dot:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+
+/* Hover and selection are rings held off the swatch by a surface-coloured gap.
+   Drawing them directly on the edge was the problem before: a dark border on a
+   dark swatch is invisible. The gap guarantees the ring is always legible
+   whatever colour it surrounds. box-shadow rather than border so the swatch
+   never changes size and the grid doesn't shift. */
+.color-dot:hover {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14),
+              0 0 0 2px var(--s-1),
+              0 0 0 3px var(--b-strong);
+}
+.color-dot[aria-checked="true"],
+.color-dot[aria-checked="true"]:hover {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14),
+              0 0 0 2px var(--s-1),
+              0 0 0 4px var(--t-base);
+}
+.color-dot:focus-visible {
+  outline: 2px solid var(--sft-focus-ring);
+  outline-offset: 3px;
+}
 
 /* The no-colour option: an outline with a slash, so it reads as "off" rather
-   than as a white swatch */
+   than as a white swatch. It leads the grid on its own row. */
 .color-dot--none {
   position: relative;
+  grid-column: 1;
   background: transparent;
-  border: 1px dashed var(--b-strong);
+  box-shadow: inset 0 0 0 1px var(--b-strong);
 }
 .color-dot--none::after {
   content: '';
   position: absolute;
-  top: 4px;
-  bottom: 4px;
+  top: 3px;
+  bottom: 3px;
   left: 50%;
   width: 1px;
   background: var(--b-strong);
   transform: rotate(45deg);
 }
-.color-dot--none[aria-checked="true"] { border-style: solid; border-color: var(--t-base); }
+.color-dot--none:hover {
+  box-shadow: inset 0 0 0 1px var(--b-strong),
+              0 0 0 2px var(--s-1),
+              0 0 0 3px var(--b-strong);
+}
+.color-dot--none[aria-checked="true"],
+.color-dot--none[aria-checked="true"]:hover {
+  box-shadow: inset 0 0 0 1px var(--b-strong),
+              0 0 0 2px var(--s-1),
+              0 0 0 4px var(--t-base);
+}
 
 /* ── 30. Colour-style chooser ──
    Miniature tabs rather than words: the styles differ visually, so showing them

@@ -5,8 +5,10 @@
    The palette itself is NOT here. applyTabColor() in popup/js/shared/utils.js
    writes two custom properties on the element —
 
-     --sftabs-tc        the accent  (palette 40)
-     --sftabs-tc-wash   the wash    (palette 90)
+     --sftabs-tc        the accent — the dot, and any indicator
+     --sftabs-tc-wash   the tint behind a row
+     --sftabs-tc-ink    the label on that tint, which for light shades is a
+                        darker step than the accent so it stays readable
 
    — and adds .sftabs-tc plus one of .sftabs-tc--dot / --tint.
    Keeping the values in JS means the twelve hues are defined once rather than
@@ -27,7 +29,15 @@
   background: var(--sftabs-tc);
 }
 
-/* ── Tint: the wash behind, the accent on the label ── */
+/* ── Tint: the wash behind, the ink on the label ──
+   Resting state only. Salesforce restyles the background on hover and again
+   when active, and its own signals for those are stronger and more familiar
+   than anything layered over them — so the colour steps aside rather than
+   competing.
+
+   The label uses --sftabs-tc-ink rather than the accent. For the lighter shades
+   those differ: the accent is light enough to tell apart as a dot but too light
+   to read as text, so the ink is a darker step of the same hue. */
 .sftabs-tc--tint {
   background-color: var(--sftabs-tc-wash);
 }
@@ -35,49 +45,7 @@
 .sftabs-tc--tint a,
 .sftabs-tc--tint .slds-align-middle,
 .sftabs-tc--tint .tab-name {
-  color: var(--sftabs-tc);
-}
-
-/* ── Active indicator ──
-   A real element, not a pseudo. Salesforce draws its own indicator with
-   ::before on this same li, so our ::before was not overlaying theirs — it was
-   the same pseudo-element, and their rule won. A child span cannot collide.
-
-   Rendered on every coloured tab and revealed only when active, so the class
-   toggle alone drives it and nothing has to be re-rendered. */
-.sftabs-tc-bar {
-  display: none;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 3px;
-  background: var(--sftabs-tc);
-  pointer-events: none;
-  z-index: 2;
-}
-.sftabs-tc { position: relative; }
-.sftabs-tc.slds-is-active > .sftabs-tc-bar,
-.sftabs-tc.active > .sftabs-tc-bar { display: block; }
-
-/* ── Tint has to hold through hover and active ──
-   Salesforce restyles the background in both states with two-class selectors,
-   which outrank a single .sftabs-tc--tint. These stack three classes so they
-   win outright rather than tying and depending on source order — injected
-   stylesheets have no guaranteed position against the page's own. Without this
-   a tinted tab turns grey the moment you point at it, which is what made the
-   colour look like it was being lost. */
-.tabItem.sf-tabs-custom-tab.sftabs-tc--tint,
-.tabItem.sf-tabs-custom-tab.sftabs-tc--tint:hover,
-.tabItem.sf-tabs-custom-tab.sftabs-tc--tint.slds-is-active,
-.tabItem.sf-tabs-custom-tab.sftabs-tc--tint.active {
-  background-color: var(--sftabs-tc-wash);
-}
-.tabItem.sf-tabs-custom-tab.sftabs-tc--tint > a,
-.tabItem.sf-tabs-custom-tab.sftabs-tc--tint:hover > a,
-.tabItem.sf-tabs-custom-tab.sftabs-tc--tint.slds-is-active > a {
-  background-color: transparent;   /* the anchor carries its own hover fill */
-  color: var(--sftabs-tc);
+  color: var(--sftabs-tc-ink, var(--sftabs-tc));
 }
 
 /* ── The dot's bead ──

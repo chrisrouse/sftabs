@@ -276,26 +276,60 @@ function resolveProfileForUrl(url, profiles, settings) {
  * "teal" is #056764 on a light surface and #06a59a on a dark one. A stored hex
  * would strand every coloured tab in whichever theme it was picked under.
  *
- * accent = palette 40, dark enough for text and indicators.
- * wash    = palette 90, light enough to sit behind that accent.
+ * Three shades per hue — deep, base and light — because at one shade the darker
+ * hues are hard to tell apart as dots. Each carries three roles:
+ *
+ *   accent  the dot and any indicator. Needs 3:1 against white, the threshold
+ *           for a graphic rather than text, which is what lets the light shade
+ *           go lighter than the label could.
+ *   wash    the tint behind a row.
+ *   ink     the label on that tint. Equal to the accent for deep and base; a
+ *           darker step for light, where the accent alone would fail AA.
+ *
+ * Every combination was checked against those thresholds in both themes before
+ * being written here.
  *
  * Values are verbatim from @salesforce-ux/design-system-2. Neutral is omitted —
  * that is the no-colour case — and electric blue, which is the brand accent and
  * would read as "selected" rather than as a chosen colour.
  */
 const TAB_COLORS = {
-  'red': { accent: 'light-dark(#ba0517, #fe5c4c)', wash: 'light-dark(#feded8, #300c01)' },
-  'hot-orange': { accent: 'light-dark(#aa3001, #ff5d2d)', wash: 'light-dark(#ffded5, #281202)' },
-  'orange': { accent: 'light-dark(#825101, #dd7a01)', wash: 'light-dark(#fedfd0, #201600)' },
-  'yellow': { accent: 'light-dark(#8c4b02, #ca8501)', wash: 'light-dark(#f9e3b6, #281202)' },
-  'green': { accent: 'light-dark(#396547, #3ba755)', wash: 'light-dark(#cdefc4, #071b12)' },
-  'teal': { accent: 'light-dark(#056764, #06a59a)', wash: 'light-dark(#acf3e4, #071b12)' },
-  'cloud-blue': { accent: 'light-dark(#05628a, #0d9dda)', wash: 'light-dark(#cfe9fe, #001a28)' },
-  'blue': { accent: 'light-dark(#0b5cab, #1b96ff)', wash: 'light-dark(#d8e6fe, #001639)' },
-  'indigo': { accent: 'light-dark(#3a49da, #7f8ced)', wash: 'light-dark(#e0e5f8, #17094e)' },
-  'violet': { accent: 'light-dark(#9602c7, #cb65ff)', wash: 'light-dark(#f2defe, #2e0039)' },
-  'purple': { accent: 'light-dark(#7526e3, #ad7bee)', wash: 'light-dark(#ece1f9, #240643)' },
-  'pink': { accent: 'light-dark(#b60554, #ff538a)', wash: 'light-dark(#fddde3, #370114)' },
+  'red-deep': { accent: 'light-dark(#640103, #feb8ab)', wash: 'light-dark(#feded8, #300c01)', ink: 'light-dark(#640103, #feb8ab)' },
+  'red': { accent: 'light-dark(#ba0517, #fe5c4c)', wash: 'light-dark(#feded8, #300c01)', ink: 'light-dark(#ba0517, #fe5c4c)' },
+  'red-light': { accent: 'light-dark(#fe5c4c, #ba0517)', wash: 'light-dark(#fef1ee, #0c0200)', ink: 'light-dark(#8e030f, #fe8f7d)' },
+  'hot-orange-deep': { accent: 'light-dark(#4a2413, #feb9a5)', wash: 'light-dark(#ffded5, #281202)', ink: 'light-dark(#4a2413, #feb9a5)' },
+  'hot-orange': { accent: 'light-dark(#aa3001, #ff5d2d)', wash: 'light-dark(#ffded5, #281202)', ink: 'light-dark(#aa3001, #ff5d2d)' },
+  'hot-orange-light': { accent: 'light-dark(#ff5d2d, #aa3001)', wash: 'light-dark(#fef1ed, #090200)', ink: 'light-dark(#7e2600, #ff906e)' },
+  'orange-deep': { accent: 'light-dark(#3e2b02, #ffba90)', wash: 'light-dark(#fedfd0, #201600)', ink: 'light-dark(#3e2b02, #ffba90)' },
+  'orange': { accent: 'light-dark(#825101, #dd7a01)', wash: 'light-dark(#fedfd0, #201600)', ink: 'light-dark(#825101, #dd7a01)' },
+  'orange-light': { accent: 'light-dark(#dd7a01, #825101)', wash: 'light-dark(#fff1ea, #060300)', ink: 'light-dark(#5f3e02, #fe9339)' },
+  'yellow-deep': { accent: 'light-dark(#4f2100, #fcc003)', wash: 'light-dark(#f9e3b6, #281202)', ink: 'light-dark(#4f2100, #fcc003)' },
+  'yellow': { accent: 'light-dark(#8c4b02, #ca8501)', wash: 'light-dark(#f9e3b6, #281202)', ink: 'light-dark(#8c4b02, #ca8501)' },
+  'yellow-light': { accent: 'light-dark(#ca8501, #8c4b02)', wash: 'light-dark(#fbf3e0, #090200)', ink: 'light-dark(#6f3400, #e4a201)' },
+  'green-deep': { accent: 'light-dark(#143b25, #91db8b)', wash: 'light-dark(#cdefc4, #071b12)', ink: 'light-dark(#143b25, #91db8b)' },
+  'green': { accent: 'light-dark(#396547, #3ba755)', wash: 'light-dark(#cdefc4, #071b12)', ink: 'light-dark(#396547, #3ba755)' },
+  'green-light': { accent: 'light-dark(#3ba755, #396547)', wash: 'light-dark(#ebf7e6, #010502)', ink: 'light-dark(#194e31, #45c65a)' },
+  'teal-deep': { accent: 'light-dark(#023434, #04e1cb)', wash: 'light-dark(#acf3e4, #071b12)', ink: 'light-dark(#023434, #04e1cb)' },
+  'teal': { accent: 'light-dark(#056764, #06a59a)', wash: 'light-dark(#acf3e4, #071b12)', ink: 'light-dark(#056764, #06a59a)' },
+  'teal-light': { accent: 'light-dark(#06a59a, #056764)', wash: 'light-dark(#def9f3, #010502)', ink: 'light-dark(#024d4c, #01c3b3)' },
+  'cloud-blue-deep': { accent: 'light-dark(#023248, #90d0fe)', wash: 'light-dark(#cfe9fe, #001a28)', ink: 'light-dark(#023248, #90d0fe)' },
+  'cloud-blue': { accent: 'light-dark(#05628a, #0d9dda)', wash: 'light-dark(#cfe9fe, #001a28)', ink: 'light-dark(#05628a, #0d9dda)' },
+  'cloud-blue-light': { accent: 'light-dark(#0d9dda, #05628a)', wash: 'light-dark(#eaf5fe, #000409)', ink: 'light-dark(#084968, #1ab9ff)' },
+  'blue-deep': { accent: 'light-dark(#032d60, #aacbff)', wash: 'light-dark(#d8e6fe, #001639)', ink: 'light-dark(#032d60, #aacbff)' },
+  'blue': { accent: 'light-dark(#0b5cab, #1b96ff)', wash: 'light-dark(#d8e6fe, #001639)', ink: 'light-dark(#0b5cab, #1b96ff)' },
+  'blue-light': { accent: 'light-dark(#1b96ff, #0b5cab)', wash: 'light-dark(#eef4ff, #000310)', ink: 'light-dark(#014486, #78b0fd)' },
+  'indigo-deep': { accent: 'light-dark(#270c92, #bec7f6)', wash: 'light-dark(#e0e5f8, #17094e)', ink: 'light-dark(#270c92, #bec7f6)' },
+  'indigo': { accent: 'light-dark(#3a49da, #7f8ced)', wash: 'light-dark(#e0e5f8, #17094e)', ink: 'light-dark(#3a49da, #7f8ced)' },
+  'indigo-light': { accent: 'light-dark(#7f8ced, #3a49da)', wash: 'light-dark(#f1f3fb, #060116)', ink: 'light-dark(#2f2cb7, #9ea9f1)' },
+  'violet-deep': { accent: 'light-dark(#580276, #e5b9fe)', wash: 'light-dark(#f2defe, #2e0039)', ink: 'light-dark(#580276, #e5b9fe)' },
+  'violet': { accent: 'light-dark(#9602c7, #cb65ff)', wash: 'light-dark(#f2defe, #2e0039)', ink: 'light-dark(#9602c7, #cb65ff)' },
+  'violet-light': { accent: 'light-dark(#cb65ff, #9602c7)', wash: 'light-dark(#f9f0ff, #060300)', ink: 'light-dark(#730394, #d892fe)' },
+  'purple-deep': { accent: 'light-dark(#401075, #d7bff2)', wash: 'light-dark(#ece1f9, #240643)', ink: 'light-dark(#401075, #d7bff2)' },
+  'purple': { accent: 'light-dark(#7526e3, #ad7bee)', wash: 'light-dark(#ece1f9, #240643)', ink: 'light-dark(#7526e3, #ad7bee)' },
+  'purple-light': { accent: 'light-dark(#ad7bee, #7526e3)', wash: 'light-dark(#f6f2fb, #070114)', ink: 'light-dark(#5a1ba9, #c29ef1)' },
+  'pink-deep': { accent: 'light-dark(#61022a, #fdb6c5)', wash: 'light-dark(#fddde3, #370114)', ink: 'light-dark(#61022a, #fdb6c5)' },
+  'pink': { accent: 'light-dark(#b60554, #ff538a)', wash: 'light-dark(#fddde3, #370114)', ink: 'light-dark(#b60554, #ff538a)' },
+  'pink-light': { accent: 'light-dark(#ff538a, #b60554)', wash: 'light-dark(#fef0f3, #0f0003)', ink: 'light-dark(#8a033e, #fe8aa7)' },
 };
 
 /**
@@ -327,6 +361,7 @@ function applyTabColor(el, name, style, enabled) {
   el.classList.remove('sftabs-tc', 'sftabs-tc--dot', 'sftabs-tc--tint');
   el.style.removeProperty('--sftabs-tc');
   el.style.removeProperty('--sftabs-tc-wash');
+  el.style.removeProperty('--sftabs-tc-ink');
   if (!enabled) return;
 
   const colour = tabColorVars(name);
@@ -335,6 +370,7 @@ function applyTabColor(el, name, style, enabled) {
   const mode = ['dot', 'tint'].includes(style) ? style : 'dot';
   el.style.setProperty('--sftabs-tc', colour.accent);
   el.style.setProperty('--sftabs-tc-wash', colour.wash);
+  el.style.setProperty('--sftabs-tc-ink', colour.ink || colour.accent);
   el.classList.add('sftabs-tc', `sftabs-tc--${mode}`);
 }
 

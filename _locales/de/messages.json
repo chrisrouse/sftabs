@@ -2915,5 +2915,25 @@
   },
   "colorName_pink": {
     "message": "Rosa"
+  },
+  "colorWithShade": {
+    "message": "$COLOR$ ($SHADE$)",
+    "description": "A tab colour named by hue and shade",
+    "placeholders": {
+      "color": {
+        "content": "$1"
+      },
+      "shade": {
+        "content": "$2"
+      }
+    }
+  },
+  "colorShadeDeep": {
+    "message": "dunkel",
+    "description": "The darkest of the three shades of a tab colour"
+  },
+  "colorShadeLight": {
+    "message": "hell",
+    "description": "The lightest of the three shades of a tab colour"
   }
 }
