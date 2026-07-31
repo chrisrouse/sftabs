@@ -385,6 +385,11 @@ async function closeReleaseNotes() {
 async function persistTabs() {
   try {
     await SFTabs.storage.saveTabs(state.tabs);
+    // Open pages were relying solely on storage.onChanged to notice an edit,
+    // which left a renamed or recoloured tab looking stale until a reload.
+    // Switching profile has always sent this; saving a tab never did.
+    // Rebuilding is idempotent, so arriving twice costs nothing.
+    broadcastTabRefresh();
   } catch (err) {
     showStatus(t('errorCouldNotSave', err.message), 'error');
   }

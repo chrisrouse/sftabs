@@ -676,6 +676,14 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
    is — Save was below the fold and people lost their input. The negative inline
    margin lets the bar span the form's padding, so nothing shows through beside
    it while content scrolls under. */
+/* A sticky box cannot leave its containing block, which is the parent's CONTENT
+   box — padding excluded. So the form's padding-bottom held this bar up off the
+   scrollport, and content scrolled visibly through the strip underneath it.
+   The form that owns an action bar therefore gives up its bottom padding; the
+   bar's own padding supplies the same breathing room, and now does it below the
+   fold line rather than above it. */
+.edit-form:has(.form-actions) { padding-bottom: 0; }
+
 .form-actions {
   position: sticky;
   bottom: 0;
