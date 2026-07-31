@@ -879,6 +879,25 @@ function renderProfileDropdown() {
 // ── Profile management ─────────────────────────────────────────
 
 /**
+ * Show a form at its top with the first field ready.
+ *
+ * focus() scrolls the focused element into view inside its nearest scrolling
+ * ancestor, and .edit-form is one. The tray is mid-animation at that moment —
+ * trayContentFadeIn applies a transform, which makes the panel a containing
+ * block — and the scroll it computes lands somewhere arbitrary, so the form
+ * opened already scrolled past its own first label. preventScroll declines that
+ * scroll; the position is then set here, where it is not a guess.
+ *
+ * Reset matters on its own too: the form element is reused rather than rebuilt,
+ * so it would otherwise reopen wherever it was left.
+ */
+function openFormAtTop(formId, inputId) {
+  const form = document.getElementById(formId);
+  if (form) form.scrollTop = 0;
+  document.getElementById(inputId)?.focus({ preventScroll: true });
+}
+
+/**
  * Open the profile form. `profileId` null means create.
  *
  * Same anatomy as the tab form on purpose — .panel-view / .edit-form /
@@ -904,7 +923,7 @@ function openProfileForm(profileId) {
   updateCharCount('input-profile-name', 'profile-name-count', 30);
 
   showView('edit-profile');
-  document.getElementById('input-profile-name').focus();
+  openFormAtTop('form-edit-profile', 'input-profile-name');
 }
 
 /**
@@ -1412,7 +1431,7 @@ function openEditTab(tabId) {
   renderColorPicker(state.editingColor);
 
   showView('edit-tab');
-  document.getElementById('input-tab-name').focus();
+  openFormAtTop('form-edit-tab', 'input-tab-name');
 }
 
 function openAddTab() {
@@ -1430,7 +1449,7 @@ function openAddTab() {
   renderColorPicker(null);
 
   showView('edit-tab');
-  document.getElementById('input-tab-name').focus();
+  openFormAtTop('form-edit-tab', 'input-tab-name');
 }
 
 function openDropdownManagement(tabId) {
