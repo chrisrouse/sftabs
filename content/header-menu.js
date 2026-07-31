@@ -311,6 +311,44 @@
   }
 
   /**
+   * Place the menu against the trigger.
+   *
+   * Aura positions its popups by writing inline coordinates from its own layout
+   * engine, which we are not using — so the uiMenuList classes alone leave the
+   * menu wherever normal flow puts it, which is under the header rather than
+   * under our button. Fixed positioning from the button's measured rect is
+   * deterministic, and inline styles beat any class rule without !important.
+   *
+   * Prefers aligning the menu's left edge to the button, flipping to right-edge
+   * alignment when that would overflow. The nubbin is ours, offset to the
+   * button's measured centre, so it points at the button either way.
+   */
+  function position(menu) {
+    const button = document.getElementById(ITEM_ID + '-button');
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    // Measured rather than assumed: the CSS width is fixed, but reading it back
+    // keeps the flip decision honest if that value ever changes.
+    const width = menu.getBoundingClientRect().width || 230;
+    const margin = 8;
+
+    const flip = rect.left + width + margin > window.innerWidth;
+    menu.classList.toggle('uiMenuList--right', flip);
+    menu.classList.toggle('uiMenuList--left', !flip);
+
+    const left = flip
+      ? Math.max(margin, rect.right - width)
+      : Math.min(rect.left, window.innerWidth - width - margin);
+
+    menu.style.position = 'fixed';
+    menu.style.top = `${Math.round(rect.bottom + NUBBIN_GAP)}px`;
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.right = 'auto';
+    menu.style.setProperty('--sftabs-hm-nubbin',
+      `${Math.round(rect.left + rect.width / 2 - left)}px`);
+  }
+
+  /**
    * Reveal or hide one level of children.
    *
    * Only the immediate children are inserted. Rendering the whole subtree at once
