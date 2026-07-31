@@ -140,6 +140,9 @@
    loses, which is how the indent came to have no effect at all. */
 #sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-1 > a { padding-left: 32px; }
 #sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-2 > a { padding-left: 52px; }
+/* The data caps nesting at grandchild, but the row builder is depth-agnostic —
+   so anything deeper still indents rather than collapsing back to the margin. */
+#sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-3 > a { padding-left: 72px; }
 
 #sftabs-header-menu .slds-grid { align-items: center; }
 

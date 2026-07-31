@@ -177,25 +177,17 @@
    * A real href rather than a button, so middle-click and cmd-click behave the
    * way they do on Salesforce's own menu items.
    */
-  function rowHTML(tab, index) {
-    return itemHTML({
-      item: tab,
-      depth: 0,
-      href: urlFor(tab),
-      attrs: `data-index="${index}"`,
-      hasKids: childrenOf(tab).length > 0,
-    });
-  }
-
   /**
-   * One row, at any depth. Layout follows the floating panel: disclosure chevron
-   * on the left of anything with children, label after it, and depth carried by
-   * a plain indent — no rules, no counts.
+   * One row, at any depth.
+   *
+   * rowKey is a dotted path — "3", "3.0", "3.0.1" — which is what makes nesting
+   * work: a row's descendants are exactly the rows whose key starts with its own
+   * key plus a dot, so collapsing a branch is one selector regardless of how deep
+   * it goes.
    */
-  function itemHTML({ item, depth, href, attrs = '', hasKids, subOf }) {
-    const chevron = hasKids
-      ? `<span class="sftabs-hm-chev">${CHEVRON}</span>`
-      : '';
+  function itemHTML({ item, depth, rowKey, hasKids }) {
+    const href = urlFor(item);
+    const chevron = hasKids ? `<span class="sftabs-hm-chev">${CHEVRON}</span>` : '';
     const newTab = item.openInNewTab
       ? `<div class="slds-p-right_small slds-no-flex sftabs-hm-newtab">
            ${svg(NEW_WINDOW, 'slds-icon slds-icon_x-small')}
@@ -204,7 +196,7 @@
       : '';
     return `
       <li role="presentation" class="slds-dropdown__item uiMenuItem sftabs-hm-depth-${depth}"
-          ${attrs}${subOf !== undefined ? ` data-sub-of="${subOf}"` : ''}>
+          data-row-key="${rowKey}" data-depth="${depth}">
         <a role="menuitem" title="${esc(item.label)}"${href ? ` href="${esc(href)}"` : ''}${
           item.openInNewTab ? ' target="_blank" rel="noopener"' : ''}${
           hasKids ? ' aria-expanded="false"' : ''}>
@@ -217,6 +209,41 @@
           </div>
         </a>
       </li>`;
+  }
+
+  /** Build a row element and wire it. Used for every level, so they cannot drift. */
+  function buildRow(item, depth, rowKey) {
+    const holder = document.createElement('ul');   // <li> only parses inside a list
+    holder.innerHTML = itemHTML({
+      item, depth, rowKey, hasKids: childrenOf(item).length > 0,
+    });
+    const li = holder.querySelector('li');
+    bindRow(li, item);
+    return li;
+  }
+
+  function bindRow(li, item) {
+    const link = li.querySelector('a');
+    if (!link) return;
+    link.addEventListener('click', event => {
+      const kids = childrenOf(item);
+      // The chevron expands; the label navigates. An item with children and no
+      // destination of its own can only expand.
+      if (kids.length && (event.target.closest('.sftabs-hm-chev') || !item.path)) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleSubItems(li, item);
+        return;
+      }
+      // Let the browser handle new-tab links and modified clicks natively
+      if (item.openInNewTab || event.metaKey || event.ctrlKey || event.button === 1) {
+        closeMenu();
+        return;
+      }
+      event.preventDefault();
+      closeMenu();
+      navigate(item);
+    });
   }
 
   /** URL for a tab or sub-item, empty for a folder with no path of its own. */
@@ -235,20 +262,12 @@
 
     const menu = document.createElement('div');
     menu.id = MENU_ID;
-    // Salesforce's own popup classes, so its CSS supplies the nubbin, radius,
-    // shadow and item treatment. uiMenuList--right aligns the menu's right edge
-    // to the trigger, which keeps it on screen: our item is the leftmost of a
-    // cluster that sits at the right of the window.
+    // Salesforce's own popup classes, so its CSS supplies the radius, shadow and
+    // item treatment.
     menu.className = 'popupTargetContainer uiPopupTarget ' +
                      'uiMenuList uiMenuList--default visible positioned ' +
                      'sftabs-hm-menu';
     menu.setAttribute('aria-labelledby', ITEM_ID + '-button');
-
-    const rows = ordered.length
-      ? ordered.map((tab, i) => rowHTML(tab, i)).join('')
-      : `<li role="presentation" class="slds-dropdown__item">
-           <span class="sftabs-hm-empty">${esc(msg('floatingModalEmptyState'))}</span>
-         </li>`;
 
     // The header sits inside the scrollable ul, as it does in the Setup menu.
     menu.innerHTML = `
@@ -262,39 +281,24 @@
               <span class="slds-assistive-text">${esc(msg('closeButton'))}</span>
             </button>
           </div>
-          ${rows}
         </ul>
       </div>`;
+
+    const list = menu.querySelector('ul.scrollable');
+    if (ordered.length) {
+      ordered.forEach((tab, i) => list.appendChild(buildRow(tab, 0, String(i))));
+    } else {
+      const empty = document.createElement('li');
+      empty.setAttribute('role', 'presentation');
+      empty.className = 'slds-dropdown__item';
+      empty.innerHTML = `<span class="sftabs-hm-empty">${esc(msg('floatingModalEmptyState'))}</span>`;
+      list.appendChild(empty);
+    }
 
     item.appendChild(menu);
     document.getElementById(ITEM_ID + '-button').setAttribute('aria-expanded', 'true');
     position(menu);
     menu.querySelector('.close-button').addEventListener('click', closeMenu);
-
-    menu.querySelectorAll('li.uiMenuItem').forEach(li => {
-      const tab = ordered[Number(li.dataset.index)];
-      const link = li.querySelector('a');
-      if (!link) return;
-      link.addEventListener('click', event => {
-        const kids = childrenOf(tab);
-        // The chevron expands; the label still navigates. A tab with children and
-        // no destination of its own can only expand.
-        if (kids.length && (event.target.closest('.sftabs-hm-chev') || !tab.path)) {
-          event.preventDefault();
-          event.stopPropagation();
-          toggleSubItems(li, tab);
-          return;
-        }
-        // Let the browser handle new-tab links and modified clicks natively
-        if (tab.openInNewTab || event.metaKey || event.ctrlKey || event.button === 1) {
-          closeMenu();
-          return;
-        }
-        event.preventDefault();
-        closeMenu();
-        navigate(tab);
-      });
-    });
 
     // Deferred so the click that opened this does not immediately close it
     setTimeout(() => {
@@ -307,91 +311,36 @@
   }
 
   /**
-   * Place the menu against the trigger.
+   * Reveal or hide one level of children.
    *
-   * Aura positions its popups by writing inline coordinates from its own
-   * layout engine, which we are not using — so relying on the uiMenuList classes
-   * alone leaves the menu wherever their default rules put it, which is not next
-   * to our button. Fixed positioning from the button's own rect is deterministic,
-   * and inline styles beat any class rule without needing !important.
+   * Only the immediate children are inserted. Rendering the whole subtree at once
+   * is what made grandchildren appear without their own parent being expanded.
+   * A child with children of its own gets a chevron and expands the same way.
    *
-   * Prefers aligning the menu's left edge to the button and flips to right-edge
-   * alignment when that would overflow. The nubbin is ours, offset to the
-   * button's measured centre, so it points at the button whichever way the menu
-   * was aligned.
+   * Collapsing removes the entire branch — every row whose key is prefixed by
+   * this one — so a nested expansion cannot be orphaned.
    */
-  function position(menu) {
-    const button = document.getElementById(ITEM_ID + '-button');
-    if (!button) return;
-    const rect = button.getBoundingClientRect();
-    // Measured rather than assumed: the CSS width is fixed, but reading it back
-    // keeps the flip decision honest if that value ever changes.
-    const width = menu.getBoundingClientRect().width || 230;
-    const margin = 8;
-
-    const flip = rect.left + width + margin > window.innerWidth;
-    menu.classList.toggle('uiMenuList--right', flip);
-    menu.classList.toggle('uiMenuList--left', !flip);
-
-    const left = flip
-      ? Math.max(margin, rect.right - width)
-      : Math.min(rect.left, window.innerWidth - width - margin);
-
-    menu.style.position = 'fixed';
-    menu.style.top = `${Math.round(rect.bottom + NUBBIN_GAP)}px`;
-    menu.style.left = `${Math.round(left)}px`;
-    menu.style.right = 'auto';
-    // Point the arrow at the button's centre. Salesforce's menu--nubbin-top is
-    // not used: its offset assumes Aura placed the popup, so it lands over
-    // whichever control happens to sit at that inset instead of ours.
-    menu.style.setProperty('--sftabs-hm-nubbin',
-      `${Math.round(rect.left + rect.width / 2 - left)}px`);
-  }
-
-  /**
-   * Sub-items expand in place beneath their parent as sibling menu items, with a
-   * divider above, rather than cascading into a second popup. Grandchildren are
-   * indented in the same block: a third floating layer on a page we do not own
-   * is more trouble than it solves, and the depth limit is two anyway.
-   */
-  function toggleSubItems(li, tab) {
+  function toggleSubItems(li, item) {
     const list = li.parentElement;
-    const key = li.dataset.index;
-    const open = list.querySelector(`[data-sub-of="${key}"]`);
-    list.querySelectorAll('[data-sub-of]').forEach(el => el.remove());
-    list.querySelectorAll('li.uiMenuItem.is-open').forEach(el => {
-      el.classList.remove('is-open');
-      const a = el.querySelector('a');
-      if (a) a.setAttribute('aria-expanded', 'false');
-    });
-    if (open) return;                                   // second click collapses
+    const key = li.dataset.rowKey;
+    const wasOpen = li.classList.contains('is-open');
 
-    // Children then their own children, so the flattened order still reads
-    // top-down. Depth drives the indent, which is what carries the nesting.
-    const rows = [];
-    childrenOf(tab).forEach(child => {
-      rows.push({ item: child, depth: 1, hasKids: childrenOf(child).length > 0 });
-      childrenOf(child).forEach(grand => rows.push({ item: grand, depth: 2, hasKids: false }));
-    });
-    if (!rows.length) return;
+    list.querySelectorAll(`[data-row-key^="${key}."]`).forEach(el => el.remove());
+    li.classList.remove('is-open');
+    const link = li.querySelector('a');
+    if (link) link.setAttribute('aria-expanded', 'false');
+    if (wasOpen) return;
+
+    const kids = childrenOf(item);
+    if (!kids.length) return;
 
     li.classList.add('is-open');
-    const parentLink = li.querySelector('a');
-    if (parentLink) parentLink.setAttribute('aria-expanded', 'true');
+    if (link) link.setAttribute('aria-expanded', 'true');
 
+    const depth = Number(li.dataset.depth) + 1;
     let cursor = li;
-    rows.forEach(({ item, depth, hasKids }) => {
-      const holder = document.createElement('ul');      // <li> only parses inside a list
-      holder.innerHTML = itemHTML({ item, depth, href: urlFor(item), hasKids, subOf: key });
-      const el = holder.querySelector('li');
-      // Sub-items already show their own children inline, so their chevron is
-      // decorative here; the whole row navigates.
-      el.querySelector('a').addEventListener('click', event => {
-        if (event.metaKey || event.ctrlKey || event.button === 1) { closeMenu(); return; }
-        event.preventDefault();
-        closeMenu();
-        navigate(item, tab);
-      });
+    kids.forEach((child, i) => {
+      const el = buildRow(child, depth, `${key}.${i}`);
       cursor.insertAdjacentElement('afterend', el);
       cursor = el;
     });
@@ -402,22 +351,16 @@
    * navigation with fallbacks. Sub-items inherit the parent's path prefix the
    * same way the modal treats them.
    */
-  function navigate(tab, parent) {
+  function navigate(item) {
     const floating = window.SFTabsFloating;
     if (floating && typeof floating.navigateToTab === 'function') {
-      floating.navigateToTab(resolveTarget(tab, parent));
+      floating.navigateToTab(item);
       return;
     }
     const utils = window.SFTabs && window.SFTabs.utils;
     if (utils && typeof utils.buildFullUrl === 'function') {
-      window.location.href = utils.buildFullUrl(resolveTarget(tab, parent));
+      window.location.href = utils.buildFullUrl(item);
     }
-  }
-
-  /** Sub-items carry their own path; inherit the parent's open-in-new-tab flag. */
-  function resolveTarget(item, parent) {
-    if (!parent) return item;
-    return { ...item, openInNewTab: parent.openInNewTab };
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────
