@@ -793,21 +793,38 @@ function setupMessageListeners() {
 }
 
 /**
+ * Rebuild the injected tab bar, at most once per burst.
+ *
+ * Two things ask for this and they routinely arrive together: a refresh_tabs
+ * message, and the storage change that prompted it. Each rebuild clears every
+ * custom tab and re-adds it, so answering both produced a visible add, clear,
+ * add — most obvious on the menu-bar "+", where the write and the broadcast are
+ * milliseconds apart.
+ *
+ * The window is short enough that a message-driven refresh still reads as
+ * immediate, and long enough to swallow the storage event that follows it.
+ */
+const refreshTabsSoon = debounce(() => {
+  const tabContainer = document.querySelector('.tabBarItems.slds-grid');
+  if (!tabContainer) return;
+  if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
+    window.SFTabsContent.tabRenderer.initTabs(tabContainer);
+  } else {
+    initTabsWithLightningNavigation(tabContainer);
+  }
+}, 120);
+
+/**
  * Handle refresh tabs request
  */
 function handleRefreshTabs(sendResponse) {
   const tabContainer = document.querySelector('.tabBarItems.slds-grid');
-
-  if (tabContainer) {
-    if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-      window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-    } else {
-      initTabsWithLightningNavigation(tabContainer);
-    }
-    sendResponse({ success: true });
-  } else {
+  if (!tabContainer) {
     sendResponse({ success: false, error: "Tab container not found" });
+    return;
   }
+  refreshTabsSoon();
+  sendResponse({ success: true });
 }
 
 /**
@@ -914,18 +931,6 @@ function handleNavigateToTab(message, sendResponse) {
  */
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
-    // Debounced handler for tab refresh to prevent rapid successive calls
-    const debouncedRefreshTabs = debounce(() => {
-      const tabContainer = document.querySelector('.tabBarItems.slds-grid');
-      if (tabContainer) {
-        if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-          window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-        } else {
-          initTabsWithLightningNavigation(tabContainer);
-        }
-      }
-    }, 500);
-
     browser.storage.onChanged.addListener((changes, area) => {
       // Check for both 'local' and 'sync' areas
       // For sync storage with chunking, also check for metadata or chunk changes
@@ -941,7 +946,9 @@ function setupStorageListeners() {
       );
 
       if ((area === 'local' || area === 'sync') && (hasCustomTabsChange || hasProfileTabsChange)) {
-        debouncedRefreshTabs();
+        // Shares the timer with the message path, so a write and the broadcast
+        // that follows it collapse into a single rebuild
+        refreshTabsSoon();
       }
     });
   }

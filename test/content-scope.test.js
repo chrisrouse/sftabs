@@ -13,6 +13,10 @@
  * the manifest changes which body wins without a single line of code changing.
  *
  * So the rule is flat: within one entry, a top-level name is declared once.
+ *
+ * The second half of this file guards the other way content scripts go wrong
+ * quietly: the same work triggered twice. Nothing errors, it just happens
+ * again, and you see it as a flicker rather than a failure.
  */
 
 const fs = require('fs');
@@ -107,6 +111,26 @@ manifest.content_scripts.forEach((entry, index) => {
     clashes.length ? clashes.map(describe).join('; ') : files.length + ' files'
   );
 });
+
+// ── Rebuilding the tab bar happens once per burst ──
+// A storage write and the refresh_tabs broadcast that follows it arrive
+// milliseconds apart, and each rebuild clears every custom tab before re-adding
+// it. Answering both showed an add, a clear, and another add. Both paths must
+// therefore share one debounced entry point — a direct initTabs from either is
+// the regression.
+const contentMain = fs.readFileSync(path.join(root, 'content/content-main.js'), 'utf8');
+
+check('there is exactly one debounced rebuild',
+  (contentMain.match(/const refreshTabsSoon = debounce\(/g) || []).length === 1);
+
+const handler = /function handleRefreshTabs\([\s\S]*?\n\}/.exec(contentMain);
+check('the message handler routes through it, and does not render directly',
+  Boolean(handler) && /refreshTabsSoon\(\)/.test(handler[0]) && !/initTabs\(/.test(handler[0]));
+
+const listener = /function setupStorageListeners\([\s\S]*?\n\}/.exec(contentMain);
+check('the storage listener routes through it too, with no timer of its own',
+  Boolean(listener) && /refreshTabsSoon\(\)/.test(listener[0]) &&
+  !/debounce\(/.test(listener[0]) && !/initTabs\(/.test(listener[0]));
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);
