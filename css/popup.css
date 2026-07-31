@@ -981,6 +981,43 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 #btn-new-profile-from-list { margin-top: var(--sft-spacing-3); }
 #profiles-manage > .form-hint { margin-top: var(--sft-spacing-2); }
 
+/* ── Which profiles hold this tab ──
+   A table rather than a list of labels: three columns keep the names aligned
+   whatever their length, and the third carries the "current" marker without
+   pushing the names out of column. */
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2px;
+}
+.profile-table td {
+  padding: 4px 0;
+  vertical-align: middle;
+  border-bottom: var(--sft-border-width-1) solid var(--b-subtle);
+}
+.profile-table tr:last-child td { border-bottom: none; }
+.profile-table-check { width: 24px; }
+.profile-table-check input {
+  margin: 0;
+  accent-color: var(--c-primary);
+  cursor: pointer;
+}
+.profile-table-check input:disabled { cursor: default; }
+.profile-table-name {
+  font-size: var(--sft-font-size-base);
+  color: var(--t-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-table-note {
+  width: 1%;
+  padding-left: 8px;
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+  white-space: nowrap;
+}
+
 /* ── "Start with" on the new-profile form ──
    Stacked radios rather than a segmented control, because the third option
    carries a picker and would not fit in a segment. */

@@ -2908,5 +2908,34 @@
         "content": "$1"
       }
     }
+  },
+  "quickAddAllProfilesLabel": {
+    "message": "Schnellzugriff fügt zu allen Profilen hinzu",
+    "description": "Setting: Quick Add writes the captured tab to every profile"
+  },
+  "quickAddAllProfilesDesc": {
+    "message": "Eine mit Schnellzugriff erfasste Seite landet in jedem Profil, nicht nur im aktiven",
+    "description": "Description under the Quick Add setting"
+  },
+  "tabInProfilesLabel": {
+    "message": "In Profilen",
+    "description": "Label above the profile checklist on the tab form"
+  },
+  "tabInProfilesHint": {
+    "message": "Ein ausgewähltes Profil erhält diese Registerkarte am Ende seiner Liste.",
+    "description": "Hint under the profile checklist"
+  },
+  "tabInProfilesCurrent": {
+    "message": "aktuell",
+    "description": "Marker beside the profile being edited in"
+  },
+  "quickAddFannedOut": {
+    "message": "Zu $COUNT$ weiteren Profilen hinzugefügt",
+    "description": "Toast after Quick Add fans a tab out",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

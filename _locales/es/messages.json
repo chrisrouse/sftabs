@@ -2908,5 +2908,34 @@
         "content": "$1"
       }
     }
+  },
+  "quickAddAllProfilesLabel": {
+    "message": "Añadir rápido añade a todos los perfiles",
+    "description": "Setting: Quick Add writes the captured tab to every profile"
+  },
+  "quickAddAllProfilesDesc": {
+    "message": "Una página capturada con Añadir rápido llega a todos los perfiles, no solo al activo",
+    "description": "Description under the Quick Add setting"
+  },
+  "tabInProfilesLabel": {
+    "message": "En perfiles",
+    "description": "Label above the profile checklist on the tab form"
+  },
+  "tabInProfilesHint": {
+    "message": "Marcar un perfil añade esta pestaña al final de su lista.",
+    "description": "Hint under the profile checklist"
+  },
+  "tabInProfilesCurrent": {
+    "message": "actual",
+    "description": "Marker beside the profile being edited in"
+  },
+  "quickAddFannedOut": {
+    "message": "Añadida a $COUNT$ perfiles más",
+    "description": "Toast after Quick Add fans a tab out",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

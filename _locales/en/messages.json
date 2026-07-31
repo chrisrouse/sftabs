@@ -3074,5 +3074,34 @@
         "content": "$1"
       }
     }
+  },
+  "quickAddAllProfilesLabel": {
+    "message": "Quick Add adds to all profiles",
+    "description": "Setting: Quick Add writes the captured tab to every profile"
+  },
+  "quickAddAllProfilesDesc": {
+    "message": "A page captured with Quick Add lands in every profile, not just the active one",
+    "description": "Description under the Quick Add setting"
+  },
+  "tabInProfilesLabel": {
+    "message": "In profiles",
+    "description": "Label above the profile checklist on the tab form"
+  },
+  "tabInProfilesHint": {
+    "message": "Ticking a profile adds this tab to the end of its list.",
+    "description": "Hint under the profile checklist"
+  },
+  "tabInProfilesCurrent": {
+    "message": "current",
+    "description": "Marker beside the profile being edited in"
+  },
+  "quickAddFannedOut": {
+    "message": "Added to $COUNT$ other profiles",
+    "description": "Toast after Quick Add fans a tab out",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

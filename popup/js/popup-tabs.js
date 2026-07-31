@@ -57,8 +57,9 @@ function ensureBrowserAPI() {
  * Enhanced Quick Add functionality with navigation caching
  */
 function enhancedAddTabForCurrentPage() {
-  
-  ensureBrowserAPI()
+  // Returned so a caller can act once the tab exists — the v2 popup fans it out
+  // to other profiles. Ignoring the value behaves exactly as before.
+  return ensureBrowserAPI()
     .then(browserAPI => {
       return browserAPI.tabs.query({ active: true, currentWindow: true });
     })

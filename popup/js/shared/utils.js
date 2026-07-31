@@ -393,6 +393,34 @@ function resolveFloatingSide(floatingButton) {
   return String(fb.anchor || '').endsWith('-left') ? 'left' : 'right';
 }
 
+/**
+ * One profile's tab list, with `tab` either present or absent.
+ *
+ * A tab lives inside a profile's list, so "the same tab in two profiles" means
+ * a copy in each, sharing an id. Ids only have to be unique within a profile,
+ * which is what makes reusing one across them both free and the only way to
+ * answer "which profiles hold this tab".
+ *
+ * Adding appends: a tab arriving in a profile must not displace an order
+ * someone arranged there. Removing renumbers what is left so positions stay
+ * dense. Both return the original array untouched when there is nothing to do,
+ * so callers can skip the write.
+ */
+function withTabMembership(tabs, tab, shouldHold) {
+  const list = Array.isArray(tabs) ? tabs : [];
+  const at = list.findIndex(t => t && t.id === tab.id);
+
+  if (shouldHold) {
+    if (at !== -1) return list;
+    const copy = JSON.parse(JSON.stringify(tab));
+    copy.position = list.length;
+    return [...list, copy];
+  }
+
+  if (at === -1) return list;
+  return list.filter(t => t.id !== tab.id).map((t, i) => ({ ...t, position: i }));
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
@@ -402,6 +430,7 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    withTabMembership,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,
@@ -424,6 +453,7 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    withTabMembership,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,

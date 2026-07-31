@@ -97,6 +97,9 @@ const DEFAULT_SETTINGS = {
   autoSwitchProfiles: false, // Enable auto-switching based on URL patterns
   activeProfileId: null, // Currently active profile ID (null = no profiles mode)
   defaultProfileId: null, // Default profile to use when auto-switch doesn't match
+  // Quick Add writes to the active profile only unless this is on, in which
+  // case a captured page lands in every profile at once.
+  quickAddAllProfiles: false,
   // Optional per-tab colors. Off by default, and switching it off only stops
   // the colors rendering — the stored tab.color values are left alone.
   tabColors: {

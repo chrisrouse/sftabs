@@ -1217,6 +1217,87 @@ function renderProfilesList() {
 }
 
 /** Display order: explicit position when set, creation order otherwise. */
+/**
+ * Which profiles besides the active one can hold a tab.
+ *
+ * A tab lives in one profile's list; putting "the same" tab in two means
+ * writing a copy into each, keyed by the same id. Ids only have to be unique
+ * within a profile, so reusing one across profiles costs nothing and is what
+ * makes membership answerable at all.
+ */
+function otherProfiles() {
+  return orderedProfiles().filter(p => p.id !== state.settings.activeProfileId);
+}
+
+/** Profiles whose list already contains this id. */
+async function profilesHoldingTab(tabId) {
+  const held = [];
+  for (const profile of otherProfiles()) {
+    const tabs = (await SFTabs.storage.getProfileTabs(profile.id)) || [];
+    if (tabs.some(t => t.id === tabId)) held.push(profile.id);
+  }
+  return held;
+}
+
+/**
+ * Make each profile's membership match `wanted`.
+ *
+ * Added copies go on the end, so a tab arriving in a profile never displaces
+ * what is already arranged there. Removal is by id and leaves the rest of the
+ * order intact.
+ */
+async function applyTabMembership(tab, wanted) {
+  const want = new Set(wanted);
+  for (const profile of otherProfiles()) {
+    const tabs = (await SFTabs.storage.getProfileTabs(profile.id)) || [];
+    const next = SFTabs.utils.withTabMembership(tabs, tab, want.has(profile.id));
+    // Returned unchanged when there is nothing to do, so this skips the write
+    if (next !== tabs) await SFTabs.storage.saveProfileTabs(profile.id, next);
+  }
+}
+
+/**
+ * The membership table on the edit form.
+ *
+ * The active profile is listed first, checked and disabled: the tab is being
+ * edited there, so it is in that profile by definition, and removing it is what
+ * the delete button is for.
+ */
+async function renderTabProfiles(tabId) {
+  const group = document.getElementById('group-tab-profiles');
+  const rows = document.getElementById('tab-profile-rows');
+  if (!group || !rows) return;
+
+  const others = otherProfiles();
+  group.hidden = !state.settings.profilesEnabled || others.length === 0;
+  if (group.hidden) return;
+
+  const active = state.profiles.find(p => p.id === state.settings.activeProfileId);
+  const held = tabId ? await profilesHoldingTab(tabId) : [];
+
+  const row = (profile, checked, locked) => `
+    <tr>
+      <td class="profile-table-check">
+        <input type="checkbox" data-profile-id="${esc(profile.id)}"
+          ${checked ? 'checked' : ''} ${locked ? 'disabled' : ''}
+          aria-label="${esc(profile.name)}" />
+      </td>
+      <td class="profile-table-name">${esc(profile.name)}</td>
+      <td class="profile-table-note">${locked ? esc(t('tabInProfilesCurrent')) : ''}</td>
+    </tr>`;
+
+  rows.innerHTML =
+    (active ? row(active, true, true) : '') +
+    others.map(p => row(p, held.includes(p.id), false)).join('');
+}
+
+/** The profiles ticked on the edit form, active one excluded. */
+function readTabProfiles() {
+  return [...document.querySelectorAll('#tab-profile-rows input[data-profile-id]:not(:disabled)')]
+    .filter(box => box.checked)
+    .map(box => box.dataset.profileId);
+}
+
 function orderedProfiles() {
   return [...state.profiles].sort((a, b) =>
     (a.position ?? Infinity) - (b.position ?? Infinity) ||
@@ -1444,6 +1525,7 @@ function openEditTab(tabId) {
   updateCharCount('input-tab-name', 'tab-name-count', 30);
   state.editingColor = tab.color || null;
   renderColorPicker(state.editingColor);
+  renderTabProfiles(state.editingTabId);
 
   showView('edit-tab');
   openFormAtTop('form-edit-tab', 'input-tab-name');
@@ -1462,6 +1544,7 @@ function openAddTab() {
   updateCharCount('input-tab-name', 'tab-name-count', 30);
   state.editingColor = null;              // None is the default on every tab
   renderColorPicker(null);
+  renderTabProfiles(state.editingTabId);
 
   showView('edit-tab');
   openFormAtTop('form-edit-tab', 'input-tab-name');
@@ -1832,7 +1915,7 @@ function itemEditRow(item, path, level) {
   return li;
 }
 
-function saveTab(e) {
+async function saveTab(e) {
   e.preventDefault();
   const nameInput = document.getElementById('input-tab-name');
   const name = nameInput.value.trim();
@@ -1855,15 +1938,17 @@ function saveTab(e) {
     color:       state.editingColor || null,
   };
 
+  let saved;
   if (state.editingTabId) {
     // Update existing
     state.tabs = state.tabs.map(t =>
       t.id === state.editingTabId ? { ...t, ...updates } : t
     );
+    saved = state.tabs.find(t => t.id === state.editingTabId);
     showStatus(t('tabSavedStatus', name));
   } else {
     // Create new
-    const newTab = {
+    saved = {
       id:           SFTabs.utils.generateId(),
       position:     state.tabs.length,
       dropdownItems:[],
@@ -1871,14 +1956,28 @@ function saveTab(e) {
       color:        null,
       ...updates,
     };
-    state.tabs = [...state.tabs, newTab];
+    state.tabs = [...state.tabs, saved];
     showStatus(t('tabAddedStatus', name));
   }
+
+  // Read the ticks before the view changes and the table is re-rendered
+  const wanted = document.getElementById('group-tab-profiles')?.hidden
+    ? null
+    : readTabProfiles();
 
   renderTabList();
   bindTabListEvents();
   showView('empty');
-  persistTabs();
+  await persistTabs();
+
+  if (wanted) {
+    try {
+      await applyTabMembership(saved, wanted);
+      broadcastTabRefresh();
+    } catch (err) {
+      showStatus(t('errorCouldNotSave', err.message), 'error');
+    }
+  }
 }
 
 // ── Tab actions ────────────────────────────────────────────────
@@ -2280,6 +2379,9 @@ function syncSettingsPanel() {
   document.getElementById('setting-compact').checked       = state.settings.compactMode;
   document.getElementById('setting-skip-delete').checked   = state.settings.skipDeleteConfirmation;
   document.getElementById('setting-profiles').checked      = state.settings.profilesEnabled;
+  document.getElementById('setting-quick-add-all').checked = !!state.settings.quickAddAllProfiles;
+  // "All profiles" says nothing when there is only ever one
+  document.getElementById('row-quick-add-all').hidden = !state.settings.profilesEnabled;
   const storageRadio = document.querySelector(`input[name="storage-type"][value="${state.settings.useSyncStorage ? 'sync' : 'local'}"]`);
   if (storageRadio) storageRadio.checked = true;
   syncTabColorRow();
@@ -2352,10 +2454,26 @@ function bindEvents() {
 
   // Toolbar
   document.getElementById('btn-add-tab').addEventListener('click', openAddTab);
-  document.getElementById('btn-quick-add').addEventListener('click', () => {
+  document.getElementById('btn-quick-add').addEventListener('click', async () => {
     // Production's parser handles setup pages, ObjectManager, object lists and
-    // custom URLs, and derives the tab name from the page title.
-    SFTabs.tabs.enhancedAddTabForCurrentPage();
+    // custom URLs, and derives the tab name from the page title. It writes to
+    // the active profile; anything else is this popup's doing.
+    const before = new Set(state.tabs.map(tab => tab.id));
+    await SFTabs.tabs.enhancedAddTabForCurrentPage();
+    if (!state.settings.quickAddAllProfiles) return;
+
+    // Whatever appeared is what it captured — it adds one tab, but diffing
+    // rather than assuming means a no-op run fans nothing out.
+    const added = state.tabs.filter(tab => !before.has(tab.id));
+    if (!added.length) return;
+    try {
+      const everyOther = otherProfiles().map(p => p.id);
+      for (const tab of added) await applyTabMembership(tab, everyOther);
+      broadcastTabRefresh();
+      showStatus(t('quickAddFannedOut', String(everyOther.length)));
+    } catch (err) {
+      showStatus(t('errorCouldNotSave', err.message), 'error');
+    }
   });
   // btn-empty-add-tab no longer in DOM (empty state moved to left panel)
 
@@ -2411,6 +2529,10 @@ function bindEvents() {
       renderTabList();
       bindTabListEvents();
     });
+  });
+
+  document.getElementById('setting-quick-add-all').addEventListener('change', e => {
+    patchSettings({ quickAddAllProfiles: e.target.checked });
   });
 
   document.getElementById('setting-skip-delete').addEventListener('change', e => {

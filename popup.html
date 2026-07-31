@@ -134,6 +134,18 @@
               </label>
             </fieldset>
 
+            <!-- Which profiles carry this tab. Only meaningful with profiles on
+                 and more than one of them. -->
+            <div class="form-group" id="group-tab-profiles" hidden>
+              <span class="form-label" id="tab-profiles-label">__MSG_tabInProfilesLabel__</span>
+              <table class="profile-table">
+                <tbody id="tab-profile-rows">
+                  <!-- Populated by renderTabProfiles() -->
+                </tbody>
+              </table>
+              <p class="form-hint">__MSG_tabInProfilesHint__</p>
+            </div>
+
             <!-- Last in the form, and only present when the feature is on -->
             <div class="form-group" id="group-tab-color" hidden>
               <span class="form-label" id="tab-color-label">__MSG_tabColorLabel__</span>
@@ -299,6 +311,20 @@
                   <div class="settings-row-control">
                     <label class="toggle" aria-label="__MSG_compactMode__">
                       <input type="checkbox" id="setting-compact" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Hidden with profiles off, where "all profiles" means one. -->
+                <div class="settings-row" id="row-quick-add-all">
+                  <label class="settings-row-label" for="setting-quick-add-all">
+                    <span class="settings-label">__MSG_quickAddAllProfilesLabel__</span>
+                    <span class="settings-desc">__MSG_quickAddAllProfilesDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_quickAddAllProfilesLabel__">
+                      <input type="checkbox" id="setting-quick-add-all" role="switch" />
                       <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
                     </label>
                   </div>
