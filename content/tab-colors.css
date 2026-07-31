@@ -3,7 +3,7 @@
    injected Setup tab bar, the floating panel, the header menu, and the popup.
 
    The palette itself is NOT here. applyTabColor() in popup/js/shared/utils.js
-   writes two custom properties on the element —
+   writes three custom properties on the element —
 
      --sftabs-tc        the accent — the dot, and any indicator
      --sftabs-tc-wash   the tint behind a row
@@ -11,8 +11,8 @@
                         darker step than the accent so it stays readable
 
    — and adds .sftabs-tc plus one of .sftabs-tc--dot / --tint.
-   Keeping the values in JS means the twelve hues are defined once rather than
-   restated in each stylesheet that needs them.
+   Keeping the values in JS means the thirty-six shades are defined once rather
+   than restated in each stylesheet that needs them.
 
    Both properties are light-dark() pairs, so a colour follows whatever
    color-scheme the surface is under. Salesforce pages resolve to the light
@@ -30,21 +30,41 @@
 }
 
 /* ── Tint: the wash behind, the ink on the label ──
-   Resting state only. Salesforce restyles the background on hover and again
-   when active, and its own signals for those are stronger and more familiar
-   than anything layered over them — so the colour steps aside rather than
-   competing.
 
    The label uses --sftabs-tc-ink rather than the accent. For the lighter shades
    those differ: the accent is light enough to tell apart as a dot but too light
-   to read as text, so the ink is a darker step of the same hue. */
-.sftabs-tc--tint {
+   to read as text, so the ink is a darker step of the same hue.
+
+   Surfaces we own — the popup, the floating panel, the header menu — tint in
+   every state, because there is no one else's styling to defer to. */
+.sftabs-tc--tint:not(.sf-tabs-custom-tab) {
   background-color: var(--sftabs-tc-wash);
 }
-.sftabs-tc--tint,
-.sftabs-tc--tint a,
-.sftabs-tc--tint .slds-align-middle,
-.sftabs-tc--tint .tab-name {
+.sftabs-tc--tint:not(.sf-tabs-custom-tab),
+.sftabs-tc--tint:not(.sf-tabs-custom-tab) a,
+.sftabs-tc--tint:not(.sf-tabs-custom-tab) .slds-align-middle,
+.sftabs-tc--tint:not(.sf-tabs-custom-tab) .tab-name {
+  color: var(--sftabs-tc-ink, var(--sftabs-tc));
+}
+
+/* ── Tint in the Setup tab bar: the resting state only ──
+   Salesforce owns hover and active here, both the background and the label
+   colour, and its signals for them are stronger and more familiar than anything
+   we would layer on. So rather than overriding those states and then trying to
+   look native, the tint excludes itself from them: with :not() the declaration
+   never enters the cascade, leaving Salesforce's own rules to resolve exactly
+   as they would on a tab we had never touched. Overriding and reverting cannot
+   achieve that — `revert` would discard Salesforce's author styles too.
+
+   The dot deliberately has no such guard. It is our own element, nothing on the
+   page styles it, and it stays put through every state. */
+.sf-tabs-custom-tab.sftabs-tc--tint:not(:hover):not(.slds-is-active) {
+  background-color: var(--sftabs-tc-wash);
+}
+.sf-tabs-custom-tab.sftabs-tc--tint:not(:hover):not(.slds-is-active),
+.sf-tabs-custom-tab.sftabs-tc--tint:not(:hover):not(.slds-is-active) > a,
+.sf-tabs-custom-tab.sftabs-tc--tint:not(:hover):not(.slds-is-active) .slds-align-middle,
+.sf-tabs-custom-tab.sftabs-tc--tint:not(:hover):not(.slds-is-active) .tab-name {
   color: var(--sftabs-tc-ink, var(--sftabs-tc));
 }
 
