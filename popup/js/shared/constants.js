@@ -100,6 +100,9 @@ const DEFAULT_SETTINGS = {
   // Quick Add writes to the active profile only unless this is on, in which
   // case a captured page lands in every profile at once.
   quickAddAllProfiles: false,
+  // A "+" at the end of the injected Setup tab bar that captures the current
+  // page without opening the popup.
+  menuBarQuickAdd: false,
   // Optional per-tab colors. Off by default, and switching it off only stops
   // the colors rendering — the stored tab.color values are left alone.
   tabColors: {

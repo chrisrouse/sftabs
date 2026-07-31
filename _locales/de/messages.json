@@ -2937,5 +2937,13 @@
         "content": "$1"
       }
     }
+  },
+  "menuBarQuickAddLabel": {
+    "message": "Schnellzugriff in der Salesforce-Menüleiste",
+    "description": "Setting: show a + at the end of the injected tab bar"
+  },
+  "menuBarQuickAddDesc": {
+    "message": "Fügt am Ende Ihrer Registerkarten ein + hinzu, das die aktuelle Seite erfasst, ohne dieses Popup zu öffnen",
+    "description": "Description under the menu-bar Quick Add setting"
   }
 }

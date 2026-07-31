@@ -540,3 +540,74 @@ browser.commands.onCommand.addListener(async (command) => {
     }
   }
 });
+
+/**
+ * Quick Add from the Salesforce menu bar.
+ *
+ * The content script parses the page — using the same shared parser the popup's
+ * Quick Add uses — and names the profiles that should receive the tab. All that
+ * happens here is the write, because this worker owns the chunk-aware storage
+ * helpers and a content script has no business carrying a second copy of them.
+ *
+ * Appending, never inserting: a tab arriving in a profile must not disturb an
+ * order arranged there. Already-present ids are skipped rather than duplicated,
+ * so a double click costs nothing.
+ */
+async function quickAddTabToProfiles(tab, profileIds) {
+  const useSync = await prefersSyncStorage();
+  const targets = Array.isArray(profileIds) && profileIds.length
+    ? profileIds.map(id => `profile_${id}_tabs`)
+    : ['customTabs'];   // installs old enough to predate profiles
+
+  let written = 0;
+  for (const key of targets) {
+    const existing = (useSync
+      ? await readChunkedSync(key)
+      : (await browser.storage.local.get(key))[key]) || [];
+
+    if (existing.some(t => t && t.id === tab.id)) continue;
+
+    const next = [...existing, { ...tab, position: existing.length }];
+    if (useSync) await saveChunkedSync(key, next);
+    else await browser.storage.local.set({ [key]: next });
+    written++;
+  }
+  return written;
+}
+
+/** Where this install keeps its tabs. Mirrors getStoragePreference elsewhere. */
+async function prefersSyncStorage() {
+  try {
+    const local = await browser.storage.local.get(['deviceSettings', 'userSettings']);
+    if (typeof local.deviceSettings?.useSyncStorage === 'boolean') {
+      return local.deviceSettings.useSyncStorage;
+    }
+    if (typeof local.userSettings?.useSyncStorage === 'boolean') {
+      return local.userSettings.useSyncStorage;
+    }
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.action !== 'quick_add_tab') return;
+
+  quickAddTabToProfiles(message.tab, message.profileIds)
+    .then(async written => {
+      // Tell every open Salesforce page to redraw, including the sender — its
+      // own bar has to grow the new tab too.
+      const tabs = await browser.tabs.query({ url: [
+        '*://*.lightning.force.com/*', '*://*.salesforce-setup.com/*',
+        '*://*.my.salesforce-setup.com/*', '*://*.salesforce.com/*',
+        '*://*.my.salesforce.com/*',
+      ] });
+      await Promise.all(tabs.map(t =>
+        browser.tabs.sendMessage(t.id, { action: 'refresh_tabs' }).catch(() => {})));
+      sendResponse({ ok: true, written });
+    })
+    .catch(error => sendResponse({ ok: false, error: error.message }));
+
+  return true;   // reply is async
+});

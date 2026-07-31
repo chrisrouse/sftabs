@@ -46,6 +46,7 @@ async function initTabs(tabContainer) {
     // assignment over there never ran and every tab rendered colored. This
     // is this file's own render entry point.
     tabColorPref = settings.tabColors || { enabled: false, style: 'dot' };
+    const quickAddInBar = !!settings.menuBarQuickAdd;
 
     // Setup tabs always render (they're the core feature)
     // The floating button location is handled separately
@@ -120,9 +121,11 @@ async function initTabs(tabContainer) {
     // Sort tabs by position (only top-level tabs)
     const topLevelTabs = getTopLevelTabs(tabsToUse);
 
-    // Remove any existing custom tabs and overflow button
+    // Remove any existing custom tabs, overflow button and quick-add button
     const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
     existingTabs.forEach(tab => tab.remove());
+    const existingQuickAdd = tabContainer.querySelector('.sf-tabs-quick-add');
+    if (existingQuickAdd) existingQuickAdd.remove();
     const existingOverflow = tabContainer.querySelector('.sf-tabs-overflow-button');
     if (existingOverflow) existingOverflow.remove();
 
@@ -140,6 +143,7 @@ async function initTabs(tabContainer) {
     // Check for overflow and handle it (use longer timeout for accurate measurement)
     setTimeout(() => {
       handleTabOverflow(tabContainer, topLevelTabs);
+      renderQuickAddButton(tabContainer, quickAddInBar);
       // Reset flag after overflow handling completes
       isRenderingTabs = false;
     }, 200);
@@ -1155,6 +1159,94 @@ function forceRefreshTabs() {
   }
 }
 
+
+/**
+ * A "+" at the end of the bar that captures the current page.
+ *
+ * Rendered after overflow has been resolved and inserted before the overflow
+ * button when there is one, so it stays the last thing before the chevron
+ * rather than disappearing into the hidden set.
+ *
+ * The write happens in the background worker: it owns the chunk-aware writer,
+ * and a content script has no business reimplementing one. This side only
+ * parses the page — with the same shared parser the popup's Quick Add uses —
+ * and says which profiles should receive it.
+ */
+function createQuickAddButton() {
+  const li = document.createElement('li');
+  li.setAttribute('role', 'presentation');
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-quick-add';
+  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+
+  const a = document.createElement('a');
+  a.setAttribute('role', 'button');
+  a.setAttribute('tabindex', '-1');
+  a.setAttribute('href', 'javascript:void(0)');
+  a.classList.add('tabHeader', 'slds-context-bar__label-action');
+  a.title = 'Add this page as a tab';
+  a.setAttribute('aria-label', a.title);
+
+  const span = document.createElement('span');
+  span.classList.add('title', 'slds-truncate');
+  span.innerHTML = '<svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" ' +
+    'style="width: 14px; height: 14px; fill: currentColor;">' +
+    '<path d="M300 290h165c8 0 15-7 15-15v-30c0-8-7-15-15-15H300c-6 0-10-4-10-10V55c0-8-7-15-15-15h-30c-8 0-15 7-15 15v165c0 6-4 10-10 10H55c-8 0-15 7-15 15v30c0 8 7 15 15 15h165c6 0 10 4 10 10v165c0 8 7 15 15 15h30c8 0 15-7 15-15V300c0-6 4-10 10-10"/></svg>';
+
+  a.addEventListener('click', async event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (li.classList.contains('sf-tabs-quick-add--busy')) return;
+    li.classList.add('sf-tabs-quick-add--busy');
+    try {
+      await quickAddCurrentPage();
+    } finally {
+      li.classList.remove('sf-tabs-quick-add--busy');
+    }
+  });
+
+  a.appendChild(span);
+  li.appendChild(a);
+  return li;
+}
+
+/** Capture this page and hand it to the background worker to store. */
+async function quickAddCurrentPage() {
+  const utils = window.SFTabs && window.SFTabs.utils;
+  if (!utils || !utils.parsePageToTab) return;
+
+  const parsed = utils.parsePageToTab(window.location.href, document.title);
+  if (!parsed) return;
+
+  const settings = await readUserSettings();
+  const profiles = await readProfiles();
+  const active = utils.resolveProfileForUrl
+    ? utils.resolveProfileForUrl(window.location.href, profiles, settings)
+    : settings.activeProfileId;
+
+  // Same rule the popup's Quick Add follows, read from the same setting
+  const targets = settings.quickAddAllProfiles && profiles.length
+    ? profiles.map(p => p.id)
+    : (active ? [active] : []);
+
+  await browser.runtime.sendMessage({
+    action: 'quick_add_tab',
+    tab: { ...parsed, id: utils.generateId(), openInNewTab: false, dropdownItems: [] },
+    profileIds: targets,
+  });
+}
+
+/** Settings, wherever this install keeps them. */
+async function readUserSettings() {
+  if (await getStoragePreference()) return (await readChunkedSync('userSettings')) || {};
+  return (await browser.storage.local.get('userSettings')).userSettings || {};
+}
+
+/** Profiles, wherever this install keeps them. */
+async function readProfiles() {
+  if (await getStoragePreference()) return (await readChunkedSync('profiles')) || [];
+  return (await browser.storage.local.get('profiles')).profiles || [];
+}
+
 /**
  * Handle tab overflow - show/hide tabs and display overflow button if needed
  * Uses two-pass approach: first check if overflow is needed, then calculate which tabs to hide
@@ -1257,6 +1349,24 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
   // Create and add overflow button
   const overflowButton = createOverflowButton(hiddenTabs.map(h => h.tab));
   tabContainer.appendChild(overflowButton);
+}
+
+/**
+ * Place the "+" last, but ahead of the overflow chevron.
+ *
+ * Called after handleTabOverflow so it cannot be swept into the hidden set.
+ * Its width is therefore not part of that measurement — the 140px right buffer
+ * already reserved there covers it.
+ */
+function renderQuickAddButton(tabContainer, enabled) {
+  const existing = tabContainer.querySelector('.sf-tabs-quick-add');
+  if (existing) existing.remove();
+  if (!enabled) return;
+
+  const button = createQuickAddButton();
+  const overflow = tabContainer.querySelector('.sf-tabs-overflow-button');
+  if (overflow) tabContainer.insertBefore(button, overflow);
+  else tabContainer.appendChild(button);
 }
 
 /**
@@ -1663,7 +1773,11 @@ window.addEventListener('resize', () => {
     if (tabContainer && tabsLoaded) {
       getTabsFromStorage().then(tabs => {
         const topLevelTabs = getTopLevelTabs(tabs);
+        const hadQuickAdd = !!tabContainer.querySelector('.sf-tabs-quick-add');
         handleTabOverflow(tabContainer, topLevelTabs);
+        // handleTabOverflow rebuilds the chevron, so the "+" is re-placed or it
+        // would be left sitting to the right of it
+        renderQuickAddButton(tabContainer, hadQuickAdd);
       }).catch(error => {
         // Error recalculating overflow on resize
       });

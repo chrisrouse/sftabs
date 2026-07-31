@@ -3103,5 +3103,13 @@
         "content": "$1"
       }
     }
+  },
+  "menuBarQuickAddLabel": {
+    "message": "Quick Add in the Salesforce menu bar",
+    "description": "Setting: show a + at the end of the injected tab bar"
+  },
+  "menuBarQuickAddDesc": {
+    "message": "Adds a + at the end of your tabs that captures the current page without opening this popup",
+    "description": "Description under the menu-bar Quick Add setting"
   }
 }

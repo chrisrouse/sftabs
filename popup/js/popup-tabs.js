@@ -67,68 +67,20 @@ function enhancedAddTabForCurrentPage() {
       if (tabs.length > 0) {
         const currentUrl = tabs[0].url;
         const pageTitle = tabs[0].title;
-        
-        // Check if this is a Salesforce page we can work with
-        const isSalesforcePage = currentUrl.includes('salesforce') || currentUrl.includes('.force.com');
-        if (!isSalesforcePage) {
-          SFTabs.main.showStatus(chrome.i18n.getMessage('notSalesforcePage'), true);
+
+        // Parsing lives in shared utils so this and the "+" in the Salesforce
+        // menu bar capture a page identically. It returns null for a page it
+        // cannot use; the two reasons are told apart here.
+        const parsed = SFTabs.utils.parsePageToTab(currentUrl, pageTitle);
+        if (!parsed) {
+          const isSalesforcePage = currentUrl.includes('salesforce') || currentUrl.includes('.force.com');
+          SFTabs.main.showStatus(chrome.i18n.getMessage(
+            isSalesforcePage ? 'notSalesforceSetupPage' : 'notSalesforcePage'), true);
           return;
         }
-        
-        let isObject = false;
-        let isCustomUrl = false;
-        let isSetupObject = false;
-        let path = '';
-        let urlBase = '';
+        const { path, isObject, isCustomUrl, isSetupObject } = parsed;
 
-        // Check if on ObjectManager page
-        if (currentUrl.includes('/lightning/setup/')) {
-          const urlParts = currentUrl.split('/lightning/setup/');
-          if (urlParts.length > 1) {
-            const fullPath = urlParts[1].split('?')[0]; 
-            
-            // ObjectManager: keep the full path so the tab lands on the exact
-            // section that was open, and mark it as a setup object so it can
-            // carry a dropdown of the object's other sections.
-            if (fullPath.startsWith('ObjectManager/')) {
-              path = fullPath;
-              isObject = false;
-              isSetupObject = true; // Mark as setup object for dropdown
-              urlBase = '/lightning/setup/';
-            } else {
-              // For other setup pages, remove trailing '/home' or '/view' if present
-              path = fullPath.replace(/\/(home|view)$/, '');
-              urlBase = '/lightning/setup/';
-            }
-          }
-        } 
-        // Check if this is a Salesforce object page
-        else if (currentUrl.includes('/lightning/o/')) {
-          isObject = true;
-          const urlParts = currentUrl.split('/lightning/o/');
-          if (urlParts.length > 1) {
-            // Keep the full path including query parameters (e.g., for list views with filterName)
-            path = urlParts[1];
-            urlBase = '/lightning/o/';
-          }
-        }
-        // Handle custom URLs (any other Salesforce URL pattern)
-        else if (currentUrl.includes('.lightning.force.com/') || currentUrl.includes('.salesforce.com/')) {
-          isCustomUrl = true;
-          const urlParts = currentUrl.split('.com/');
-          if (urlParts.length > 1) {
-            path = urlParts[1].split('?')[0];
-          }
-        }
-        
-        // If no valid path was found, show an error
-        if (!path) {
-          SFTabs.main.showStatus(chrome.i18n.getMessage('notSalesforceSetupPage'), true);
-          return;
-        }
-
-        // Determine an appropriate name for the tab
-        let name = generateTabName(path, pageTitle, isObject, isCustomUrl, isSetupObject);
+        const name = parsed.label;
 
         // Create a new tab object with ALL properties
         const existingTabs = SFTabs.main.getTabs();
@@ -155,153 +107,6 @@ function enhancedAddTabForCurrentPage() {
       SFTabs.main.showStatus(chrome.i18n.getMessage('errorAccessingTab', [error.message]), true);
     });
 }
-
-/**
- * Generate tab name based on various inputs
- */
-function generateTabName(path, pageTitle, isObject, isCustomUrl, isSetupObject) {
-  let name = '';
-  
-  if (isCustomUrl) {
-    if (pageTitle) {
-      let cleanTitle = pageTitle.split(' | ')[0];
-      name = cleanTitle;
-    }
-    
-    if (!name || name.length === 0) {
-      const pathSegments = path.split('/');
-      for (const segment of pathSegments) {
-        if (segment && segment.length > 0 && segment !== 'apex' && segment !== 'lightning') {
-          name = segment
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/\.(app|jsp|page)$/, '')
-            .replace(/^./, str => str.toUpperCase())
-            .trim();
-          break;
-        }
-      }
-      
-      if (!name || name.length === 0) {
-        name = 'Custom Page';
-      }
-    }
-  } else if (isObject) {
-    // Try to get object name from page title first (handles custom objects with IDs in URL)
-    if (pageTitle) {
-      let cleanTitle = pageTitle.split(' | ')[0];
-      name = cleanTitle;
-    }
-
-    // Fallback to extracting from path if title not available
-    if (!name || name.length === 0) {
-      const pathSegments = path.split('/');
-      if (pathSegments.length > 0) {
-        const objectName = formatObjectNameFromURL(pathSegments[0]);
-        let viewType = '';
-        if (pathSegments.length > 1) {
-          viewType = pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1);
-        }
-        name = viewType ? `${objectName} ${viewType}` : objectName;
-      }
-    }
-  } else if (path.startsWith('ObjectManager/')) {
-    // Name as "<Object> - <Section>" so tabs for different sections of the same
-    // object stay distinguishable. The page title is only consulted for the
-    // object itself, and only when the URL carries a record ID instead of a
-    // readable API name (custom objects).
-    const pathSegments = path.split('/').filter(segment => segment.length > 0);
-
-    let objectName = 'Object Manager';
-    if (pathSegments.length >= 2) {
-      const segment = pathSegments[1];
-      const looksLikeId = /^[a-zA-Z0-9]{15,18}$/.test(segment) && !segment.includes('_');
-      if (looksLikeId && pageTitle) {
-        let cleanTitle = pageTitle.split(' | ')[0];
-        if (cleanTitle.includes('Setup: ')) {
-          cleanTitle = cleanTitle.split('Setup: ')[1];
-        }
-        objectName = cleanTitle || formatObjectNameFromURL(segment);
-      } else {
-        objectName = formatObjectNameFromURL(segment);
-      }
-    }
-
-    // Section names arrive camel-cased: RelatedLookupFilters -> Related Lookup Filters
-    let sectionName = '';
-    if (pathSegments.length >= 3 && pathSegments[2].toLowerCase() !== 'details') {
-      sectionName = pathSegments[2].replace(/([A-Z])/g, ' $1').trim();
-    }
-
-    name = sectionName ? `${objectName} - ${sectionName}` : objectName;
-  } else {
-    if (pageTitle) {
-      let titleParts = pageTitle.split(' | ');
-      let cleanTitle = titleParts[0];
-      
-      if (cleanTitle.includes('Setup')) {
-        const setupParts = cleanTitle.split('Setup: ');
-        if (setupParts.length > 1) {
-          cleanTitle = setupParts[1];
-        }
-      }
-
-      if (cleanTitle && cleanTitle.length > 0) {
-        name = cleanTitle;
-      }
-    }
-    
-    if (!name || name.length === 0) {
-      if (path && path.length > 0) {
-        const pathSegments = path.split('/').filter(segment => segment.length > 0);
-        
-        if (pathSegments.length > 0) {
-          let lastSegment = pathSegments[pathSegments.length - 1];
-          name = lastSegment
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/^./, str => str.toUpperCase())
-            .trim();
-          
-          if (!name.trim()) {
-            name = path
-              .replace(/([A-Z])/g, ' $1')
-              .replace(/^./, str => str.toUpperCase())
-              .trim();
-          }
-        }
-      }
-      
-      if (!name || !name.trim()) {
-        name = 'Setup: ' + path;
-      }
-    }
-  }
-  
-  return name;
-}
-
-/**
- * Fallback function to format object names if utils not available
- */
-function formatObjectNameFromURL(objectNameFromURL) {
-  if (!objectNameFromURL) {
-    return 'Object';
-  }
-  
-  // Remove any __c or similar custom object suffix
-  let cleanName = objectNameFromURL.replace(/__c$/g, '');
-  
-  // Replace underscores with spaces
-  cleanName = cleanName.replace(/_/g, ' ');
-  
-  // Insert spaces between camelCase words
-  cleanName = cleanName.replace(/([a-z])([A-Z])/g, '$1 $2');
-  
-  // Ensure proper capitalization
-  cleanName = cleanName.replace(/\b\w/g, letter => letter.toUpperCase());
-  
-  return cleanName;
-}
-
 /**
  * Generate a unique ID for tabs
  */

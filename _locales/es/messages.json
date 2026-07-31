@@ -2937,5 +2937,13 @@
         "content": "$1"
       }
     }
+  },
+  "menuBarQuickAddLabel": {
+    "message": "Añadir rápido en la barra de menús de Salesforce",
+    "description": "Setting: show a + at the end of the injected tab bar"
+  },
+  "menuBarQuickAddDesc": {
+    "message": "Añade un + al final de sus pestañas que captura la página actual sin abrir esta ventana",
+    "description": "Description under the menu-bar Quick Add setting"
   }
 }

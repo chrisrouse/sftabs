@@ -2380,6 +2380,7 @@ function syncSettingsPanel() {
   document.getElementById('setting-skip-delete').checked   = state.settings.skipDeleteConfirmation;
   document.getElementById('setting-profiles').checked      = state.settings.profilesEnabled;
   document.getElementById('setting-quick-add-all').checked = !!state.settings.quickAddAllProfiles;
+  document.getElementById('setting-menu-bar-quick-add').checked = !!state.settings.menuBarQuickAdd;
   // "All profiles" says nothing when there is only ever one
   document.getElementById('row-quick-add-all').hidden = !state.settings.profilesEnabled;
   const storageRadio = document.querySelector(`input[name="storage-type"][value="${state.settings.useSyncStorage ? 'sync' : 'local'}"]`);
@@ -2529,6 +2530,11 @@ function bindEvents() {
       renderTabList();
       bindTabListEvents();
     });
+  });
+
+  document.getElementById('setting-menu-bar-quick-add').addEventListener('change', async e => {
+    await patchSettings({ menuBarQuickAdd: e.target.checked });
+    broadcastTabRefresh();   // the bar has to redraw to gain or lose the button
   });
 
   document.getElementById('setting-quick-add-all').addEventListener('change', e => {

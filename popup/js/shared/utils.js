@@ -421,6 +421,185 @@ function withTabMembership(tabs, tab, shouldHold) {
   return list.filter(t => t.id !== tab.id).map((t, i) => ({ ...t, position: i }));
 }
 
+/**
+ * A readable name for a captured page.
+ *
+ * Lifted verbatim out of popup-tabs.js so the popup's Quick Add and the "+" in
+ * the Salesforce menu bar name a page the same way. Two implementations of this
+ * would drift on the first ObjectManager edge case.
+ */
+function generateTabName(path, pageTitle, isObject, isCustomUrl, isSetupObject) {
+  let name = '';
+  
+  if (isCustomUrl) {
+    if (pageTitle) {
+      let cleanTitle = pageTitle.split(' | ')[0];
+      name = cleanTitle;
+    }
+    
+    if (!name || name.length === 0) {
+      const pathSegments = path.split('/');
+      for (const segment of pathSegments) {
+        if (segment && segment.length > 0 && segment !== 'apex' && segment !== 'lightning') {
+          name = segment
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/\.(app|jsp|page)$/, '')
+            .replace(/^./, str => str.toUpperCase())
+            .trim();
+          break;
+        }
+      }
+      
+      if (!name || name.length === 0) {
+        name = 'Custom Page';
+      }
+    }
+  } else if (isObject) {
+    // Try to get object name from page title first (handles custom objects with IDs in URL)
+    if (pageTitle) {
+      let cleanTitle = pageTitle.split(' | ')[0];
+      name = cleanTitle;
+    }
+
+    // Fallback to extracting from path if title not available
+    if (!name || name.length === 0) {
+      const pathSegments = path.split('/');
+      if (pathSegments.length > 0) {
+        const objectName = formatObjectNameFromURL(pathSegments[0]);
+        let viewType = '';
+        if (pathSegments.length > 1) {
+          viewType = pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1);
+        }
+        name = viewType ? `${objectName} ${viewType}` : objectName;
+      }
+    }
+  } else if (path.startsWith('ObjectManager/')) {
+    // Name as "<Object> - <Section>" so tabs for different sections of the same
+    // object stay distinguishable. The page title is only consulted for the
+    // object itself, and only when the URL carries a record ID instead of a
+    // readable API name (custom objects).
+    const pathSegments = path.split('/').filter(segment => segment.length > 0);
+
+    let objectName = 'Object Manager';
+    if (pathSegments.length >= 2) {
+      const segment = pathSegments[1];
+      const looksLikeId = /^[a-zA-Z0-9]{15,18}$/.test(segment) && !segment.includes('_');
+      if (looksLikeId && pageTitle) {
+        let cleanTitle = pageTitle.split(' | ')[0];
+        if (cleanTitle.includes('Setup: ')) {
+          cleanTitle = cleanTitle.split('Setup: ')[1];
+        }
+        objectName = cleanTitle || formatObjectNameFromURL(segment);
+      } else {
+        objectName = formatObjectNameFromURL(segment);
+      }
+    }
+
+    // Section names arrive camel-cased: RelatedLookupFilters -> Related Lookup Filters
+    let sectionName = '';
+    if (pathSegments.length >= 3 && pathSegments[2].toLowerCase() !== 'details') {
+      sectionName = pathSegments[2].replace(/([A-Z])/g, ' $1').trim();
+    }
+
+    name = sectionName ? `${objectName} - ${sectionName}` : objectName;
+  } else {
+    if (pageTitle) {
+      let titleParts = pageTitle.split(' | ');
+      let cleanTitle = titleParts[0];
+      
+      if (cleanTitle.includes('Setup')) {
+        const setupParts = cleanTitle.split('Setup: ');
+        if (setupParts.length > 1) {
+          cleanTitle = setupParts[1];
+        }
+      }
+
+      if (cleanTitle && cleanTitle.length > 0) {
+        name = cleanTitle;
+      }
+    }
+    
+    if (!name || name.length === 0) {
+      if (path && path.length > 0) {
+        const pathSegments = path.split('/').filter(segment => segment.length > 0);
+        
+        if (pathSegments.length > 0) {
+          let lastSegment = pathSegments[pathSegments.length - 1];
+          name = lastSegment
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase())
+            .trim();
+          
+          if (!name.trim()) {
+            name = path
+              .replace(/([A-Z])/g, ' $1')
+              .replace(/^./, str => str.toUpperCase())
+              .trim();
+          }
+        }
+      }
+      
+      if (!name || !name.trim()) {
+        name = 'Setup: ' + path;
+      }
+    }
+  }
+  
+  return name;
+}
+
+/**
+ * Turn a Salesforce URL into the tab that captures it.
+ *
+ * Returns null for anything that is not a Salesforce page, and for Salesforce
+ * pages with no usable path — the caller decides what to say about that.
+ *
+ * The shapes it recognises: /lightning/setup/ paths (with ObjectManager kept
+ * whole, so the tab lands on the exact section that was open), /lightning/o/
+ * object pages, and anything else on a Salesforce host as a custom URL.
+ */
+function parsePageToTab(url, pageTitle) {
+  if (!url) return null;
+  if (!url.includes('salesforce') && !url.includes('.force.com')) return null;
+
+  let isObject = false;
+  let isCustomUrl = false;
+  let isSetupObject = false;
+  let path = '';
+
+  if (url.includes('/lightning/setup/')) {
+    const parts = url.split('/lightning/setup/');
+    if (parts.length > 1) {
+      const fullPath = parts[1].split('?')[0];
+      if (fullPath.startsWith('ObjectManager/')) {
+        path = fullPath;
+        isSetupObject = true;
+      } else {
+        path = fullPath.replace(/\/(home|view)$/, '');
+      }
+    }
+  } else if (url.includes('/lightning/o/')) {
+    isObject = true;
+    const parts = url.split('/lightning/o/');
+    // Query string kept: list views identify themselves with filterName
+    if (parts.length > 1) path = parts[1];
+  } else if (url.includes('.lightning.force.com/') || url.includes('.salesforce.com/')) {
+    isCustomUrl = true;
+    const parts = url.split('.com/');
+    if (parts.length > 1) path = parts[1].split('?')[0];
+  }
+
+  if (!path) return null;
+
+  return {
+    label: generateTabName(path, pageTitle, isObject, isCustomUrl, isSetupObject),
+    path,
+    isObject,
+    isCustomUrl,
+    isSetupObject,
+  };
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
@@ -431,6 +610,8 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveProfileForUrl,
     resolveFloatingSide,
     withTabMembership,
+    generateTabName,
+    parsePageToTab,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,
@@ -454,6 +635,8 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveProfileForUrl,
     resolveFloatingSide,
     withTabMembership,
+    generateTabName,
+    parsePageToTab,
     formatObjectNameFromURL,
     extractNameFromTitle,
     formatPathToName,

@@ -10,6 +10,9 @@
       runtime: {
         getURL: chrome.runtime.getURL.bind(chrome.runtime),
         onMessage: chrome.runtime.onMessage,
+        // Needed to hand work to the background worker — the menu-bar "+" asks
+        // it to write the captured tab, since it owns the chunk-aware writer.
+        sendMessage: chrome.runtime.sendMessage.bind(chrome.runtime),
         lastError: chrome.runtime.lastError
       },
       storage: {
