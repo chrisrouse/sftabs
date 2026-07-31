@@ -888,17 +888,15 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
    so this header packs from the start instead. */
 #view-settings .panel-view-header { justify-content: flex-start; }
 
-/* One scroll container, not two. The header is now sticky chrome carrying the
-   back button, so it stays put while .settings-body scrolls under it — the
-   view itself no longer scrolls. */
-
+/* One scroll container, not two: .settings-body is it.
+   #view-settings used to scroll instead, and this pair of rules existed to keep
+   the body from competing — overflow: visible and flex: none between them
+   neutralised the scrolling .settings-body declares for itself. Removing the
+   view's overflow without removing these left nothing able to scroll at all,
+   since .panel-view clips with overflow: hidden. */
 #view-settings .panel-view-header {
   background: none;
   border-bottom: none;
-}
-#view-settings .settings-body {
-  overflow: visible;
-  flex: none;
 }
 
 /* Settings groups follow the SLDS form-element pattern: no container

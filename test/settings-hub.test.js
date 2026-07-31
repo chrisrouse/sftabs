@@ -24,6 +24,7 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'popup.html'), 'utf8');
 const js = fs.readFileSync(path.join(root, 'js/popup.js'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'css/popup.css'), 'utf8');
 
 let passed = 0;
 let failed = 0;
@@ -159,6 +160,34 @@ if (refreshMap) {
   check('the navigator actually invokes the map',
     /if \(id\) SETTINGS_SECTION_REFRESH\[id\]\?\.\(\)/.test(js));
 }
+
+// ── 9. Exactly one thing scrolls, and it is .settings-body ──
+// A scrolling flex child needs min-height: 0 on every ancestor between it and
+// the fixed-height shell, or the chain refuses to shrink and the overflow never
+// materialises. And a second scroll container above it is not harmless: the
+// view used to scroll instead, with a companion rule cancelling the body's own
+// overflow. Removing one without the other left nothing able to scroll, because
+// .panel-view clips.
+const rulesFor = selector =>
+  [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)]
+    .filter(m => m[1].split(',').some(sel => sel.trim().endsWith(selector)))
+    .map(m => m[2]);
+
+const bodyOwn = rulesFor('.settings-body')[0] || '';
+check('.settings-body declares itself the scroll container',
+  /flex:\s*1/.test(bodyOwn) && /min-height:\s*0/.test(bodyOwn) && /overflow-y:\s*auto/.test(bodyOwn));
+
+check('nothing cancels that scrolling',
+  !rulesFor('.settings-body').some(body =>
+    /overflow\s*:\s*(visible|hidden)/.test(body) || /flex\s*:\s*none/.test(body)));
+
+check('the view above it does not scroll too',
+  !/#view-settings\s*\{[^}]*overflow/.test(css));
+
+['.app-body', '.panel-tray', '.panel-view'].forEach(sel => {
+  check(`${sel} can shrink, so the overflow reaches the body`,
+    rulesFor(sel).some(body => /min-height:\s*0/.test(body)));
+});
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);
