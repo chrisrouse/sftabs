@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — per-tab colors</title>
+<style>
+  :root { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+
+  /* Real SLDS expressive-palette pairs, 40 for the accent and 90 for the wash.
+     Taken from @salesforce-ux/design-system-2, not sampled by eye. */
+  :root {
+    --c-red:    light-dark(#ba0517, #fe5c4c);  --c-red-bg:    light-dark(#feded8, #300c01);
+    --c-orange: light-dark(#825101, #dd7a01);  --c-orange-bg: light-dark(#fedfd0, #201600);
+    --c-yellow: light-dark(#8c4b02, #ca8501);  --c-yellow-bg: light-dark(#f9e3b6, #281202);
+    --c-green:  light-dark(#396547, #3ba755);  --c-green-bg:  light-dark(#cdefc4, #071b12);
+    --c-teal:   light-dark(#056764, #06a59a);  --c-teal-bg:   light-dark(#acf3e4, #071b12);
+    --c-cloud:  light-dark(#05628a, #0d9dda);  --c-cloud-bg:  light-dark(#cfe9fe, #001a28);
+    --c-blue:   light-dark(#0b5cab, #1b96ff);  --c-blue-bg:   light-dark(#d8e6fe, #001639);
+    --c-indigo: light-dark(#3a49da, #7f8ced);  --c-indigo-bg: light-dark(#e0e5f8, #17094e);
+    --c-violet: light-dark(#9602c7, #cb65ff);  --c-violet-bg: light-dark(#f2defe, #2e0039);
+    --c-purple: light-dark(#7526e3, #ad7bee);  --c-purple-bg: light-dark(#ece1f9, #240643);
+    --c-pink:   light-dark(#b60554, #ff538a);  --c-pink-bg:   light-dark(#fddde3, #370114);
+
+    --page:    light-dark(#f3f2f2, #181818);
+    --surface: light-dark(#ffffff, #242424);
+    --text:    light-dark(#181818, #e5e5e5);
+    --muted:   light-dark(#5c5c5c, #aeaeae);
+    --line:    light-dark(#e5e5e5, #444444);
+    --brand:   light-dark(#0176d3, #1b96ff);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--page); color: var(--text); padding: 28px;
+  }
+  h1 { font-size: 20px; font-weight: 600; }
+  h2 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .lede, .why { color: var(--muted); max-width: 92ch; }
+  .lede { margin: 8px 0 20px; }
+  .why { font-size: 12px; margin-bottom: 12px; }
+  section { margin-bottom: 34px; }
+
+  .bar { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+  .bar .sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
+  .bar button {
+    font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer;
+    border: 1px solid var(--line); border-radius: 100px;
+    background: var(--surface); color: var(--text);
+  }
+  .bar button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+  /* ── Salesforce Setup tab bar ── */
+  .sf-chrome { border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .sf-search { height: 46px; background: var(--surface); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; padding: 0 16px; }
+  .sf-search span { width: 260px; height: 26px; border: 1px solid var(--line); border-radius: 100px;
+    display: flex; align-items: center; padding: 0 12px; font-size: 12px; color: var(--muted); }
+  .tabbar { display: flex; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .tab {
+    position: relative; padding: 11px 16px; font-size: 13px; color: var(--text);
+    border-right: 1px solid var(--line); cursor: pointer; white-space: nowrap;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .tab .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--tc); display: none; flex-shrink: 0; }
+  .tab::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: transparent; }
+  .tab.is-active { font-weight: 600; }
+  .tab.is-active::after { background: var(--brand); }
+  .sf-body { background: var(--page); padding: 18px; height: 90px; }
+
+  /* Treatment: none — nothing extra, platform only */
+
+  /* Treatment: dot — a colored bead before the label */
+  [data-treat="dot"] .tab .dot { display: block; }
+  [data-treat="dot"] .tab.is-active::after { background: var(--tc); }
+
+  /* Treatment: underline — the tab's own rule carries the color */
+  [data-treat="underline"] .tab::after { background: color-mix(in srgb, var(--tc) 35%, transparent); }
+  [data-treat="underline"] .tab.is-active::after { background: var(--tc); }
+
+  /* Treatment: tint — a wash plus a colored label */
+  [data-treat="tint"] .tab { background: var(--tc-bg); color: var(--tc); }
+  [data-treat="tint"] .tab.is-active::after { background: var(--tc); }
+
+  /* Treatment: fill — the competitor's, solid color behind the label */
+  [data-treat="fill"] .tab { background: var(--tc); color: #fff; }
+  [data-treat="fill"] .tab.is-active::after { background: light-dark(#000, #fff); opacity: .45; }
+
+  /* ── The other three surfaces ── */
+  .surfaces { display: flex; gap: 18px; flex-wrap: wrap; }
+  .surface { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; width: 250px; overflow: hidden; }
+  .surface h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+    font-weight: 600; padding: 10px 12px 6px; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 9px 12px; font-size: 13px; position: relative; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row .bead { width: 7px; height: 7px; border-radius: 50%; background: var(--tc); flex-shrink: 0; }
+  .row .edge { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--tc); }
+  .card-row { border: 1px solid var(--line); border-radius: 6px; margin: 6px 8px; padding: 9px 12px; }
+
+  /* ── Palette picker ── */
+  .picker { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; width: 330px; }
+  .picker .label { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background: var(--sc); }
+  .sw[aria-pressed="true"] { border-color: var(--text); box-shadow: 0 0 0 2px var(--surface) inset; }
+  .sw.none { background: transparent; border: 1px dashed var(--muted); position: relative; }
+  .sw.none::after { content: ''; position: absolute; inset: 5px 0; left: 50%; width: 1px;
+    background: var(--muted); transform: rotate(45deg); }
+
+  .note { font-size: 12px; color: var(--muted); max-width: 92ch; }
+  .note + .note { margin-top: 8px; }
+  .note b { color: var(--text); }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px;
+    background: light-dark(#eef1f6, #2e2e2e); padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>Per-tab colors</h1>
+<p class="lede">
+  Five treatments over the same six tabs, from "platform only" to the competitor's
+  solid fill. The point of showing them together is that the colour data is
+  identical in every case — only the rendering differs — so the treatment can be a
+  user setting rather than a decision we impose.
+</p>
+
+<div class="bar">
+  <button data-treat-btn="none" aria-pressed="true">None (today)</button>
+  <button data-treat-btn="dot">Dot</button>
+  <button data-treat-btn="underline">Underline</button>
+  <button data-treat-btn="tint">Tint</button>
+  <button data-treat-btn="fill">Fill (competitor)</button>
+  <span class="sep"></span>
+  <button id="theme">Dark</button>
+</div>
+
+<section>
+  <h2>Setup tab bar</h2>
+  <p class="why" id="treat-why">Salesforce's own styling, untouched. This is where we are now.</p>
+  <div class="sf-chrome">
+    <div class="sf-search"><span>Search Setup</span></div>
+    <div class="tabbar" id="tabbar"></div>
+    <div class="sf-body"></div>
+  </div>
+</section>
+
+<section>
+  <h2>The same colours on the other three surfaces</h2>
+  <p class="why">
+    Whatever we choose has to work in four places, not one. These use the subtler
+    end — a bead in menus, an edge on cards — because a menu row filled with colour
+    is unreadable at 12px, whichever treatment the tab bar uses.
+  </p>
+  <div class="surfaces">
+    <div class="surface">
+      <h3>Header menu</h3>
+      <div id="s-header"></div>
+    </div>
+    <div class="surface">
+      <h3>Floating panel</h3>
+      <div id="s-floating"></div>
+    </div>
+    <div class="surface">
+      <h3>Popup list</h3>
+      <div id="s-popup"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Setting the colour</h2>
+  <p class="why">
+    A fixed palette rather than a free colour picker — reasoning below.
+  </p>
+  <div class="picker">
+    <div class="label">Tab colour</div>
+    <div class="swatches" id="swatches"></div>
+  </div>
+</section>
+
+<section>
+  <h2>Notes</h2>
+  <p class="note">
+    <b>A curated palette, not a colour wheel.</b> Every swatch is an SLDS
+    expressive-palette pair — the 40 for the accent, the 90 for any wash — so each
+    one already has a dark-mode counterpart and known contrast. A free picker lets
+    someone choose <code>#ffff00</code>, which is unreadable in light mode, invisible
+    in dark, and ours to apologise for. Eleven hues is more than anyone will use.
+  </p>
+  <p class="note">
+    <b>Colour is optional and additive.</b> <code>tab.color</code> would be a new
+    optional field on <code>TAB_STRUCTURE</code>. Absent means today's behaviour
+    exactly, so nothing changes for existing users and nothing changes for anyone
+    who never opens the picker.
+  </p>
+  <p class="note">
+    <b>The treatment is a setting, not a decision.</b> One preference —
+    <code>tabColorStyle</code> — choosing none / dot / underline / tint / fill. You
+    get the restrained version, someone migrating from the competitor gets what they
+    are used to, and we do not have to be right about which is better.
+  </p>
+  <p class="note">
+    <b>Dark mode comes free, but only via the palette.</b> Each pair is a
+    <code>light-dark()</code>, so a tab coloured "teal" resolves to
+    <code>#056764</code> on white and <code>#06a59a</code> on dark. That is only
+    possible because the value stored is a palette <em>name</em>, not a hex string.
+    Storing hex would strand every coloured tab in one theme.
+  </p>
+  <p class="note">
+    <b>Fill has a real cost, which is why it is not the default.</b> It overrides
+    Salesforce's active-tab indicator, so the active tab stops being obvious — note
+    how the mockup has to fake one with a dark bar. It also fights the org's own
+    theme colour. Worth offering; not worth defaulting to.
+  </p>
+</section>
+
+<script>
+  const TABS = [
+    { name: 'Flows',            color: 'cloud'  },
+    { name: 'Users',            color: 'green'  },
+    { name: 'Profiles',         color: 'purple' },
+    { name: 'Permission Sets',  color: 'orange', active: true },
+    { name: 'CMDT',             color: 'teal'   },
+    { name: 'Sites',            color: null     },
+  ];
+  const PALETTE = ['red','orange','yellow','green','teal','cloud','blue','indigo','violet','purple','pink'];
+
+  const vars = c => c ? `--tc: var(--c-${c}); --tc-bg: var(--c-${c}-bg);`
+                      : '--tc: var(--muted); --tc-bg: transparent;';
+
+  document.getElementById('tabbar').innerHTML = TABS.map(t => `
+    <div class="tab ${t.active ? 'is-active' : ''}" style="${vars(t.color)}">
+      <span class="dot"></span>${t.name}
+    </div>`).join('');
+
+  // Menus stay subtle regardless of the tab bar treatment
+  document.getElementById('s-header').innerHTML = TABS.map(t => `
+    <div class="row" style="${vars(t.color)}">
+      ${t.color ? '<span class="bead"></span>' : '<span class="bead" style="background:transparent"></span>'}
+      ${t.name}
+    </div>`).join('');
+  document.getElementById('s-floating').innerHTML = TABS.map(t => `
+    <div class="row" style="${vars(t.color)}">
+      ${t.color ? '<span class="bead"></span>' : '<span class="bead" style="background:transparent"></span>'}
+      ${t.name}
+    </div>`).join('');
+  document.getElementById('s-popup').innerHTML = TABS.map(t => `
+    <div class="row card-row" style="${vars(t.color)}">
+      ${t.color ? '<span class="edge"></span>' : ''}
+      ${t.name}
+    </div>`).join('');
+
+  document.getElementById('swatches').innerHTML =
+    `<button class="sw none" aria-pressed="false" title="No colour"></button>` +
+    PALETTE.map((c, i) => `
+      <button class="sw" style="--sc: var(--c-${c})" title="${c}"
+        aria-pressed="${c === 'orange'}"></button>`).join('');
+  document.getElementById('swatches').addEventListener('click', e => {
+    const sw = e.target.closest('.sw');
+    if (!sw) return;
+    [...e.currentTarget.children].forEach(b => b.setAttribute('aria-pressed', 'false'));
+    sw.setAttribute('aria-pressed', 'true');
+  });
+
+  const WHY = {
+    none:      "Salesforce's own styling, untouched. This is where we are now.",
+    dot:       'A bead before the label, and the active tab’s indicator takes the colour. Readable at a glance, and the platform look survives intact.',
+    underline: 'Every tab carries a muted rule in its colour; the active one goes full strength. Reads as a colour-coded set without adding a second shape.',
+    tint:      'A wash from the palette’s 90 plus a label in its 40. Stronger, still legible, still recognisably a Salesforce tab bar.',
+    fill:      'The competitor’s: solid colour behind a white label. Loudest, and it costs you the active-tab indicator — the dark bar here is a substitute for the one it covers.',
+  };
+  document.querySelectorAll('[data-treat-btn]').forEach(btn => {
+    btn.onclick = () => {
+      const t = btn.dataset.treatBtn;
+      document.querySelectorAll('[data-treat-btn]').forEach(b =>
+        b.setAttribute('aria-pressed', String(b === btn)));
+      document.body.setAttribute('data-treat', t);
+      document.getElementById('treat-why').textContent = WHY[t];
+    };
+  });
+  document.body.setAttribute('data-treat', 'none');
+
+  const themeBtn = document.getElementById('theme');
+  themeBtn.onclick = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    themeBtn.textContent = dark ? 'Dark' : 'Light';
+  };
+</script>
+</body>
+</html>
