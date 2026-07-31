@@ -119,6 +119,30 @@ check('the theme control survived the move',
 check('the storage radios survived the move',
   (panel.match(/name="storage-type"/g) || []).length === 2);
 
+// ── 5b. Each control is in the section it belongs to ──
+// Controls get moved between sections by hand, and a misplaced one is invisible
+// — the section it landed in just grows a row nobody expected, and the section
+// it was meant for silently lacks it. That is exactly how the Quick Add toggle
+// ended up in General: it was inserted next to skip-delete, which had itself
+// moved to General a commit earlier.
+const BELONGS_IN = {
+  general:  ['setting-compact', 'setting-skip-delete'],
+  tabs:     ['setting-tab-colors', 'row-tab-color-style', 'setting-quick-add-all'],
+  profiles: ['setting-profiles', 'setting-auto-switch', 'profiles-list'],
+};
+Object.entries(BELONGS_IN).forEach(([section, ids]) => {
+  const body = sectionBody(section);
+  ids.forEach(id => {
+    const elsewhere = sections.find(other => other !== section && sectionBody(other).includes(`id="${id}"`));
+    check(`#${id} is in "${section}"`,
+      body.includes(`id="${id}"`),
+      elsewhere ? `found in "${elsewhere}" instead` : '');
+  });
+});
+
+check('the theme cards are in "general"', sectionBody('general').includes('data-theme-val'));
+check('the storage radios are in "data"', sectionBody('data').includes('name="storage-type"'));
+
 // ── 6. Profiles is managed in its section, not a sheet of its own ──
 // The list used to live in a separate panel-view reached through a Manage
 // button. Both are gone; if either comes back, the feature has two homes again.
