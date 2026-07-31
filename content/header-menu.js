@@ -17,6 +17,11 @@
   // SLDS new_window, the same glyph Salesforce puts on menu items that leave the
   // page. Shown only on hover or focus, as theirs is.
   const NEW_WINDOW = 'M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7';
+  // Disclosure chevron, matching the floating panel's .dropdown-indicator: a
+  // stroked polyline rather than a filled path, rotated 90deg when open.
+  const CHEVRON = '<svg class="sftabs-hm-chev-icon" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' +
+    'aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"></polyline></svg>';
   const CLOSE = 'm310 254 130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 0 1-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0 1 14 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 0 1 0-14';
 
   // Native menus sit 12.8px below their trigger (margin-top on the popup), which
@@ -173,33 +178,42 @@
    * way they do on Salesforce's own menu items.
    */
   function rowHTML(tab, index) {
-    const kids = childrenOf(tab);
-    const href = urlFor(tab);
-    const marks = [
-      kids.length
-        ? `<span class="sftabs-hm-count">${kids.length}<span class="sftabs-hm-chev" aria-hidden="true">&rsaquo;</span></span>`
-        : '',
-      // Same affordance Salesforce shows on items that leave the page, and on the
-      // same terms: only while the row is hovered or focused.
-      tab.openInNewTab
-        ? `<span class="sftabs-hm-newtab">${svg(NEW_WINDOW, 'slds-icon slds-icon_x-small')}
-             <span class="slds-assistive-text">${esc(msg('opensInNewTabTitle'))}</span></span>`
-        : ''
-    ].filter(Boolean).join('');
-    const trailing = marks
-      ? `<div class="slds-p-right_small slds-p-left_small slds-no-flex slds-size_2-of-12">${marks}</div>`
+    return itemHTML({
+      item: tab,
+      depth: 0,
+      href: urlFor(tab),
+      attrs: `data-index="${index}"`,
+      hasKids: childrenOf(tab).length > 0,
+    });
+  }
+
+  /**
+   * One row, at any depth. Layout follows the floating panel: disclosure chevron
+   * on the left of anything with children, label after it, and depth carried by
+   * a plain indent — no rules, no counts.
+   */
+  function itemHTML({ item, depth, href, attrs = '', hasKids, subOf }) {
+    const chevron = hasKids
+      ? `<span class="sftabs-hm-chev">${CHEVRON}</span>`
+      : '';
+    const newTab = item.openInNewTab
+      ? `<div class="slds-p-right_small slds-no-flex sftabs-hm-newtab">
+           ${svg(NEW_WINDOW, 'slds-icon slds-icon_x-small')}
+           <span class="slds-assistive-text">${esc(msg('opensInNewTabTitle'))}</span>
+         </div>`
       : '';
     return `
-      <li role="presentation" class="slds-dropdown__item uiMenuItem" data-index="${index}">
-        <a role="menuitem" title="${esc(tab.label)}"${href ? ` href="${esc(href)}"` : ''}${
-          tab.openInNewTab ? ' target="_blank" rel="noopener"' : ''}>
+      <li role="presentation" class="slds-dropdown__item uiMenuItem sftabs-hm-depth-${depth}"
+          ${attrs}${subOf !== undefined ? ` data-sub-of="${subOf}"` : ''}>
+        <a role="menuitem" title="${esc(item.label)}"${href ? ` href="${esc(href)}"` : ''}${
+          item.openInNewTab ? ' target="_blank" rel="noopener"' : ''}${
+          hasKids ? ' aria-expanded="false"' : ''}>
           <div class="slds-grid">
-            <div class="slds-col slds-size_${marks ? '10' : '12'}-of-12">
-              <span class="slds-truncate">
-                <span class="slds-align-middle">${esc(tab.label)}</span>
-              </span>
+            ${chevron}
+            <div class="slds-col slds-truncate">
+              <span class="slds-align-middle">${esc(item.label)}</span>
             </div>
-            ${trailing}
+            ${newTab}
           </div>
         </a>
       </li>`;
@@ -263,9 +277,9 @@
       if (!link) return;
       link.addEventListener('click', event => {
         const kids = childrenOf(tab);
-        // The count column, or a tab with children and no destination of its
-        // own, expands the sub-items instead of navigating.
-        if (kids.length && (event.target.closest('.sftabs-hm-count') || !tab.path)) {
+        // The chevron expands; the label still navigates. A tab with children and
+        // no destination of its own can only expand.
+        if (kids.length && (event.target.closest('.sftabs-hm-chev') || !tab.path)) {
           event.preventDefault();
           event.stopPropagation();
           toggleSubItems(li, tab);
@@ -352,13 +366,12 @@
     });
     if (open) return;                                   // second click collapses
 
-    // Children first, then their own children, so the flattened order still
-    // reads top-down. Depth drives the indent, which is what makes the nesting
-    // legible — without it a child is indistinguishable from a sibling tab.
+    // Children then their own children, so the flattened order still reads
+    // top-down. Depth drives the indent, which is what carries the nesting.
     const rows = [];
     childrenOf(tab).forEach(child => {
-      rows.push({ item: child, depth: 0 });
-      childrenOf(child).forEach(grand => rows.push({ item: grand, depth: 1 }));
+      rows.push({ item: child, depth: 1, hasKids: childrenOf(child).length > 0 });
+      childrenOf(child).forEach(grand => rows.push({ item: grand, depth: 2, hasKids: false }));
     });
     if (!rows.length) return;
 
@@ -367,22 +380,12 @@
     if (parentLink) parentLink.setAttribute('aria-expanded', 'true');
 
     let cursor = li;
-    rows.forEach(({ item, depth }) => {
-      const el = document.createElement('li');
-      el.setAttribute('role', 'presentation');
-      el.className = `slds-dropdown__item uiMenuItem sftabs-hm-sub-item sftabs-hm-depth-${depth}`;
-      el.dataset.subOf = key;
-      const href = urlFor(item);
-      el.innerHTML = `
-        <a role="menuitem" title="${esc(item.label)}"${href ? ` href="${esc(href)}"` : ''}>
-          <div class="slds-grid">
-            <div class="slds-col slds-size_12-of-12">
-              <span class="slds-truncate">
-                <span class="slds-align-middle">${esc(item.label)}</span>
-              </span>
-            </div>
-          </div>
-        </a>`;
+    rows.forEach(({ item, depth, hasKids }) => {
+      const holder = document.createElement('ul');      // <li> only parses inside a list
+      holder.innerHTML = itemHTML({ item, depth, href: urlFor(item), hasKids, subOf: key });
+      const el = holder.querySelector('li');
+      // Sub-items already show their own children inline, so their chevron is
+      // decorative here; the whole row navigates.
       el.querySelector('a').addEventListener('click', event => {
         if (event.metaKey || event.ctrlKey || event.button === 1) { closeMenu(); return; }
         event.preventDefault();

@@ -122,17 +122,6 @@
 #sftabs-header-menu li.uiMenuItem:hover .sftabs-hm-newtab,
 #sftabs-header-menu li.uiMenuItem > a:focus .sftabs-hm-newtab { visibility: visible; }
 
-#sftabs-header-menu .sftabs-hm-count {
-  color: #706e6b;
-  font-size: 11px;
-  white-space: nowrap;
-  margin-right: 4px;
-}
-#sftabs-header-menu .slds-size_2-of-12 {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
 #sftabs-header-menu .sftabs-hm-empty {
   display: block;
   padding: 4px 12px 8px;
@@ -140,37 +129,27 @@
   color: #706e6b;
 }
 
-/* ── Expanded sub-items ──
-   Indentation carries the hierarchy. There is no native nested menu to copy, and
-   a divider alone did not work: a child at the same indent as its parent reads as
-   a sibling, so "Flows > Failed Flows" looked like two unrelated tabs. The rule
-   down the left binds the group to the tab above it. */
-/* li.uiMenuItem is repeated in these selectors on purpose. The generic row rule
-   above is #id li.uiMenuItem > a — specificity 1,1,2 — and sets the padding
-   shorthand. Matching only .sftabs-hm-sub-item scores 1,1,1 and loses, so the
-   indent silently never applied while the ::before hairline did, which left the
-   rows looking flat with stray rules beside them. */
-#sftabs-header-menu li.uiMenuItem.sftabs-hm-sub-item > a {
-  position: relative;
-  padding-left: 32px;
-  font-size: 12px;
-}
-#sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-1 > a { padding-left: 52px; }
+/* ── Nesting ──
+   Layout follows the floating panel: disclosure chevron on the left, depth
+   carried by a plain indent. No rules and no counts — both were tried and made
+   the levels harder to read, not easier.
 
-#sftabs-header-menu li.uiMenuItem.sftabs-hm-sub-item > a::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 20px;
-  border-left: 1px solid #dddbda;
-}
-#sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-1 > a::before { left: 40px; }
+   li.uiMenuItem is repeated in these selectors on purpose. The generic row rule
+   above is #id li.uiMenuItem > a, specificity 1,1,2, and it sets the padding
+   shorthand — matching on the depth class alone scores 1,1,1 and silently
+   loses, which is how the indent came to have no effect at all. */
+#sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-1 > a { padding-left: 32px; }
+#sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-2 > a { padding-left: 52px; }
 
-/* The chevron turns to point down while the group is open */
+#sftabs-header-menu .slds-grid { align-items: center; }
+
 #sftabs-header-menu .sftabs-hm-chev {
-  display: inline-block;
-  margin-left: 3px;
-  transition: transform 0.1s linear;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 4px;
+  color: #706e6b;
+  transition: transform 0.2s ease;
 }
-#sftabs-header-menu li.is-open .sftabs-hm-chev { transform: rotate(90deg); }
+#sftabs-header-menu .sftabs-hm-chev-icon { width: 14px; height: 14px; }
+#sftabs-header-menu li.is-open > a .sftabs-hm-chev { transform: rotate(90deg); }
