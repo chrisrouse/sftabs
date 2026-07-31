@@ -520,12 +520,26 @@ async function getProfiles() {
  */
 async function saveProfiles(profiles, showToast = true) {
   try {
-    // Order by explicit position when the caller has assigned one, so a
-    // user-arranged order survives a save. Profiles written before `position`
-    // existed have none, tie at Infinity, and keep their creation order — so
-    // this behaves exactly as before for untouched data.
-    const sortedProfiles = [...profiles].sort((a, b) =>
-      (a.position ?? Infinity) - (b.position ?? Infinity) ||
+    // Fill in any missing `position` before ordering, walking the array and
+    // handing out the next number above the highest seen so far. That keeps the
+    // incoming order exactly as given while making the data fully positioned,
+    // which is the point: a set where some profiles carry a position and others
+    // do not cannot be ordered coherently.
+    //
+    // Sorting the gaps to Infinity instead — the previous approach — looked
+    // right because untouched data all tied and fell back to creation order.
+    // But Infinity also means last, so a single newly created profile with a
+    // real position sorted ahead of every profile that predated the field, and
+    // new profiles surfaced at the top of the list instead of the bottom.
+    let nextPosition = 0;
+    const positioned = profiles.map(profile => {
+      const position = Number.isFinite(profile.position) ? profile.position : nextPosition;
+      nextPosition = Math.max(nextPosition, position) + 1;
+      return profile.position === position ? profile : { ...profile, position };
+    });
+
+    const sortedProfiles = positioned.sort((a, b) =>
+      a.position - b.position ||
       new Date(a.createdAt) - new Date(b.createdAt)
     );
 

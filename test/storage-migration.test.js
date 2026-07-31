@@ -197,6 +197,46 @@ const counts = async () => ({
   r = await deleteProfile('p2', r.profiles);
   check('deleting the last profile is refused', r.refused === true && r.profiles.length === 1);
 
+  // ── Profile ordering ──
+  // A new profile is appended, so it has to come out last. It did not: profiles
+  // written before `position` existed carry none, the old sort tied those at
+  // Infinity, and Infinity also means last — so the single profile holding a
+  // real position sorted ahead of every legacy one, and anything newly created
+  // surfaced at the top of the list instead of the bottom.
+  const orderAfterSave = async profiles => {
+    await S.saveProfiles(profiles, false);
+    const stored = (await S.getProfiles()) || [];
+    return stored.map(p => p.name).join(' -> ');
+  };
+
+  const legacy = [
+    { id: 'a', name: 'Default', createdAt: '2025-01-01T00:00:00Z' },
+    { id: 'b', name: 'test',    createdAt: '2025-02-01T00:00:00Z' },
+  ];
+
+  check('a new profile lands at the bottom, past profiles that predate position',
+    await orderAfterSave([...legacy,
+      { id: 'c', name: 'newest', createdAt: '2025-03-01T00:00:00Z', position: 2 }])
+    === 'Default -> test -> newest');
+
+  check('untouched legacy profiles keep their creation order',
+    await orderAfterSave(legacy) === 'Default -> test');
+
+  check('a dragged order survives the save',
+    await orderAfterSave([
+      { id: 'c', name: 'C', position: 0 },
+      { id: 'a', name: 'A', position: 1 },
+      { id: 'b', name: 'B', position: 2 },
+    ]) === 'C -> A -> B');
+
+  check('a half-positioned set keeps the order it arrived in',
+    await orderAfterSave([
+      { id: 'a', name: 'A', position: 5 }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' },
+    ]) === 'A -> B -> C');
+
+  check('saving fills every gap, so the mixed state cannot recur',
+    ((await S.getProfiles()) || []).every(p => Number.isFinite(p.position)));
+
   const failed = results.filter(r2 => !r2.pass);
   console.log(`\n${results.length - failed.length}/${results.length} passed`);
   process.exit(failed.length ? 1 : 0);
