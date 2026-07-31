@@ -2174,11 +2174,9 @@ function applyProfilesVisibility(enabled) {
 // ── Settings panel ─────────────────────────────────────────────
 
 function syncSettingsPanel() {
-  const themeButtons = document.querySelectorAll('.seg-btn[data-theme-val]');
-  themeButtons.forEach(btn => {
-    const active = btn.dataset.themeVal === state.settings.themeMode;
-    btn.classList.toggle('active', active);
-    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  document.querySelectorAll('.theme-card[data-theme-val]').forEach(card => {
+    card.setAttribute('aria-checked',
+      String(card.dataset.themeVal === state.settings.themeMode));
   });
   document.getElementById('setting-compact').checked       = state.settings.compactMode;
   document.getElementById('setting-skip-delete').checked   = state.settings.skipDeleteConfirmation;
@@ -2283,16 +2281,12 @@ function bindEvents() {
     }
   });
 
-  document.querySelectorAll('.seg-btn[data-theme-val]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.seg-btn[data-theme-val]').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-      applyTheme(btn.dataset.themeVal);
-      patchSettings({ themeMode: btn.dataset.themeVal });
+  const themeCards = document.querySelectorAll('.theme-card[data-theme-val]');
+  themeCards.forEach(card => {
+    card.addEventListener('click', () => {
+      themeCards.forEach(c => c.setAttribute('aria-checked', String(c === card)));
+      applyTheme(card.dataset.themeVal);
+      patchSettings({ themeMode: card.dataset.themeVal });
     });
   });
 

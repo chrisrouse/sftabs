@@ -279,16 +279,26 @@
             <section class="settings-section" data-settings-section="appearance"
               aria-labelledby="s-appearance" hidden>
               <h3 class="settings-section-title sr-only" id="s-appearance">__MSG_settingsNavGeneral__</h3>
-                <div class="settings-row">
+                <div class="settings-row settings-row--stack">
                   <div class="settings-row-label">
                     <span class="settings-label">__MSG_themeMode__</span>
                   </div>
-                  <div class="settings-row-control">
-                    <div class="seg-ctrl" role="group" aria-label="__MSG_ariaThemeSelection__">
-                      <button class="seg-btn active" data-theme-val="light" aria-pressed="true">__MSG_themeLight__</button>
-                      <button class="seg-btn" data-theme-val="dark" aria-pressed="false">__MSG_themeDark__</button>
-                      <button class="seg-btn" data-theme-val="system" aria-pressed="false">__MSG_themeSystem__</button>
-                    </div>
+                  <div class="theme-cards" role="radiogroup" aria-label="__MSG_ariaThemeSelection__">
+                    <button type="button" class="theme-card" data-theme-val="light"
+                      role="radio" aria-checked="false">
+                      <span class="theme-card-art"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="42" rx="4" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#f3f3f3"/><path d="M1 12h62" stroke="#c9c9c9" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="12" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="17" cy="6.5" r="1.4" fill="#c9c9c9"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#c9c9c9"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#e5e5e5"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#e5e5e5"/></svg></span>
+                      <span class="theme-card-name">__MSG_themeLight__</span>
+                    </button>
+                    <button type="button" class="theme-card" data-theme-val="dark"
+                      role="radio" aria-checked="false">
+                      <span class="theme-card-art"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="42" rx="4" fill="#2e2e2e" stroke="#5c5c5c" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#1a1a1a"/><path d="M1 12h62" stroke="#5c5c5c" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="12" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="17" cy="6.5" r="1.4" fill="#8a8a8a"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#8a8a8a"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#5c5c5c"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#5c5c5c"/></svg></span>
+                      <span class="theme-card-name">__MSG_themeDark__</span>
+                    </button>
+                    <button type="button" class="theme-card" data-theme-val="system"
+                      role="radio" aria-checked="false">
+                      <span class="theme-card-art"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><defs><clipPath id="sft-theme-split"><rect x="32" y="0" width="32" height="44"/></clipPath></defs><rect x="1" y="1" width="62" height="42" rx="4" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#f3f3f3"/><path d="M1 12h62" stroke="#c9c9c9" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="12" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="17" cy="6.5" r="1.4" fill="#c9c9c9"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#c9c9c9"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#e5e5e5"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#e5e5e5"/><g clip-path="url(#sft-theme-split)"><rect x="1" y="1" width="62" height="42" rx="4" fill="#2e2e2e" stroke="#5c5c5c" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#1a1a1a"/><path d="M1 12h62" stroke="#5c5c5c" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="12" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="17" cy="6.5" r="1.4" fill="#8a8a8a"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#8a8a8a"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#5c5c5c"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#5c5c5c"/></g></svg></span>
+                      <span class="theme-card-name">__MSG_themeSystem__</span>
+                    </button>
                   </div>
                 </div>
 

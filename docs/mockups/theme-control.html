@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — theme control</title>
+<style>
+  :root { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  :root {
+    --page: light-dark(#f3f3f3, #181818);
+    --s-panel: light-dark(#ffffff, #181818);
+    --s-1: light-dark(#ffffff, #2e2e2e);
+    --s-2: light-dark(#f3f3f3, #181818);
+    --s-hover: light-dark(#f3f3f3, #444444);
+    --t-base: light-dark(#2e2e2e, #e5e5e5);
+    --t-weak: light-dark(#757575, #939393);
+    --t-muted: light-dark(#5c5c5c, #aeaeae);
+    --b-subtle: light-dark(#e5e5e5, #444444);
+    --b-medium: light-dark(#c9c9c9, #444444);
+    --accent: #066afe;
+    --accent-bg: light-dark(#edf4ff, #002775);
+    --r-sm: 4px; --r-md: 8px;
+    --ease: .2s cubic-bezier(.4,0,.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: var(--page); color: var(--t-base); padding: 28px 28px 60px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  .lede { color: var(--t-muted); max-width: 90ch; margin: 6px 0 18px; }
+  .toggle-theme { position: fixed; top: 16px; right: 16px; padding: 6px 12px; font: inherit;
+                   cursor: pointer; background: var(--s-1); color: var(--t-base);
+                   border: 1px solid var(--b-medium); border-radius: var(--r-sm); }
+  .strip { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; }
+  .cap { font-size: 12px; color: var(--t-weak); margin-bottom: 6px; }
+  .cap b { color: var(--t-base); font-weight: 600; }
+  .note { color: var(--t-weak); max-width: 90ch; margin: 26px 0 10px; }
+
+  .panel { width: 380px; background: var(--s-panel); border: 1px solid var(--b-subtle);
+            border-radius: var(--r-md); overflow: hidden; }
+  .phead { display: flex; align-items: center; justify-content: flex-start; gap: 8px;
+            padding: 12px 16px; border-bottom: 1px solid var(--b-subtle); background: var(--s-1); }
+  .ptitle { font-size: 15px; font-weight: 600; }
+  .backbtn { width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center;
+              justify-content: center; background: transparent; color: var(--t-muted);
+              cursor: pointer; border: 1px solid var(--b-medium); border-radius: 50%; }
+  .backbtn svg { width: 11px; height: 11px; }
+  .pbody { padding: 4px 16px 16px; }
+
+  .srow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; }
+  .sblock { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; }
+  .srow + .srow, .sblock + .srow { border-top: 1px solid var(--b-subtle); }
+  .slabel { display: flex; flex-direction: column; }
+  .sname { font-weight: 500; }
+  .sdesc { font-size: 12px; color: var(--t-weak); }
+  .sw { width: 34px; height: 20px; border-radius: 10px; background: var(--b-medium); position: relative; flex-shrink: 0; }
+  .sw::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; }
+
+  /* T1 — icons only */
+  .seg { display: inline-flex; border: 1px solid var(--b-medium); border-radius: var(--r-sm);
+          overflow: hidden; background: var(--s-2); }
+  .seg button { font: inherit; cursor: pointer; background: none; color: var(--t-muted);
+                 border: 0; border-right: 1px solid var(--b-medium); transition: background var(--ease); }
+  .seg button:last-child { border-right: 0; }
+  .seg button:hover { background: var(--s-hover); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .seg--icon button { width: 40px; height: 30px; display: grid; place-items: center; }
+  .seg--icon svg { width: 15px; height: 15px; }
+
+  /* T2 — icon over label */
+  .seg--stack button { width: 62px; padding: 6px 0 5px; display: flex; flex-direction: column;
+                        align-items: center; gap: 3px; font-size: 11px; }
+  .seg--stack svg { width: 15px; height: 15px; }
+
+  /* T3 — cards */
+  .theme-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .theme-card { display: flex; flex-direction: column; gap: 5px; padding: 0; font: inherit;
+                color: var(--t-muted); background: none; border: 0; cursor: pointer; }
+  .theme-card-art { display: block; border: 1.5px solid var(--b-medium); border-radius: var(--r-sm);
+                    overflow: hidden; transition: border-color var(--ease), box-shadow var(--ease); }
+  .theme-card-art svg { display: block; width: 100%; height: auto; }
+  .theme-card-name { font-size: 12px; text-align: center; }
+  .theme-card:hover .theme-card-art { border-color: var(--t-weak); }
+  .theme-card[aria-checked="true"] .theme-card-art { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .theme-card[aria-checked="true"] .theme-card-name { color: var(--accent); font-weight: 600; }
+  .themecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tcard { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 0;
+            font: inherit; cursor: pointer; background: none; border: 0; color: var(--t-muted); }
+  .tcard-art { display: grid; place-items: center; height: 52px; border-radius: var(--r-sm);
+                border: 1.5px solid var(--b-medium); transition: border-color var(--ease); }
+  .tcard-art svg { width: 18px; height: 18px; }
+  .tcard-art--light  { background: #ffffff; color: #5c5c5c; }
+  .tcard-art--dark   { background: #181818; color: #e5e5e5; }
+  .tcard-art--system { background: linear-gradient(90deg, #ffffff 50%, #181818 50%); color: var(--accent); }
+  .tcard-name { font-size: 12px; text-align: center; }
+  .tcard.on .tcard-art { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .tcard.on .tcard-name { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<button class="toggle-theme" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark'">Toggle theme</button>
+
+<h1>Theme control — three treatments <small style="font-weight:400;color:var(--t-weak)">(T3 shipped)</small></h1>
+<p class="lede">The Appearance section at real width. Title now sits beside the back button.
+Pick one; System is shown selected in each.</p>
+
+<div class="strip">
+  <div>
+    <div class="cap"><b>T1 — icons only, same row</b></div>
+    <div class="panel">
+      <div class="phead"><button class="backbtn"><svg viewBox="0 0 520 520" fill="currentColor" style="transform:scaleX(-1)"><path d="m179 44 207 205c6 6 6 16 0 22L179 476c-6 6-16 6-22 0l-22-22c-6-6-6-16 0-22l163-161c6-6 6-16 0-22L136 88c-6-6-6-16 0-22l22-22c6-5 15-5 21 0"/></svg></button><h2 class="ptitle">Appearance</h2></div>
+      <div class="pbody"><div class="srow">
+        <span class="slabel"><span class="sname">Theme Mode</span></span>
+        <div class="seg seg--icon"><button class="" title="Light" aria-label="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button><button class="" title="Dark" aria-label="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="on" title="System" aria-label="System"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></button></div>
+      </div>
+      <div class="srow">
+        <span class="slabel"><span class="sname">Compact Mode</span><span class="sdesc">Reduces tab item height</span></span>
+        <span class="sw"></span>
+      </div></div>
+    </div>
+  </div>
+  <div>
+    <div class="cap"><b>T2 — icon over label, same row</b></div>
+    <div class="panel">
+      <div class="phead"><button class="backbtn"><svg viewBox="0 0 520 520" fill="currentColor" style="transform:scaleX(-1)"><path d="m179 44 207 205c6 6 6 16 0 22L179 476c-6 6-16 6-22 0l-22-22c-6-6-6-16 0-22l163-161c6-6 6-16 0-22L136 88c-6-6-6-16 0-22l22-22c6-5 15-5 21 0"/></svg></button><h2 class="ptitle">Appearance</h2></div>
+      <div class="pbody"><div class="srow">
+        <span class="slabel"><span class="sname">Theme Mode</span></span>
+        <div class="seg seg--stack"><button class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><span>Light</span></button><button class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span>Dark</span></button><button class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>System</span></button></div>
+      </div>
+      <div class="srow">
+        <span class="slabel"><span class="sname">Compact Mode</span><span class="sdesc">Reduces tab item height</span></span>
+        <span class="sw"></span>
+      </div></div>
+    </div>
+  </div>
+  <div>
+    <div class="cap"><b>T3 — cards on their own line — SHIPPED</b></div>
+    <div class="panel">
+      <div class="phead"><button class="backbtn"><svg viewBox="0 0 520 520" fill="currentColor" style="transform:scaleX(-1)"><path d="m179 44 207 205c6 6 6 16 0 22L179 476c-6 6-16 6-22 0l-22-22c-6-6-6-16 0-22l163-161c6-6 6-16 0-22L136 88c-6-6-6-16 0-22l22-22c6-5 15-5 21 0"/></svg></button><h2 class="ptitle">Appearance</h2></div>
+      <div class="pbody"><div class="sblock">
+        <span class="sname">Theme Mode</span>
+        <div class="theme-cards" role="radiogroup" aria-label="Theme">
+                    <button type="button" class="theme-card" data-theme-val="light"
+                      role="radio" aria-checked="false">
+                      <span class="theme-card-art"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="42" rx="4" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#f3f3f3"/><path d="M1 12h62" stroke="#c9c9c9" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="12" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="17" cy="6.5" r="1.4" fill="#c9c9c9"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#c9c9c9"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#e5e5e5"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#e5e5e5"/></svg></span>
+                      <span class="theme-card-name">Light</span>
+                    </button>
+                    <button type="button" class="theme-card" data-theme-val="dark"
+                      role="radio" aria-checked="false">
+                      <span class="theme-card-art"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><rect x="1" y="1" width="62" height="42" rx="4" fill="#2e2e2e" stroke="#5c5c5c" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#1a1a1a"/><path d="M1 12h62" stroke="#5c5c5c" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="12" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="17" cy="6.5" r="1.4" fill="#8a8a8a"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#8a8a8a"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#5c5c5c"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#5c5c5c"/></svg></span>
+                      <span class="theme-card-name">Dark</span>
+                    </button>
+                    <button type="button" class="theme-card" data-theme-val="system"
+                      role="radio" aria-checked="true">
+                      <span class="theme-card-art"><svg viewBox="0 0 64 44" aria-hidden="true" focusable="false"><defs><clipPath id="sft-theme-split"><rect x="32" y="0" width="32" height="44"/></clipPath></defs><rect x="1" y="1" width="62" height="42" rx="4" fill="#ffffff" stroke="#c9c9c9" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#f3f3f3"/><path d="M1 12h62" stroke="#c9c9c9" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="12" cy="6.5" r="1.4" fill="#c9c9c9"/><circle cx="17" cy="6.5" r="1.4" fill="#c9c9c9"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#c9c9c9"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#e5e5e5"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#e5e5e5"/><g clip-path="url(#sft-theme-split)"><rect x="1" y="1" width="62" height="42" rx="4" fill="#2e2e2e" stroke="#5c5c5c" stroke-width="1.5"/><rect x="1.75" y="1.75" width="60.5" height="10" rx="3" fill="#1a1a1a"/><path d="M1 12h62" stroke="#5c5c5c" stroke-width="1.2"/><circle cx="7" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="12" cy="6.5" r="1.4" fill="#8a8a8a"/><circle cx="17" cy="6.5" r="1.4" fill="#8a8a8a"/><rect x="8" y="19" width="33" height="3" rx="1.5" fill="#8a8a8a"/><rect x="8" y="26" width="23" height="3" rx="1.5" fill="#5c5c5c"/><rect x="8" y="33" width="29" height="3" rx="1.5" fill="#5c5c5c"/></g></svg></span>
+                      <span class="theme-card-name">System</span>
+                    </button>
+                  </div>
+      </div>
+      <div class="srow">
+        <span class="slabel"><span class="sname">Compact Mode</span><span class="sdesc">Reduces tab item height</span></span>
+        <span class="sw"></span>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<p class="note">
+<b>T1</b> is the densest and keeps the row shape used by every other setting, but a sun and a
+moon carry the meaning alone — the words only appear on hover. <b>T2</b> keeps one row and
+still says the words, at the cost of a taller control than any other row in the panel.
+<b>T3</b> shipped, with the art reworked after Chris pointed at Firefox: a miniature browser
+window rather than a sun and a moon, split down the middle for System. The card shows the
+surfaces the option produces instead of symbolising them. It costs a second line.
+</p>
+</body>
+</html>
