@@ -250,7 +250,7 @@
                  js/popup.js swaps which is visible and retitles the header. -->
             <div class="settings-hub" id="settings-hub">
               <div class="settings-tiles">
-              <button type="button" class="settings-tile" data-settings-section="appearance">
+              <button type="button" class="settings-tile" data-settings-section="general">
                 <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31c-12 10-16 28-8 42l16 28c6 10 17 16 29 16l11-2 46-17a180 180 0 0 0 60 34l8 46c3 16 17 25 33 25h32c16 0 30-9 33-25l8-47a168 168 0 0 0 59-34l46 17 11 2c12 0 23-6 29-16l16-28c8-14 4-32-8-42M261 371a110 110 0 1 1 0-220 110 110 0 0 1 0 220"/></svg>
                 <span class="settings-tile-label">__MSG_settingsNavGeneral__</span>
               </button>
@@ -276,9 +276,9 @@
               </div>
             </div>
 
-            <section class="settings-section" data-settings-section="appearance"
-              aria-labelledby="s-appearance" hidden>
-              <h3 class="settings-section-title sr-only" id="s-appearance">__MSG_settingsNavGeneral__</h3>
+            <section class="settings-section" data-settings-section="general"
+              aria-labelledby="s-general" hidden>
+              <h3 class="settings-section-title sr-only" id="s-general">__MSG_settingsNavGeneral__</h3>
                 <div class="settings-row settings-row--stack">
                   <div class="settings-row-label">
                     <span class="settings-label">__MSG_themeMode__</span>
@@ -310,6 +310,19 @@
                   <div class="settings-row-control">
                     <label class="toggle" aria-label="__MSG_compactMode__">
                       <input type="checkbox" id="setting-compact" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-skip-delete">
+                    <span class="settings-label">__MSG_skipDeleteConfirmation__</span>
+                    <span class="settings-desc">__MSG_skipDeleteConfirmationDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_skipDeleteConfirmation__">
+                      <input type="checkbox" id="setting-skip-delete" role="switch" />
                       <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
                     </label>
                   </div>
@@ -356,18 +369,6 @@
                   </div>
                 </div>
 
-                <div class="settings-row">
-                  <label class="settings-row-label" for="setting-skip-delete">
-                    <span class="settings-label">__MSG_skipDeleteConfirmation__</span>
-                    <span class="settings-desc">__MSG_skipDeleteConfirmationDesc__</span>
-                  </label>
-                  <div class="settings-row-control">
-                    <label class="toggle" aria-label="__MSG_skipDeleteConfirmation__">
-                      <input type="checkbox" id="setting-skip-delete" role="switch" />
-                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                    </label>
-                  </div>
-                </div>
             </section>
 
             <section class="settings-section" data-settings-section="profiles"
