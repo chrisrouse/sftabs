@@ -234,171 +234,189 @@
         <!-- View: Settings -->
         <div class="panel-view" id="view-settings" hidden aria-label="__MSG_settingsHeader__">
           <div class="panel-view-header">
+            <!-- Shown only inside a section; the footer gear still closes the panel. -->
+            <button class="btn-close settings-back" id="btn-settings-back" hidden
+              aria-label="__MSG_ariaBackToSettings__" title="__MSG_ariaBackToSettings__">
+              <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m179 44 207 205c6 6 6 16 0 22L179 476c-6 6-16 6-22 0l-22-22c-6-6-6-16 0-22l163-161c6-6 6-16 0-22L136 88c-6-6-6-16 0-22l22-22c6-5 15-5 21 0"/></svg>
+            </button>
             <div class="panel-view-heading">
-              <h2 class="panel-view-title">__MSG_settingsHeader__</h2>
+              <h2 class="panel-view-title" id="settings-title">__MSG_settingsHeader__</h2>
             </div>
           </div>
 
           <div class="settings-body">
 
-            <section class="settings-section" aria-labelledby="s-appearance">
-              <h3 class="settings-section-title" id="s-appearance">__MSG_appearanceSection__</h3>
-
-              <div class="settings-row">
-                <div class="settings-row-label">
-                  <span class="settings-label">__MSG_themeMode__</span>
-                </div>
-                <div class="settings-row-control">
-                  <div class="seg-ctrl" role="group" aria-label="__MSG_ariaThemeSelection__">
-                    <button class="seg-btn active" data-theme-val="light" aria-pressed="true">__MSG_themeLight__</button>
-                    <button class="seg-btn" data-theme-val="dark" aria-pressed="false">__MSG_themeDark__</button>
-                    <button class="seg-btn" data-theme-val="system" aria-pressed="false">__MSG_themeSystem__</button>
-                  </div>
-                </div>
+            <!-- The hub. Tiles open a section below; showSettingsSection() in
+                 js/popup.js swaps which is visible and retitles the header. -->
+            <div class="settings-hub" id="settings-hub">
+              <div class="settings-tiles">
+              <button type="button" class="settings-tile" data-settings-section="appearance">
+                <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31c-12 10-16 28-8 42l16 28c6 10 17 16 29 16l11-2 46-17a180 180 0 0 0 60 34l8 46c3 16 17 25 33 25h32c16 0 30-9 33-25l8-47a168 168 0 0 0 59-34l46 17 11 2c12 0 23-6 29-16l16-28c8-14 4-32-8-42M261 371a110 110 0 1 1 0-220 110 110 0 0 1 0 220"/></svg>
+                <span class="settings-tile-label">__MSG_settingsNavGeneral__</span>
+              </button>
+              <button type="button" class="settings-tile" data-settings-section="tabs">
+                <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7"/></svg>
+                <span class="settings-tile-label">__MSG_settingsNavTabs__</span>
+              </button>
+              <button type="button" class="settings-tile" data-settings-section="profiles">
+                <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg>
+                <span class="settings-tile-label">__MSG_profilesSection__</span>
+              </button>
+              <button type="button" class="settings-tile" data-settings-section="data">
+                <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28A210 210 0 0 0 41 225z"/></svg>
+                <span class="settings-tile-label">__MSG_settingsNavData__</span>
+              </button>
               </div>
 
-              <div class="settings-row">
-                <label class="settings-row-label" for="setting-compact">
-                  <span class="settings-label">__MSG_compactMode__</span>
-                  <span class="settings-desc">__MSG_compactModeDesc__</span>
-                </label>
-                <div class="settings-row-control">
-                  <label class="toggle" aria-label="__MSG_compactMode__">
-                    <input type="checkbox" id="setting-compact" role="switch" />
-                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                  </label>
-                </div>
+              <div class="settings-advanced">
+                <a href="#" class="advanced-link" id="btn-advanced-settings" aria-label="__MSG_ariaAdvancedSettings__">
+                  __MSG_advancedSettingsLink__
+                  <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg>
+                </a>
               </div>
-            </section>
-
-              <div class="settings-row">
-                <label class="settings-row-label" for="setting-tab-colors">
-                  <span class="settings-label">__MSG_tabColorsLabel__</span>
-                  <span class="settings-desc">__MSG_tabColorsDesc__</span>
-                </label>
-                <div class="settings-row-control">
-                  <label class="toggle" aria-label="__MSG_tabColorsLabel__">
-                    <input type="checkbox" id="setting-tab-colors" role="switch" />
-                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Only meaningful once colors are on -->
-              <div class="settings-row" id="row-tab-color-style" hidden>
-                <div class="settings-row-label">
-                  <span class="settings-label">__MSG_tabColorStyleLabel__</span>
-                  <span class="settings-desc">__MSG_tabColorStyleDesc__</span>
-                </div>
-                <div class="settings-row-control">
-                  <!-- Each option is a miniature of the tab it produces, so the
-                       choice is made by looking rather than by reading. The name
-                       stays as the accessible label and the tooltip. -->
-                  <div class="style-choices" role="radiogroup" aria-label="__MSG_tabColorStyleLabel__">
-                    <button type="button" class="style-choice" data-color-style="dot"
-                      role="radio" aria-checked="false"
-                      title="__MSG_tabColorStyleDot__" aria-label="__MSG_tabColorStyleDot__">
-                      <span class="style-preview style-preview--dot"><i></i>Flows</span>
-                    </button>
-                    <button type="button" class="style-choice" data-color-style="tint"
-                      role="radio" aria-checked="false"
-                      title="__MSG_tabColorStyleTint__" aria-label="__MSG_tabColorStyleTint__">
-                      <span class="style-preview style-preview--tint">Flows</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section class="settings-section" aria-labelledby="s-behavior">
-              <h3 class="settings-section-title" id="s-behavior">__MSG_behaviorSection__</h3>
-
-              <div class="settings-row">
-                <label class="settings-row-label" for="setting-skip-delete">
-                  <span class="settings-label">__MSG_skipDeleteConfirmation__</span>
-                  <span class="settings-desc">__MSG_skipDeleteConfirmationDesc__</span>
-                </label>
-                <div class="settings-row-control">
-                  <label class="toggle" aria-label="__MSG_skipDeleteConfirmation__">
-                    <input type="checkbox" id="setting-skip-delete" role="switch" />
-                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="settings-row">
-                <label class="settings-row-label" for="setting-profiles">
-                  <span class="settings-label">__MSG_enableProfiles__</span>
-                  <span class="settings-desc">__MSG_enableProfilesDesc__</span>
-                </label>
-                <div class="settings-row-control">
-                  <label class="toggle" aria-label="__MSG_enableProfiles__">
-                    <input type="checkbox" id="setting-profiles" role="switch" checked />
-                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="settings-row" id="row-manage-profiles">
-                <div class="settings-row-label">
-                  <span class="settings-label">__MSG_manageProfilesLabel__</span>
-                  <span class="settings-desc">__MSG_manageProfilesDesc__</span>
-                </div>
-                <div class="settings-row-control">
-                  <button class="btn-secondary" id="btn-manage-profiles-settings">__MSG_manageButton__</button>
-                </div>
-              </div>
-            </section>
-
-            <section class="settings-section" aria-labelledby="s-storage">
-              <h3 class="settings-section-title" id="s-storage">__MSG_storageSectionTitle__</h3>
-              <div class="storage-cards" role="radiogroup" aria-labelledby="s-storage">
-                <label class="storage-card">
-                  <input type="radio" name="storage-type" value="sync" checked />
-                  <div class="storage-card-body">
-                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
-                      <path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"/>
-                    </svg>
-                    <div>
-                      <span class="storage-card-title">__MSG_firstLaunchSyncStorageTitle__</span>
-                      <span class="storage-card-desc">__MSG_syncStorageCardDesc__</span>
-                    </div>
-                  </div>
-                </label>
-                <label class="storage-card">
-                  <input type="radio" name="storage-type" value="local" />
-                  <div class="storage-card-body">
-                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
-                      <path d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"/>
-                    </svg>
-                    <div>
-                      <span class="storage-card-title">__MSG_firstLaunchLocalStorageTitle__</span>
-                      <span class="storage-card-desc">__MSG_localStorageCardDesc__</span>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </section>
-
-            <section class="settings-section" aria-labelledby="s-debug">
-              <h3 class="settings-section-title" id="s-debug">__MSG_debugSectionTitle__</h3>
-              <div class="settings-row">
-                <div class="settings-row-label">
-                  <span class="settings-label">__MSG_previewFirstLaunchLabel__</span>
-                  <span class="settings-desc">__MSG_previewFirstLaunchDesc__</span>
-                </div>
-                <div class="settings-row-control">
-                  <button class="btn-secondary" id="btn-preview-first-launch">__MSG_previewButton__</button>
-                </div>
-              </div>
-            </section>
-
-            <div class="settings-advanced">
-              <a href="#" class="advanced-link" id="btn-advanced-settings" aria-label="__MSG_ariaAdvancedSettings__">
-                __MSG_advancedSettingsLink__
-                <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg>
-              </a>
             </div>
+
+            <section class="settings-section" data-settings-section="appearance"
+              aria-labelledby="s-appearance" hidden>
+              <h3 class="settings-section-title sr-only" id="s-appearance">__MSG_settingsNavGeneral__</h3>
+                <div class="settings-row">
+                  <div class="settings-row-label">
+                    <span class="settings-label">__MSG_themeMode__</span>
+                  </div>
+                  <div class="settings-row-control">
+                    <div class="seg-ctrl" role="group" aria-label="__MSG_ariaThemeSelection__">
+                      <button class="seg-btn active" data-theme-val="light" aria-pressed="true">__MSG_themeLight__</button>
+                      <button class="seg-btn" data-theme-val="dark" aria-pressed="false">__MSG_themeDark__</button>
+                      <button class="seg-btn" data-theme-val="system" aria-pressed="false">__MSG_themeSystem__</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-compact">
+                    <span class="settings-label">__MSG_compactMode__</span>
+                    <span class="settings-desc">__MSG_compactModeDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_compactMode__">
+                      <input type="checkbox" id="setting-compact" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+            </section>
+
+            <section class="settings-section" data-settings-section="tabs"
+              aria-labelledby="s-tabs" hidden>
+              <h3 class="settings-section-title sr-only" id="s-tabs">__MSG_settingsNavTabs__</h3>
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-tab-colors">
+                    <span class="settings-label">__MSG_tabColorsLabel__</span>
+                    <span class="settings-desc">__MSG_tabColorsDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_tabColorsLabel__">
+                      <input type="checkbox" id="setting-tab-colors" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-row" id="row-tab-color-style" hidden>
+                  <div class="settings-row-label">
+                    <span class="settings-label">__MSG_tabColorStyleLabel__</span>
+                    <span class="settings-desc">__MSG_tabColorStyleDesc__</span>
+                  </div>
+                  <div class="settings-row-control">
+                    <!-- Each option is a miniature of the tab it produces, so the
+                         choice is made by looking rather than by reading. The name
+                         stays as the accessible label and the tooltip. -->
+                    <div class="style-choices" role="radiogroup" aria-label="__MSG_tabColorStyleLabel__">
+                      <button type="button" class="style-choice" data-color-style="dot"
+                        role="radio" aria-checked="false"
+                        title="__MSG_tabColorStyleDot__" aria-label="__MSG_tabColorStyleDot__">
+                        <span class="style-preview style-preview--dot"><i></i>Flows</span>
+                      </button>
+                      <button type="button" class="style-choice" data-color-style="tint"
+                        role="radio" aria-checked="false"
+                        title="__MSG_tabColorStyleTint__" aria-label="__MSG_tabColorStyleTint__">
+                        <span class="style-preview style-preview--tint">Flows</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-skip-delete">
+                    <span class="settings-label">__MSG_skipDeleteConfirmation__</span>
+                    <span class="settings-desc">__MSG_skipDeleteConfirmationDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_skipDeleteConfirmation__">
+                      <input type="checkbox" id="setting-skip-delete" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+            </section>
+
+            <section class="settings-section" data-settings-section="profiles"
+              aria-labelledby="s-profiles" hidden>
+              <h3 class="settings-section-title sr-only" id="s-profiles">__MSG_profilesSection__</h3>
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-profiles">
+                    <span class="settings-label">__MSG_enableProfiles__</span>
+                    <span class="settings-desc">__MSG_enableProfilesDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_enableProfiles__">
+                      <input type="checkbox" id="setting-profiles" role="switch" checked />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="settings-row" id="row-manage-profiles">
+                  <div class="settings-row-label">
+                    <span class="settings-label">__MSG_manageProfilesLabel__</span>
+                    <span class="settings-desc">__MSG_manageProfilesDesc__</span>
+                  </div>
+                  <div class="settings-row-control">
+                    <button class="btn-secondary" id="btn-manage-profiles-settings">__MSG_manageButton__</button>
+                  </div>
+                </div>
+            </section>
+
+            <section class="settings-section" data-settings-section="data"
+              aria-labelledby="s-data" hidden>
+              <h3 class="settings-section-title sr-only" id="s-data">__MSG_settingsNavData__</h3>
+                <div class="storage-cards" role="radiogroup" aria-labelledby="s-storage">
+                  <label class="storage-card">
+                    <input type="radio" name="storage-type" value="sync" checked />
+                    <div class="storage-card-body">
+                      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"/>
+                      </svg>
+                      <div>
+                        <span class="storage-card-title">__MSG_firstLaunchSyncStorageTitle__</span>
+                        <span class="storage-card-desc">__MSG_syncStorageCardDesc__</span>
+                      </div>
+                    </div>
+                  </label>
+                  <label class="storage-card">
+                    <input type="radio" name="storage-type" value="local" />
+                    <div class="storage-card-body">
+                      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+                        <path d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"/>
+                      </svg>
+                      <div>
+                        <span class="storage-card-title">__MSG_firstLaunchLocalStorageTitle__</span>
+                        <span class="storage-card-desc">__MSG_localStorageCardDesc__</span>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+            </section>
 
           </div>
         </div>
@@ -555,9 +573,6 @@
         </div>
 
         <div class="modal-body modal-body-scroll">
-          <p class="wizard-preview-note" id="fl-preview-note" hidden>
-            __MSG_firstLaunchPreviewNote__
-          </p>
           <div class="choice-cards" role="radiogroup" aria-label="__MSG_ariaStartingPoint__">
             <label class="choice-card">
               <input type="radio" name="fl-setup" value="default" checked />

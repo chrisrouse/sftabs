@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — settings hub</title>
+<style>
+  :root { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+
+  /* Copied from css/tokens.css and css/popup.css, resolved one level so this
+     file stands alone. If they drift, the popup is the source of truth. */
+  :root {
+    --page:      light-dark(#f3f3f3, #181818);
+    --s-panel:   light-dark(#ffffff, #181818);
+    --s-1:       light-dark(#ffffff, #2e2e2e);
+    --s-hover:   light-dark(#f3f3f3, #444444);
+    --t-base:    light-dark(#2e2e2e, #e5e5e5);
+    --t-weak:    light-dark(#757575, #939393);
+    --t-muted:   light-dark(#5c5c5c, #aeaeae);
+    --b-subtle:  light-dark(#e5e5e5, #444444);
+    --b-medium:  light-dark(#c9c9c9, #444444);
+    --accent:    #066afe;
+    --accent-bg: light-dark(#edf4ff, #002775);
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px;
+    --ease: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: var(--page); color: var(--t-base); padding: 28px 28px 60px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  .lede { color: var(--t-muted); max-width: 90ch; margin: 6px 0; }
+  .ask { max-width: 90ch; margin: 10px 0 0; padding: 10px 12px; background: var(--accent-bg);
+          border-radius: var(--r-md); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  h2.grouphead { font-size: 14px; font-weight: 600; margin: 34px 0 2px; }
+  .note { color: var(--t-weak); max-width: 90ch; margin-bottom: 12px; }
+  .toggle-theme { position: fixed; top: 16px; right: 16px; z-index: 10; padding: 6px 12px;
+                   font: inherit; cursor: pointer; background: var(--s-1); color: var(--t-base);
+                   border: 1px solid var(--b-medium); border-radius: var(--r-sm); }
+  .strip { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; }
+  .cap { font-size: 12px; color: var(--t-weak); margin-bottom: 6px; }
+  .cap b { color: var(--t-base); font-weight: 600; }
+
+  .panel { width: 380px; height: 400px; display: flex; flex-direction: column;
+            background: var(--s-panel); border: 1px solid var(--b-subtle);
+            border-radius: var(--r-md); overflow: hidden; }
+  .phead { display: flex; align-items: center; gap: 8px; padding: 12px 16px 8px; flex-shrink: 0; }
+  .ptitle { font-size: 15px; font-weight: 600; }
+  .pbody { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 16px 16px;
+            display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── Tiles: the icon leads, the word names it ── */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tile { display: flex; flex-direction: column; align-items: center; justify-content: center;
+           gap: 10px; padding: 18px 12px; cursor: pointer; font: inherit; color: var(--t-base);
+           background: var(--s-1); border: 1px solid var(--b-subtle); border-radius: var(--r-md);
+           transition: background var(--ease), border-color var(--ease); }
+  .tile:hover { background: var(--s-hover); border-color: var(--b-medium); }
+  .tile > svg { width: 26px; height: 26px; color: var(--accent); }
+  .tile-label { font-weight: 600; }
+  .tile--later { opacity: 0.55; }
+
+  /* Variant: icon sits in a tinted disc */
+  .tile-chip { display: flex; align-items: center; justify-content: center;
+                width: 44px; height: 44px; border-radius: 50%; background: var(--accent-bg); }
+  .tile-chip svg { width: 20px; height: 20px; color: var(--accent); }
+
+  /* Variant: shorter tiles, icon and label on one line */
+  .tiles--inline .tile { flex-direction: row; justify-content: flex-start; gap: 10px; padding: 14px 12px; }
+  .tiles--inline .tile > svg { width: 18px; height: 18px; }
+
+  .links { margin-top: auto; padding-top: 8px; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  .links a { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); text-decoration: none; }
+  .links svg { width: 10px; height: 10px; }
+
+  .backbtn { width: 26px; height: 26px; flex-shrink: 0; padding: 0; display: flex; align-items: center;
+              justify-content: center; background: transparent; color: var(--t-muted); cursor: pointer;
+              border: 1px solid var(--b-medium); border-radius: 50%; }
+  .backbtn:hover { background: var(--s-hover); color: var(--t-base); }
+  .backbtn svg { width: 11px; height: 11px; transform: rotate(180deg); }
+  .crumb { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0;
+            cursor: pointer; font: inherit; font-size: 12px; color: var(--accent); }
+  .crumb svg { width: 10px; height: 10px; transform: rotate(180deg); }
+
+  .srow { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 8px 0; }
+  .srow + .srow { border-top: 1px solid var(--b-subtle); }
+  .slabel { display: flex; flex-direction: column; }
+  .sname { font-weight: 500; }
+  .sdesc { font-size: 12px; color: var(--t-weak); }
+  .seg { display: inline-flex; border: 1px solid var(--b-medium); border-radius: var(--r-sm); overflow: hidden; }
+  .seg button { font: inherit; font-size: 12px; padding: 4px 10px; cursor: pointer; background: var(--s-1);
+                 color: var(--t-muted); border: 0; border-right: 1px solid var(--b-medium); }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .sw { width: 34px; height: 20px; border-radius: 10px; background: var(--b-medium); position: relative; flex-shrink: 0; }
+  .sw.on { background: var(--accent); }
+  .sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+                border-radius: 50%; background: #fff; }
+</style>
+</head>
+<body>
+
+<button class="toggle-theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">Toggle theme</button>
+
+<h1>Settings hub — tile treatment</h1>
+<p class="lede">Real tray width (380px), values from <code>css/tokens.css</code>. Controls are inert.</p>
+<p class="ask"><b>Left to decide:</b> which icon treatment (A1/A2/A3), and how you get back out
+of a section (C1/C2). Everything else is settled — tiles, no descriptions, four now and five
+once the floating Button section moves over.</p>
+
+<h2 class="grouphead">A · Icon treatment</h2>
+<p class="note">Four tiles today. The faded fifth is Button, arriving when the floating-panel
+settings leave the advanced page — the only section still headed here.</p>
+<div class="strip">
+  <div>
+    <div class="cap"><b>A1</b> — plain icon, stacked</div>
+    <div class="panel"><div class="phead"><h2 class="ptitle">Settings</h2></div><div class="pbody"><div class="tiles"><button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg><span class="tile-label">Appearance</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7"/></svg><span class="tile-label">Tabs</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg><span class="tile-label">Profiles</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28 210 210 0 0 0-94 143z"/></svg><span class="tile-label">Data</span></button></div><div class="links">
+            <a href="#">Preview first-launch wizard</a>
+            <a href="#">Advanced settings <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg></a>
+          </div></div></div>
+  </div>
+  <div>
+    <div class="cap"><b>A2</b> — icon in a tinted disc</div>
+    <div class="panel"><div class="phead"><h2 class="ptitle">Settings</h2></div><div class="pbody"><div class="tiles"><button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg></span><span class="tile-label">Appearance</span></button>
+          <button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7"/></svg></span><span class="tile-label">Tabs</span></button>
+          <button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg></span><span class="tile-label">Profiles</span></button>
+          <button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28 210 210 0 0 0-94 143z"/></svg></span><span class="tile-label">Data</span></button></div><div class="links">
+            <a href="#">Preview first-launch wizard</a>
+            <a href="#">Advanced settings <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg></a>
+          </div></div></div>
+  </div>
+  <div>
+    <div class="cap"><b>A3</b> — icon and label on one line</div>
+    <div class="panel"><div class="phead"><h2 class="ptitle">Settings</h2></div><div class="pbody"><div class="tiles tiles--inline"><button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg><span class="tile-label">Appearance</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7"/></svg><span class="tile-label">Tabs</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg><span class="tile-label">Profiles</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28 210 210 0 0 0-94 143z"/></svg><span class="tile-label">Data</span></button></div><div class="links">
+            <a href="#">Preview first-launch wizard</a>
+            <a href="#">Advanced settings <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg></a>
+          </div></div></div>
+  </div>
+</div>
+
+<h2 class="grouphead">Same three, with Button in place</h2>
+<p class="note">Five is an odd number in a two-column grid, so the last tile sits alone. Worth
+seeing now rather than discovering it later.</p>
+<div class="strip">
+  <div>
+    <div class="cap"><b>A1</b> — five</div>
+    <div class="panel"><div class="phead"><h2 class="ptitle">Settings</h2></div><div class="pbody"><div class="tiles"><button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg><span class="tile-label">Appearance</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7"/></svg><span class="tile-label">Tabs</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg><span class="tile-label">Profiles</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28 210 210 0 0 0-94 143z"/></svg><span class="tile-label">Data</span></button>
+          <button class="tile tile--later"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M495 154 360 19c-14-14-36-14-50 0s-14 36 0 50l7 7-162 107-5-5c-14-14-36-14-50 0s-14 36 0 50l72 72L24 448a36 36 0 0 0 0 51 36 36 0 0 0 51 0l148-149 63 63a35 35 0 0 0 50 0 35 35 0 0 0 0-50l-5-5 106-163 7 7a35 35 0 0 0 50 0c14-12 14-34 1-48"/></svg><span class="tile-label">Button</span></button></div><div class="links">
+            <a href="#">Preview first-launch wizard</a>
+            <a href="#">Advanced settings <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg></a>
+          </div></div></div>
+  </div>
+  <div>
+    <div class="cap"><b>A2</b> — five</div>
+    <div class="panel"><div class="phead"><h2 class="ptitle">Settings</h2></div><div class="pbody"><div class="tiles"><button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg></span><span class="tile-label">Appearance</span></button>
+          <button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7"/></svg></span><span class="tile-label">Tabs</span></button>
+          <button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg></span><span class="tile-label">Profiles</span></button>
+          <button class="tile tile--chip"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28 210 210 0 0 0-94 143z"/></svg></span><span class="tile-label">Data</span></button>
+          <button class="tile tile--chip tile--later"><span class="tile-chip"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M495 154 360 19c-14-14-36-14-50 0s-14 36 0 50l7 7-162 107-5-5c-14-14-36-14-50 0s-14 36 0 50l72 72L24 448a36 36 0 0 0 0 51 36 36 0 0 0 51 0l148-149 63 63a35 35 0 0 0 50 0 35 35 0 0 0 0-50l-5-5 106-163 7 7a35 35 0 0 0 50 0c14-12 14-34 1-48"/></svg></span><span class="tile-label">Button</span></button></div><div class="links">
+            <a href="#">Preview first-launch wizard</a>
+            <a href="#">Advanced settings <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg></a>
+          </div></div></div>
+  </div>
+  <div>
+    <div class="cap"><b>A3</b> — five</div>
+    <div class="panel"><div class="phead"><h2 class="ptitle">Settings</h2></div><div class="pbody"><div class="tiles tiles--inline"><button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M261 191c-39 0-70 31-70 70s31 70 70 70 70-31 70-70-31-70-70-70m210 133-37-31a195 195 0 0 0 0-68l37-31c12-10 16-28 8-42l-16-28a34 34 0 0 0-40-14l-46 17a168 168 0 0 0-59-34l-8-47c-3-16-17-25-33-25h-32c-16 0-30 9-33 25l-8 46a180 180 0 0 0-60 34l-46-17-11-2c-12 0-23 6-29 16l-16 28c-8 14-5 32 8 42l37 31a195 195 0 0 0 0 68l-37 31a34 34 0 0 0-8 42l16 28a34 34 0 0 0 40 14l46-17c18 16 38 27 59 34l8 48a33 33 0 0 0 33 27h32c16 0 30-12 33-28l8-48a170 170 0 0 0 62-37l43 17 12 2c12 0 23-6 29-16l15-26c9-11 5-29-7-39m-210 47c-61 0-110-49-110-110s49-110 110-110 110 49 110 110-49 110-110 110"/></svg><span class="tile-label">Appearance</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m373 496-99-99c-6-6-15-6-21 0L147 497c-7 6-17 2-17-7V60a40 40 0 0 1 40-40h180a40 40 0 0 1 40 40v429c0 9-11 14-17 7"/></svg><span class="tile-label">Tabs</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg><span class="tile-label">Profiles</span></button>
+          <button class="tile"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28 210 210 0 0 0-94 143z"/></svg><span class="tile-label">Data</span></button>
+          <button class="tile tile--later"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M495 154 360 19c-14-14-36-14-50 0s-14 36 0 50l7 7-162 107-5-5c-14-14-36-14-50 0s-14 36 0 50l72 72L24 448a36 36 0 0 0 0 51 36 36 0 0 0 51 0l148-149 63 63a35 35 0 0 0 50 0 35 35 0 0 0 0-50l-5-5 106-163 7 7a35 35 0 0 0 50 0c14-12 14-34 1-48"/></svg><span class="tile-label">Button</span></button></div><div class="links">
+            <a href="#">Preview first-launch wizard</a>
+            <a href="#">Advanced settings <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7"/></svg></a>
+          </div></div></div>
+  </div>
+</div>
+
+<h2 class="grouphead">C · An open section, and how you get back</h2>
+<p class="note">Settings is the only view whose header has no button; every sibling puts an X
+in that slot.</p>
+<div class="strip">
+  <div>
+    <div class="cap"><b>C1</b> — round back button, matching the X elsewhere</div>
+    <div class="panel"><div class="phead"><button class="backbtn"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m179 44 207 205c6 6 6 16 0 22L179 476c-6 6-16 6-22 0l-22-22c-6-6-6-16 0-22l163-161c6-6 6-16 0-22L136 88c-6-6-6-16 0-22l22-22c6-5 15-5 21 0"/></svg></button><h2 class="ptitle">Appearance</h2></div><div class="pbody"><div>
+          <div class="srow">
+            <span class="slabel"><span class="sname">Theme Mode</span></span>
+            <span class="seg"><button class="on">Light</button><button>Dark</button><button>System</button></span>
+          </div>
+          <div class="srow">
+            <span class="slabel"><span class="sname">Compact Mode</span><span class="sdesc">Tighter spacing throughout</span></span>
+            <span class="sw"></span>
+          </div>
+        </div></div></div>
+  </div>
+  <div>
+    <div class="cap"><b>C2</b> — breadcrumb above the title, no extra button</div>
+    <div class="panel"><div class="phead" style="flex-direction:column;align-items:flex-start;gap:2px"><button class="crumb"><svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m179 44 207 205c6 6 6 16 0 22L179 476c-6 6-16 6-22 0l-22-22c-6-6-6-16 0-22l163-161c6-6 6-16 0-22L136 88c-6-6-6-16 0-22l22-22c6-5 15-5 21 0"/></svg> Settings</button><h2 class="ptitle">Appearance</h2></div><div class="pbody"><div>
+          <div class="srow">
+            <span class="slabel"><span class="sname">Theme Mode</span></span>
+            <span class="seg"><button class="on">Light</button><button>Dark</button><button>System</button></span>
+          </div>
+          <div class="srow">
+            <span class="slabel"><span class="sname">Compact Mode</span><span class="sdesc">Tighter spacing throughout</span></span>
+            <span class="sw"></span>
+          </div>
+        </div></div></div>
+  </div>
+</div>
+
+<h2 class="grouphead">What went where</h2>
+<p class="note">
+<b>Appearance</b> theme + compact density · <b>Tabs</b> color-code tabs, color style, skip delete
+confirmation · <b>Profiles</b> enable, and a Manage button into the existing Profiles sheet ·
+<b>Data</b> sync/local storage, plus import and export once they move across ·
+<b>Button</b> floating panel and header menu, still on the advanced page.<br><br>
+Dropped as tiles: Shortcuts, Translations, Debug. Shortcuts and Translations stay on the advanced
+page. The first-launch preview is a link at the bottom rather than a tile, since it is a debug
+affordance rather than a setting — say if you would rather it went entirely.
+</p>
+
+</body>
+</html>

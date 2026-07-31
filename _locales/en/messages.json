@@ -2134,22 +2134,6 @@
     "message": "This device only",
     "description": "Description on the Local storage option"
   },
-  "debugSectionTitle": {
-    "message": "Debug",
-    "description": "Settings section heading for developer tools"
-  },
-  "previewFirstLaunchLabel": {
-    "message": "Preview first-launch wizard",
-    "description": "Label for the debug action that opens the welcome wizard read-only"
-  },
-  "previewFirstLaunchDesc": {
-    "message": "Opens the welcome screen without writing anything",
-    "description": "Description for the preview action, stressing that no data changes"
-  },
-  "previewButton": {
-    "message": "Preview",
-    "description": "Button that opens the first-launch wizard in preview mode"
-  },
   "advancedSettingsLink": {
     "message": "Advanced settings — import, export, danger zone",
     "description": "Link to the full settings page"
@@ -2201,10 +2185,6 @@
   "firstLaunchSubtitle": {
     "message": "Pick a starting point.",
     "description": "Subtitle in the welcome wizard"
-  },
-  "firstLaunchPreviewNote": {
-    "message": "Preview — your saved tabs and settings won’t be touched.",
-    "description": "Banner shown when the wizard is opened from Settings > Debug"
   },
   "ariaStartingPoint": {
     "message": "Starting point",
@@ -2654,10 +2634,6 @@
       }
     }
   },
-  "closePreviewButton": {
-    "message": "Close preview",
-    "description": "Button that closes the first-launch wizard when it was opened in preview mode"
-  },
   "errorSetupDidNotFinish": {
     "message": "Setup didn’t finish: $ERROR$",
     "description": "Error when the first-launch wizard fails to write initial data",
@@ -2667,50 +2643,6 @@
         "example": "QUOTA_BYTES exceeded"
       }
     }
-  },
-  "previewOutcomeDefaultCount": {
-    "message": "a Default profile with $COUNT$ tabs",
-    "description": "Fragment describing what the wizard would have created. Used inside previewSummary",
-    "placeholders": {
-      "count": {
-        "content": "$1",
-        "example": "5"
-      }
-    }
-  },
-  "previewOutcomeDefault": {
-    "message": "a Default profile with the default tabs",
-    "description": "Fragment used when the number of default tabs is unknown. Used inside previewSummary"
-  },
-  "previewOutcomeEmpty": {
-    "message": "an empty Default profile",
-    "description": "Fragment describing the start-empty choice. Used inside previewSummary"
-  },
-  "previewOutcomeImport": {
-    "message": "an empty Default profile, then opened the settings page to import",
-    "description": "Fragment describing the import choice. Used inside previewSummary"
-  },
-  "previewSummary": {
-    "message": "Preview only — would have created $OUTCOME$, profiles $STATE$. Nothing was saved.",
-    "description": "Status shown after closing the wizard in preview mode. $OUTCOME$ is one of the previewOutcome* fragments and $STATE$ is stateOn or stateOff",
-    "placeholders": {
-      "outcome": {
-        "content": "$1",
-        "example": "an empty Default profile"
-      },
-      "state": {
-        "content": "$2",
-        "example": "off"
-      }
-    }
-  },
-  "stateOn": {
-    "message": "on",
-    "description": "The word “on” for a setting’s state, used inside previewSummary"
-  },
-  "stateOff": {
-    "message": "off",
-    "description": "The word “off” for a setting’s state, used inside previewSummary"
   },
   "ariaViewReleaseNotesUnread": {
     "message": "View release notes — new update available",
@@ -3117,5 +3049,13 @@
   "colorShadeLight": {
     "message": "light",
     "description": "The lightest of the three shades of a tab color"
+  },
+  "settingsNavTabs": {
+    "message": "Tabs",
+    "description": "Settings hub tile: tab appearance and behavior"
+  },
+  "ariaBackToSettings": {
+    "message": "Back to Settings",
+    "description": "Back button out of a settings section"
   }
 }

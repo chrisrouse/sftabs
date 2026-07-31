@@ -2106,18 +2106,6 @@
   "localStorageCardDesc": {
     "message": "Solo en este dispositivo"
   },
-  "debugSectionTitle": {
-    "message": "Depuración"
-  },
-  "previewFirstLaunchLabel": {
-    "message": "Ver el asistente de primer inicio"
-  },
-  "previewFirstLaunchDesc": {
-    "message": "Abre la pantalla de bienvenida sin guardar nada"
-  },
-  "previewButton": {
-    "message": "Vista previa"
-  },
   "advancedSettingsLink": {
     "message": "Ajustes avanzados: importar, exportar, acciones críticas"
   },
@@ -2156,9 +2144,6 @@
   },
   "firstLaunchSubtitle": {
     "message": "Elija un punto de partida."
-  },
-  "firstLaunchPreviewNote": {
-    "message": "Vista previa: sus pestañas y ajustes guardados no se modificarán."
   },
   "ariaStartingPoint": {
     "message": "Punto de partida"
@@ -2548,9 +2533,6 @@
       }
     }
   },
-  "closePreviewButton": {
-    "message": "Cerrar la vista previa"
-  },
   "errorSetupDidNotFinish": {
     "message": "La configuración no se completó: $ERROR$",
     "placeholders": {
@@ -2559,43 +2541,6 @@
         "example": "QUOTA_BYTES exceeded"
       }
     }
-  },
-  "previewOutcomeDefaultCount": {
-    "message": "un perfil predeterminado con $COUNT$ pestañas",
-    "placeholders": {
-      "count": {
-        "content": "$1",
-        "example": "5"
-      }
-    }
-  },
-  "previewOutcomeDefault": {
-    "message": "un perfil predeterminado con las pestañas predeterminadas"
-  },
-  "previewOutcomeEmpty": {
-    "message": "un perfil predeterminado vacío"
-  },
-  "previewOutcomeImport": {
-    "message": "un perfil predeterminado vacío y se habría abierto la página de ajustes para importar"
-  },
-  "previewSummary": {
-    "message": "Solo vista previa: se habría creado $OUTCOME$, perfiles $STATE$. No se guardó nada.",
-    "placeholders": {
-      "outcome": {
-        "content": "$1",
-        "example": "an empty Default profile"
-      },
-      "state": {
-        "content": "$2",
-        "example": "off"
-      }
-    }
-  },
-  "stateOn": {
-    "message": "activados"
-  },
-  "stateOff": {
-    "message": "desactivados"
   },
   "ariaViewReleaseNotesUnread": {
     "message": "Ver notas de la versión: hay una actualización nueva"
@@ -2935,5 +2880,13 @@
   "colorShadeLight": {
     "message": "claro",
     "description": "The lightest of the three shades of a tab color"
+  },
+  "settingsNavTabs": {
+    "message": "Pestañas",
+    "description": "Settings hub tile: tab appearance and behavior"
+  },
+  "ariaBackToSettings": {
+    "message": "Volver a Ajustes",
+    "description": "Back button out of a settings section"
   }
 }

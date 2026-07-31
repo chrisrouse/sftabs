@@ -2106,18 +2106,6 @@
   "localStorageCardDesc": {
     "message": "Nur auf diesem Gerät"
   },
-  "debugSectionTitle": {
-    "message": "Debug"
-  },
-  "previewFirstLaunchLabel": {
-    "message": "Assistenten für den ersten Start ansehen"
-  },
-  "previewFirstLaunchDesc": {
-    "message": "Öffnet den Willkommensbildschirm, ohne etwas zu speichern"
-  },
-  "previewButton": {
-    "message": "Vorschau"
-  },
   "advancedSettingsLink": {
     "message": "Erweiterte Einstellungen — Import, Export, kritische Aktionen"
   },
@@ -2156,9 +2144,6 @@
   },
   "firstLaunchSubtitle": {
     "message": "Wählen Sie einen Ausgangspunkt."
-  },
-  "firstLaunchPreviewNote": {
-    "message": "Vorschau — Ihre gespeicherten Registerkarten und Einstellungen bleiben unverändert."
   },
   "ariaStartingPoint": {
     "message": "Ausgangspunkt"
@@ -2548,9 +2533,6 @@
       }
     }
   },
-  "closePreviewButton": {
-    "message": "Vorschau schließen"
-  },
   "errorSetupDidNotFinish": {
     "message": "Die Einrichtung wurde nicht abgeschlossen: $ERROR$",
     "placeholders": {
@@ -2559,43 +2541,6 @@
         "example": "QUOTA_BYTES exceeded"
       }
     }
-  },
-  "previewOutcomeDefaultCount": {
-    "message": "ein Standardprofil mit $COUNT$ Registerkarten",
-    "placeholders": {
-      "count": {
-        "content": "$1",
-        "example": "5"
-      }
-    }
-  },
-  "previewOutcomeDefault": {
-    "message": "ein Standardprofil mit den Standard-Registerkarten"
-  },
-  "previewOutcomeEmpty": {
-    "message": "ein leeres Standardprofil"
-  },
-  "previewOutcomeImport": {
-    "message": "ein leeres Standardprofil, danach hätte sich die Einstellungsseite zum Importieren geöffnet"
-  },
-  "previewSummary": {
-    "message": "Nur Vorschau — erstellt worden wäre: $OUTCOME$. Profile $STATE$. Es wurde nichts gespeichert.",
-    "placeholders": {
-      "outcome": {
-        "content": "$1",
-        "example": "an empty Default profile"
-      },
-      "state": {
-        "content": "$2",
-        "example": "off"
-      }
-    }
-  },
-  "stateOn": {
-    "message": "aktiviert"
-  },
-  "stateOff": {
-    "message": "deaktiviert"
   },
   "ariaViewReleaseNotesUnread": {
     "message": "Versionshinweise anzeigen — neues Update verfügbar"
@@ -2935,5 +2880,13 @@
   "colorShadeLight": {
     "message": "hell",
     "description": "The lightest of the three shades of a tab color"
+  },
+  "settingsNavTabs": {
+    "message": "Registerkarten",
+    "description": "Settings hub tile: tab appearance and behavior"
+  },
+  "ariaBackToSettings": {
+    "message": "Zurück zu den Einstellungen",
+    "description": "Back button out of a settings section"
   }
 }

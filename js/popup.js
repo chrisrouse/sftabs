@@ -44,6 +44,7 @@ let state = {
   pendingDeleteId: null,
   loadError:       null,
   expandedPaths:   new Set(), // UI-only; never written to storage
+  settingsSection: null,      // open Settings section id; null = the tile hub
   editingItemPath: null,      // dropdown item currently open for inline edit
   addingItemUnder: null,      // parent path for a pending add ([] = root)
 };
@@ -243,56 +244,33 @@ async function maybeRunFirstLaunch() {
   }
   if (status?.reason !== 'first-install') return;
 
-  await runFirstLaunchWizard({ preview: false });
+  await runFirstLaunchWizard();
 }
 
-/**
- * Open the wizard and resolve once it closes.
- *
- * `preview: true` is the Settings > Debug route — everything is interactive but
- * the choice is never applied, so it can be opened on a populated install
- * without touching saved data.
- */
-function runFirstLaunchWizard({ preview }) {
+/** Open the wizard and resolve once it closes. */
+function runFirstLaunchWizard() {
   return new Promise(resolve => {
     const overlay = document.getElementById('modal-first-launch');
     if (!overlay) return resolve();
 
-    document.getElementById('fl-preview-note').hidden = !preview;
-    document.getElementById('fl-start').textContent =
-      t(preview ? 'closePreviewButton' : 'firstLaunchGetStartedButton');
+    document.getElementById('fl-start').textContent = t('firstLaunchGetStartedButton');
     overlay.hidden = false;
 
     document.getElementById('fl-start').addEventListener('click', async () => {
       const setup = document.querySelector('input[name="fl-setup"]:checked')?.value || 'default';
       const enableProfiles = document.getElementById('fl-enable-profiles').checked;
 
-      if (preview) {
-        showStatus(describeFirstLaunchChoice(setup, enableProfiles));
-      } else {
-        try {
-          await applyFirstLaunchChoice(setup, enableProfiles);
-        } catch (err) {
-          // Leaving storage empty is recoverable: ensureUsableState() seeds
-          // defaults on the next line of init.
-          state.loadError = t('errorSetupDidNotFinish', err.message);
-        }
+      try {
+        await applyFirstLaunchChoice(setup, enableProfiles);
+      } catch (err) {
+        // Leaving storage empty is recoverable: ensureUsableState() seeds
+        // defaults on the next line of init.
+        state.loadError = t('errorSetupDidNotFinish', err.message);
       }
       overlay.hidden = true;
       resolve();
     }, { once: true });
   });
-}
-
-/** What a real run of this choice would have done — preview mode only. */
-function describeFirstLaunchChoice(setup, enableProfiles) {
-  const count = window.SFTabs?.constants?.DEFAULT_TABS?.length;
-  const outcome = {
-    default: count ? t('previewOutcomeDefaultCount', String(count)) : t('previewOutcomeDefault'),
-    empty:   t('previewOutcomeEmpty'),
-    import:  t('previewOutcomeImport')
-  }[setup];
-  return t('previewSummary', outcome, t(enableProfiles ? 'stateOn' : 'stateOff'));
 }
 
 /**
@@ -1306,6 +1284,39 @@ function showView(viewName) {
   if (settingsBtn) settingsBtn.setAttribute('aria-pressed', viewName === 'settings' ? 'true' : 'false');
 }
 
+/**
+ * Move between the Settings hub and one of its sections.
+ *
+ * Deliberately NOT part of showView(). That switches `panel-view`s and writes
+ * `state.activeView`, which is compared against string literals in a dozen
+ * places — `=== 'settings'` toggles the footer gear, `!== 'empty'` guards a
+ * keyboard shortcut. Adding sibling views called 'settings-tabs' and friends
+ * would silently falsify both, the same way `activeView === 'edit'` never
+ * matched the stored 'edit-tab'. Settings stays one view; only its innards move.
+ *
+ * @param {string|null} id  section to open, or null for the hub
+ */
+function showSettingsSection(id) {
+  const hub = document.getElementById('settings-hub');
+  if (!hub) return;
+
+  state.settingsSection = id;
+  hub.hidden = Boolean(id);
+
+  let title = t('settingsHeader');
+  document.querySelectorAll('#view-settings .settings-section').forEach(section => {
+    const match = section.dataset.settingsSection === id;
+    section.hidden = !match;
+    if (match) {
+      const heading = section.querySelector('.settings-section-title');
+      if (heading) title = heading.textContent;
+    }
+  });
+
+  document.getElementById('settings-title').textContent = title;
+  document.getElementById('btn-settings-back').hidden = !id;
+}
+
 function clearEditingHighlight() {
   document.querySelectorAll('.tab-item.is-editing').forEach(el => el.classList.remove('is-editing'));
   document.getElementById('tab-list').classList.remove('has-editing');
@@ -2267,6 +2278,7 @@ function bindEvents() {
       showView('empty');
     } else {
       syncSettingsPanel();
+      showSettingsSection(null);   // never resume on the section last looked at
       showView('settings');
     }
   });
@@ -2368,9 +2380,12 @@ function bindEvents() {
     });
   });
 
-  document.getElementById('btn-preview-first-launch').addEventListener('click', () => {
-    runFirstLaunchWizard({ preview: true });
+  document.querySelectorAll('.settings-tile[data-settings-section]').forEach(tile => {
+    tile.addEventListener('click', () => showSettingsSection(tile.dataset.settingsSection));
   });
+
+  document.getElementById('btn-settings-back')
+    .addEventListener('click', () => showSettingsSection(null));
 
   document.getElementById('btn-advanced-settings').addEventListener('click', e => {
     e.preventDefault();

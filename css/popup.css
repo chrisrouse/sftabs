@@ -882,14 +882,9 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .settings-body::-webkit-scrollbar { width: 3px; }
 .settings-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
 
-/* Settings panel: the header shares the panel surface and scrolls with
-   the content, so the whole view is the scroll container rather than
-   just the body. */
-#view-settings {
-  overflow-y: auto;
-}
-#view-settings::-webkit-scrollbar { width: 3px; }
-#view-settings::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
+/* One scroll container, not two. The header is now sticky chrome carrying the
+   back button, so it stays put while .settings-body scrolls under it — the
+   view itself no longer scrolls. */
 
 #view-settings .panel-view-header {
   background: none;
@@ -906,6 +901,51 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   background: none;
   border: none;
 }
+
+/* ── Settings hub ──
+   Four tiles that open a section in place. The icon leads and the label names
+   it; descriptions live inside the section rather than on the tile, which keeps
+   the grid scannable at a glance. */
+.settings-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sft-spacing-2);
+}
+
+.settings-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 12px;
+  font: inherit;
+  color: var(--t-base);
+  background: var(--s-1);
+  border: var(--sft-border-width-1) solid var(--b-subtle);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background var(--ease), border-color var(--ease);
+}
+.settings-tile:hover {
+  background: var(--s-hover);
+  border-color: var(--b-medium);
+}
+.settings-tile:focus-visible {
+  outline: 2px solid var(--sft-focus-ring);
+  outline-offset: 2px;
+}
+.settings-tile svg {
+  width: 26px;
+  height: 26px;
+  color: var(--c-primary);
+}
+.settings-tile-label { font-weight: var(--sft-font-weight-semibold); }
+
+/* The back control occupies the slot every other panel view fills with its
+   close button, so the header keeps one shape across the tray. Mirrored
+   because the vendored SLDS chevron only points right. */
+.settings-back svg { transform: scaleX(-1); }
 
 .settings-section-title {
   font-size: var(--sft-font-size-base);
