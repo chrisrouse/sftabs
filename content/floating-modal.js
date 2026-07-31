@@ -514,34 +514,29 @@
 
       tabEl.appendChild(rowEl);
 
-      // Click handler for tab row
+      // The chevron expands; the label navigates. Previously any tab with
+      // children only ever toggled, which made a parent that has its own
+      // destination unreachable from this menu.
+      const activateTab = (e, fromChevron) => {
+        const url = buildTabUrl(tab);
+        if (fromChevron || !url) {
+          if (hasDropdown) tabEl.classList.toggle('expanded');
+          return;
+        }
+        this.navigateToTab(tab);
+      };
+
       rowEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (hasDropdown) {
-          // Always toggle dropdown if it has items
-          tabEl.classList.toggle('expanded');
-        } else {
-          // Only navigate if tab has a path (not a folder-style tab)
-          const url = buildTabUrl(tab);
-          if (url) {
-            this.navigateToTab(tab);
-          }
-        }
+        activateTab(e, hasDropdown && !!e.target.closest('.dropdown-indicator'));
       });
 
-      // Keyboard handler (Enter or Space)
+      // Keyboard handler (Enter or Space). Enter follows the label; Space, which
+      // reads as "operate the control", expands.
       tabEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          if (hasDropdown) {
-            tabEl.classList.toggle('expanded');
-          } else {
-            const url = buildTabUrl(tab);
-            if (url) {
-              this.navigateToTab(tab);
-            }
-          }
-        }
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        activateTab(e, hasDropdown && e.key === ' ');
       });
 
       // Render dropdown children if has dropdown
@@ -609,34 +604,25 @@
 
       childEl.appendChild(rowEl);
 
-      // Click handler for child row
+      // Same rule as the top level: chevron expands, label navigates.
+      const activateChild = (e, fromChevron) => {
+        const url = buildTabUrl(childTab);
+        if (fromChevron || !url) {
+          if (hasDropdown) childEl.classList.toggle('expanded');
+          return;
+        }
+        this.navigateToTab(childTab);
+      };
+
       rowEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (hasDropdown) {
-          // Toggle nested dropdown if it has items
-          childEl.classList.toggle('expanded');
-        } else {
-          // Only navigate if child tab has a path (not a folder-style tab)
-          const url = buildTabUrl(childTab);
-          if (url) {
-            this.navigateToTab(childTab);
-          }
-        }
+        activateChild(e, hasDropdown && !!e.target.closest('.dropdown-indicator'));
       });
 
-      // Keyboard handler (Enter or Space)
       childEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          if (hasDropdown) {
-            childEl.classList.toggle('expanded');
-          } else {
-            const url = buildTabUrl(childTab);
-            if (url) {
-              this.navigateToTab(childTab);
-            }
-          }
-        }
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        activateChild(e, hasDropdown && e.key === ' ');
       });
 
       // Render nested dropdown children if has dropdown (third level)
