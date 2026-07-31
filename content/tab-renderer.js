@@ -82,8 +82,6 @@ async function getTabsFromStorage() {
       settings = result[settingsKey] || {};
     }
 
-    tabColorPref = settings.tabColors || { enabled: false, style: 'dot' };
-
     // Which profile applies to THIS page. Resolved from the page's own org
     // rather than the globally active profile, so two orgs render their own
     // tabs at the same time whether they sit in one window or two.
@@ -152,6 +150,12 @@ async function initTabs(tabContainer) {
       const result = await browser.storage.local.get(settingsKey);
       settings = result[settingsKey] || {};
     }
+
+    // Set here rather than in getTabsFromStorage: content-main.js declares a
+    // function of that name too and, loading last, its copy wins — so the
+    // assignment over there never ran and every tab rendered uncoloured. This
+    // is this file's own render entry point.
+    tabColorPref = settings.tabColors || { enabled: false, style: 'dot' };
 
     // Setup tabs always render (they're the core feature)
     // The floating button location is handled separately

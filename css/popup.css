@@ -1544,3 +1544,67 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   transform: rotate(45deg);
 }
 .color-dot--none[aria-checked="true"] { border-style: solid; border-color: var(--t-base); }
+
+/* ── 30. Colour-style chooser ──
+   Miniature tabs rather than words: the styles differ visually, so showing them
+   is more direct than naming them. Each preview borrows the same teal the
+   picker offers, purely as a stand-in — the real colour comes from the tab. */
+.style-choices { display: flex; gap: 6px; }
+.style-choice {
+  padding: 3px;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: border-color var(--ease);
+}
+.style-choice:hover { border-color: var(--b-subtle); }
+.style-choice[aria-checked="true"] { border-color: var(--c-primary); }
+.style-choice:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+
+.style-preview {
+  --demo: light-dark(#056764, #06a59a);      /* palette teal-40, as a sample */
+  --demo-wash: light-dark(#acf3e4, #071b12); /* palette teal-90 */
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 2px;
+  background: var(--s-1);
+  border: 1px solid var(--b-subtle);
+  font-size: var(--sft-font-size-xxs);
+  color: var(--t-base);
+  white-space: nowrap;
+}
+/* The strong bar above is the active indicator, which every style recolours */
+.style-preview::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 2px;
+  background: var(--demo);
+}
+.style-preview--dot i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--demo);
+  flex-shrink: 0;
+}
+.style-preview--underline::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  right: -1px;
+  height: 2px;
+  background: var(--demo);
+  opacity: 0.35;
+}
+.style-preview--tint {
+  background: var(--demo-wash);
+  color: var(--demo);
+}

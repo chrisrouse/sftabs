@@ -291,10 +291,25 @@
                   <span class="settings-desc">__MSG_tabColorStyleDesc__</span>
                 </div>
                 <div class="settings-row-control">
-                  <div class="seg" role="group" aria-label="__MSG_tabColorStyleLabel__">
-                    <button type="button" class="seg-btn" data-color-style="dot">__MSG_tabColorStyleDot__</button>
-                    <button type="button" class="seg-btn" data-color-style="underline">__MSG_tabColorStyleUnderline__</button>
-                    <button type="button" class="seg-btn" data-color-style="tint">__MSG_tabColorStyleTint__</button>
+                  <!-- Each option is a miniature of the tab it produces, so the
+                       choice is made by looking rather than by reading. The name
+                       stays as the accessible label and the tooltip. -->
+                  <div class="style-choices" role="radiogroup" aria-label="__MSG_tabColorStyleLabel__">
+                    <button type="button" class="style-choice" data-color-style="dot"
+                      role="radio" aria-checked="false"
+                      title="__MSG_tabColorStyleDot__" aria-label="__MSG_tabColorStyleDot__">
+                      <span class="style-preview style-preview--dot"><i></i>Flows</span>
+                    </button>
+                    <button type="button" class="style-choice" data-color-style="underline"
+                      role="radio" aria-checked="false"
+                      title="__MSG_tabColorStyleUnderline__" aria-label="__MSG_tabColorStyleUnderline__">
+                      <span class="style-preview style-preview--underline">Flows</span>
+                    </button>
+                    <button type="button" class="style-choice" data-color-style="tint"
+                      role="radio" aria-checked="false"
+                      title="__MSG_tabColorStyleTint__" aria-label="__MSG_tabColorStyleTint__">
+                      <span class="style-preview style-preview--tint">Flows</span>
+                    </button>
                   </div>
                 </div>
               </div>

@@ -2150,9 +2150,7 @@ function syncTabColorRow() {
   toggle.checked = tabColorsOn();
   document.getElementById('row-tab-color-style').hidden = !tabColorsOn();
   document.querySelectorAll('[data-color-style]').forEach(btn => {
-    const on = btn.dataset.colorStyle === tabColorStyle();
-    btn.classList.toggle('active', on);
-    btn.setAttribute('aria-pressed', String(on));
+    btn.setAttribute('aria-checked', String(btn.dataset.colorStyle === tabColorStyle()));
   });
 }
 
