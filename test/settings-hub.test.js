@@ -46,6 +46,20 @@ const panel = html.slice(
 const tiles = [...panel.matchAll(/class="settings-tile" data-settings-section="([a-z-]+)"/g)].map(m => m[1]);
 const sections = [...panel.matchAll(/class="settings-section" data-settings-section="([a-z-]+)"/g)].map(m => m[1]);
 
+/**
+ * The body of one section.
+ *
+ * Anchored on `class="settings-section"`, because the tile that opens a section
+ * carries the same data-settings-section attribute and appears earlier in the
+ * document — matching on the attribute alone silently returned the wrong region
+ * and made anything asserted against it pass for free.
+ */
+function sectionBody(id) {
+  const from = panel.indexOf(`class="settings-section" data-settings-section="${id}"`);
+  if (from < 0) return '';
+  return panel.slice(from, panel.indexOf('</section>', from));
+}
+
 // ── 1. Tiles and sections pair up ──
 check('there is at least one tile', tiles.length > 0, tiles.join(', '));
 check('every tile opens a section that exists',
@@ -70,10 +84,8 @@ check('the back button ships hidden',
 
 // ── 3. Each section can name itself in the header ──
 sections.forEach(id => {
-  const from = panel.indexOf(`data-settings-section="${id}"`);
-  const body = panel.slice(from, panel.indexOf('</section>', from));
   check(`section "${id}" carries a title for the header`,
-    body.includes('settings-section-title'));
+    sectionBody(id).includes('settings-section-title'));
 });
 
 // ── 4. Settings stays one panel-view ──
@@ -129,6 +141,24 @@ check('the form tracks creating separately from the autosaved id',
   /profileFormIsNew/.test(js) && /state\.profileFormIsNew = !profile/.test(js));
 check('editing hides the control rather than disabling it',
   /group\.hidden = !state\.profileFormIsNew/.test(js));
+
+// ── 8. Sections built at runtime refresh when opened ──
+// The markup marks these with a "Populated by" comment. Unhiding such a section
+// shows whatever was last rendered into it — nothing, on a first visit. Profiles
+// hit exactly that: the list was empty until a detour through New Profile
+// happened to render it on the way back.
+const refreshMap = /SETTINGS_SECTION_REFRESH = \{([\s\S]*?)\n\};/.exec(js);
+check('the refresh map exists', Boolean(refreshMap));
+if (refreshMap) {
+  const refreshed = [...refreshMap[1].matchAll(/^ {2}([a-z-]+):/gm)].map(m => m[1]);
+  const needsRefresh = sections.filter(id => /Populated by/.test(sectionBody(id)));
+  check('every runtime-built section refreshes when opened',
+    needsRefresh.every(id => refreshed.includes(id)),
+    needsRefresh.filter(id => !refreshed.includes(id)).join(', ') ||
+      `${needsRefresh.join(', ') || 'none'} covered`);
+  check('the navigator actually invokes the map',
+    /if \(id\) SETTINGS_SECTION_REFRESH\[id\]\?\.\(\)/.test(js));
+}
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

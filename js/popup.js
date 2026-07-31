@@ -1138,9 +1138,7 @@ async function seedTabsFor(profileId) {
  * Everything that used to open that sheet lands here instead.
  */
 function openProfilesList() {
-  renderProfilesList();
-  syncAutoSwitchRow();
-  showSettingsSection('profiles');
+  showSettingsSection('profiles');   // renders the list on the way in
   showView('settings');
 }
 
@@ -1368,6 +1366,21 @@ function showView(viewName) {
 }
 
 /**
+ * Sections whose contents are built at runtime, and so have to be rebuilt each
+ * time the section is opened rather than once at load.
+ *
+ * Without this, Profiles rendered only when something else happened to call
+ * renderProfilesList() — so arriving from the hub showed an empty list, and a
+ * detour through New Profile and back appeared to fix it.
+ */
+const SETTINGS_SECTION_REFRESH = {
+  profiles: () => {
+    renderProfilesList();
+    syncAutoSwitchRow();
+  },
+};
+
+/**
  * Move between the Settings hub and one of its sections.
  *
  * Deliberately NOT part of showView(). That switches `panel-view`s and writes
@@ -1398,6 +1411,8 @@ function showSettingsSection(id) {
 
   document.getElementById('settings-title').textContent = title;
   document.getElementById('btn-settings-back').hidden = !id;
+
+  if (id) SETTINGS_SECTION_REFRESH[id]?.();
 }
 
 function clearEditingHighlight() {
