@@ -39,20 +39,14 @@
 }
 
 /* ── Active indicator ──
-   Salesforce marks the active Setup tab with a bar along the top. When a tab has
-   a colour, that bar takes the colour at full strength, so the active tab stays
-   just as obvious as it is without colours.
+   A real element, not a pseudo. Salesforce draws its own indicator with
+   ::before on this same li, so our ::before was not overlaying theirs — it was
+   the same pseudo-element, and their rule won. A child span cannot collide.
 
-   Drawn as our own overlay rather than by overriding Salesforce's rule: the
-   property they use is theirs to change between releases, and covering it is
-   stable in a way that guessing at it is not. */
-.sftabs-tc.slds-is-active,
-.sftabs-tc.active {
-  position: relative;
-}
-.sftabs-tc.slds-is-active::before,
-.sftabs-tc.active::before {
-  content: '';
+   Rendered on every coloured tab and revealed only when active, so the class
+   toggle alone drives it and nothing has to be re-rendered. */
+.sftabs-tc-bar {
+  display: none;
   position: absolute;
   left: 0;
   right: 0;
@@ -60,7 +54,30 @@
   height: 3px;
   background: var(--sftabs-tc);
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
+}
+.sftabs-tc { position: relative; }
+.sftabs-tc.slds-is-active > .sftabs-tc-bar,
+.sftabs-tc.active > .sftabs-tc-bar { display: block; }
+
+/* ── Tint has to hold through hover and active ──
+   Salesforce restyles the background in both states with two-class selectors,
+   which outrank a single .sftabs-tc--tint. These stack three classes so they
+   win outright rather than tying and depending on source order — injected
+   stylesheets have no guaranteed position against the page's own. Without this
+   a tinted tab turns grey the moment you point at it, which is what made the
+   colour look like it was being lost. */
+.tabItem.sf-tabs-custom-tab.sftabs-tc--tint,
+.tabItem.sf-tabs-custom-tab.sftabs-tc--tint:hover,
+.tabItem.sf-tabs-custom-tab.sftabs-tc--tint.slds-is-active,
+.tabItem.sf-tabs-custom-tab.sftabs-tc--tint.active {
+  background-color: var(--sftabs-tc-wash);
+}
+.tabItem.sf-tabs-custom-tab.sftabs-tc--tint > a,
+.tabItem.sf-tabs-custom-tab.sftabs-tc--tint:hover > a,
+.tabItem.sf-tabs-custom-tab.sftabs-tc--tint.slds-is-active > a {
+  background-color: transparent;   /* the anchor carries its own hover fill */
+  color: var(--sftabs-tc);
 }
 
 /* ── The dot's bead ──
