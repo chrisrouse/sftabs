@@ -978,6 +978,11 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .settings-desc  { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
 .settings-row-control { flex-shrink: 0; }
 
+/* The list, the button that adds to it, and the note about deleting all ran
+   together once these moved out of the sheet and lost its inline margins. */
+#btn-new-profile-from-list { margin-top: var(--sft-spacing-3); }
+#profiles-manage > .form-hint { margin-top: var(--sft-spacing-2); }
+
 /* ── "Start with" on the new-profile form ──
    Stacked radios rather than a segmented control, because the third option
    carries a picker and would not fit in a segment. */
