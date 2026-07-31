@@ -329,7 +329,7 @@ function createTabElementWithDropdown(tab) {
   // Add appropriate classes
   a.classList.add('tabHeader', 'slds-context-bar__label-action');
 
-  // Optional per-tab colour. Applied to the li so the underline and the active
+  // Optional per-tab colour. Applied to the li so the tint and the active
   // indicator can span the whole tab, not just the label.
   const utils = window.SFTabs && window.SFTabs.utils;
   if (utils && utils.applyTabColor) {

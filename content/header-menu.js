@@ -228,7 +228,7 @@
 
   /**
    * Optional per-tab colour. Menus always use the bead, whatever the tab bar is
-   * set to: a 12px row filled or underlined is harder to read, not easier.
+   * set to: a 12px row filled with colour is harder to read, not easier.
    */
   function paintRow(li, item) {
     const utils = window.SFTabs && window.SFTabs.utils;

@@ -2046,7 +2046,6 @@ function confirmStorageChange(toSync) {
 
 const tabColorsOn = () => !!(state.settings.tabColors && state.settings.tabColors.enabled);
 const TAB_COLOR_STYLES = ['dot', 'tint'];
-/** Coerced, so a style that has been retired — 'underline' — still resolves. */
 const tabColorStyle = () => {
   const stored = state.settings.tabColors && state.settings.tabColors.style;
   return TAB_COLOR_STYLES.includes(stored) ? stored : 'dot';

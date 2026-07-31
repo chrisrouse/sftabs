@@ -69,10 +69,6 @@ el = fakeEl();
 applyTabColor(el, 'teal', 'nonsense', true);
 check('an unknown style falls back to dot', el.classList.contains('sftabs-tc--dot'));
 
-el = fakeEl();
-applyTabColor(el, 'teal', 'underline', true);
-check('the retired underline style falls back rather than rendering nothing',
-  el.classList.contains('sftabs-tc--dot') && !el.classList.contains('sftabs-tc--underline'));
 
 el = fakeEl();
 applyTabColor(el, null, 'tint', true);

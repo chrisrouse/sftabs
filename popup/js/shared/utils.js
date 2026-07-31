@@ -332,8 +332,6 @@ function applyTabColor(el, name, style, enabled) {
   const colour = tabColorVars(name);
   if (!colour) return;
 
-  // 'underline' was offered briefly and removed for being too faint against
-  // Salesforce's chrome; anything unrecognised, including that, falls back.
   const mode = ['dot', 'tint'].includes(style) ? style : 'dot';
   el.style.setProperty('--sftabs-tc', colour.accent);
   el.style.setProperty('--sftabs-tc-wash', colour.wash);
