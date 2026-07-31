@@ -106,7 +106,7 @@ Their dropdowns render as:
 
 ## Row contents
 
-Favorites shows a coloured record-type icon per entry. Our tabs have no
+Favorites shows a colored record-type icon per entry. Our tabs have no
 equivalent — the type badge was removed as noise — so each row is the tab name
 over its path, matching the popup. A count and chevron appear where a tab has
 sub-items.

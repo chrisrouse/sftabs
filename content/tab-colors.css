@@ -1,5 +1,5 @@
 /* content/tab-colors.css
-   Optional per-tab colours, shared by every surface that lists tabs: the
+   Optional per-tab colors, shared by every surface that lists tabs: the
    injected Setup tab bar, the floating panel, the header menu, and the popup.
 
    The palette itself is NOT here. applyTabColor() in popup/js/shared/utils.js
@@ -14,7 +14,7 @@
    Keeping the values in JS means the thirty-six shades are defined once rather
    than restated in each stylesheet that needs them.
 
-   Both properties are light-dark() pairs, so a colour follows whatever
+   Both properties are light-dark() pairs, so a color follows whatever
    color-scheme the surface is under. Salesforce pages resolve to the light
    value, which is correct for standard Lightning; the popup sets color-scheme
    from its own theme, so it flips with the extension.
@@ -49,7 +49,7 @@
 
 /* ── Tint in the Setup tab bar: the resting state only ──
    Salesforce owns hover and active here, both the background and the label
-   colour, and its signals for them are stronger and more familiar than anything
+   color, and its signals for them are stronger and more familiar than anything
    we would layer on. So rather than overriding those states and then trying to
    look native, the tint excludes itself from them: with :not() the declaration
    never enters the cascade, leaving Salesforce's own rules to resolve exactly

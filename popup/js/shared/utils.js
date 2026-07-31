@@ -239,7 +239,7 @@ function extractOrgIdentifier(url) {
  * case-insensitive equality against the org identifier. If the two ever
  * disagree, a page renders one profile while the popup claims another.
  *
- * When auto-switch is off this returns activeProfileId unchanged, so behaviour
+ * When auto-switch is off this returns activeProfileId unchanged, so behavior
  * for anyone not using linked orgs is exactly as before.
  *
  * @param {string} url        the page being rendered
@@ -269,12 +269,12 @@ function resolveProfileForUrl(url, profiles, settings) {
 }
 
 /**
- * Optional per-tab colours.
+ * Optional per-tab colors.
  *
  * Keyed by SLDS expressive-palette hue name, not by hex. Storing the name is
- * what lets a colour follow the theme: each value is a light-dark() pair, so
+ * what lets a color follow the theme: each value is a light-dark() pair, so
  * "teal" is #056764 on a light surface and #06a59a on a dark one. A stored hex
- * would strand every coloured tab in whichever theme it was picked under.
+ * would strand every colored tab in whichever theme it was picked under.
  *
  * Three shades per hue — deep, base and light — because at one shade the darker
  * hues are hard to tell apart as dots. Each carries three roles:
@@ -290,8 +290,8 @@ function resolveProfileForUrl(url, profiles, settings) {
  * being written here.
  *
  * Values are verbatim from @salesforce-ux/design-system-2. Neutral is omitted —
- * that is the no-colour case — and electric blue, which is the brand accent and
- * would read as "selected" rather than as a chosen colour.
+ * that is the no-color case — and electric blue, which is the brand accent and
+ * would read as "selected" rather than as a chosen color.
  */
 const TAB_COLORS = {
   'red-deep': { accent: 'light-dark(#640103, #feb8ab)', wash: 'light-dark(#feded8, #300c01)', ink: 'light-dark(#640103, #feb8ab)' },
@@ -333,7 +333,7 @@ const TAB_COLORS = {
 };
 
 /**
- * Inline custom properties for a tab's colour, or null when it has none.
+ * Inline custom properties for a tab's color, or null when it has none.
  *
  * Returned as properties rather than baked-into-CSS classes so the palette lives
  * in exactly one place — here — instead of being restated in every stylesheet
@@ -347,13 +347,13 @@ function tabColorVars(name) {
 }
 
 /**
- * Put a tab's colour on an element, or take it off.
+ * Put a tab's color on an element, or take it off.
  *
  * Clearing is as important as setting: turning the feature off must leave the
- * stored colour alone but stop rendering it, and rows get reused.
+ * stored color alone but stop rendering it, and rows get reused.
  *
  * @param {Element} el
- * @param {string|null} name   colour name, or null/unknown for none
+ * @param {string|null} name   color name, or null/unknown for none
  * @param {string} style       'dot' | 'tint'
  * @param {boolean} enabled    the tabColors.enabled setting
  */
@@ -364,13 +364,13 @@ function applyTabColor(el, name, style, enabled) {
   el.style.removeProperty('--sftabs-tc-ink');
   if (!enabled) return;
 
-  const colour = tabColorVars(name);
-  if (!colour) return;
+  const color = tabColorVars(name);
+  if (!color) return;
 
   const mode = ['dot', 'tint'].includes(style) ? style : 'dot';
-  el.style.setProperty('--sftabs-tc', colour.accent);
-  el.style.setProperty('--sftabs-tc-wash', colour.wash);
-  el.style.setProperty('--sftabs-tc-ink', colour.ink || colour.accent);
+  el.style.setProperty('--sftabs-tc', color.accent);
+  el.style.setProperty('--sftabs-tc-wash', color.wash);
+  el.style.setProperty('--sftabs-tc-ink', color.ink || color.accent);
   el.classList.add('sftabs-tc', `sftabs-tc--${mode}`);
 }
 

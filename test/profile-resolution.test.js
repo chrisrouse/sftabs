@@ -35,7 +35,7 @@ const check = (name, pass, detail = '') => {
 };
 const r = (url, s) => resolveProfileForUrl(url, PROFILES, s);
 
-// The reported bug: same behaviour whether the orgs are in one window or two,
+// The reported bug: same behavior whether the orgs are in one window or two,
 // because nothing here depends on window or focus.
 check('linked org resolves to its own profile', r(DEV1, ON) === 'p_default', r(DEV1, ON));
 check('a second linked org resolves independently', r(QA, ON) === 'p_test', r(QA, ON));

@@ -1260,7 +1260,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .profile-dropdown[hidden] { display: none; }
 
 /* No translateX: the menu is right-anchored now. Leaving the old -50% here
-   made it animate in from centre and jump right when the animation ended. */
+   made it animate in from center and jump right when the animation ended. */
 @keyframes dropdownIn {
   from { opacity: 0; transform: translateY(-5px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -1493,7 +1493,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 .profile-option-new + .profile-option-new { border-top: none; }
 
-/* Profile colour dot in the profiles list. The switcher's dot sits in a
+/* Profile color dot in the profiles list. The switcher's dot sits in a
    text-only menu row; this one is a flex child of a .tab-item row. */
 .profile-dot {
   width: 8px;
@@ -1506,12 +1506,12 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .dropdown-item .profile-dot + .tab-info { padding-left: var(--sft-spacing-2); }
 
 /* Default-profile star. Off is the outline icon in the usual muted action
-   colour; on is the filled icon in the notification yellow, the same accent
+   color; on is the filled icon in the notification yellow, the same accent
    the unread dot uses. */
 .tab-btn--star.is-on { color: #fcc003; }
 .tab-btn--star.is-on:hover { background: color-mix(in srgb, #fcc003 18%, transparent); }
 
-/* ── 29. Tab colour picker ──
+/* ── 29. Tab color picker ──
    Dots rather than a named grid: it is the most compact of the three layouts
    mocked up, and the form is already close to the fold. */
 .color-dots {
@@ -1535,10 +1535,10 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14);
 }
 
-/* Hover and selection are rings held off the swatch by a surface-coloured gap.
+/* Hover and selection are rings held off the swatch by a surface-colored gap.
    Drawing them directly on the edge was the problem before: a dark border on a
    dark swatch is invisible. The gap guarantees the ring is always legible
-   whatever colour it surrounds. box-shadow rather than border so the swatch
+   whatever color it surrounds. box-shadow rather than border so the swatch
    never changes size and the grid doesn't shift. */
 .color-dot:hover {
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14),
@@ -1556,7 +1556,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   outline-offset: 3px;
 }
 
-/* The no-colour option: an outline with a slash, so it reads as "off" rather
+/* The no-color option: an outline with a slash, so it reads as "off" rather
    than as a white swatch. It leads the grid on its own row. */
 .color-dot--none {
   position: relative;
@@ -1586,10 +1586,10 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
               0 0 0 4px var(--t-base);
 }
 
-/* ── 30. Colour-style chooser ──
+/* ── 30. Color-style chooser ──
    Miniature tabs rather than words: the styles differ visually, so showing them
    is more direct than naming them. Each preview borrows the same teal the
-   picker offers, purely as a stand-in — the real colour comes from the tab. */
+   picker offers, purely as a stand-in — the real color comes from the tab. */
 .style-choices { display: flex; gap: 6px; }
 .style-choice {
   padding: 3px;
@@ -1618,7 +1618,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   color: var(--t-base);
   white-space: nowrap;
 }
-/* The strong bar above is the active indicator, which every style recolours */
+/* The strong bar above is the active indicator, which every style colors */
 .style-preview::before {
   content: '';
   position: absolute;

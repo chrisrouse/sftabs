@@ -3020,87 +3020,87 @@
   },
   "tabColorsLabel": {
     "message": "Color-code tabs",
-    "description": "Setting that enables optional per-tab colours"
+    "description": "Setting that enables optional per-tab colors"
   },
   "tabColorsDesc": {
     "message": "Give individual tabs a color. Tabs without one keep the standard look.",
-    "description": "Description under the colour-coding toggle"
+    "description": "Description under the color-coding toggle"
   },
   "tabColorStyleLabel": {
     "message": "Color style",
-    "description": "Choice of how a tab colour is shown"
+    "description": "Choice of how a tab color is shown"
   },
   "tabColorStyleDesc": {
     "message": "How the color appears on a tab",
-    "description": "Description under the colour-style choice"
+    "description": "Description under the color-style choice"
   },
   "tabColorStyleDot": {
     "message": "Dot",
-    "description": "Colour style: a coloured bead before the label"
+    "description": "Color style: a colored bead before the label"
   },
   "tabColorStyleTint": {
     "message": "Tint",
-    "description": "Colour style: a coloured wash behind the tab"
+    "description": "Color style: a colored wash behind the tab"
   },
   "tabColorLabel": {
     "message": "Tab color",
-    "description": "Label for the colour picker in the tab edit form"
+    "description": "Label for the color picker in the tab edit form"
   },
   "colorNone": {
     "message": "No color",
-    "description": "The default, un-coloured option in the picker"
+    "description": "The default, un-colored option in the picker"
   },
   "colorName_red": {
     "message": "Red",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_hot_orange": {
     "message": "Hot orange",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_orange": {
     "message": "Orange",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_yellow": {
     "message": "Yellow",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_green": {
     "message": "Green",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_teal": {
     "message": "Teal",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_cloud_blue": {
     "message": "Cloud blue",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_blue": {
     "message": "Blue",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_indigo": {
     "message": "Indigo",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_violet": {
     "message": "Violet",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_purple": {
     "message": "Purple",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorName_pink": {
     "message": "Pink",
-    "description": "Palette colour name"
+    "description": "Palette color name"
   },
   "colorWithShade": {
     "message": "$COLOR$ ($SHADE$)",
-    "description": "A tab colour named by hue and shade, e.g. \"Teal (light)\"",
+    "description": "A tab color named by hue and shade, e.g. \"Teal (light)\"",
     "placeholders": {
       "color": {
         "content": "$1"
@@ -3112,10 +3112,10 @@
   },
   "colorShadeDeep": {
     "message": "deep",
-    "description": "The darkest of the three shades of a tab colour"
+    "description": "The darkest of the three shades of a tab color"
   },
   "colorShadeLight": {
     "message": "light",
-    "description": "The lightest of the three shades of a tab colour"
+    "description": "The lightest of the three shades of a tab color"
   }
 }

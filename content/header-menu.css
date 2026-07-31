@@ -51,7 +51,7 @@
 /* Nubbin. Ours rather than Salesforce's menu--nubbin-top, whose horizontal
    offset assumes Aura positioned the popup — with our own placement it landed
    over a neighbouring control instead of our button. position() measures the
-   button and passes its centre through --sftabs-hm-nubbin. */
+   button and passes its center through --sftabs-hm-nubbin. */
 #sftabs-header-menu::before {
   content: '';
   position: absolute;

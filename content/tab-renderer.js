@@ -58,7 +58,7 @@ async function readChunkedSync(baseKey) {
 }
 
 /**
- * Colour preference, cached from the settings read in getTabsFromStorage().
+ * Color preference, cached from the settings read in getTabsFromStorage().
  * createTabElementWithDropdown() has no settings in scope and runs per row, so
  * reading storage there would mean a round-trip per tab.
  */
@@ -153,7 +153,7 @@ async function initTabs(tabContainer) {
 
     // Set here rather than in getTabsFromStorage: content-main.js declares a
     // function of that name too and, loading last, its copy wins — so the
-    // assignment over there never ran and every tab rendered uncoloured. This
+    // assignment over there never ran and every tab rendered colored. This
     // is this file's own render entry point.
     tabColorPref = settings.tabColors || { enabled: false, style: 'dot' };
 
@@ -329,7 +329,7 @@ function createTabElementWithDropdown(tab) {
   // Add appropriate classes
   a.classList.add('tabHeader', 'slds-context-bar__label-action');
 
-  // Optional per-tab colour. Applied to the li so the tint and the active
+  // Optional per-tab color. Applied to the li so the tint and the active
   // indicator can span the whole tab, not just the label.
   const utils = window.SFTabs && window.SFTabs.utils;
   if (utils && utils.applyTabColor) {

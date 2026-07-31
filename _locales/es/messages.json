@@ -2918,7 +2918,7 @@
   },
   "colorWithShade": {
     "message": "$COLOR$ ($SHADE$)",
-    "description": "A tab colour named by hue and shade",
+    "description": "A tab color named by hue and shade",
     "placeholders": {
       "color": {
         "content": "$1"
@@ -2930,10 +2930,10 @@
   },
   "colorShadeDeep": {
     "message": "oscuro",
-    "description": "The darkest of the three shades of a tab colour"
+    "description": "The darkest of the three shades of a tab color"
   },
   "colorShadeLight": {
     "message": "claro",
-    "description": "The lightest of the three shades of a tab colour"
+    "description": "The lightest of the three shades of a tab color"
   }
 }

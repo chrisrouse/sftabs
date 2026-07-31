@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Per-tab colours.
+ * Per-tab colors.
  *
  * The rule that matters most: switching the feature off must stop the rendering
  * and leave every stored tab.color alone, so switching it back on restores what
@@ -38,7 +38,7 @@ function fakeEl() {
 }
 
 // ── Defaults ──
-check('a tab has no colour by default', TAB_STRUCTURE.color === null);
+check('a tab has no color by default', TAB_STRUCTURE.color === null);
 check('the feature is off by default', DEFAULT_SETTINGS.tabColors.enabled === false);
 check('the default style is dot', DEFAULT_SETTINGS.tabColors.style === 'dot');
 
@@ -52,20 +52,20 @@ check('twelve hues in three shades', Object.keys(TAB_COLORS).length === 36,
 check('every hue carries all three shades',
   HUES.every(h => TAB_COLORS[h] && TAB_COLORS[h + '-deep'] && TAB_COLORS[h + '-light']));
 
-// The base shades keep their bare names, so a tab coloured before the shades
+// The base shades keep their bare names, so a tab colored before the shades
 // existed still resolves. Renaming them to 'teal-base' would have silently
-// dropped the colour off every tab already stored.
-check('the base shade keeps the bare hue name, so stored colours survive',
+// dropped the color off every tab already stored.
+check('the base shade keeps the bare hue name, so stored colors survive',
   HUES.every(h => tabColorVars(h) !== null));
 
 check('every shade has an accent, a wash and an ink',
   Object.values(TAB_COLORS).every(c => c.accent && c.wash && c.ink));
-check('every value is a light-dark pair, so colours follow the theme',
+check('every value is a light-dark pair, so colors follow the theme',
   Object.values(TAB_COLORS).every(c =>
     pair.test(c.accent) && pair.test(c.wash) && pair.test(c.ink)));
 
 // The light shade exists to be told apart as a dot, which only has to clear the
-// contrast bar for a graphic. That is below what the same colour would need as
+// contrast bar for a graphic. That is below what the same color would need as
 // label text, so it carries a darker ink instead of reusing its accent.
 check('deep and base label with their own accent',
   HUES.every(h => TAB_COLORS[h].ink === TAB_COLORS[h].accent &&
@@ -76,7 +76,7 @@ check('no two shades of a hue share an accent',
   HUES.every(h => new Set([TAB_COLORS[h], TAB_COLORS[h + '-deep'], TAB_COLORS[h + '-light']]
     .map(c => c.accent)).size === 3));
 check('an unknown hue resolves to nothing rather than throwing', tabColorVars('chartreuse') === null);
-check('no colour resolves to nothing', tabColorVars(null) === null);
+check('no color resolves to nothing', tabColorVars(null) === null);
 
 // ── Rendering ──
 let el = fakeEl();
@@ -93,7 +93,7 @@ check('clearing removes the ink with the rest', (() => {
   return !el.props.has('--sftabs-tc-ink');
 })());
 
-check('enabled + coloured: marked and given both properties',
+check('enabled + colored: marked and given both properties',
   el.classList.contains('sftabs-tc') && el.classList.contains('sftabs-tc--dot') &&
   el.props.get('--sftabs-tc') === TAB_COLORS.teal.accent &&
   el.props.get('--sftabs-tc-wash') === TAB_COLORS.teal.wash);
@@ -109,7 +109,7 @@ check('an unknown style falls back to dot', el.classList.contains('sftabs-tc--do
 
 el = fakeEl();
 applyTabColor(el, null, 'tint', true);
-check('enabled but uncoloured: nothing applied',
+check('enabled but colored: nothing applied',
   el.classList.size === 0 && el.props.size === 0);
 
 // The headline requirement.
@@ -121,7 +121,7 @@ check('switching off removes every class and property',
 
 const stored = { id: 't1', label: 'Flows', color: 'teal' };
 applyTabColor(fakeEl(), stored.color, 'tint', false);
-check('switching off does not touch the stored colour', stored.color === 'teal');
+check('switching off does not touch the stored color', stored.color === 'teal');
 applyTabColor(fakeEl(), stored.color, 'tint', true);
 check('switching back on still finds it', tabColorVars(stored.color) !== null);
 

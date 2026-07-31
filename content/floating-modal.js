@@ -512,7 +512,7 @@
         rowEl.appendChild(indicator);
       }
 
-      // Optional per-tab colour, always as a bead here — see header-menu.js
+      // Optional per-tab color, always as a bead here — see header-menu.js
       const utils = window.SFTabs && window.SFTabs.utils;
       if (utils && utils.applyTabColor) {
         const on = !!(this.settings && this.settings.tabColors && this.settings.tabColors.enabled);

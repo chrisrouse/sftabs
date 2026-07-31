@@ -38,7 +38,7 @@ let state = {
   activeView:      'empty',   // 'empty' | 'edit-tab' | 'dropdowns' | 'edit-profile'
                               //         | 'profiles' | 'settings' | 'release-notes'
   editingProfileId: null,     // profile open in the form; null while creating
-  editingColor:     null,     // colour chosen in the open edit form
+  editingColor:     null,     // color chosen in the open edit form
   editingTabId:    null,
   profileDropdownOpen: false,
   pendingDeleteId: null,
@@ -386,7 +386,7 @@ async function persistTabs() {
   try {
     await SFTabs.storage.saveTabs(state.tabs);
     // Open pages were relying solely on storage.onChanged to notice an edit,
-    // which left a renamed or recoloured tab looking stale until a reload.
+    // which left a renamed or colored tab looking stale until a reload.
     // Switching profile has always sent this; saving a tab never did.
     // Rebuilding is idempotent, so arriving twice costs nothing.
     broadcastTabRefresh();
@@ -784,7 +784,7 @@ function renderTabList() {
   }
   const ordered = state.tabs.slice().sort((a, b) => a.position - b.position);
   list.innerHTML = ordered.map(tab => tabItemHTML(tab)).join('');
-  // Colours are inline custom properties, so they go on after the markup exists
+  // Colors are inline custom properties, so they go on after the markup exists
   ordered.forEach(tab => {
     const el = list.querySelector(`.tab-item[data-id="${tab.id}"]`);
     if (el) paintTabRow(el, tab);
@@ -2047,7 +2047,7 @@ function confirmStorageChange(toSync) {
   });
 }
 
-// ── Tab colours ────────────────────────────────────────────────
+// ── Tab colors ────────────────────────────────────────────────
 
 const tabColorsOn = () => !!(state.settings.tabColors && state.settings.tabColors.enabled);
 const TAB_COLOR_STYLES = ['dot', 'tint'];
@@ -2056,7 +2056,7 @@ const tabColorStyle = () => {
   return TAB_COLOR_STYLES.includes(stored) ? stored : 'dot';
 };
 
-/** Paint a rendered row from its tab's stored colour. No-op when switched off. */
+/** Paint a rendered row from its tab's stored color. No-op when switched off. */
 function paintTabRow(el, tab) {
   const utils = window.SFTabs && window.SFTabs.utils;
   if (!utils || !utils.applyTabColor) return;
@@ -2177,7 +2177,7 @@ function syncSettingsPanel() {
   syncTabColorRow();
 }
 
-/** Keep the colour controls in step; the style choice is moot while off. */
+/** Keep the color controls in step; the style choice is moot while off. */
 function syncTabColorRow() {
   const toggle = document.getElementById('setting-tab-colors');
   if (!toggle) return;
@@ -2212,7 +2212,7 @@ function updateCharCount(inputId, countId, max) {
 
 // ── Helpers ────────────────────────────────────────────────────
 
-/** Drives data-type, which colours the row's left accent bar. */
+/** Drives data-type, which colors the row's left accent bar. */
 function tabType(tab) {
   if (tab.isCustomUrl)   return 'custom';
   if (tab.isSetupObject) return 'setup';

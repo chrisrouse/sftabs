@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8" />
-<title>SF Tabs — tab colour picker</title>
+<title>SF Tabs — tab color picker</title>
 <style>
   :root { color-scheme: light; }
   :root[data-theme="dark"] { color-scheme: dark; }
@@ -73,11 +73,11 @@
 </head>
 <body>
 
-<h1>Tab colour picker</h1>
+<h1>Tab color picker</h1>
 <p class="lede">
-  Twelve hues — every colour hue in the SLDS expressive palette, leaving out
-  neutral (that is the "no colour" case) and electric blue (the brand accent,
-  which would read as "selected" rather than as a chosen colour). Three ways to
+  Twelve hues — every color hue in the SLDS expressive palette, leaving out
+  neutral (that is the "no color" case) and electric blue (the brand accent,
+  which would read as "selected" rather than as a chosen color). Three ways to
   present the same set. Toggle the theme: each swatch is a light-dark pair, so the
   whole picker restates itself.
 </p>
@@ -86,9 +86,9 @@
 
 <section>
   <h2>A · Dots</h2>
-  <p class="why">Compact, and it fits the edit form without pushing anything below the fold. No names, so a colour is chosen by eye.</p>
+  <p class="why">Compact, and it fits the edit form without pushing anything below the fold. No names, so a color is chosen by eye.</p>
   <div class="panel">
-    <div class="flabel">Tab colour</div>
+    <div class="flabel">Tab color</div>
     <div class="dots" id="a"></div>
   </div>
 </section>
@@ -97,7 +97,7 @@
   <h2>B · Named grid</h2>
   <p class="why">Same swatches with their palette names. Costs vertical space, but the name is what actually gets stored, so this is the honest version — and it is searchable and speakable.</p>
   <div class="panel">
-    <div class="flabel">Tab colour</div>
+    <div class="flabel">Tab color</div>
     <div class="grid" id="b"></div>
   </div>
 </section>
@@ -106,7 +106,7 @@
   <h2>C · Preview rows</h2>
   <p class="why">Each option rendered as the thing it produces — the 90 as the wash, the 40 as the label. Tallest of the three, and the only one where you pick the result rather than the ingredient.</p>
   <div class="panel">
-    <div class="flabel">Tab colour</div>
+    <div class="flabel">Tab color</div>
     <div class="strip" id="c"></div>
   </div>
 </section>
@@ -116,7 +116,7 @@
   const LABELS = ["Red","Hot orange","Orange","Yellow","Green","Teal","Cloud blue","Blue","Indigo","Violet","Purple","Pink"];
 
   const a = document.getElementById('a');
-  a.innerHTML = '<button class="dot none" aria-pressed="true" title="No colour"></button>' +
+  a.innerHTML = '<button class="dot none" aria-pressed="true" title="No color"></button>' +
     HUES.map((h, i) => `<button class="dot" style="--sc: var(--c-${h})" title="${LABELS[i]}" aria-pressed="false"></button>`).join('');
 
   const b = document.getElementById('b');

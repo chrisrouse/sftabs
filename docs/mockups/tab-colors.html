@@ -120,7 +120,7 @@
 <h1>Per-tab colors</h1>
 <p class="lede">
   Five treatments over the same six tabs, from "platform only" to the competitor's
-  solid fill. The point of showing them together is that the colour data is
+  solid fill. The point of showing them together is that the color data is
   identical in every case — only the rendering differs — so the treatment can be a
   user setting rather than a decision we impose.
 </p>
@@ -146,10 +146,10 @@
 </section>
 
 <section>
-  <h2>The same colours on the other three surfaces</h2>
+  <h2>The same colors on the other three surfaces</h2>
   <p class="why">
     Whatever we choose has to work in four places, not one. These use the subtler
-    end — a bead in menus, an edge on cards — because a menu row filled with colour
+    end — a bead in menus, an edge on cards — because a menu row filled with color
     is unreadable at 12px, whichever treatment the tab bar uses.
   </p>
   <div class="surfaces">
@@ -169,12 +169,12 @@
 </section>
 
 <section>
-  <h2>Setting the colour</h2>
+  <h2>Setting the color</h2>
   <p class="why">
-    A fixed palette rather than a free colour picker — reasoning below.
+    A fixed palette rather than a free color picker — reasoning below.
   </p>
   <div class="picker">
-    <div class="label">Tab colour</div>
+    <div class="label">Tab color</div>
     <div class="swatches" id="swatches"></div>
   </div>
 </section>
@@ -182,15 +182,15 @@
 <section>
   <h2>Notes</h2>
   <p class="note">
-    <b>A curated palette, not a colour wheel.</b> Every swatch is an SLDS
+    <b>A curated palette, not a color wheel.</b> Every swatch is an SLDS
     expressive-palette pair — the 40 for the accent, the 90 for any wash — so each
     one already has a dark-mode counterpart and known contrast. A free picker lets
     someone choose <code>#ffff00</code>, which is unreadable in light mode, invisible
     in dark, and ours to apologise for. Eleven hues is more than anyone will use.
   </p>
   <p class="note">
-    <b>Colour is optional and additive.</b> <code>tab.color</code> would be a new
-    optional field on <code>TAB_STRUCTURE</code>. Absent means today's behaviour
+    <b>Color is optional and additive.</b> <code>tab.color</code> would be a new
+    optional field on <code>TAB_STRUCTURE</code>. Absent means today's behavior
     exactly, so nothing changes for existing users and nothing changes for anyone
     who never opens the picker.
   </p>
@@ -202,16 +202,16 @@
   </p>
   <p class="note">
     <b>Dark mode comes free, but only via the palette.</b> Each pair is a
-    <code>light-dark()</code>, so a tab coloured "teal" resolves to
+    <code>light-dark()</code>, so a tab colored "teal" resolves to
     <code>#056764</code> on white and <code>#06a59a</code> on dark. That is only
     possible because the value stored is a palette <em>name</em>, not a hex string.
-    Storing hex would strand every coloured tab in one theme.
+    Storing hex would strand every colored tab in one theme.
   </p>
   <p class="note">
     <b>Fill has a real cost, which is why it is not the default.</b> It overrides
     Salesforce's active-tab indicator, so the active tab stops being obvious — note
     how the mockup has to fake one with a dark bar. It also fights the org's own
-    theme colour. Worth offering; not worth defaulting to.
+    theme color. Worth offering; not worth defaulting to.
   </p>
 </section>
 
@@ -252,7 +252,7 @@
     </div>`).join('');
 
   document.getElementById('swatches').innerHTML =
-    `<button class="sw none" aria-pressed="false" title="No colour"></button>` +
+    `<button class="sw none" aria-pressed="false" title="No color"></button>` +
     PALETTE.map((c, i) => `
       <button class="sw" style="--sc: var(--c-${c})" title="${c}"
         aria-pressed="${c === 'orange'}"></button>`).join('');
@@ -265,10 +265,10 @@
 
   const WHY = {
     none:      "Salesforce's own styling, untouched. This is where we are now.",
-    dot:       'A bead before the label, and the active tab’s indicator takes the colour. Readable at a glance, and the platform look survives intact.',
-    underline: 'Every tab carries a muted rule in its colour; the active one goes full strength. Reads as a colour-coded set without adding a second shape.',
+    dot:       'A bead before the label, and the active tab’s indicator takes the color. Readable at a glance, and the platform look survives intact.',
+    underline: 'Every tab carries a muted rule in its color; the active one goes full strength. Reads as a color-coded set without adding a second shape.',
     tint:      'A wash from the palette’s 90 plus a label in its 40. Stronger, still legible, still recognisably a Salesforce tab bar.',
-    fill:      'The competitor’s: solid colour behind a white label. Loudest, and it costs you the active-tab indicator — the dark bar here is a substitute for the one it covers.',
+    fill:      'The competitor’s: solid color behind a white label. Loudest, and it costs you the active-tab indicator — the dark bar here is a substitute for the one it covers.',
   };
   document.querySelectorAll('[data-treat-btn]').forEach(btn => {
     btn.onclick = () => {

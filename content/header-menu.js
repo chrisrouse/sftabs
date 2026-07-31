@@ -227,8 +227,8 @@
   }
 
   /**
-   * Optional per-tab colour. Menus always use the bead, whatever the tab bar is
-   * set to: a 12px row filled with colour is harder to read, not easier.
+   * Optional per-tab color. Menus always use the bead, whatever the tab bar is
+   * set to: a 12px row filled with color is harder to read, not easier.
    */
   function paintRow(li, item) {
     const utils = window.SFTabs && window.SFTabs.utils;
@@ -335,7 +335,7 @@
    *
    * Prefers aligning the menu's left edge to the button, flipping to right-edge
    * alignment when that would overflow. The nubbin is ours, offset to the
-   * button's measured centre, so it points at the button either way.
+   * button's measured center, so it points at the button either way.
    */
   function position(menu) {
     const button = document.getElementById(ITEM_ID + '-button');
