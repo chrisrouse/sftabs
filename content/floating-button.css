@@ -131,7 +131,6 @@
 /* Active tab state - only for navigable items (items with URLs) */
 .sftabs-floating-modal .tab-item.navigable.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 /* Tab Row - Contains chevron and label */
@@ -144,25 +143,13 @@
   background: transparent;
 }
 
-/* Show hover box-shadow for all rows */
-.sftabs-floating-modal .tab-row:hover {
-  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
 /* Navigable top-level items get background on hover */
 .sftabs-floating-modal .tab-item.navigable > .tab-row:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .tab-row:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
-}
-
-/* Keep active state on hover for navigable active tabs */
-.sftabs-floating-modal .tab-item.navigable.active > .tab-row:hover {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .tab-label {
@@ -209,10 +196,9 @@
   cursor: pointer;
 }
 
-/* Active dropdown child state - uses box-shadow for left indicator */
+/* Active dropdown child state */
 .sftabs-floating-modal .dropdown-child-item.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-child-row {
@@ -240,23 +226,10 @@
 
 .sftabs-floating-modal .dropdown-child-row:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
-/* Non-navigable dropdown children - only box-shadow on hover, no background */
-.sftabs-floating-modal .dropdown-child-item:not(.navigable) > .dropdown-child-row:hover {
-  background: transparent;
-  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-child-row:active:not(.active) {
   background: var(--slds-g-color-neutral-base-90, var(--lwc-colorBackgroundRowActive, #e5e5e5));
-}
-
-/* Keep active state on hover for active dropdown children */
-.sftabs-floating-modal .dropdown-child-item.active > .dropdown-child-row:hover {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-child-label {
@@ -286,13 +259,6 @@
 
 .sftabs-floating-modal .dropdown-nested-item:hover {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
-/* Non-navigable nested items - only box-shadow on hover, no background */
-.sftabs-floating-modal .dropdown-nested-item:not(.navigable):hover {
-  background: transparent;
-  box-shadow: inset 3px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-nested-item:active:not(.active) {
@@ -302,13 +268,6 @@
 /* Active nested item state */
 .sftabs-floating-modal .dropdown-nested-item.active {
   background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
-}
-
-/* Keep active state on hover for active nested items */
-.sftabs-floating-modal .dropdown-nested-item.active:hover {
-  background: var(--lwc-brandPrimaryTransparent10, rgba(1, 118, 211, 0.1));
-  box-shadow: inset 4px 0 0 var(--lwc-brandPrimary, #0176d3);
 }
 
 .sftabs-floating-modal .dropdown-nested-label {
