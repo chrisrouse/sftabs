@@ -3017,5 +3017,89 @@
   "headerMenuAriaLabel": {
     "message": "SF Tabs — open your tabs",
     "description": "Accessible name for the bookmark button injected into the Salesforce header"
+  },
+  "tabColorsLabel": {
+    "message": "Color-code tabs",
+    "description": "Setting that enables optional per-tab colours"
+  },
+  "tabColorsDesc": {
+    "message": "Give individual tabs a color. Tabs without one keep the standard look.",
+    "description": "Description under the colour-coding toggle"
+  },
+  "tabColorStyleLabel": {
+    "message": "Color style",
+    "description": "Choice of how a tab colour is shown"
+  },
+  "tabColorStyleDesc": {
+    "message": "How the color appears on a tab",
+    "description": "Description under the colour-style choice"
+  },
+  "tabColorStyleDot": {
+    "message": "Dot",
+    "description": "Colour style: a coloured bead before the label"
+  },
+  "tabColorStyleUnderline": {
+    "message": "Underline",
+    "description": "Colour style: a coloured rule under the tab"
+  },
+  "tabColorStyleTint": {
+    "message": "Tint",
+    "description": "Colour style: a coloured wash behind the tab"
+  },
+  "tabColorLabel": {
+    "message": "Tab color",
+    "description": "Label for the colour picker in the tab edit form"
+  },
+  "colorNone": {
+    "message": "No color",
+    "description": "The default, un-coloured option in the picker"
+  },
+  "colorName_red": {
+    "message": "Red",
+    "description": "Palette colour name"
+  },
+  "colorName_hot_orange": {
+    "message": "Hot orange",
+    "description": "Palette colour name"
+  },
+  "colorName_orange": {
+    "message": "Orange",
+    "description": "Palette colour name"
+  },
+  "colorName_yellow": {
+    "message": "Yellow",
+    "description": "Palette colour name"
+  },
+  "colorName_green": {
+    "message": "Green",
+    "description": "Palette colour name"
+  },
+  "colorName_teal": {
+    "message": "Teal",
+    "description": "Palette colour name"
+  },
+  "colorName_cloud_blue": {
+    "message": "Cloud blue",
+    "description": "Palette colour name"
+  },
+  "colorName_blue": {
+    "message": "Blue",
+    "description": "Palette colour name"
+  },
+  "colorName_indigo": {
+    "message": "Indigo",
+    "description": "Palette colour name"
+  },
+  "colorName_violet": {
+    "message": "Violet",
+    "description": "Palette colour name"
+  },
+  "colorName_purple": {
+    "message": "Purple",
+    "description": "Palette colour name"
+  },
+  "colorName_pink": {
+    "message": "Pink",
+    "description": "Palette colour name"
   }
 }

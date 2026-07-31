@@ -58,6 +58,13 @@ async function readChunkedSync(baseKey) {
 }
 
 /**
+ * Colour preference, cached from the settings read in getTabsFromStorage().
+ * createTabElementWithDropdown() has no settings in scope and runs per row, so
+ * reading storage there would mean a round-trip per tab.
+ */
+let tabColorPref = { enabled: false, style: 'dot' };
+
+/**
  * Get tabs from storage (sync or local based on preference)
  */
 async function getTabsFromStorage() {
@@ -74,6 +81,8 @@ async function getTabsFromStorage() {
       const result = await browser.storage.local.get(settingsKey);
       settings = result[settingsKey] || {};
     }
+
+    tabColorPref = settings.tabColors || { enabled: false, style: 'dot' };
 
     // Which profile applies to THIS page. Resolved from the page's own org
     // rather than the globally active profile, so two orgs render their own
@@ -315,7 +324,20 @@ function createTabElementWithDropdown(tab) {
   
   // Add appropriate classes
   a.classList.add('tabHeader', 'slds-context-bar__label-action');
-  
+
+  // Optional per-tab colour. Applied to the li so the underline and the active
+  // indicator can span the whole tab, not just the label.
+  const utils = window.SFTabs && window.SFTabs.utils;
+  if (utils && utils.applyTabColor) {
+    utils.applyTabColor(li, tab.color, tabColorPref.style, tabColorPref.enabled);
+    if (li.classList.contains('sftabs-tc--dot')) {
+      const bead = document.createElement('span');
+      bead.className = 'sftabs-tc-mark';
+      bead.setAttribute('aria-hidden', 'true');
+      a.appendChild(bead);
+    }
+  }
+
   // Create span for tab title
   const span = document.createElement('span');
   span.classList.add('title', 'slds-truncate');

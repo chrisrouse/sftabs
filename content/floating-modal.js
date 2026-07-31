@@ -512,6 +512,19 @@
         rowEl.appendChild(indicator);
       }
 
+      // Optional per-tab colour, always as a bead here — see header-menu.js
+      const utils = window.SFTabs && window.SFTabs.utils;
+      if (utils && utils.applyTabColor) {
+        const on = !!(this.settings && this.settings.tabColors && this.settings.tabColors.enabled);
+        utils.applyTabColor(tabEl, tab.color, 'dot', on);
+        if (tabEl.classList.contains('sftabs-tc--dot')) {
+          const bead = document.createElement('span');
+          bead.className = 'sftabs-tc-mark';
+          bead.setAttribute('aria-hidden', 'true');
+          rowEl.insertBefore(bead, rowEl.firstChild);
+        }
+      }
+
       tabEl.appendChild(rowEl);
 
       // The chevron expands; the label navigates. Previously any tab with

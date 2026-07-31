@@ -1,0 +1,105 @@
+/* content/tab-colors.css
+   Optional per-tab colours, shared by every surface that lists tabs: the
+   injected Setup tab bar, the floating panel, the header menu, and the popup.
+
+   The palette itself is NOT here. applyTabColor() in popup/js/shared/utils.js
+   writes two custom properties on the element —
+
+     --sftabs-tc        the accent  (palette 40)
+     --sftabs-tc-wash   the wash    (palette 90)
+
+   — and adds .sftabs-tc plus one of .sftabs-tc--dot / --underline / --tint.
+   Keeping the values in JS means the twelve hues are defined once rather than
+   restated in each stylesheet that needs them.
+
+   Both properties are light-dark() pairs, so a colour follows whatever
+   color-scheme the surface is under. Salesforce pages resolve to the light
+   value, which is correct for standard Lightning; the popup sets color-scheme
+   from its own theme, so it flips with the extension.
+
+   Nothing here applies unless the element carries .sftabs-tc, which
+   applyTabColor only adds when the feature is switched on. Turning it off stops
+   the rendering and leaves the stored tab.color untouched. */
+
+/* ── Dot: a bead before the label ── */
+.sftabs-tc--dot > .sftabs-tc-mark,
+.sftabs-tc--dot .sftabs-tc-mark {
+  background: var(--sftabs-tc);
+}
+
+/* ── Underline: a soft rule along the bottom, always present ──
+   Uses the accent at low opacity rather than the wash, so it reads as the same
+   colour as the active indicator rather than a second, paler one. */
+.sftabs-tc--underline {
+  position: relative;
+}
+.sftabs-tc--underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--sftabs-tc);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ── Tint: the wash behind, the accent on the label ── */
+.sftabs-tc--tint {
+  background-color: var(--sftabs-tc-wash);
+}
+.sftabs-tc--tint,
+.sftabs-tc--tint a,
+.sftabs-tc--tint .slds-align-middle,
+.sftabs-tc--tint .tab-name {
+  color: var(--sftabs-tc);
+}
+
+/* ── Active indicator ──
+   Salesforce marks the active Setup tab with a bar along the top. When a tab has
+   a colour, that bar takes the colour at full strength — so with Underline you
+   get the soft rule below and the strong one above, and the active tab stays
+   just as obvious as it is without colours.
+
+   Drawn as our own overlay rather than by overriding Salesforce's rule: the
+   property they use is theirs to change between releases, and covering it is
+   stable in a way that guessing at it is not. */
+.sftabs-tc.slds-is-active,
+.sftabs-tc.active {
+  position: relative;
+}
+.sftabs-tc.slds-is-active::before,
+.sftabs-tc.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: var(--sftabs-tc);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── The dot's bead ──
+   A span rather than a pseudo-element, because the surfaces put it in different
+   places: before the label in the Setup tab bar and the menus, inside the row's
+   top line in the popup. Sized here so all of them agree. */
+.sftabs-tc-mark {
+  display: none;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--sftabs-tc);
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.sftabs-tc--dot .sftabs-tc-mark { display: inline-block; }
+
+/* The Setup tab bar lays its label out inline, so the bead needs to sit with it */
+.sf-tabs-custom-tab.sftabs-tc--dot .tabHeader {
+  display: inline-flex;
+  align-items: center;
+}

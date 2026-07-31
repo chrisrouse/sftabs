@@ -6,6 +6,8 @@
   <title>__MSG_extensionName__</title>
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/popup.css" />
+  <!-- Tab colour treatments, shared with the injected surfaces -->
+  <link rel="stylesheet" href="content/tab-colors.css" />
 </head>
 <body>
 
@@ -132,6 +134,14 @@
               </label>
             </fieldset>
 
+            <!-- Last in the form, and only present when the feature is on -->
+            <div class="form-group" id="group-tab-color" hidden>
+              <span class="form-label" id="tab-color-label">__MSG_tabColorLabel__</span>
+              <div class="color-dots" id="tab-color-dots" role="radiogroup" aria-labelledby="tab-color-label">
+                <!-- Populated by renderColorPicker() -->
+              </div>
+            </div>
+
             <div class="form-actions">
               <button type="button" class="btn-secondary" id="btn-cancel-edit">__MSG_cancelButton__</button>
               <button type="submit" class="btn-primary" id="btn-save-tab">__MSG_saveTabButton__</button>
@@ -257,6 +267,35 @@
                     <input type="checkbox" id="setting-compact" role="switch" />
                     <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
                   </label>
+                </div>
+              </div>
+            </section>
+
+              <div class="settings-row">
+                <label class="settings-row-label" for="setting-tab-colors">
+                  <span class="settings-label">__MSG_tabColorsLabel__</span>
+                  <span class="settings-desc">__MSG_tabColorsDesc__</span>
+                </label>
+                <div class="settings-row-control">
+                  <label class="toggle" aria-label="__MSG_tabColorsLabel__">
+                    <input type="checkbox" id="setting-tab-colors" role="switch" />
+                    <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Only meaningful once colours are on -->
+              <div class="settings-row" id="row-tab-color-style" hidden>
+                <div class="settings-row-label">
+                  <span class="settings-label">__MSG_tabColorStyleLabel__</span>
+                  <span class="settings-desc">__MSG_tabColorStyleDesc__</span>
+                </div>
+                <div class="settings-row-control">
+                  <div class="seg" role="group" aria-label="__MSG_tabColorStyleLabel__">
+                    <button type="button" class="seg-btn" data-color-style="dot">__MSG_tabColorStyleDot__</button>
+                    <button type="button" class="seg-btn" data-color-style="underline">__MSG_tabColorStyleUnderline__</button>
+                    <button type="button" class="seg-btn" data-color-style="tint">__MSG_tabColorStyleTint__</button>
+                  </div>
                 </div>
               </div>
             </section>

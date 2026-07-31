@@ -2855,5 +2855,68 @@
   },
   "headerMenuAriaLabel": {
     "message": "SF Tabs: abrir sus pestañas"
+  },
+  "tabColorsLabel": {
+    "message": "Codificar las pestañas por color"
+  },
+  "tabColorsDesc": {
+    "message": "Asigne un color a pestañas concretas. Las que no tengan uno conservan el aspecto estándar."
+  },
+  "tabColorStyleLabel": {
+    "message": "Estilo de color"
+  },
+  "tabColorStyleDesc": {
+    "message": "Cómo aparece el color en una pestaña"
+  },
+  "tabColorStyleDot": {
+    "message": "Punto"
+  },
+  "tabColorStyleUnderline": {
+    "message": "Subrayado"
+  },
+  "tabColorStyleTint": {
+    "message": "Tinte"
+  },
+  "tabColorLabel": {
+    "message": "Color de la pestaña"
+  },
+  "colorNone": {
+    "message": "Sin color"
+  },
+  "colorName_red": {
+    "message": "Rojo"
+  },
+  "colorName_hot_orange": {
+    "message": "Naranja intenso"
+  },
+  "colorName_orange": {
+    "message": "Naranja"
+  },
+  "colorName_yellow": {
+    "message": "Amarillo"
+  },
+  "colorName_green": {
+    "message": "Verde"
+  },
+  "colorName_teal": {
+    "message": "Verde azulado"
+  },
+  "colorName_cloud_blue": {
+    "message": "Azul cielo"
+  },
+  "colorName_blue": {
+    "message": "Azul"
+  },
+  "colorName_indigo": {
+    "message": "Índigo"
+  },
+  "colorName_violet": {
+    "message": "Violeta"
+  },
+  "colorName_purple": {
+    "message": "Morado"
+  },
+  "colorName_pink": {
+    "message": "Rosa"
   }
 }

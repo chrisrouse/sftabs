@@ -38,6 +38,7 @@ let state = {
   activeView:      'empty',   // 'empty' | 'edit-tab' | 'dropdowns' | 'edit-profile'
                               //         | 'profiles' | 'settings' | 'release-notes'
   editingProfileId: null,     // profile open in the form; null while creating
+  editingColor:     null,     // colour chosen in the open edit form
   editingTabId:    null,
   profileDropdownOpen: false,
   pendingDeleteId: null,
@@ -776,11 +777,13 @@ function renderTabList() {
     list.innerHTML = `<li class="tab-list-empty">${emptyStateHTML()}</li>`;
     return;
   }
-  list.innerHTML = state.tabs
-    .slice()
-    .sort((a, b) => a.position - b.position)
-    .map(tab => tabItemHTML(tab))
-    .join('');
+  const ordered = state.tabs.slice().sort((a, b) => a.position - b.position);
+  list.innerHTML = ordered.map(tab => tabItemHTML(tab)).join('');
+  // Colours are inline custom properties, so they go on after the markup exists
+  ordered.forEach(tab => {
+    const el = list.querySelector(`.tab-item[data-id="${tab.id}"]`);
+    if (el) paintTabRow(el, tab);
+  });
 }
 
 /**
@@ -814,6 +817,7 @@ function tabItemHTML(tab) {
     </div>
     <div class="tab-info">
       <div class="tab-info-top">
+        <span class="sftabs-tc-mark" aria-hidden="true"></span>
         <span class="tab-name">${name}</span>
         ${hasDropdown(tab) ? `<span class="tab-count">${countItems(tab.dropdownItems)}<span class="sr-only"> ${t('srSubItems')}</span></span>` : ''}
       </div>
@@ -1324,6 +1328,8 @@ function openEditTab(tabId) {
   document.getElementById('input-is-custom-url').checked = !!tab.isCustomUrl;
   document.getElementById('input-open-new-tab').checked  = !!tab.openInNewTab;
   updateCharCount('input-tab-name', 'tab-name-count', 30);
+  state.editingColor = tab.color || null;
+  renderColorPicker(state.editingColor);
 
   showView('edit-tab');
   document.getElementById('input-tab-name').focus();
@@ -1340,6 +1346,8 @@ function openAddTab() {
   document.getElementById('input-is-custom-url').checked = false;
   document.getElementById('input-open-new-tab').checked  = false;
   updateCharCount('input-tab-name', 'tab-name-count', 30);
+  state.editingColor = null;              // None is the default on every tab
+  renderColorPicker(null);
 
   showView('edit-tab');
   document.getElementById('input-tab-name').focus();
@@ -1730,6 +1738,7 @@ function saveTab(e) {
     isObject:    document.getElementById('input-is-object').checked,
     isCustomUrl: document.getElementById('input-is-custom-url').checked,
     openInNewTab:document.getElementById('input-open-new-tab').checked,
+    color:       state.editingColor || null,
   };
 
   if (state.editingTabId) {
@@ -1745,6 +1754,7 @@ function saveTab(e) {
       position:     state.tabs.length,
       dropdownItems:[],
       isSetupObject:false,
+      color:        null,
       ...updates,
     };
     state.tabs = [...state.tabs, newTab];
@@ -2032,6 +2042,52 @@ function confirmStorageChange(toSync) {
   });
 }
 
+// ── Tab colours ────────────────────────────────────────────────
+
+const tabColorsOn = () => !!(state.settings.tabColors && state.settings.tabColors.enabled);
+const tabColorStyle = () => (state.settings.tabColors && state.settings.tabColors.style) || 'dot';
+
+/** Paint a rendered row from its tab's stored colour. No-op when switched off. */
+function paintTabRow(el, tab) {
+  const utils = window.SFTabs && window.SFTabs.utils;
+  if (!utils || !utils.applyTabColor) return;
+  utils.applyTabColor(el, tab.color, tabColorStyle(), tabColorsOn());
+}
+
+/**
+ * The picker: one dot per palette hue, plus a "none" option.
+ *
+ * Rebuilt whenever the form opens rather than once at startup, because the
+ * feature can be switched on while the popup is open.
+ */
+function renderColorPicker(selected) {
+  const group = document.getElementById('group-tab-color');
+  const dots = document.getElementById('tab-color-dots');
+  if (!group || !dots) return;
+
+  group.hidden = !tabColorsOn();
+  if (group.hidden) return;
+
+  const palette = (window.SFTabs?.utils?.TAB_COLORS) || {};
+  const options = [null, ...Object.keys(palette)];
+  dots.innerHTML = options.map(name => {
+    const on = (name || null) === (selected || null);
+    const label = name ? t('colorName_' + name.replace('-', '_')) : t('colorNone');
+    return `<button type="button" role="radio" aria-checked="${on}"
+      class="color-dot${name ? '' : ' color-dot--none'}" data-color="${name || ''}"
+      title="${esc(label)}" aria-label="${esc(label)}"
+      ${name ? `style="--dot-color: ${palette[name].accent}"` : ''}></button>`;
+  }).join('');
+
+  dots.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      state.editingColor = dot.dataset.color || null;
+      dots.querySelectorAll('.color-dot').forEach(d =>
+        d.setAttribute('aria-checked', String(d === dot)));
+    });
+  });
+}
+
 // ── Theme ──────────────────────────────────────────────────────
 
 function applyTheme(theme) {
@@ -2084,6 +2140,20 @@ function syncSettingsPanel() {
   document.getElementById('setting-profiles').checked      = state.settings.profilesEnabled;
   const storageRadio = document.querySelector(`input[name="storage-type"][value="${state.settings.useSyncStorage ? 'sync' : 'local'}"]`);
   if (storageRadio) storageRadio.checked = true;
+  syncTabColorRow();
+}
+
+/** Keep the colour controls in step; the style choice is moot while off. */
+function syncTabColorRow() {
+  const toggle = document.getElementById('setting-tab-colors');
+  if (!toggle) return;
+  toggle.checked = tabColorsOn();
+  document.getElementById('row-tab-color-style').hidden = !tabColorsOn();
+  document.querySelectorAll('[data-color-style]').forEach(btn => {
+    const on = btn.dataset.colorStyle === tabColorStyle();
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
 }
 
 // ── Toast ──────────────────────────────────────────────────────
@@ -2185,6 +2255,25 @@ function bindEvents() {
   document.getElementById('setting-compact').addEventListener('change', e => {
     applyDensity(e.target.checked);
     patchSettings({ compactMode: e.target.checked });
+  });
+
+  document.getElementById('setting-tab-colors').addEventListener('change', async e => {
+    // Only the rendering is switched; stored tab.color values are left alone, so
+    // turning it back on restores what was there.
+    await patchSettings({ tabColors: { ...state.settings.tabColors, enabled: e.target.checked } });
+    syncTabColorRow();
+    renderTabList();
+    bindTabListEvents();
+    if (state.activeView === 'edit-tab') renderColorPicker(state.editingColor);
+  });
+
+  document.querySelectorAll('[data-color-style]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await patchSettings({ tabColors: { ...state.settings.tabColors, style: btn.dataset.colorStyle } });
+      syncTabColorRow();
+      renderTabList();
+      bindTabListEvents();
+    });
   });
 
   document.getElementById('setting-skip-delete').addEventListener('change', e => {

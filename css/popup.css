@@ -1502,3 +1502,45 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
    the unread dot uses. */
 .tab-btn--star.is-on { color: #fcc003; }
 .tab-btn--star.is-on:hover { background: color-mix(in srgb, #fcc003 18%, transparent); }
+
+/* ── 29. Tab colour picker ──
+   Dots rather than a named grid: it is the most compact of the three layouts
+   mocked up, and the form is already close to the fold. */
+.color-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--sft-spacing-1);
+}
+.color-dot {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--dot-color);
+  cursor: pointer;
+  transition: border-color var(--ease);
+}
+.color-dot:hover { border-color: var(--b-medium); }
+.color-dot[aria-checked="true"] { border-color: var(--t-base); }
+.color-dot:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+
+/* The no-colour option: an outline with a slash, so it reads as "off" rather
+   than as a white swatch */
+.color-dot--none {
+  position: relative;
+  background: transparent;
+  border: 1px dashed var(--b-strong);
+}
+.color-dot--none::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 50%;
+  width: 1px;
+  background: var(--b-strong);
+  transform: rotate(45deg);
+}
+.color-dot--none[aria-checked="true"] { border-style: solid; border-color: var(--t-base); }

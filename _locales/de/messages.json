@@ -2855,5 +2855,68 @@
   },
   "headerMenuAriaLabel": {
     "message": "SF Tabs — Registerkarten öffnen"
+  },
+  "tabColorsLabel": {
+    "message": "Registerkarten farblich kennzeichnen"
+  },
+  "tabColorsDesc": {
+    "message": "Weisen Sie einzelnen Registerkarten eine Farbe zu. Registerkarten ohne Farbe behalten das Standardaussehen."
+  },
+  "tabColorStyleLabel": {
+    "message": "Farbstil"
+  },
+  "tabColorStyleDesc": {
+    "message": "Wie die Farbe auf einer Registerkarte erscheint"
+  },
+  "tabColorStyleDot": {
+    "message": "Punkt"
+  },
+  "tabColorStyleUnderline": {
+    "message": "Unterstrich"
+  },
+  "tabColorStyleTint": {
+    "message": "Tönung"
+  },
+  "tabColorLabel": {
+    "message": "Farbe der Registerkarte"
+  },
+  "colorNone": {
+    "message": "Keine Farbe"
+  },
+  "colorName_red": {
+    "message": "Rot"
+  },
+  "colorName_hot_orange": {
+    "message": "Leuchtendes Orange"
+  },
+  "colorName_orange": {
+    "message": "Orange"
+  },
+  "colorName_yellow": {
+    "message": "Gelb"
+  },
+  "colorName_green": {
+    "message": "Grün"
+  },
+  "colorName_teal": {
+    "message": "Blaugrün"
+  },
+  "colorName_cloud_blue": {
+    "message": "Himmelblau"
+  },
+  "colorName_blue": {
+    "message": "Blau"
+  },
+  "colorName_indigo": {
+    "message": "Indigo"
+  },
+  "colorName_violet": {
+    "message": "Violett"
+  },
+  "colorName_purple": {
+    "message": "Lila"
+  },
+  "colorName_pink": {
+    "message": "Rosa"
   }
 }

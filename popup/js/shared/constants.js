@@ -11,7 +11,8 @@ const TAB_STRUCTURE = {
   isCustomUrl: false,
   isSetupObject: false,
   dropdownItems: [],
-  position: 0
+  position: 0,
+  color: null        // SLDS palette hue name, or null for the theme default
 };
 
 // Profile data structure
@@ -96,6 +97,12 @@ const DEFAULT_SETTINGS = {
   autoSwitchProfiles: false, // Enable auto-switching based on URL patterns
   activeProfileId: null, // Currently active profile ID (null = no profiles mode)
   defaultProfileId: null, // Default profile to use when auto-switch doesn't match
+  // Optional per-tab colours. Off by default, and switching it off only stops
+  // the colours rendering — the stored tab.color values are left alone.
+  tabColors: {
+    enabled: false,
+    style: 'dot'     // 'dot' | 'underline' | 'tint'
+  },
   // Injected into Salesforce's own global header. Independent of floatingButton
   // on purpose: either surface can be used alone or both together.
   headerMenu: {

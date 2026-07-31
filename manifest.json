@@ -58,7 +58,8 @@
       ],
       "css": [
         "content/floating-button.css",
-        "content/header-menu.css"
+        "content/header-menu.css",
+        "content/tab-colors.css"
       ],
       "run_at": "document_idle"
     },
@@ -76,7 +77,10 @@
         "content/tab-renderer.js",
         "content/content-main.js"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "css": [
+        "content/tab-colors.css"
+      ]
     }
   ],
   "web_accessible_resources": [

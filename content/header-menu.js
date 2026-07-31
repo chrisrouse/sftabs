@@ -30,6 +30,8 @@
   const NUBBIN_GAP = 13;
 
   let observer = null;
+  // Held so row rendering can read tabColors without another storage read
+  let menuSettings = {};
 
   const msg = (key, subs) => {
     try {
@@ -202,6 +204,7 @@
           hasKids ? ' aria-expanded="false"' : ''}>
           <div class="slds-grid">
             ${chevron}
+            <span class="sftabs-tc-mark" aria-hidden="true"></span>
             <div class="slds-col slds-truncate">
               <span class="slds-align-middle">${esc(item.label)}</span>
             </div>
@@ -218,8 +221,19 @@
       item, depth, rowKey, hasKids: childrenOf(item).length > 0,
     });
     const li = holder.querySelector('li');
+    paintRow(li, item);
     bindRow(li, item);
     return li;
+  }
+
+  /**
+   * Optional per-tab colour. Menus always use the bead, whatever the tab bar is
+   * set to: a 12px row filled or underlined is harder to read, not easier.
+   */
+  function paintRow(li, item) {
+    const utils = window.SFTabs && window.SFTabs.utils;
+    if (!utils || !utils.applyTabColor) return;
+    utils.applyTabColor(li, item.color, 'dot', !!(menuSettings.tabColors && menuSettings.tabColors.enabled));
   }
 
   function bindRow(li, item) {
@@ -432,6 +446,7 @@
       if (typeof loader !== 'function') return;   // floating-button.js owns the read
 
       const { tabs, settings } = await loader();
+      menuSettings = settings || {};
       if (!settings || !settings.headerMenu || !settings.headerMenu.enabled) {
         teardown();
         return;
