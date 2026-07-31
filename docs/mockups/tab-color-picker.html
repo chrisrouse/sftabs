@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — tab colour picker</title>
+<style>
+  :root { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  :root {
+    --c-red: light-dark(#ba0517, #fe5c4c);                                     --c-red-bg: light-dark(#feded8, #300c01);
+    --c-hot-orange: light-dark(#aa3001, #ff5d2d);                                     --c-hot-orange-bg: light-dark(#ffded5, #281202);
+    --c-orange: light-dark(#825101, #dd7a01);                                     --c-orange-bg: light-dark(#fedfd0, #201600);
+    --c-yellow: light-dark(#8c4b02, #ca8501);                                     --c-yellow-bg: light-dark(#f9e3b6, #281202);
+    --c-green: light-dark(#396547, #3ba755);                                     --c-green-bg: light-dark(#cdefc4, #071b12);
+    --c-teal: light-dark(#056764, #06a59a);                                     --c-teal-bg: light-dark(#acf3e4, #071b12);
+    --c-cloud-blue: light-dark(#05628a, #0d9dda);                                     --c-cloud-blue-bg: light-dark(#cfe9fe, #001a28);
+    --c-blue: light-dark(#0b5cab, #1b96ff);                                     --c-blue-bg: light-dark(#d8e6fe, #001639);
+    --c-indigo: light-dark(#3a49da, #7f8ced);                                     --c-indigo-bg: light-dark(#e0e5f8, #17094e);
+    --c-violet: light-dark(#9602c7, #cb65ff);                                     --c-violet-bg: light-dark(#f2defe, #2e0039);
+    --c-purple: light-dark(#7526e3, #ad7bee);                                     --c-purple-bg: light-dark(#ece1f9, #240643);
+    --c-pink: light-dark(#b60554, #ff538a);                                     --c-pink-bg: light-dark(#fddde3, #370114);
+
+    --page:    light-dark(#f3f2f2, #181818);
+    --surface: light-dark(#ffffff, #242424);
+    --text:    light-dark(#181818, #e5e5e5);
+    --muted:   light-dark(#5c5c5c, #aeaeae);
+    --line:    light-dark(#e5e5e5, #444444);
+    --brand:   light-dark(#0176d3, #1b96ff);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--page); color: var(--text); padding: 28px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  .lede { color: var(--muted); margin: 8px 0 20px; max-width: 90ch; }
+  h2 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .why { color: var(--muted); font-size: 12px; margin-bottom: 12px; max-width: 90ch; }
+  section { margin-bottom: 30px; }
+  .bar { display: flex; gap: 6px; margin-bottom: 18px; }
+  .bar button { font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer;
+    border: 1px solid var(--line); border-radius: 100px; background: var(--surface); color: var(--text); }
+
+  .panel { background: var(--surface); border: 1px solid var(--line);
+    border-radius: 6px; padding: 16px; width: 358px; }
+  .flabel { font-size: 12px; font-weight: 500; margin-bottom: 8px; }
+
+  /* A — dots */
+  .dots { display: flex; flex-wrap: wrap; gap: 10px; }
+  .dot { width: 28px; height: 28px; border-radius: 50%; background: var(--sc);
+    border: 2px solid transparent; cursor: pointer; padding: 0; }
+  .dot[aria-pressed="true"] { border-color: var(--text); }
+  .dot.none { background: transparent; border: 1px dashed var(--muted); position: relative; }
+  .dot.none::after { content: ''; position: absolute; top: 4px; bottom: 4px; left: 50%;
+    width: 1px; background: var(--muted); transform: rotate(45deg); }
+
+  /* B — swatch grid with names */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 7px 4px; border: 2px solid transparent; border-radius: 6px;
+    background: none; cursor: pointer; color: var(--text); font: inherit; font-size: 10px; }
+  .cell:hover { background: light-dark(#f3f2f2, #2e2e2e); }
+  .cell[aria-pressed="true"] { border-color: var(--brand); }
+  .cell i { width: 22px; height: 22px; border-radius: 50%; background: var(--sc); }
+
+  /* C — preview strip: each swatch shown as the tab it produces */
+  .strip { display: flex; flex-direction: column; gap: 4px; }
+  .prev { display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+    border: 2px solid transparent; border-radius: 4px; cursor: pointer;
+    background: var(--sc-bg); color: var(--sc); font: inherit; font-size: 12px; text-align: left; }
+  .prev[aria-pressed="true"] { border-color: var(--brand); }
+  .prev b { width: 8px; height: 8px; border-radius: 50%; background: var(--sc); flex-shrink: 0; }
+  .prev span { margin-left: auto; color: var(--muted); font-size: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Tab colour picker</h1>
+<p class="lede">
+  Twelve hues — every colour hue in the SLDS expressive palette, leaving out
+  neutral (that is the "no colour" case) and electric blue (the brand accent,
+  which would read as "selected" rather than as a chosen colour). Three ways to
+  present the same set. Toggle the theme: each swatch is a light-dark pair, so the
+  whole picker restates itself.
+</p>
+
+<div class="bar"><button id="theme">Dark</button></div>
+
+<section>
+  <h2>A · Dots</h2>
+  <p class="why">Compact, and it fits the edit form without pushing anything below the fold. No names, so a colour is chosen by eye.</p>
+  <div class="panel">
+    <div class="flabel">Tab colour</div>
+    <div class="dots" id="a"></div>
+  </div>
+</section>
+
+<section>
+  <h2>B · Named grid</h2>
+  <p class="why">Same swatches with their palette names. Costs vertical space, but the name is what actually gets stored, so this is the honest version — and it is searchable and speakable.</p>
+  <div class="panel">
+    <div class="flabel">Tab colour</div>
+    <div class="grid" id="b"></div>
+  </div>
+</section>
+
+<section>
+  <h2>C · Preview rows</h2>
+  <p class="why">Each option rendered as the thing it produces — the 90 as the wash, the 40 as the label. Tallest of the three, and the only one where you pick the result rather than the ingredient.</p>
+  <div class="panel">
+    <div class="flabel">Tab colour</div>
+    <div class="strip" id="c"></div>
+  </div>
+</section>
+
+<script>
+  const HUES = ['red', 'hot-orange', 'orange', 'yellow', 'green', 'teal', 'cloud-blue', 'blue', 'indigo', 'violet', 'purple', 'pink'];
+  const LABELS = ["Red","Hot orange","Orange","Yellow","Green","Teal","Cloud blue","Blue","Indigo","Violet","Purple","Pink"];
+
+  const a = document.getElementById('a');
+  a.innerHTML = '<button class="dot none" aria-pressed="true" title="No colour"></button>' +
+    HUES.map((h, i) => `<button class="dot" style="--sc: var(--c-${h})" title="${LABELS[i]}" aria-pressed="false"></button>`).join('');
+
+  const b = document.getElementById('b');
+  b.innerHTML = '<button class="cell" aria-pressed="true"><i style="border:1px dashed var(--muted);background:transparent"></i>None</button>' +
+    HUES.map((h, i) => `<button class="cell" aria-pressed="false"><i style="--sc: var(--c-${h})"></i>${LABELS[i]}</button>`).join('');
+
+  const c = document.getElementById('c');
+  c.innerHTML = HUES.map((h, i) => `
+    <button class="prev" style="--sc: var(--c-${h}); --sc-bg: var(--c-${h}-bg)" aria-pressed="${i === 4}">
+      <b></b>Permission Sets<span>${LABELS[i]}</span>
+    </button>`).join('');
+
+  for (const id of ['a', 'b', 'c']) {
+    document.getElementById(id).addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      [...e.currentTarget.children].forEach(x => x.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+    });
+  }
+
+  const t = document.getElementById('theme');
+  t.onclick = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    t.textContent = dark ? 'Dark' : 'Light';
+  };
+</script>
+</body>
+</html>
