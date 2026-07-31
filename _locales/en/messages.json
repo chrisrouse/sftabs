@@ -3038,10 +3038,6 @@
     "message": "Dot",
     "description": "Colour style: a coloured bead before the label"
   },
-  "tabColorStyleUnderline": {
-    "message": "Underline",
-    "description": "Colour style: a coloured rule under the tab"
-  },
   "tabColorStyleTint": {
     "message": "Tint",
     "description": "Colour style: a coloured wash behind the tab"

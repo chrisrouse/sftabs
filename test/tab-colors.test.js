@@ -62,12 +62,17 @@ check('enabled + coloured: marked and given both properties',
   el.props.get('--sftabs-tc-wash') === TAB_COLORS.teal.wash);
 
 el = fakeEl();
-applyTabColor(el, 'teal', 'underline', true);
-check('style selects the treatment', el.classList.contains('sftabs-tc--underline'));
+applyTabColor(el, 'teal', 'tint', true);
+check('style selects the treatment', el.classList.contains('sftabs-tc--tint'));
 
 el = fakeEl();
 applyTabColor(el, 'teal', 'nonsense', true);
 check('an unknown style falls back to dot', el.classList.contains('sftabs-tc--dot'));
+
+el = fakeEl();
+applyTabColor(el, 'teal', 'underline', true);
+check('the retired underline style falls back rather than rendering nothing',
+  el.classList.contains('sftabs-tc--dot') && !el.classList.contains('sftabs-tc--underline'));
 
 el = fakeEl();
 applyTabColor(el, null, 'tint', true);
@@ -90,9 +95,9 @@ check('switching back on still finds it', tabColorVars(stored.color) !== null);
 // Re-rendering a reused row must not accumulate state.
 el = fakeEl();
 applyTabColor(el, 'teal', 'dot', true);
-applyTabColor(el, 'red', 'underline', true);
+applyTabColor(el, 'red', 'tint', true);
 check('re-painting a row replaces rather than stacks',
-  el.classList.contains('sftabs-tc--underline') &&
+  el.classList.contains('sftabs-tc--tint') &&
   !el.classList.contains('sftabs-tc--dot') &&
   el.props.get('--sftabs-tc') === TAB_COLORS.red.accent,
   el.classList.list().join(' '));

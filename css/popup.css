@@ -1594,16 +1594,6 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   background: var(--demo);
   flex-shrink: 0;
 }
-.style-preview--underline::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: -1px;
-  right: -1px;
-  height: 2px;
-  background: var(--demo);
-  opacity: 0.35;
-}
 .style-preview--tint {
   background: var(--demo-wash);
   color: var(--demo);

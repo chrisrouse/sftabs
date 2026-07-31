@@ -27,24 +27,6 @@
   background: var(--sftabs-tc);
 }
 
-/* ── Underline: a soft rule along the bottom, always present ──
-   Uses the accent at low opacity rather than the wash, so it reads as the same
-   colour as the active indicator rather than a second, paler one. */
-.sftabs-tc--underline {
-  position: relative;
-}
-.sftabs-tc--underline::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  background: var(--sftabs-tc);
-  opacity: 0.35;
-  pointer-events: none;
-}
-
 /* ── Tint: the wash behind, the accent on the label ── */
 .sftabs-tc--tint {
   background-color: var(--sftabs-tc-wash);

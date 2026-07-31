@@ -2045,7 +2045,12 @@ function confirmStorageChange(toSync) {
 // ── Tab colours ────────────────────────────────────────────────
 
 const tabColorsOn = () => !!(state.settings.tabColors && state.settings.tabColors.enabled);
-const tabColorStyle = () => (state.settings.tabColors && state.settings.tabColors.style) || 'dot';
+const TAB_COLOR_STYLES = ['dot', 'tint'];
+/** Coerced, so a style that has been retired — 'underline' — still resolves. */
+const tabColorStyle = () => {
+  const stored = state.settings.tabColors && state.settings.tabColors.style;
+  return TAB_COLOR_STYLES.includes(stored) ? stored : 'dot';
+};
 
 /** Paint a rendered row from its tab's stored colour. No-op when switched off. */
 function paintTabRow(el, tab) {

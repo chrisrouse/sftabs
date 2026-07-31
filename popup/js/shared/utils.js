@@ -324,7 +324,7 @@ function tabColorVars(name) {
  * @param {boolean} enabled    the tabColors.enabled setting
  */
 function applyTabColor(el, name, style, enabled) {
-  el.classList.remove('sftabs-tc', 'sftabs-tc--dot', 'sftabs-tc--underline', 'sftabs-tc--tint');
+  el.classList.remove('sftabs-tc', 'sftabs-tc--dot', 'sftabs-tc--tint');
   el.style.removeProperty('--sftabs-tc');
   el.style.removeProperty('--sftabs-tc-wash');
   if (!enabled) return;
@@ -332,7 +332,9 @@ function applyTabColor(el, name, style, enabled) {
   const colour = tabColorVars(name);
   if (!colour) return;
 
-  const mode = ['dot', 'underline', 'tint'].includes(style) ? style : 'dot';
+  // 'underline' was offered briefly and removed for being too faint against
+  // Salesforce's chrome; anything unrecognised, including that, falls back.
+  const mode = ['dot', 'tint'].includes(style) ? style : 'dot';
   el.style.setProperty('--sftabs-tc', colour.accent);
   el.style.setProperty('--sftabs-tc-wash', colour.wash);
   el.classList.add('sftabs-tc', `sftabs-tc--${mode}`);

@@ -101,7 +101,7 @@ const DEFAULT_SETTINGS = {
   // the colours rendering — the stored tab.color values are left alone.
   tabColors: {
     enabled: false,
-    style: 'dot'     // 'dot' | 'underline' | 'tint'
+    style: 'dot'     // 'dot' | 'tint'
   },
   // Injected into Salesforce's own global header. Independent of floatingButton
   // on purpose: either surface can be used alone or both together.
