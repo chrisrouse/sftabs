@@ -118,6 +118,11 @@
   visibility: hidden;
   color: #747474;
   line-height: 1;
+  /* Pull right explicitly. It used to sit in a .slds-size_2-of-12 column that
+     was justified to the end; that rule went with the count badge, leaving the
+     icon to rely on .slds-col growing to fill the row, which it does not do
+     when the label is short — so the icon ended up beside the text. */
+  margin-left: auto;
 }
 #sftabs-header-menu li.uiMenuItem:hover .sftabs-hm-newtab,
 #sftabs-header-menu li.uiMenuItem > a:focus .sftabs-hm-newtab { visibility: visible; }
@@ -145,6 +150,8 @@
 #sftabs-header-menu li.uiMenuItem.sftabs-hm-depth-3 > a { padding-left: 72px; }
 
 #sftabs-header-menu .slds-grid { align-items: center; }
+/* min-width:0 so .slds-truncate can ellipsise instead of forcing the row wider */
+#sftabs-header-menu .slds-grid > .slds-col { min-width: 0; }
 
 #sftabs-header-menu .sftabs-hm-chev {
   display: inline-flex;
