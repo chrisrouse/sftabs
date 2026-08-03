@@ -2480,9 +2480,11 @@ async function removeOrgColor(entry) {
 /**
  * Add the org of the page in front of us.
  *
- * Deliberately the same four outcomes as captureCurrentOrg on the profile form,
- * reusing its strings: no tab, not Salesforce, already listed, added. Two
- * captures that behave alike should also read alike.
+ * The same four outcomes as captureCurrentOrg on the profile form — no tab, not
+ * Salesforce, already there, added — and it shares the strings for the three
+ * that say nothing about profiles. The duplicate case gets its own: adding a
+ * colour here does not touch profiles, so "already linked to this profile"
+ * would be describing something that did not happen.
  */
 async function captureOrgColor() {
   try {
@@ -2494,7 +2496,7 @@ async function captureOrgColor() {
 
     const config = orgColorConfig();
     if (config.orgs.some(o => String(o.identifier).toLowerCase() === identifier.toLowerCase())) {
-      return showStatus(t('orgAlreadyLinked', identifier));
+      return showStatus(t('orgColorsAlreadyAdded', identifier));
     }
 
     const environment = SFTabs.utils.detectOrgEnvironment(active.url) || 'sandbox';

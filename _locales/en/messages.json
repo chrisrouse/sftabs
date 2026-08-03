@@ -3188,5 +3188,14 @@
   "orgColorsResetDone": {
     "message": "Environment colors reset",
     "description": "Toast after resetting environment colors"
+  },
+  "orgColorsAlreadyAdded": {
+    "message": "$ORG$ is already in the list.",
+    "description": "Toast when the current org already has a colour entry",
+    "placeholders": {
+      "org": {
+        "content": "$1"
+      }
+    }
   }
 }
