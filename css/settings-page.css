@@ -1,0 +1,257 @@
+/* ==========================================================================
+   SF Tabs — Import & Export page
+   --------------------------------------------------------------------------
+   The one screen that cannot live in the popup: a file picker closes an
+   extension popup the moment it takes focus, and the import flow branches on
+   what the file turns out to contain.
+
+   Built on css/tokens.css, the same design tokens the popup uses, so the two
+   surfaces read as one product. This replaces popup.css plus 606 lines of
+   inline <style> that predated the design system.
+
+   One hard constraint runs through this file: settings.js shows and hides the
+   import options by writing `style.display = 'block'`. Any container it
+   touches must therefore lay out correctly as a block — flex on those is
+   silently discarded the moment they are shown.
+   ========================================================================== */
+
+:root { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* Aliases onto the design tokens, named for what they do on this page */
+:root {
+  --page:     var(--sft-surface-base);
+  --surface:  light-dark(#ffffff, #2e2e2e);
+  --sunken:   light-dark(#f8f8f8, #242424);
+  --t-base:   var(--sft-text);
+  --t-weak:   light-dark(#757575, #939393);
+  --b-subtle: light-dark(#e5e5e5, #444444);
+  --b-medium: var(--sft-border);
+  --accent:   var(--sft-accent);
+  --accent-bg: var(--sft-accent-container);
+  --warn-bg:  light-dark(#fef7e6, #2e2200);
+  --warn-br:  light-dark(#f0d48a, #6b5300);
+  --danger:   light-dark(#ba0517, #fe5c4c);
+  --ease-page: var(--sft-duration-promptly) var(--sft-ease);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sft-font-family);
+  font-size: var(--sft-font-size-base);
+  line-height: var(--sft-line-height-base);
+  background: var(--page);
+  color: var(--t-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select { font: inherit; color: inherit; }
+
+/* ── Header ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: var(--sft-border-width-1) solid var(--b-subtle);
+}
+.topbar-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-logo { width: 22px; height: 22px; color: var(--accent); flex-shrink: 0; }
+.topbar h1 { font-size: 17px; font-weight: var(--sft-font-weight-semibold); }
+.topbar-spacer { flex: 1; }
+.topbar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--sft-font-size-xs);
+  color: var(--accent);
+  text-decoration: none;
+}
+.topbar a:hover { text-decoration: underline; }
+.topbar a svg { width: 11px; height: 11px; }
+
+/* ── Layout ── */
+.wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  background: var(--surface);
+  border: var(--sft-border-width-1) solid var(--b-subtle);
+  border-radius: var(--sft-radius-3);
+  overflow: hidden;
+}
+.card-head { padding: 16px 20px 12px; }
+.card-head h2 { font-size: 15px; font-weight: var(--sft-font-weight-semibold); }
+.card-head p { font-size: var(--sft-font-size-xs); color: var(--t-weak); margin-top: 2px; }
+.card-body { padding: 0 20px 20px; }
+/* Block, not flex: settings.js sets display on children of this. Spacing is
+   therefore a margin on the child rather than a gap on the parent. */
+.card-body > * + * { margin-top: 14px; }
+
+/* ── Radio groups ── */
+.choices {
+  border: var(--sft-border-width-1) solid var(--b-subtle);
+  border-radius: var(--sft-radius-2);
+  overflow: hidden;
+}
+.choice {
+  display: flex;
+  gap: 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  border-bottom: var(--sft-border-width-1) solid var(--b-subtle);
+  transition: background var(--ease-page);
+}
+.choice:last-child { border-bottom: none; }
+.choice:hover { background: var(--sunken); }
+.choice:has(input:checked) { background: var(--accent-bg); }
+.choice input { margin-top: 3px; accent-color: var(--accent); flex-shrink: 0; }
+.choice-body { display: flex; flex-direction: column; }
+.choice-title { font-weight: var(--sft-font-weight-medium); }
+.choice-desc { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
+
+/* ── Sunken sub-panels ── */
+.subpanel {
+  padding: 14px 16px;
+  background: var(--sunken);
+  border: var(--sft-border-width-1) solid var(--b-subtle);
+  border-radius: var(--sft-radius-2);
+}
+.subpanel > * + * { margin-top: 4px; }
+.subhead {
+  font-size: 11px;
+  font-weight: var(--sft-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--t-weak);
+}
+.subhead:not(:first-child) { margin-top: 14px; }
+
+.check { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; }
+.check input { accent-color: var(--accent); flex-shrink: 0; }
+.check-count { color: var(--t-weak); font-size: var(--sft-font-size-xs); }
+
+/* ── Buttons ── */
+.btn {
+  padding: 7px 16px;
+  font-size: var(--sft-font-size-xs);
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--t-base);
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--sft-radius-1);
+  transition: border-color var(--ease-page), color var(--ease-page), background var(--ease-page);
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+.btn--primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn--primary:hover { background: var(--sft-accent-hover, var(--accent)); color: #fff; opacity: 0.92; }
+.btn--quiet { border-color: transparent; color: var(--t-weak); }
+.btn--quiet:hover { border-color: var(--b-medium); }
+
+.hint { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
+.hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: var(--sunken);
+  padding: 1px 5px;
+  border-radius: var(--sft-radius-1);
+}
+
+/* ── Import-specific ── */
+.filerow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--sunken);
+  border: var(--sft-border-width-1) solid var(--b-subtle);
+  border-radius: var(--sft-radius-2);
+}
+.filename {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--sft-font-size-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.warn {
+  display: flex;
+  gap: 10px;
+  padding: 11px 14px;
+  font-size: var(--sft-font-size-xs);
+  background: var(--warn-bg);
+  border: var(--sft-border-width-1) solid var(--warn-br);
+  border-radius: var(--sft-radius-2);
+}
+.warn svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
+.warn-title { font-weight: var(--sft-font-weight-semibold); display: block; }
+
+.select-input,
+.text-input {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--surface);
+  color: var(--t-base);
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--sft-radius-1);
+}
+.select-input:focus-visible,
+.text-input:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
+
+/* Nested under a radio they belong to, so the indent shows the relationship */
+.choice-extra { padding: 8px 14px 12px 38px; border-bottom: var(--sft-border-width-1) solid var(--b-subtle); }
+.choice-extra:last-child { border-bottom: none; }
+
+/* ── Footer ── */
+.footer {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 4px 24px 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+}
+.footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* ── Toast ──
+   Carried over from the page's old inline styles; toast.js appends straight to
+   body and expects these class names. */
+.sftabs-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  max-width: 350px;
+  padding: 12px 20px;
+  text-align: center;
+  font-weight: var(--sft-font-weight-medium);
+  background: var(--surface);
+  color: var(--t-base);
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--sft-radius-2);
+  box-shadow: var(--sft-shadow-3, 0 4px 12px rgb(0 0 0 / 0.15));
+  opacity: 0;
+  z-index: 10000;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.sftabs-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.sftabs-toast.success { background: var(--sft-success, #2e844a); color: #fff; border-color: transparent; }
+.sftabs-toast.error { background: var(--danger); color: #fff; border-color: transparent; }

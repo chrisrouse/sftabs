@@ -119,71 +119,9 @@ async function saveUserSettings() {
 }
 
 /**
- * Setup sidebar navigation
- */
-function setupNavigation() {
-	const navItems = document.querySelectorAll('.settings-nav-item');
-	const sections = document.querySelectorAll('.settings-section');
-
-	navItems.forEach((item, index) => {
-		// Make nav items keyboard accessible
-		item.setAttribute('tabindex', '0');
-		item.setAttribute('role', 'button');
-		item.setAttribute('aria-label', chrome.i18n.getMessage('navigateToSection', [item.textContent.trim()]));
-
-		// Handle navigation activation
-		const activateNavItem = () => {
-			const sectionId = item.dataset.section;
-
-			// Update active nav item
-			navItems.forEach(nav => {
-				nav.classList.remove('active');
-				nav.setAttribute('aria-selected', 'false');
-			});
-			item.classList.add('active');
-			item.setAttribute('aria-selected', 'true');
-
-			// Show corresponding section
-			sections.forEach(section => section.classList.remove('active'));
-			document.getElementById(`section-${sectionId}`).classList.add('active');
-		};
-
-		// Click handler
-		item.addEventListener('click', activateNavItem);
-
-		// Keyboard handler (Enter and Space)
-		item.addEventListener('keydown', (e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-				e.preventDefault();
-				activateNavItem();
-			}
-			// Arrow key navigation
-			else if (e.key === 'ArrowDown') {
-				e.preventDefault();
-				const nextItem = navItems[index + 1];
-				if (nextItem) nextItem.focus();
-			}
-			else if (e.key === 'ArrowUp') {
-				e.preventDefault();
-				const prevItem = navItems[index - 1];
-				if (prevItem) prevItem.focus();
-			}
-		});
-	});
-
-	// Set initial aria-selected state
-	navItems.forEach(item => {
-		item.setAttribute('aria-selected', item.classList.contains('active') ? 'true' : 'false');
-	});
-}
-
-/**
  * Setup event listeners
  */
 function setupEventListeners() {
-	// Setup sidebar navigation
-	setupNavigation();
-
 	// Export mode radio buttons
 	document.getElementById('export-everything-radio').addEventListener('change', () => {
 		toggleExportCustomOptions();

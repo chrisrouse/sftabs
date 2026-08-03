@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>Import &amp; Export — page redesign</title>
+<style>
+  :root { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  :root {
+    --page:    light-dark(#f3f3f3, #181818);
+    --surface: light-dark(#ffffff, #2e2e2e);
+    --sunken:  light-dark(#f8f8f8, #242424);
+    --t-base:  light-dark(#2e2e2e, #e5e5e5);
+    --t-weak:  light-dark(#757575, #939393);
+    --t-muted: light-dark(#5c5c5c, #aeaeae);
+    --b-subtle: light-dark(#e5e5e5, #444444);
+    --b-medium: light-dark(#c9c9c9, #444444);
+    --accent: #066afe; --accent-bg: light-dark(#edf4ff, #002775);
+    --warn-bg: light-dark(#fef7e6, #2e2200); --warn-br: light-dark(#f0d48a, #6b5300);
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px;
+    --ease: .2s cubic-bezier(.4,0,.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: var(--page); color: var(--t-base); }
+  code { font: 12px ui-monospace, Menlo, monospace; background: var(--sunken);
+          padding: 1px 5px; border-radius: 4px; }
+  .toggle-theme { position: fixed; top: 14px; right: 14px; padding: 6px 12px; font: inherit;
+                   cursor: pointer; background: var(--surface); color: var(--t-base);
+                   border: 1px solid var(--b-medium); border-radius: var(--r-sm); z-index: 5; }
+  .note { max-width: 780px; margin: 0 auto 20px; padding: 11px 14px; background: var(--accent-bg);
+           border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+           border-radius: var(--r-md); font-size: 13px; }
+
+  /* ── The page ── */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--b-subtle); }
+  .topbar-inner { max-width: 780px; margin: 0 auto; padding: 16px 24px;
+                   display: flex; align-items: center; gap: 10px; }
+  .topbar svg { width: 22px; height: 22px; color: var(--accent); }
+  .topbar h1 { font-size: 17px; font-weight: 650; }
+  .topbar .spacer { flex: 1; }
+  .topbar a { font-size: 13px; color: var(--accent); text-decoration: none; }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 24px; display: flex;
+           flex-direction: column; gap: 18px; }
+
+  .card { background: var(--surface); border: 1px solid var(--b-subtle);
+           border-radius: var(--r-lg); overflow: hidden; }
+  .card-head { padding: 16px 20px 12px; }
+  .card-head h2 { font-size: 15px; font-weight: 650; }
+  .card-head p { font-size: 13px; color: var(--t-weak); margin-top: 2px; }
+  .card-body { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+
+  .choices { display: flex; flex-direction: column; width: 100%;
+              border: 1px solid var(--b-subtle); border-radius: var(--r-md); overflow: hidden; }
+  .choice { display: flex; gap: 10px; padding: 11px 14px; cursor: pointer;
+             border-bottom: 1px solid var(--b-subtle); transition: background var(--ease); }
+  .choice:last-child { border-bottom: none; }
+  .choice:has(input:checked) { background: var(--accent-bg); }
+  .choice input { margin-top: 3px; accent-color: var(--accent); }
+  .choice-body { display: flex; flex-direction: column; }
+  .choice-title { font-weight: 550; }
+  .choice-desc { font-size: 12.5px; color: var(--t-weak); }
+
+  .subpanel { width: 100%; padding: 14px 16px; background: var(--sunken);
+               border: 1px solid var(--b-subtle); border-radius: var(--r-md); }
+  .subpanel h3 { font-size: 11px; font-weight: 650; text-transform: uppercase;
+                  letter-spacing: .05em; color: var(--t-weak); margin-bottom: 6px; }
+  .subpanel h3 + .check { margin-bottom: 2px; }
+  .subpanel h3:not(:first-child) { margin-top: 14px; }
+  .check { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; }
+  .check input { accent-color: var(--accent); }
+  .check em { font-style: normal; color: var(--t-weak); font-size: 12.5px; margin-left: 4px; }
+
+  .btn { padding: 7px 16px; font: inherit; font-size: 13px; cursor: pointer;
+          background: var(--surface); color: var(--t-base);
+          border: 1px solid var(--b-medium); border-radius: var(--r-sm); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn--primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn--primary:hover { color: #fff; opacity: .92; }
+  .btn--quiet { border-color: transparent; color: var(--t-weak); }
+  .hint { font-size: 12.5px; color: var(--t-weak); }
+
+  .filerow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px;
+              background: var(--sunken); border: 1px solid var(--b-subtle); border-radius: var(--r-md); }
+  .filename { flex: 1; font: 13px ui-monospace, Menlo, monospace; }
+  .warn { width: 100%; padding: 10px 14px; font-size: 13px; background: var(--warn-bg);
+           border: 1px solid var(--warn-br); border-radius: var(--r-md); }
+
+  .footer { max-width: 780px; margin: 0 auto; padding: 8px 24px 40px;
+             display: flex; gap: 16px; font-size: 12.5px; color: var(--t-weak); }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .cap { max-width: 780px; margin: 26px auto 8px; font-size: 12px; color: var(--t-weak); }
+  .cap b { color: var(--t-base); font-weight: 600; }
+</style>
+</head>
+<body>
+<button class="toggle-theme" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark'">Toggle theme</button>
+
+<div class="topbar"><div class="topbar-inner">
+  <svg viewBox="0 0 520 520" fill="currentColor"><path d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg>
+  <h1>Import &amp; Export</h1>
+  <span class="spacer"></span>
+  <a href="#">User Guide ↗</a>
+</div></div>
+
+<div class="note">The sidebar is gone — with one section it was navigation to nowhere. Single column,
+the popup's tokens, and the same controls underneath: every id and radio name <code>settings.js</code>
+binds to is preserved, so the 622-line import flow keeps working untouched.</div>
+
+<p class="cap"><b>Resting state</b></p>
+<div class="wrap">
+  <section class="card">
+      <header class="card-head">
+        <h2>Export</h2>
+        <p>Save your tabs, profiles and settings to a file.</p>
+      </header>
+      <div class="card-body">
+      <div class="choices">
+        <label class="choice">
+        <input type="radio" name="export-mode" value="everything" checked />
+        <span class="choice-body"><span class="choice-title">Everything</span>
+        <span class="choice-desc">Tabs, profiles and settings — the whole configuration</span></span>
+      </label>
+        <label class="choice">
+        <input type="radio" name="export-mode" value="custom" />
+        <span class="choice-body"><span class="choice-title">Choose what to include</span>
+        <span class="choice-desc">Pick individual profiles, and whether settings come along</span></span>
+      </label>
+      </div>
+      <button class="btn btn--primary">Export configuration</button></div>
+    </section>
+  <section class="card">
+      <header class="card-head">
+        <h2>Import</h2>
+        <p>Restore from a file you exported earlier.</p>
+      </header>
+      <div class="card-body">
+      <button class="btn">Choose a file…</button>
+      <p class="hint">A <code>.json</code> file exported from SF Tabs.</p></div>
+    </section>
+</div>
+
+<p class="cap"><b>Export expanded</b> · custom selection, and <b>Import</b> with a file chosen</p>
+<div class="wrap">
+  <section class="card">
+      <header class="card-head">
+        <h2>Export</h2>
+        <p>Save your tabs, profiles and settings to a file.</p>
+      </header>
+      <div class="card-body">
+      <div class="choices">
+        <label class="choice">
+        <input type="radio" name="export-mode" value="everything" />
+        <span class="choice-body"><span class="choice-title">Everything</span>
+        <span class="choice-desc">Tabs, profiles and settings — the whole configuration</span></span>
+      </label>
+        <label class="choice">
+        <input type="radio" name="export-mode" value="custom" checked />
+        <span class="choice-body"><span class="choice-title">Choose what to include</span>
+        <span class="choice-desc">Pick individual profiles, and whether settings come along</span></span>
+      </label>
+      </div>
+      <div class="subpanel">
+        <h3>Settings</h3>
+        <label class="check"><input type="checkbox" checked /> <span>Include settings</span></label>
+        <h3>Profiles</h3>
+        <label class="check"><input type="checkbox" checked /> <span>Default <em>7 tabs</em></span></label>
+        <label class="check"><input type="checkbox" checked /> <span>Dev1 <em>4 tabs</em></span></label>
+        <label class="check"><input type="checkbox" /> <span>UAT <em>12 tabs</em></span></label>
+      </div>
+      <button class="btn btn--primary">Export configuration</button></div>
+    </section>
+  <section class="card">
+      <header class="card-head">
+        <h2>Import</h2>
+        <p>Restore from a file you exported earlier.</p>
+      </header>
+      <div class="card-body">
+      <div class="filerow">
+        <span class="filename">sftabs-backup-2026-08-03.json</span>
+        <button class="btn btn--quiet">Cancel</button>
+      </div>
+      <div class="warn">
+        <strong>Profiles will be turned on.</strong> This file contains more than one profile.
+      </div>
+      <div class="subpanel">
+        <h3>Settings</h3>
+        <label class="check"><input type="checkbox" checked /> <span>Import settings</span></label>
+        <h3>Profiles</h3>
+        <label class="check"><input type="checkbox" checked /> <span>Default <em>7 tabs</em></span></label>
+        <label class="check"><input type="checkbox" checked /> <span>Dev1 <em>4 tabs</em></span></label>
+      </div>
+      <button class="btn btn--primary">Import</button></div>
+    </section>
+</div>
+
+<div class="footer">
+  <span>SF Tabs v2.1.2</span>
+  <a href="#">Sponsor</a>
+  <a href="#">GitHub</a>
+</div>
+
+</body>
+</html>
