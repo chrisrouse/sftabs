@@ -102,6 +102,25 @@ check('an entry with no colour falls through to the environment',
 check('a malformed entry does not throw',
   resolveOrgColor(DEV2, on({ orgs: [null, undefined, {}] })) === DEFAULT_ENV_COLORS.sandbox);
 
+// ── Resetting the environment layer ──
+// Clearing `environments` is the whole reset: an empty map means the shipped
+// colours are in force, which is also how the feature starts. Per-org entries
+// are untouched, because each was set deliberately and a button labelled
+// "defaults" has no business discarding them.
+const customised = on({
+  environments: { production: '#000000', sandbox: '#111111' },
+  orgs: [{ identifier: 'acme--dev2', environment: 'sandbox', color: '#8430ce' }],
+});
+const afterReset = { ...customised, environments: {} };
+
+check('a reset returns every environment to its default',
+  resolveOrgColor(PROD, afterReset) === DEFAULT_ENV_COLORS.production &&
+  resolveOrgColor(DEV1, afterReset) === DEFAULT_ENV_COLORS.sandbox);
+check('and leaves per-org colours alone',
+  resolveOrgColor(DEV2, afterReset) === '#8430ce');
+check('an empty environments map behaves exactly like a fresh install',
+  resolveOrgColor(PROD, afterReset) === resolveOrgColor(PROD, on()));
+
 // ── The favicon itself ──
 const url = orgFaviconDataUrl('#c5221f');
 check('the favicon is an SVG data URL', url.startsWith('data:image/svg+xml,'));

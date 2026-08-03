@@ -2375,6 +2375,11 @@ function renderEnvColors() {
   const { environments } = orgColorConfig();
   const defaults = SFTabs.utils.DEFAULT_ENV_COLORS;
 
+  // Nothing stored means the shipped colors are in force, so there is nothing
+  // a reset would change
+  document.getElementById('btn-reset-env-colors').disabled =
+    Object.keys(environments).length === 0;
+
   rows.innerHTML = ORG_COLOR_ENVIRONMENTS.map(env => {
     const color = environments[env] || defaults[env];
     return `<tr>
@@ -2732,6 +2737,15 @@ function bindEvents() {
     });
     renderEnvColors();
     renderOrgColors();   // profile-linked rows show their environment's colour
+  });
+
+  document.getElementById('btn-reset-env-colors').addEventListener('click', async () => {
+    // Only the environment layer. Per-org colors were each set deliberately and
+    // are not something a button labelled "defaults" should be able to discard.
+    await patchSettings({ orgColors: { ...orgColorConfig(), environments: {} } });
+    renderEnvColors();
+    renderOrgColors();   // profile-linked rows show their environment's color
+    showStatus(t('orgColorsResetDone'));
   });
 
   document.getElementById('btn-capture-org-color').addEventListener('click', captureOrgColor);

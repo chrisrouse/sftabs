@@ -3014,5 +3014,13 @@
   "orgEnv_patch": {
     "message": "Org de parche",
     "description": "Org environment name"
+  },
+  "orgColorsResetDefaults": {
+    "message": "Restablecer los colores predeterminados",
+    "description": "Button that clears customized environment colors"
+  },
+  "orgColorsResetDone": {
+    "message": "Colores de entorno restablecidos",
+    "description": "Toast after resetting environment colors"
   }
 }
