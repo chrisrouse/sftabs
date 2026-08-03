@@ -2139,14 +2139,6 @@
     "message": "This device only",
     "description": "Description on the Local storage option"
   },
-  "advancedSettingsLink": {
-    "message": "Advanced settings — import, export, danger zone",
-    "description": "Link to the full settings page"
-  },
-  "ariaAdvancedSettings": {
-    "message": "Open advanced settings in a new tab",
-    "description": "Accessible name for the advanced settings link"
-  },
   "ariaReleaseNotesPanel": {
     "message": "Release notes",
     "description": "Accessible name for the release-notes panel"

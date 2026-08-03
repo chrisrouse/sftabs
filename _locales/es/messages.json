@@ -2111,12 +2111,6 @@
   "localStorageCardDesc": {
     "message": "Solo en este dispositivo"
   },
-  "advancedSettingsLink": {
-    "message": "Ajustes avanzados: importar, exportar, acciones críticas"
-  },
-  "ariaAdvancedSettings": {
-    "message": "Abrir los ajustes avanzados en una pestaña nueva"
-  },
   "ariaReleaseNotesPanel": {
     "message": "Notas de la versión"
   },

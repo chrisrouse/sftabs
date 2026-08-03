@@ -946,6 +946,18 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 .settings-tile-label { font-weight: var(--sft-font-weight-semibold); }
 
+/* Tiles that leave the popup say so, quietly. The marker sits in the corner
+   rather than beside the label, so every tile's label stays on the same line. */
+.settings-tile--link { position: relative; }
+.settings-tile-ext {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  color: var(--t-weak);
+}
+
 /* The back control occupies the slot every other panel view fills with its
    close button, so the header keeps one shape across the tray. Mirrored
    because the vendored SLDS chevron only points right. */

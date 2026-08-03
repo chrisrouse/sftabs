@@ -45,6 +45,9 @@ const panel = html.slice(
 );
 
 const tiles = [...panel.matchAll(/class="settings-tile" data-settings-section="([a-z-]+)"/g)].map(m => m[1]);
+// Tiles that open a page instead of a section — they pair with a URL, not a
+// <section>, so they are held to a different rule below.
+const linkTiles = [...panel.matchAll(/data-settings-link="([a-z-]+)"/g)].map(m => m[1]);
 const sections = [...panel.matchAll(/class="settings-section" data-settings-section="([a-z-]+)"/g)].map(m => m[1]);
 
 /**
@@ -70,6 +73,25 @@ check('every section is reachable from a tile',
   sections.every(s => tiles.includes(s)),
   sections.filter(s => !tiles.includes(s)).join(', ') || 'all reachable');
 check('no tile is declared twice', new Set(tiles).size === tiles.length);
+
+// ── 1b. Link tiles resolve to a URL, not a section ──
+// A tile whose id is missing from the router is silent: it renders, it clicks,
+// and nothing happens.
+const linkRouter = /const SETTINGS_LINKS = \{([\s\S]*?)\n  \};/.exec(js);
+check('the link router exists', Boolean(linkRouter));
+if (linkRouter) {
+  const routed = [...linkRouter[1].matchAll(/'([a-z-]+)':/g)].map(m => m[1]);
+  check('every link tile has a destination',
+    linkTiles.every(t => routed.includes(t)),
+    linkTiles.filter(t => !routed.includes(t)).join(', ') || linkTiles.join(', '));
+  check('every destination has a tile',
+    routed.every(r => linkTiles.includes(r)),
+    routed.filter(r => !linkTiles.includes(r)).join(', ') || 'all reachable');
+}
+check('a link tile never doubles as a section tile',
+  linkTiles.every(t => !tiles.includes(t)));
+check('the advanced-settings link is gone, replaced by its tile',
+  !panel.includes('btn-advanced-settings') && linkTiles.includes('import-export'));
 
 // ── 2. Resting state: hub showing, everything else put away ──
 check('the hub is visible at rest',
@@ -110,7 +132,7 @@ if (viewsLine) {
  'setting-profiles', 'setting-auto-switch', 'auto-switch-hint', 'profiles-manage',
  'profiles-list', 'btn-new-profile-from-list',
  'setting-menu-bar-quick-add', 'setting-org-colors', 'env-color-rows', 'org-color-rows',
- 'btn-advanced-settings', 'settings-title', 'settings-hub'].forEach(id => {
+ 'settings-title', 'settings-hub'].forEach(id => {
   const n = (panel.match(new RegExp(`id="${id}"`, 'g')) || []).length;
   check(`#${id} appears exactly once in the panel`, n === 1, n === 1 ? '' : `found ${n}`);
 });

@@ -3041,9 +3041,18 @@ function bindEvents() {
   document.getElementById('btn-settings-back')
     .addEventListener('click', () => showSettingsSection(null));
 
-  document.getElementById('btn-advanced-settings').addEventListener('click', e => {
-    e.preventDefault();
-    chrome.tabs.create({ url: chrome.runtime.getURL('popup/settings.html') });
+  // Tiles that open a page rather than a section. Import & Export stays on its
+  // own page because a file picker closes an extension popup the moment it
+  // takes focus, and because the import flow branches on what the file holds.
+  const SETTINGS_LINKS = {
+    'import-export': () => chrome.runtime.getURL('popup/settings.html'),
+    'user-guide': () => 'https://chrisrouse.github.io/sftabs/',
+  };
+  document.querySelectorAll('.settings-tile[data-settings-link]').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const url = SETTINGS_LINKS[tile.dataset.settingsLink];
+      if (url) chrome.tabs.create({ url: url() });
+    });
   });
 
   // Footer theme toggle
