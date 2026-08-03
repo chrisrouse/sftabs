@@ -666,27 +666,6 @@
                     <button class="btn-danger" id="btn-reset-everything">__MSG_resetButton__</button>
                   </div>
                 </div>
-
-                <!-- ══ TEMPORARY: file-picker proof of concept ══
-                     Delete this block, its handler in js/popup.js, and the
-                     filePickerPoc storage key once the question is answered.
-
-                     It records in two stages so the result distinguishes three
-                     outcomes rather than two: nothing recorded means the popup
-                     died before the change event fired; a name but no read
-                     means it survived the picker and died during the async
-                     FileReader; both means a popup-native import is viable. -->
-                <h4 class="settings-subhead"><span>File picker test</span></h4>
-                <div class="settings-row">
-                  <div class="settings-row-label">
-                    <span class="settings-label">Pick any file</span>
-                    <span class="settings-desc" id="poc-result">No test run yet.</span>
-                  </div>
-                  <div class="settings-row-control">
-                    <button class="btn-secondary" id="btn-poc-pick">Choose file…</button>
-                    <input type="file" id="poc-file-input" hidden />
-                  </div>
-                </div>
 </section>
 
           </div>
