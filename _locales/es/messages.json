@@ -3031,5 +3031,53 @@
         "content": "$1"
       }
     }
+  },
+  "floatingButtonStyleSection": {
+    "message": "Estilo",
+    "description": "Subheading for the floating button layout choice"
+  },
+  "floatingButtonLayoutHandle": {
+    "message": "Pestaña lateral",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutHandleDesc": {
+    "message": "Tirador acoplado; el panel se despliega desde el borde",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonLayoutFab": {
+    "message": "Botón redondo",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutFabDesc": {
+    "message": "Círculo interior; se abre una tarjeta al lado",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonLayoutPill": {
+    "message": "Píldora con etiqueta",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutPillDesc": {
+    "message": "Muestra «SF Tabs»; el objetivo más grande",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonEdgeLabel": {
+    "message": "Borde",
+    "description": "Which side of the window the button docks to"
+  },
+  "floatingButtonEdgeLeft": {
+    "message": "Izquierda",
+    "description": "Dock the floating button to the left edge"
+  },
+  "floatingButtonEdgeRight": {
+    "message": "Derecha",
+    "description": "Dock the floating button to the right edge"
+  },
+  "floatingButtonOffsetLabel": {
+    "message": "Distancia desde arriba",
+    "description": "Distance the floating button sits from the top"
+  },
+  "floatingButtonOffsetDesc": {
+    "message": "En píxeles, para que no se mueva al redimensionar la ventana",
+    "description": "Description under the offset slider"
   }
 }

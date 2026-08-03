@@ -1472,6 +1472,7 @@ const SETTINGS_SECTION_REFRESH = {
     syncAutoSwitchRow();
   },
   'org-colors': () => syncOrgColorsSection(),
+  button: () => syncFloatingButtonSection(),
 };
 
 /**
@@ -2343,6 +2344,61 @@ function colorLabel(name) {
   return t('colorWithShade', hue, t(shade === 'deep' ? 'colorShadeDeep' : 'colorShadeLight'));
 }
 
+// ── Floating button ────────────────────────────────────────────
+
+/** The stored config, with everything the renderers need present. */
+function floatingButtonConfig() {
+  const defaults = SFTabs.constants.DEFAULT_SETTINGS.floatingButton;
+  return { ...defaults, ...(state.settings.floatingButton || {}) };
+}
+
+/** Patch one or more fields without dropping the rest of the object. */
+async function patchFloatingButton(partial) {
+  await patchSettings({ floatingButton: { ...floatingButtonConfig(), ...partial } });
+}
+
+/**
+ * Reflect the stored config into the section.
+ *
+ * The edge comes from the shared resolver rather than reading `side` directly,
+ * so this and the page agree on what an older `anchor` value means — a settings
+ * screen highlighting one edge while the button sits on the other is the exact
+ * drift that resolver exists to prevent.
+ */
+function syncFloatingButtonSection() {
+  const toggle = document.getElementById('setting-floating-button');
+  if (!toggle) return;
+  const config = floatingButtonConfig();
+
+  toggle.checked = !!config.enabled;
+  document.getElementById('setting-header-menu').checked =
+    !!(state.settings.headerMenu && state.settings.headerMenu.enabled);
+  document.getElementById('floating-button-options').hidden = !config.enabled;
+  if (!config.enabled) return;
+
+  const pick = (group, value) => {
+    const input = document.querySelector(`input[name="${group}"][value="${value}"]`);
+    if (input) input.checked = true;
+  };
+  pick('fb-location', config.location);
+  pick('fb-layout', config.layout);
+
+  const side = SFTabs.utils.resolveFloatingSide(config);
+  document.querySelectorAll('#floating-button-sides button[data-side]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.side === side));
+  });
+
+  // A legacy install stores only the percentage; show its pixel equivalent so
+  // the slider is not lying about where the button currently sits.
+  let offset = Number(config.offset) || 0;
+  if (!offset) {
+    const percent = Number.isFinite(Number(config.position)) ? Number(config.position) : 25;
+    offset = Math.round((percent / 100) * (window.screen?.availHeight || 900));
+  }
+  document.getElementById('floating-button-offset').value = offset;
+  document.getElementById('floating-button-offset-value').textContent = `${offset}px`;
+}
+
 // ── Org colors ─────────────────────────────────────────────────
 
 /** The stored config, with the shape the renderers expect. */
@@ -2722,6 +2778,48 @@ function bindEvents() {
       syncTabColorRow();
       renderTabList();
       bindTabListEvents();
+    });
+  });
+
+  document.getElementById('setting-floating-button').addEventListener('change', async e => {
+    await patchFloatingButton({ enabled: e.target.checked });
+    syncFloatingButtonSection();
+  });
+
+  document.getElementById('setting-header-menu').addEventListener('change', async e => {
+    const current = state.settings.headerMenu || {};
+    await patchSettings({ headerMenu: { ...current, enabled: e.target.checked } });
+  });
+
+  document.querySelectorAll('input[name="fb-location"]').forEach(radio => {
+    radio.addEventListener('change', () => patchFloatingButton({ location: radio.value }));
+  });
+
+  // Every layout can dock to either edge, so changing it does not invalidate
+  // the placement the way the old nine-cell anchor grid could.
+  document.querySelectorAll('input[name="fb-layout"]').forEach(radio => {
+    radio.addEventListener('change', () => patchFloatingButton({ layout: radio.value }));
+  });
+
+  document.getElementById('floating-button-sides').addEventListener('click', async e => {
+    const button = e.target.closest('button[data-side]');
+    if (!button) return;
+    // `anchor` deleted, not just superseded, so the legacy fallback cannot
+    // re-engage and contradict the choice just made
+    const { anchor, ...rest } = floatingButtonConfig();
+    await patchSettings({ floatingButton: { ...rest, side: button.dataset.side } });
+    syncFloatingButtonSection();
+  });
+
+  const offsetSlider = document.getElementById('floating-button-offset');
+  const offsetValue = document.getElementById('floating-button-offset-value');
+  offsetSlider.addEventListener('input', () => {
+    offsetValue.textContent = `${offsetSlider.value}px`;   // live while dragging
+  });
+  offsetSlider.addEventListener('change', async () => {
+    const { position, ...rest } = floatingButtonConfig();  // drop the legacy percentage
+    await patchSettings({
+      floatingButton: { ...rest, offset: parseInt(offsetSlider.value, 10) },
     });
   });
 

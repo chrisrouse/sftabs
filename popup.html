@@ -263,6 +263,10 @@
                 <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg>
                 <span class="settings-tile-label">__MSG_profilesSection__</span>
               </button>
+              <button type="button" class="settings-tile" data-settings-section="button">
+                <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M495 154 360 19c-14-14-36-14-50 0s-14 36 0 50l7 7-162 107-5-5c-14-14-36-14-50 0s-14 36 0 50l72 72L24 448a36 36 0 0 0 0 51 36 36 0 0 0 51 0l148-149 63 63a35 35 0 0 0 50 0 35 35 0 0 0 0-50l-5-5 106-163 7 7a35 35 0 0 0 50 0c14-12 14-34 1-48"/></svg>
+                <span class="settings-tile-label">__MSG_settingsNavButton__</span>
+              </button>
               <button type="button" class="settings-tile" data-settings-section="org-colors">
                 <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg>
                 <span class="settings-tile-label">__MSG_orgColorsSection__</span>
@@ -448,6 +452,128 @@
                 </div>
             </section>
 
+            <section class="settings-section" data-settings-section="button"
+              aria-labelledby="s-button" hidden>
+              <h3 class="settings-section-title sr-only" id="s-button">__MSG_settingsNavButton__</h3>
+
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-floating-button">
+                    <span class="settings-label">__MSG_floatingButtonEnabled__</span>
+                    <span class="settings-desc">__MSG_floatingButtonEnabledDescription__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_floatingButtonEnabled__">
+                      <input type="checkbox" id="setting-floating-button" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- A second on-page surface, independent of the floating button:
+                     either can be used alone or both together. -->
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-header-menu">
+                    <span class="settings-label">__MSG_headerMenuEnabled__</span>
+                    <span class="settings-desc">__MSG_headerMenuEnabledDescription__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_headerMenuEnabled__">
+                      <input type="checkbox" id="setting-header-menu" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Nothing below applies while the floating button is off -->
+                <div id="floating-button-options">
+                  <h4 class="settings-subhead"><span>__MSG_floatingButtonLocationSection__</span></h4>
+                  <div class="choice-cards" role="radiogroup" aria-label="__MSG_floatingButtonLocationSection__">
+                    <label class="choice-card">
+                      <input type="radio" name="fb-location" value="everywhere" checked />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLocationEverywhere__</span>
+                          <span class="choice-card-desc">__MSG_floatingButtonLocationEverywhereDescription__</span>
+                        </div>
+                      </div>
+                    </label>
+                    <label class="choice-card">
+                      <input type="radio" name="fb-location" value="setup-only" />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLocationSetupOnly__</span>
+                          <span class="choice-card-desc">__MSG_floatingButtonLocationSetupOnlyDescription__</span>
+                        </div>
+                      </div>
+                    </label>
+                    <label class="choice-card">
+                      <input type="radio" name="fb-location" value="outside-setup" />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLocationOutsideSetup__</span>
+                          <span class="choice-card-desc">__MSG_floatingButtonLocationOutsideSetupDescription__</span>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <h4 class="settings-subhead"><span>__MSG_floatingButtonStyleSection__</span></h4>
+                  <div class="choice-cards" role="radiogroup" aria-label="__MSG_floatingButtonStyleSection__">
+                    <label class="choice-card">
+                      <input type="radio" name="fb-layout" value="handle" checked />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLayoutHandle__</span>
+                          <span class="choice-card-desc">__MSG_floatingButtonLayoutHandleDesc__</span>
+                        </div>
+                      </div>
+                    </label>
+                    <label class="choice-card">
+                      <input type="radio" name="fb-layout" value="fab" />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLayoutFab__</span>
+                          <span class="choice-card-desc">__MSG_floatingButtonLayoutFabDesc__</span>
+                        </div>
+                      </div>
+                    </label>
+                    <label class="choice-card">
+                      <input type="radio" name="fb-layout" value="pill" />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLayoutPill__</span>
+                          <span class="choice-card-desc">__MSG_floatingButtonLayoutPillDesc__</span>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <h4 class="settings-subhead"><span>__MSG_floatingButtonPositionSection__</span></h4>
+                  <div class="settings-row">
+                    <div class="settings-row-label">
+                      <span class="settings-label">__MSG_floatingButtonEdgeLabel__</span>
+                    </div>
+                    <div class="settings-row-control">
+                      <div class="fb-sides" id="floating-button-sides" role="group" aria-label="__MSG_floatingButtonEdgeLabel__">
+                        <button type="button" data-side="left" aria-pressed="false">__MSG_floatingButtonEdgeLeft__</button>
+                        <button type="button" data-side="right" aria-pressed="true">__MSG_floatingButtonEdgeRight__</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="settings-row settings-row--stack">
+                    <div class="settings-row-label">
+                      <span class="settings-label">__MSG_floatingButtonOffsetLabel__</span>
+                      <span class="settings-desc">__MSG_floatingButtonOffsetDesc__</span>
+                    </div>
+                    <div class="offset-row">
+                      <input type="range" id="floating-button-offset" min="0" max="800" step="4" value="200"
+                        aria-label="__MSG_floatingButtonOffsetLabel__" />
+                      <span class="offset-value" id="floating-button-offset-value">200px</span>
+                    </div>
+                  </div>
+                </div>
+            </section>
             <section class="settings-section" data-settings-section="org-colors"
               aria-labelledby="s-org-colors" hidden>
               <h3 class="settings-section-title sr-only" id="s-org-colors">__MSG_orgColorsSection__</h3>

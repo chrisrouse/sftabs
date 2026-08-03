@@ -981,6 +981,40 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 #btn-new-profile-from-list { margin-top: var(--sft-spacing-3); }
 #profiles-manage > .form-hint { margin-top: var(--sft-spacing-2); }
 
+/* ── Floating button placement ──
+   Two edges, not the nine-cell grid this replaced: the vertical axis moved to
+   the offset slider, which expresses it better than three fixed rows did. */
+.fb-sides { display: flex; gap: 6px; }
+.fb-sides button {
+  min-width: 58px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-muted);
+  background: var(--s-1);
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+.fb-sides button:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.fb-sides button[aria-pressed="true"] {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+  color: var(--t-inverse);
+}
+.fb-sides button:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
+
+.offset-row { display: flex; align-items: center; gap: 10px; }
+.offset-row input[type="range"] { flex: 1; min-width: 0; accent-color: var(--c-primary); }
+.offset-value {
+  min-width: 46px;
+  text-align: right;
+  font-size: var(--sft-font-size-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--t-weak);
+}
+
 /* ── Org colors ──
    A three-column table so the 16px previews line up whatever the org names are.
    The preview is the real favicon data URL, not an approximation of it. */

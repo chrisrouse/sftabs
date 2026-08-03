@@ -132,6 +132,8 @@ const BELONGS_IN = {
   profiles: ['setting-profiles', 'setting-auto-switch', 'profiles-list'],
   'org-colors': ['setting-org-colors', 'org-colors-body', 'env-color-rows',
                  'org-color-rows', 'btn-capture-org-color'],
+  button: ['setting-floating-button', 'setting-header-menu', 'floating-button-options',
+           'floating-button-sides', 'floating-button-offset'],
 };
 Object.entries(BELONGS_IN).forEach(([section, ids]) => {
   const body = sectionBody(section);
@@ -218,6 +220,23 @@ check('the view above it does not scroll too',
   check(`${sel} can shrink, so the overflow reaches the body`,
     rulesFor(sel).some(body => /min-height:\s*0/.test(body)));
 });
+
+// ── 10. The floating button has one home ──
+// It used to be configured on the standalone advanced page. Both surfaces
+// writing settings.floatingButton would be two places to change and one to
+// forget — and the advanced page's markup is gone, so any handler left behind
+// would throw on a missing element and take the whole page down with it.
+const advancedHtml = fs.readFileSync(path.join(root, 'popup/settings.html'), 'utf8');
+const advancedJs = fs.readFileSync(path.join(root, 'popup/settings.js'), 'utf8');
+
+check('the advanced page no longer has a Button section',
+  !advancedHtml.includes('id="section-button"') && !advancedHtml.includes('data-section="button"'));
+check('and no code left reaching for its elements',
+  !['floating-button-enabled', 'header-menu-enabled', 'floating-button-sides',
+    'floating-button-offset', 'floating-button-settings'].some(id => advancedJs.includes(id)));
+check('every element the advanced page still reaches for exists in it',
+  [...new Set([...advancedJs.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]))]
+    .every(id => advancedHtml.includes(`id="${id}"`)));
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

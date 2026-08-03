@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Auto tab grouping — what it would look like</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #f5f6f7; color: #202124; padding: 32px 32px 80px; }
+  h1 { font-size: 23px; font-weight: 700; }
+  h2 { font-size: 17px; font-weight: 650; margin: 38px 0 6px; }
+  h3 { font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em;
+        color: #5f6368; margin: 20px 0 8px; }
+  p { max-width: 92ch; color: #4a4a4a; }
+  code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: #eceff1;
+          padding: 1px 5px; border-radius: 4px; }
+  .note { max-width: 92ch; margin: 12px 0; padding: 12px 14px; border-radius: 8px;
+           background: #fff8e1; border: 1px solid #f0d48a; }
+  .note--bad { background: #fdeced; border-color: #f3b7b5; }
+  .note--good { background: #e7f5ea; border-color: #a8d8b4; }
+
+  .strip { display: flex; align-items: flex-end; padding: 8px 8px 0; background: #dee1e6;
+            border-radius: 10px 10px 0 0; width: max-content; }
+  .tab { display: flex; align-items: center; gap: 7px; width: 176px; height: 32px; padding: 0 10px;
+          background: #f1f3f4; border-radius: 9px 9px 0 0; font-size: 11px; color: #3c4043; flex-shrink: 0; }
+  .tab--active { background: #fff; }
+  .tab-ico, .tab-ico svg { width: 15px; height: 15px; display: block; flex-shrink: 0; }
+  .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tab-x { opacity: .45; }
+
+  .group { display: inline-flex; align-items: flex-end; padding: 3px 3px 0; border-radius: 10px 10px 0 0; }
+  .group + .group { margin-left: 5px; }
+  .chiplabel { display: flex; align-items: center; height: 26px; padding: 0 9px; margin-bottom: 3px;
+                border-radius: 8px; color: #fff; font-size: 11px; font-weight: 600; white-space: nowrap; }
+
+  .sw { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; margin: 0 14px 6px 0; }
+  .sw span { width: 14px; height: 14px; border-radius: 50%; }
+  .chip { display: inline-block; width: 13px; height: 13px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+
+  table { border-collapse: collapse; background: #fff; border: 1px solid #dadce0;
+           border-radius: 8px; overflow: hidden; margin: 10px 0; }
+  th, td { padding: 7px 14px; text-align: left; border-bottom: 1px solid #eceff1; font-size: 13px; }
+  th { background: #f1f3f4; font-weight: 650; }
+  tr:last-child td { border-bottom: none; }
+  .de { color: #1e8e3e; font-size: 12px; }
+  .arrow { font-size: 22px; color: #9aa0a6; margin: 10px 0 10px 14px; }
+</style>
+</head>
+<body>
+
+<h1>Auto tab grouping</h1>
+<p>Yes — both browsers support it, with the same API and the same nine colors. Chrome has had
+<code>chrome.tabGroups</code> for years; Firefox shipped <code>browser.tabGroups</code> in 139, and
+we already require 142. Verified against both sets of docs in August 2026.</p>
+
+<div class="note note--bad">
+<b>The thing to decide first, because everything else is detail.</b> Grouping <em>moves your tabs</em>.
+The spec is explicit: “All tabs in a tab group must be adjacent, and tabs are moved if needed.” So
+switching this on rearranges the tab strip, and keeps rearranging it every time you open a
+Salesforce tab. That is the feature working correctly, not a bug — but it is a big change to
+something people arrange deliberately.
+</div>
+
+<h2>What it would look like</h2>
+<h3>Before — four orgs, opened in whatever order you opened them</h3>
+<div class="strip">
+  <div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#c5221f" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">acme · Accounts</span><span class="tab-x">×</span></div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#1e8e3e" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">acme--dev1 · Flows</span><span class="tab-x">×</span></div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#5f6368" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">Jira · SFT-204</span><span class="tab-x">×</span></div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#c5221f" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">acme · Setup</span><span class="tab-x">×</span></div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#1e8e3e" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">acme--uat · Users</span><span class="tab-x">×</span></div>
+</div>
+
+<div class="arrow">↓</div>
+
+<h3>After — grouped by org, and reordered to make that possible</h3>
+<div class="strip">
+  <div class="group" style="background:#d93025">
+    <div class="chiplabel" style="background:#d93025">acme</div>
+    <div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#c5221f" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">Accounts</span><span class="tab-x">×</span></div>
+    <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#c5221f" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">Setup</span><span class="tab-x">×</span></div>
+  </div>
+  <div class="group" style="background:#1e8e3e">
+    <div class="chiplabel" style="background:#1e8e3e">acme--dev1</div>
+    <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#1e8e3e" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">Flows</span><span class="tab-x">×</span></div>
+  </div>
+  <div class="group" style="background:#1e8e3e">
+    <div class="chiplabel" style="background:#1e8e3e">acme--uat</div>
+    <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#1e8e3e" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">Users</span><span class="tab-x">×</span></div>
+  </div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 520 520"><path fill="#5f6368" d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg></span><span class="tab-title">Jira · SFT-204</span><span class="tab-x">×</span></div>
+</div>
+<p style="margin-top:10px">Note what happened to the Jira tab: it was second, and it is now last.
+Nothing moved it on purpose — it was simply in the way of two <code>acme</code> tabs becoming
+adjacent.</p>
+
+<div class="note">
+<b>And the two sandboxes are still both green.</b> Group colors are the same nine names in both
+browsers, so the per-org overrides you just set cannot come through — <code>acme--dev1</code> and
+<code>acme--uat</code> are both “green” no matter what hex you picked. The group <em>name</em>
+carries the distinction; the color cannot.
+</div>
+
+<h2>The nine colors, and where ours land</h2>
+<div><div class="sw"><span style="background:#5f6368"></span>grey</div><div class="sw"><span style="background:#1a73e8"></span>blue</div><div class="sw"><span style="background:#d93025"></span>red</div><div class="sw"><span style="background:#f9ab00"></span>yellow</div><div class="sw"><span style="background:#1e8e3e"></span>green</div><div class="sw"><span style="background:#d01884"></span>pink</div><div class="sw"><span style="background:#9334e6"></span>purple</div><div class="sw"><span style="background:#007b83"></span>cyan</div><div class="sw"><span style="background:#fa903e"></span>orange</div></div>
+<p>No hex, in either browser. Mapping our environment defaults to the nearest of the nine, measured
+as CIELAB distance:</p>
+<table>
+  <tr><th>Environment</th><th>Our color</th><th></th><th>Group color</th><th></th></tr>
+  
+  <tr>
+    <td>production</td>
+    <td><span class="chip" style="background:#c5221f"></span><code>#c5221f</code></td>
+    <td>→</td>
+    <td><span class="chip" style="background:#d93025"></span><code>red</code></td>
+    <td class="de"></td>
+  </tr>
+  <tr>
+    <td>sandbox</td>
+    <td><span class="chip" style="background:#1e8e3e"></span><code>#1e8e3e</code></td>
+    <td>→</td>
+    <td><span class="chip" style="background:#1e8e3e"></span><code>green</code></td>
+    <td class="de">exact</td>
+  </tr>
+  <tr>
+    <td>developer</td>
+    <td><span class="chip" style="background:#1a73e8"></span><code>#1a73e8</code></td>
+    <td>→</td>
+    <td><span class="chip" style="background:#1a73e8"></span><code>blue</code></td>
+    <td class="de">exact</td>
+  </tr>
+  <tr>
+    <td>scratch</td>
+    <td><span class="chip" style="background:#7526e3"></span><code>#7526e3</code></td>
+    <td>→</td>
+    <td><span class="chip" style="background:#9334e6"></span><code>purple</code></td>
+    <td class="de"></td>
+  </tr>
+  <tr>
+    <td>demo</td>
+    <td><span class="chip" style="background:#b06000"></span><code>#b06000</code></td>
+    <td>→</td>
+    <td><span class="chip" style="background:#fa903e"></span><code>orange</code></td>
+    <td class="de"></td>
+  </tr>
+  <tr>
+    <td>patch</td>
+    <td><span class="chip" style="background:#5c5c5c"></span><code>#5c5c5c</code></td>
+    <td>→</td>
+    <td><span class="chip" style="background:#5f6368"></span><code>grey</code></td>
+    <td class="de"></td>
+  </tr>
+  <tr>
+    <td>playground</td>
+    <td><span class="chip" style="background:#0d9dda"></span><code>#0d9dda</code></td>
+    <td>→</td>
+    <td><span class="chip" style="background:#007b83"></span><code>cyan</code></td>
+    <td class="de"></td>
+  </tr>
+</table>
+<p>Sandbox and Developer land exactly on the browser's own green and blue. Production, Scratch and
+Patch are close. Demo and Playground are not — a dark amber becomes a bright orange, and a mid
+cyan becomes a dark teal. All seven still map to <em>distinct</em> group colors, so nothing
+collides; they just stop being the colors you chose.</p>
+
+<h2>What it would cost to build</h2>
+<table>
+  <tr><th>Piece</th><th>Notes</th></tr>
+  <tr><td>Group on navigation</td>
+      <td>Listen for a tab becoming a Salesforce URL, find or create that org's group in that
+          window, <code>tabs.group()</code>. Ungroup when it navigates away.</td></tr>
+  <tr><td>One group per window</td>
+      <td>Groups cannot span windows. Two windows on the same org means two groups with the same
+          name — matching how profiles already resolve per page.</td></tr>
+  <tr><td>Respect manual edits</td>
+      <td>If you rename or recolor a group by hand, we have to remember it and stop overwriting —
+          otherwise the next tab you open reverts it. This is the piece that looks small and is not.</td></tr>
+  <tr><td>Naming</td>
+      <td>The profile name where one covers the org, else the org identifier. Both already resolved.</td></tr>
+</table>
+
+<div class="note note--good">
+<b>One thing we must get right regardless.</b> <code>tabGroups</code> has to go in
+<code>optional_permissions</code>, requested when the feature is switched on — not in
+<code>permissions</code>. Adding a required permission to an update <em>disables the extension for
+every existing user</em> until they re-approve it. Optional permissions are exempt.
+</div>
+
+</body>
+</html>

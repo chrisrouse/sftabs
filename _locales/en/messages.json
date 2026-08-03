@@ -3197,5 +3197,53 @@
         "content": "$1"
       }
     }
+  },
+  "floatingButtonStyleSection": {
+    "message": "Style",
+    "description": "Subheading for the floating button layout choice"
+  },
+  "floatingButtonLayoutHandle": {
+    "message": "Edge drawer",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutHandleDesc": {
+    "message": "Docked handle; the panel slides out from the edge",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonLayoutFab": {
+    "message": "Round button",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutFabDesc": {
+    "message": "Inset circle; a card opens next to it",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonLayoutPill": {
+    "message": "Labeled pill",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutPillDesc": {
+    "message": "Shows “SF Tabs”; the largest target",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonEdgeLabel": {
+    "message": "Edge",
+    "description": "Which side of the window the button docks to"
+  },
+  "floatingButtonEdgeLeft": {
+    "message": "Left",
+    "description": "Dock the floating button to the left edge"
+  },
+  "floatingButtonEdgeRight": {
+    "message": "Right",
+    "description": "Dock the floating button to the right edge"
+  },
+  "floatingButtonOffsetLabel": {
+    "message": "Offset from top",
+    "description": "Distance the floating button sits from the top"
+  },
+  "floatingButtonOffsetDesc": {
+    "message": "In pixels, so it stays put when the window resizes",
+    "description": "Description under the offset slider"
   }
 }

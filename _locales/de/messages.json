@@ -3031,5 +3031,53 @@
         "content": "$1"
       }
     }
+  },
+  "floatingButtonStyleSection": {
+    "message": "Stil",
+    "description": "Subheading for the floating button layout choice"
+  },
+  "floatingButtonLayoutHandle": {
+    "message": "Randleiste",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutHandleDesc": {
+    "message": "Angedockter Griff; das Panel gleitet vom Rand heraus",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonLayoutFab": {
+    "message": "Runde Schaltfläche",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutFabDesc": {
+    "message": "Eingerückter Kreis; eine Karte öffnet sich daneben",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonLayoutPill": {
+    "message": "Beschriftete Pille",
+    "description": "Floating button layout"
+  },
+  "floatingButtonLayoutPillDesc": {
+    "message": "Zeigt „SF Tabs“; das größte Ziel",
+    "description": "Floating button layout description"
+  },
+  "floatingButtonEdgeLabel": {
+    "message": "Rand",
+    "description": "Which side of the window the button docks to"
+  },
+  "floatingButtonEdgeLeft": {
+    "message": "Links",
+    "description": "Dock the floating button to the left edge"
+  },
+  "floatingButtonEdgeRight": {
+    "message": "Rechts",
+    "description": "Dock the floating button to the right edge"
+  },
+  "floatingButtonOffsetLabel": {
+    "message": "Abstand von oben",
+    "description": "Distance the floating button sits from the top"
+  },
+  "floatingButtonOffsetDesc": {
+    "message": "In Pixeln, damit er bei Größenänderung des Fensters an Ort und Stelle bleibt",
+    "description": "Description under the offset slider"
   }
 }

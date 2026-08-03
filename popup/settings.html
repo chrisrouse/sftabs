@@ -639,14 +639,6 @@
 					</svg>
 					<span>__MSG_settingsNavGeneral__</span>
 				</div>
-				<div class="settings-nav-item" data-section="button">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="12" cy="12" r="10"></circle>
-						<line x1="12" y1="8" x2="12" y2="12"></line>
-						<line x1="12" y1="16" x2="12.01" y2="16"></line>
-					</svg>
-					<span>__MSG_settingsNavButton__</span>
-				</div>
 				<div class="settings-nav-item" data-section="profiles">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -804,117 +796,6 @@
 				</section>
 
 				<!-- Button Section -->
-				<section id="section-button" class="settings-section">
-					<div class="settings-section-header">
-						<h2>__MSG_floatingButtonSection__</h2>
-						<p class="section-description">__MSG_floatingButtonDescription__</p>
-					</div>
-
-					<div class="setting-card">
-						<div class="setting-item">
-							<label class="checkbox-group">
-								<input type="checkbox" id="floating-button-enabled">
-								<span>__MSG_floatingButtonEnabled__</span>
-							</label>
-							<div class="setting-description">__MSG_floatingButtonEnabledDescription__</div>
-						</div>
-					</div>
-
-					<!-- Independent of the floating button: either surface can be used
-					     alone, or both together. -->
-					<div class="setting-card">
-						<div class="setting-item">
-							<label class="checkbox-group">
-								<input type="checkbox" id="header-menu-enabled">
-								<span>__MSG_headerMenuEnabled__</span>
-							</label>
-							<div class="setting-description">__MSG_headerMenuEnabledDescription__</div>
-						</div>
-					</div>
-
-					<div id="floating-button-settings" style="display: none;">
-						<div class="setting-card">
-							<h3>__MSG_floatingButtonLocationSection__</h3>
-							<div class="setting-item">
-								<label class="radio-group">
-									<input type="radio" name="floating-button-location" value="everywhere" id="floating-location-everywhere">
-									<div style="flex: 1;">
-										<div style="font-weight: 600; margin-bottom: 4px;">__MSG_floatingButtonLocationEverywhere__</div>
-										<div style="font-size: 13px; color: var(--color-text-weak);">__MSG_floatingButtonLocationEverywhereDescription__</div>
-									</div>
-								</label>
-								<label class="radio-group">
-									<input type="radio" name="floating-button-location" value="setup-only" id="floating-location-setup-only">
-									<div style="flex: 1;">
-										<div style="font-weight: 600; margin-bottom: 4px;">__MSG_floatingButtonLocationSetupOnly__</div>
-										<div style="font-size: 13px; color: var(--color-text-weak);">__MSG_floatingButtonLocationSetupOnlyDescription__</div>
-									</div>
-								</label>
-								<label class="radio-group">
-									<input type="radio" name="floating-button-location" value="outside-setup" id="floating-location-outside-setup">
-									<div style="flex: 1;">
-										<div style="font-weight: 600; margin-bottom: 4px;">__MSG_floatingButtonLocationOutsideSetup__</div>
-										<div style="font-size: 13px; color: var(--color-text-weak);">__MSG_floatingButtonLocationOutsideSetupDescription__</div>
-									</div>
-								</label>
-							</div>
-						</div>
-
-						<div class="setting-card">
-							<h3>Style</h3>
-							<div class="setting-item">
-								<div class="fb-layouts">
-									<label class="fb-layout">
-										<input type="radio" name="floating-button-layout" value="handle" id="floating-layout-handle">
-										<span class="fb-layout-body">
-											<span class="fb-layout-title">Edge drawer</span>
-											<span class="fb-layout-desc">Docked handle; the panel slides out from the edge</span>
-										</span>
-									</label>
-									<label class="fb-layout">
-										<input type="radio" name="floating-button-layout" value="fab" id="floating-layout-fab">
-										<span class="fb-layout-body">
-											<span class="fb-layout-title">Round button</span>
-											<span class="fb-layout-desc">Inset circle; a card opens next to it</span>
-										</span>
-									</label>
-									<label class="fb-layout">
-										<input type="radio" name="floating-button-layout" value="pill" id="floating-layout-pill">
-										<span class="fb-layout-body">
-											<span class="fb-layout-title">Labeled pill</span>
-											<span class="fb-layout-desc">Shows “SF Tabs”; the largest target</span>
-										</span>
-									</label>
-								</div>
-							</div>
-						</div>
-
-						<div class="setting-card">
-							<h3>__MSG_floatingButtonPositionSection__</h3>
-
-							<div class="setting-item">
-								<label class="setting-label">Edge</label>
-								<div class="fb-sides" id="floating-button-sides" role="group" aria-label="Edge">
-									<button type="button" data-side="left"  aria-label="Left edge">← Left</button>
-									<button type="button" data-side="right" aria-label="Right edge">Right →</button>
-								</div>
-								<div class="setting-description">Which edge the button docks to. Use the offset below to move it up or down.</div>
-							</div>
-
-							<div class="setting-item">
-								<label class="setting-label" for="floating-button-offset">Offset from top</label>
-								<div style="display: flex; align-items: center; gap: 12px;">
-									<input type="range" id="floating-button-offset" min="0" max="800" value="200" step="4" style="flex: 1;">
-									<span id="floating-button-offset-value" style="min-width: 52px; text-align: right; font-weight: 500; color: var(--color-text);">200px</span>
-								</div>
-								<div class="setting-description">Distance down from the top of the window, in pixels — so it stays put when the window resizes or devtools opens.</div>
-							</div>
-
-						</div>
-					</div>
-				</section>
-
-				<!-- Profiles Section -->
 				<section id="section-profiles" class="settings-section">
 					<div class="settings-section-header">
 						<h2>__MSG_profilesSection__</h2>
