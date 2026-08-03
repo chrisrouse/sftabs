@@ -640,11 +640,78 @@ function parsePageToTab(url, pageTitle) {
   };
 }
 
+/**
+ * The Salesforce cloud, as one path on a 520 viewBox — SLDS utility
+ * `salesforce1`, vendored at icons/slds/salesforce1.svg.
+ *
+ * Drawing our own copy rather than recolouring the org's real favicon avoids
+ * the whole canvas problem: that icon is served cross-origin, and drawing it
+ * taints the canvas so toDataURL() throws. This is the same silhouette, and it
+ * needs no fetch, no canvas and no re-encoding.
+ */
+const SALESFORCE_CLOUD_PATH = 'M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40';
+
+/** Colours for orgs nobody has configured. Chosen to stay apart at 16px. */
+const DEFAULT_ENV_COLORS = {
+  production: '#c5221f',   // the one worth hesitating over
+  sandbox:    '#1e8e3e',
+  developer:  '#1a73e8',
+  scratch:    '#7526e3',
+  demo:       '#b06000',
+  patch:      '#5c5c5c',
+  playground: '#0d9dda',
+};
+
+/**
+ * A favicon of the Salesforce cloud in one colour, as an SVG data URL.
+ *
+ * SVG rather than a canvas PNG because both browsers have taken SVG favicons
+ * for years and it removes every moving part — no image decode, no canvas, no
+ * tainting, and it stays sharp on whatever the display does.
+ */
+function orgFaviconDataUrl(color) {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520">' +
+    '<path fill="' + color + '" d="' + SALESFORCE_CLOUD_PATH + '"/></svg>';
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
+/**
+ * The colour an org's tab icon should take, or null to leave it alone.
+ *
+ * A per-org entry wins over its environment's colour — that is the whole point
+ * of the override, and it is what lets three sandboxes in one org be told
+ * apart when the hostname says only "sandbox" for all three.
+ *
+ * Entries are keyed by identifier AND environment because the identifier alone
+ * collides: `acme.lightning.force.com` and `acme.develop.lightning.force.com`
+ * both reduce to `acme`, and they are different orgs.
+ */
+function resolveOrgColor(url, orgColors) {
+  const config = orgColors || {};
+  if (!config.enabled) return null;
+
+  const environment = detectOrgEnvironment(url);
+  if (!environment) return null;
+
+  const identifier = extractOrgIdentifier(url);
+  const override = (config.orgs || []).find(entry =>
+    entry &&
+    String(entry.identifier).toLowerCase() === String(identifier).toLowerCase() &&
+    (entry.environment || environment) === environment);
+  if (override && override.color) return override.color;
+
+  const environments = config.environments || {};
+  return environments[environment] || DEFAULT_ENV_COLORS[environment] || null;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
     extractOrgIdentifier,
     detectOrgEnvironment,
+    DEFAULT_ENV_COLORS,
+    resolveOrgColor,
+    orgFaviconDataUrl,
     ORG_PARTITIONS,
     TAB_COLORS,
     tabColorVars,
@@ -674,6 +741,9 @@ if (typeof module !== 'undefined' && module.exports) {
     generateId,
     extractOrgIdentifier,
     detectOrgEnvironment,
+    DEFAULT_ENV_COLORS,
+    resolveOrgColor,
+    orgFaviconDataUrl,
     ORG_PARTITIONS,
     TAB_COLORS,
     tabColorVars,

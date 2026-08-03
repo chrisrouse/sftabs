@@ -263,6 +263,10 @@
                 <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M271 27a19 19 0 0 0-22 0C164 91 85 151 85 267a169 169 0 0 0 47 123l7 7a179 179 0 0 0 106 42l-18 31s-20 27 27 27h12c47 0 26-27 26-27l-17-31a179 179 0 0 0 106-42c35-31 54-76 54-129 0-117-79-177-164-241m101 324a97 97 0 0 1-10 11 108 108 0 0 0-202-5 102 102 0 0 1-15-17 150 150 0 0 1-19-108c12-67 61-110 134-166 86 65 137 114 137 201a137 137 0 0 1-25 84"/><circle cx="260" cy="207" r="62"/></svg>
                 <span class="settings-tile-label">__MSG_profilesSection__</span>
               </button>
+              <button type="button" class="settings-tile" data-settings-section="org-colors">
+                <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40"/></svg>
+                <span class="settings-tile-label">__MSG_orgColorsSection__</span>
+              </button>
               <button type="button" class="settings-tile" data-settings-section="data">
                 <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M479 293c0-8-7-15-15-15h-35c-8 0-14 6-14 14l-1 7a148 148 0 0 1-250 69c-5-4-9-9-12-14-3-8 4-12 13-12h70c8 0 15-7 15-15v-31c0-8-6-14-14-14H53c-7 0-13 6-13 13v182c1 8 8 15 16 15h30c8 0 15-7 15-15v-70c0-9 5-13 12-7l10 10a210 210 0 0 0 262 28 210 210 0 0 0 94-143zM41 227c0 8 7 15 15 15h35c8 0 14-6 14-14l1-7a148 148 0 0 1 250-69c5 4 9 9 12 14 3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V43c-1-8-8-15-16-15h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 0 0-262-28A210 210 0 0 0 41 225z"/></svg>
                 <span class="settings-tile-label">__MSG_settingsNavData__</span>
@@ -444,6 +448,44 @@
                 </div>
             </section>
 
+            <section class="settings-section" data-settings-section="org-colors"
+              aria-labelledby="s-org-colors" hidden>
+              <h3 class="settings-section-title sr-only" id="s-org-colors">__MSG_orgColorsSection__</h3>
+
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-org-colors">
+                    <span class="settings-label">__MSG_orgColorsLabel__</span>
+                    <span class="settings-desc">__MSG_orgColorsDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_orgColorsLabel__">
+                      <input type="checkbox" id="setting-org-colors" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Everything below is meaningless while the feature is off -->
+                <div id="org-colors-body">
+                  <h4 class="settings-subhead">__MSG_orgColorsByEnvironment__</h4>
+                  <table class="color-table">
+                    <tbody id="env-color-rows">
+                      <!-- Populated by renderEnvColors() -->
+                    </tbody>
+                  </table>
+                  <p class="form-hint">__MSG_orgColorsEnvHint__</p>
+
+                  <h4 class="settings-subhead">__MSG_orgColorsSpecificOrgs__</h4>
+                  <table class="color-table">
+                    <tbody id="org-color-rows">
+                      <!-- Populated by renderOrgColors() -->
+                    </tbody>
+                  </table>
+                  <p class="form-hint" id="org-colors-empty" hidden>__MSG_orgColorsNoOrgs__</p>
+                  <button class="btn-secondary" id="btn-capture-org-color">__MSG_captureCurrentOrg__</button>
+                  <p class="form-hint">__MSG_orgColorsOrgHint__</p>
+                </div>
+            </section>
             <section class="settings-section" data-settings-section="data"
               aria-labelledby="s-data" hidden>
               <h3 class="settings-section-title sr-only" id="s-data">__MSG_settingsNavData__</h3>

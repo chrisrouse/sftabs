@@ -3111,5 +3111,74 @@
   "menuBarQuickAddDesc": {
     "message": "Adds a + at the end of your tabs that captures the current page without opening this popup",
     "description": "Description under the menu-bar Quick Add setting"
+  },
+  "orgColorsSection": {
+    "message": "Org Colors",
+    "description": "Settings hub tile for tab icon colors"
+  },
+  "orgColorsLabel": {
+    "message": "Color the browser tab icon",
+    "description": "Master toggle for org colors"
+  },
+  "orgColorsDesc": {
+    "message": "Tints the Salesforce icon in your browser tab so you can tell orgs apart at a glance",
+    "description": "Description under the org colors toggle"
+  },
+  "orgColorsByEnvironment": {
+    "message": "By environment",
+    "description": "Subheading for the environment color table"
+  },
+  "orgColorsEnvHint": {
+    "message": "Used for any org without a color of its own.",
+    "description": "Hint under the environment table"
+  },
+  "orgColorsSpecificOrgs": {
+    "message": "Specific orgs",
+    "description": "Subheading for the per-org color table"
+  },
+  "orgColorsOrgHint": {
+    "message": "Orgs linked to a profile are listed automatically. Set a color here to override its environment — the only way to tell two sandboxes apart, since their web addresses look the same.",
+    "description": "Hint under the per-org table"
+  },
+  "orgColorsNoOrgs": {
+    "message": "No orgs yet. Open a Salesforce tab and add it.",
+    "description": "Empty state for the per-org table"
+  },
+  "orgColorsFromProfile": {
+    "message": "from profile “$NAME$”",
+    "description": "Note beside an org that came from a profile",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "orgEnv_production": {
+    "message": "Production",
+    "description": "Org environment name"
+  },
+  "orgEnv_sandbox": {
+    "message": "Sandbox",
+    "description": "Org environment name"
+  },
+  "orgEnv_developer": {
+    "message": "Developer Edition",
+    "description": "Org environment name"
+  },
+  "orgEnv_scratch": {
+    "message": "Scratch org",
+    "description": "Org environment name"
+  },
+  "orgEnv_demo": {
+    "message": "Demo org",
+    "description": "Org environment name"
+  },
+  "orgEnv_playground": {
+    "message": "Trailhead Playground",
+    "description": "Org environment name"
+  },
+  "orgEnv_patch": {
+    "message": "Patch org",
+    "description": "Org environment name"
   }
 }

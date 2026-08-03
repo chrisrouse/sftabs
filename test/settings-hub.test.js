@@ -109,6 +109,7 @@ if (viewsLine) {
 ['setting-compact', 'setting-tab-colors', 'row-tab-color-style', 'setting-skip-delete',
  'setting-profiles', 'setting-auto-switch', 'auto-switch-hint', 'profiles-manage',
  'profiles-list', 'btn-new-profile-from-list',
+ 'setting-menu-bar-quick-add', 'setting-org-colors', 'env-color-rows', 'org-color-rows',
  'btn-advanced-settings', 'settings-title', 'settings-hub'].forEach(id => {
   const n = (panel.match(new RegExp(`id="${id}"`, 'g')) || []).length;
   check(`#${id} appears exactly once in the panel`, n === 1, n === 1 ? '' : `found ${n}`);
@@ -129,6 +130,8 @@ const BELONGS_IN = {
   general:  ['setting-compact', 'setting-skip-delete'],
   tabs:     ['setting-tab-colors', 'row-tab-color-style', 'setting-quick-add-all'],
   profiles: ['setting-profiles', 'setting-auto-switch', 'profiles-list'],
+  'org-colors': ['setting-org-colors', 'org-colors-body', 'env-color-rows',
+                 'org-color-rows', 'btn-capture-org-color'],
 };
 Object.entries(BELONGS_IN).forEach(([section, ids]) => {
   const body = sectionBody(section);
@@ -175,7 +178,10 @@ check('editing hides the control rather than disabling it',
 const refreshMap = /SETTINGS_SECTION_REFRESH = \{([\s\S]*?)\n\};/.exec(js);
 check('the refresh map exists', Boolean(refreshMap));
 if (refreshMap) {
-  const refreshed = [...refreshMap[1].matchAll(/^ {2}([a-z-]+):/gm)].map(m => m[1]);
+  // Quoted as well as bare: a section id with a hyphen cannot be a bare key,
+  // so 'org-colors' was read as absent and the check failed on a map entry that
+  // was in fact there.
+  const refreshed = [...refreshMap[1].matchAll(/^ {2}'?([a-z-]+)'?:/gm)].map(m => m[1]);
   const needsRefresh = sections.filter(id => /Populated by/.test(sectionBody(id)));
   check('every runtime-built section refreshes when opened',
     needsRefresh.every(id => refreshed.includes(id)),

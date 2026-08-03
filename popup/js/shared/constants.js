@@ -103,6 +103,15 @@ const DEFAULT_SETTINGS = {
   // A "+" at the end of the injected Setup tab bar that captures the current
   // page without opening the popup.
   menuBarQuickAdd: false,
+  // Tints the browser tab's favicon so orgs are told apart in the tab strip.
+  // Two layers: every org gets its environment's colour, and an entry in `orgs`
+  // overrides that for one org — which is the only way to separate sandboxes,
+  // since the hostname never says which tier a sandbox is.
+  orgColors: {
+    enabled: false,
+    environments: {},   // environment -> hex; empty means use DEFAULT_ENV_COLORS
+    orgs: []            // { identifier, environment, color }
+  },
   // Optional per-tab colors. Off by default, and switching it off only stops
   // the colors rendering — the stored tab.color values are left alone.
   tabColors: {

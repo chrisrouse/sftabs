@@ -30,6 +30,18 @@ function t(key, ...subs) {
   return chrome.i18n.getMessage(key, subs.map(String)) || key;
 }
 
+/**
+ * Icons drawn in more than one row template.
+ *
+ * Vendored SLDS utility paths — icons/slds/delete.svg and edit.svg — hoisted
+ * because the delete glyph alone had been pasted four times, in wrappers that
+ * had already drifted apart on the focusable attribute. Long enough that a
+ * divergent copy would not be caught in review. Single-use icons stay inline,
+ * where they read better than an indirection.
+ */
+const ICON_DELETE = '<svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>';
+const ICON_EDIT = '<svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>';
+
 // ── State ──────────────────────────────────────────────────────
 let state = {
   tabs:            [],
@@ -825,7 +837,7 @@ function tabItemHTML(tab) {
       </button>
       <button class="tab-btn tab-btn--edit"
         aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}" data-action="edit" data-id="${tab.id}">
-        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
+        ${ICON_EDIT}
       </button>
       <button class="tab-btn tab-btn--newtab ${newTabOn}"
         aria-label="${newTabAriaLabel}" aria-pressed="${!!tab.openInNewTab}"
@@ -834,7 +846,7 @@ function tabItemHTML(tab) {
       </button>
       <button class="tab-btn tab-btn--delete"
         aria-label="${t('ariaDeleteNamed', name)}" title="${t('deleteButtonTitle')}" data-action="delete" data-id="${tab.id}">
-        <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
+        ${ICON_DELETE}
       </button>
     </div>
   </li>`;
@@ -1193,12 +1205,12 @@ function renderProfilesList() {
         </button>
         <button class="tab-btn tab-btn--edit" data-action="edit-profile" data-id="${p.id}"
           aria-label="${t('ariaEditNamed', name)}" title="${t('editButton')}">
-          <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
+          ${ICON_EDIT}
         </button>
         ${state.profiles.length > 1 ? `
         <button class="tab-btn tab-btn--delete" data-action="delete-profile" data-id="${p.id}"
           aria-label="${t('ariaDeleteNamed', name)}" title="${t('deleteButtonTitle')}">
-          <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true" focusable="false"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
+          ${ICON_DELETE}
         </button>` : ''}
       </div>
     </li>`;
@@ -1459,6 +1471,7 @@ const SETTINGS_SECTION_REFRESH = {
     renderProfilesList();
     syncAutoSwitchRow();
   },
+  'org-colors': () => syncOrgColorsSection(),
 };
 
 /**
@@ -1650,7 +1663,7 @@ function itemRow(item, path, level) {
       </button>` : ''}
       <button class="tab-btn tab-btn--edit" data-action="edit-item" data-path="${pathKey(path)}"
         aria-label="${t('ariaEditNamed', label)}" title="${t('editButton')}">
-        <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true"><path d="m95 334 89 89c4 4 10 4 14 0l222-223c4-4 4-10 0-14l-88-88a10 10 0 0 0-14 0L95 321c-4 4-4 10 0 13M361 57a10 10 0 0 0 0 14l88 88c4 4 10 4 14 0l25-25a38 38 0 0 0 0-55l-47-47a40 40 0 0 0-57 0zM21 482c-2 10 7 19 17 17l109-26c4-1 7-3 9-5l2-2c2-2 3-9-1-13l-90-90c-4-4-11-3-13-1l-2 2a20 20 0 0 0-5 9z"/></svg>
+        ${ICON_EDIT}
       </button>
       <button class="tab-btn tab-btn--promote" data-action="promote-item" data-path="${pathKey(path)}"
         aria-label="${path.length === 1 ? t('ariaPromoteToTab', label) : t('ariaPromoteLevel', label)}"
@@ -1659,7 +1672,7 @@ function itemRow(item, path, level) {
       </button>
       <button class="tab-btn tab-btn--delete" data-action="delete-item" data-path="${pathKey(path)}"
         aria-label="${t('ariaDeleteNamed', label)}" title="${t('deleteButtonTitle')}">
-        <svg viewBox="0 0 52 52" fill="currentColor" aria-hidden="true"><path d="M45.5 10H33V6a4 4 0 0 0-4-4h-6a4 4 0 0 0-4 4v4H6.5c-.8 0-1.5.7-1.5 1.5v3c0 .8.7 1.5 1.5 1.5h39c.8 0 1.5-.7 1.5-1.5v-3c0-.8-.7-1.5-1.5-1.5M23 7c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v3h-6zm18.5 13h-31c-.8 0-1.5.7-1.5 1.5V45a5 5 0 0 0 5 5h24a5 5 0 0 0 5-5V21.5c0-.8-.7-1.5-1.5-1.5M23 42c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1zm10 0c0 .6-.4 1-1 1h-2c-.6 0-1-.4-1-1V28c0-.6.4-1 1-1h2c.6 0 1 .4 1 1z"/></svg>
+        ${ICON_DELETE}
       </button>
     </div>`;
   return li;
@@ -2330,6 +2343,179 @@ function colorLabel(name) {
   return t('colorWithShade', hue, t(shade === 'deep' ? 'colorShadeDeep' : 'colorShadeLight'));
 }
 
+// ── Org colors ─────────────────────────────────────────────────
+
+/** The stored config, with the shape the renderers expect. */
+function orgColorConfig() {
+  const stored = state.settings.orgColors || {};
+  return {
+    enabled: !!stored.enabled,
+    environments: stored.environments || {},
+    orgs: Array.isArray(stored.orgs) ? stored.orgs : [],
+  };
+}
+
+/** A 16px preview of exactly what the browser tab will show. */
+function orgColorSwatch(color) {
+  return `<img class="color-table-ico" alt="" src="${esc(SFTabs.utils.orgFaviconDataUrl(color))}" />`;
+}
+
+/**
+ * The environments we can name from a hostname alone.
+ *
+ * Not the five an admin thinks in: Full Copy, Partial Copy, Developer and
+ * Developer Pro all arrive as `--name.sandbox` with nothing to tell them apart.
+ * Separating those is what the per-org list below is for.
+ */
+const ORG_COLOR_ENVIRONMENTS = ['production', 'sandbox', 'developer', 'scratch', 'demo', 'playground', 'patch'];
+
+function renderEnvColors() {
+  const rows = document.getElementById('env-color-rows');
+  if (!rows) return;
+  const { environments } = orgColorConfig();
+  const defaults = SFTabs.utils.DEFAULT_ENV_COLORS;
+
+  rows.innerHTML = ORG_COLOR_ENVIRONMENTS.map(env => {
+    const color = environments[env] || defaults[env];
+    return `<tr>
+      <td class="color-table-swatch">${orgColorSwatch(color)}</td>
+      <td class="color-table-name">${esc(t('orgEnv_' + env))}</td>
+      <td class="color-table-input">
+        <input type="color" value="${esc(color)}" data-env-color="${esc(env)}"
+          aria-label="${esc(t('orgEnv_' + env))}" />
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/**
+ * Orgs with a colour of their own, plus every org any profile is linked to.
+ *
+ * Profiles already carry org identifiers in urlPatterns, so listing them costs
+ * nothing and saves retyping `acme--dev1` by hand. A profile org with no colour
+ * set yet shows its environment's colour, same as it would in the tab strip.
+ */
+function orgColorRows() {
+  const { orgs } = orgColorConfig();
+  const rows = orgs.map(entry => ({ ...entry, source: 'saved' }));
+  const seen = new Set(rows.map(r => String(r.identifier).toLowerCase()));
+
+  state.profiles.forEach(profile => {
+    (profile.urlPatterns || []).forEach(pattern => {
+      const key = String(pattern).toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      rows.push({ identifier: pattern, environment: null, color: null, source: profile.name });
+    });
+  });
+  return rows;
+}
+
+function renderOrgColors() {
+  const rows = document.getElementById('org-color-rows');
+  if (!rows) return;
+
+  const entries = orgColorRows();
+  const defaults = SFTabs.utils.DEFAULT_ENV_COLORS;
+  document.getElementById('org-colors-empty').hidden = entries.length > 0;
+
+  rows.innerHTML = entries.map((entry, index) => {
+    const env = entry.environment || 'sandbox';
+    const color = entry.color || defaults[env];
+    const note = entry.source === 'saved'
+      ? t('orgEnv_' + env)
+      : t('orgColorsFromProfile', entry.source);
+    return `<tr>
+      <td class="color-table-swatch">${orgColorSwatch(color)}</td>
+      <td class="color-table-name">${esc(entry.identifier)}<span class="color-table-note">${esc(note)}</span></td>
+      <td class="color-table-input">
+        <input type="color" value="${esc(color)}" data-org-index="${index}"
+          aria-label="${esc(entry.identifier)}" />
+      </td>
+      <td class="color-table-del">
+        ${entry.source === 'saved'
+          ? `<button type="button" class="tab-btn tab-btn--delete" data-org-remove="${index}"
+               aria-label="${esc(t('removeButton'))}" title="${esc(t('removeButton'))}">${ICON_DELETE}</button>`
+          : ''}
+      </td>
+    </tr>`;
+  }).join('');
+
+  rows.querySelectorAll('[data-org-index]').forEach(input => {
+    input.addEventListener('change', () => saveOrgColor(entries[+input.dataset.orgIndex], input.value));
+  });
+  rows.querySelectorAll('[data-org-remove]').forEach(button => {
+    button.addEventListener('click', () => removeOrgColor(entries[+button.dataset.orgRemove]));
+  });
+}
+
+/** Write one org's colour, adding the entry if it only existed as a profile link. */
+async function saveOrgColor(entry, color) {
+  const config = orgColorConfig();
+  const environment = entry.environment || 'sandbox';
+  const at = config.orgs.findIndex(o =>
+    String(o.identifier).toLowerCase() === String(entry.identifier).toLowerCase());
+
+  const next = at === -1
+    ? [...config.orgs, { identifier: entry.identifier, environment, color }]
+    : config.orgs.map((o, i) => (i === at ? { ...o, color } : o));
+
+  await patchSettings({ orgColors: { ...config, orgs: next } });
+  renderOrgColors();
+}
+
+async function removeOrgColor(entry) {
+  const config = orgColorConfig();
+  const next = config.orgs.filter(o =>
+    String(o.identifier).toLowerCase() !== String(entry.identifier).toLowerCase());
+  await patchSettings({ orgColors: { ...config, orgs: next } });
+  renderOrgColors();
+}
+
+/**
+ * Add the org of the page in front of us.
+ *
+ * Deliberately the same four outcomes as captureCurrentOrg on the profile form,
+ * reusing its strings: no tab, not Salesforce, already listed, added. Two
+ * captures that behave alike should also read alike.
+ */
+async function captureOrgColor() {
+  try {
+    const [active] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (!active?.url) return showStatus(t('noActiveTab'), 'error');
+
+    const identifier = SFTabs.utils.extractOrgIdentifier(active.url);
+    if (!identifier) return showStatus(t('notASalesforceOrg'), 'error');
+
+    const config = orgColorConfig();
+    if (config.orgs.some(o => String(o.identifier).toLowerCase() === identifier.toLowerCase())) {
+      return showStatus(t('orgAlreadyLinked', identifier));
+    }
+
+    const environment = SFTabs.utils.detectOrgEnvironment(active.url) || 'sandbox';
+    const color = config.environments[environment] || SFTabs.utils.DEFAULT_ENV_COLORS[environment];
+    await patchSettings({
+      orgColors: { ...config, orgs: [...config.orgs, { identifier, environment, color }] },
+    });
+    renderOrgColors();
+    showStatus(t('orgCaptured', identifier));
+  } catch (err) {
+    showStatus(t('errorCouldNotSave', err.message), 'error');
+  }
+}
+
+/** Keep the section in step; the lists are moot while the feature is off. */
+function syncOrgColorsSection() {
+  const toggle = document.getElementById('setting-org-colors');
+  if (!toggle) return;
+  const { enabled } = orgColorConfig();
+  toggle.checked = enabled;
+  document.getElementById('org-colors-body').hidden = !enabled;
+  if (!enabled) return;
+  renderEnvColors();
+  renderOrgColors();
+}
+
 // ── Theme ──────────────────────────────────────────────────────
 
 function applyTheme(theme) {
@@ -2531,6 +2717,24 @@ function bindEvents() {
       bindTabListEvents();
     });
   });
+
+  document.getElementById('setting-org-colors').addEventListener('change', async e => {
+    await patchSettings({ orgColors: { ...orgColorConfig(), enabled: e.target.checked } });
+    syncOrgColorsSection();
+  });
+
+  document.getElementById('env-color-rows').addEventListener('change', async e => {
+    const input = e.target.closest('[data-env-color]');
+    if (!input) return;
+    const config = orgColorConfig();
+    await patchSettings({
+      orgColors: { ...config, environments: { ...config.environments, [input.dataset.envColor]: input.value } },
+    });
+    renderEnvColors();
+    renderOrgColors();   // profile-linked rows show their environment's colour
+  });
+
+  document.getElementById('btn-capture-org-color').addEventListener('click', captureOrgColor);
 
   document.getElementById('setting-menu-bar-quick-add').addEventListener('change', async e => {
     await patchSettings({ menuBarQuickAdd: e.target.checked });

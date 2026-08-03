@@ -981,6 +981,59 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 #btn-new-profile-from-list { margin-top: var(--sft-spacing-3); }
 #profiles-manage > .form-hint { margin-top: var(--sft-spacing-2); }
 
+/* ── Org colors ──
+   A three-column table so the 16px previews line up whatever the org names are.
+   The preview is the real favicon data URL, not an approximation of it. */
+.settings-subhead {
+  font-size: var(--sft-font-size-xs);
+  font-weight: var(--sft-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--t-weak);
+  margin: var(--sft-spacing-3) 0 2px;
+}
+
+.color-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.color-table td {
+  padding: 5px 0;
+  vertical-align: middle;
+  border-bottom: var(--sft-border-width-1) solid var(--b-subtle);
+}
+.color-table tr:last-child td { border-bottom: none; }
+.color-table-swatch { width: 24px; }
+.color-table-ico { width: 16px; height: 16px; display: block; }
+.color-table-name {
+  font-size: var(--sft-font-size-base);
+  color: var(--t-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.color-table-note {
+  display: block;
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+}
+.color-table-input { width: 42px; text-align: right; }
+/* Reset the platform chrome so the well reads as a swatch rather than a button */
+.color-table-input input[type="color"] {
+  width: 34px;
+  height: 22px;
+  padding: 0;
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--r-sm);
+  background: none;
+  cursor: pointer;
+}
+.color-table-input input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+.color-table-input input[type="color"]::-webkit-color-swatch { border: none; border-radius: 2px; }
+.color-table-del { width: 28px; text-align: right; }
+
+#btn-capture-org-color { margin-top: var(--sft-spacing-2); }
+
 /* ── Which profiles hold this tab ──
    A table rather than a list of labels: three columns keep the names aligned
    whatever their length, and the third carries the "current" marker without
