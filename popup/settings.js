@@ -19,13 +19,31 @@ async function initSettingsPage() {
 		}
 	}
 
-	// Apply current theme
 	applyTheme();
-
-	// Initialize UI
-	initThemeSelector();
-	updateUI();
 	setupEventListeners();
+}
+
+/**
+ * Apply theme based on current settings
+ */
+function applyTheme() {
+	if (userSettings.themeMode === 'system') {
+		// Check system preference
+		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			document.documentElement.setAttribute('data-theme', 'dark');
+		} else {
+			document.documentElement.setAttribute('data-theme', 'light');
+		}
+
+		// Listen for changes in system theme
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+			const newTheme = e.matches ? 'dark' : 'light';
+			document.documentElement.setAttribute('data-theme', newTheme);
+		});
+	} else {
+		// Apply user selected theme
+		document.documentElement.setAttribute('data-theme', userSettings.themeMode);
+	}
 }
 
 /**
@@ -101,47 +119,6 @@ async function saveUserSettings() {
 }
 
 /**
- * Apply theme based on current settings
- */
-function applyTheme() {
-	if (userSettings.themeMode === 'system') {
-		// Check system preference
-		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-			document.documentElement.setAttribute('data-theme', 'dark');
-		} else {
-			document.documentElement.setAttribute('data-theme', 'light');
-		}
-
-		// Listen for changes in system theme
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-			const newTheme = e.matches ? 'dark' : 'light';
-			document.documentElement.setAttribute('data-theme', newTheme);
-		});
-	} else {
-		// Apply user selected theme
-		document.documentElement.setAttribute('data-theme', userSettings.themeMode);
-	}
-}
-
-function toggleAutoSwitchVisibility() {
-	const autoSwitchContainer = document.getElementById('auto-switch-container');
-	const disableProfilesContainer = document.getElementById('disable-profiles-container');
-	const enableProfilesCheckbox = document.getElementById('enable-profiles');
-	const profilesEnabled = enableProfilesCheckbox.checked;
-
-	autoSwitchContainer.style.display = profilesEnabled ? 'block' : 'none';
-	disableProfilesContainer.style.display = profilesEnabled ? 'block' : 'none';
-
-	// Disable the checkbox when profiles are enabled (user must use Disable Profiles button)
-	enableProfilesCheckbox.disabled = profilesEnabled;
-
-	// Populate the profile dropdown when showing the section
-	if (profilesEnabled && window.SFTabs && window.SFTabs.profiles && window.SFTabs.profiles.populateProfileSelect) {
-		window.SFTabs.profiles.populateProfileSelect();
-	}
-}
-
-/**
  * Setup sidebar navigation
  */
 function setupNavigation() {
@@ -207,113 +184,6 @@ function setupEventListeners() {
 	// Setup sidebar navigation
 	setupNavigation();
 
-	// Compact mode
-	document.getElementById('compact-mode').addEventListener('change', async (e) => {
-		userSettings.compactMode = e.target.checked;
-		await saveUserSettings();
-	});
-
-	// Skip delete confirmation
-	document.getElementById('skip-delete-confirmation').addEventListener('change', async (e) => {
-		userSettings.skipDeleteConfirmation = e.target.checked;
-		await saveUserSettings();
-	});
-
-	// Storage option buttons
-	const storageOptions = document.querySelectorAll('[data-storage]');
-	storageOptions.forEach(option => {
-		option.addEventListener('click', async () => {
-			const storageType = option.getAttribute('data-storage');
-			const newValue = storageType === 'sync';
-			const oldValue = userSettings.useSyncStorage;
-
-			// Don't do anything if already selected
-			if (newValue === oldValue) {
-				return;
-			}
-
-			// When ENABLING sync, check for conflicts
-			if (newValue) {
-				const conflict = await detectSyncConflict();
-
-				if (conflict.hasConflict) {
-					// Show conflict resolution UI
-					await showSyncConflictDialog(conflict);
-					return;
-				}
-			}
-
-			const confirmed = confirm(
-				newValue
-					? chrome.i18n.getMessage('enableSyncConfirmTitle') + '\n\n' + chrome.i18n.getMessage('enableSyncConfirmMessage')
-					: chrome.i18n.getMessage('disableSyncConfirmTitle') + '\n\n' + chrome.i18n.getMessage('disableSyncConfirmMessage')
-			);
-
-			if (confirmed) {
-				userSettings.useSyncStorage = newValue;
-				try {
-					// Perform migration if needed
-					await migrateBetweenStorageTypes(oldValue, newValue);
-					await saveUserSettings();
-
-					// Update UI
-					const localOption = document.getElementById('settings-storage-option-local');
-					const syncOption = document.getElementById('settings-storage-option-sync');
-					const localRadio = document.getElementById('settings-storage-local');
-					const syncRadio = document.getElementById('settings-storage-sync');
-
-					if (newValue) {
-						syncOption.classList.add('active');
-						localOption.classList.remove('active');
-						syncRadio.checked = true;
-						localRadio.checked = false;
-					} else {
-						localOption.classList.add('active');
-						syncOption.classList.remove('active');
-						localRadio.checked = true;
-						syncRadio.checked = false;
-					}
-
-					showStatus(
-						newValue ? chrome.i18n.getMessage('syncEnabled') : chrome.i18n.getMessage('syncDisabled'),
-						false
-					);
-				} catch (error) {
-					showStatus(chrome.i18n.getMessage('errorSavingSettings', [error.message]), true);
-					userSettings.useSyncStorage = oldValue;
-					// Restore UI state
-					updateUI();
-				}
-			}
-		});
-	});
-
-	// Enable profiles
-	document.getElementById('enable-profiles').addEventListener('change', async (e) => {
-		const enableProfiles = e.target.checked;
-
-		if (enableProfiles) {
-			userSettings.profilesEnabled = true;
-			await saveUserSettings();
-			toggleAutoSwitchVisibility();
-		}
-		// Note: Checkbox is disabled when profiles are enabled, so user cannot uncheck it
-		// They must use the "Disable Profiles" button instead
-	});
-
-	// Disable profiles button (inline section)
-	document.getElementById('disable-profiles-button').addEventListener('click', async () => {
-		if (window.SFTabs && window.SFTabs.profiles && window.SFTabs.profiles.disableProfilesFromInline) {
-			await window.SFTabs.profiles.disableProfilesFromInline();
-		}
-	});
-
-	// Auto-switch profiles
-	document.getElementById('auto-switch-profiles').addEventListener('change', async (e) => {
-		userSettings.autoSwitchProfiles = e.target.checked;
-		await saveUserSettings();
-	});
-
 	// Export mode radio buttons
 	document.getElementById('export-everything-radio').addEventListener('change', () => {
 		toggleExportCustomOptions();
@@ -375,18 +245,6 @@ function setupEventListeners() {
 		});
 	});
 
-	// Reset button
-	document.getElementById('reset-button').addEventListener('click', async () => {
-		const confirmed = confirm(
-			chrome.i18n.getMessage('resetModalTitle') + '\n\n' + chrome.i18n.getMessage('resetModalPrompt') + '\n\n' +
-			chrome.i18n.getMessage('resetModalWarning')
-				);
-
-		if (confirmed) {
-			await resetToDefaults();
-		}
-	});
-
 	// User guide link
 	document.getElementById('user-guide-link').addEventListener('click', (e) => {
 		e.preventDefault();
@@ -395,59 +253,6 @@ function setupEventListeners() {
 		});
 	});
 
-	// Export before disable link (navigate to Import/Export section)
-	document.getElementById('export-before-disable-link').addEventListener('click', (e) => {
-		e.preventDefault();
-
-		// Navigate to Import/Export section
-		const navItems = document.querySelectorAll('.settings-nav-item');
-		const sections = document.querySelectorAll('.settings-section');
-
-		navItems.forEach(nav => {
-			nav.classList.remove('active');
-			nav.setAttribute('aria-selected', 'false');
-		});
-
-		const importExportNav = document.querySelector('.settings-nav-item[data-section="import-export"]');
-		if (importExportNav) {
-			importExportNav.classList.add('active');
-			importExportNav.setAttribute('aria-selected', 'true');
-		}
-
-		sections.forEach(section => section.classList.remove('active'));
-		const importExportSection = document.getElementById('section-import-export');
-		if (importExportSection) {
-			importExportSection.classList.add('active');
-			importExportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}
-	});
-
-	// Export before reset link (navigate to Import/Export section)
-	document.getElementById('export-before-reset-link').addEventListener('click', (e) => {
-		e.preventDefault();
-
-		// Navigate to Import/Export section
-		const navItems = document.querySelectorAll('.settings-nav-item');
-		const sections = document.querySelectorAll('.settings-section');
-
-		navItems.forEach(nav => {
-			nav.classList.remove('active');
-			nav.setAttribute('aria-selected', 'false');
-		});
-
-		const importExportNav = document.querySelector('.settings-nav-item[data-section="import-export"]');
-		if (importExportNav) {
-			importExportNav.classList.add('active');
-			importExportNav.setAttribute('aria-selected', 'true');
-		}
-
-		sections.forEach(section => section.classList.remove('active'));
-		const importExportSection = document.getElementById('section-import-export');
-		if (importExportSection) {
-			importExportSection.classList.add('active');
-			importExportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}
-	});
 }
 
 /**
@@ -1061,10 +866,11 @@ async function performImportFromInline() {
 		hideImportOptions();
 		showStatus(chrome.i18n.getMessage('configImported'), false);
 
-		// Reload UI
+		// Profiles may have changed, so the export picker is refreshed rather
+		// than the settings controls that used to live on this page
 		await loadUserSettings();
-		updateUI();
 		applyTheme();
+		if (document.getElementById('export-custom-radio').checked) populateInlineProfilesList();
 	} catch (error) {
 		showStatus(chrome.i18n.getMessage('errorImport', [error.message]), true);
 	}
@@ -1411,51 +1217,6 @@ async function importOnlySettings(importData) {
 }
 
 /**
- * Reset everything to defaults
- */
-async function resetToDefaults() {
-	try {
-		// Reset settings
-		userSettings = { ...SFTabs.constants.DEFAULT_SETTINGS };
-		await browser.storage.sync.set({ userSettings });
-
-		// Reset tabs to defaults
-		await browser.storage.sync.set({ tabs: SFTabs.constants.DEFAULT_TABS });
-
-		// Remove profiles
-		await browser.storage.sync.remove(['profiles', 'activeProfileId', 'defaultProfileId']);
-
-		// Clear chunked data and profile-specific storage
-		const syncData = await browser.storage.sync.get(null);
-		const localData = await browser.storage.local.get(null);
-
-		// Remove chunked data from sync storage
-		const syncChunkedKeys = Object.keys(syncData).filter(key =>
-			key.includes('_chunk_') || key.includes('_metadata') || key.startsWith('profile_')
-		);
-		if (syncChunkedKeys.length > 0) {
-			await browser.storage.sync.remove(syncChunkedKeys);
-		}
-
-		// Remove chunked data from local storage
-		const localChunkedKeys = Object.keys(localData).filter(key =>
-			key.includes('_chunk_') || key.includes('_metadata') || key.startsWith('profile_')
-		);
-		if (localChunkedKeys.length > 0) {
-			await browser.storage.local.remove(localChunkedKeys);
-		}
-
-		// Reload UI
-		updateUI();
-		applyTheme();
-
-		showStatus(chrome.i18n.getMessage('settingsReset'), false);
-	} catch (error) {
-		showStatus(chrome.i18n.getMessage('errorReset', [error.message]), true);
-	}
-}
-
-/**
  * Detect if enabling sync would cause a data conflict
  * @returns {Object} Conflict information
  */
@@ -1551,17 +1312,8 @@ async function showSyncConflictDialog(conflict) {
 			userSettings.useSyncStorage = true;
 			await saveUserSettings();
 
-			// Update UI
-			const localOption = document.getElementById('settings-storage-option-local');
-			const syncOption = document.getElementById('settings-storage-option-sync');
-			const localRadio = document.getElementById('settings-storage-local');
-			const syncRadio = document.getElementById('settings-storage-sync');
-
-			syncOption.classList.add('active');
-			localOption.classList.remove('active');
-			syncRadio.checked = true;
-			localRadio.checked = false;
-
+			// The storage controls this used to update live in the popup now;
+			// the merge itself is what matters here.
 			showStatus(chrome.i18n.getMessage('dataMergedSyncEnabled'), false);
 		} catch (error) {
 			showStatus(chrome.i18n.getMessage('errorMerge', [error.message]), true);

@@ -238,5 +238,39 @@ check('every element the advanced page still reaches for exists in it',
   [...new Set([...advancedJs.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]))]
     .every(id => advancedHtml.includes(`id="${id}"`)));
 
+// Checking elements is not enough. Removing a section also removes functions,
+// and a helper that deletes by brace-matching will happily take the neighbour
+// above it when that neighbour's docblock is the nearest one — which is how
+// updateUI and initThemeSelector vanished. Nothing threw at build time; the
+// page simply stopped wiring anything, because initSettingsPage died on the
+// first missing name before it reached setupEventListeners.
+const loadedScripts = [...advancedHtml.matchAll(/<script src="([^"]+)"/g)]
+  .map(m => path.join(root, 'popup', m[1]))
+  .filter(f => fs.existsSync(f));
+
+const availableFns = new Set();
+loadedScripts.forEach(file => {
+  const src = fs.readFileSync(file, 'utf8');
+  [...src.matchAll(/^(?:async )?function ([A-Za-z0-9_$]+)/gm)].forEach(m => availableFns.add(m[1]));
+  [...src.matchAll(/(?:const|let|var) ([A-Za-z0-9_$]+)\s*=\s*(?:async\s*)?\(/g)].forEach(m => availableFns.add(m[1]));
+  [...src.matchAll(/^\s*([A-Za-z0-9_$]+)[,:]\s*$/gm)].forEach(m => availableFns.add(m[1]));
+});
+
+const BROWSER_GLOBALS = new Set([
+  'if', 'for', 'while', 'switch', 'catch', 'function', 'return', 'typeof', 'await', 'new',
+  'async', 'var', 'setTimeout', 'clearTimeout', 'setInterval', 'confirm', 'alert', 'fetch',
+  'parseInt', 'parseFloat', 'isNaN', 'encodeURIComponent', 'decodeURIComponent',
+  'console', 'document', 'window', 'chrome', 'browser', 'structuredClone',
+]);
+
+const code = advancedJs
+  .replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '')
+  .replace(/'[^']*'/g, "''").replace(/"[^"]*"/g, '""').replace(/`[^`]*`/g, '``');
+const undefinedCalls = [...new Set([...code.matchAll(/(?<![\w.$])([a-z][A-Za-z0-9_$]*)\s*\(/g)]
+  .map(m => m[1]))].filter(n => !availableFns.has(n) && !BROWSER_GLOBALS.has(n));
+
+check('the advanced page calls no function that no longer exists',
+  undefinedCalls.length === 0, undefinedCalls.join(', ') || 'all resolved');
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

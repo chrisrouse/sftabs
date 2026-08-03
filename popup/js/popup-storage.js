@@ -628,6 +628,31 @@ setupStorageListeners();
 
 // Export functions for use by other modules
 window.SFTabs = window.SFTabs || {};
+/**
+ * Put the extension back to a fresh install.
+ *
+ * Both areas are cleared outright rather than rewritten with defaults, because
+ * the defaults ARE what empty storage produces — every reader in the codebase
+ * falls back to DEFAULT_SETTINGS or DEFAULT_TABS when its key is absent. The
+ * previous implementation wrote DEFAULT_TABS to a `tabs` key that nothing
+ * reads, touched only sync, and left the local mirror behind.
+ *
+ * Clearing sync propagates: this wipes the synced copy for every device signed
+ * into the same browser profile, not just this one. The confirmation has to say
+ * so, because nothing here can undo it.
+ */
+async function resetEverything() {
+  await browser.storage.local.clear();
+  try {
+    await browser.storage.sync.clear();
+  } catch (error) {
+    // A browser with sync disabled still has a working local area; a failure
+    // here should not leave the reset half-done and silent
+    console.warn('[SF Tabs] sync storage could not be cleared:', error.message);
+  }
+  return true;
+}
+
 window.SFTabs.storage = {
   getStoragePreference,
   getTabs,
@@ -635,6 +660,7 @@ window.SFTabs.storage = {
   getUserSettings,
   saveUserSettings,
   clearAllStorage,
+  resetEverything,
   exportConfiguration,
   importConfiguration,
   migrateBetweenStorageTypes,

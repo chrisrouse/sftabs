@@ -1083,8 +1083,13 @@
     "description": "Title of the disable profiles confirmation modal"
   },
   "disableProfilesBody": {
-    "message": "Disabling profiles will keep one profile and remove all others.",
-    "description": "Body text of the disable profiles modal"
+    "message": "Without profiles there is one set of tabs. The other $COUNT$ profiles and their tabs will be deleted.",
+    "description": "Explains what turning profiles off destroys",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "disableProfilesQuestion": {
     "message": "Which profile would you like to keep?",
@@ -3245,5 +3250,17 @@
   "floatingButtonOffsetDesc": {
     "message": "In pixels, so it stays put when the window resizes",
     "description": "Description under the offset slider"
+  },
+  "resetConfirmTitle": {
+    "message": "Reset everything?",
+    "description": "Title of the reset confirmation"
+  },
+  "resetConfirmBody": {
+    "message": "This removes every tab, profile and setting and cannot be undone. If your data is synced, it is removed from every device signed into this browser.",
+    "description": "Body of the reset confirmation"
+  },
+  "profilesDisabled": {
+    "message": "Profiles turned off",
+    "description": "Toast after disabling profiles"
   }
 }

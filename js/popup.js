@@ -2344,6 +2344,75 @@ function colorLabel(name) {
   return t('colorWithShade', hue, t(shade === 'deep' ? 'colorShadeDeep' : 'colorShadeLight'));
 }
 
+/**
+ * Turn profiles off, keeping one profile's tabs.
+ *
+ * Disabling is destructive in a way enabling is not: with the feature off there
+ * is one list of tabs, so every other profile's tabs stop being reachable. The
+ * advanced page always asked which to keep before doing this, and the popup's
+ * toggle did not — it flipped the flag and left the rest. Now that the popup is
+ * the only way to do it, it has to ask.
+ *
+ * The kept profile becomes both active and default, since background.js falls
+ * back to the default when nothing matches.
+ */
+async function disableProfilesKeeping(keepId) {
+  const keep = state.profiles.find(p => p.id === keepId);
+  if (!keep) return;
+
+  for (const profile of state.profiles) {
+    if (profile.id !== keepId) await removeProfileTabs(profile.id);
+  }
+
+  const remaining = [{ ...keep, isDefault: true, position: 0 }];
+  await SFTabs.storage.saveProfiles(remaining, false);
+  state.profiles = remaining;
+
+  await patchSettings({
+    profilesEnabled: false,
+    autoSwitchProfiles: false,
+    activeProfileId: keepId,
+    defaultProfileId: keepId,
+  });
+
+  state.tabs = (await SFTabs.storage.getProfileTabs(keepId)) || [];
+  renderTabList();
+  bindTabListEvents();
+  renderProfileChip();
+  applyProfilesVisibility(false);
+  broadcastTabRefresh();
+}
+
+/**
+ * Ask which profile survives, then disable.
+ *
+ * With one profile there is nothing to choose and nothing to lose, so the
+ * toggle just flips.
+ */
+function promptDisableProfiles() {
+  if (state.profiles.length < 2) {
+    patchSettings({ profilesEnabled: false });
+    applyProfilesVisibility(false);
+    return;
+  }
+
+  const select = document.getElementById('modal-disable-profiles-keep');
+  select.innerHTML = orderedProfiles()
+    .map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  const active = state.settings.activeProfileId;
+  if (active && state.profiles.some(p => p.id === active)) select.value = active;
+
+  document.getElementById('modal-disable-profiles-body').textContent =
+    t('disableProfilesBody', String(state.profiles.length - 1));
+  document.getElementById('modal-disable-profiles').hidden = false;
+  select.focus();
+}
+
+function closeDisableProfilesModal(restoreToggle) {
+  document.getElementById('modal-disable-profiles').hidden = true;
+  if (restoreToggle) document.getElementById('setting-profiles').checked = true;
+}
+
 // ── Floating button ────────────────────────────────────────────
 
 /** The stored config, with everything the renderers need present. */
@@ -2864,8 +2933,37 @@ function bindEvents() {
   });
 
   document.getElementById('setting-profiles').addEventListener('change', e => {
-    patchSettings({ profilesEnabled: e.target.checked });
-    applyProfilesVisibility(e.target.checked);
+    if (!e.target.checked) return promptDisableProfiles();   // may need to ask first
+    patchSettings({ profilesEnabled: true });
+    applyProfilesVisibility(true);
+  });
+
+  document.getElementById('modal-disable-profiles-cancel')
+    .addEventListener('click', () => closeDisableProfilesModal(true));
+  document.getElementById('modal-disable-profiles-confirm').addEventListener('click', async () => {
+    const keepId = document.getElementById('modal-disable-profiles-keep').value;
+    closeDisableProfilesModal(false);
+    await disableProfilesKeeping(keepId);
+    showStatus(t('profilesDisabled'));
+  });
+
+  document.getElementById('btn-reset-everything').addEventListener('click', () => {
+    document.getElementById('modal-reset').hidden = false;
+    document.getElementById('modal-reset-cancel').focus();
+  });
+  document.getElementById('modal-reset-cancel').addEventListener('click', () => {
+    document.getElementById('modal-reset').hidden = true;
+  });
+  document.getElementById('modal-reset-confirm').addEventListener('click', async () => {
+    document.getElementById('modal-reset').hidden = true;
+    try {
+      await SFTabs.storage.resetEverything();
+      // Reopening is the only honest way to show a fresh install: every piece
+      // of in-memory state this popup holds is now stale
+      window.location.reload();
+    } catch (err) {
+      showStatus(t('errorReset', err.message), 'error');
+    }
   });
 
   // Profiles

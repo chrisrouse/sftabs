@@ -1083,8 +1083,13 @@
     "description": "Title of the disable profiles confirmation modal"
   },
   "disableProfilesBody": {
-    "message": "Beim Deaktivieren der Profile wird ein Profil beibehalten und alle anderen entfernt.",
-    "description": "Body text of the disable profiles modal"
+    "message": "Ohne Profile gibt es nur einen Satz Registerkarten. Die anderen $COUNT$ Profile und ihre Registerkarten werden gelöscht.",
+    "description": "Explains what turning profiles off destroys",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "disableProfilesQuestion": {
     "message": "Welches Profil möchten Sie behalten?",
@@ -3079,5 +3084,17 @@
   "floatingButtonOffsetDesc": {
     "message": "In Pixeln, damit er bei Größenänderung des Fensters an Ort und Stelle bleibt",
     "description": "Description under the offset slider"
+  },
+  "resetConfirmTitle": {
+    "message": "Alles zurücksetzen?",
+    "description": "Title of the reset confirmation"
+  },
+  "resetConfirmBody": {
+    "message": "Dies entfernt alle Registerkarten, Profile und Einstellungen und kann nicht rückgängig gemacht werden. Bei synchronisierten Daten werden diese von allen in diesem Browser angemeldeten Geräten entfernt.",
+    "description": "Body of the reset confirmation"
+  },
+  "profilesDisabled": {
+    "message": "Profile deaktiviert",
+    "description": "Toast after disabling profiles"
   }
 }

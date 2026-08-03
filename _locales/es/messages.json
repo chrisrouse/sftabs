@@ -1083,8 +1083,13 @@
     "description": "Title of the disable profiles confirmation modal"
   },
   "disableProfilesBody": {
-    "message": "Al deshabilitar los perfiles se conservará un perfil y se eliminarán todos los demás.",
-    "description": "Body text of the disable profiles modal"
+    "message": "Sin perfiles solo hay un conjunto de pestañas. Los otros $COUNT$ perfiles y sus pestañas se eliminarán.",
+    "description": "Explains what turning profiles off destroys",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   },
   "disableProfilesQuestion": {
     "message": "¿Qué perfil desea conservar?",
@@ -3079,5 +3084,17 @@
   "floatingButtonOffsetDesc": {
     "message": "En píxeles, para que no se mueva al redimensionar la ventana",
     "description": "Description under the offset slider"
+  },
+  "resetConfirmTitle": {
+    "message": "¿Restablecer todo?",
+    "description": "Title of the reset confirmation"
+  },
+  "resetConfirmBody": {
+    "message": "Se eliminarán todas las pestañas, perfiles y ajustes, y no se puede deshacer. Si sus datos están sincronizados, se eliminarán de todos los dispositivos con sesión iniciada en este navegador.",
+    "description": "Body of the reset confirmation"
+  },
+  "profilesDisabled": {
+    "message": "Perfiles desactivados",
+    "description": "Toast after disabling profiles"
   }
 }
