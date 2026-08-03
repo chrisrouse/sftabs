@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>Org Colors — settings</title>
+<style>
+  :root { color-scheme: light; }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  :root {
+    --page: light-dark(#f3f3f3, #181818);
+    --s-panel: light-dark(#ffffff, #181818);
+    --s-1: light-dark(#ffffff, #2e2e2e);
+    --s-hover: light-dark(#f3f3f3, #444444);
+    --t-base: light-dark(#2e2e2e, #e5e5e5);
+    --t-weak: light-dark(#757575, #939393);
+    --t-muted: light-dark(#5c5c5c, #aeaeae);
+    --b-subtle: light-dark(#e5e5e5, #444444);
+    --b-medium: light-dark(#c9c9c9, #444444);
+    --accent: #066afe; --accent-bg: light-dark(#edf4ff, #002775);
+    --r-sm: 4px; --r-md: 8px; --ease: .2s cubic-bezier(.4,0,.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 13px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: var(--page); color: var(--t-base); padding: 28px 28px 70px; }
+  h1 { font-size: 21px; font-weight: 700; }
+  .lede { color: var(--t-muted); max-width: 92ch; margin: 6px 0 16px; }
+  .ask { max-width: 92ch; margin: 12px 0 22px; padding: 11px 14px; background: var(--accent-bg);
+          border-radius: var(--r-md); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  h2 { font-size: 14px; font-weight: 650; margin: 30px 0 8px; }
+  .cap { font-size: 12px; color: var(--t-weak); margin-bottom: 6px; }
+  .cap b { color: var(--t-base); font-weight: 600; }
+  .strip2 { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .toggle-theme { position: fixed; top: 16px; right: 16px; padding: 6px 12px; font: inherit;
+                   cursor: pointer; background: var(--s-1); color: var(--t-base);
+                   border: 1px solid var(--b-medium); border-radius: var(--r-sm); }
+
+  /* the tray */
+  .panel { width: 380px; background: var(--s-panel); border: 1px solid var(--b-subtle);
+            border-radius: var(--r-md); overflow: hidden; }
+  .phead { display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+            border-bottom: 1px solid var(--b-subtle); background: var(--s-1); }
+  .ptitle { font-size: 15px; font-weight: 600; }
+  .backbtn { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%;
+              border: 1px solid var(--b-medium); color: var(--t-muted); font-size: 12px; }
+  .pbody { padding: 12px 16px 16px; }
+
+  .srow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; }
+  .srow + .srow { border-top: 1px solid var(--b-subtle); }
+  .slabel { display: flex; flex-direction: column; }
+  .sname { font-weight: 500; }
+  .sdesc { font-size: 12px; color: var(--t-weak); }
+  .sw { width: 34px; height: 20px; border-radius: 10px; background: var(--accent); position: relative; flex-shrink: 0; }
+  .sw::after { content:''; position:absolute; top:2px; left:16px; width:16px; height:16px; border-radius:50%; background:#fff; }
+  .sw--off { background: var(--b-medium); }
+  .sw--off::after { left: 2px; }
+
+  .grouphead { font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .04em;
+                color: var(--t-weak); margin: 18px 0 6px; }
+
+  .crow { display: flex; align-items: center; gap: 10px; padding: 7px 0;
+           border-bottom: 1px solid var(--b-subtle); }
+  .crow:last-child { border-bottom: none; }
+  .cico, .cico svg { width: 16px; height: 16px; display: block; flex-shrink: 0; }
+  .cname { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .chost { font-size: 11px; color: var(--t-weak); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cswatch { width: 34px; height: 22px; border-radius: var(--r-sm); border: 1px solid var(--b-medium);
+              flex-shrink: 0; cursor: pointer; }
+  .cdel { font-size: 12px; opacity: .5; cursor: pointer; }
+  .btn { display: inline-block; margin-top: 12px; padding: 6px 12px; font: inherit; font-size: 12px;
+          background: var(--s-1); border: 1px solid var(--b-medium); border-radius: var(--r-sm); cursor: pointer; }
+  .hint { font-size: 12px; color: var(--t-weak); margin-top: 8px; }
+
+  /* browser tab strip preview */
+  .strip { display: flex; align-items: flex-end; padding: 8px 8px 0; background: #dee1e6;
+            border-radius: 10px 10px 0 0; width: max-content; }
+  .tab { display: flex; align-items: center; gap: 8px; width: 168px; height: 32px; padding: 0 10px;
+          background: #f1f3f4; border-radius: 9px 9px 0 0; font-size: 11px; color: #3c4043; }
+  .tab--active { background: #fff; }
+  .tab-ico, .tab-ico svg { width: 16px; height: 16px; display: block; flex-shrink: 0; }
+  .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tab-x { opacity: .45; }
+</style>
+</head>
+<body>
+<button class="toggle-theme" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark'">Toggle theme</button>
+
+<h1>Org Colors</h1>
+<p class="lede">A fifth tile in Settings. Everything at the real 380px tray width; swatches stand in
+for a native <code>&lt;input type="color"&gt;</code>.</p>
+
+<div class="ask"><b>The proposal:</b> not two modes but two layers in one sheet. Environment colors
+give every org a sensible color with no setup; a per-org entry overrides it. That way your three
+sandboxes start green together and you recolor only the ones you need to tell apart — rather than
+switching to "custom" and having to map every org by hand.</div>
+
+<h2>What it produces</h2>
+<div class="cap">Three sandboxes in one org — green by default, two overridden</div>
+<div class="strip">
+  <div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#c5221f"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">acme · Accounts</span><span class="tab-x">×</span></div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#1e8e3e"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">acme--dev1 · Flows</span><span class="tab-x">×</span></div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#8430ce"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">acme--dev2 · Users</span><span class="tab-x">×</span></div>
+  <div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#b06000"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">acme--uat · Setup</span><span class="tab-x">×</span></div>
+</div>
+
+<h2>The sheet</h2>
+<div class="strip2">
+  <div>
+    <div class="cap"><b>Off</b> — one toggle, nothing else to read</div>
+    <div class="panel">
+      <div class="phead"><span class="backbtn">‹</span><span class="ptitle">Org Colors</span></div>
+      <div class="pbody">
+        <div class="srow">
+          <span class="slabel"><span class="sname">Color Salesforce tab icons</span>
+            <span class="sdesc">Tints the favicon so you can tell orgs apart in the browser tab strip</span></span>
+          <span class="sw sw--off"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="cap"><b>On</b> — environment defaults, then overrides</div>
+    <div class="panel">
+      <div class="phead"><span class="backbtn">‹</span><span class="ptitle">Org Colors</span></div>
+      <div class="pbody">
+        <div class="srow">
+          <span class="slabel"><span class="sname">Color Salesforce tab icons</span>
+            <span class="sdesc">Tints the favicon so you can tell orgs apart</span></span>
+          <span class="sw"></span>
+        </div>
+
+        <div class="grouphead">By environment</div>
+        
+        <div class="crow">
+          <span class="cico"><svg viewBox="0 0 32 32"><g fill="#c5221f"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+          <span class="cname">Production<span class="chost">acme.lightning.force.com</span></span>
+          <span class="cswatch" style="background:#c5221f"></span>
+        </div>
+        <div class="crow">
+          <span class="cico"><svg viewBox="0 0 32 32"><g fill="#1e8e3e"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+          <span class="cname">Sandbox<span class="chost">acme--<i>name</i>.sandbox…</span></span>
+          <span class="cswatch" style="background:#1e8e3e"></span>
+        </div>
+        <div class="crow">
+          <span class="cico"><svg viewBox="0 0 32 32"><g fill="#1a73e8"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+          <span class="cname">Developer / Scratch<span class="chost">acme.develop…</span></span>
+          <span class="cswatch" style="background:#1a73e8"></span>
+        </div>
+        <p class="hint">Applied to any org without its own color below.</p>
+
+        <div class="grouphead">Specific orgs</div>
+        
+        <div class="crow">
+          <span class="cico"><svg viewBox="0 0 32 32"><g fill="#c5221f"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+          <span class="cname">acme<span class="chost">from profile “Production”</span></span>
+          <span class="cswatch" style="background:#c5221f"></span>
+          <span class="cdel">🗑</span>
+        </div>
+        <div class="crow">
+          <span class="cico"><svg viewBox="0 0 32 32"><g fill="#1e8e3e"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+          <span class="cname">acme--dev1<span class="chost">from profile “Dev1”</span></span>
+          <span class="cswatch" style="background:#1e8e3e"></span>
+          <span class="cdel">🗑</span>
+        </div>
+        <div class="crow">
+          <span class="cico"><svg viewBox="0 0 32 32"><g fill="#8430ce"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+          <span class="cname">acme--dev2<span class="chost">added manually</span></span>
+          <span class="cswatch" style="background:#8430ce"></span>
+          <span class="cdel">🗑</span>
+        </div>
+        <div class="crow">
+          <span class="cico"><svg viewBox="0 0 32 32"><g fill="#b06000"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+          <span class="cname">acme--uat<span class="chost">added manually</span></span>
+          <span class="cswatch" style="background:#b06000"></span>
+          <span class="cdel">🗑</span>
+        </div>
+        <button class="btn">+ Add this org</button>
+        <p class="hint">Orgs linked to a profile are listed here automatically. Adding one here does
+        not create a profile.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>Two things worth knowing before we build</h2>
+<div class="ask" style="background:#fdeced;border-color:#f3b7b5">
+<b>Only three environments are detectable.</b> The hostname tells us production from
+<code>--name.sandbox</code> from <code>.develop</code>, and that is all it tells us. Full Copy,
+Partial Copy and Developer sandboxes are all just <code>.sandbox.</code> — Salesforce does not put
+the type in the URL. So the environment layer can honestly offer three rows, not the five that
+extension showed. Telling a Full Copy from a Partial Copy is exactly what the per-org layer is for.
+</div>
+<div class="ask" style="background:#fff8e1;border-color:#f0d48a">
+<b>The org key is the subdomain.</b> <code>extractOrgIdentifier</code> already returns
+<code>acme</code> and <code>acme--dev1</code>, and it is the same key profiles match on — so
+"piggyback on profiles" is a join on a value we already compute, not new matching logic.
+</div>
+
+</body>
+</html>

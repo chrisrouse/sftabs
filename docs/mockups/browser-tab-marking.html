@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Marking browser tabs — what Chrome and Firefox actually allow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #f5f6f7; color: #202124; padding: 32px 32px 80px; }
+  h1 { font-size: 24px; font-weight: 700; }
+  h2 { font-size: 17px; font-weight: 650; margin: 40px 0 4px; }
+  h3 { font-size: 14px; font-weight: 650; margin: 22px 0 8px; color: #444; }
+  p  { max-width: 88ch; color: #4a4a4a; }
+  .verdict { max-width: 88ch; margin: 12px 0 6px; padding: 12px 14px; border-radius: 8px;
+              background: #fff8e1; border: 1px solid #f0d48a; }
+  .verdict b { color: #7a5b00; }
+  code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: #eceff1;
+          padding: 1px 5px; border-radius: 4px; }
+
+  table.cap { border-collapse: collapse; margin: 14px 0 4px; background: #fff;
+               border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; }
+  table.cap th, table.cap td { padding: 9px 14px; text-align: left; border-bottom: 1px solid #eceff1; font-size: 13px; }
+  table.cap th { background: #f1f3f4; font-weight: 650; }
+  table.cap tr:last-child td { border-bottom: none; }
+  .yes { color: #1e8e3e; font-weight: 650; }
+  .no  { color: #c5221f; font-weight: 650; }
+  .part { color: #b06000; font-weight: 650; }
+
+  /* ── A browser tab strip, close enough to judge 16px art by ── */
+  .strip { display: flex; align-items: flex-end; gap: 0; padding: 8px 8px 0;
+            background: #dee1e6; border-radius: 10px 10px 0 0; }
+  .strip--dark { background: #202124; }
+  .tab { display: flex; align-items: center; gap: 8px; width: 210px; height: 34px;
+          padding: 0 10px; background: #f1f3f4; border-radius: 9px 9px 0 0;
+          font-size: 12px; color: #3c4043; flex-shrink: 0; }
+  .tab--active { background: #fff; }
+  .strip--dark .tab { background: #292b2f; color: #c9cbcf; }
+  .strip--dark .tab--active { background: #35363a; color: #e8eaed; }
+  .tab-ico { width: 16px; height: 16px; flex-shrink: 0; display: block; }
+  .tab-ico svg { width: 16px; height: 16px; display: block; }
+  .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tab-x { opacity: .5; }
+
+  .specs { display: flex; flex-wrap: wrap; gap: 18px; }
+  .spec { width: 230px; }
+  .spec-tab { background: #dee1e6; padding: 8px 8px 0; border-radius: 8px 8px 0 0; }
+  .spec-name { font-weight: 650; font-size: 13px; margin-top: 8px; }
+  .spec-note { font-size: 12px; color: #5f6368; }
+
+  /* Chrome tab group: a colored strip and chip wrapping a run of tabs */
+  .group { display: inline-flex; align-items: flex-end; padding: 3px 3px 0;
+            border-radius: 10px 10px 0 0; }
+  .group-chip { display: flex; align-items: center; height: 28px; padding: 0 10px; margin-bottom: 3px;
+                 border-radius: 8px; color: #fff; font-size: 12px; font-weight: 600; }
+  .sw { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; margin-right: 14px; }
+  .sw span { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+
+  /* Firefox window theming: the whole chrome recolors */
+  .win { border-radius: 10px; overflow: hidden; width: 720px; border: 1px solid #cfd3d7; }
+  .win-chrome { padding: 8px 8px 0; }
+  .win-bar { height: 34px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; }
+  .win-page { height: 60px; background: #fff; display: flex; align-items: center;
+               justify-content: center; color: #9aa0a6; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>Marking browser tabs — what Chrome and Firefox actually allow</h1>
+<p>Everything below is rendered at real tab scale. Verified against the Chrome and MDN extension
+docs in August 2026; sources listed at the bottom.</p>
+
+<div class="verdict">
+<b>The short answer:</b> neither browser lets an extension color an individual tab or draw a border
+around one. There is no API for it and no CSS reaches the browser chrome. What you can do is
+three things — repaint the <b>favicon</b>, rewrite the <b>title</b>, and put tabs in a
+<b>tab group</b> that carries a name and one of nine fixed colors. Firefox adds a fourth: it can
+recolor the <b>entire window's</b> chrome, though not one tab within it.
+</div>
+
+<table class="cap">
+  <tr><th>Technique</th><th>Chrome</th><th>Firefox</th><th>Granularity</th><th>Color freedom</th></tr>
+  <tr><td>Favicon repaint</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Per tab</td><td>Anything you can draw</td></tr>
+  <tr><td>Title rewrite</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Per tab</td><td>Text only</td></tr>
+  <tr><td>Tab group color + name</td><td class="yes">Yes</td><td class="part">Yes, 139+</td><td>Per group</td><td>9 fixed names, no hex</td></tr>
+  <tr><td>Whole-window chrome theme</td><td class="no">No</td><td class="yes">Yes</td><td>Per window</td><td>Any CSS color</td></tr>
+  <tr><td><b>Single tab background</b></td><td class="no">No</td><td class="no">No</td><td>—</td><td>—</td></tr>
+  <tr><td><b>Border around one tab</b></td><td class="no">No</td><td class="no">No</td><td>—</td><td>—</td></tr>
+</table>
+
+<h2>1 · Favicon — the only true per-tab paint surface</h2>
+<p>A content script swaps the page's <code>&lt;link rel="icon"&gt;</code> for a canvas or SVG data
+URL, so anything you can draw in 16×16 is available. This is what the extension in your
+screenshots is doing with its shapes, emoji and text overlays. Both browsers, no permission
+beyond the content script you already run.</p>
+<div class="specs"><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Untouched</div><div class="spec-note">what the page ships</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#e02020"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Tinted</div><div class="spec-note">icon recolored per environment</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g><circle cx="25" cy="25" r="7" fill="#e02020" stroke="#fff" stroke-width="2.5"/></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Corner dot</div><div class="spec-note">original icon still readable</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#e02020" stroke-width="3"/><g fill="#0d9dda" transform="translate(16,16) scale(.62) translate(-16,-16)"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Ring</div><div class="spec-note">strongest at 16px</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="7" fill="#e02020"/><text x="16" y="23" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="20" font-weight="700" fill="#fff">P</text></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Letter badge</div><div class="spec-note">icon replaced entirely</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g><rect x="0" y="27" width="32" height="5" rx="2" fill="#e02020"/></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Underbar</div><div class="spec-note">reads as a colored edge</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><text x="16" y="25" text-anchor="middle" font-size="24">🚀</text></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Emoji</div><div class="spec-note">no drawing needed, but no color control</div></div></div>
+
+<h2>2 · Title — free, and visible even when the tab is narrow</h2>
+<p>Setting <code>document.title</code> changes the tab label. It survives Lightning's own title
+updates only if you keep reapplying it, which means a MutationObserver on <code>&lt;title&gt;</code>.
+Worth knowing: it also changes what gets bookmarked and what appears in history.</p>
+<div class="specs"><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div></div><div class="spec-name">Untouched</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">[PROD] Accounts</span><span class="tab-x">×</span></div></div><div class="spec-name">Bracket prefix</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">🔴 Accounts</span><span class="tab-x">×</span></div></div><div class="spec-name">Emoji prefix</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">PROD · Accounts</span><span class="tab-x">×</span></div></div><div class="spec-name">Separator</div></div><div class="spec"><div class="spec-tab"><div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Accounts — Dev1</span><span class="tab-x">×</span></div></div><div class="spec-name">Suffix</div></div></div>
+
+<h2>3 · Tab groups — the closest thing to coloring a tab</h2>
+<p>Chrome's <code>chrome.tabGroups</code> and Firefox's <code>browser.tabGroups</code> (139+) can set a
+group's <b>title</b>, <b>color</b> and <b>collapsed</b> state. The group paints a colored strip
+behind its tabs and a labelled chip to their left. Requires the <code>tabGroups</code> permission,
+and grouping itself is done with <code>tabs.group()</code>.</p>
+<p><b>The catch:</b> nine named colors, no hex — so an org's color has to be mapped to the nearest
+one. And a group is a run of adjacent tabs, so putting a tab in a group moves it.</p>
+<h3>The nine colors, exactly</h3>
+<div><div class="sw"><span style="background:#5f6368"></span>grey</div><div class="sw"><span style="background:#1a73e8"></span>blue</div><div class="sw"><span style="background:#d93025"></span>red</div><div class="sw"><span style="background:#f9ab00"></span>yellow</div><div class="sw"><span style="background:#1e8e3e"></span>green</div><div class="sw"><span style="background:#d01884"></span>pink</div><div class="sw"><span style="background:#9334e6"></span>purple</div><div class="sw"><span style="background:#007b83"></span>cyan</div><div class="sw"><span style="background:#fa903e"></span>orange</div></div>
+<h3>How it looks</h3>
+<div class="strip" style="width: 760px">
+  <div class="group" style="background:#d93025">
+    <div class="group-chip" style="background:#d93025">PROD</div>
+    <div class="tab tab--active" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div>
+    <div class="tab" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Setup: Flows</span><span class="tab-x">×</span></div>
+  </div>
+  <div class="group" style="background:#1e8e3e; margin-left:6px">
+    <div class="group-chip" style="background:#1e8e3e">Dev1</div>
+    <div class="tab" ><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span><span class="tab-title">Setup: Users</span><span class="tab-x">×</span></div>
+  </div>
+</div>
+
+<h2>4 · Firefox only — recolor the whole window</h2>
+<p><code>browser.theme.update(windowId, theme)</code> accepts a <b>windowId</b>, so one window can be
+themed while others are left alone. Colors take any CSS value, including hex. The useful keys are
+<code>frame</code> (the strip behind the tabs), <code>tab_selected</code>, <code>tab_text</code>,
+<code>tab_background_text</code> and <code>tab_line</code>.</p>
+<p><b>The catch:</b> it is per window, not per tab. It only helps if you keep each org in its own
+window — which, given profiles already work per org, may suit how you work anyway.</p>
+<div class="win">
+  <div class="win-chrome" style="background:#7a0b0b">
+    <div class="strip" style="background:transparent; padding:0">
+      <div class="tab tab--active" style="background:#a31515; color:#fff">
+        <span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span>
+        <span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span>
+      </div>
+      <div class="tab" style="background:transparent; color:#f3c9c9">
+        <span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#0d9dda"><path d="M25.5 21.5a5.5 5.5 0 0 1-.58 10.97L24.5 32.5h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 17.7a5.5 5.5 0 0 1 1.5 3.8z" transform="translate(0,-2)"/></g></svg></span>
+        <span class="tab-title">Setup: Flows</span><span class="tab-x">×</span>
+      </div>
+    </div>
+    <div class="win-bar" style="background:#a31515; color:#f3c9c9">acme.lightning.force.com</div>
+  </div>
+  <div class="win-page">page content is untouched</div>
+</div>
+<p style="margin-top:10px">A production window, unmistakable from across the desk. The same call
+with a green <code>frame</code> would mark a sandbox window.</p>
+
+<h2>What this rules out</h2>
+<p>The two things you asked about specifically — a background color on one tab, and a border
+around one tab — are not possible in either browser. Extensions cannot style the tab strip; the
+only pixels they own are the favicon. Every extension that appears to color a tab is either
+painting the favicon, using a tab group, or theming the window.</p>
+
+</body>
+</html>

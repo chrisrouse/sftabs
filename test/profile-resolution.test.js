@@ -7,13 +7,16 @@
  * activeProfileId — with the global value, whichever org was activated last
  * governed every page, so two windows (and two tabs) fought over it.
  *
- * The matching here has to stay identical to checkAndSwitchProfile in
- * background.js. If they drift, a page renders one profile while the popup
- * claims another.
+ * The background worker used to keep its own copy of extractOrgIdentifier, and
+ * this file existed partly to catch the two drifting. They now share the one in
+ * shared utils, so what is pinned instead is that the sharing holds — plus the
+ * org-host shapes themselves, since a host that resolves to nothing silently
+ * resolves to no profile either.
  *
  * Run: npm test
  */
-const { extractOrgIdentifier, resolveProfileForUrl } = require('../popup/js/shared/utils.js');
+const { extractOrgIdentifier, detectOrgEnvironment, resolveProfileForUrl } =
+  require('../popup/js/shared/utils.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -61,15 +64,53 @@ check('missing settings does not throw', (() => {
 check('pattern match is case-insensitive',
   resolveProfileForUrl(DEV1, [{ id: 'x', urlPatterns: ['AMPLIFY--DEV1'] }], ON) === 'x');
 
-// And the two implementations must still agree.
+// ── The background worker shares this matching rather than copying it ──
 const bg = fs.readFileSync(path.join(__dirname, '..', 'background.js'), 'utf8');
 check('background.js still compares org identifiers by exact equality',
   /pattern\.toLowerCase\(\) === orgIdentifier\.toLowerCase\(\)/.test(bg));
-for (const url of [DEV1, QA, OTHER]) {
-  const org = extractOrgIdentifier(url);
-  const bgMatch = PROFILES.find(p => (p.urlPatterns || []).some(x => x.toLowerCase() === String(org).toLowerCase()));
-  const bgTarget = bgMatch || PROFILES.find(p => p.isDefault) || PROFILES.find(p => p.id === ON.defaultProfileId);
-  check(`resolver agrees with background for ${org}`, bgTarget.id === r(url, ON));
+check('background.js has no copy of extractOrgIdentifier',
+  !/^function extractOrgIdentifier/m.test(bg));
+check('background.js calls the shared one',
+  /SFTabs\.utils\.extractOrgIdentifier\(/.test(bg));
+check('and can load it — Chrome imports, Firefox lists it first',
+  /importScripts\('popup\/js\/shared\/utils\.js'\)/.test(bg) &&
+  /scripts: \['popup\/js\/shared\/utils\.js', 'background\.js'\]/.test(
+    fs.readFileSync(path.join(__dirname, '..', 'build-manifest.js'), 'utf8')));
+
+// ── Every org host shape Salesforce hands out ──
+// A shape that resolves to no identifier resolves to no profile, silently. Four
+// of these returned null until the matcher was rewritten: Developer Edition on
+// its main domain, plus scratch, demo, patch and Trailhead Playground orgs.
+const HOSTS = [
+  ['acme.my.salesforce.com',                     'acme',       'production'],
+  ['acme.lightning.force.com',                   'acme',       'production'],
+  ['acme.my.salesforce-setup.com',               'acme',       'production'],
+  ['acme.salesforce.com',                        'acme',       'production'],
+  ['acme--dev1.sandbox.my.salesforce.com',       'acme--dev1', 'sandbox'],
+  ['acme--dev1.sandbox.lightning.force.com',     'acme--dev1', 'sandbox'],
+  ['acme--dev1.sandbox.my.salesforce-setup.com', 'acme--dev1', 'sandbox'],
+  ['acme.develop.my.salesforce.com',             'acme',       'developer'],
+  ['acme.develop.lightning.force.com',           'acme',       'developer'],
+  ['acme.scratch.my.salesforce.com',             'acme',       'scratch'],
+  ['acme.demo.my.salesforce.com',                'acme',       'demo'],
+  ['acme.trailblaze.my.salesforce.com',          'acme',       'playground'],
+  ['acme.patch.my.salesforce.com',               'acme',       'patch'],
+];
+for (const [host, id, env] of HOSTS) {
+  const url = `https://${host}/lightning/setup/Flows/home`;
+  check(`${host} -> ${id}`, extractOrgIdentifier(url) === id, String(extractOrgIdentifier(url)));
+  check(`${host} is ${env}`, detectOrgEnvironment(url) === env, String(detectOrgEnvironment(url)));
+}
+
+// A sandbox on an org that never moved to enhanced domains has no partition
+// word, only the -- in its name.
+check('-- means sandbox even without a partition word',
+  detectOrgEnvironment('https://acme--dev1.lightning.force.com/x') === 'sandbox');
+
+// Non-Salesforce and unrecognised shapes stay null rather than guessing.
+for (const host of ['example.com', 'foo.bar.lightning.force.com', 'not a url']) {
+  check(`${host} yields no identifier`, extractOrgIdentifier(`https://${host}/`) === null);
+  check(`${host} yields no environment`, detectOrgEnvironment(`https://${host}/`) === null);
 }
 
 const failed = results.filter(x => !x).length;

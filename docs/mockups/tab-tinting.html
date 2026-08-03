@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Tinted favicons + Firefox window theming</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          background: #f5f6f7; color: #202124; padding: 32px 32px 80px; }
+  h1 { font-size: 24px; font-weight: 700; }
+  h2 { font-size: 17px; font-weight: 650; margin: 40px 0 6px; }
+  h3 { font-size: 13px; font-weight: 650; margin: 20px 0 6px; color: #444;
+        text-transform: uppercase; letter-spacing: .04em; }
+  p { max-width: 90ch; color: #4a4a4a; }
+  code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: #eceff1;
+          padding: 1px 5px; border-radius: 4px; }
+  .note { max-width: 90ch; margin: 12px 0; padding: 12px 14px; border-radius: 8px;
+           background: #fff8e1; border: 1px solid #f0d48a; }
+  .note--bad { background: #fdeced; border-color: #f3b7b5; }
+  .note--good { background: #e7f5ea; border-color: #a8d8b4; }
+
+  .strip { display: flex; align-items: flex-end; padding: 8px 8px 0; background: #dee1e6;
+            border-radius: 10px 10px 0 0; width: max-content; }
+  .strip--dark { background: #202124; }
+  .tab { display: flex; align-items: center; gap: 8px; width: 196px; height: 34px; padding: 0 10px;
+          background: #f1f3f4; border-radius: 9px 9px 0 0; font-size: 12px; color: #3c4043; }
+  .tab--active { background: #fff; }
+  .strip--dark .tab { background: #292b2f; color: #c9cbcf; }
+  .strip--dark .tab--active { background: #35363a; color: #e8eaed; }
+  .tab-ico, .tab-ico svg { width: 16px; height: 16px; display: block; flex-shrink: 0; }
+  .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tab-x { opacity: .45; }
+
+  .env { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 3px 0; }
+  .env-dot { width: 14px; height: 14px; border-radius: 4px; }
+  .env b { width: 130px; }
+
+  .cols { display: flex; gap: 34px; flex-wrap: wrap; align-items: flex-start; }
+
+  .win { width: 660px; border-radius: 10px; overflow: hidden; border: 1px solid #cfd3d7; }
+  .win .strip { background: transparent; padding: 0; width: auto; }
+  .win .tab { width: 180px; }
+  .win-chrome { padding: 8px 8px 0; }
+  .win-bar { height: 32px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; }
+  .win-page { height: 54px; background: #fff; display: flex; align-items: center;
+               justify-content: center; color: #9aa0a6; font-size: 12px; }
+
+  table { border-collapse: collapse; background: #fff; border: 1px solid #dadce0;
+           border-radius: 8px; overflow: hidden; margin: 10px 0; }
+  th, td { padding: 9px 14px; text-align: left; border-bottom: 1px solid #eceff1; font-size: 13px;
+            vertical-align: top; }
+  th { background: #f1f3f4; font-weight: 650; }
+  tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<h1>Tinted favicons, and theming a Firefox window</h1>
+<p>Real 16px rendering. Five environments, one color each.</p>
+<div style="margin:14px 0 4px"><div class="env"><span class="env-dot" style="background:#c5221f"></span><b>Production</b><code>acme.lightning.force.com</code></div><div class="env"><span class="env-dot" style="background:#b06000"></span><b>Full Copy</b><code>acme--full.sandbox.lightning.force.com</code></div><div class="env"><span class="env-dot" style="background:#8430ce"></span><b>Partial Copy</b><code>acme--partial.sandbox.lightning.force.com</code></div><div class="env"><span class="env-dot" style="background:#1e8e3e"></span><b>Dev Sandbox</b><code>acme--dev1.sandbox.lightning.force.com</code></div><div class="env"><span class="env-dot" style="background:#1a73e8"></span><b>Scratch / Dev Ed</b><code>acme.develop.lightning.force.com</code></div></div>
+
+<h2>1 · What gets tinted</h2>
+<p>Two ways to produce a colored icon, and they look quite different at the size that matters.</p>
+
+<div class="cols">
+  <div>
+    <h3>Untouched, for reference</h3>
+    <div class="strip"><div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Production · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Full Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Partial Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Dev Sandbox · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Scratch / Dev Ed · Accounts</span><span class="tab-x">×</span></div></div>
+  </div>
+</div>
+
+<div class="cols" style="margin-top:26px">
+  <div>
+    <h3>A · Recolor the Salesforce cloud</h3>
+    <div class="strip"><div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#c5221f"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Production · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#b06000"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Full Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#8430ce"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Partial Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#1e8e3e"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Dev Sandbox · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#1a73e8"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Scratch / Dev Ed · Accounts</span><span class="tab-x">×</span></div></div>
+    <p style="margin-top:10px;max-width:44ch">Keeps the silhouette people already scan for.
+    The shape stays Salesforce; only the hue carries the environment.</p>
+  </div>
+  <div>
+    <h3>B · Our own mark, filled</h3>
+    <div class="strip"><div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#c5221f"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Production · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#b06000"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Full Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#8430ce"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Partial Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#1e8e3e"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Dev Sandbox · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#1a73e8"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Scratch / Dev Ed · Accounts</span><span class="tab-x">×</span></div></div>
+    <p style="margin-top:10px;max-width:44ch">A solid block of color reads from further away,
+    but every Salesforce tab now looks like SF&nbsp;Tabs rather than Salesforce.</p>
+  </div>
+</div>
+
+<h3 style="margin-top:30px">Both, on a dark tab strip</h3>
+<div class="cols">
+  <div><div class="strip strip--dark"><div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#c5221f"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Production · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#b06000"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Full Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#8430ce"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Partial Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#1e8e3e"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Dev Sandbox · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#1a73e8"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Scratch / Dev Ed · Accounts</span><span class="tab-x">×</span></div></div></div>
+  <div><div class="strip strip--dark"><div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#c5221f"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Production · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#b06000"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Full Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#8430ce"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Partial Copy · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#1e8e3e"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Dev Sandbox · Accounts</span><span class="tab-x">×</span></div><div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><rect x="1" y="1" width="30" height="30" rx="8" fill="#1a73e8"/><g fill="#fff" transform="translate(16,16) scale(.68) translate(-16,-16)"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Scratch / Dev Ed · Accounts</span><span class="tab-x">×</span></div></div></div>
+</div>
+
+<div class="note note--bad">
+<b>The implementation catch for A.</b> Recoloring Salesforce's real favicon means drawing it to a
+canvas, and the icon is served cross-origin — which taints the canvas and makes
+<code>toDataURL()</code> throw. The fix is to <code>fetch()</code> it first (we already hold host
+permissions for these domains), turn it into a blob URL, and draw that. Worth knowing before
+choosing A, because it is the difference between "set an attribute" and "fetch, decode, composite,
+re-encode, and watch for Lightning replacing it again".<br><br>
+Option B has no such problem: we draw our own SVG, so there is nothing to fetch.
+</div>
+
+<div class="note">
+<b>Both need a watcher.</b> Lightning rewrites <code>&lt;link rel="icon"&gt;</code> on navigation, so
+whichever we choose has to be reapplied from a <code>MutationObserver</code> on
+<code>&lt;head&gt;</code> — the same shape as the tab-bar observer we already run.
+</div>
+
+<h2>2 · Where the color comes from</h2>
+<table>
+  <tr><th>Source</th><th>How it works</th><th>Trade-off</th></tr>
+  <tr>
+    <td><b>Detected org type</b></td>
+    <td><code>extractOrgIdentifier</code> already tells <code>.sandbox.</code> and
+        <code>.develop.</code> hosts apart from plain ones, so a sensible color can be picked with
+        no setup at all.</td>
+    <td>Cannot tell a Full Copy from a Partial Copy — the hostname does not say. Both would get
+        one "sandbox" color.</td>
+  </tr>
+  <tr>
+    <td><b>Per-profile color</b></td>
+    <td>A color field on the profile, matched by the same <code>resolveProfileForUrl</code> that
+        already picks tabs per org — tested, and correct across windows.</td>
+    <td>Only colors orgs you have made a profile for.</td>
+  </tr>
+  <tr>
+    <td><b>Both</b></td>
+    <td>Org type supplies the default; a profile color overrides it when one is set.</td>
+    <td>Two places to look when a color is not what you expected.</td>
+  </tr>
+</table>
+
+<h2>3 · Firefox — theming the whole window</h2>
+<p><code>browser.theme.update(windowId, …)</code> with arbitrary hex. Needs the <code>theme</code>
+permission, which is Firefox-only and can go in the Firefox branch of
+<code>build-manifest.js</code> — Chrome never sees it.</p>
+
+<h3>Default</h3>
+<div class="win">
+  <div class="win-chrome" style="background:#dee1e6">
+    <div class="strip">
+      <div class="tab tab--active"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div>
+      <div class="tab"><span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span><span class="tab-title">Setup: Flows</span><span class="tab-x">×</span></div>
+    </div>
+    <div class="win-bar" style="background:#fff; color:#5f6368">acme.lightning.force.com</div>
+  </div>
+  <div class="win-page">page content is never touched</div>
+</div>
+
+<h3 style="margin-top:24px">Production window</h3>
+<div class="win">
+  <div class="win-chrome" style="background:#7a0b0b">
+    <div class="strip">
+      <div class="tab tab--active" style="background:#c5221f;color:#fff">
+        <span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+        <span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div>
+      <div class="tab" style="background:transparent;color:#f0bdbc">
+        <span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+        <span class="tab-title">Setup: Flows</span><span class="tab-x">×</span></div>
+    </div>
+    <div class="win-bar" style="background:#c5221f; color:#fff">acme.lightning.force.com</div>
+  </div>
+  <div class="win-page">page content is never touched</div>
+</div>
+
+<h3 style="margin-top:24px">Dev sandbox window</h3>
+<div class="win">
+  <div class="win-chrome" style="background:#0d4f22">
+    <div class="strip">
+      <div class="tab tab--active" style="background:#1e8e3e;color:#fff">
+        <span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+        <span class="tab-title">Accounts | Salesforce</span><span class="tab-x">×</span></div>
+      <div class="tab" style="background:transparent;color:#bde5c8">
+        <span class="tab-ico"><svg viewBox="0 0 32 32"><g fill="#00a1e0"><path d="M25.5 19.5a5.5 5.5 0 0 1-.58 10.97l-.42.03h-13a6 6 0 0 1-.63-11.97A7 7 0 0 1 24 15.7a5.5 5.5 0 0 1 1.5 3.8z"/></g></svg></span>
+        <span class="tab-title">Setup: Users</span><span class="tab-x">×</span></div>
+    </div>
+    <div class="win-bar" style="background:#1e8e3e; color:#fff">acme--dev1.sandbox.lightning.force.com</div>
+  </div>
+  <div class="win-page">page content is never touched</div>
+</div>
+
+<div class="note note--bad" style="margin-top:22px">
+<b>The one that decides whether this ships.</b> <code>theme.reset()</code> always returns the window
+to Firefox's <em>default</em> theme — not to whatever theme the user had installed. That is a known
+Firefox bug (<a href="https://bugzil.la/1415267">1415267</a>), and there is no way around it:
+<code>theme.getCurrent()</code> returns an empty object for a user-installed static theme, so we
+cannot capture one to put back.<br><br>
+So: harmless for anyone on Firefox's built-in light or dark theme, and destructive for anyone
+running a custom theme — their theme would vanish the first time we colored a window and would
+not come back until they reselected it.
+</div>
+
+<div class="note note--good">
+<b>Which suggests:</b> ship it off by default, say plainly in the setting that it will reset a
+custom Firefox theme, and only ever touch a window we have actually colored — never call
+<code>reset()</code> on a window we never touched.
+</div>
+
+<h3 style="margin-top:24px">When does it apply?</h3>
+<table>
+  <tr><th>Rule</th><th>Feels like</th></tr>
+  <tr><td><b>Follows the active tab</b></td>
+      <td>Switch to a prod tab and the window turns red; switch to a non-Salesforce tab and it
+          returns to normal. Most informative, and what the extensions you looked at do — but the
+          chrome recolors as you move between tabs, which some people find busy.</td></tr>
+  <tr><td><b>Any Salesforce tab in the window</b></td>
+      <td>Calmer, stays put. Wrong whenever you are looking at something else in that window, and
+          ambiguous when one window holds two different orgs.</td></tr>
+  <tr><td><b>Only when every tab is the same org</b></td>
+      <td>Never wrong, rarely on.</td></tr>
+</table>
+
+</body>
+</html>

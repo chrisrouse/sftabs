@@ -188,43 +188,83 @@ function deepClone(obj) {
 
 // Export for use in other modules
 /**
- * Extract the Salesforce org identifier from a URL — the subdomain label that
- * identifies the org, e.g. "amplify--dev1" from
- * amplify--dev1.sandbox.my.salesforce-setup.com.
+ * Salesforce marks an org's type with a partition word in its My Domain host —
+ * `acme--dev1.sandbox.my.salesforce.com`, `acme.develop.lightning.force.com`.
+ * Production has none. Mapped to our own names so the storage vocabulary does
+ * not change if Salesforce renames a partition.
  *
- * This is what profile URL patterns are compared against, by exact
- * case-insensitive equality (checkAndSwitchProfile in background.js). A pattern
- * holding a full hostname therefore never matches, which is why the profile
- * form captures this rather than letting it be typed.
- *
- * NOTE: background.js carries its own copy, because a service worker cannot
- * load these popup scripts. Keep the two in step.
- *
- * @param {string} url
- * @returns {string|null} the identifier, or null for a non-Salesforce host
+ * What the host does NOT carry is the sandbox tier: Full Copy, Partial Copy,
+ * Developer and Developer Pro are all `--name.sandbox`, and the only variable
+ * is the name an admin chose. Telling those apart needs a per-org override.
  */
-function extractOrgIdentifier(url) {
+const ORG_PARTITIONS = {
+  sandbox:    'sandbox',
+  develop:    'developer',    // Developer Edition
+  patch:      'patch',
+  scratch:    'scratch',
+  demo:       'demo',
+  trailblaze: 'playground',   // Trailhead Playground
+};
+
+/** Longest first, so `my.salesforce.com` is not mistaken for `salesforce.com`. */
+const SALESFORCE_HOST_SUFFIXES = [
+  'my.salesforce-setup.com',
+  'my.salesforce.com',
+  'lightning.force.com',
+  'salesforce-setup.com',
+  'salesforce.com',
+];
+
+/**
+ * Split a Salesforce host into the org's identifier and its partition word.
+ *
+ * Replaces a hand-written list of nine regexes that had grown gaps — Developer
+ * Edition on `develop.my.salesforce.com` matched nothing, and scratch, demo,
+ * patch and Trailhead Playground orgs matched nothing at all, which meant
+ * profiles silently never resolved for them. Deriving both facts from one split
+ * closes those and cannot drift the way parallel regexes did.
+ */
+function splitOrgHost(url) {
   try {
-    const hostname = new URL(url).hostname;
-    const patterns = [
-      /^([^.]+)\.sandbox\.my\.salesforce-setup\.com$/i,
-      /^([^.]+)\.sandbox\.my\.salesforce\.com$/i,
-      /^([^.]+)\.sandbox\.lightning\.force\.com$/i,
-      /^([^.]+)\.develop\.my\.salesforce-setup\.com$/i,
-      /^([^.]+)\.develop\.lightning\.force\.com$/i,
-      /^([^.]+)\.lightning\.force\.com$/i,
-      /^([^.]+)\.my\.salesforce\.com$/i,
-      /^([^.]+)\.my\.salesforce-setup\.com$/i,
-      /^([^.]+)\.salesforce\.com$/i
-    ];
-    for (const re of patterns) {
-      const m = hostname.match(re);
-      if (m) return m[1];
+    const hostname = new URL(url).hostname.toLowerCase();
+    const suffix = SALESFORCE_HOST_SUFFIXES.find(s => hostname.endsWith('.' + s));
+    if (!suffix) return null;
+
+    const labels = hostname.slice(0, -(suffix.length + 1)).split('.');
+    if (labels.length === 1) return { identifier: labels[0], partition: null };
+    if (labels.length === 2 && ORG_PARTITIONS[labels[1]]) {
+      return { identifier: labels[0], partition: labels[1] };
     }
-    return null;
+    return null;   // a host shape we do not recognise; better null than a guess
   } catch {
     return null;
   }
+}
+
+/**
+ * The org an URL belongs to, as a bare identifier — `acme`, `acme--dev1`.
+ *
+ * This is the value profiles store in urlPatterns, so it has to keep returning
+ * exactly what it always did for every host that already worked. Verified
+ * against the previous implementation before replacing it.
+ */
+function extractOrgIdentifier(url) {
+  const parsed = splitOrgHost(url);
+  return parsed ? parsed.identifier : null;
+}
+
+/**
+ * Which kind of org an URL is, from its host alone.
+ *
+ * Returns null for anything that is not a Salesforce host. A `--` in the
+ * identifier means a sandbox even without a partition word, which is how
+ * sandboxes look on orgs that never moved to enhanced domains.
+ */
+function detectOrgEnvironment(url) {
+  const parsed = splitOrgHost(url);
+  if (!parsed) return null;
+  if (parsed.partition) return ORG_PARTITIONS[parsed.partition];
+  return parsed.identifier.includes('--') ? 'sandbox' : 'production';
 }
 
 /**
@@ -604,6 +644,8 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
     extractOrgIdentifier,
+    detectOrgEnvironment,
+    ORG_PARTITIONS,
     TAB_COLORS,
     tabColorVars,
     applyTabColor,
@@ -625,10 +667,14 @@ if (typeof module !== 'undefined' && module.exports) {
   };
 } else {
   // Browser environment
-  window.SFTabs = window.SFTabs || {};
-  window.SFTabs.utils = {
+  // globalThis rather than window: a service worker has no window, and the
+  // background worker imports this file for its org matching.
+  globalThis.SFTabs = globalThis.SFTabs || {};
+  globalThis.SFTabs.utils = {
     generateId,
     extractOrgIdentifier,
+    detectOrgEnvironment,
+    ORG_PARTITIONS,
     TAB_COLORS,
     tabColorVars,
     applyTabColor,

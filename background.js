@@ -4,6 +4,14 @@
 
 'use strict';
 
+// Org matching lives in shared utils so this worker and the popup cannot drift
+// apart on it. Chrome's service worker has importScripts; Firefox's background
+// is an event page without it, so build-manifest.js puts utils.js ahead of this
+// file in the scripts array instead.
+if (typeof importScripts === 'function') {
+  importScripts('popup/js/shared/utils.js');
+}
+
 // Chrome compatibility - use native browser API if available, otherwise wrap chrome
 if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
   globalThis.browser = {
@@ -303,50 +311,6 @@ browser.runtime.onStartup.addListener(async () => {
 });
 
 /**
- * Extract org identifier from Salesforce URL
- */
-function extractOrgIdentifier(url) {
-  try {
-    const urlObj = new URL(url);
-    const hostname = urlObj.hostname;
-
-    // Sandbox patterns (check first)
-    const sandboxSetupMatch = hostname.match(/^([^.]+)\.sandbox\.my\.salesforce-setup\.com$/i);
-    if (sandboxSetupMatch) return sandboxSetupMatch[1];
-
-    const sandboxMyDomainMatch = hostname.match(/^([^.]+)\.sandbox\.my\.salesforce\.com$/i);
-    if (sandboxMyDomainMatch) return sandboxMyDomainMatch[1];
-
-    const sandboxLightningMatch = hostname.match(/^([^.]+)\.sandbox\.lightning\.force\.com$/i);
-    if (sandboxLightningMatch) return sandboxLightningMatch[1];
-
-    // Developer edition patterns
-    const devSetupMatch = hostname.match(/^([^.]+)\.develop\.my\.salesforce-setup\.com$/i);
-    if (devSetupMatch) return devSetupMatch[1];
-
-    const devLightningMatch = hostname.match(/^([^.]+)\.develop\.lightning\.force\.com$/i);
-    if (devLightningMatch) return devLightningMatch[1];
-
-    // Standard patterns
-    const lightningMatch = hostname.match(/^([^.]+)\.lightning\.force\.com$/i);
-    if (lightningMatch) return lightningMatch[1];
-
-    const myDomainMatch = hostname.match(/^([^.]+)\.my\.salesforce\.com$/i);
-    if (myDomainMatch) return myDomainMatch[1];
-
-    const setupMatch = hostname.match(/^([^.]+)\.my\.salesforce-setup\.com$/i);
-    if (setupMatch) return setupMatch[1];
-
-    const standardMatch = hostname.match(/^([^.]+)\.salesforce\.com$/i);
-    if (standardMatch) return standardMatch[1];
-
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
-
-/**
  * Check if auto-switching is enabled and switch profile if URL matches
  */
 async function checkAndSwitchProfile(url) {
@@ -368,7 +332,7 @@ async function checkAndSwitchProfile(url) {
     }
 
     // Extract org identifier from URL
-    const orgIdentifier = extractOrgIdentifier(url);
+    const orgIdentifier = SFTabs.utils.extractOrgIdentifier(url);
     if (!orgIdentifier) {
       return;
     }
