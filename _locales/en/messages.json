@@ -3254,5 +3254,9 @@
   "profilesDisabled": {
     "message": "Profiles turned off",
     "description": "Toast after disabling profiles"
+  },
+  "githubLink": {
+    "message": "GitHub",
+    "description": "Link to the project repository"
   }
 }

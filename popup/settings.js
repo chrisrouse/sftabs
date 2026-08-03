@@ -183,14 +183,6 @@ function setupEventListeners() {
 		});
 	});
 
-	// User guide link
-	document.getElementById('user-guide-link').addEventListener('click', (e) => {
-		e.preventDefault();
-		browser.tabs.create({
-			url: 'https://chrisrouse.github.io/sftabs/'
-		});
-	});
-
 }
 
 /**

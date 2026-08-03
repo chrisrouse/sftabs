@@ -946,6 +946,17 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 .settings-tile-label { font-weight: var(--sft-font-weight-semibold); }
 
+/* Below the grid, deliberately quiet: these leave the extension entirely and
+   are not settings, so they read as text rather than competing with the tiles. */
+.hub-links {
+  display: flex;
+  gap: 14px;
+  margin-top: var(--sft-spacing-3);
+  font-size: var(--sft-font-size-xs);
+}
+.hub-links a { color: var(--t-weak); text-decoration: none; }
+.hub-links a:hover { color: var(--c-primary); text-decoration: underline; }
+
 
 /* The back control occupies the slot every other panel view fills with its
    close button, so the header keeps one shape across the tray. Mirrored
