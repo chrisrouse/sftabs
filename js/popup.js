@@ -1473,6 +1473,7 @@ const SETTINGS_SECTION_REFRESH = {
   },
   'org-colors': () => syncOrgColorsSection(),
   button: () => syncFloatingButtonSection(),
+  data: () => renderPocResult(),            // TEMPORARY, with the POC
 };
 
 /**
@@ -2413,6 +2414,73 @@ function closeDisableProfilesModal(restoreToggle) {
   if (restoreToggle) document.getElementById('setting-profiles').checked = true;
 }
 
+// ══ TEMPORARY: file-picker proof of concept ══════════════════════
+// Does an <input type="file"> survive in an extension popup? Chromium has open
+// reports saying no, but a competitor appears to manage it, so this measures it
+// rather than arguing about it.
+//
+// Written to storage in two stages, because "it worked" and "it didn't" are not
+// the only outcomes. If the popup is torn down when the OS dialog takes focus,
+// nothing is recorded. If it survives the dialog but dies during the async read,
+// stage one lands and stage two does not — and that second case still rules out
+// a popup-native import, since import has to read the file.
+//
+// Delete this function, its bindings, the markup and the storage key together.
+async function recordPocStage(patch) {
+  const stored = (await browser.storage.local.get('filePickerPoc')).filePickerPoc || {};
+  await browser.storage.local.set({ filePickerPoc: { ...stored, ...patch } });
+  renderPocResult();
+}
+
+async function renderPocResult() {
+  const el = document.getElementById('poc-result');
+  if (!el) return;
+  const r = (await browser.storage.local.get('filePickerPoc')).filePickerPoc;
+  if (!r || !r.picked) {
+    el.textContent = 'No test run yet.';
+    return;
+  }
+  const survived = r.stillOpen ? 'popup stayed open' : 'popup had closed';
+  const read = r.readBytes != null
+    ? `read ${r.readBytes} bytes`
+    : (r.readError ? `read failed: ${r.readError}` : 'never finished reading');
+  el.textContent = `${r.name} · ${r.size} bytes · ${survived} · ${read}`;
+}
+
+function bindFilePickerPoc() {
+  const input = document.getElementById('poc-file-input');
+  const button = document.getElementById('btn-poc-pick');
+  if (!input || !button) return;
+
+  button.addEventListener('click', () => {
+    // Marker written before the dialog opens, so a run that vanishes entirely
+    // is distinguishable from one that was never started
+    browser.storage.local.set({ filePickerPoc: { started: Date.now() } });
+    input.click();
+  });
+
+  input.addEventListener('change', () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    // Stage one, synchronous: the change event fired at all
+    recordPocStage({
+      picked: true,
+      name: file.name,
+      size: file.size,
+      // document.hasFocus() is the honest test — the popup can still be alive
+      // in this callback and about to be dismissed
+      stillOpen: document.hasFocus(),
+    });
+
+    // Stage two: can we actually read it before being torn down?
+    const reader = new FileReader();
+    reader.onload = () => recordPocStage({ readBytes: String(reader.result).length });
+    reader.onerror = () => recordPocStage({ readError: String(reader.error && reader.error.name) });
+    reader.readAsText(file);
+  });
+}
+
 // ── Floating button ────────────────────────────────────────────
 
 /** The stored config, with everything the renderers need present. */
@@ -2946,6 +3014,8 @@ function bindEvents() {
     await disableProfilesKeeping(keepId);
     showStatus(t('profilesDisabled'));
   });
+
+  bindFilePickerPoc();   // TEMPORARY
 
   document.getElementById('btn-reset-everything').addEventListener('click', () => {
     document.getElementById('modal-reset').hidden = false;
