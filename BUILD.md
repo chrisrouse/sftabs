@@ -129,7 +129,7 @@ sftabs/
 ├── content/                # Content scripts for Salesforce
 ├── icons/                  # Extension icons
 ├── package.json            # NPM scripts and dependencies
-├── web-ext-config.cjs      # web-ext configuration
+├── web-ext-config.mjs      # web-ext configuration
 └── web-ext-artifacts/      # Build output (gitignored)
 ```
 
@@ -141,12 +141,12 @@ sftabs/
 - `web-ext-artifacts/`
 - Build artifacts (*.zip, *.xpi)
 
-### In Build (web-ext-config.cjs)
+### In Build (web-ext-config.mjs)
 - `manifest.base.json` (source only)
 - `build-manifest.js` (build script)
 - `node_modules/`
 - Documentation files (*.md)
-- Config files (package.json, web-ext-config.cjs)
+- Config files (package.json, web-ext-config.mjs)
 
 ## Distribution
 

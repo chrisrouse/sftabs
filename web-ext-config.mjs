@@ -1,5 +1,12 @@
 // web-ext configuration for SF Tabs
-module.exports = {
+//
+// ESM with `export default`, not CommonJS. web-ext 8.10 reads a .cjs config's
+// sandbox rather than its exports, so `module.exports = {...}` arrives as a
+// top-level key literally named "module.exports" and it refuses to start:
+//   UsageError: The config option "module.exports" must be specified in camel case
+// The effect was silent until you tried to build — every web-ext command failed,
+// which also meant the ignore list below was never applied.
+export default {
   // Source directory (root of extension)
   sourceDir: './',
 
@@ -24,7 +31,7 @@ module.exports = {
     // Project files
     'package.json',
     'package-lock.json',
-    'web-ext-config.cjs',
+    'web-ext-config.mjs',
     'manifest.base.json',
     'build-manifest.js',
     // Documentation
