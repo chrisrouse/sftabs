@@ -1027,6 +1027,28 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   color: var(--t-weak);
 }
 
+/* ── Tinted rows in dark mode ──
+   The palette's dark wash is a near-black version of the hue — red is #300c01 —
+   which on a #2e2e2e card reads as a hole punched in the list rather than a
+   coloured card. So in dark mode the accent is mixed into the card surface
+   instead, and the row stays a dark card that has taken on the hue.
+
+   The label goes back to ordinary text at the same time, and that part is not
+   cosmetic: a bright accent label on a tint of the same hue converges as the
+   mix rises, and fails AA at every level worth using — 4.05 even at 6%, where
+   the tint is invisible. Letting the card carry the colour and the text carry
+   the words gives 6.7 on the title at a 20% mix, where the hue is obvious.
+
+   Light mode keeps the palette wash, which works there: the wash is pale and
+   the ink is dark, so they diverge rather than converge. */
+[data-theme="dark"] .tab-item.sftabs-tc--tint {
+  background-color: color-mix(in srgb, var(--sftabs-tc) 20%, var(--s-1));
+  color: var(--t-base);
+}
+[data-theme="dark"] .tab-item.sftabs-tc--tint .tab-name { color: var(--t-base); }
+/* One step lighter than --t-muted, which drops to 3.79 against the tint */
+[data-theme="dark"] .tab-item.sftabs-tc--tint .tab-path { color: #c9c9c9; }
+
 /* ── Org colors ──
    A three-column table so the 16px previews line up whatever the org names are.
    The preview is the real favicon data URL, not an approximation of it. */
