@@ -2442,9 +2442,9 @@ async function renderPocResult() {
   }
   const survived = r.stillOpen ? 'popup stayed open' : 'popup had closed';
   const read = r.readBytes != null
-    ? `read ${r.readBytes} bytes`
+    ? `read ${SFTabs.utils.formatBytes(r.readBytes)}`
     : (r.readError ? `read failed: ${r.readError}` : 'never finished reading');
-  el.textContent = `${r.name} · ${r.size} bytes · ${survived} · ${read}`;
+  el.textContent = `${r.name} · ${SFTabs.utils.formatBytes(r.size)} · ${survived} · ${read}`;
 }
 
 function bindFilePickerPoc() {

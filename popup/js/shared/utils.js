@@ -704,6 +704,40 @@ function resolveOrgColor(url, orgColors) {
   return environments[environment] || DEFAULT_ENV_COLORS[environment] || null;
 }
 
+/**
+ * A byte count as people read it: 940 bytes, 15 KB, 1.4 MB.
+ *
+ * 1024 to the step, matching what developer tooling and Chrome's own downloads
+ * UI show. One decimal below ten so small files keep their precision — 1.4 MB
+ * rather than a bare 1 — and none above it, where the extra digit is noise.
+ *
+ * The carry guard matters: 1048000 bytes is 1023.4 KB, which rounds to 1023 and
+ * stays KB, but 1048570 is 1023.99 and would print "1024 KB" without it.
+ */
+function formatBytes(bytes) {
+  // null and undefined mean "no size", not zero — Number(null) is 0, which
+  // would print a confident "0 bytes" for a value we simply do not have
+  if (bytes == null || bytes === '') return '';
+  const value = Number(bytes);
+  if (!Number.isFinite(value) || value < 0) return '';
+  if (value < 1024) return `${value} ${value === 1 ? 'byte' : 'bytes'}`;
+
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  let scaled = value / 1024;
+  let unit = 0;
+  while (scaled >= 1024 && unit < units.length - 1) {
+    scaled /= 1024;
+    unit += 1;
+  }
+
+  let rounded = scaled >= 10 ? Math.round(scaled) : Math.round(scaled * 10) / 10;
+  if (rounded >= 1024 && unit < units.length - 1) {
+    rounded = 1;
+    unit += 1;
+  }
+  return `${rounded} ${units[unit]}`;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
@@ -730,7 +764,8 @@ if (typeof module !== 'undefined' && module.exports) {
     isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
     debounce,
-    deepClone
+    deepClone,
+    formatBytes
   };
 } else {
   // Browser environment
@@ -762,6 +797,7 @@ if (typeof module !== 'undefined' && module.exports) {
     isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
     debounce,
-    deepClone
+    deepClone,
+    formatBytes
   };
 }
