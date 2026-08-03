@@ -467,16 +467,21 @@
 
                 <!-- Everything below is meaningless while the feature is off -->
                 <div id="org-colors-body">
-                  <h4 class="settings-subhead">__MSG_orgColorsByEnvironment__</h4>
+                  <h4 class="settings-subhead">
+                    <span>__MSG_orgColorsByEnvironment__</span>
+                    <!-- Above the colour column, and disabled while nothing is
+                         customized so the row also says the defaults are in effect. -->
+                    <button type="button" class="subhead-action" id="btn-reset-env-colors" disabled
+                      aria-label="__MSG_orgColorsResetDefaults__" title="__MSG_orgColorsResetDefaults__">
+                      <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M465 40h-30c-8 0-15 7-15 15v70c0 9-5 13-12 7l-10-10a210 210 0 1 0-12 309c7-6 7-16 1-22l-21-21c-5-5-14-6-20-1a152 152 0 0 1-172 14 152 152 0 0 1 77-281 150 150 0 0 1 118 58c3 8-4 12-13 12h-70c-8 0-15 7-15 15v31c0 8 6 14 14 14h183c7 0 13-6 13-13V55c-1-8-8-15-16-15"/></svg>
+                    </button>
+                  </h4>
                   <table class="color-table">
                     <tbody id="env-color-rows">
                       <!-- Populated by renderEnvColors() -->
                     </tbody>
                   </table>
                   <p class="form-hint">__MSG_orgColorsEnvHint__</p>
-                  <!-- Disabled rather than hidden while nothing is customized, so the
-                       row also states that the defaults are what is in effect. -->
-                  <button class="btn-secondary" id="btn-reset-env-colors" disabled>__MSG_orgColorsResetDefaults__</button>
 
                   <h4 class="settings-subhead">__MSG_orgColorsSpecificOrgs__</h4>
                   <table class="color-table">

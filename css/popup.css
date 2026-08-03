@@ -985,6 +985,10 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
    A three-column table so the 16px previews line up whatever the org names are.
    The preview is the real favicon data URL, not an approximation of it. */
 .settings-subhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   font-size: var(--sft-font-size-xs);
   font-weight: var(--sft-font-weight-semibold);
   text-transform: uppercase;
@@ -992,6 +996,28 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   color: var(--t-weak);
   margin: var(--sft-spacing-3) 0 2px;
 }
+
+/* An action belonging to the column it sits over, not to the sheet — so it is
+   an icon at the heading's weight rather than a button competing with it. */
+.subhead-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin-right: 6px;   /* lines up over the colour wells, not the panel edge */
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--t-weak);
+  cursor: pointer;
+  transition: background var(--ease), color var(--ease);
+}
+.subhead-action svg { width: 13px; height: 13px; }
+.subhead-action:hover:not(:disabled) { background: var(--s-hover); color: var(--t-base); }
+.subhead-action:disabled { opacity: 0.35; cursor: default; }
+.subhead-action:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
 
 .color-table {
   width: 100%;
