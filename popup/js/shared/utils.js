@@ -355,6 +355,49 @@ function applyTabColor(el, name, style, enabled) {
 }
 
 /**
+ * Where a tab points. The single rule; there were five.
+ *
+ * Salesforce Setup nodes live at `/lightning/setup/{node}/home` and the `/home`
+ * is not optional. Three kinds of path are exceptions: an ObjectManager path is
+ * already complete, a path that arrives fully qualified with `/lightning/` is a
+ * link scraped from Salesforce's own navigation and must be used verbatim, and
+ * a custom URL may be absolute and belong to another host entirely.
+ *
+ * Every copy of this had drifted. One omitted the `/home`, which 404'd any tab
+ * moved into a folder. One omitted the `/lightning/` passthrough, which
+ * double-prefixed a promoted nav item. Two omitted the absolute-URL check, so a
+ * custom `https://example.com` link became
+ * `https://org.lightning.force.com/https://example.com`. None of them was
+ * wrong on purpose; they were written at different times.
+ *
+ * Returns null when a tab has no destination — a folder is a container, and
+ * callers differ on what to render for that: the tab bar needs an inert href,
+ * the navigators need to do nothing at all.
+ *
+ * The origin defaults to this page's. The popup passes the origin of the tab it
+ * is acting on, because its own is a moz-extension:// or chrome-extension:// URL.
+ * Deriving it by splitting the current URL on '/lightning/setup/' — as the tab
+ * bar used to — silently yields the entire URL on any page that is not a Setup
+ * page, and Lightning is a single-page app that navigates away from Setup
+ * without reloading.
+ */
+function tabDestinationUrl(tab, origin) {
+  const path = String((tab && tab.path) || '').trim();
+  if (!path) return null;
+
+  const base = origin || (typeof window !== 'undefined' ? window.location.origin : '');
+
+  if (tab.isCustomUrl) {
+    if (/^https?:\/\//i.test(path)) return path;
+    return base + (path.startsWith('/') ? path : '/' + path);
+  }
+  if (path.startsWith('/lightning/')) return base + path;
+  if (tab.isObject) return `${base}/lightning/o/${path}`;
+  if (path.includes('ObjectManager/')) return `${base}/lightning/setup/${path}`;
+  return `${base}/lightning/setup/${path}/home`;
+}
+
+/**
  * Rank tabs by how well each one claims the current page.
  *
  * Longest matching prefix wins, and an exact prefix always beats the
@@ -825,6 +868,7 @@ if (typeof module !== 'undefined' && module.exports) {
   mergeUserSettings,
   tabStorageChanged,
   matchTabsToUrl,
+  tabDestinationUrl,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,
@@ -857,6 +901,7 @@ if (typeof module !== 'undefined' && module.exports) {
     mergeUserSettings,
     tabStorageChanged,
     matchTabsToUrl,
+    tabDestinationUrl,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,

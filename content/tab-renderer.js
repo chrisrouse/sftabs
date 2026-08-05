@@ -225,14 +225,7 @@ function getTopLevelTabs(allTabs) {
  * Create tab element with dropdown functionality
  */
 function createTabElementWithDropdown(tab) {
-  // Get the base URL for the current org
-  const currentUrl = window.location.href;
-  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
-  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
-  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
-  
-  // Determine the full URL based on tab type
-  const fullUrl = buildTabBarUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
+  const fullUrl = buildTabBarUrl(tab);
   
   // Create the tab element
   const li = document.createElement('li');
@@ -850,12 +843,7 @@ function toggleInlineDropdown(dropdown, dropdownButton) {
 function navigateToMainTab(tab) {
   rememberClickedTab(tab.id);
 
-  const currentUrl = window.location.href;
-  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
-  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
-  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
-  
-  const fullUrl = buildTabBarUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject);
+  const fullUrl = buildTabBarUrl(tab);
   
   if (tab.openInNewTab) {
     window.open(fullUrl, '_blank');
@@ -875,38 +863,9 @@ function navigateToMainTab(tab) {
 /**
  * Build full URL from tab configuration
  */
-function buildTabBarUrl(tab, baseUrlRoot, baseUrlSetup, baseUrlObject) {
-  // Check if this is a folder-style tab (no path)
-  if (!tab.path || !tab.path.trim()) {
-    // For folder tabs, return a javascript:void(0) to prevent navigation
-    return 'javascript:void(0)';
-  }
-
-  let fullUrl = '';
-  const isObject = tab.hasOwnProperty('isObject') ? tab.isObject : false;
-  const isCustomUrl = tab.hasOwnProperty('isCustomUrl') ? tab.isCustomUrl : false;
-
-  if (isCustomUrl) {
-    // For custom URLs, ensure there's a leading slash
-    let formattedPath = tab.path;
-
-    if (!formattedPath.startsWith('/')) {
-      formattedPath = '/' + formattedPath;
-    }
-
-    fullUrl = `${baseUrlRoot}${formattedPath}`;
-  } else if (isObject) {
-    // Object URLs: don't add /home suffix - use the path as is
-    fullUrl = `${baseUrlObject}${tab.path}`;
-  } else if (tab.path.includes('ObjectManager/')) {
-    // ObjectManager URLs don't need /home
-    fullUrl = `${baseUrlSetup}${tab.path}`;
-  } else {
-    // Setup URLs need /home at the end
-    fullUrl = `${baseUrlSetup}${tab.path}/home`;
-  }
-
-  return fullUrl;
+function buildTabBarUrl(tab) {
+  // A folder has nowhere to go, and an <a> still needs an href.
+  return window.SFTabs.utils.tabDestinationUrl(tab) || 'javascript:void(0)';
 }
 
 /**

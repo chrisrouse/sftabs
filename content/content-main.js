@@ -339,33 +339,11 @@ function delayLoadTabs(attemptCount) {
  * Navigate to a navigation item from dropdown
  */
 function navigateToNavigationItem(navItem, parentTab) {
-  const baseUrl = window.location.origin;
-  let fullUrl = '';
-  let path = navItem.path || navItem.url || '';
-
-  // Check if path already includes full Lightning URL (nested navigation items)
-  if (path.startsWith('/lightning/')) {
-    // Path already has full Lightning path, just add origin
-    fullUrl = `${baseUrl}${path}`;
-  } else if (navItem.isObject) {
-    // Object paths: /lightning/o/{objectName}/list or /lightning/o/{objectName}/view/{recordId}
-    fullUrl = `${baseUrl}/lightning/o/${path}`;
-  } else if (navItem.isCustomUrl) {
-    // Custom URLs: ensure leading slash
-    if (!path.startsWith('/')) {
-      path = '/' + path;
-    }
-    fullUrl = `${baseUrl}${path}`;
-  } else if (path.includes('ObjectManager/')) {
-    // ObjectManager paths are already complete
-    fullUrl = `${baseUrl}/lightning/setup/${path}`;
-  } else {
-    // A bare setup node needs /home, exactly as it does at top level. This
-    // branch is what a real tab hits once it is moved into a folder: nav items
-    // scraped from Salesforce's own menu carry a full /lightning/ path and have
-    // already left above, so the only things arriving here are our own tabs.
-    fullUrl = `${baseUrl}/lightning/setup/${path}/home`;
-  }
+  // Nav items carry their destination in `path` or `url` depending on whether
+  // they were configured by hand or scraped from Salesforce's own menu.
+  const fullUrl = window.SFTabs.utils.tabDestinationUrl(
+    { ...navItem, path: navItem.path || navItem.url || '' });
+  if (!fullUrl) return;
 
   if (parentTab.openInNewTab) {
     window.open(fullUrl, '_blank');
@@ -594,29 +572,7 @@ function handleNavigateToTab(message, sendResponse) {
     return;
   }
 
-  // Build the full URL for the tab
-  const currentUrl = window.location.href;
-  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
-  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
-  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
-
-  let fullUrl = '';
-  const isObject = tab.isObject || false;
-  const isCustomUrl = tab.isCustomUrl || false;
-
-  if (isCustomUrl) {
-    let formattedPath = tab.path;
-    if (!formattedPath.startsWith('/')) {
-      formattedPath = '/' + formattedPath;
-    }
-    fullUrl = `${baseUrlRoot}${formattedPath}`;
-  } else if (isObject) {
-    fullUrl = `${baseUrlObject}${tab.path}`;
-  } else if (tab.path.includes('ObjectManager/')) {
-    fullUrl = `${baseUrlSetup}${tab.path}`;
-  } else {
-    fullUrl = `${baseUrlSetup}${tab.path}/home`;
-  }
+  const fullUrl = window.SFTabs.utils.tabDestinationUrl(tab);
 
   // Navigate based on tab settings
   if (tab.openInNewTab) {

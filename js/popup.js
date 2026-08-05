@@ -3296,21 +3296,11 @@ async function navigateToTab(tab) {
       showStatus(t('noActiveTab'), 'error');
       return;
     }
+    // The origin of the page being navigated, not this popup's — ours is an
+    // extension URL.
     const origin = active.url.split('/lightning/')[0];
-    const path   = tab.path || '';
-    let url;
-
-    if (tab.isCustomUrl) {
-      url = /^https?:\/\//i.test(path) ? path : origin + (path.startsWith('/') ? path : `/${path}`);
-    } else if (path.startsWith('/lightning/')) {
-      url = origin + path;            // already fully qualified
-    } else if (tab.isObject) {
-      url = `${origin}/lightning/o/${path}`;
-    } else if (path.includes('ObjectManager/')) {
-      url = `${origin}/lightning/setup/${path}`;
-    } else {
-      url = `${origin}/lightning/setup/${path}/home`;
-    }
+    const url = SFTabs.utils.tabDestinationUrl(tab, origin);
+    if (!url) return;   // a folder is a container, not a destination
 
     if (tab.openInNewTab) {
       await browser.tabs.create({ url });

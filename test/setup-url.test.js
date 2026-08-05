@@ -1,33 +1,30 @@
 #!/usr/bin/env node
 /**
- * Turning a stored tab path into a Setup URL.
+ * Where a tab points.
  *
- * A Salesforce Setup node is addressed as `/lightning/setup/{node}/home`, and
- * the `/home` is not optional — `/lightning/setup/SalesCloudEverywhereSettings`
- * does not resolve. Two kinds of path are exceptions: an ObjectManager path is
- * already complete, and a path arriving fully qualified with `/lightning/` is a
- * link scraped from Salesforce's own nav and has to be used verbatim.
+ * A Salesforce Setup node lives at `/lightning/setup/{node}/home` and the
+ * `/home` is not optional — `/lightning/setup/SalesCloudEverywhereSettings`
+ * does not resolve. Three kinds of path are exceptions: an ObjectManager path
+ * is already complete, a fully-qualified `/lightning/…` path is a link scraped
+ * from Salesforce's own navigation and must be used verbatim, and a custom URL
+ * may be absolute and point at another host entirely.
  *
- * That rule is written out in five separate functions. Duplication is the
- * whole reason this file exists. Moving a tab into a folder broke it, because
- * the one copy that folder children go through — navigateToNavigationItem —
- * had the bare form with no `/home`. The same tab worked at top level and 404'd
- * inside a folder, since the two go through different functions.
+ * This rule was written out five times, and every copy had drifted. One omitted
+ * the `/home`, so any tab moved into a folder 404'd — that shipped. One omitted
+ * the `/lightning/` passthrough, so a promoted nav item got double-prefixed.
+ * Two omitted the absolute-URL check, turning a custom `https://example.com`
+ * link into `https://org.lightning.force.com/https://example.com`.
  *
- * So this is a source test rather than a behaviour test. Every copy reads
- * `window.location` and is wired into a DOM, which makes them all awkward to
- * call directly; but drift between them is a real defect that has now shipped
- * once, and drift is plainly visible in the source. The invariant is that each
- * builder states the whole rule: the exception and the `/home`. A builder that
- * mentions only one of the two has half the rule, which is how this broke.
- *
- * Adding a sixth builder means adding it to BUILDERS below. Better still,
- * don't add one.
+ * This file used to check that all five *stated* the rule, because none of them
+ * could be called: each read window.location and expected a DOM. There is one
+ * now, it takes an origin, and it can simply be tested. The last section guards
+ * against a sixth appearing.
  *
  * Run: npm test
  */
 const fs = require('fs');
 const path = require('path');
+const { tabDestinationUrl } = require('../popup/js/shared/utils.js');
 
 let passed = 0;
 let failed = 0;
@@ -42,62 +39,70 @@ function check(label, ok, detail) {
   }
 }
 
-const ROOT = path.join(__dirname, '..');
+const ORIGIN = 'https://acme.my.salesforce-setup.com';
+const url = (tab, origin = ORIGIN) => tabDestinationUrl(tab, origin);
 
-/** Every function in the extension that turns a tab path into a Setup URL. */
-const BUILDERS = [
-  ['popup/js/shared/utils.js',   'buildFullUrl'],
-  ['js/popup.js',                'navigateToTab'],
-  ['content/content-main.js',    'navigateToNavigationItem'],
-  ['content/content-main.js',    'handleNavigateToTab'],
-  ['content/tab-renderer.js',    'buildTabBarUrl'],
-  ['content/floating-modal.js',  'buildTabUrl'],
-];
+// ── The rule ──
+check('a bare Setup node gets /home',
+  url({ path: 'SalesCloudEverywhereSettings' }) === ORIGIN + '/lightning/setup/SalesCloudEverywhereSettings/home',
+  'without it the page does not resolve');
 
-const APPENDS_HOME = /\/home`/;
-const GUARDS_OBJECT_MANAGER = /ObjectManager\//;
+check('an ObjectManager path is already complete',
+  url({ path: 'ObjectManager/Account/Details/view' }) === ORIGIN + '/lightning/setup/ObjectManager/Account/Details/view');
 
-/** The source of one function, by brace matching from its declaration. */
-function bodyOf(rel, name) {
-  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
-  const decl = new RegExp('(?:async\\s+)?function\\s+' + name + '\\s*\\(').exec(src);
-  if (!decl) return null;
-  let i = src.indexOf('{', decl.index);
-  for (let depth = 0; i < src.length; i++) {
-    if (src[i] === '{') depth++;
-    else if (src[i] === '}' && --depth === 0) return src.slice(decl.index, i + 1);
-  }
-  return null;
+check('an object tab goes to /lightning/o/',
+  url({ path: 'Account/list', isObject: true }) === ORIGIN + '/lightning/o/Account/list');
+
+check('a scraped nav link is used verbatim',
+  url({ path: '/lightning/setup/Flows/page?address=%2F300' }) === ORIGIN + '/lightning/setup/Flows/page?address=%2F300',
+  'appending /home to one of these breaks it');
+
+check('a relative custom URL gets a leading slash',
+  url({ path: 'apex/MyPage', isCustomUrl: true }) === ORIGIN + '/apex/MyPage');
+check('a rooted custom URL is left as-is',
+  url({ path: '/apex/MyPage', isCustomUrl: true }) === ORIGIN + '/apex/MyPage');
+check('an absolute custom URL keeps its own host',
+  url({ path: 'https://example.com/x', isCustomUrl: true }) === 'https://example.com/x',
+  'prefixing the org origin produced https://org/https://example.com');
+
+// ── Precedence, which is where copies disagreed ──
+check('custom beats everything, even an ObjectManager-looking path',
+  url({ path: 'https://example.com/ObjectManager/x', isCustomUrl: true }) === 'https://example.com/ObjectManager/x');
+check('a fully-qualified path beats the object branch',
+  url({ path: '/lightning/o/Account/list', isObject: true }) === ORIGIN + '/lightning/o/Account/list',
+  'and is not re-prefixed');
+check('the object branch beats the ObjectManager check',
+  url({ path: 'ObjectManager/list', isObject: true }) === ORIGIN + '/lightning/o/ObjectManager/list');
+
+// ── Folders have no destination ──
+check('a folder tab returns null', url({ path: '' }) === null);
+check('whitespace is not a path', url({ path: '   ' }) === null);
+check('a missing path returns null', url({}) === null);
+check('no tab at all returns null', url(null) === null && url(undefined) === null);
+
+// ── The origin is the caller's business ──
+// The popup acts on another tab, and its own origin is an extension URL.
+check('the supplied origin is used',
+  url({ path: 'Flows' }, 'https://other.lightning.force.com') === 'https://other.lightning.force.com/lightning/setup/Flows/home');
+
+// ── One copy, and it stays that way ──
+// Every file that used to build this URL now delegates. A new inline copy is
+// how the /home bug got in, so it is worth failing loudly on.
+const CALLERS = ['content/tab-renderer.js', 'content/content-main.js',
+                 'content/floating-modal.js', 'js/popup.js'];
+const INLINE_RULE = /\/lightning\/setup\/\$\{[^}]*\}\/home/;
+
+for (const rel of CALLERS) {
+  const src = fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
+  const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+  check(`${rel.split('/').pop()} delegates rather than rebuilding the rule`,
+    !INLINE_RULE.test(code),
+    'add a case to tabDestinationUrl instead of a sixth copy');
 }
 
-// ── Every builder states the whole rule ──
-for (const [rel, name] of BUILDERS) {
-  const body = bodyOf(rel, name);
-  if (!body) {
-    check(`${name} exists in ${rel}`, false, 'not found — renamed or removed?');
-    continue;
-  }
-  const home = APPENDS_HOME.test(body);
-  const guard = GUARDS_OBJECT_MANAGER.test(body);
-  check(`${rel.split('/').pop()} ${name} appends /home to a bare setup node`, home);
-  check(`${rel.split('/').pop()} ${name} exempts ObjectManager paths`, guard);
-}
-
-// ── The specific regression ──
-// A tab at top level and the same tab inside a folder go through different
-// functions, and must agree — otherwise moving a tab silently breaks it.
-const topLevel = bodyOf('content/tab-renderer.js', 'buildTabBarUrl');
-const inFolder = bodyOf('content/content-main.js', 'navigateToNavigationItem');
-
-check('a folder child and a top-level tab both append /home',
-  APPENDS_HOME.test(topLevel) && APPENDS_HOME.test(inFolder));
-check('a folder child still passes a fully-qualified nav link through untouched',
-  inFolder.includes("path.startsWith('/lightning/')"));
-
-// Order matters. A scraped nav link such as /lightning/setup/Flows/page must
-// leave before the /home branch, or it gets /home stapled onto the end of it.
-check('and that check runs before the /home branch',
-  inFolder.indexOf("startsWith('/lightning/')") < inFolder.search(APPENDS_HOME));
+const utils = fs.readFileSync(path.join(__dirname, '..', 'popup/js/shared/utils.js'), 'utf8');
+check('and utils.js holds exactly one implementation',
+  (utils.match(INLINE_RULE) || []).length === 1);
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

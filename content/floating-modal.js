@@ -27,39 +27,7 @@
    * Build full URL for a tab (matches tab-renderer.js buildFullUrl logic)
    */
   function buildTabUrl(tab) {
-    const baseUrl = window.location.origin;
-
-    // Check if path already includes full Lightning URL (nested navigation items)
-    if (tab.path && tab.path.startsWith('/lightning/')) {
-      return `${baseUrl}${tab.path}`;
-    }
-
-    // For custom URLs
-    if (tab.isCustomUrl) {
-      let formattedPath = tab.path || '';
-      if (!formattedPath.startsWith('/')) {
-        formattedPath = '/' + formattedPath;
-      }
-      return `${baseUrl}${formattedPath}`;
-    }
-
-    // For Object URLs
-    if (tab.isObject) {
-      return `${baseUrl}/lightning/o/${tab.path}`;
-    }
-
-    // For ObjectManager URLs
-    if (tab.path && tab.path.includes('ObjectManager/')) {
-      return `${baseUrl}/lightning/setup/${tab.path}`;
-    }
-
-    // For Setup URLs (add /home at the end)
-    if (tab.path) {
-      return `${baseUrl}/lightning/setup/${tab.path}/home`;
-    }
-
-    // No path - return null (folder-style tab)
-    return null;
+    return window.SFTabs?.utils?.tabDestinationUrl(tab) ?? null;
   }
 
   /**
