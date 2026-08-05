@@ -217,19 +217,20 @@ async function pruneChunks(baseKey, keep, previousChunkCount, dropDirectKey = fa
  */
 async function checkAndSwitchProfile(url) {
   try {
-    // Get user settings
+    // URL check first — it is free, and it rejects nearly every navigation.
+    // Reading settings before it woke the worker for storage on every page load
+    // anywhere in the browser.
+    if (!url || (!url.includes('salesforce.com') &&
+                  !url.includes('salesforce-setup.com') &&
+                  !url.includes('force.com'))) {
+      return;
+    }
+
     const settingsResult = await browser.storage.sync.get('userSettings');
     const settings = settingsResult.userSettings || {};
 
     // Check if profiles and auto-switching are enabled
     if (!settings.profilesEnabled || !settings.autoSwitchProfiles) {
-      return;
-    }
-
-    // Check if this is a Salesforce URL
-    if (!url || (!url.includes('salesforce.com') &&
-                  !url.includes('salesforce-setup.com') &&
-                  !url.includes('force.com'))) {
       return;
     }
 
@@ -239,9 +240,18 @@ async function checkAndSwitchProfile(url) {
       return;
     }
 
-    // Get all profiles
-    const profilesResult = await browser.storage.sync.get('profiles');
-    const profiles = profilesResult.profiles || [];
+    // Chunk-aware, like every other reader. A raw get returns undefined once
+    // the profile list outgrows a single sync value, so auto-switching simply
+    // stopped working — silently — for anyone with enough profiles.
+    const useSync = await prefersSyncStorage();
+    let profiles;
+    try {
+      profiles = (useSync
+        ? await readChunkedSync('profiles')
+        : (await browser.storage.local.get('profiles')).profiles) || [];
+    } catch (error) {
+      return;   // could not read the list; switching blind would be worse
+    }
 
     // Find a profile that matches this URL pattern
     const matchingProfile = profiles.find(profile => {
@@ -280,11 +290,19 @@ async function checkAndSwitchProfile(url) {
     settings.activeProfileId = targetProfile.id;
     targetProfile.lastActive = new Date().toISOString();
 
-    // Save updated settings and profiles
+    // Re-read immediately before writing and change only activeProfileId. The
+    // snapshot above may be seconds old by now, and writing it back whole would
+    // revert anything the popup changed in between — toggling tab colours while
+    // a Salesforce page finished loading was enough to lose the toggle.
+    const current = (await browser.storage.sync.get('userSettings')).userSettings || {};
     await browser.storage.sync.set({
-      userSettings: settings,
-      profiles: profiles
+      userSettings: { ...current, activeProfileId: targetProfile.id }
     });
+
+    // saveChunkedSync, not a raw set: writing the direct key beside stale chunk
+    // metadata leaves the next read reassembling the old list.
+    if (useSync) await saveChunkedSync('profiles', profiles);
+    else await browser.storage.local.set({ profiles });
 
     // Notify all open tabs to refresh their tab bars
     const allTabs = await browser.tabs.query({

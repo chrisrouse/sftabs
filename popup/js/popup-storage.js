@@ -178,11 +178,15 @@ async function getUserSettings() {
       useSyncStorage = localResult.userSettings.useSyncStorage;
     }
 
-    // Merge synced settings with defaults
+    // Merge one level deep, not with a spread. A spread replaces a whole
+    // nested object, so settings stored by an older build — say a
+    // floatingButton written before `side`, `offset` and `location` existed —
+    // came back missing those keys entirely rather than picking up their
+    // defaults. Every nested default added since is invisible to existing
+    // users under a spread.
     const syncedSettings = syncResult.userSettings || {};
     const mergedSettings = {
-      ...SFTabs.constants.DEFAULT_SETTINGS,
-      ...syncedSettings,
+      ...SFTabs.utils.mergeUserSettings(SFTabs.constants.DEFAULT_SETTINGS, syncedSettings),
       useSyncStorage // Override with device-specific value
     };
 
