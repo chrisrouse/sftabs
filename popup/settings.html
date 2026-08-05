@@ -66,7 +66,7 @@
       <div class="card-body">
 
         <button id="import-button" class="btn">__MSG_chooseFileToImport__</button>
-        <input type="file" id="import-file-input" accept=".json" style="display: none;">
+        <input type="file" id="import-file-input" accept=".json" style="display: none;" aria-label="__MSG_chooseFileToImport__">
 
         <!-- Everything below appears once a file is chosen, via populateImportOptions().
              Each container is shown with style.display = 'block', so none of them
@@ -155,7 +155,7 @@
             <span class="choice-desc">__MSG_importModeAddDescription__</span></span>
         </label>
                 <div class="choice-extra" id="import-add-section" style="display: none;">
-                  <select id="import-profile-add-select" class="select-input">
+                  <select id="import-profile-add-select" class="select-input" aria-label="__MSG_importDestinationAdd__">
                     <option value="">__MSG_chooseProfileOption__</option>
                   </select>
                 </div>
@@ -165,7 +165,7 @@
             <span class="choice-desc">__MSG_importDestinationOverwriteDescription__</span></span>
         </label>
                 <div class="choice-extra" id="import-overwrite-section" style="display: none;">
-                  <select id="import-profile-select-inline" class="select-input">
+                  <select id="import-profile-select-inline" class="select-input" aria-label="__MSG_importDestinationOverwrite__">
                     <option value="">__MSG_chooseProfileOption__</option>
                   </select>
                 </div>
@@ -174,7 +174,7 @@
           <span class="choice-body"><span class="choice-title">__MSG_importDestinationNew__</span></span>
         </label>
                 <div class="choice-extra" id="import-new-profile-section" style="display: none;">
-                  <input type="text" id="import-new-profile-name" class="text-input"
+                  <input type="text" id="import-new-profile-name" class="text-input" aria-label="__MSG_newProfileNamePlaceholder__"
                     placeholder="__MSG_newProfileNamePlaceholder__" maxlength="50">
                 </div>
               </div>

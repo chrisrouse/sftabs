@@ -24,11 +24,6 @@
    the rendering and leaves the stored tab.color untouched. */
 
 /* ── Dot: a bead before the label ── */
-.sftabs-tc--dot > .sftabs-tc-mark,
-.sftabs-tc--dot .sftabs-tc-mark {
-  background: var(--sftabs-tc);
-}
-
 /* ── Tint: the wash behind, the ink on the label ──
 
    The label uses --sftabs-tc-ink rather than the accent. For the lighter shades

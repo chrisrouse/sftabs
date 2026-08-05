@@ -1613,7 +1613,6 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 .btn-danger:hover  { background: var(--c-error-fill-hover); }
 .btn-danger:active { background: var(--c-error-fill-active); }
-.btn-danger:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
 
 /* ── 21. Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {

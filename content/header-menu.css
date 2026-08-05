@@ -28,7 +28,12 @@
 #sftabs-header-menu {
   /* top/left are written inline by position(); see header-menu.js */
   position: fixed;
-  z-index: 9000;
+  /* Above SLDS dropdowns (7000), below its overlays (8000) and modals (9000).
+     This was 9000, tying the modal layer — so a Salesforce modal rendered later
+     in the DOM painted over our menu while our menu painted over its overlays,
+     depending on source order. A dropdown from the header belongs on the
+     dropdown layer, just above Salesforce's own. */
+  z-index: 7500;
   /* 230px, matching the Setup menu, which measured 232.78px content-derived.
      Fixed rather than auto so the menu does not change width with the longest
      tab name; .slds-truncate ellipsises anything that does not fit.
