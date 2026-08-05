@@ -889,6 +889,16 @@ function handleNavigateToTab(message, sendResponse) {
     return;
   }
 
+  // A folder tab is a container, not a destination — it has no path to go to.
+  // Every sibling URL builder guards this; without it `tab.path.includes` threw
+  // and sendResponse never fired, leaving the caller's promise hanging. Report
+  // it as handled-but-nowhere-to-go so a shortcut aimed at a folder is simply
+  // ignored. Folder tabs are documented as not shortcut-targetable.
+  if (!tab.path || !tab.path.trim()) {
+    sendResponse({ success: false, error: 'Folder tabs have no destination' });
+    return;
+  }
+
   // Build the full URL for the tab
   const currentUrl = window.location.href;
   const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
