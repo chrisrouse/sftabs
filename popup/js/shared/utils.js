@@ -831,6 +831,7 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    floatingButtonAllowedHere,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,

@@ -849,8 +849,17 @@
 
     const { settings } = await resolveFloatingData();
     // Honours everywhere / Setup only / outside Setup. The rule lives in shared
-    // utils; it also covers the enabled flag, so this is the whole gate.
-    if (window.SFTabs?.utils?.floatingButtonAllowedHere(window.location.href, settings?.floatingButton)) {
+    // utils; it also covers the enabled flag, so it is the whole gate when
+    // present. If it is not — utils failing to load, or an export list falling
+    // out of step, which has happened — fall back to the enabled flag rather
+    // than hiding a button the user switched on. Optional chaining alone gave
+    // undefined here, which read as a legitimate "no" and made the button
+    // vanish entirely.
+    const allowed = window.SFTabs?.utils?.floatingButtonAllowedHere;
+    const show = typeof allowed === 'function'
+      ? allowed(window.location.href, settings?.floatingButton)
+      : Boolean(settings?.floatingButton?.enabled);
+    if (show) {
       window.SFTabsFloating.modal = new FloatingModal();
     }
   }
@@ -877,7 +886,9 @@
       if (window.location.href === lastUrl) return;
       lastUrl = window.location.href;
       const { settings } = await resolveFloatingData();
-      const allowed = !!window.SFTabs?.utils?.floatingButtonAllowedHere(lastUrl, settings?.floatingButton);
+      const rule = window.SFTabs?.utils?.floatingButtonAllowedHere;
+      if (typeof rule !== 'function') return;   // nothing to re-evaluate against
+      const allowed = !!rule(lastUrl, settings?.floatingButton);
       if (allowed === lastAllowed) return;
       lastAllowed = allowed;
       initFloatingModal();
