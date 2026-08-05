@@ -211,63 +211,7 @@ async function parseObjectManagerNavigation() {
   return navigation;
 }
 
-/**
- * Message handler for navigation parsing requests
- */
-function handleNavigationMessage(request, sender, sendResponse) {
-  if (request.action === 'parse_navigation') {
-    if (isObjectManagerPage()) {
-      parseObjectManagerNavigation()
-        .then(navigation => {
-          const objectName = getObjectNameFromUrl();
-          const pageInfo = getCurrentPageInfo();
 
-          sendResponse({
-            success: true,
-            items: navigation,  // Changed from 'navigation' to 'items' for backward compatibility
-            navigation: navigation,  // Keep both for compatibility
-            objectName: objectName,
-            pageInfo: pageInfo,
-            currentUrl: window.location.href
-          });
-        })
-        .catch(error => {
-          sendResponse({
-            success: false,
-            error: error.message
-          });
-        });
-
-      return true; // Keep message channel open for async response
-    } else {
-      const objectName = getObjectNameFromUrl() || 'the object';
-      sendResponse({
-        success: false,
-        error: `Go to ${objectName} in Setup to refresh the list`
-      });
-    }
-  } else if (request.action === 'navigate_to_url') {
-    // Handle navigation requests
-    if (request.useLightning && typeof sforce !== 'undefined' && sforce.one) {
-      // Use Lightning navigation if available
-      sforce.one.navigateToURL(request.url);
-    } else {
-      // Fallback to regular navigation
-      window.location.href = request.url;
-    }
-    sendResponse({ success: true });
-  } else if (request.action === 'refresh_tabs') {
-    // Handle tab refresh requests
-    sendResponse({ success: true });
-  }
-}
-
-// Set up message listener
-if (typeof browser !== 'undefined' && browser.runtime) {
-  browser.runtime.onMessage.addListener(handleNavigationMessage);
-} else if (typeof chrome !== 'undefined' && chrome.runtime) {
-  chrome.runtime.onMessage.addListener(handleNavigationMessage);
-}
 
 // Export navigation parser functions
 window.SFTabsContent = window.SFTabsContent || {};

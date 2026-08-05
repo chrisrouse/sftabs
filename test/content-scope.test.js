@@ -192,5 +192,44 @@ check('browser-compat.js defines every browser.* call the content scripts make',
 check('runtime.sendMessage specifically — the menu-bar "+" and drag both need it',
   typeof shim?.runtime?.sendMessage === 'function');
 
+
+// ── No file is injected by more than one entry ──
+// Both entries share a single isolated world, so a file listed twice runs
+// twice. Function declarations tolerate that; top-level `const` does not —
+// re-running utils.js raised "Identifier 'ORG_PARTITIONS' has already been
+// declared" on every Setup page, aborting that copy. It survived only because
+// the other copy had already populated SFTabs.utils.
+const injectedBy = new Map();
+manifest.content_scripts.forEach((entry, index) => {
+  entry.js.forEach(file => {
+    if (!injectedBy.has(file)) injectedBy.set(file, []);
+    injectedBy.get(file).push(index);
+  });
+});
+const doubled = [...injectedBy.entries()].filter(([, entries]) => entries.length > 1);
+check('no file is injected by more than one entry',
+  doubled.length === 0,
+  doubled.length ? doubled.map(([f, e]) => f + ' (entries ' + e.join(',') + ')').join('; ')
+                 : injectedBy.size + ' files');
+
+// ── Entries that rely on another entry's scripts must be covered by it ──
+// Entry 1 lists none of the shared modules; it reaches debounce, SFTabs.utils
+// and the rest through entry 0's copies. That only holds where entry 0 also
+// matches, so entry 0's patterns must cover every page entry 1 runs on.
+const prefixOf = pattern => pattern.replace(/\*$/, '');
+const covers = (outer, inner) => inner.startsWith(prefixOf(outer));
+
+const [broad, narrow] = manifest.content_scripts;
+const usesSharedModules = narrow.js.some(f => f.startsWith('popup/js/shared/'));
+check('the narrower entry carries no shared modules of its own', !usesSharedModules);
+
+const uncovered = narrow.matches.filter(m => !broad.matches.some(b => covers(b, m)));
+check('every page the narrow entry runs on is also matched by the broad one',
+  uncovered.length === 0,
+  uncovered.length ? 'not covered: ' + uncovered.join(', ') : narrow.matches.length + ' patterns');
+
+check('and both run at the same time, so ordering is manifest order',
+  (broad.run_at || 'document_idle') === (narrow.run_at || 'document_idle'));
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

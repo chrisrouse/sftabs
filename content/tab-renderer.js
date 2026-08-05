@@ -1384,14 +1384,26 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
   const visibleTabs = [];
   const hiddenTabs = [];
 
-  customTabElements.forEach((tabElement, index) => {
-    const tabWidth = tabElement.getBoundingClientRect().width;
+  // Pair each element with its own tab, by id.
+  //
+  // This used to index topLevelTabs by the element's position in the DOM, which
+  // assumes the two lists are in the same order. They are not, in the window
+  // between a drag in the tab bar and the write that persists it: the DOM is
+  // already rearranged while topLevelTabs is still sorted by stored position.
+  // The overflow menu then listed the wrong labels and navigated to the wrong
+  // pages — quietly, since both lists are the same length.
+  const tabsById = new Map(topLevelTabs.map(tab => [tab.id, tab]));
 
+  customTabElements.forEach(tabElement => {
+    const tab = tabsById.get(tabElement.getAttribute('data-tab-id'));
+    if (!tab) return;   // element from a render that has been superseded
+
+    const tabWidth = tabElement.getBoundingClientRect().width;
     if (usedWidth + tabWidth <= availableWidth) {
       usedWidth += tabWidth;
-      visibleTabs.push({ element: tabElement, tab: topLevelTabs[index] });
+      visibleTabs.push({ element: tabElement, tab });
     } else {
-      hiddenTabs.push({ element: tabElement, tab: topLevelTabs[index] });
+      hiddenTabs.push({ element: tabElement, tab });
     }
   });
 

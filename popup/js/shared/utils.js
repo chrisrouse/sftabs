@@ -355,6 +355,63 @@ function applyTabColor(el, name, style, enabled) {
 }
 
 /**
+ * Rank tabs by how well each one claims the current page.
+ *
+ * Longest matching prefix wins, and an exact prefix always beats the
+ * ObjectManager fallback — a tab pointing at an object still counts as active
+ * while you browse that object's sections, but only if nothing matches
+ * properly.
+ *
+ * Extracted because the floating panel had its own rule: it truncated the tab
+ * URL at `/Details` and prefix-matched the remainder, so an Account object tab
+ * claimed every page under Account, including the sibling Fields tab that
+ * should have been the active one. tab-renderer.js had already replaced that
+ * with the scoring below and documented why; the panel never got the fix.
+ *
+ * Takes plain {id, url} pairs so it stays free of the DOM. Callers layer their
+ * own tie-breaks on top — the tab bar prefers a tab the user actually clicked.
+ */
+function matchTabsToUrl(candidates, currentUrl) {
+  const url = String(currentUrl || '');
+
+  return (candidates || [])
+    .filter(candidate => candidate && candidate.url)
+    .map(candidate => {
+      if (url.startsWith(candidate.url)) {
+        return { id: candidate.id, exact: true, score: candidate.url.length };
+      }
+      const objectRoot = candidate.url.match(/^.*\/ObjectManager\/[^/]+/);
+      if (objectRoot && url.startsWith(objectRoot[0])) {
+        return { id: candidate.id, exact: false, score: objectRoot[0].length };
+      }
+      return null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => (b.exact - a.exact) || (b.score - a.score));
+}
+
+/**
+ * Does this batch of storage changes affect a profile's tabs?
+ *
+ * Four surfaces asked this and three phrased it differently. Two of them
+ * matched `key.endsWith('_tabs')`, which is exactly the key that does NOT exist
+ * once a profile outgrows 7000 bytes — chunking replaces it with
+ * `_tabs_chunk_N` plus `_tabs_metadata`. So editing a large profile refreshed
+ * the Setup tab bar and the header menu while the floating panel kept showing
+ * the old list until the page was reloaded.
+ *
+ * `customTabs` and its chunks are the pre-profiles layout, still live on old
+ * installs.
+ */
+function tabStorageChanged(changes) {
+  return Object.keys(changes || {}).some(key =>
+    (key.startsWith('profile_') && key.includes('_tabs')) ||
+    key === 'customTabs' ||
+    key.startsWith('customTabs_chunk_') ||
+    key === 'customTabs_metadata');
+}
+
+/**
  * Merge imported settings over current ones without losing nested detail.
  *
  * A spread is one level deep, so `{...current, ...incoming}` replaces whole
@@ -766,6 +823,8 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveFloatingSide,
   floatingButtonAllowedHere,
   mergeUserSettings,
+  tabStorageChanged,
+  matchTabsToUrl,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,
@@ -796,6 +855,8 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveFloatingSide,
     floatingButtonAllowedHere,
     mergeUserSettings,
+    tabStorageChanged,
+    matchTabsToUrl,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,

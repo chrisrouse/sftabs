@@ -484,7 +484,7 @@
     browser.storage.onChanged.addListener((changes, area) => {
       if (area !== 'local' && area !== 'sync') return;
       const touched = changes.userSettings ||
-        Object.keys(changes).some(k => k.startsWith('profile_') && k.includes('_tabs'));
+        window.SFTabs?.utils?.tabStorageChanged(changes);
       if (touched) {
         teardown();
         init();

@@ -187,11 +187,10 @@
     browser.storage.onChanged.addListener(async (changes, area) => {
       const floatingButton = window.SFTabsFloating?.button;
 
-      // Check if tabs or settings changed
-      const tabsChanged = Object.keys(changes).some(key =>
-        key.startsWith('profile_') && key.endsWith('_tabs') ||
-        key === 'customTabs'
-      );
+      // endsWith('_tabs') used to be the test here, which is the one key that
+      // stops existing once a profile is chunked — so a large profile's edits
+      // never reached this surface.
+      const tabsChanged = window.SFTabs?.utils?.tabStorageChanged(changes);
 
       if (tabsChanged && floatingButton) {
         // Reload tabs data

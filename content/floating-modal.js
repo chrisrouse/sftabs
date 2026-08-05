@@ -412,17 +412,35 @@
       }
     }
 
+    /**
+     * Which tab, if any, owns the current page.
+     *
+     * Scored against every tab rather than tested one at a time, because the
+     * question is comparative: several tabs can match a page and only the most
+     * specific should light up. The old test truncated the tab URL at
+     * `/Details` and prefix-matched what was left, so an Account object tab
+     * claimed every page beneath Account — including the Fields tab sitting
+     * right next to it in the same list.
+     */
+    activeTabId() {
+      const url = window.location.href;
+      // Memoised: this is asked once per row across three nested render loops,
+      // and each miss rebuilds a URL for every tab.
+      if (this._matchUrl === url && this._matchTabs === this.tabs) return this._matchId;
+
+      // Every tab, not just top-level ones — children and nested children are
+      // rendered here too and can be the page you are on.
+      const candidates = this.tabs.map(tab => ({ id: tab.id, url: buildTabUrl(tab) }));
+      const ranked = window.SFTabs?.utils?.matchTabsToUrl(candidates, url) || [];
+
+      this._matchUrl = url;
+      this._matchTabs = this.tabs;
+      this._matchId = ranked.length ? ranked[0].id : null;
+      return this._matchId;
+    }
+
     isTabActive(tab) {
-      const currentUrl = window.location.href;
-      const tabUrl = buildTabUrl(tab);
-
-      if (!tabUrl) {
-        return false;
-      }
-
-      // Match based on URL prefix (similar to main navigation logic)
-      const baseTabUrl = tabUrl.split('/Details')[0];
-      return currentUrl.startsWith(baseTabUrl);
+      return tab && tab.id === this.activeTabId();
     }
 
     renderTabs() {
@@ -761,12 +779,10 @@
 
       // Listen for storage changes to update tabs in real-time
       const storageChangeHandler = async (changes, areaName) => {
-        // Check if tabs or settings changed
-        const tabsChanged = Object.keys(changes).some(key =>
-          key.startsWith('profile_') && key.endsWith('_tabs') ||
-          key === 'customTabs' ||
-          key === 'userSettings'
-        );
+        // Same fix as floating-button.js: the old endsWith('_tabs') missed
+        // every chunked profile.
+        const tabsChanged = window.SFTabs?.utils?.tabStorageChanged(changes) ||
+          Boolean(changes.userSettings);
 
         if (tabsChanged) {
           // Reload data and re-render tabs

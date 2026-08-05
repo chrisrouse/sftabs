@@ -535,18 +535,42 @@ function handleLightningNavigate(message, sendResponse) {
 /**
  * Handle parse navigation request
  */
+/**
+ * Read Object Manager's own left-hand nav so the popup can turn it into
+ * sub-items.
+ *
+ * There were two listeners answering this, in two files. Both called
+ * sendResponse; this one answered synchronously, so it always won, and the
+ * richer reply from navigation-parser.js — the one carrying objectName — was
+ * discarded. That silently disabled the popup's guard against pulling
+ * Contact's navigation into an Account tab.
+ *
+ * One endpoint now, with the better behaviour: the retrying async parse, and
+ * every field the popup reads.
+ */
 function handleParseNavigation(sendResponse) {
-  if (window.SFTabsContent && window.SFTabsContent.navigationParser) {
-    const navigation = window.SFTabsContent.navigationParser.parseCurrentObjectManagerNavigation();
-    sendResponse({
-      success: true,
-      navigation: navigation,
-      count: navigation.length,
-      pageInfo: window.SFTabsContent.navigationParser.getCurrentPageInfo()
-    });
-  } else {
+  const parser = window.SFTabsContent && window.SFTabsContent.navigationParser;
+  if (!parser) {
     sendResponse({ success: false, error: 'Navigation parser not available' });
+    return;
   }
+
+  if (!parser.isObjectManagerPage()) {
+    const objectName = parser.getObjectNameFromUrl() || 'the object';
+    sendResponse({ success: false, error: `Go to ${objectName} in Setup to refresh the list` });
+    return;
+  }
+
+  parser.parseObjectManagerNavigation()
+    .then(navigation => sendResponse({
+      success: true,
+      items: navigation,        // what the popup reads first
+      navigation: navigation,   // kept for older callers
+      objectName: parser.getObjectNameFromUrl(),
+      pageInfo: parser.getCurrentPageInfo(),
+      currentUrl: window.location.href
+    }))
+    .catch(error => sendResponse({ success: false, error: error.message }));
 }
 
 /**
@@ -619,20 +643,9 @@ function handleNavigateToTab(message, sendResponse) {
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener((changes, area) => {
-      // Check for both 'local' and 'sync' areas
-      // For sync storage with chunking, also check for metadata or chunk changes
-      const hasCustomTabsChange = changes.customTabs ||
-                                   changes.customTabs_metadata ||
-                                   Object.keys(changes).some(key => key.startsWith('customTabs_chunk_'));
-
-      // Check for profile-specific tab changes (profile_{id}_tabs)
-      const hasProfileTabsChange = Object.keys(changes).some(key =>
-        key.startsWith('profile_') && key.endsWith('_tabs')
-      ) || Object.keys(changes).some(key =>
-        key.startsWith('profile_') && (key.endsWith('_tabs_metadata') || key.includes('_tabs_chunk_'))
-      );
-
-      if ((area === 'local' || area === 'sync') && (hasCustomTabsChange || hasProfileTabsChange)) {
+      // One shared predicate, so every surface agrees on what a tab change is
+      if ((area === 'local' || area === 'sync') &&
+          window.SFTabs?.utils?.tabStorageChanged(changes)) {
         // Shares the timer with the message path, so a write and the broadcast
         // that follows it collapse into a single rebuild
         refreshTabsSoon();
