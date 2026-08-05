@@ -126,7 +126,13 @@ async function readChunkedSync(baseKey) {
     const jsonString = chunks.join('');
     return JSON.parse(jsonString);
   } catch (error) {
-    return null;
+    // Rethrow, matching storage-chunking.js. Returning null here made a torn
+    // read — a chunk missing or unparseable — indistinguishable from a key that
+    // simply is not set, and callers coalesce null to []. That turns "I could
+    // not read your tabs" into "you have no tabs", and the next write persists
+    // it. An absent key still returns null, without throwing; only a genuine
+    // failure to reassemble raises.
+    throw error;
   }
 }
 
@@ -135,18 +141,15 @@ async function saveChunkedSync(baseKey, data) {
     const jsonString = JSON.stringify(data);
     const byteSize = new Blob([jsonString]).size;
 
-    // Clear existing chunks first
+    // Note what the previous value used, but do not delete anything yet. The
+    // old order cleared first and wrote second, which left a window with no
+    // data at all — and this is a service worker, which Chrome can terminate
+    // between two awaits. A quick-add that lost that race took the profile's
+    // tabs with it. Writing first means the worst case is orphan chunks the
+    // metadata already tells readers to ignore.
     const metadataKey = `${baseKey}_metadata`;
     const metadataResult = await browser.storage.sync.get(metadataKey);
-    const metadata = metadataResult[metadataKey];
-
-    const keysToRemove = [baseKey, metadataKey];
-    if (metadata && metadata.chunked && metadata.chunkCount) {
-      for (let i = 0; i < metadata.chunkCount; i++) {
-        keysToRemove.push(`${baseKey}_chunk_${i}`);
-      }
-    }
-    await browser.storage.sync.remove(keysToRemove);
+    const previousChunkCount = metadataResult[metadataKey]?.chunkCount || 0;
 
     if (byteSize <= CHUNK_SIZE) {
       // Save directly
@@ -158,6 +161,7 @@ async function saveChunkedSync(baseKey, data) {
         savedAt: new Date().toISOString()
       };
       await browser.storage.sync.set(storageObj);
+      await pruneChunks(baseKey, 0, previousChunkCount);
       return { success: true, chunked: false };
     }
 
@@ -181,9 +185,30 @@ async function saveChunkedSync(baseKey, data) {
     };
 
     await browser.storage.sync.set(storageObj);
+    await pruneChunks(baseKey, chunks.length, previousChunkCount, true);
     return { success: true, chunked: true, chunkCount: chunks.length };
   } catch (error) {
     throw error;
+  }
+}
+
+/**
+ * Drop what the previous value left behind, once the new one is stored.
+ *
+ * Mirrors storage-chunking.js. Best-effort: unreferenced keys are ignored by
+ * readers because the metadata states the count, so failing here is harmless,
+ * whereas throwing would fail a write that already succeeded.
+ */
+async function pruneChunks(baseKey, keep, previousChunkCount, dropDirectKey = false) {
+  try {
+    const stale = [];
+    if (dropDirectKey) stale.push(baseKey);
+    for (let i = keep; i < previousChunkCount; i++) {
+      stale.push(`${baseKey}_chunk_${i}`);
+    }
+    if (stale.length) await browser.storage.sync.remove(stale);
+  } catch (error) {
+    // Leaving unreferenced keys behind is the safe failure here.
   }
 }
 
@@ -402,9 +427,18 @@ async function quickAddTabToProfiles(tab, profileIds) {
 
   let written = 0;
   for (const key of targets) {
-    const existing = (useSync
-      ? await readChunkedSync(key)
-      : (await browser.storage.local.get(key))[key]) || [];
+    let existing;
+    try {
+      existing = (useSync
+        ? await readChunkedSync(key)
+        : (await browser.storage.local.get(key))[key]) || [];
+    } catch (error) {
+      // Skip this profile rather than write over it. Appending to what we
+      // failed to read would replace the stored list with a single tab — the
+      // one being added — and there is no way back from that. Not adding the
+      // tab is visible and harmless; losing the profile is neither.
+      continue;
+    }
 
     if (existing.some(t => t && t.id === tab.id)) continue;
 
@@ -446,9 +480,14 @@ async function reorderTabsForProfile(profileId, order) {
   const key = profileId ? `profile_${profileId}_tabs` : 'customTabs';
   const useSync = await prefersSyncStorage();
 
-  const tabs = (useSync
-    ? await readChunkedSync(key)
-    : (await browser.storage.local.get(key))[key]) || [];
+  let tabs;
+  try {
+    tabs = (useSync
+      ? await readChunkedSync(key)
+      : (await browser.storage.local.get(key))[key]) || [];
+  } catch (error) {
+    return 0;   // reordering what we could not read would write a wrong order
+  }
   if (!tabs.length) return 0;
 
   const next = SFTabs.utils.reorderTopLevelTabs(tabs, order);

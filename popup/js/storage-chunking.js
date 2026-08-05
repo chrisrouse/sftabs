@@ -53,8 +53,15 @@ async function saveChunkedSync(baseKey, data) {
 		byteSize = new Blob([jsonString]).size;
 		const chunkSize = SFTabs.constants.CHUNK_SIZE;
 
-		// Clear any existing chunks first
-		await clearChunkedSync(baseKey);
+		// How many chunks the previous value used, so the stale tail can be
+		// pruned AFTER the new value is in place. The previous order was the
+		// other way round — clear everything, then write — which left a window
+		// with no data at all. On Chrome that window is real: an MV3 worker can
+		// be terminated between two awaits, and a profile's tabs are then simply
+		// gone, with nothing to recover from. Writing first means the worst
+		// interruption leaves orphan chunks that the metadata says to ignore.
+		const previous = await browser.storage.sync.get(`${baseKey}_metadata`);
+		const previousChunkCount = previous[`${baseKey}_metadata`]?.chunkCount || 0;
 
 		// Determine if chunking is needed
 		if (byteSize <= chunkSize) {
@@ -68,6 +75,7 @@ async function saveChunkedSync(baseKey, data) {
 			};
 
 			await browser.storage.sync.set(storageObj);
+			await pruneChunks(baseKey, 0, previousChunkCount);
 			return { success: true, chunked: false, chunkCount: 1 };
 		}
 
@@ -90,6 +98,7 @@ async function saveChunkedSync(baseKey, data) {
 		};
 
 		await browser.storage.sync.set(storageObj);
+		await pruneChunks(baseKey, chunks.length, previousChunkCount, true);
 		return { success: true, chunked: true, chunkCount: chunks.length };
 	} catch (error) {
 		// Check if it's a quota error
@@ -147,6 +156,31 @@ async function readChunkedSync(baseKey) {
 		return data;
 	} catch (error) {
 		throw error;
+	}
+}
+
+/**
+ * Drop what the previous value left behind, once the new one is safely stored.
+ *
+ * Only keys the new value does not use: chunks past its own count, and the
+ * direct key when the value is now chunked. Best-effort by design — a failure
+ * here leaves unreferenced keys, which the metadata already tells readers to
+ * ignore, and that is a far better outcome than failing a write that succeeded.
+ *
+ * The old cleanup swept fifty speculative chunk keys on every single save.
+ * Chrome allows 120 sync writes a minute, and a removal counts, so a burst of
+ * drag-reorders could hit the ceiling on housekeeping alone.
+ */
+async function pruneChunks(baseKey, keep, previousChunkCount, dropDirectKey = false) {
+	try {
+		const stale = [];
+		if (dropDirectKey) stale.push(baseKey);
+		for (let i = keep; i < previousChunkCount; i++) {
+			stale.push(`${baseKey}_chunk_${i}`);
+		}
+		if (stale.length) await browser.storage.sync.remove(stale);
+	} catch (error) {
+		// Unreferenced keys are harmless; a thrown cleanup error would not be.
 	}
 }
 
@@ -224,5 +258,6 @@ window.SFTabs.storageChunking = {
 	saveChunkedSync,
 	readChunkedSync,
 	clearChunkedSync,
+	pruneChunks,
 	detectStorageFormat
 };
