@@ -415,6 +415,28 @@ function applyTabColor(el, name, style, enabled) {
 }
 
 /**
+ * Whether the floating button belongs on this page.
+ *
+ * The popup offers everywhere / Setup only / outside Setup, and has always
+ * saved the choice — but the only code that read it was a shouldShow() method
+ * on a class nothing constructs, so the button appeared everywhere regardless.
+ * Kept here, next to resolveFloatingSide, because it is the same kind of rule:
+ * pure, derived from URL plus settings, and wanted by more than one surface.
+ *
+ * An unrecognised value shows the button. Hiding a feature the user has
+ * switched on is the worse failure of the two.
+ */
+function floatingButtonAllowedHere(url, floatingButton) {
+  const fb = floatingButton || {};
+  if (!fb.enabled) return false;
+
+  const inSetup = String(url || '').includes('/lightning/setup/');
+  if (fb.location === 'setup-only') return inSetup;
+  if (fb.location === 'outside-setup') return !inSetup;
+  return true;
+}
+
+/**
  * Which edge the floating button docks to.
  *
  * Shared because the page and the settings screen must agree: if they disagree,
@@ -774,6 +796,7 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+  floatingButtonAllowedHere,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,

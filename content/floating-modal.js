@@ -848,9 +848,44 @@
     document.querySelectorAll('.sftabs-floating-modal').forEach(el => el.remove());
 
     const { settings } = await resolveFloatingData();
-    if (settings?.floatingButton?.enabled) {
+    // Honours everywhere / Setup only / outside Setup. The rule lives in shared
+    // utils; it also covers the enabled flag, so this is the whole gate.
+    if (window.SFTabs?.utils?.floatingButtonAllowedHere(window.location.href, settings?.floatingButton)) {
       window.SFTabsFloating.modal = new FloatingModal();
     }
+  }
+
+  /**
+   * Re-evaluate on navigation.
+   *
+   * "Setup only" and "outside Setup" are decided from the URL, and Lightning is
+   * a single-page app — crossing between Setup and an app page never reloads.
+   * Without this the choice would be honoured where you happened to land and
+   * then go stale for the rest of the session.
+   *
+   * popstate plus a <title> observer, the same event-driven pair
+   * content-main.js uses. Deliberately no polling: favicon.js already runs a
+   * 1s interval for its own copy of this problem and a second one is not
+   * wanted. Only re-inits when the answer actually changes, so ordinary
+   * navigation within Setup costs one boolean.
+   */
+  function watchLocationForVisibility() {
+    let lastUrl = window.location.href;
+    let lastAllowed = null;
+
+    const recheck = async () => {
+      if (window.location.href === lastUrl) return;
+      lastUrl = window.location.href;
+      const { settings } = await resolveFloatingData();
+      const allowed = !!window.SFTabs?.utils?.floatingButtonAllowedHere(lastUrl, settings?.floatingButton);
+      if (allowed === lastAllowed) return;
+      lastAllowed = allowed;
+      initFloatingModal();
+    };
+
+    window.addEventListener('popstate', recheck);
+    const title = document.querySelector('title');
+    if (title) new MutationObserver(recheck).observe(title, { childList: true });
   }
 
   // Let floating-button.js rebuild us after a settings change
@@ -860,6 +895,8 @@
   // have one implementation rather than a copy per surface.
   window.SFTabsFloating.buildTabUrl = buildTabUrl;
   window.SFTabsFloating.navigateToTab = navigateToTab;
+
+  watchLocationForVisibility();
 
   // Initialize on page load
   if (document.readyState === 'loading') {

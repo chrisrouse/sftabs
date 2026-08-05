@@ -16,7 +16,7 @@
  *
  * Run: npm test
  */
-const { resolveFloatingSide, DEFAULT_SETTINGS } = (() => ({
+const { resolveFloatingSide, floatingButtonAllowedHere, DEFAULT_SETTINGS } = (() => ({
   ...require('../popup/js/shared/utils.js'),
   ...require('../popup/js/shared/constants.js'),
 }))();
@@ -73,6 +73,47 @@ check('offset still ships, since it now carries the whole vertical axis',
   DEFAULT_SETTINGS.floatingButton.offset === 0);
 check('legacy position still ships, so an upgrade can derive its offset',
   DEFAULT_SETTINGS.floatingButton.position === 25);
+
+
+// ── Where the button is allowed to appear ──
+// The popup has always offered everywhere / Setup only / outside Setup, and has
+// always saved the choice. Nothing enforced it: the only code that read
+// `location` was a method on a class nothing constructs, so the button showed
+// up everywhere no matter what was picked. These are the rules that gate it now.
+const SETUP = 'https://acme.lightning.force.com/lightning/setup/Flows/home';
+const APP   = 'https://acme.lightning.force.com/lightning/o/Account/list';
+const fb = location => ({ enabled: true, location });
+
+check('the default is everywhere, so upgrading changes nothing anyone sees',
+  DEFAULT_SETTINGS.floatingButton.location === 'everywhere');
+
+check('disabled beats every location', 
+  !floatingButtonAllowedHere(SETUP, { enabled: false, location: 'everywhere' }));
+check('everywhere shows in Setup', floatingButtonAllowedHere(SETUP, fb('everywhere')));
+check('everywhere shows outside Setup', floatingButtonAllowedHere(APP, fb('everywhere')));
+
+check('Setup only shows in Setup', floatingButtonAllowedHere(SETUP, fb('setup-only')));
+check('Setup only hides outside Setup', !floatingButtonAllowedHere(APP, fb('setup-only')));
+check('outside Setup hides in Setup', !floatingButtonAllowedHere(SETUP, fb('outside-setup')));
+check('outside Setup shows outside Setup', floatingButtonAllowedHere(APP, fb('outside-setup')));
+
+// The two exclusive modes must actually partition the space, or a user picking
+// one of them loses the button on pages the other would have covered.
+check('the two exclusive modes cover every page between them',
+  [SETUP, APP].every(url =>
+    floatingButtonAllowedHere(url, fb('setup-only')) !== floatingButtonAllowedHere(url, fb('outside-setup'))));
+
+// Failing open matters here: an unreadable value should not silently remove a
+// feature the user switched on.
+check('an unrecognised location shows the button rather than hiding it',
+  floatingButtonAllowedHere(APP, fb('nonsense')));
+check('a missing location behaves as everywhere',
+  floatingButtonAllowedHere(APP, { enabled: true }));
+check('missing config hides, and does not throw',
+  !floatingButtonAllowedHere(APP, null) && !floatingButtonAllowedHere(APP, undefined));
+check('a missing url does not throw',
+  floatingButtonAllowedHere(undefined, fb('everywhere')) === true &&
+  floatingButtonAllowedHere(undefined, fb('setup-only')) === false);
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);
