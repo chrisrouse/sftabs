@@ -53,49 +53,6 @@ window.sfTabsLightningNav = function(details) {
   return false;
 };
 
-/**
- * Enhanced Lightning navigation with additional methods
- */
-window.sfTabsLightningNavExtended = function(details) {
-  try {
-    // Try different navigation approaches based on context
-    if (details.navigationType === "component" && details.componentDef) {
-      // Navigate to a specific Lightning component
-      if (typeof $A !== 'undefined' && $A.get) {
-        const e = $A.get("e.force:navigateToComponent");
-        if (e) {
-          e.setParams({
-            componentDef: details.componentDef,
-            componentAttributes: details.componentAttributes || {}
-          });
-          e.fire();
-          return true;
-        }
-      }
-    } else if (details.navigationType === "list" && details.listViewId) {
-      // Navigate to a list view
-      if (typeof $A !== 'undefined' && $A.get) {
-        const e = $A.get("e.force:navigateToList");
-        if (e) {
-          e.setParams({
-            listViewId: details.listViewId,
-            listViewName: details.listViewName,
-            scope: details.scope
-          });
-          e.fire();
-          return true;
-        }
-      }
-    } else {
-      // Fall back to standard navigation
-      return window.sfTabsLightningNav(details);
-    }
-  } catch (error) {
-    return false;
-  }
-  
-  return false;
-};
 
 /**
  * Listen for postMessage for Lightning navigation (backup method)
@@ -118,14 +75,6 @@ window.addEventListener("message", function(event) {
         fallbackUsed: true
       }, window.location.origin);
     }
-  } else if (event.data && event.data.type === 'SF_TABS_EXTENDED_NAVIGATE') {
-    const success = window.sfTabsLightningNavExtended(event.data);
-    
-    window.postMessage({
-      type: 'SF_TABS_NAVIGATION_COMPLETE',
-      success: success,
-      extended: true
-    }, window.location.origin);
   }
 });
 
@@ -133,27 +82,9 @@ window.addEventListener("message", function(event) {
  * Check Lightning framework availability
  */
 function checkLightningAvailability() {
-  const isAvailable = typeof $A !== 'undefined' && typeof $A.get === 'function';
-
-  if (isAvailable) {
-    // Check for specific navigation events
-    const events = [
-      'e.force:navigateToURL',
-      'e.force:navigateToSObject',
-      'e.force:navigateToComponent',
-      'e.force:navigateToList'
-    ];
-
-    const availableEvents = events.filter(eventName => {
-      try {
-        return !!$A.get(eventName);
-      } catch (e) {
-        return false;
-      }
-    });
-  }
-
-  return isAvailable;
+  // The probe that used to live here called $A.get four times and threw the
+  // result away — leftover instrumentation from a removed logging pass.
+  return typeof $A !== 'undefined' && typeof $A.get === 'function';
 }
 
 /**

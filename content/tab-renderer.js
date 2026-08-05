@@ -1126,44 +1126,12 @@ async function monitorNativeTabActiveState() {
 }
 
 /**
- * Remove all custom tabs from the container
- */
-function removeCustomTabs(tabContainer) {
-  const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
-  existingTabs.forEach(tab => tab.remove());
-}
-
-/**
- * Get tab by ID from storage
- */
-async function getTabById(tabId) {
-  try {
-    const result = await browser.storage.local.get('customTabs');
-    const tabs = result.customTabs || [];
-    return tabs.find(tab => tab.id === tabId);
-  } catch (error) {
-    return null;
-  }
-}
-
-/**
  * Check if tabs are currently visible/loaded
  */
 function areTabsLoaded() {
   const customTabs = document.querySelectorAll('.sf-tabs-custom-tab');
   return customTabs.length > 0;
 }
-
-/**
- * Force refresh all tabs (useful for debugging)
- */
-function forceRefreshTabs() {
-  const tabContainer = document.querySelector('.tabBarItems.slds-grid');
-  if (tabContainer) {
-    initTabs(tabContainer);
-  }
-}
-
 
 /**
  * Refuse to be dragged.
@@ -1894,10 +1862,7 @@ window.SFTabsContent.tabRenderer = {
   buildTabBarUrl,
   addTabClickListeners,
   highlightActiveTab,
-  removeCustomTabs,
-  getTabById,
   areTabsLoaded,
-  forceRefreshTabs,
   navigateToMainTab,
   createInlineDropdownMenu,
   toggleInlineDropdown,

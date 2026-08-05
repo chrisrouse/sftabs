@@ -36,33 +36,6 @@ function formatObjectNameFromURL(objectNameFromURL) {
 }
 
 /**
- * Extract name from page title
- */
-function extractNameFromTitle(pageTitle) {
-  if (!pageTitle) return '';
-  
-  // Remove " | Salesforce" suffix and other common suffixes
-  let cleanTitle = pageTitle.split(' | ')[0];
-  
-  // Remove "Setup: " prefix
-  if (cleanTitle.startsWith('Setup: ')) {
-    cleanTitle = cleanTitle.substring(7);
-  }
-  
-  return cleanTitle.trim();
-}
-
-/**
- * Format path segment to readable name
- */
-function formatPathToName(pathSegment) {
-  return pathSegment
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, str => str.toUpperCase())
-    .trim();
-}
-
-/**
  * Get current page information
  */
 function getCurrentPageInfo() {
@@ -131,32 +104,6 @@ function buildFullUrl(tab, subPath = '') {
 }
 
 /**
- * Check if tab can have dropdown
- */
-function canHaveDropdown(tab) {
-  // Any tab can have manual dropdowns
-  return true;
-}
-
-/**
- * Check if current page matches a tab's path
- */
-function isCurrentPageMatchingTab(tab) {
-  const currentPageInfo = getCurrentPageInfo();
-  if (!currentPageInfo) return false;
-  
-  if (tab.isSetupObject && currentPageInfo.type === 'objectManager') {
-    // Check if the tab's path starts with ObjectManager/ and matches current object
-    if (tab.path.startsWith('ObjectManager/')) {
-      const tabObjectName = tab.path.split('/')[1];
-      return tabObjectName === currentPageInfo.objectName;
-    }
-  }
-  
-  return false;
-}
-
-/**
  * Check if Lightning Navigation is enabled
  * Always returns true as Lightning Navigation is now standard
  */
@@ -177,13 +124,6 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
-}
-
-/**
- * Deep clone an object
- */
-function deepClone(obj) {
-  return JSON.parse(JSON.stringify(obj));
 }
 
 // Export for use in other modules
@@ -369,7 +309,7 @@ const TAB_COLORS = {
   'purple-light': { accent: 'light-dark(#ad7bee, #7526e3)', wash: 'light-dark(#f6f2fb, #070114)', ink: 'light-dark(#5a1ba9, #c29ef1)' },
   'pink-deep': { accent: 'light-dark(#61022a, #fdb6c5)', wash: 'light-dark(#fddde3, #370114)', ink: 'light-dark(#61022a, #fdb6c5)' },
   'pink': { accent: 'light-dark(#b60554, #ff538a)', wash: 'light-dark(#fddde3, #370114)', ink: 'light-dark(#b60554, #ff538a)' },
-  'pink-light': { accent: 'light-dark(#ff538a, #b60554)', wash: 'light-dark(#fef0f3, #0f0003)', ink: 'light-dark(#8a033e, #fe8aa7)' },
+  'pink-light': { accent: 'light-dark(#ff538a, #b60554)', wash: 'light-dark(#fef0f3, #0f0003)', ink: 'light-dark(#8a033e, #fe8aa7)' }
 };
 
 /**
@@ -658,7 +598,7 @@ function parsePageToTab(url, pageTitle) {
     path,
     isObject,
     isCustomUrl,
-    isSetupObject,
+    isSetupObject
   };
 }
 
@@ -681,7 +621,7 @@ const DEFAULT_ENV_COLORS = {
   scratch:    '#7526e3',
   demo:       '#b06000',
   patch:      '#5c5c5c',
-  playground: '#0d9dda',
+  playground: '#0d9dda'
 };
 
 /**
@@ -802,16 +742,10 @@ if (typeof module !== 'undefined' && module.exports) {
     tabOrderMatches,
     generateTabName,
     parsePageToTab,
-    formatObjectNameFromURL,
-    extractNameFromTitle,
-    formatPathToName,
     getCurrentPageInfo,
     buildFullUrl,
-    canHaveDropdown,
-    isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
-    debounce,
-    deepClone
+    debounce
   };
 } else {
   // Browser environment
@@ -837,15 +771,9 @@ if (typeof module !== 'undefined' && module.exports) {
     tabOrderMatches,
     generateTabName,
     parsePageToTab,
-    formatObjectNameFromURL,
-    extractNameFromTitle,
-    formatPathToName,
     getCurrentPageInfo,
     buildFullUrl,
-    canHaveDropdown,
-    isCurrentPageMatchingTab,
     isLightningNavigationEnabled,
-    debounce,
-    deepClone
+    debounce
   };
 }

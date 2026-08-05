@@ -99,7 +99,6 @@
 })();
 
 // State tracking
-let loadAttempts = 0;
 const maxLoadAttempts = 5;
 let tabsInitialized = false;
 let handlerReady = false;

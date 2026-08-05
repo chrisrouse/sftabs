@@ -189,45 +189,6 @@ function getObjectNameFromUrl() {
 }
 
 /**
- * Monitor page changes and notify when navigation is available
- */
-function monitorNavigationChanges(callback) {
-  let lastNavigationCount = 0;
-  
-  const checkNavigation = () => {
-    const navigation = parseCurrentObjectManagerNavigation();
-    if (navigation.length !== lastNavigationCount) {
-      lastNavigationCount = navigation.length;
-      callback(navigation);
-    }
-  };
-  
-  // Check initially
-  checkNavigation();
-  
-  // Set up observer for navigation changes
-  const observer = new MutationObserver(checkNavigation);
-  
-  // Observe the area where navigation typically appears
-  const observeTargets = [
-    document.querySelector('.forceEntityManagerPageContainer'),
-    document.querySelector('.setupEntityContainer'),
-    document.body
-  ].filter(Boolean);
-  
-  observeTargets.forEach(target => {
-    observer.observe(target, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['aria-selected', 'href']
-    });
-  });
-  
-  return observer;
-}
-
-/**
  * Main function to parse navigation for popup requests
  */
 async function parseObjectManagerNavigation() {
@@ -318,6 +279,5 @@ window.SFTabsContent.navigationParser = {
   sortObjectManagerItems,
   isObjectManagerPage,
   getObjectNameFromUrl,
-  monitorNavigationChanges,
   parseObjectManagerNavigation
 };
