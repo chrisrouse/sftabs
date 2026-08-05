@@ -104,122 +104,20 @@ let tabsInitialized = false;
 let handlerReady = false;
 
 /**
- * Get storage preference from settings
- * @returns {Promise<boolean>} true for sync storage, false for local
- */
-async function getStoragePreference() {
-  try {
-    const localResult = await browser.storage.local.get(['deviceSettings', 'userSettings']);
-
-    // Priority 1: Check deviceSettings (most authoritative, written by popup before migration)
-    if (localResult.deviceSettings && typeof localResult.deviceSettings.useSyncStorage === 'boolean') {
-      return localResult.deviceSettings.useSyncStorage;
-    }
-
-    // Priority 2: Backward compat - check cached userSettings in local storage
-    if (localResult.userSettings && typeof localResult.userSettings.useSyncStorage === 'boolean') {
-      return localResult.userSettings.useSyncStorage;
-    }
-
-    // Priority 3: Default to sync storage
-    return true;
-  } catch (error) {
-    return true;
-  }
-}
-
-/**
- * Read tabs from chunked sync storage
- */
-async function readChunkedSync(baseKey) {
-  try {
-    const metadataKey = `${baseKey}_metadata`;
-    const metadataResult = await browser.storage.sync.get(metadataKey);
-    const metadata = metadataResult[metadataKey];
-
-    if (!metadata || !metadata.chunked) {
-      const directResult = await browser.storage.sync.get(baseKey);
-      return directResult[baseKey] || null;
-    }
-
-    const chunkCount = metadata.chunkCount;
-    const chunkKeys = [];
-    for (let i = 0; i < chunkCount; i++) {
-      chunkKeys.push(`${baseKey}_chunk_${i}`);
-    }
-
-    const chunksResult = await browser.storage.sync.get(chunkKeys);
-    const chunks = [];
-    for (let i = 0; i < chunkCount; i++) {
-      const chunkKey = `${baseKey}_chunk_${i}`;
-      if (!chunksResult[chunkKey]) {
-        throw new Error(`Missing chunk ${i} of ${chunkCount}`);
-      }
-      chunks.push(chunksResult[chunkKey]);
-    }
-
-    const jsonString = chunks.join('');
-    return JSON.parse(jsonString);
-  } catch (error) {
-    return null;
-  }
-}
-
-/**
- * Get tabs from storage (sync or local based on preference)
- * Respects profile system if enabled
+ * The tabs that apply to this page.
+ *
+ * The rule lives in shared utils now. Three surfaces each had their own copy
+ * and disagreed on which storage area to read — content-main took the
+ * preference from local, where the device-specific value actually lives, while
+ * floating-button took it from sync, which does not hold it. A user on local
+ * storage therefore saw tabs in the Setup bar and an empty floating panel on
+ * the same page.
  */
 async function getTabsFromStorage() {
   try {
-    const useSyncStorage = await getStoragePreference();
-
-    // Get user settings
-    const settingsKey = 'userSettings';
-    let settings;
-    if (useSyncStorage) {
-      const settingsData = await readChunkedSync(settingsKey);
-      settings = settingsData || {};
-    } else {
-      const result = await browser.storage.local.get(settingsKey);
-      settings = result[settingsKey] || {};
-    }
-
-    // Which profile applies to THIS page. Resolved from the page's own org
-    // rather than the globally active profile, so two orgs render their own
-    // tabs at the same time whether they sit in one window or two.
-    let profiles = [];
-    if (useSyncStorage) {
-      profiles = await readChunkedSync('profiles') || [];
-    } else {
-      const profilesResult = await browser.storage.local.get('profiles');
-      profiles = profilesResult.profiles || [];
-    }
-    const profileId = window.SFTabs && window.SFTabs.utils && window.SFTabs.utils.resolveProfileForUrl
-      ? window.SFTabs.utils.resolveProfileForUrl(window.location.href, profiles, settings)
-      : settings.activeProfileId;
-
-    if (profileId) {
-      const profileTabsKey = `profile_${profileId}_tabs`;
-
-      if (useSyncStorage) {
-        const tabs = await readChunkedSync(profileTabsKey);
-        return tabs || [];
-      } else {
-        const result = await browser.storage.local.get(profileTabsKey);
-        return result[profileTabsKey] || [];
-      }
-    }
-
-    // Fallback to legacy customTabs key (for very old installations)
-    if (useSyncStorage) {
-      const tabs = await readChunkedSync('customTabs');
-      return tabs || [];
-    } else {
-      const result = await browser.storage.local.get('customTabs');
-      return result.customTabs || [];
-    }
+    return (await window.SFTabs.utils.loadTabsForUrl(window.location.href)).tabs;
   } catch (error) {
-    return [];
+    return [];   // a torn chunk read; an empty bar beats a wrong one
   }
 }
 

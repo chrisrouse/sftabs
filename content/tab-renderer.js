@@ -71,19 +71,12 @@ async function initTabs(tabContainer) {
   isRenderingTabs = true;
 
   try {
-    let tabsToUse = await getTabsFromStorage();
-
-    // Get user settings to check if we should use defaults
-    const useSyncStorage = await getStoragePreference();
-    const settingsKey = 'userSettings';
-    let settings;
-    if (useSyncStorage) {
-      const settingsData = await readChunkedSync(settingsKey);
-      settings = settingsData || {};
-    } else {
-      const result = await browser.storage.local.get(settingsKey);
-      settings = result[settingsKey] || {};
-    }
+    // One pass for both. This used to read tabs and then settings separately,
+    // which meant resolving the storage preference twice and re-reading the
+    // profile list, on a path that runs on every URL and storage change.
+    const { tabs: storedTabs, settings } =
+      await window.SFTabs.utils.loadTabsForUrl(window.location.href);
+    let tabsToUse = storedTabs;
 
     // Set here rather than in getTabsFromStorage: content-main.js declares a
     // function of that name too and, loading last, its copy wins — so the
@@ -1250,14 +1243,14 @@ async function quickAddCurrentPage() {
 
 /** Settings, wherever this install keeps them. */
 async function readUserSettings() {
-  if (await getStoragePreference()) return (await readChunkedSync('userSettings')) || {};
-  return (await browser.storage.local.get('userSettings')).userSettings || {};
+  const utils = window.SFTabs.utils;
+  return (await utils.readStoredValue('userSettings', await utils.storagePreference())) || {};
 }
 
 /** Profiles, wherever this install keeps them. */
 async function readProfiles() {
-  if (await getStoragePreference()) return (await readChunkedSync('profiles')) || [];
-  return (await browser.storage.local.get('profiles')).profiles || [];
+  const utils = window.SFTabs.utils;
+  return (await utils.readStoredValue('profiles', await utils.storagePreference())) || [];
 }
 
 /**

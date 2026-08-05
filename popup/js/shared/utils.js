@@ -354,6 +354,89 @@ function applyTabColor(el, name, style, enabled) {
   el.classList.add('sftabs-tc', `sftabs-tc--${mode}`);
 }
 
+// ── Reading stored tabs from a content script ────────────────────
+//
+// The popup has popup-storage.js for this; content scripts do not, so each
+// surface grew its own copy. Three of them, and they disagreed on the one thing
+// that matters: which storage area to read. content-main.js took the preference
+// from local, which is where the device-specific value actually lives;
+// floating-button.js took it from sync, which does not hold it. So a user who
+// switched to local storage got their tabs in the Setup tab bar and an empty
+// floating panel, on the same page, with nothing to explain it.
+
+/**
+ * Which area this device keeps its data in.
+ *
+ * deviceSettings is authoritative and local by definition — the popup writes it
+ * before migrating anything. The userSettings fallback is for installs that
+ * predate it. Defaults to sync, which is what a fresh install uses.
+ */
+async function storagePreference() {
+  try {
+    const local = await browser.storage.local.get(['deviceSettings', 'userSettings']);
+    if (typeof local.deviceSettings?.useSyncStorage === 'boolean') {
+      return local.deviceSettings.useSyncStorage;
+    }
+    if (typeof local.userSettings?.useSyncStorage === 'boolean') {
+      return local.userSettings.useSyncStorage;
+    }
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * One value from sync, reassembled if it was split across chunks.
+ *
+ * Throws when a chunk is missing or unparseable, rather than returning null —
+ * callers coalesce null to an empty array, which turns "I could not read your
+ * tabs" into "you have no tabs", and the next write makes that true.
+ */
+async function readChunkedSyncValue(key) {
+  const metadataKey = `${key}_metadata`;
+  const metadata = (await browser.storage.sync.get(metadataKey))[metadataKey];
+
+  if (!metadata || !metadata.chunked) {
+    return (await browser.storage.sync.get(key))[key] ?? null;
+  }
+
+  const chunkKeys = Array.from({ length: metadata.chunkCount }, (_, i) => `${key}_chunk_${i}`);
+  const stored = await browser.storage.sync.get(chunkKeys);
+  const chunks = chunkKeys.map(chunkKey => {
+    if (stored[chunkKey] === undefined) throw new Error(`Missing chunk ${chunkKey}`);
+    return stored[chunkKey];
+  });
+  return JSON.parse(chunks.join(''));
+}
+
+/** One value from whichever area this device uses. */
+async function readStoredValue(key, preferSync) {
+  if (preferSync) return readChunkedSyncValue(key);
+  return (await browser.storage.local.get(key))[key] ?? null;
+}
+
+/**
+ * The settings, profiles and tabs that apply to a given page.
+ *
+ * The profile is resolved from the page's own org rather than the globally
+ * active one, so two orgs open at once each render their own tabs. `customTabs`
+ * is the pre-profiles layout, still live on old installs.
+ *
+ * Takes the URL rather than reading window.location, so this stays callable
+ * from the background worker, which has no window.
+ */
+async function loadTabsForUrl(url) {
+  const preferSync = await storagePreference();
+  const settings = await readStoredValue('userSettings', preferSync) || {};
+  const profiles = await readStoredValue('profiles', preferSync) || [];
+  const profileId = resolveProfileForUrl(url, profiles, settings) || settings.activeProfileId;
+  const tabs = await readStoredValue(
+    profileId ? `profile_${profileId}_tabs` : 'customTabs', preferSync) || [];
+
+  return { preferSync, settings, profiles, profileId, tabs };
+}
+
 /**
  * Where a tab points. The single rule; there were five.
  *
@@ -869,6 +952,10 @@ if (typeof module !== 'undefined' && module.exports) {
   tabStorageChanged,
   matchTabsToUrl,
   tabDestinationUrl,
+  loadTabsForUrl,
+  readStoredValue,
+  readChunkedSyncValue,
+  storagePreference,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,
@@ -902,6 +989,10 @@ if (typeof module !== 'undefined' && module.exports) {
     tabStorageChanged,
     matchTabsToUrl,
     tabDestinationUrl,
+    loadTabsForUrl,
+    readStoredValue,
+    readChunkedSyncValue,
+    storagePreference,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,
