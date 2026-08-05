@@ -256,58 +256,39 @@ async function performExportFromInline() {
  */
 async function performExport(exportEverything, exportSettings, selectedProfileIds) {
 	try {
-		const syncData = await browser.storage.sync.get(null);
-		const localData = await browser.storage.local.get(null);
-
 		const exportData = {
 			version: '2.0.0',
 			exportDate: new Date().toISOString()
 		};
 
 		if (exportEverything) {
-			// Export everything
-			exportData.settings = syncData.userSettings || {};
-			exportData.profiles = syncData.profiles || [];
+			// Export everything, read through the storage layer so the values are
+			// whole. Taking syncData[`profile_X_tabs`] straight from a get(null)
+			// missed two whole classes of user: anyone on local storage, whose
+			// data is not in sync at all, and anyone whose profile had outgrown
+			// 7000 bytes, where the direct key does not exist because the value
+			// lives in _chunk_N parts. Both exported a profile with no tabs.
+			exportData.settings = await SFTabs.storage.getUserSettings() || {};
+			exportData.profiles = await SFTabs.storage.getProfiles() || [];
 			exportData.profileData = {};
-			exportData.chunkedData = {};
 
-			// Export all profile tabs
-			const profiles = syncData.profiles || [];
-			for (const profile of profiles) {
-				const profileKey = `profile_${profile.id}_tabs`;
-				if (syncData[profileKey]) {
-					exportData.profileData[profile.id] = syncData[profileKey];
-				}
-			}
-
-			// Include all chunked data
-			for (const key in syncData) {
-				if (key.includes('_chunk_') || key.includes('_metadata')) {
-					exportData.chunkedData[key] = syncData[key];
-				}
-			}
-			for (const key in localData) {
-				if (key.includes('_chunk_') || key.includes('_metadata')) {
-					exportData.chunkedData[key] = localData[key];
-				}
+			for (const profile of exportData.profiles) {
+				exportData.profileData[profile.id] = await SFTabs.storage.getProfileTabs(profile.id) || [];
 			}
 		} else {
 			// Selective export
 			if (exportSettings) {
-				exportData.settings = syncData.userSettings || {};
+				exportData.settings = await SFTabs.storage.getUserSettings() || {};
 			}
 
 			if (selectedProfileIds.length > 0) {
-				const allProfiles = syncData.profiles || [];
+				const allProfiles = await SFTabs.storage.getProfiles() || [];
 				exportData.profiles = allProfiles.filter(p => selectedProfileIds.includes(p.id));
 				exportData.profileData = {};
 
 				// Export only selected profile tabs
 				for (const profileId of selectedProfileIds) {
-					const profileKey = `profile_${profileId}_tabs`;
-					if (syncData[profileKey]) {
-						exportData.profileData[profileId] = syncData[profileKey];
-					}
+					exportData.profileData[profileId] = await SFTabs.storage.getProfileTabs(profileId) || [];
 				}
 			}
 		}
@@ -901,9 +882,10 @@ async function importFromHybridMode(importData, importSettings) {
 	}
 
 	// Import chunked data if available
-	if (importData.chunkedData && Object.keys(importData.chunkedData).length > 0) {
-		await browser.storage.local.set(importData.chunkedData);
-	}
+	// No chunkedData restore. It wrote sync-format _chunk_N keys into local,
+	// where nothing reads them — chunking is a sync-only concern — so it never
+	// restored anything. Tabs now arrive whole in profileData and are written
+	// by saveProfileTabs, which re-chunks as needed for the target area.
 }
 
 /**
@@ -1059,9 +1041,10 @@ async function importTabsToDestination(importData, importSettings) {
 	}
 
 	// Import chunked data if available
-	if (importData.chunkedData && Object.keys(importData.chunkedData).length > 0) {
-		await browser.storage.local.set(importData.chunkedData);
-	}
+	// No chunkedData restore. It wrote sync-format _chunk_N keys into local,
+	// where nothing reads them — chunking is a sync-only concern — so it never
+	// restored anything. Tabs now arrive whole in profileData and are written
+	// by saveProfileTabs, which re-chunks as needed for the target area.
 }
 
 /**
