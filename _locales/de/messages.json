@@ -3094,5 +3094,110 @@
   "githubLink": {
     "message": "GitHub",
     "description": "Link to the project repository"
+  },
+  "editTabPanelTitle": {
+    "message": "Tab bearbeiten"
+  },
+  "addTabPanelTitle": {
+    "message": "Tab hinzufügen"
+  },
+  "subItemsOne": {
+    "message": "$COUNT$ Unterelement",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "subItemsMany": {
+    "message": "$COUNT$ Unterelemente",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "objectMismatch": {
+    "message": "Dieser Tab gehört zu \"$WANTED$\", angezeigt wird aber \"$ACTUAL$\".",
+    "placeholders": {
+      "wanted": {
+        "content": "$1",
+        "example": "Account"
+      },
+      "actual": {
+        "content": "$2",
+        "example": "Contact"
+      }
+    }
+  },
+  "itemsReplacedOne": {
+    "message": "1 Element durch $COUNT$ aus $OBJECT$ ersetzt",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      },
+      "object": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "itemsReplacedMany": {
+    "message": "$PREVIOUS$ Elemente durch $COUNT$ aus $OBJECT$ ersetzt",
+    "placeholders": {
+      "previous": {
+        "content": "$1",
+        "example": "3"
+      },
+      "count": {
+        "content": "$2",
+        "example": "7"
+      },
+      "object": {
+        "content": "$3",
+        "example": "Account"
+      }
+    }
+  },
+  "itemsAdded": {
+    "message": "$COUNT$ Elemente aus $OBJECT$ hinzugefügt",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      },
+      "object": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "deleteItemConfirmTitle": {
+    "message": "Element löschen?"
+  },
+  "deleteItemConfirmBody": {
+    "message": "Möchten Sie \"$NAME$\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields"
+      }
+    }
+  },
+  "deleteItemConfirmBodyNested": {
+    "message": "Beim Löschen von \"$NAME$\" werden auch die $COUNT$ untergeordneten Elemente gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields"
+      },
+      "count": {
+        "content": "$2",
+        "example": "3"
+      }
+    }
   }
 }

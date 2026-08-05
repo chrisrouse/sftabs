@@ -3258,5 +3258,110 @@
   "githubLink": {
     "message": "GitHub",
     "description": "Link to the project repository"
+  },
+  "editTabPanelTitle": {
+    "message": "Edit Tab"
+  },
+  "addTabPanelTitle": {
+    "message": "Add Tab"
+  },
+  "subItemsOne": {
+    "message": "$COUNT$ sub-item",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "subItemsMany": {
+    "message": "$COUNT$ sub-items",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "objectMismatch": {
+    "message": "This tab is for \"$WANTED$\" but you're viewing \"$ACTUAL$\".",
+    "placeholders": {
+      "wanted": {
+        "content": "$1",
+        "example": "Account"
+      },
+      "actual": {
+        "content": "$2",
+        "example": "Contact"
+      }
+    }
+  },
+  "itemsReplacedOne": {
+    "message": "Replaced 1 item with $COUNT$ from $OBJECT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      },
+      "object": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "itemsReplacedMany": {
+    "message": "Replaced $PREVIOUS$ items with $COUNT$ from $OBJECT$",
+    "placeholders": {
+      "previous": {
+        "content": "$1",
+        "example": "3"
+      },
+      "count": {
+        "content": "$2",
+        "example": "7"
+      },
+      "object": {
+        "content": "$3",
+        "example": "Account"
+      }
+    }
+  },
+  "itemsAdded": {
+    "message": "Added $COUNT$ items from $OBJECT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      },
+      "object": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "deleteItemConfirmTitle": {
+    "message": "Delete Item?"
+  },
+  "deleteItemConfirmBody": {
+    "message": "Are you sure you want to delete \"$NAME$\"? This action cannot be undone.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields"
+      }
+    }
+  },
+  "deleteItemConfirmBodyNested": {
+    "message": "Deleting \"$NAME$\" also deletes its $COUNT$ nested items. This action cannot be undone.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields"
+      },
+      "count": {
+        "content": "$2",
+        "example": "3"
+      }
+    }
   }
 }

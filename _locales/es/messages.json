@@ -3094,5 +3094,110 @@
   "githubLink": {
     "message": "GitHub",
     "description": "Link to the project repository"
+  },
+  "editTabPanelTitle": {
+    "message": "Editar pestaña"
+  },
+  "addTabPanelTitle": {
+    "message": "Añadir pestaña"
+  },
+  "subItemsOne": {
+    "message": "$COUNT$ subelemento",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "subItemsMany": {
+    "message": "$COUNT$ subelementos",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "4"
+      }
+    }
+  },
+  "objectMismatch": {
+    "message": "Esta pestaña es de \"$WANTED$\", pero estás viendo \"$ACTUAL$\".",
+    "placeholders": {
+      "wanted": {
+        "content": "$1",
+        "example": "Account"
+      },
+      "actual": {
+        "content": "$2",
+        "example": "Contact"
+      }
+    }
+  },
+  "itemsReplacedOne": {
+    "message": "Se reemplazó 1 elemento por $COUNT$ de $OBJECT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      },
+      "object": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "itemsReplacedMany": {
+    "message": "Se reemplazaron $PREVIOUS$ elementos por $COUNT$ de $OBJECT$",
+    "placeholders": {
+      "previous": {
+        "content": "$1",
+        "example": "3"
+      },
+      "count": {
+        "content": "$2",
+        "example": "7"
+      },
+      "object": {
+        "content": "$3",
+        "example": "Account"
+      }
+    }
+  },
+  "itemsAdded": {
+    "message": "Se añadieron $COUNT$ elementos de $OBJECT$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "7"
+      },
+      "object": {
+        "content": "$2",
+        "example": "Account"
+      }
+    }
+  },
+  "deleteItemConfirmTitle": {
+    "message": "¿Eliminar elemento?"
+  },
+  "deleteItemConfirmBody": {
+    "message": "¿Seguro que quieres eliminar \"$NAME$\"? Esta acción no se puede deshacer.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields"
+      }
+    }
+  },
+  "deleteItemConfirmBodyNested": {
+    "message": "Al eliminar \"$NAME$\" también se eliminan sus $COUNT$ elementos anidados. Esta acción no se puede deshacer.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Fields"
+      },
+      "count": {
+        "content": "$2",
+        "example": "3"
+      }
+    }
   }
 }

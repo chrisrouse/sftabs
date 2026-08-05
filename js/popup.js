@@ -422,7 +422,11 @@ function installProductionHooks() {
   SFTabs.main = warnOnMissing({
     getTabs: () => state.tabs,
     setTabs: tabs => { state.tabs = tabs; },
-    showStatus: (message, isError) => showStatus(message, isError ? 'error' : 'success'),
+    // Errors only. The storage layer emits its own generic, untranslated
+    // successes — "Settings saved", "Profiles saved" — after work the popup has
+    // already reported specifically. They arrived last and won, so deleting a
+    // tab announced "Settings saved", in English, whatever the user's locale.
+    showStatus: (message, isError) => { if (isError) showStatus(message, 'error'); },
     // saveUserSettings needs these three. getUserSettings in particular gates
     // its sync<->local comparison: without it, flipping useSyncStorage would
     // save the preference but never move the data.
@@ -431,7 +435,11 @@ function installProductionHooks() {
     applyTheme: () => applyTheme(state.settings.themeMode)
   });
   SFTabs.ui = warnOnMissing({
-    renderTabList: () => { renderTabList(); bindTabListEvents(); }
+    // popup-storage.js calls this from its own storage listener, which knows
+    // nothing about the edit form. Rendering there would replace the list under
+    // a half-finished edit; this popup's listener already handles external
+    // changes, with that guard.
+    renderTabList: () => { if (!isEditing()) { renderTabList(); bindTabListEvents(); } }
   });
 }
 
@@ -819,7 +827,7 @@ function tabItemHTML(tab) {
       </div>
       ${path ? `<span class="tab-path">${path}</span>` : ''}
       ${hasDropdown(tab) ? `<button class="tab-dropdown-note" data-action="manage-items" data-id="${tab.id}"
-        >▾ ${countItems(tab.dropdownItems)} sub-item${countItems(tab.dropdownItems) === 1 ? '' : 's'}</button>` : ''}
+        >▾ ${esc(subItemLabel(countItems(tab.dropdownItems)))}</button>` : ''}
     </div>
     <div class="tab-actions" role="group" aria-label="${t('ariaTabActions', name)}">
       <button class="tab-btn tab-btn--move tab-btn--up"
@@ -1275,10 +1283,30 @@ async function applyTabMembership(tab, wanted) {
  * edited there, so it is in that profile by definition, and removing it is what
  * the delete button is for.
  */
+/**
+ * Which tabs this membership table currently describes.
+ *
+ * The table is filled after an await, and both callers fire this without
+ * waiting. Open Edit on tab A, close it, open tab B and save before A's read
+ * came back, and the rows on screen were A's while the form was B's — so
+ * saving wrote tab B into tab A's profiles. Nothing failed; the wrong data was
+ * simply persisted.
+ *
+ * The token discards a render that has been superseded, and the container is
+ * stamped with the tab it belongs to so the read path can refuse to guess.
+ */
+let tabProfilesToken = 0;
+
 async function renderTabProfiles(tabId) {
   const group = document.getElementById('group-tab-profiles');
   const rows = document.getElementById('tab-profile-rows');
   if (!group || !rows) return;
+
+  const token = ++tabProfilesToken;
+
+  // Clear first: stale rows must not be readable while the new ones load
+  rows.innerHTML = '';
+  delete rows.dataset.tabId;
 
   const others = otherProfiles();
   group.hidden = !state.settings.profilesEnabled || others.length === 0;
@@ -1286,6 +1314,7 @@ async function renderTabProfiles(tabId) {
 
   const active = state.profiles.find(p => p.id === state.settings.activeProfileId);
   const held = tabId ? await profilesHoldingTab(tabId) : [];
+  if (token !== tabProfilesToken) return;   // a later render owns the table now
 
   const row = (profile, checked, locked) => `
     <tr>
@@ -1301,10 +1330,22 @@ async function renderTabProfiles(tabId) {
   rows.innerHTML =
     (active ? row(active, true, true) : '') +
     others.map(p => row(p, held.includes(p.id), false)).join('');
+  rows.dataset.tabId = tabId || '';
 }
 
-/** The profiles ticked on the edit form, active one excluded. */
-function readTabProfiles() {
+/**
+ * The profiles ticked on the edit form, active one excluded.
+ *
+ * Returns null when the table does not describe the tab being saved — still
+ * loading, or left over from a previous edit. Callers treat that as "leave
+ * membership alone", which is the only safe reading: acting on rows belonging
+ * to another tab is how a tab ended up in the wrong profiles.
+ */
+function readTabProfiles(expectedTabId) {
+  const rows = document.getElementById('tab-profile-rows');
+  if (!rows || rows.dataset.tabId === undefined) return null;
+  if ((rows.dataset.tabId || '') !== (expectedTabId || '')) return null;
+
   return [...document.querySelectorAll('#tab-profile-rows input[data-profile-id]:not(:disabled)')]
     .filter(box => box.checked)
     .map(box => box.dataset.profileId);
@@ -1529,7 +1570,7 @@ function openEditTab(tabId) {
   const tabEl = document.querySelector(`.tab-item[data-id="${tabId}"]`);
   if (tabEl) tabEl.classList.add('is-editing');
 
-  document.getElementById('edit-panel-title').textContent    = 'Edit Tab';
+  document.getElementById('edit-panel-title').textContent    = t('editTabPanelTitle');
   document.getElementById('edit-panel-subtitle').textContent = t('editingTabSubtitle', tab.label);
   document.getElementById('input-tab-name').value    = tab.label;
   document.getElementById('input-tab-path').value    = tab.path || '';
@@ -1548,7 +1589,7 @@ function openEditTab(tabId) {
 function openAddTab() {
   state.editingTabId = null;
 
-  document.getElementById('edit-panel-title').textContent    = 'Add Tab';
+  document.getElementById('edit-panel-title').textContent    = t('addTabPanelTitle');
   document.getElementById('edit-panel-subtitle').textContent = t('addTabSubtitle');
   document.getElementById('input-tab-name').value    = '';
   document.getElementById('input-tab-path').value    = '';
@@ -1737,7 +1778,7 @@ async function scrapeObjectNavigation() {
     if (wantedObject && res.objectName &&
         wantedObject.toLowerCase() !== res.objectName.toLowerCase()) {
       showStatus(
-        `This tab is for "${wantedObject}" but you're viewing "${res.objectName}".`, 'error');
+        t('objectMismatch', wantedObject, res.objectName), 'error');
       return;
     }
 
@@ -1753,8 +1794,10 @@ async function scrapeObjectNavigation() {
 
     state.expandedPaths.clear();
     showStatus(previous
-      ? `Replaced ${previous} item${previous === 1 ? '' : 's'} with ${items.length} from ${res.objectName || wantedObject}`
-      : `Added ${items.length} items from ${res.objectName || wantedObject}`);
+      ? (previous === 1
+          ? t('itemsReplacedOne', items.length, res.objectName || wantedObject)
+          : t('itemsReplacedMany', previous, items.length, res.objectName || wantedObject))
+      : t('itemsAdded', items.length, res.objectName || wantedObject));
 
     renderDropdownItems(state.editingTabId);
     renderTabList();
@@ -1887,7 +1930,7 @@ function promoteDropdownItem(path) {
   persistTabs();
 }
 
-function deleteDropdownItem(path) {
+async function deleteDropdownItem(path) {
   const tab = state.tabs.find(t => t.id === state.editingTabId);
   if (!tab) return;
   const item = getItemByPath(tab.dropdownItems, path);
@@ -1895,8 +1938,16 @@ function deleteDropdownItem(path) {
 
   const childCount = countItems(item.dropdownItems);
   if (!state.settings.skipDeleteConfirmation) {
-    const extra = childCount ? ` and its ${childCount} nested item${childCount === 1 ? '' : 's'}` : '';
-    if (!confirm(`Delete "${item.label}"${extra}?`)) return;
+    // confirmDialog, not window.confirm: every other confirmation in this popup
+    // uses it, the text was hardcoded English, and Chrome restricts
+    // window.confirm in extension popups — where it is suppressed it returns
+    // false, so the delete silently did nothing.
+    const ok = await confirmDialog(
+      t('deleteItemConfirmTitle'),
+      childCount
+        ? t('deleteItemConfirmBodyNested', item.label, childCount)
+        : t('deleteItemConfirmBody', item.label));
+    if (!ok) return;
   }
 
   removeItemByPath(tab.dropdownItems, path);
@@ -1977,7 +2028,7 @@ async function saveTab(e) {
   // Read the ticks before the view changes and the table is re-rendered
   const wanted = document.getElementById('group-tab-profiles')?.hidden
     ? null
-    : readTabProfiles();
+    : readTabProfiles(state.editingTabId);
 
   renderTabList();
   bindTabListEvents();
@@ -2165,8 +2216,21 @@ async function adoptExternalProfileSwitch(settings) {
   showStatus(t('profileChangedExternally', name));
 }
 
+/**
+ * Pick up a change made outside this popup.
+ *
+ * Compares before announcing. Every save this popup makes also fires the
+ * storage listener, so saving one tab produced a full reload and a "tabs
+ * updated externally" toast on top of the specific message already shown —
+ * three toasts and three renders for one edit. Comparing the stored value
+ * against what is held distinguishes a genuine outside change from the echo of
+ * our own write, without timers or write markers to get wrong.
+ */
 async function reloadTabsFromStorage() {
-  state.tabs = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
+  const fresh = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
+  if (JSON.stringify(fresh) === JSON.stringify(state.tabs)) return;   // our own echo
+
+  state.tabs = fresh;
   renderTabList();
   bindTabListEvents();
   showStatus(t('tabsUpdatedExternally'));
@@ -3157,9 +3221,19 @@ function bindEvents() {
   // Escape key
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      if (!document.getElementById('modal-delete').hidden) {
-        document.getElementById('modal-delete').hidden = true;
-        state.pendingDeleteId = null;
+      // Any open dialog, not just the delete one. The others were unreachable
+      // by keyboard, and Escape acted on the view behind them — so with the
+      // storage-migration dialog up, the overlay stayed and the promise behind
+      // it never settled, leaving no way out but reopening the popup.
+      //
+      // Cancel is clicked rather than the overlay hidden, because these dialogs
+      // hand back a promise that only the button handlers resolve. Hiding the
+      // overlay alone is what left confirmDialog() pending forever. A dialog
+      // with no cancel — the first-launch wizard — is deliberately not
+      // dismissable this way.
+      const openDialog = dismissableDialog();
+      if (openDialog) {
+        openDialog.click();
       } else if (state.profileDropdownOpen) {
         closeProfileDropdown();
         document.getElementById('btn-profile-switcher').focus();
@@ -3170,6 +3244,22 @@ function bindEvents() {
   });
 
   bindTabListEvents();
+}
+
+/** "3 sub-items", localised, singular when there is one. */
+function subItemLabel(count) {
+  return t(count === 1 ? 'subItemsOne' : 'subItemsMany', count);
+}
+
+/**
+ * The cancel button of whichever dialog is on screen, if it can be dismissed.
+ *
+ * Presence of a cancel control is the test for "dismissable": the first-launch
+ * wizard has none, and escaping it would strand a new install half-configured.
+ */
+function dismissableDialog() {
+  const open = [...document.querySelectorAll('.modal-overlay')].find(modal => !modal.hidden);
+  return open ? open.querySelector('[id$="-cancel"]') : null;
 }
 
 const handleTabListClick = e => {
