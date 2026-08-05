@@ -18,14 +18,25 @@
 :root { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
 
-/* Aliases onto the design tokens, named for what they do on this page */
+/* Aliases onto the design tokens, named for what they do on this page.
+ *
+ * Three of these carry a literal light-dark() pair rather than a token, and do
+ * so deliberately: they are the same values css/popup.css uses for the same
+ * roles, where each is documented as a contrast choice the raw token does not
+ * make — surface-3 in dark so cards separate from the panel behind them, and a
+ * mid grey that clears AA on both surfaces. Replacing them with the raw tokens
+ * would make this page disagree with the popup, which is the opposite of the
+ * point. If they change, they change in both files together.
+ *
+ * --sunken was the one real divergence: #f8f8f8/#242424 against the popup's
+ * --sft-surface-2, so recessed panels here sat a shade off the popup's. */
 :root {
   --page:     var(--sft-surface-base);
-  --surface:  light-dark(#ffffff, #2e2e2e);
-  --sunken:   light-dark(#f8f8f8, #242424);
+  --surface:  light-dark(#ffffff, #2e2e2e); /* = popup --s-1 */
+  --sunken:   var(--sft-surface-2);         /* = popup --s-2 */
   --t-base:   var(--sft-text);
-  --t-weak:   light-dark(#757575, #939393);
-  --b-subtle: light-dark(#e5e5e5, #444444);
+  --t-weak:   light-dark(#757575, #939393); /* = popup --t-weak */
+  --b-subtle: light-dark(#e5e5e5, #444);    /* = popup --b-subtle */
   --b-medium: var(--sft-border);
   --accent:   var(--sft-accent);
   --accent-bg: var(--sft-accent-container);
@@ -34,6 +45,11 @@
   --danger:   light-dark(#ba0517, #fe5c4c);
   --ease-page: var(--sft-duration-promptly) var(--sft-ease);
 }
+
+/* The px values left below — 10, 11, 14, 15, 17, 18, 38 — have no token
+   equivalent. This page's density was tuned by eye at a wider measure than the
+   380px popup, and rounding each to the nearest 4px step would change the
+   layout to no one's benefit. Only exact matches were tokenised. */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -56,7 +72,7 @@ button, input, select { font: inherit; color: inherit; }
 .topbar-inner {
   max-width: 780px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: var(--sft-spacing-4) var(--sft-spacing-5);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -69,7 +85,7 @@ button, input, select { font: inherit; color: inherit; }
 .wrap {
   max-width: 780px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--sft-spacing-5);
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -128,7 +144,7 @@ button, input, select { font: inherit; color: inherit; }
 }
 .subhead:not(:first-child) { margin-top: 14px; }
 
-.check { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; }
+.check { display: flex; align-items: center; gap: var(--sft-spacing-2); padding: 3px 0; cursor: pointer; }
 .check input { accent-color: var(--accent); flex-shrink: 0; }
 
 /* ── Buttons ── */
@@ -144,15 +160,15 @@ button, input, select { font: inherit; color: inherit; }
 }
 .btn:hover { border-color: var(--accent); color: var(--accent); }
 .btn:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
-.btn--primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn--primary:hover { background: var(--sft-accent-hover, var(--accent)); color: #fff; opacity: 0.92; }
+.btn--primary { background: var(--accent); border-color: var(--accent); color: var(--sft-text-on-accent); }
+.btn--primary:hover { background: var(--sft-accent-hover, var(--accent)); color: var(--sft-text-on-accent); opacity: 0.92; }
 .btn--quiet { border-color: transparent; color: var(--t-weak); }
 .btn--quiet:hover { border-color: var(--b-medium); }
 
 .hint { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
 .hint code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
+  font-size: var(--sft-font-size-xs);
   background: var(--sunken);
   padding: 1px 5px;
   border-radius: var(--sft-radius-1);
@@ -162,7 +178,7 @@ button, input, select { font: inherit; color: inherit; }
 .filerow {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--sft-spacing-3);
   padding: 10px 14px;
   background: var(--sunken);
   border: var(--sft-border-width-1) solid var(--b-subtle);
@@ -228,5 +244,5 @@ button, input, select { font: inherit; color: inherit; }
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .sftabs-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.sftabs-toast.success { background: var(--sft-success, #2e844a); color: #fff; border-color: transparent; }
-.sftabs-toast.error { background: var(--danger); color: #fff; border-color: transparent; }
+.sftabs-toast.success { background: var(--sft-success); color: var(--sft-text-on-accent); border-color: transparent; }
+.sftabs-toast.error { background: var(--danger); color: var(--sft-text-on-accent); border-color: transparent; }

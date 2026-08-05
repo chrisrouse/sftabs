@@ -82,6 +82,14 @@
 
   /* Motion */
   --ease: var(--sft-duration-promptly) var(--sft-ease);
+
+  /* Two values with no token behind them, named here rather than repeated.
+     The yellow is SLDS palette-yellow-80, used for the notification dot and the
+     "default tab" star; the hairline is the inset ring on the colour swatches,
+     which has to read against both a light and a dark swatch and so cannot be
+     a themed border token. */
+  --c-star:     #fcc003;
+  --c-inset-hairline: rgb(0 0 0 / 0.14);
 }
 
 /* ── 2. Reset ── */
@@ -125,7 +133,7 @@ a:hover { text-decoration: underline; }
   z-index: 9999;
   padding: 4px 12px;
   background: var(--c-primary);
-  color: #fff;
+  color: var(--sft-text-on-accent);
   border-radius: var(--r-sm);
   font-size: var(--sft-font-size-base);
   font-weight: var(--sft-font-weight-semibold);
@@ -150,10 +158,10 @@ a:hover { text-decoration: underline; }
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--sft-spacing-3);
   padding: 0 16px;
   background: var(--c-brand);
-  color: #fff;
+  color: var(--sft-text-on-accent);
   position: relative;
   z-index: 10;
 }
@@ -161,7 +169,7 @@ a:hover { text-decoration: underline; }
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   flex-shrink: 0;
 }
 
@@ -200,9 +208,9 @@ a:hover { text-decoration: underline; }
   cursor: pointer;
   transition: background var(--ease), color var(--ease);
 }
-.header-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.header-btn:hover { background: rgba(255,255,255,0.14); color: var(--sft-text-on-accent); }
 /* Menu triggers stay lit while their menu is open */
-.header-btn[aria-expanded="true"] { background: rgba(255,255,255,0.2); color: #fff; }
+.header-btn[aria-expanded="true"] { background: rgba(255,255,255,0.2); color: var(--sft-text-on-accent); }
 .header-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.75); outline-offset: 2px; }
 .header-btn svg { width: 18px; height: 18px; }
 
@@ -213,7 +221,7 @@ a:hover { text-decoration: underline; }
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #fcc003; /* palette-yellow-80 notification accent */
+  background: var(--c-star); /* palette-yellow-80 notification accent */
   box-shadow: 0 0 0 1.5px rgba(255,255,255,0.5);
 }
 
@@ -242,7 +250,7 @@ nav[aria-label="Custom tabs"] {
   overflow-x: hidden;
 }
 nav[aria-label="Custom tabs"]::-webkit-scrollbar { width: 3px; }
-nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
+nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: var(--sft-radius-1); }
 
 .tab-list {
   padding: var(--sft-spacing-var-block-2) var(--sft-spacing-2);
@@ -337,7 +345,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-info-top {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sft-spacing-1);
   min-width: 0;
 }
 
@@ -380,7 +388,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   align-items: center;
   justify-content: center;
   background: #7526e3;              /* palette-purple-40, fixed for white text */
-  color: #fff;
+  color: var(--sft-text-on-accent);
   border-radius: var(--sft-radius-circle);
   font-size: var(--sft-font-size-xxs);
   font-weight: var(--sft-font-weight-semibold);
@@ -503,7 +511,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   padding: var(--sft-spacing-var-block-4) var(--sft-spacing-4) var(--sft-spacing-var-block-3);
   border-bottom: 1px solid var(--b-subtle);
   flex-shrink: 0;
@@ -551,9 +559,9 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   gap: var(--sft-spacing-var-block-4);
 }
 .edit-form::-webkit-scrollbar { width: 3px; }
-.edit-form::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
+.edit-form::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: var(--sft-radius-1); }
 
-.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group { display: flex; flex-direction: column; gap: var(--sft-spacing-1); }
 
 /* SLDS form labels are sentence case at body size, not uppercase micro-caps */
 .form-label {
@@ -615,7 +623,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
 }
 .form-legend {
   font-size: var(--sft-font-size-base);
@@ -627,7 +635,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .check-row {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   cursor: pointer;
 }
 /* SLDS checkbox: 16px faux box, 1px border-2, radius-1, accent fill +
@@ -643,7 +651,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   background: var(--sft-surface-container-1);
   border: var(--sft-border-width-1) solid var(--sft-border-strong);
   border-radius: var(--sft-radius-1);
-  transition: background-color 0.1s linear, border-color 0.1s linear;
+  transition: background-color var(--sft-duration-quickly) linear, border-color var(--sft-duration-quickly) linear;
   cursor: pointer;
 }
 .check-input::after {
@@ -657,7 +665,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   border-bottom: var(--sft-border-width-2) solid var(--sft-on-accent-1);
   transform: rotate(45deg);
   opacity: 0;
-  transition: opacity 0.1s linear;
+  transition: opacity var(--sft-duration-quickly) linear;
 }
 .check-input:checked {
   background: var(--sft-accent-container-1);
@@ -691,7 +699,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   margin-top: auto;
   margin-inline: calc(-1 * var(--sft-spacing-4));
   padding: var(--sft-spacing-2) var(--sft-spacing-4);
@@ -707,7 +715,7 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
 }
 
 /* .dropdown-item also carries .tab-item, inheriting that anatomy. */
@@ -800,7 +808,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   gap: var(--sft-spacing-var-block-5);
 }
 .settings-body::-webkit-scrollbar { width: 3px; }
-.settings-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
+.settings-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: var(--sft-radius-1); }
 
 /* Settings reverses the header's usual order: the back button comes first and
    the title follows it, where every other view leads with the title and puts
@@ -894,7 +902,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--sft-spacing-3);
   padding: var(--sft-spacing-var-block-2) 0;
 }
 
@@ -976,7 +984,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   font-size: var(--sft-font-size-xs);
   font-weight: var(--sft-font-weight-semibold);
   text-transform: uppercase;
@@ -1097,7 +1105,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .seed-choice {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   font-size: var(--sft-font-size-base);
   color: var(--t-base);
   cursor: pointer;
@@ -1180,8 +1188,8 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   background: var(--sft-neutral-60);
   border: var(--sft-border-width-1) solid var(--sft-neutral-60);
   border-radius: var(--sft-radius-pill);
-  transition: background-color 0.2s cubic-bezier(0.75, 0, 0.08, 1),
-              border-color 0.2s cubic-bezier(0.75, 0, 0.08, 1);
+  transition: background-color var(--sft-duration-promptly) cubic-bezier(0.75, 0, 0.08, 1),
+              border-color var(--sft-duration-promptly) cubic-bezier(0.75, 0, 0.08, 1);
 }
 .toggle:hover .toggle-track {
   background: var(--sft-neutral-50);
@@ -1200,7 +1208,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   border-bottom: var(--sft-border-width-2) solid var(--sft-on-accent-1);
   transform: rotate(45deg);
   opacity: 0;
-  transition: opacity 0.2s cubic-bezier(0.75, 0, 0.08, 1);
+  transition: opacity var(--sft-duration-promptly) cubic-bezier(0.75, 0, 0.08, 1);
 }
 
 .toggle input:checked + .toggle-track {
@@ -1222,7 +1230,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   height: 1.25rem;
   background: var(--sft-on-accent-1);
   border-radius: var(--sft-radius-pill);
-  transition: transform 0.2s cubic-bezier(0.75, 0, 0.08, 1);
+  transition: transform var(--sft-duration-promptly) cubic-bezier(0.75, 0, 0.08, 1);
 }
 .toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(1.5rem); }
 
@@ -1244,7 +1252,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .choice-card {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   padding: 8px 12px;
   cursor: pointer;
   border-bottom: 1px solid var(--b-subtle);
@@ -1267,7 +1275,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   background: var(--sft-surface-container-1);
   border: var(--sft-border-width-1) solid var(--sft-border-strong);
   border-radius: 50%;
-  transition: border-color 0.1s linear;
+  transition: border-color var(--sft-duration-quickly) linear;
   cursor: pointer;
 }
 .storage-card input[type="radio"]::after,
@@ -1278,7 +1286,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   border-radius: 50%;
   background: var(--sft-accent-container-1);
   opacity: 0;
-  transition: opacity 0.1s linear;
+  transition: opacity var(--sft-duration-quickly) linear;
 }
 .storage-card input[type="radio"]:checked,
 .choice-card input[type="radio"]:checked { border-color: var(--sft-border-accent); }
@@ -1323,7 +1331,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .advanced-link {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   font-size: var(--sft-font-size-xs);
   color: var(--t-weak);
   padding: 8px 4px;
@@ -1341,10 +1349,10 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--sft-spacing-4);
 }
 .rn-body::-webkit-scrollbar { width: 3px; }
-.rn-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: 4px; }
+.rn-body::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: var(--sft-radius-1); }
 
 .rn-version-label {
   display: inline-flex;
@@ -1354,11 +1362,11 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   padding: 4px 8px;
   border-radius: var(--r-pill);
   background: var(--c-primary);
-  color: #fff;
+  color: var(--sft-text-on-accent);
   margin-bottom: 8px;
 }
 
-.rn-items { display: flex; flex-direction: column; gap: 8px; }
+.rn-items { display: flex; flex-direction: column; gap: var(--sft-spacing-2); }
 
 .rn-item {
   display: flex;
@@ -1374,7 +1382,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--sft-spacing-3);
   padding: 12px 16px;
   border-top: 1px solid var(--b-subtle);
   background: var(--s-1);
@@ -1390,7 +1398,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   padding: 6px 12px;
   background: var(--footer-bg);
   border-top: 1px solid rgba(255,255,255,0.05);
@@ -1485,7 +1493,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .profile-option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   padding: 8px 12px;
   cursor: pointer;
   font-size: var(--sft-font-size-base);
@@ -1559,7 +1567,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   padding: var(--sft-spacing-4);
   border-top: var(--sft-border-width-1) solid var(--sft-border);
   background: var(--sft-surface-container-1);
@@ -1573,7 +1581,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--sft-spacing-2);
   min-height: var(--sft-size-control);
   padding: 0 16px;
   border-radius: var(--sft-radius-pill);
@@ -1703,8 +1711,8 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 /* Default-profile star. Off is the outline icon in the usual muted action
    color; on is the filled icon in the notification yellow, the same accent
    the unread dot uses. */
-.tab-btn--star.is-on { color: #fcc003; }
-.tab-btn--star.is-on:hover { background: color-mix(in srgb, #fcc003 18%, transparent); }
+.tab-btn--star.is-on { color: var(--c-star); }
+.tab-btn--star.is-on:hover { background: color-mix(in srgb, var(--c-star) 18%, transparent); }
 
 /* ── 29. Tab color picker ──
    Dots rather than a named grid: it is the most compact of the three layouts
@@ -1727,7 +1735,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   transition: box-shadow var(--ease);
   /* A hairline inside the swatch, so the palest shades still read as a disc
      against the panel rather than dissolving into it */
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14);
+  box-shadow: inset 0 0 0 1px var(--c-inset-hairline);
 }
 
 /* Hover and selection are rings held off the swatch by a surface-colored gap.
@@ -1736,13 +1744,13 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
    whatever color it surrounds. box-shadow rather than border so the swatch
    never changes size and the grid doesn't shift. */
 .color-dot:hover {
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14),
+  box-shadow: inset 0 0 0 1px var(--c-inset-hairline),
               0 0 0 2px var(--s-1),
               0 0 0 3px var(--b-strong);
 }
 .color-dot[aria-checked="true"],
 .color-dot[aria-checked="true"]:hover {
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14),
+  box-shadow: inset 0 0 0 1px var(--c-inset-hairline),
               0 0 0 2px var(--s-1),
               0 0 0 4px var(--t-base);
 }
@@ -1804,7 +1812,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sft-spacing-1);
   padding: 5px 8px;
   border-radius: 2px;
   background: var(--s-1);
