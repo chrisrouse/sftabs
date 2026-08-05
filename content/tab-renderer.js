@@ -142,14 +142,15 @@ async function initTabs(tabContainer) {
 
     // Check for overflow and handle it (use longer timeout for accurate measurement)
     setTimeout(() => {
-      handleTabOverflow(tabContainer, topLevelTabs);
-      renderQuickAddButton(tabContainer, quickAddInBar);
-      // Snapshot after the bar has settled, so the watcher compares a drag
-      // against what is actually on screen rather than what we intended
-      renderedTabOrder = currentBarOrder(tabContainer);
-      watchBarReorder(tabContainer);
-      // Reset flag after overflow handling completes
-      isRenderingTabs = false;
+      try {
+        handleTabOverflow(tabContainer, topLevelTabs);
+        renderQuickAddButton(tabContainer, quickAddInBar);
+        watchBarReorder(tabContainer);
+      } finally {
+        // Always clear it. A throw above used to leave it set, and every later
+        // render then early-returned — the bar stopped updating until reload.
+        isRenderingTabs = false;
+      }
     }, 200);
 
     // Re-run highlightActiveTab after a delay to catch any Salesforce DOM updates
@@ -1357,12 +1358,6 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
 
 // ── Dragging tabs in the Salesforce bar ──────────────────────────
 
-/**
- * The order we last rendered, so a drag can be told from our own repaint.
- * Salesforce moves the DOM nodes; nothing tells us it happened.
- */
-let renderedTabOrder = [];
-
 /** The custom tabs currently in the bar, in the order they appear. */
 function currentBarOrder(tabContainer) {
   return [...tabContainer.querySelectorAll('.sf-tabs-custom-tab[data-tab-id]')]
@@ -1376,37 +1371,46 @@ function currentBarOrder(tabContainer) {
  * console drag for free — but that only moves DOM nodes, so the next render
  * rebuilt from stored positions and undid it.
  *
- * The comparison is against what we rendered rather than a flag, because our
- * own repaint also reorders nodes: a flag would have to be cleared at exactly
- * the right moment, whereas an order that matches what we drew is by definition
- * not a drag.
- *
- * The write goes to the background worker, which owns the chunk-aware storage
- * helpers.
+ * The comparison is against STORED order, not against a snapshot of what we
+ * last drew. A snapshot desyncs the moment a render is dropped — initTabs
+ * early-returns while another render is in flight — and a stale snapshot makes
+ * every repaint look like a drag: the watcher writes, the write broadcasts a
+ * refresh, the refresh repaints, and the loop keeps renders permanently in
+ * flight so real updates get swallowed. Comparing against the source of truth
+ * cannot do that, because after a write the two agree by construction.
  */
 function watchBarReorder(tabContainer) {
   if (tabContainer.dataset.sftabsReorderWatched) return;
   tabContainer.dataset.sftabsReorderWatched = '1';
 
   const onChanged = debounce(async () => {
-    const order = currentBarOrder(tabContainer);
-    if (order.length === 0) return;
-    if (order.length === renderedTabOrder.length &&
-        order.every((id, i) => id === renderedTabOrder[i])) return;   // our own repaint
-
-    renderedTabOrder = order;
-
     const utils = window.SFTabs && window.SFTabs.utils;
-    if (!utils || !utils.resolveProfileForUrl) return;
+    if (!utils || !utils.tabOrderMatches) return;
+
+    const order = currentBarOrder(tabContainer);
+    if (order.length === 0) return;               // mid-render, nothing to compare
+
+    const stored = await getTabsFromStorage();
+    if (!stored || !stored.length) return;
+    if (utils.tabOrderMatches(stored, order)) return;   // a repaint, not a drag
+
+    // Only act on a genuine permutation: the same tabs, rearranged. Any other
+    // difference means the bar is out of step with storage rather than dragged
+    // — a render still in flight, or one dropped by the isRenderingTabs guard
+    // while Salesforce touched the container for its own reasons. Writing then
+    // would push a stale order back over a newer one.
+    const storedIds = stored.filter(tab => tab && !tab.parentId).map(tab => tab.id);
+    if (order.length !== storedIds.length) return;
+    if (!order.every(id => storedIds.includes(id))) return;
+
     const settings = await readUserSettings();
     const profiles = await readProfiles();
-
     await browser.runtime.sendMessage({
       action: 'reorder_tabs',
       profileId: utils.resolveProfileForUrl(window.location.href, profiles, settings),
       order,
     });
-  }, 250);
+  }, 300);
 
   new MutationObserver(onChanged).observe(tabContainer, { childList: true });
 }
