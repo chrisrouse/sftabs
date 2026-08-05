@@ -439,7 +439,7 @@ function installProductionHooks() {
     // nothing about the edit form. Rendering there would replace the list under
     // a half-finished edit; this popup's listener already handles external
     // changes, with that guard.
-    renderTabList: () => { if (!isEditing()) { renderTabList(); bindTabListEvents(); } }
+    renderTabList: () => { if (!isEditing()) renderTabList(); }
   });
 }
 
@@ -644,20 +644,36 @@ function canNestTab(sourceId, targetId) {
   return Math.max(incoming, existing) <= MAX_ITEM_DEPTH;
 }
 
+/**
+ * A list with one entry moved to sit before or after another, renumbered.
+ *
+ * Returns null when the move is meaningless, so callers can bail without
+ * writing. Shared by the tab list and the profile list, which had the same
+ * fourteen lines of find-splice-find-splice-renumber each — and each did the
+ * second findIndex against the already-spliced array, which is easy to get
+ * subtly wrong in one copy only.
+ */
+function movedWithin(list, sourceId, targetId, before) {
+  if (sourceId === targetId) return null;
+  const ordered = list.slice();
+  const from = ordered.findIndex(entry => entry.id === sourceId);
+  if (from === -1 || !ordered.some(entry => entry.id === targetId)) return null;
+
+  const [moved] = ordered.splice(from, 1);
+  // Re-found after the splice, because removing the source shifts the target.
+  const insertAt = ordered.findIndex(entry => entry.id === targetId) + (before ? 0 : 1);
+  ordered.splice(insertAt, 0, moved);
+
+  return ordered.map((entry, index) => ({ ...entry, position: index }));
+}
+
 function reorderTab(sourceId, targetId, before) {
   const sorted = state.tabs.slice().sort((a, b) => a.position - b.position);
-  const from = sorted.findIndex(t => t.id === sourceId);
-  const to   = sorted.findIndex(t => t.id === targetId);
-  if (from === -1 || to === -1) return;
+  const reordered = movedWithin(sorted, sourceId, targetId, before);
+  if (!reordered) return;
 
-  const [moved] = sorted.splice(from, 1);
-  const insertAt = sorted.findIndex(t => t.id === targetId) + (before ? 0 : 1);
-  sorted.splice(insertAt, 0, moved);
-  sorted.forEach((t, i) => { t.position = i; });
-
-  state.tabs = sorted;
+  state.tabs = reordered;
   renderTabList();
-  bindTabListEvents();
   persistTabs();
 }
 
@@ -691,7 +707,6 @@ function nestTabIntoTab(sourceId, targetId) {
 
   showStatus(t('tabNestedUnder', src.label, tgt.label));
   renderTabList();
-  bindTabListEvents();
   if (state.activeView === 'dropdowns' && state.editingTabId === targetId) {
     renderDropdownItems(targetId);
   }
@@ -769,7 +784,6 @@ function moveDropdownItem(fromPath, toPath, zone) {
 
   renderDropdownItems(state.editingTabId);
   renderTabList();
-  bindTabListEvents();
   persistTabs();
 }
 
@@ -788,6 +802,7 @@ function renderTabList() {
     const el = list.querySelector(`.tab-item[data-id="${tab.id}"]`);
     if (el) paintTabRow(el, tab);
   });
+  bindTabListEvents();
 }
 
 /**
@@ -1075,7 +1090,6 @@ async function deleteProfileFlow(profileId) {
     state.profiles = remaining;
     state.tabs = await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || [];
     renderTabList();
-    bindTabListEvents();
     renderProfileChip();
     renderProfileDropdown();
     renderProfilesList();
@@ -1396,18 +1410,11 @@ function bindProfileDrag() {
 }
 
 async function reorderProfile(sourceId, targetId, before) {
-  const ordered = orderedProfiles();
-  const from = ordered.findIndex(p => p.id === sourceId);
-  const to = ordered.findIndex(p => p.id === targetId);
-  if (from === -1 || to === -1 || from === to) return;
+  // Renumbering the whole list matters here: partial positions would tie and
+  // fall back to creation order, which is not what was just dragged.
+  const profiles = movedWithin(orderedProfiles(), sourceId, targetId, before);
+  if (!profiles) return;
 
-  const [moved] = ordered.splice(from, 1);
-  const insertAt = ordered.findIndex(p => p.id === targetId) + (before ? 0 : 1);
-  ordered.splice(insertAt, 0, moved);
-
-  // Renumber the whole list: partial positions would tie at Infinity and fall
-  // back to creation order, which is not what was just dragged.
-  const profiles = ordered.map((p, i) => ({ ...p, position: i }));
   try {
     await SFTabs.storage.saveProfiles(profiles, false);
     state.profiles = profiles;
@@ -1801,7 +1808,6 @@ async function scrapeObjectNavigation() {
 
     renderDropdownItems(state.editingTabId);
     renderTabList();
-    bindTabListEvents();
     persistTabs();
   } catch (err) {
     showStatus(t('errorLoadingNavigation', err.message), 'error');
@@ -1849,7 +1855,6 @@ function commitDropdownItem(path) {
   state.addingItemUnder = null;
   renderDropdownItems(state.editingTabId);
   renderTabList();
-  bindTabListEvents();
   persistTabs();
 }
 
@@ -1926,7 +1931,6 @@ function promoteDropdownItem(path) {
 
   renderDropdownItems(state.editingTabId);
   renderTabList();
-  bindTabListEvents();
   persistTabs();
 }
 
@@ -1956,7 +1960,6 @@ async function deleteDropdownItem(path) {
 
   renderDropdownItems(state.editingTabId);
   renderTabList();
-  bindTabListEvents();
   persistTabs();
 }
 
@@ -2031,7 +2034,6 @@ async function saveTab(e) {
     : readTabProfiles(state.editingTabId);
 
   renderTabList();
-  bindTabListEvents();
   showView('empty');
   await persistTabs();
 
@@ -2069,7 +2071,6 @@ function confirmDelete(tabId) {
   state.pendingDeleteId = null;
   document.getElementById('modal-delete').hidden = true;
   renderTabList();
-  bindTabListEvents();
   if (state.editingTabId === id) showView('empty');
   showStatus(t('tabDeletedStatus'));
   persistTabs();
@@ -2080,7 +2081,6 @@ function toggleNewTab(tabId) {
     t.id === tabId ? { ...t, openInNewTab: !t.openInNewTab } : t
   );
   renderTabList();
-  bindTabListEvents();
   persistTabs();
 }
 
@@ -2098,7 +2098,6 @@ function moveTab(tabId, direction) {
 
   state.tabs = sorted;
   renderTabList();
-  bindTabListEvents();
 
   // Restore focus to the moved tab
   const movedTab = document.querySelector(`[data-id="${tabId}"]`);
@@ -2113,7 +2112,6 @@ async function switchProfile(profileId) {
   await patchSettings({ activeProfileId: profileId });
   state.tabs = await SFTabs.storage.getProfileTabs(profileId) || [];
   renderTabList();
-  bindTabListEvents();
   renderProfileChip();
   renderProfileDropdown();
   closeProfileDropdown();
@@ -2209,7 +2207,6 @@ async function adoptExternalProfileSwitch(settings) {
   state.tabs = await SFTabs.storage.getProfileTabs(settings.activeProfileId) || [];
   if (isEditing()) showView('empty');
   renderTabList();
-  bindTabListEvents();
   renderProfileChip();
   renderProfileDropdown();
   const name = state.profiles.find(p => p.id === settings.activeProfileId)?.name || '';
@@ -2232,7 +2229,6 @@ async function reloadTabsFromStorage() {
 
   state.tabs = fresh;
   renderTabList();
-  bindTabListEvents();
   showStatus(t('tabsUpdatedExternally'));
 }
 
@@ -2279,7 +2275,6 @@ async function changeStorageLocation(toSync) {
       ? await SFTabs.storage.getProfileTabs(state.settings.activeProfileId) || []
       : [];
     renderTabList();
-    bindTabListEvents();
     renderProfileChip();
     renderProfileDropdown();
     showStatus(t(toSync ? 'syncEnabled' : 'syncDisabled'));
@@ -2309,29 +2304,11 @@ async function syncAreaHasData() {
   }
 }
 
+/** confirmDialog with the storage-switch wording. */
 function confirmStorageChange(toSync) {
-  return new Promise(resolve => {
-    const overlay = document.getElementById('modal-storage');
-    document.getElementById('modal-storage-title').textContent =
-      t(toSync ? 'enableSyncConfirmTitle' : 'disableSyncConfirmTitle');
-    document.getElementById('modal-storage-body').textContent =
-      t(toSync ? 'enableSyncConfirmMessage' : 'disableSyncConfirmMessage');
-    overlay.hidden = false;
-
-    const done = answer => {
-      overlay.hidden = true;
-      cancel.removeEventListener('click', onCancel);
-      confirm.removeEventListener('click', onConfirm);
-      resolve(answer);
-    };
-    const cancel = document.getElementById('modal-storage-cancel');
-    const confirm = document.getElementById('modal-storage-confirm');
-    const onCancel = () => done(false);
-    const onConfirm = () => done(true);
-    cancel.addEventListener('click', onCancel);
-    confirm.addEventListener('click', onConfirm);
-    cancel.focus();
-  });
+  return confirmDialog(
+    t(toSync ? 'enableSyncConfirmTitle' : 'disableSyncConfirmTitle'),
+    t(toSync ? 'enableSyncConfirmMessage' : 'disableSyncConfirmMessage'));
 }
 
 // ── Tab colors ────────────────────────────────────────────────
@@ -2442,7 +2419,6 @@ async function disableProfilesKeeping(keepId) {
 
   state.tabs = (await SFTabs.storage.getProfileTabs(keepId)) || [];
   renderTabList();
-  bindTabListEvents();
   renderProfileChip();
   applyProfilesVisibility(false);
   broadcastTabRefresh();
@@ -2902,7 +2878,6 @@ function bindEvents() {
     await patchSettings({ tabColors: { ...state.settings.tabColors, enabled: e.target.checked } });
     syncTabColorRow();
     renderTabList();
-    bindTabListEvents();
     if (state.activeView === 'edit-tab') renderColorPicker(state.editingColor);
   });
 
@@ -2911,7 +2886,6 @@ function bindEvents() {
       await patchSettings({ tabColors: { ...state.settings.tabColors, style: btn.dataset.colorStyle } });
       syncTabColorRow();
       renderTabList();
-      bindTabListEvents();
     });
   });
 
@@ -3242,8 +3216,6 @@ function bindEvents() {
       }
     }
   });
-
-  bindTabListEvents();
 }
 
 /** "3 sub-items", localised, singular when there is one. */
@@ -3320,6 +3292,15 @@ async function navigateToTab(tab) {
   }
 }
 
+/**
+ * Wire the tab list. Called by renderTabList, which replaces the list's markup
+ * and therefore its nodes.
+ *
+ * Idempotent by design — the listener is removed before being added — which is
+ * what makes folding it into the render safe. It used to be a separate call
+ * that every one of twenty-one render sites had to remember, and forgetting it
+ * left a list that drew correctly and responded to nothing.
+ */
 function bindTabListEvents() {
   const tabList = document.getElementById('tab-list');
   tabList.removeEventListener('click', handleTabListClick);

@@ -133,7 +133,7 @@ async function checkAndSwitchProfile(url) {
     // Chunk-aware, like every other reader. A raw get returns undefined once
     // the profile list outgrows a single sync value, so auto-switching simply
     // stopped working — silently — for anyone with enough profiles.
-    const useSync = await prefersSyncStorage();
+    const useSync = await SFTabs.utils.storagePreference();
     let profiles;
     try {
       profiles = (useSync
@@ -328,7 +328,7 @@ browser.commands.onCommand.addListener(async (command) => {
  * so a double click costs nothing.
  */
 async function quickAddTabToProfiles(tab, profileIds) {
-  const useSync = await prefersSyncStorage();
+  const useSync = await SFTabs.utils.storagePreference();
   const targets = Array.isArray(profileIds) && profileIds.length
     ? profileIds.map(id => `profile_${id}_tabs`)
     : ['customTabs'];   // installs old enough to predate profiles
@@ -358,22 +358,6 @@ async function quickAddTabToProfiles(tab, profileIds) {
   return written;
 }
 
-/** Where this install keeps its tabs. Mirrors getStoragePreference elsewhere. */
-async function prefersSyncStorage() {
-  try {
-    const local = await browser.storage.local.get(['deviceSettings', 'userSettings']);
-    if (typeof local.deviceSettings?.useSyncStorage === 'boolean') {
-      return local.deviceSettings.useSyncStorage;
-    }
-    if (typeof local.userSettings?.useSyncStorage === 'boolean') {
-      return local.userSettings.useSyncStorage;
-    }
-    return true;
-  } catch {
-    return true;
-  }
-}
-
 /**
  * Persist an order dragged in the Salesforce tab bar.
  *
@@ -386,7 +370,7 @@ async function prefersSyncStorage() {
  */
 async function reorderTabsForProfile(profileId, order) {
   const key = profileId ? `profile_${profileId}_tabs` : 'customTabs';
-  const useSync = await prefersSyncStorage();
+  const useSync = await SFTabs.utils.storagePreference();
 
   let tabs;
   try {
