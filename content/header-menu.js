@@ -97,7 +97,16 @@
 
   // ── Menu ─────────────────────────────────────────────────────────
 
+  /**
+   * Whether the menu is on screen. Open state is really the menu's presence in
+   * the DOM, but the scroll handler runs in the capture phase for every
+   * scrollable element on the page, and a getElementById per event — almost
+   * always to discover the menu is closed — is exactly what it should not do.
+   */
+  let menuIsOpen = false;
+
   function closeMenu() {
+    menuIsOpen = false;
     const menu = document.getElementById(MENU_ID);
     if (menu) menu.remove();
     const button = document.getElementById(`${ITEM_ID}-button`);
@@ -310,6 +319,7 @@
     }
 
     item.appendChild(menu);
+    menuIsOpen = true;
     document.getElementById(ITEM_ID + '-button').setAttribute('aria-expanded', 'true');
     position(menu);
     menu.querySelector('.close-button').addEventListener('click', closeMenu);
@@ -424,10 +434,19 @@
    */
   function watch(tabs, settings) {
     if (observer) observer.disconnect();
-    observer = new MutationObserver(() => {
+    // Watch for Salesforce dropping our item, and put it back.
+    //
+    // Narrowed from document.body, and debounced. Lightning mutates the body
+    // continuously, so an undebounced subtree observer there ran on every batch
+    // for the life of the page — content-main.js already scopes its equivalent
+    // to .slds-context-bar and notes that it cuts callbacks by 10-100x. The
+    // global header is the smallest node that still survives the re-renders we
+    // need to catch; body remains the fallback if it is not there yet.
+    const watched = document.querySelector('.slds-global-header') || document.body;
+    observer = new MutationObserver(debounce(() => {
       if (!document.getElementById(ITEM_ID)) inject(tabs, settings);
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    }, 250));
+    observer.observe(watched, { childList: true, subtree: true });
   }
 
   function teardown() {
@@ -473,9 +492,23 @@
     });
   }
 
+  // Scroll is bound in the capture phase, so it fires for every scrollable
+  // descendant Salesforce renders — list views, the setup nav, every
+  // slds-scrollable. It used to do a getElementById each time, open or not.
+  //
+  // Now it returns immediately unless the menu is actually open, and the real
+  // work is coalesced to one call per frame. rAF rather than a debounce because
+  // the menu has to track the header while scrolling, not settle after it.
+  let repositionQueued = false;
   const reposition = () => {
-    const menu = document.getElementById(MENU_ID);
-    if (menu) position(menu);
+    if (!menuIsOpen) return;
+    if (repositionQueued) return;
+    repositionQueued = true;
+    requestAnimationFrame(() => {
+      repositionQueued = false;
+      const menu = document.getElementById(MENU_ID);
+      if (menu) position(menu);
+    });
   };
   window.addEventListener('resize', reposition);
   window.addEventListener('scroll', reposition, true);

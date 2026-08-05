@@ -168,19 +168,6 @@
       }
     }
 
-    /** Remove our DOM and listeners so a fresh instance can replace us. */
-    destroy() {
-      if (this.resizeHandler) {
-        window.removeEventListener('resize', this.resizeHandler);
-        this.resizeHandler = null;
-      }
-      if (this.modal && this.modal.parentNode) {
-        this.modal.parentNode.removeChild(this.modal);
-      }
-      this.modal = null;
-      this.isOpen = false;
-    }
-
     async loadData() {
       try {
         const data = await resolveFloatingData();
@@ -207,20 +194,23 @@
             this.modal.setAttribute('data-theme', 'light');
           }
 
-          // Listen for changes in system theme
-          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            const newTheme = e.matches ? 'dark' : 'light';
-            if (this.modal) {
-              this.modal.setAttribute('data-theme', newTheme);
-            }
-          });
+          // Listen for changes in system theme. Held on the instance, because
+          // floating-button.js destroys and rebuilds this modal on every
+          // settings write — an anonymous listener here survived each rebuild,
+          // still holding a reference to the removed modal, and fired again on
+          // every subsequent change. Ten settings edits, ten dead listeners.
+          this.systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          this.systemThemeHandler = e => {
+            if (this.modal) this.modal.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          };
+          this.systemThemeQuery.addEventListener('change', this.systemThemeHandler);
         } else {
           // Apply user selected theme
           this.modal.setAttribute('data-theme', themeMode);
         }
 
-        // Listen for theme changes in storage
-        browser.storage.onChanged.addListener((changes, area) => {
+        // Listen for theme changes in storage — same reasoning, same fix
+        this.themeStorageHandler = (changes, area) => {
           if (changes.userSettings && changes.userSettings.newValue) {
             const newThemeMode = changes.userSettings.newValue.themeMode;
             if (newThemeMode && this.modal) {
@@ -232,7 +222,8 @@
               }
             }
           }
-        });
+        };
+        browser.storage.onChanged.addListener(this.themeStorageHandler);
       } catch (error) {
         // Fail gracefully - default to light theme
         if (this.modal) {
@@ -719,16 +710,18 @@
         });
       }
 
-      // ESC key to close
-      document.addEventListener('keydown', (e) => {
+      // ESC key to close. On the instance so destroy() can remove it: these
+      // are on `document`, which outlives every modal we build.
+      this.escapeHandler = (e) => {
         if (e.key === 'Escape' && this.isOpen) {
           e.preventDefault();
           this.close();
         }
-      });
+      };
+      document.addEventListener('keydown', this.escapeHandler);
 
       // Click outside to close
-      document.addEventListener('click', (e) => {
+      this.outsideClickHandler = (e) => {
         if (!this.isOpen) return;
 
         // Don't close if clicking within the modal content
@@ -739,7 +732,8 @@
 
         // Click was outside - close the modal
         this.close();
-      });
+      };
+      document.addEventListener('click', this.outsideClickHandler);
 
       // Trap focus within modal when open
       this.modal.addEventListener('keydown', (e) => {
@@ -820,10 +814,31 @@
         this.resizeHandler = null;
       }
 
-      // Clean up storage change listener
+      // Clean up storage change listeners
       if (this.storageChangeHandler) {
         browser.storage.onChanged.removeListener(this.storageChangeHandler);
         this.storageChangeHandler = null;
+      }
+      if (this.themeStorageHandler) {
+        browser.storage.onChanged.removeListener(this.themeStorageHandler);
+        this.themeStorageHandler = null;
+      }
+
+      // System theme query, and the two document-level handlers. All of these
+      // outlive the modal element, so leaving them attached kept a destroyed
+      // instance alive and firing.
+      if (this.systemThemeHandler && this.systemThemeQuery) {
+        this.systemThemeQuery.removeEventListener('change', this.systemThemeHandler);
+        this.systemThemeHandler = null;
+        this.systemThemeQuery = null;
+      }
+      if (this.escapeHandler) {
+        document.removeEventListener('keydown', this.escapeHandler);
+        this.escapeHandler = null;
+      }
+      if (this.outsideClickHandler) {
+        document.removeEventListener('click', this.outsideClickHandler);
+        this.outsideClickHandler = null;
       }
 
       if (this.modal) {

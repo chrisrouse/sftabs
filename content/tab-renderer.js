@@ -5,6 +5,50 @@
 let isRenderingTabs = false;
 
 /**
+ * Submenus live on document.body, not inside the tab that opens them, because
+ * the tab bar clips overflow. That puts them outside everything initTabs
+ * cleans up: re-rendering removed the tabs and left every submenu and hover
+ * bridge behind, along with a MutationObserver each, watching a menu node that
+ * had just been detached. Three folder tabs with four children apiece leaked
+ * twenty-four nodes and twelve observers per render, and renders are frequent.
+ *
+ * So they are tracked and swept at the start of each render.
+ */
+const submenuObservers = [];
+
+/**
+ * The bar order as we last drew it, used only to skip work.
+ *
+ * The reorder watcher fires on any childList change to the tab bar, and
+ * Salesforce mutates that container for its own reasons all day. Three storage
+ * reads per mutation is the wrong price for discovering nothing moved.
+ *
+ * This is emphatically not the authority on what changed — comparing a drag
+ * against a snapshot is the bug that made the bar stop updating, because a
+ * dropped render leaves the snapshot stale and every repaint then looks like a
+ * drag. It is only ever used to answer "is the DOM exactly what we drew?", and
+ * a yes means there is nothing to do. Any other answer falls through to the
+ * stored order, which remains the only thing allowed to decide.
+ */
+let lastRenderedOrder = [];
+
+function sameOrder(a, b) {
+  return a.length === b.length && a.every((id, index) => id === b[index]);
+}
+
+function trackSubmenuObserver(observer) {
+  submenuObservers.push(observer);
+  return observer;
+}
+
+function clearSubmenus() {
+  submenuObservers.forEach(observer => observer.disconnect());
+  submenuObservers.length = 0;
+  document.querySelectorAll('.submenu-container, .submenu-bridge')
+    .forEach(element => element.remove());
+}
+
+/**
  * Color preference, cached from the settings read in getTabsFromStorage().
  * createTabElementWithDropdown() has no settings in scope and runs per row, so
  * reading storage there would mean a round-trip per tab.
@@ -121,6 +165,9 @@ async function initTabs(tabContainer) {
     // Sort tabs by position (only top-level tabs)
     const topLevelTabs = getTopLevelTabs(tabsToUse);
 
+    // Body-level submenus from the previous render, and their observers
+    clearSubmenus();
+
     // Remove any existing custom tabs, overflow button and quick-add button
     const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
     existingTabs.forEach(tab => tab.remove());
@@ -145,6 +192,7 @@ async function initTabs(tabContainer) {
       try {
         handleTabOverflow(tabContainer, topLevelTabs);
         renderQuickAddButton(tabContainer, quickAddInBar);
+        lastRenderedOrder = currentBarOrder(tabContainer);
         watchBarReorder(tabContainer);
       } finally {
         // Always clear it. A throw above used to leave it set, and every later
@@ -694,12 +742,12 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
       });
 
       // Clean up submenu and bridge when menu is hidden
-      const observer = new MutationObserver(() => {
+      const observer = trackSubmenuObserver(new MutationObserver(() => {
         if (menu.style.display === 'none') {
           submenuContainer.style.setProperty('display', 'none', 'important');
           bridge.style.setProperty('display', 'none', 'important');
         }
-      });
+      }));
       observer.observe(menu, { attributes: true, attributeFilter: ['style'] });
     }
   });
@@ -1045,83 +1093,95 @@ async function highlightActiveTab() {
   }
 }
 
+// ── Keeping Salesforce from re-highlighting its own tab ──────────
+//
+// When one of our tabs is the active page, Salesforce still marks one of its
+// native tabs active, and keeps re-applying that as it re-renders. So the class
+// has to be removed whenever it comes back, which means watching for it.
+//
+// Exactly one observer does that, for the life of the page. It used to be one
+// per call, and this is called twice per initTabs — which runs on every URL
+// change, every storage change and every refresh_tabs. After twenty
+// navigations roughly forty live observers watched the same nodes, and since
+// the callback removes a class, and removing a class is an attribute mutation,
+// each one's work re-triggered all the others. That compounds, and it is the
+// likeliest reason the tab bar felt slower the longer a tab stayed open.
+
+/** The single observer, and the nodes it is currently attached to. */
+let nativeActiveObserver = null;
+let observedTabBar = null;
+let observedPinned = null;
+
+/** Whether one of our tabs owns the current page. Read by the observer. */
+let suppressNativeActive = false;
+
+/** Strip the active state Salesforce put back on its own tabs. */
+function removeNativeActiveState() {
+  document.querySelectorAll('.tabBarItems .tabItem:not(.sf-tabs-custom-tab)').forEach(tabEl => {
+    if (tabEl.classList.contains('slds-is-active')) {
+      tabEl.classList.remove('slds-is-active');
+      const anchor = tabEl.querySelector('a');
+      if (anchor) anchor.setAttribute('aria-selected', 'false');
+    }
+  });
+
+  // Home, Object Manager and the rest of the pinned strip
+  document.querySelectorAll('.pinnedItems .tabItem').forEach(tabEl => {
+    if (tabEl.classList.contains('slds-is-active') || tabEl.classList.contains('active')) {
+      tabEl.classList.remove('slds-is-active', 'active');
+      const anchor = tabEl.querySelector('a');
+      if (anchor) anchor.setAttribute('aria-selected', 'false');
+    }
+  });
+}
+
 /**
- * Monitor native tabs and prevent them from showing active state when custom tab is active
- * This is necessary because Salesforce continuously re-applies active state to native tabs
+ * Attach the observer, once — or re-attach if Salesforce has replaced the
+ * containers, since an observer on a detached node watches nothing.
  */
-async function monitorNativeTabActiveState() {
-  const currentUrl = window.location.href;
+function ensureNativeActiveObserver() {
+  const tabBar = document.querySelector('.tabBarItems');
+  const pinned = document.querySelector('.pinnedItems');
+  if (!tabBar && !pinned) return;
+  if (nativeActiveObserver && tabBar === observedTabBar && pinned === observedPinned) return;
 
-  try {
-    const tabs = await getTabsFromStorage();
-    const topLevelTabs = getTopLevelTabs(tabs);
-    const customTabIsActive = !!findMatchingTab(topLevelTabs, currentUrl);
+  if (nativeActiveObserver) nativeActiveObserver.disconnect();
 
-    // If a custom tab is active, watch native tabs and remove their active state
-    if (customTabIsActive) {
-      const removeNativeActiveState = () => {
-        // Remove from tabBarItems (all native tabs)
-        const allTabs = document.querySelectorAll('.tabBarItems .tabItem:not(.sf-tabs-custom-tab)');
-        allTabs.forEach(tabEl => {
-          if (tabEl.classList.contains('slds-is-active')) {
-            tabEl.classList.remove('slds-is-active');
-            const anchor = tabEl.querySelector('a');
-            if (anchor) anchor.setAttribute('aria-selected', 'false');
-          }
-        });
-
-        // Remove from pinnedItems (Home, Object Manager, etc.)
-        const pinnedTabs = document.querySelectorAll('.pinnedItems .tabItem');
-        pinnedTabs.forEach(tabEl => {
-          if (tabEl.classList.contains('slds-is-active') || tabEl.classList.contains('active')) {
-            tabEl.classList.remove('slds-is-active', 'active');
-            const anchor = tabEl.querySelector('a');
-            if (anchor) anchor.setAttribute('aria-selected', 'false');
-          }
-        });
-      };
-
-      // Set up mutation observer on the tab bar container
-      const tabBarContainer = document.querySelector('.tabBarItems');
-      const pinnedContainer = document.querySelector('.pinnedItems');
-
-      if (tabBarContainer || pinnedContainer) {
-        const observer = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-              const target = mutation.target;
-              // If a native tab got the active class, remove it
-              if (target.classList.contains('tabItem') &&
-                  !target.classList.contains('sf-tabs-custom-tab') &&
-                  (target.classList.contains('slds-is-active') || target.classList.contains('active'))) {
-                removeNativeActiveState();
-              }
-            }
-          }
-        });
-
-        // Observe both containers
-        if (tabBarContainer) {
-          observer.observe(tabBarContainer, {
-            attributes: true,
-            attributeFilter: ['class'],
-            subtree: true
-          });
-        }
-        if (pinnedContainer) {
-          observer.observe(pinnedContainer, {
-            attributes: true,
-            attributeFilter: ['class'],
-            subtree: true
-          });
-        }
-
-        // Also run immediately to catch any existing active state
+  nativeActiveObserver = new MutationObserver(mutations => {
+    if (!suppressNativeActive) return;   // our tab is not the active page
+    for (const mutation of mutations) {
+      const target = mutation.target;
+      if (target.classList &&
+          target.classList.contains('tabItem') &&
+          !target.classList.contains('sf-tabs-custom-tab') &&
+          (target.classList.contains('slds-is-active') || target.classList.contains('active'))) {
         removeNativeActiveState();
+        return;   // one sweep clears them all; the rest of this batch is noise
       }
     }
+  });
+
+  const options = { attributes: true, attributeFilter: ['class'], subtree: true };
+  if (tabBar) nativeActiveObserver.observe(tabBar, options);
+  if (pinned) nativeActiveObserver.observe(pinned, options);
+  observedTabBar = tabBar;
+  observedPinned = pinned;
+}
+
+/**
+ * Decide whether native tabs should be suppressed on this page, and make sure
+ * the observer that enforces it exists.
+ */
+async function monitorNativeTabActiveState() {
+  try {
+    const tabs = await getTabsFromStorage();
+    suppressNativeActive = !!findMatchingTab(getTopLevelTabs(tabs), window.location.href);
+
+    if (!suppressNativeActive) return;
+    ensureNativeActiveObserver();
+    removeNativeActiveState();   // catch what is already marked
   } catch (error) {
-    // Error monitoring native tabs
+    // Leave the previous decision in place rather than guessing
   }
 }
 
@@ -1378,6 +1438,7 @@ function watchBarReorder(tabContainer) {
 
     const order = currentBarOrder(tabContainer);
     if (order.length === 0) return;               // mid-render, nothing to compare
+    if (sameOrder(order, lastRenderedOrder)) return;   // Salesforce moved something of its own
 
     const stored = await getTabsFromStorage();
     if (!stored || !stored.length) return;
@@ -1707,12 +1768,12 @@ function createOverflowSubmenu(itemLi, tab, parentMenu) {
   });
 
   // Clean up when parent menu closes
-  const observer = new MutationObserver(() => {
+  const observer = trackSubmenuObserver(new MutationObserver(() => {
     if (parentMenu.style.display === 'none') {
       submenuContainer.style.setProperty('display', 'none', 'important');
       bridge.style.setProperty('display', 'none', 'important');
     }
-  });
+  }));
   observer.observe(parentMenu, { attributes: true, attributeFilter: ['style'] });
 }
 
