@@ -1180,8 +1180,13 @@ function forceRefreshTabs() {
 function createQuickAddButton() {
   const li = document.createElement('li');
   li.setAttribute('role', 'presentation');
-  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-quick-add';
-  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+  // No navexConsoleTabItem here, unlike a real tab: that class is what makes
+  // Salesforce's console drag pick a node up, and the quick-add "+" is a control,
+  // not a tab. Dragging it is meaningless, and it has no stored position to
+  // write back — it is placed last on every render. Everything the node looks
+  // like comes from the other three classes, so dropping it costs no styling.
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight sf-tabs-quick-add';
+  li.draggable = false;   // and refuse native HTML5 drag regardless
 
   const a = document.createElement('a');
   a.setAttribute('role', 'button');
@@ -1439,8 +1444,13 @@ function renderQuickAddButton(tabContainer, enabled) {
 function createOverflowButton(hiddenTabs) {
   const li = document.createElement('li');
   li.setAttribute('role', 'presentation');
-  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-overflow-button';
-  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
+  // No navexConsoleTabItem here, unlike a real tab: that class is what makes
+  // Salesforce's console drag pick a node up, and the overflow chevron is a control,
+  // not a tab. Dragging it is meaningless, and it has no stored position to
+  // write back — it is placed last on every render. Everything the node looks
+  // like comes from the other three classes, so dropping it costs no styling.
+  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight sf-tabs-overflow-button';
+  li.draggable = false;   // and refuse native HTML5 drag regardless
 
   const a = document.createElement('a');
   a.setAttribute('role', 'tab');
