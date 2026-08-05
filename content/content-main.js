@@ -325,270 +325,11 @@ function delayLoadTabs(attemptCount) {
   } else {
     // Set flag immediately to prevent race conditions
     tabsInitialized = true;
-    // Use the tab renderer if available, otherwise fall back to direct initialization
-    if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-      window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-    } else {
-      // Fallback initialization if modules aren't loaded
-      initTabsWithLightningNavigation(tabContainer);
-    }
+    window.SFTabsContent.tabRenderer.initTabs(tabContainer);
   }
 }
 
-/**
- * Fallback tab initialization WITH Lightning Navigation AND Dropdown Support
- */
-async function initTabsWithLightningNavigation(tabContainer) {
-  try {
-    let tabsToUse = await getTabsFromStorage();
 
-    // Get user settings to check if we should use defaults
-    const useSyncStorage = await getStoragePreference();
-    const settingsKey = 'userSettings';
-    let settings;
-    if (useSyncStorage) {
-      const settingsData = await readChunkedSync(settingsKey);
-      settings = settingsData || {};
-    } else {
-      const result = await browser.storage.local.get(settingsKey);
-      settings = result[settingsKey] || {};
-    }
-
-    // Setup tabs always render (they're the core feature)
-    // The floating button location is handled separately
-
-    if (!tabsToUse || tabsToUse.length === 0) {
-      // If activeProfileId exists, respect empty profiles (don't use defaults)
-      // This means profiles system is active internally even if UI is disabled
-      if (settings.activeProfileId) {
-        tabsToUse = [];
-      } else {
-        // No profile system - use default tabs from constants if available
-        if (window.SFTabs && window.SFTabs.constants) {
-          tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
-        } else {
-          // Hardcoded fallback
-          tabsToUse = [
-            { id: 'default_tab_flows', label: 'Flows', path: 'Flows', openInNewTab: false, position: 0 },
-            { id: 'default_tab_users', label: 'Users', path: 'ManageUsers', openInNewTab: false, position: 1 }
-          ];
-        }
-      }
-    }
-
-    // Remove existing custom tabs
-    const existingTabs = tabContainer.querySelectorAll('.sf-tabs-custom-tab');
-    existingTabs.forEach(tab => tab.remove());
-
-    // Sort and add tabs
-    const topLevelTabs = tabsToUse.filter(tab => !tab.parentId).sort((a, b) => a.position - b.position);
-
-    for (const tab of topLevelTabs) {
-      const tabElement = createTabElementWithLightningAndDropdown(tab);
-      tabContainer.appendChild(tabElement);
-    }
-
-    // Highlight active tab after rendering
-    // Use a longer delay to ensure this happens after any navigation-triggered highlights
-    // This will be the "final" highlight after tab re-rendering
-    // Cancel any existing pending highlight
-    if (pendingHighlightTimeout) {
-      clearTimeout(pendingHighlightTimeout);
-    }
-    pendingHighlightTimeout = setTimeout(() => {
-      // Force highlight by resetting debounce time
-      lastHighlightTime = 0;
-      highlightActiveTabStandalone();
-      pendingHighlightTimeout = null;
-    }, 600);
-  } catch (error) {
-    // Error in fallback tab initialization
-  }
-}
-
-/**
- * Create tab element with Lightning Navigation AND Dropdown Support
- */
-function createTabElementWithLightningAndDropdown(tab) {
-  const currentUrl = window.location.href;
-  const baseUrlSetup = currentUrl.split('/lightning/setup/')[0] + '/lightning/setup/';
-  const baseUrlObject = currentUrl.split('/lightning/setup/')[0] + '/lightning/o/';
-  const baseUrlRoot = currentUrl.split('/lightning/setup/')[0];
-
-  let fullUrl = '';
-
-  // Check if this is a folder-style tab (no path) first
-  if (!tab.path || !tab.path.trim()) {
-    // For folder tabs, return javascript:void(0) to prevent navigation
-    fullUrl = 'javascript:void(0)';
-  } else {
-    const isObject = tab.isObject || false;
-    const isCustomUrl = tab.isCustomUrl || false;
-
-    if (isCustomUrl) {
-      let formattedPath = tab.path;
-      if (!formattedPath.startsWith('/')) {
-        formattedPath = '/' + formattedPath;
-      }
-      fullUrl = `${baseUrlRoot}${formattedPath}`;
-    } else if (isObject) {
-      fullUrl = `${baseUrlObject}${tab.path}`;
-    } else if (tab.path.includes('ObjectManager/')) {
-      fullUrl = `${baseUrlSetup}${tab.path}`;
-    } else {
-      fullUrl = `${baseUrlSetup}${tab.path}/home`;
-    }
-  }
-  
-  const li = document.createElement('li');
-  li.setAttribute('role', 'presentation');
-  li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight navexConsoleTabItem sf-tabs-custom-tab';
-  li.setAttribute('data-aura-class', 'navexConsoleTabItem');
-  li.setAttribute('data-tab-id', tab.id);
-  li.setAttribute('data-url', fullUrl);
-  
-  // Add dropdown indicator classes if tab has dropdown functionality
-  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
-    li.classList.add('has-dropdown');
-  }
-  
-  const a = document.createElement('a');
-  a.setAttribute('role', 'tab');
-  a.setAttribute('tabindex', '-1');
-  a.setAttribute('title', tab.label);
-  a.setAttribute('aria-selected', 'false');
-  a.setAttribute('href', fullUrl);
-  
-  if (tab.openInNewTab) {
-    a.setAttribute('target', '_blank');
-  } else {
-    a.setAttribute('target', '_self');
-  }
-  
-  a.classList.add('tabHeader', 'slds-context-bar__label-action');
-  
-  const span = document.createElement('span');
-  span.classList.add('title', 'slds-truncate');
-  span.textContent = tab.label;
-
-  // Assemble the tab label first
-  a.appendChild(span);
-  li.appendChild(a);
-
-  // Add dropdown button as separate sibling element (not nested in label)
-  if (tab.dropdownItems && tab.dropdownItems.length > 0) {
-    // Create wrapper div matching native Salesforce structure
-    const dropdownWrapper = document.createElement('div');
-    dropdownWrapper.className = 'slds-context-bar__label-action slds-p-left--none uiMenu oneNavItemDropdown';
-    dropdownWrapper.setAttribute('data-aura-rendered-by', `sftabs-dropdown-wrapper-${tab.id}`);
-    dropdownWrapper.setAttribute('data-aura-class', 'uiMenu oneNavItemDropdown');
-
-    // Create inner trigger wrapper
-    const triggerWrapper = document.createElement('div');
-    triggerWrapper.className = 'uiPopupTrigger';
-    triggerWrapper.setAttribute('id', `dropdown-trigger-${tab.id}`);
-    triggerWrapper.setAttribute('data-aura-rendered-by', `sftabs-trigger-${tab.id}`);
-    triggerWrapper.setAttribute('data-aura-class', 'uiPopupTrigger');
-
-    // Create dropdown button with proper ARIA attributes
-    const dropdownButton = document.createElement('a');
-    dropdownButton.className = 'slds-button slds-button--icon';
-    dropdownButton.setAttribute('id', `dropdown-arrow-${tab.id}`);
-    dropdownButton.setAttribute('role', 'button');
-    dropdownButton.setAttribute('aria-disabled', 'false');
-    dropdownButton.setAttribute('tabindex', '0');
-    dropdownButton.setAttribute('aria-expanded', 'false');
-    dropdownButton.setAttribute('aria-haspopup', 'true');
-    dropdownButton.setAttribute('aria-controls', `dropdown-menu-${tab.id}`);
-    dropdownButton.setAttribute('href', 'javascript:void(0)');
-    dropdownButton.setAttribute('title', `${tab.label} List`);
-    dropdownButton.innerHTML = `
-    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-icon slds-icon_xx-small slds-button__icon slds-button__icon--hint">
-      <path d="M476 178L271 385c-6 6-16 6-22 0L44 178c-6-6-6-16 0-22l22-22c6-6 16-6 22 0l161 163c6 6 16 6 22 0l161-162c6-6 16-6 22 0l22 22c5 6 5 15 0 21z"></path>
-    </svg>
-    `;
-
-    // Assemble dropdown structure
-    triggerWrapper.appendChild(dropdownButton);
-    dropdownWrapper.appendChild(triggerWrapper);
-    li.appendChild(dropdownWrapper);
-
-    // Create dropdown menu if dropdown items exist
-    if (tab.dropdownItems && tab.dropdownItems.length > 0) {
-      const dropdown = createInlineDropdownMenu(tab);
-      li.appendChild(dropdown);
-
-      // Add dropdown toggle handler
-      dropdownButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        toggleInlineDropdown(dropdown, dropdownButton);
-      });
-    }
-  }
-  
-  // Add click handler WITH Lightning Navigation - FROM ORIGINAL
-  a.addEventListener('click', (event) => {
-    // FIRST: Check if this is a folder-style tab (no path)
-    const hasPath = tab.path && tab.path.trim();
-
-    if (!hasPath) {
-      // Folder-style tab - prevent navigation immediately
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-
-      // If it has a dropdown, open it
-      const hasDropdown = tab.dropdownItems && tab.dropdownItems.length > 0;
-      if (hasDropdown) {
-        const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
-        const dropdown = tabElement?.querySelector('.sftabs-custom-dropdown');
-        const dropdownButton = document.getElementById(`dropdown-arrow-${tab.id}`);
-
-        if (dropdown && dropdownButton) {
-          toggleInlineDropdown(dropdown, dropdownButton);
-        }
-      }
-      return;
-    }
-
-    // If clicking on dropdown button or its wrapper, don't navigate
-    if (event.target.closest('.oneNavItemDropdown') ||
-        event.target.closest('.uiPopupTrigger') ||
-        event.target.closest(`#dropdown-arrow-${tab.id}`)) {
-      return;
-    }
-
-    // NEW: If clicking within the dropdown menu, don't navigate
-    if (event.target.closest('.sftabs-custom-dropdown')) {
-      return;
-    }
-
-    const lightningEnabled = isLightningNavigationEnabled();
-
-    if (tab.openInNewTab) {
-      // For new tab, always use window.open
-      event.preventDefault();
-      window.open(fullUrl, '_blank');
-    } else {
-      // For same tab, check if Lightning navigation is enabled
-      if (lightningEnabled) {
-        // Use Lightning navigation
-        event.preventDefault();
-        lightningNavigate({
-          navigationType: "url",
-          url: fullUrl
-        }, fullUrl);
-      } else {
-        // Lightning navigation is disabled, use regular navigation
-        event.preventDefault();
-        window.location.href = fullUrl;
-      }
-    }
-  });
-  
-  return li;
-}
 
 // Note: The following functions are now used from tab-renderer.js to avoid code duplication:
 // - createInlineDropdownMenu(tab)
@@ -647,66 +388,6 @@ let lastHighlightTime = 0;
 const HIGHLIGHT_DEBOUNCE_MS = 1000; // Increased to 1 second to catch re-initialization
 let pendingHighlightTimeout = null;
 
-/**
- * Standalone version of highlightActiveTab for use when tab-renderer.js isn't loaded yet
- */
-async function highlightActiveTabStandalone() {
-  // Debounce: skip if we just highlighted within the last 200ms
-  const now = Date.now();
-  if (now - lastHighlightTime < HIGHLIGHT_DEBOUNCE_MS) {
-    return;
-  }
-  lastHighlightTime = now;
-
-  const currentUrl = window.location.href;
-
-  try {
-    const tabs = await getTabsFromStorage();
-    const topLevelTabs = tabs.filter(tab => !tab.parentId).sort((a, b) => a.position - b.position);
-    let matchedTab = null;
-
-    for (const tab of topLevelTabs) {
-      const tabElement = document.querySelector(`li[data-tab-id="${tab.id}"]`);
-      if (tabElement) {
-        const tabUrl = tabElement.getAttribute('data-url');
-        const baseTabUrl = tabUrl ? tabUrl.split('/Details')[0] : null;
-        const matches = tabUrl && currentUrl.startsWith(baseTabUrl);
-        if (matches) {
-          matchedTab = tab;
-          break;
-        }
-      }
-    }
-
-    if (matchedTab) {
-      // Remove active state from all tabs in tabBarItems
-      const allTabs = document.querySelectorAll('.tabBarItems .tabItem');
-      allTabs.forEach(tabEl => {
-        tabEl.classList.remove('slds-is-active');
-        const anchor = tabEl.querySelector('a');
-        if (anchor) anchor.setAttribute('aria-selected', 'false');
-      });
-
-      // Also remove active state from native pinned tabs (Salesforce Starter Edition)
-      const pinnedTabs = document.querySelectorAll('.pinnedItems .tabItem');
-      pinnedTabs.forEach(tabEl => {
-        tabEl.classList.remove('slds-is-active', 'active');
-        const anchor = tabEl.querySelector('a');
-        if (anchor) anchor.setAttribute('aria-selected', 'false');
-      });
-
-      // Add active state to matched tab
-      const activeEl = document.querySelector(`li[data-tab-id="${matchedTab.id}"]`);
-      if (activeEl) {
-        activeEl.classList.add('slds-is-active');
-        const anchor = activeEl.querySelector('a');
-        if (anchor) anchor.setAttribute('aria-selected', 'true');
-      }
-    }
-  } catch (error) {
-    // Error in highlightActiveTabStandalone
-  }
-}
 
 /**
  * Setup dropdown event handlers
@@ -753,12 +434,7 @@ function setupMessageListeners() {
           clearTimeout(pendingHighlightTimeout);
         }
         pendingHighlightTimeout = setTimeout(() => {
-          if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-            window.SFTabsContent.tabRenderer.highlightActiveTab();
-          } else {
-            // Fallback: call standalone version
-            highlightActiveTabStandalone();
-          }
+          window.SFTabsContent.tabRenderer.highlightActiveTab();
           pendingHighlightTimeout = null;
         }, 500);
       }
@@ -813,11 +489,7 @@ function setupMessageListeners() {
 const refreshTabsSoon = debounce(() => {
   const tabContainer = document.querySelector('.tabBarItems.slds-grid');
   if (!tabContainer) return;
-  if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-    window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-  } else {
-    initTabsWithLightningNavigation(tabContainer);
-  }
+  window.SFTabsContent.tabRenderer.initTabs(tabContainer);
 }, 120);
 
 /**
@@ -984,11 +656,7 @@ function handleUrlChange() {
   setTimeout(() => {
     const tabContainer = document.querySelector('.tabBarItems.slds-grid');
     if (tabContainer) {
-      if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-        window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-      } else {
-        initTabsWithLightningNavigation(tabContainer);
-      }
+      window.SFTabsContent.tabRenderer.initTabs(tabContainer);
     }
   }, 500);
 }
@@ -1043,17 +711,11 @@ function setupMutationObserver() {
 
       // Set flag immediately to prevent race conditions
       tabsInitialized = true;
-      if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-        window.SFTabsContent.tabRenderer.initTabs(tabContainer);
-      } else {
-        initTabsWithLightningNavigation(tabContainer);
-      }
+      window.SFTabsContent.tabRenderer.initTabs(tabContainer);
 
       // Re-highlight the active tab
       setTimeout(() => {
-        if (window.SFTabsContent && window.SFTabsContent.tabRenderer) {
-          window.SFTabsContent.tabRenderer.highlightActiveTab();
-        }
+        window.SFTabsContent.tabRenderer.highlightActiveTab();
       }, 500);
     }
   });
