@@ -45,9 +45,12 @@ function unchunkData(chunks) {
  * @returns {Promise<{success: boolean, chunked: boolean, chunkCount: number}>}
  */
 async function saveChunkedSync(baseKey, data) {
+	// Declared out here so the catch can report it. Scoped inside the try it was
+	// a ReferenceError, which replaced the quota message with a meaningless one.
+	let byteSize = 0;
 	try {
 		const jsonString = JSON.stringify(data);
-		const byteSize = new Blob([jsonString]).size;
+		byteSize = new Blob([jsonString]).size;
 		const chunkSize = SFTabs.constants.CHUNK_SIZE;
 
 		// Clear any existing chunks first
