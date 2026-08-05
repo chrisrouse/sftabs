@@ -130,7 +130,6 @@ button, input, select { font: inherit; color: inherit; }
 
 .check { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; }
 .check input { accent-color: var(--accent); flex-shrink: 0; }
-.check-count { color: var(--t-weak); font-size: var(--sft-font-size-xs); }
 
 /* ── Buttons ── */
 .btn {

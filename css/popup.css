@@ -771,22 +771,6 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   font-variant-numeric: tabular-nums;
 }
 
-.dropdown-child-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1rem;
-  height: 1rem;
-  padding: 0 4px;
-  margin-left: 4px;
-  background: var(--sft-surface-container-3);
-  color: var(--t-muted);
-  border-radius: var(--sft-radius-pill);
-  font-size: var(--sft-font-size-xxs);
-  font-weight: var(--sft-font-weight-semibold);
-  line-height: 1;
-}
-
 /* Inline add/edit row */
 .dropdown-item--editing {
   border-color: var(--c-primary);
@@ -803,70 +787,6 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   display: flex;
   justify-content: flex-end;
   gap: var(--sft-spacing-2);
-}
-
-.dropdown-item-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.dropdown-item-label {
-  font-size: var(--sft-font-size-base);
-  font-weight: var(--sft-font-weight-medium);
-  color: var(--t-base);
-  word-break: break-word;
-}
-
-.dropdown-item-path {
-  font-size: var(--sft-font-size-xs);
-  color: var(--t-weak);
-  word-break: break-word;
-}
-
-.dropdown-item-actions {
-  display: flex;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.dropdown-item-btn {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  background: transparent;
-  border: var(--sft-border-width-1) solid var(--sft-border-strong);
-  border-radius: var(--sft-radius-circle);
-  color: var(--t-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--ease);
-  font-size: var(--sft-font-size-base);
-}
-.dropdown-item-btn:hover {
-  color: var(--t-base);
-  background: var(--s-hover);
-}
-.dropdown-item-btn:focus-visible {
-  outline: 2px solid var(--sft-focus-ring);
-  outline-offset: 1px;
-}
-.dropdown-item-btn svg { width: 14px; height: 14px; }
-
-/* Match the tab-row action semantics: neutral by default, tinted per action */
-.dropdown-item-btn[data-action^="edit"]:hover {
-  background: var(--c-primary-tint);
-  color: var(--c-primary-on-tint);
-  border-color: transparent;
-}
-.dropdown-item-btn[data-action^="delete"]:hover {
-  background: var(--c-error-bg);
-  color: var(--c-error-on-bg);
-  border-color: transparent;
 }
 
 /* ── 15. Settings ── */
@@ -1400,7 +1320,6 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   line-height: var(--sft-line-height-base);
 }
 
-.settings-advanced { padding: 0; }
 .advanced-link {
   display: flex;
   align-items: center;
@@ -1743,16 +1662,6 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   background: var(--s-1);
 }
 .check-row-standalone:has(input:checked) { background: var(--c-primary-light); }
-.wizard-preview-note {
-  margin: 0 0 var(--sft-spacing-3);
-  padding: var(--sft-spacing-2) var(--sft-spacing-3);
-  border-radius: var(--r-sm);
-  background: var(--c-primary-tint);
-  color: var(--c-primary-on-tint);
-  font-size: var(--sft-font-size-xs);
-  line-height: var(--sft-line-height-base);
-}
-
 /* ── 28. Empty state ──
    lightning-empty-state's text anatomy: h3 title, then a description. */
 .tab-list-empty {

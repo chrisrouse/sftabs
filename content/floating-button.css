@@ -1,11 +1,6 @@
 /* content/floating-button.css */
 /* Styling for SF Tabs floating button and modal */
 
-/* Hide the old separate floating button if it exists */
-.sftabs-floating-button {
-  display: none !important;
-}
-
 /* Modal Container */
 .sftabs-floating-modal {
   position: fixed;
@@ -369,20 +364,6 @@
   .sftabs-floating-modal .dropdown-child-label {
     font-size: 11px;
   }
-}
-
-/* Animation for initial load */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 0.95;
-  }
-}
-
-.sftabs-floating-button {
-  animation: fadeIn 0.3s ease-out;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
