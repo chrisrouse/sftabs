@@ -132,5 +132,65 @@ check('the storage listener routes through it too, with no timer of its own',
   Boolean(listener) && /refreshTabsSoon\(\)/.test(listener[0]) &&
   !/debounce\(/.test(listener[0]) && !/initTabs\(/.test(listener[0]));
 
+
+// ── The Chrome shim covers every browser.* API content scripts actually use ──
+// Firefox has `browser` natively; Chrome does not, so browser-compat.js builds
+// one. Content scripts from BOTH manifest entries share a single isolated
+// world, and entry 0's match patterns are a superset of entry 1's — so
+// browser-compat.js always defines `browser` first, and the fallback shim in
+// content-main.js, guarded by `typeof browser === 'undefined'`, never runs on
+// Chrome. Anything missing from browser-compat.js is therefore simply absent.
+//
+// That shipped: runtime.sendMessage was added to the content-main shim, which
+// never executes, so the menu-bar "+" and tab-bar drag-reorder both threw on
+// Chrome while working perfectly on Firefox. Every call listed here must be
+// satisfied by browser-compat.js alone.
+const vm = require('vm');
+
+/**
+ * Build the shim for real and look at what it produced.
+ *
+ * Parsing it was worse: `storage` is assembled by an IIFE, and `.addListener`
+ * is a native method on an event object rather than a key in a literal, so a
+ * textual scan reports both as missing. Running it in a sandbox with a stub
+ * `chrome` and no `browser` reproduces Chrome exactly.
+ */
+function buildChromeShim() {
+  const callable = () => {};
+  const stub = () => new Proxy(callable, {
+    get: (target, prop) => (prop in target ? target[prop] : stub()),
+  });
+  const window = {};
+  const context = { window, chrome: stub(), console };
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(root, 'popup/js/shared/browser-compat.js'), 'utf8'), context);
+  return window.browser;
+}
+
+const shim = buildChromeShim();
+
+const contentFiles = [...new Set(manifest.content_scripts.flatMap(e => e.js))]
+  .filter(f => f.startsWith('content/'));
+
+const used = new Set();
+contentFiles.forEach(f => {
+  const src = fs.readFileSync(path.join(root, f), 'utf8');
+  for (const m of src.matchAll(/\bbrowser\.([A-Za-z0-9_$]+)\.([A-Za-z0-9_$]+)/g)) {
+    used.add(m[1] + '.' + m[2]);
+  }
+});
+
+const missing = [...used].filter(chain =>
+  chain.split('.').reduce((node, key) => (node == null ? undefined : node[key]), shim) === undefined);
+
+check('the Chrome shim builds at all', Boolean(shim));
+check('browser-compat.js defines every browser.* call the content scripts make',
+  missing.length === 0,
+  missing.length ? 'missing: ' + missing.join(', ') : [...used].length + ' calls checked');
+
+check('runtime.sendMessage specifically — the menu-bar "+" and drag both need it',
+  typeof shim?.runtime?.sendMessage === 'function');
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

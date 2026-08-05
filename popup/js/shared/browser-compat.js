@@ -11,6 +11,13 @@
         getURL: chrome.runtime.getURL.bind(chrome.runtime),
         getManifest: chrome.runtime.getManifest.bind(chrome.runtime),
         onMessage: chrome.runtime.onMessage,
+        // Content scripts hand work to the background worker through this — the
+        // menu-bar "+" and the tab-bar drag both do. It has to live HERE rather
+        // than in the shim inside content-main.js: this file is in the first
+        // manifest entry, whose matches are a superset of the second's, so it
+        // always defines `browser` first and the other shim's
+        // `typeof browser === 'undefined'` guard never passes.
+        sendMessage: chrome.runtime.sendMessage.bind(chrome.runtime),
         lastError: chrome.runtime.lastError,
         openOptionsPage: function() {
           return new Promise((resolve, reject) => {
