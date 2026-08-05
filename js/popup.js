@@ -2058,6 +2058,7 @@ function moveTab(tabId, direction) {
 // ── Profile switching ──────────────────────────────────────────
 
 async function switchProfile(profileId) {
+  if (!profileId) return;   // never persist an undefined active profile
   await patchSettings({ activeProfileId: profileId });
   state.tabs = await SFTabs.storage.getProfileTabs(profileId) || [];
   renderTabList();
@@ -3128,7 +3129,11 @@ function bindEvents() {
 
   // Profile dropdown
   document.getElementById('profile-dropdown').addEventListener('click', e => {
-    const option = e.target.closest('.profile-option');
+    // The New Profile button is a .profile-option too, but carries no id — it
+    // opens the form via its own handler. Without this guard the click also
+    // reaches here and persists activeProfileId: undefined, after which every
+    // save throws "No active profile ID found" until the popup is reopened.
+    const option = e.target.closest('.profile-option[data-profile-id]');
     if (option) switchProfile(option.dataset.profileId);
   });
 
