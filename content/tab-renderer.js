@@ -1166,6 +1166,23 @@ function forceRefreshTabs() {
 
 
 /**
+ * Refuse to be dragged.
+ *
+ * Setting `draggable` on the element is not enough: these controls are an <li>
+ * wrapping an <a href>, and an anchor with an href is draggable by default —
+ * `draggable = false` on the parent does not reach the child that is actually
+ * being grabbed. Cancelling dragstart at the container does, because the event
+ * bubbles, so this covers any drag a descendant starts however it was wired.
+ */
+function refuseDrag(li) {
+  li.draggable = false;
+  li.addEventListener('dragstart', event => {
+    event.preventDefault();
+    event.stopPropagation();
+  });
+}
+
+/**
  * A "+" at the end of the bar that captures the current page.
  *
  * Rendered after overflow has been resolved and inserted before the overflow
@@ -1180,13 +1197,12 @@ function forceRefreshTabs() {
 function createQuickAddButton() {
   const li = document.createElement('li');
   li.setAttribute('role', 'presentation');
-  // No navexConsoleTabItem here, unlike a real tab: that class is what makes
+  // No navexConsoleTabItem, unlike a real tab: that class is what makes
   // Salesforce's console drag pick a node up, and the quick-add "+" is a control,
-  // not a tab. Dragging it is meaningless, and it has no stored position to
-  // write back — it is placed last on every render. Everything the node looks
-  // like comes from the other three classes, so dropping it costs no styling.
+  // not a tab. It has no stored position to write back — it is placed last on
+  // every render. The look comes from the other three classes.
   li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight sf-tabs-quick-add';
-  li.draggable = false;   // and refuse native HTML5 drag regardless
+  refuseDrag(li);
 
   const a = document.createElement('a');
   a.setAttribute('role', 'button');
@@ -1444,13 +1460,12 @@ function renderQuickAddButton(tabContainer, enabled) {
 function createOverflowButton(hiddenTabs) {
   const li = document.createElement('li');
   li.setAttribute('role', 'presentation');
-  // No navexConsoleTabItem here, unlike a real tab: that class is what makes
+  // No navexConsoleTabItem, unlike a real tab: that class is what makes
   // Salesforce's console drag pick a node up, and the overflow chevron is a control,
-  // not a tab. Dragging it is meaningless, and it has no stored position to
-  // write back — it is placed last on every render. Everything the node looks
-  // like comes from the other three classes, so dropping it costs no styling.
+  // not a tab. It has no stored position to write back — it is placed last on
+  // every render. The look comes from the other three classes.
   li.className = 'oneConsoleTabItem tabItem slds-context-bar__item borderRight sf-tabs-overflow-button';
-  li.draggable = false;   // and refuse native HTML5 drag regardless
+  refuseDrag(li);
 
   const a = document.createElement('a');
   a.setAttribute('role', 'tab');
