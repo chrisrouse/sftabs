@@ -616,9 +616,15 @@ function navigateToNavigationItem(navItem, parentTab) {
       path = '/' + path;
     }
     fullUrl = `${baseUrl}${path}`;
-  } else {
-    // Setup paths: /lightning/setup/{setupPath}
+  } else if (path.includes('ObjectManager/')) {
+    // ObjectManager paths are already complete
     fullUrl = `${baseUrl}/lightning/setup/${path}`;
+  } else {
+    // A bare setup node needs /home, exactly as it does at top level. This
+    // branch is what a real tab hits once it is moved into a folder: nav items
+    // scraped from Salesforce's own menu carry a full /lightning/ path and have
+    // already left above, so the only things arriving here are our own tabs.
+    fullUrl = `${baseUrl}/lightning/setup/${path}/home`;
   }
 
   if (parentTab.openInNewTab) {
