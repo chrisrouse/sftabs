@@ -99,5 +99,47 @@ for (const fn of ['resolveFloatingSide', 'resolveOrgColor', 'reorderTopLevelTabs
   check(`${fn} is reachable off SFTabs.utils`, typeof utils[fn] === 'function');
 }
 
+
+// ── The modules the background worker loads must survive having no window ──
+// A service worker has no `window`. utils.js has always exported via globalThis
+// for that reason; constants.js used `window.SFTabs` and only got away with it
+// because the worker did not load it. The moment it did, `window is not
+// defined` killed the worker outright — no listeners, no quick-add, no
+// auto-switch, and nothing in the popup to hint at why.
+//
+// The list comes from the manifest, so adding a file to the worker's scripts
+// automatically brings it under this check.
+const workerScripts = (() => {
+  // Two mechanisms, one per browser. Firefox lists them in the manifest's
+  // background.scripts; Chrome's service worker pulls them in with
+  // importScripts. Both must be checked, or a module added to only one of them
+  // escapes.
+  const built = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.json'), 'utf8'));
+  const fromManifest = (built.background || {}).scripts || [];
+
+  const background = fs.readFileSync(path.join(ROOT, 'background.js'), 'utf8');
+  const call = /importScripts\(([^)]*)\)/.exec(background);
+  const fromImport = call ? [...call[1].matchAll(/['"]([^'"]+)['"]/g)].map(m => m[1]) : [];
+
+  return [...new Set([...fromManifest, ...fromImport])];
+})().filter(f => f.startsWith('popup/js/shared/'));
+
+check('the worker loads at least one shared module', workerScripts.length > 0,
+  workerScripts.join(', '));
+
+for (const rel of workerScripts) {
+  let error = null;
+  try {
+    const context = { console };
+    context.globalThis = context;          // deliberately no `window`
+    vm.createContext(context);
+    vm.runInContext(fs.readFileSync(path.join(ROOT, rel), 'utf8'), context);
+  } catch (e) {
+    error = e.message;
+  }
+  check(`${rel.split('/').pop()} loads in a worker scope`, error === null,
+    error || 'no window needed');
+}
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

@@ -40,7 +40,12 @@ global.browser = {
 global.chrome = global.browser;
 global.SFTabs = {};
 
-for (const f of ['popup/js/shared/constants.js', 'popup/js/storage-chunking.js', 'popup/js/popup-storage.js']) {
+// The same order the pages load them in. utils.js is not optional here: the
+// chunk layer lives there now, and storage-chunking.js is the facade in front
+// of it — omitting it made every write fail with "cannot read properties of
+// undefined", which is exactly what a page would do.
+for (const f of ['popup/js/shared/constants.js', 'popup/js/shared/utils.js',
+                 'popup/js/storage-chunking.js', 'popup/js/popup-storage.js']) {
   new Function(fs.readFileSync(path.join(root, f), 'utf8'))();
 }
 const S = SFTabs.storage;

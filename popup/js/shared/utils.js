@@ -410,6 +410,76 @@ async function readChunkedSyncValue(key) {
   return JSON.parse(chunks.join(''));
 }
 
+/**
+ * Drop what the previous value left behind, once the new one is stored.
+ *
+ * Best-effort by design: an unreferenced chunk is harmless because the metadata
+ * states the count, so readers never look at it. Throwing here would fail a
+ * write that had already succeeded.
+ */
+async function pruneStaleChunks(key, keep, previousChunkCount, dropDirectKey = false) {
+  try {
+    const stale = [];
+    if (dropDirectKey) stale.push(key);
+    for (let i = keep; i < previousChunkCount; i++) stale.push(`${key}_chunk_${i}`);
+    if (stale.length) await browser.storage.sync.remove(stale);
+  } catch {
+    // Leaving keys behind is the safe failure here.
+  }
+}
+
+/**
+ * Write one value to sync, splitting it across chunks if it is too large.
+ *
+ * The new value is written before anything is deleted. The old order — clear,
+ * then write — left a window in which the value did not exist at all, and in an
+ * MV3 service worker, which Chrome terminates whenever it likes, a quick-add
+ * that lost that race took a profile's whole tab list with it. Writing first
+ * means the worst interruption leaves orphan chunks that readers already skip.
+ *
+ * Everything for one value goes in a single storage.sync.set, so the chunks and
+ * the metadata that describes them cannot disagree.
+ */
+async function writeChunkedSyncValue(key, data) {
+  const json = JSON.stringify(data);
+  const byteSize = new Blob([json]).size;
+  const chunkSize = SFTabs.constants.CHUNK_SIZE;
+
+  // Note the old shape before overwriting, so the stale tail can be pruned.
+  const metadataKey = `${key}_metadata`;
+  const previousChunkCount =
+    (await browser.storage.sync.get(metadataKey))[metadataKey]?.chunkCount || 0;
+
+  try {
+    if (byteSize <= chunkSize) {
+      await browser.storage.sync.set({
+        [key]: data,
+        [metadataKey]: { chunked: false, byteSize, savedAt: new Date().toISOString() }
+      });
+      await pruneStaleChunks(key, 0, previousChunkCount);
+      return { success: true, chunked: false, chunkCount: 1 };
+    }
+
+    const chunks = [];
+    for (let offset = 0; offset < json.length; offset += chunkSize) {
+      chunks.push(json.slice(offset, offset + chunkSize));
+    }
+
+    const payload = { [metadataKey]: {
+      chunked: true, chunkCount: chunks.length, byteSize, savedAt: new Date().toISOString() } };
+    chunks.forEach((chunk, index) => { payload[`${key}_chunk_${index}`] = chunk; });
+
+    await browser.storage.sync.set(payload);
+    await pruneStaleChunks(key, chunks.length, previousChunkCount, true);
+    return { success: true, chunked: true, chunkCount: chunks.length };
+  } catch (error) {
+    if (error.message && error.message.includes('QUOTA')) {
+      throw new Error(`Sync storage quota exceeded. Your configuration is too large (${Math.round(byteSize / 1024)}KB). Please reduce the number of tabs or dropdown items.`);
+    }
+    throw error;
+  }
+}
+
 /** One value from whichever area this device uses. */
 async function readStoredValue(key, preferSync) {
   if (preferSync) return readChunkedSyncValue(key);
@@ -955,6 +1025,8 @@ if (typeof module !== 'undefined' && module.exports) {
   loadTabsForUrl,
   readStoredValue,
   readChunkedSyncValue,
+  pruneStaleChunks,
+  writeChunkedSyncValue,
   storagePreference,
     withTabMembership,
     reorderTopLevelTabs,
@@ -992,6 +1064,8 @@ if (typeof module !== 'undefined' && module.exports) {
     loadTabsForUrl,
     readStoredValue,
     readChunkedSyncValue,
+    pruneStaleChunks,
+    writeChunkedSyncValue,
     storagePreference,
     withTabMembership,
     reorderTopLevelTabs,

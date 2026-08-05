@@ -19,11 +19,12 @@ function buildManifest(browser) {
 
   if (browser === 'firefox') {
     // Firefox: Use scripts array (MV2-style background for MV3).
-    // shared/utils.js comes first because background.js calls its org matching
+    // constants.js and utils.js come first: background.js reaches the shared
+    // chunk layer and CHUNK_SIZE through them, and utils.js reads constants.
     // and cannot importScripts — Firefox's background is an event page, not a
     // worker. Chrome imports it at the top of background.js instead.
     manifest.background = {
-      scripts: ['popup/js/shared/utils.js', 'background.js']
+      scripts: ['popup/js/shared/constants.js', 'popup/js/shared/utils.js', 'background.js']
     };
   } else {
     // Chrome/Edge: Use service_worker (true MV3)

@@ -4,12 +4,13 @@
 
 'use strict';
 
-// Org matching lives in shared utils so this worker and the popup cannot drift
-// apart on it. Chrome's service worker has importScripts; Firefox's background
-// is an event page without it, so build-manifest.js puts utils.js ahead of this
-// file in the scripts array instead.
+// The shared foundation: org matching, the chunk layer, CHUNK_SIZE and the
+// settings defaults, so this worker and the popup cannot drift apart on any of
+// them. Chrome's service worker has importScripts; Firefox's background is an
+// event page without it, so build-manifest.js puts these ahead of this file in
+// the scripts array instead.
 if (typeof importScripts === 'function') {
-  importScripts('popup/js/shared/utils.js');
+  importScripts('popup/js/shared/constants.js', 'popup/js/shared/utils.js');
 }
 
 // Chrome compatibility - use native browser API if available, otherwise wrap chrome
@@ -91,125 +92,14 @@ if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
   };
 }
 
-/**
- * Chunked storage utilities for background script
- */
-const CHUNK_SIZE = 7000;
-
+/** Read one sync value, reassembling chunks. Shared with every other surface. */
 async function readChunkedSync(baseKey) {
-  try {
-    const metadataKey = `${baseKey}_metadata`;
-    const metadataResult = await browser.storage.sync.get(metadataKey);
-    const metadata = metadataResult[metadataKey];
-
-    if (!metadata || !metadata.chunked) {
-      const directResult = await browser.storage.sync.get(baseKey);
-      return directResult[baseKey] || null;
-    }
-
-    const chunkCount = metadata.chunkCount;
-    const chunkKeys = [];
-    for (let i = 0; i < chunkCount; i++) {
-      chunkKeys.push(`${baseKey}_chunk_${i}`);
-    }
-
-    const chunksResult = await browser.storage.sync.get(chunkKeys);
-    const chunks = [];
-    for (let i = 0; i < chunkCount; i++) {
-      const chunkKey = `${baseKey}_chunk_${i}`;
-      if (!chunksResult[chunkKey]) {
-        throw new Error(`Missing chunk ${i} of ${chunkCount}`);
-      }
-      chunks.push(chunksResult[chunkKey]);
-    }
-
-    const jsonString = chunks.join('');
-    return JSON.parse(jsonString);
-  } catch (error) {
-    // Rethrow, matching storage-chunking.js. Returning null here made a torn
-    // read — a chunk missing or unparseable — indistinguishable from a key that
-    // simply is not set, and callers coalesce null to []. That turns "I could
-    // not read your tabs" into "you have no tabs", and the next write persists
-    // it. An absent key still returns null, without throwing; only a genuine
-    // failure to reassemble raises.
-    throw error;
-  }
+  return SFTabs.utils.readChunkedSyncValue(baseKey);
 }
 
+/** Write one sync value, chunking it if needed. Shared, so the two cannot drift. */
 async function saveChunkedSync(baseKey, data) {
-  try {
-    const jsonString = JSON.stringify(data);
-    const byteSize = new Blob([jsonString]).size;
-
-    // Note what the previous value used, but do not delete anything yet. The
-    // old order cleared first and wrote second, which left a window with no
-    // data at all — and this is a service worker, which Chrome can terminate
-    // between two awaits. A quick-add that lost that race took the profile's
-    // tabs with it. Writing first means the worst case is orphan chunks the
-    // metadata already tells readers to ignore.
-    const metadataKey = `${baseKey}_metadata`;
-    const metadataResult = await browser.storage.sync.get(metadataKey);
-    const previousChunkCount = metadataResult[metadataKey]?.chunkCount || 0;
-
-    if (byteSize <= CHUNK_SIZE) {
-      // Save directly
-      const storageObj = {};
-      storageObj[baseKey] = data;
-      storageObj[`${baseKey}_metadata`] = {
-        chunked: false,
-        byteSize: byteSize,
-        savedAt: new Date().toISOString()
-      };
-      await browser.storage.sync.set(storageObj);
-      await pruneChunks(baseKey, 0, previousChunkCount);
-      return { success: true, chunked: false };
-    }
-
-    // Chunk the data
-    const chunks = [];
-    let offset = 0;
-    while (offset < jsonString.length) {
-      chunks.push(jsonString.slice(offset, offset + CHUNK_SIZE));
-      offset += CHUNK_SIZE;
-    }
-
-    const storageObj = {};
-    chunks.forEach((chunk, index) => {
-      storageObj[`${baseKey}_chunk_${index}`] = chunk;
-    });
-    storageObj[`${baseKey}_metadata`] = {
-      chunked: true,
-      chunkCount: chunks.length,
-      byteSize: byteSize,
-      savedAt: new Date().toISOString()
-    };
-
-    await browser.storage.sync.set(storageObj);
-    await pruneChunks(baseKey, chunks.length, previousChunkCount, true);
-    return { success: true, chunked: true, chunkCount: chunks.length };
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
- * Drop what the previous value left behind, once the new one is stored.
- *
- * Mirrors storage-chunking.js. Best-effort: unreferenced keys are ignored by
- * readers because the metadata states the count, so failing here is harmless,
- * whereas throwing would fail a write that already succeeded.
- */
-async function pruneChunks(baseKey, keep, previousChunkCount, dropDirectKey = false) {
-  try {
-    const stale = [];
-    if (dropDirectKey) stale.push(baseKey);
-    for (let i = keep; i < previousChunkCount; i++) {
-      stale.push(`${baseKey}_chunk_${i}`);
-    }
-    if (stale.length) await browser.storage.sync.remove(stale);
-  } catch (error) {
-    // Leaving unreferenced keys behind is the safe failure here.
-  }
+  return SFTabs.utils.writeChunkedSyncValue(baseKey, data);
 }
 
 /**

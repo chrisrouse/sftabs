@@ -137,9 +137,13 @@ if (typeof module !== 'undefined' && module.exports) {
     CHUNK_SIZE
   };
 } else {
-  // Browser environment
-  window.SFTabs = window.SFTabs || {};
-  window.SFTabs.constants = {
+  // Browser environment. globalThis, not window: the background worker loads
+  // this file and a service worker has no window — `window.SFTabs` there is a
+  // ReferenceError that kills the whole worker. utils.js has always used
+  // globalThis for that reason; this file did not, and only got away with it
+  // because the worker did not load it until now.
+  globalThis.SFTabs = globalThis.SFTabs || {};
+  globalThis.SFTabs.constants = {
     TAB_STRUCTURE,
     DEFAULT_TABS,
     DEFAULT_SETTINGS,

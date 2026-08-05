@@ -72,10 +72,18 @@ check('background.js has no copy of extractOrgIdentifier',
   !/^function extractOrgIdentifier/m.test(bg));
 check('background.js calls the shared one',
   /SFTabs\.utils\.extractOrgIdentifier\(/.test(bg));
+// Both mechanisms must list it — Chrome imports, Firefox declares. Asserted by
+// membership rather than exact text, because the worker now loads constants.js
+// alongside it for the shared chunk layer.
+const builder = fs.readFileSync(path.join(__dirname, '..', 'build-manifest.js'), 'utf8');
+const imported = /importScripts\(([^)]*)\)/.exec(bg);
+const declared = /scripts: \[([^\]]*)\]/.exec(builder);
 check('and can load it — Chrome imports, Firefox lists it first',
-  /importScripts\('popup\/js\/shared\/utils\.js'\)/.test(bg) &&
-  /scripts: \['popup\/js\/shared\/utils\.js', 'background\.js'\]/.test(
-    fs.readFileSync(path.join(__dirname, '..', 'build-manifest.js'), 'utf8')));
+  Boolean(imported) && imported[1].includes('popup/js/shared/utils.js') &&
+  Boolean(declared) && declared[1].includes('popup/js/shared/utils.js'));
+check('utils.js is listed before background.js for Firefox',
+  Boolean(declared) &&
+  declared[1].indexOf('utils.js') < declared[1].indexOf('background.js'));
 
 // ── Every org host shape Salesforce hands out ──
 // A shape that resolves to no identifier resolves to no profile, silently. Four

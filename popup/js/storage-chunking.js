@@ -1,263 +1,61 @@
 // popup/js/storage-chunking.js
-// Storage chunking utilities for handling large configs in sync storage
+// The pages' entry point to chunked sync storage.
+//
+// Sync storage caps a single value, so anything larger is split across
+// `${key}_chunk_N` with a `${key}_metadata` record giving the count.
+//
+// The implementation is not here. It lives in shared/utils.js, which the popup,
+// the settings page, both content-script entries and the background worker all
+// load — this file is the SFTabs.storageChunking name the pages already call
+// through. There used to be two full implementations, this one and a copy in
+// background.js, and they drifted: the worker's reader returned null when
+// reassembly failed while this one threw, so a torn read became "you have no
+// tabs" in the worker and the next write made that true. One implementation
+// cannot disagree with itself.
 
-/**
- * Split a JSON string into chunks of specified size
- * @param {string} jsonString - The JSON string to chunk
- * @param {number} chunkSize - Maximum size of each chunk in bytes
- * @returns {string[]} Array of chunk strings
- */
-function chunkData(jsonString, chunkSize) {
-	if (!jsonString) {
-		return [];
-	}
-
-	const chunks = [];
-	let offset = 0;
-
-	while (offset < jsonString.length) {
-		const chunk = jsonString.slice(offset, offset + chunkSize);
-		chunks.push(chunk);
-		offset += chunkSize;
-	}
-
-	return chunks;
-}
-
-/**
- * Reassemble chunks back into a single JSON string
- * @param {string[]} chunks - Array of chunk strings
- * @returns {string} Reassembled JSON string
- */
-function unchunkData(chunks) {
-	if (!chunks || chunks.length === 0) {
-		return '';
-	}
-
-	const reassembled = chunks.join('');
-	return reassembled;
-}
-
-/**
- * Save data to sync storage with automatic chunking if needed
- * @param {string} baseKey - Base key name (e.g., 'customTabs')
- * @param {*} data - Data to save (will be JSON stringified)
- * @returns {Promise<{success: boolean, chunked: boolean, chunkCount: number}>}
- */
-async function saveChunkedSync(baseKey, data) {
-	// Declared out here so the catch can report it. Scoped inside the try it was
-	// a ReferenceError, which replaced the quota message with a meaningless one.
-	let byteSize = 0;
-	try {
-		const jsonString = JSON.stringify(data);
-		byteSize = new Blob([jsonString]).size;
-		const chunkSize = SFTabs.constants.CHUNK_SIZE;
-
-		// How many chunks the previous value used, so the stale tail can be
-		// pruned AFTER the new value is in place. The previous order was the
-		// other way round — clear everything, then write — which left a window
-		// with no data at all. On Chrome that window is real: an MV3 worker can
-		// be terminated between two awaits, and a profile's tabs are then simply
-		// gone, with nothing to recover from. Writing first means the worst
-		// interruption leaves orphan chunks that the metadata says to ignore.
-		const previous = await browser.storage.sync.get(`${baseKey}_metadata`);
-		const previousChunkCount = previous[`${baseKey}_metadata`]?.chunkCount || 0;
-
-		// Determine if chunking is needed
-		if (byteSize <= chunkSize) {
-			// Small enough to save directly
-			const storageObj = {};
-			storageObj[baseKey] = data;
-			storageObj[`${baseKey}_metadata`] = {
-				chunked: false,
-				byteSize: byteSize,
-				savedAt: new Date().toISOString()
-			};
-
-			await browser.storage.sync.set(storageObj);
-			await pruneChunks(baseKey, 0, previousChunkCount);
-			return { success: true, chunked: false, chunkCount: 1 };
-		}
-
-		// Need to chunk the data
-		const chunks = chunkData(jsonString, chunkSize);
-		const storageObj = {};
-
-		// Save each chunk
-		chunks.forEach((chunk, index) => {
-			const chunkKey = `${baseKey}_chunk_${index}`;
-			storageObj[chunkKey] = chunk;
-		});
-
-		// Save metadata
-		storageObj[`${baseKey}_metadata`] = {
-			chunked: true,
-			chunkCount: chunks.length,
-			byteSize: byteSize,
-			savedAt: new Date().toISOString()
-		};
-
-		await browser.storage.sync.set(storageObj);
-		await pruneChunks(baseKey, chunks.length, previousChunkCount, true);
-		return { success: true, chunked: true, chunkCount: chunks.length };
-	} catch (error) {
-		// Check if it's a quota error
-		if (error.message && error.message.includes('QUOTA')) {
-			throw new Error(`Sync storage quota exceeded. Your configuration is too large (${Math.round(byteSize / 1024)}KB). Please reduce the number of tabs or dropdown items.`);
-		}
-
-		throw error;
-	}
-}
-
-/**
- * Read data from sync storage, handling both chunked and non-chunked formats
- * @param {string} baseKey - Base key name (e.g., 'customTabs')
- * @returns {Promise<*>} The reassembled data object, or null if not found
- */
+/** Read one value, reassembling chunks. Throws if a chunk is missing. */
 async function readChunkedSync(baseKey) {
-	try {
-		// First check metadata to determine format
-		const metadataKey = `${baseKey}_metadata`;
-		const metadataResult = await browser.storage.sync.get(metadataKey);
-		const metadata = metadataResult[metadataKey];
+	return SFTabs.utils.readChunkedSyncValue(baseKey);
+}
 
-		// Check for non-chunked data (old format or small config)
-		if (!metadata || !metadata.chunked) {
-			const directResult = await browser.storage.sync.get(baseKey);
-			if (directResult[baseKey]) {
-				return directResult[baseKey];
-			}
-			return null;
-		}
-
-		// Data is chunked - read all chunks
-		const chunkCount = metadata.chunkCount;
-		const chunkKeys = [];
-		for (let i = 0; i < chunkCount; i++) {
-			chunkKeys.push(`${baseKey}_chunk_${i}`);
-		}
-
-		const chunksResult = await browser.storage.sync.get(chunkKeys);
-
-		// Verify all chunks were found
-		const chunks = [];
-		for (let i = 0; i < chunkCount; i++) {
-			const chunkKey = `${baseKey}_chunk_${i}`;
-			if (!chunksResult[chunkKey]) {
-				throw new Error(`Missing chunk ${i} of ${chunkCount} for key: ${baseKey}`);
-			}
-			chunks.push(chunksResult[chunkKey]);
-		}
-
-		// Reassemble and parse
-		const jsonString = unchunkData(chunks);
-		const data = JSON.parse(jsonString);
-		return data;
-	} catch (error) {
-		throw error;
-	}
+/** Write one value, chunking it when it outgrows a single sync entry. */
+async function saveChunkedSync(baseKey, data) {
+	return SFTabs.utils.writeChunkedSyncValue(baseKey, data);
 }
 
 /**
- * Drop what the previous value left behind, once the new one is safely stored.
+ * Delete a value and every chunk of it.
  *
- * Only keys the new value does not use: chunks past its own count, and the
- * direct key when the value is now chunked. Best-effort by design — a failure
- * here leaves unreferenced keys, which the metadata already tells readers to
- * ignore, and that is a far better outcome than failing a write that succeeded.
+ * Distinct from writing, and still needed: migrating between storage areas and
+ * resetting both remove a key outright rather than replacing its contents.
  *
- * The old cleanup swept fifty speculative chunk keys on every single save.
- * Chrome allows 120 sync writes a minute, and a removal counts, so a burst of
- * drag-reorders could hit the ceiling on housekeeping alone.
- */
-async function pruneChunks(baseKey, keep, previousChunkCount, dropDirectKey = false) {
-	try {
-		const stale = [];
-		if (dropDirectKey) stale.push(baseKey);
-		for (let i = keep; i < previousChunkCount; i++) {
-			stale.push(`${baseKey}_chunk_${i}`);
-		}
-		if (stale.length) await browser.storage.sync.remove(stale);
-	} catch (error) {
-		// Unreferenced keys are harmless; a thrown cleanup error would not be.
-	}
-}
-
-/**
- * Clear all chunks and metadata for a given key from sync storage
- * @param {string} baseKey - Base key name
- * @returns {Promise<void>}
+ * The speculative sweep of fifty chunk keys is deliberate here, unlike on the
+ * write path where it was removed. A deletion is the one moment orphans left by
+ * an interrupted earlier write should be cleared, and it is rare — Chrome's
+ * limit of 120 sync writes a minute is no concern for an explicit delete.
  */
 async function clearChunkedSync(baseKey) {
 	try {
-		// Check metadata to see how many chunks exist
 		const metadataKey = `${baseKey}_metadata`;
-		const metadataResult = await browser.storage.sync.get(metadataKey);
-		const metadata = metadataResult[metadataKey];
+		const metadata = (await browser.storage.sync.get(metadataKey))[metadataKey];
 
 		const keysToRemove = [baseKey, metadataKey];
-
-		if (metadata && metadata.chunked && metadata.chunkCount) {
-			// Add all chunk keys
-			for (let i = 0; i < metadata.chunkCount; i++) {
-				keysToRemove.push(`${baseKey}_chunk_${i}`);
-			}
-		}
-
-		// Also try to remove chunks even if metadata is missing (cleanup orphaned chunks)
-		// Check for chunks 0-49 (should be more than enough)
-		for (let i = 0; i < 50; i++) {
+		const known = (metadata && metadata.chunked && metadata.chunkCount) || 0;
+		for (let i = 0; i < Math.max(known, 50); i++) {
 			keysToRemove.push(`${baseKey}_chunk_${i}`);
 		}
 
 		await browser.storage.sync.remove(keysToRemove);
 	} catch (error) {
-		// Don't throw - cleanup is best-effort
+		// Best-effort: unreferenced keys are ignored by readers, which take the
+		// count from metadata, so a failure here is not worth surfacing.
 	}
 }
 
-/**
- * Detect the storage format for a given key
- * @param {string} baseKey - Base key name
- * @returns {Promise<{location: 'sync-chunked'|'sync-direct'|'local'|'none', metadata: object|null}>}
- */
-async function detectStorageFormat(baseKey) {
-	try {
-		// Check for chunked sync storage
-		const metadataKey = `${baseKey}_metadata`;
-		const syncMetadata = await browser.storage.sync.get(metadataKey);
-
-		if (syncMetadata[metadataKey] && syncMetadata[metadataKey].chunked) {
-			return { location: 'sync-chunked', metadata: syncMetadata[metadataKey] };
-		}
-
-		// Check for non-chunked sync storage
-		const syncDirect = await browser.storage.sync.get(baseKey);
-		if (syncDirect[baseKey]) {
-			return { location: 'sync-direct', metadata: null };
-		}
-
-		// Check for local storage
-		const localData = await browser.storage.local.get(baseKey);
-		if (localData[baseKey]) {
-			return { location: 'local', metadata: null };
-		}
-
-		return { location: 'none', metadata: null };
-	} catch (error) {
-		return { location: 'none', metadata: null };
-	}
-}
-
-// Export functions
+// Export
 window.SFTabs = window.SFTabs || {};
 window.SFTabs.storageChunking = {
-	chunkData,
-	unchunkData,
 	saveChunkedSync,
 	readChunkedSync,
-	clearChunkedSync,
-	pruneChunks,
-	detectStorageFormat
+	clearChunkedSync
 };
