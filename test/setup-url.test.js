@@ -8,7 +8,7 @@
  * already complete, and a path arriving fully qualified with `/lightning/` is a
  * link scraped from Salesforce's own nav and has to be used verbatim.
  *
- * That rule is written out in seven separate functions. Duplication is the
+ * That rule is written out in six separate functions. Duplication is the
  * whole reason this file exists. Moving a tab into a folder broke it, because
  * the one copy that folder children go through — navigateToNavigationItem —
  * had the bare form with no `/home`. The same tab worked at top level and 404'd
@@ -21,7 +21,7 @@
  * builder states the whole rule: the exception and the `/home`. A builder that
  * mentions only one of the two has half the rule, which is how this broke.
  *
- * Adding an eighth builder means adding it to BUILDERS below. Better still,
+ * Adding a seventh builder means adding it to BUILDERS below. Better still,
  * don't add one.
  *
  * Run: npm test
@@ -47,7 +47,6 @@ const ROOT = path.join(__dirname, '..');
 /** Every function in the extension that turns a tab path into a Setup URL. */
 const BUILDERS = [
   ['popup/js/shared/utils.js',   'buildFullUrl'],
-  ['popup/js/popup-ui.js',       'navigateToTab'],
   ['js/popup.js',                'navigateToTab'],
   ['content/content-main.js',    'createTabElementWithLightningAndDropdown'],
   ['content/content-main.js',    'navigateToNavigationItem'],
