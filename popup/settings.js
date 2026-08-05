@@ -170,9 +170,12 @@ async function populateInlineProfilesList() {
 	const profilesList = document.getElementById('export-profiles-inline');
 
 	// Load profiles from storage
-	const result = await browser.storage.sync.get(['profiles', 'userSettings']);
-	const profiles = result.profiles || [];
-	const settings = result.userSettings || {};
+	// Through the storage layer rather than straight at sync: it reads the area
+	// the user actually chose and reassembles chunked values. Reading sync
+	// directly returned nothing for anyone on local storage, and for anyone
+	// whose profile list had outgrown 7000 bytes and been split into chunks.
+	const profiles = await SFTabs.storage.getProfiles() || [];
+	const settings = await SFTabs.storage.getUserSettings() || {};
 
 	// Clear existing content
 	profilesList.innerHTML = '';
@@ -624,8 +627,7 @@ async function populateImportOptions(importData, filename) {
 		document.getElementById('import-destination-container').style.display = 'block';
 
 		// Populate both profile dropdowns (add and overwrite)
-		const result = await browser.storage.sync.get('profiles');
-		const profiles = result.profiles || [];
+		const profiles = await SFTabs.storage.getProfiles() || [];
 
 		const addSelect = document.getElementById('import-profile-add-select');
 		addSelect.innerHTML = '<option value="">Choose a profile...</option>';
@@ -657,8 +659,7 @@ async function populateImportOptions(importData, filename) {
 			document.getElementById('import-destination-container').style.display = 'block';
 
 			// Populate both profile dropdowns (add and overwrite)
-			const result = await browser.storage.sync.get('profiles');
-			const profiles = result.profiles || [];
+			const profiles = await SFTabs.storage.getProfiles() || [];
 
 			const addSelect = document.getElementById('import-profile-add-select');
 			addSelect.innerHTML = '<option value="">Choose a profile...</option>';
@@ -779,14 +780,16 @@ async function importSelectedProfiles(importData, selectedProfileIds, importSett
 	// Import settings if requested
 	if (importSettings && importData.settings) {
 		const mergedSettings = {
-			...userSettings,
-			...importData.settings,
+			// Deep merge, or a nested object in the file replaces the live one
+			// wholesale — that is how importing with org colours off wiped every
+			// per-org override.
+			...SFTabs.utils.mergeUserSettings(userSettings, importData.settings),
 			// Enable profiles if importing profiles
 			profilesEnabled: true,
 			// Preserve storage preference
 			useSyncStorage: userSettings.useSyncStorage
 		};
-		await browser.storage.sync.set({ userSettings: mergedSettings });
+		await SFTabs.storage.saveUserSettings(mergedSettings, true, false);
 		userSettings = mergedSettings;
 	} else if (needsProfilesEnabled) {
 		// Enable profiles even if not importing settings
@@ -794,13 +797,12 @@ async function importSelectedProfiles(importData, selectedProfileIds, importSett
 			...userSettings,
 			profilesEnabled: true
 		};
-		await browser.storage.sync.set({ userSettings: mergedSettings });
+		await SFTabs.storage.saveUserSettings(mergedSettings, true, false);
 		userSettings = mergedSettings;
 	}
 
 	// Import selected profiles
-	const result = await browser.storage.sync.get('profiles');
-	const currentProfiles = result.profiles || [];
+	const currentProfiles = await SFTabs.storage.getProfiles() || [];
 
 	// Filter and import selected profiles
 	const profilesToImport = importData.profiles.filter(p => selectedProfileIds.includes(p.id));
@@ -820,12 +822,13 @@ async function importSelectedProfiles(importData, selectedProfileIds, importSett
 
 		// Import tabs for this profile
 		const profileTabs = importData.profileData[profile.id] || [];
-		const storageKey = `profile_${newProfileId}_tabs`;
-		await browser.storage.sync.set({ [storageKey]: profileTabs });
+		await SFTabs.storage.saveProfileTabs(newProfileId, profileTabs);
 	}
 
-	// Save updated profiles list
-	await browser.storage.sync.set({ profiles: currentProfiles });
+	// saveProfiles chunks once the list outgrows a single sync value. A raw set
+	// left the old chunks and their metadata behind, so the next read
+	// reassembled the stale list and silently discarded this write.
+	await SFTabs.storage.saveProfiles(currentProfiles, false);
 }
 
 /**
@@ -849,28 +852,18 @@ async function importFromHybridMode(importData, importSettings) {
 		// Add tabs to existing tabs without enabling profiles
 		if (importSettings && importData.settings) {
 			const mergedSettings = {
-				...userSettings,
-				...importData.settings,
+				...SFTabs.utils.mergeUserSettings(userSettings, importData.settings),
 				// Preserve current state
 				profilesEnabled: userSettings.profilesEnabled,
 				activeProfileId: userSettings.activeProfileId,
 				useSyncStorage: userSettings.useSyncStorage
 			};
-			await browser.storage.sync.set({ userSettings: mergedSettings });
+			await SFTabs.storage.saveUserSettings(mergedSettings, true, false);
 		}
 
 		// Add to existing tabs in the active profile's storage key
-		const useSyncStorage = await SFTabs.storage.getStoragePreference();
 		const activeProfileId = userSettings.activeProfileId;
-		const storageKey = `profile_${activeProfileId}_tabs`;
-		let existingTabs = [];
-
-		if (useSyncStorage) {
-			existingTabs = await SFTabs.storageChunking.readChunkedSync(storageKey) || [];
-		} else {
-			const localResult = await browser.storage.local.get(storageKey);
-			existingTabs = localResult[storageKey] || [];
-		}
+		const existingTabs = await SFTabs.storage.getProfileTabs(activeProfileId) || [];
 
 		// Merge tabs - imported tabs get new positions after existing ones
 		const maxPosition = existingTabs.length > 0 ? Math.max(...existingTabs.map(t => t.position || 0)) : -1;
@@ -889,35 +882,22 @@ async function importFromHybridMode(importData, importSettings) {
 		});
 
 		// Save merged tabs
-		if (useSyncStorage) {
-			await SFTabs.storageChunking.saveChunkedSync(storageKey, mergedTabs);
-		} else {
-			await browser.storage.local.set({ [storageKey]: mergedTabs });
-		}
+		await SFTabs.storage.saveProfileTabs(activeProfileId, mergedTabs);
 	} else if (hybridMode === 'replace-tabs') {
 		// Replace all tabs without enabling profiles
 		if (importSettings && importData.settings) {
 			const mergedSettings = {
-				...userSettings,
-				...importData.settings,
+				...SFTabs.utils.mergeUserSettings(userSettings, importData.settings),
 				// Preserve current state
 				profilesEnabled: userSettings.profilesEnabled,
 				activeProfileId: userSettings.activeProfileId,
 				useSyncStorage: userSettings.useSyncStorage
 			};
-			await browser.storage.sync.set({ userSettings: mergedSettings });
+			await SFTabs.storage.saveUserSettings(mergedSettings, true, false);
 		}
 
 		// Replace tabs in the active profile's storage key
-		const useSyncStorage = await SFTabs.storage.getStoragePreference();
-		const activeProfileId = userSettings.activeProfileId;
-		const storageKey = `profile_${activeProfileId}_tabs`;
-
-		if (useSyncStorage) {
-			await SFTabs.storageChunking.saveChunkedSync(storageKey, tabs);
-		} else {
-			await browser.storage.local.set({ [storageKey]: tabs });
-		}
+		await SFTabs.storage.saveProfileTabs(userSettings.activeProfileId, tabs);
 	}
 
 	// Import chunked data if available
@@ -935,14 +915,13 @@ async function importTabsToDestination(importData, importSettings) {
 	// Import settings if requested
 	if (importSettings && importData.settings) {
 		const mergedSettings = {
-			...userSettings,
-			...importData.settings,
+			...SFTabs.utils.mergeUserSettings(userSettings, importData.settings),
 			// Preserve current profile state and storage preference
 			profilesEnabled: userSettings.profilesEnabled,
 			activeProfileId: userSettings.activeProfileId,
 			useSyncStorage: userSettings.useSyncStorage
 		};
-		await browser.storage.sync.set({ userSettings: mergedSettings });
+		await SFTabs.storage.saveUserSettings(mergedSettings, true, false);
 	}
 
 	// Import tabs
@@ -960,9 +939,7 @@ async function importTabsToDestination(importData, importSettings) {
 			}
 
 			// Load existing tabs from the profile
-			const storageKey = `profile_${profileId}_tabs`;
-			const result = await browser.storage.sync.get(storageKey);
-			const existingTabs = result[storageKey] || [];
+			const existingTabs = await SFTabs.storage.getProfileTabs(profileId) || [];
 
 			// Merge tabs - imported tabs get new positions after existing ones
 			const maxPosition = existingTabs.length > 0 ? Math.max(...existingTabs.map(t => t.position || 0)) : -1;
@@ -981,7 +958,7 @@ async function importTabsToDestination(importData, importSettings) {
 			});
 
 			// Save merged tabs
-			await browser.storage.sync.set({ [storageKey]: mergedTabs });
+			await SFTabs.storage.saveProfileTabs(profileId, mergedTabs);
 		} else if (destRadio.value === 'overwrite') {
 			// Overwrite existing profile
 			const profileId = document.getElementById('import-profile-select-inline').value;
@@ -989,8 +966,7 @@ async function importTabsToDestination(importData, importSettings) {
 				throw new Error(chrome.i18n.getMessage('selectProfileError'));
 			}
 
-			const storageKey = `profile_${profileId}_tabs`;
-			await browser.storage.sync.set({ [storageKey]: tabs });
+			await SFTabs.storage.saveProfileTabs(profileId, tabs);
 		} else if (destRadio.value === 'new') {
 			// Create new profile
 			const profileName = document.getElementById('import-new-profile-name').value.trim();
@@ -998,8 +974,7 @@ async function importTabsToDestination(importData, importSettings) {
 				throw new Error(chrome.i18n.getMessage('profileNameError'));
 			}
 
-			const result = await browser.storage.sync.get('profiles');
-			const profiles = result.profiles || [];
+			const profiles = await SFTabs.storage.getProfiles() || [];
 
 			const newProfileId = 'profile_' + Date.now();
 			const newProfile = {
@@ -1011,10 +986,10 @@ async function importTabsToDestination(importData, importSettings) {
 			};
 
 			profiles.push(newProfile);
-			await browser.storage.sync.set({ profiles });
-
-			const storageKey = `profile_${newProfileId}_tabs`;
-			await browser.storage.sync.set({ [storageKey]: tabs });
+			await SFTabs.storage.saveProfiles(profiles, false);
+			// saveProfileTabs, not a raw set: a large import chunks, and writing
+			// the direct key next to stale chunk metadata loses the whole import.
+			await SFTabs.storage.saveProfileTabs(newProfileId, tabs);
 		}
 	} else {
 		// No profiles UI - but popup always loads from activeProfileId profile storage internally
@@ -1098,15 +1073,14 @@ async function importOnlySettings(importData) {
 	}
 
 	const mergedSettings = {
-		...userSettings,
-		...importData.settings,
+		...SFTabs.utils.mergeUserSettings(userSettings, importData.settings),
 		// Preserve current profile state and storage preference
 		profilesEnabled: userSettings.profilesEnabled,
 		activeProfileId: userSettings.activeProfileId,
 		useSyncStorage: userSettings.useSyncStorage
 	};
 
-	await browser.storage.sync.set({ userSettings: mergedSettings });
+	await SFTabs.storage.saveUserSettings(mergedSettings, true, false);
 }
 
 /**

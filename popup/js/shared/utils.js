@@ -355,6 +355,34 @@ function applyTabColor(el, name, style, enabled) {
 }
 
 /**
+ * Merge imported settings over current ones without losing nested detail.
+ *
+ * A spread is one level deep, so `{...current, ...incoming}` replaces whole
+ * sub-objects rather than merging them. That silently destroys data: importing
+ * a file exported before org colours existed — or with the feature switched
+ * off, where `orgColors` serialises as `{enabled:false}` — replaced the live
+ * `orgColors` outright and took `environments` and every per-org override with
+ * it. The same shape applies to floatingButton, headerMenu and tabColors.
+ *
+ * One level of merging is deliberate, not a step towards a general deep merge.
+ * Arrays are replaced wholesale, which is what an import should do to a list:
+ * merging `orgs` element-wise would invent entries nobody exported.
+ */
+function mergeUserSettings(current, incoming) {
+  const isPlainObject = value =>
+    value !== null && typeof value === 'object' && !Array.isArray(value);
+
+  const merged = { ...(current || {}) };
+  for (const [key, value] of Object.entries(incoming || {})) {
+    const existing = merged[key];
+    merged[key] = isPlainObject(value) && isPlainObject(existing)
+      ? { ...existing, ...value }
+      : value;
+  }
+  return merged;
+}
+
+/**
  * Whether the floating button belongs on this page.
  *
  * The popup offers everywhere / Setup only / outside Setup, and has always
@@ -737,6 +765,7 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveProfileForUrl,
     resolveFloatingSide,
   floatingButtonAllowedHere,
+  mergeUserSettings,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,
@@ -766,6 +795,7 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveProfileForUrl,
     resolveFloatingSide,
     floatingButtonAllowedHere,
+    mergeUserSettings,
     withTabMembership,
     reorderTopLevelTabs,
     tabOrderMatches,
