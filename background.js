@@ -555,10 +555,40 @@ async function prefersSyncStorage() {
   }
 }
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.action !== 'quick_add_tab') return;
+/**
+ * Persist an order dragged in the Salesforce tab bar.
+ *
+ * The content script reports which tabs are in the bar and in what order; the
+ * rule that turns that into positions lives in shared utils, so the popup's own
+ * drag-and-drop and this one cannot disagree about what an order means.
+ *
+ * Only top-level positions move — a nested tab keeps its place inside its
+ * parent, which renumbering the whole array by index would have destroyed.
+ */
+async function reorderTabsForProfile(profileId, order) {
+  const key = profileId ? `profile_${profileId}_tabs` : 'customTabs';
+  const useSync = await prefersSyncStorage();
 
-  quickAddTabToProfiles(message.tab, message.profileIds)
+  const tabs = (useSync
+    ? await readChunkedSync(key)
+    : (await browser.storage.local.get(key))[key]) || [];
+  if (!tabs.length) return 0;
+
+  const next = SFTabs.utils.reorderTopLevelTabs(tabs, order);
+  if (useSync) await saveChunkedSync(key, next);
+  else await browser.storage.local.set({ [key]: next });
+  return next.length;
+}
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  const action = message && message.action;
+  if (action !== 'quick_add_tab' && action !== 'reorder_tabs') return;
+
+  const work = action === 'quick_add_tab'
+    ? quickAddTabToProfiles(message.tab, message.profileIds)
+    : reorderTabsForProfile(message.profileId, message.order);
+
+  work
     .then(async written => {
       // Tell every open Salesforce page to redraw, including the sender — its
       // own bar has to grow the new tab too.

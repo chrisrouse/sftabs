@@ -143,9 +143,6 @@
     }
   },
   "background": {
-    "scripts": [
-      "popup/js/shared/utils.js",
-      "background.js"
-    ]
+    "service_worker": "background.js"
   }
 }

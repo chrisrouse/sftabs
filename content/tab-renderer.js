@@ -144,6 +144,10 @@ async function initTabs(tabContainer) {
     setTimeout(() => {
       handleTabOverflow(tabContainer, topLevelTabs);
       renderQuickAddButton(tabContainer, quickAddInBar);
+      // Snapshot after the bar has settled, so the watcher compares a drag
+      // against what is actually on screen rather than what we intended
+      renderedTabOrder = currentBarOrder(tabContainer);
+      watchBarReorder(tabContainer);
       // Reset flag after overflow handling completes
       isRenderingTabs = false;
     }, 200);
@@ -1349,6 +1353,62 @@ function handleTabOverflow(tabContainer, topLevelTabs) {
   // Create and add overflow button
   const overflowButton = createOverflowButton(hiddenTabs.map(h => h.tab));
   tabContainer.appendChild(overflowButton);
+}
+
+// ── Dragging tabs in the Salesforce bar ──────────────────────────
+
+/**
+ * The order we last rendered, so a drag can be told from our own repaint.
+ * Salesforce moves the DOM nodes; nothing tells us it happened.
+ */
+let renderedTabOrder = [];
+
+/** The custom tabs currently in the bar, in the order they appear. */
+function currentBarOrder(tabContainer) {
+  return [...tabContainer.querySelectorAll('.sf-tabs-custom-tab[data-tab-id]')]
+    .map(li => li.getAttribute('data-tab-id'));
+}
+
+/**
+ * Watch for the bar being reordered and write the new order back.
+ *
+ * Our tabs carry navexConsoleTabItem, which is what gives them Salesforce's own
+ * console drag for free — but that only moves DOM nodes, so the next render
+ * rebuilt from stored positions and undid it.
+ *
+ * The comparison is against what we rendered rather than a flag, because our
+ * own repaint also reorders nodes: a flag would have to be cleared at exactly
+ * the right moment, whereas an order that matches what we drew is by definition
+ * not a drag.
+ *
+ * The write goes to the background worker, which owns the chunk-aware storage
+ * helpers.
+ */
+function watchBarReorder(tabContainer) {
+  if (tabContainer.dataset.sftabsReorderWatched) return;
+  tabContainer.dataset.sftabsReorderWatched = '1';
+
+  const onChanged = debounce(async () => {
+    const order = currentBarOrder(tabContainer);
+    if (order.length === 0) return;
+    if (order.length === renderedTabOrder.length &&
+        order.every((id, i) => id === renderedTabOrder[i])) return;   // our own repaint
+
+    renderedTabOrder = order;
+
+    const utils = window.SFTabs && window.SFTabs.utils;
+    if (!utils || !utils.resolveProfileForUrl) return;
+    const settings = await readUserSettings();
+    const profiles = await readProfiles();
+
+    await browser.runtime.sendMessage({
+      action: 'reorder_tabs',
+      profileId: utils.resolveProfileForUrl(window.location.href, profiles, settings),
+      order,
+    });
+  }, 250);
+
+  new MutationObserver(onChanged).observe(tabContainer, { childList: true });
 }
 
 /**

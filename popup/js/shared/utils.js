@@ -704,6 +704,62 @@ function resolveOrgColor(url, orgColors) {
   return environments[environment] || DEFAULT_ENV_COLORS[environment] || null;
 }
 
+/**
+ * Apply an order taken from the Salesforce tab bar back onto stored tabs.
+ *
+ * Salesforce's own console tab bar can be dragged, and our injected tabs carry
+ * navexConsoleTabItem, so they inherit that for free — but it moves DOM nodes
+ * and nothing else, and the next render rebuilds from `position` and snaps them
+ * back. This turns the DOM order into stored positions.
+ *
+ * Only top-level tabs appear in the bar, so only their positions move. A nested
+ * tab keeps whatever position it had inside its parent; renumbering the whole
+ * array by index would quietly reshuffle children that were never dragged.
+ *
+ * A partial order permutes only the slots its own tabs occupy. Numbering them
+ * 0..n-1 instead would collide with tabs that were not in the bar: given
+ * positions a:0 b:1 c:2 and an order of just ['c'], c would be handed 0 and sit
+ * on top of a, producing an order nobody dragged. So the tabs being reordered
+ * keep their collective set of positions and are dealt back out in the new
+ * sequence. That case is real — the bar can be showing a subset while a render
+ * races a write.
+ */
+function reorderTopLevelTabs(tabs, orderedIds) {
+  const list = Array.isArray(tabs) ? tabs : [];
+  const moving = (orderedIds || [])
+    .filter(id => list.some(tab => tab && !tab.parentId && tab.id === id));
+  if (!moving.length) return list;
+
+  const slots = list
+    .filter(tab => tab && !tab.parentId && moving.includes(tab.id))
+    .map(tab => tab.position ?? 0)
+    .sort((a, b) => a - b);
+
+  const assigned = new Map(moving.map((id, index) => [id, slots[index]]));
+
+  return list.map(tab => {
+    if (!tab || tab.parentId || !assigned.has(tab.id)) return tab;
+    const position = assigned.get(tab.id);
+    return tab.position === position ? tab : { ...tab, position };
+  });
+}
+
+/**
+ * Whether a bar order differs from what the stored positions would produce.
+ *
+ * The caller uses this to skip writes: our own render puts the tabs in stored
+ * order, so without this check the observer that watches for drags would fire
+ * on every render and write back what was already there.
+ */
+function tabOrderMatches(tabs, orderedIds) {
+  const stored = (Array.isArray(tabs) ? tabs : [])
+    .filter(tab => tab && !tab.parentId)
+    .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+    .map(tab => tab.id);
+  const seen = (orderedIds || []).filter(id => stored.includes(id));
+  return seen.length === stored.length && seen.every((id, i) => id === stored[i]);
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     generateId,
@@ -719,6 +775,8 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveProfileForUrl,
     resolveFloatingSide,
     withTabMembership,
+    reorderTopLevelTabs,
+    tabOrderMatches,
     generateTabName,
     parsePageToTab,
     formatObjectNameFromURL,
@@ -751,6 +809,8 @@ if (typeof module !== 'undefined' && module.exports) {
     resolveProfileForUrl,
     resolveFloatingSide,
     withTabMembership,
+    reorderTopLevelTabs,
+    tabOrderMatches,
     generateTabName,
     parsePageToTab,
     formatObjectNameFromURL,
