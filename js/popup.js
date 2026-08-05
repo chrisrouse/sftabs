@@ -797,9 +797,12 @@ function renderTabList() {
   }
   const ordered = state.tabs.slice().sort((a, b) => a.position - b.position);
   list.innerHTML = ordered.map(tab => tabItemHTML(tab)).join('');
-  // Colors are inline custom properties, so they go on after the markup exists
-  ordered.forEach(tab => {
-    const el = list.querySelector(`.tab-item[data-id="${tab.id}"]`);
+  // Colors are inline custom properties, so they go on after the markup exists.
+  // Indexed rather than queried: the children are in the order just written, so
+  // a querySelector per row was a fresh subtree scan to find the node already
+  // sitting at that index.
+  ordered.forEach((tab, index) => {
+    const el = list.children[index];
     if (el) paintTabRow(el, tab);
   });
   bindTabListEvents();
@@ -819,6 +822,9 @@ function emptyStateHTML() {
 function tabItemHTML(tab) {
   const type   = tabType(tab);
   const name   = esc(tab.label);
+  // Once per row: countItems walks the whole sub-item tree, and three separate
+  // places below need the number.
+  const itemCount = hasDropdown(tab) ? countItems(tab.dropdownItems) : 0;
   const path   = tab.path ? esc(tab.path) : '';
   const newTabOn = tab.openInNewTab ? 'is-on' : '';
   const newTabAriaLabel = tab.openInNewTab
@@ -838,11 +844,11 @@ function tabItemHTML(tab) {
       <div class="tab-info-top">
         <span class="sftabs-tc-mark" aria-hidden="true"></span>
         <span class="tab-name">${name}</span>
-        ${hasDropdown(tab) ? `<span class="tab-count">${countItems(tab.dropdownItems)}<span class="sr-only"> ${t('srSubItems')}</span></span>` : ''}
+        ${hasDropdown(tab) ? `<span class="tab-count">${itemCount}<span class="sr-only"> ${t('srSubItems')}</span></span>` : ''}
       </div>
       ${path ? `<span class="tab-path">${path}</span>` : ''}
       ${hasDropdown(tab) ? `<button class="tab-dropdown-note" data-action="manage-items" data-id="${tab.id}"
-        >▾ ${esc(subItemLabel(countItems(tab.dropdownItems)))}</button>` : ''}
+        >▾ ${esc(subItemLabel(itemCount))}</button>` : ''}
     </div>
     <div class="tab-actions" role="group" aria-label="${t('ariaTabActions', name)}">
       <button class="tab-btn tab-btn--move tab-btn--up"
@@ -854,7 +860,7 @@ function tabItemHTML(tab) {
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M96 310c-8 8-8 19 0 27l150 147c8 8 20 8 28 0l151-147c8-8 8-19 0-27l-28-27a20 20 0 0 0-28 0l-47 46c-8 8-22 3-22-9V50c0-10-9-20-20-20h-40c-11 0-20 11-20 20v270c0 12-14 17-22 9l-47-46a20 20 0 0 0-28 0z"/></svg>
       </button>
       <button class="tab-btn tab-btn--group ${hasDropdown(tab) ? 'is-on' : ''}"
-        aria-label="${hasDropdown(tab) ? t('ariaManageSubItems', String(countItems(tab.dropdownItems)), name) : t('ariaAddSubItems', name)}"
+        aria-label="${hasDropdown(tab) ? t('ariaManageSubItems', String(itemCount), name) : t('ariaAddSubItems', name)}"
         title="${t('subItemsTitle')}" data-action="manage-items" data-id="${tab.id}">
         <svg viewBox="0 0 520 520" fill="currentColor" aria-hidden="true" focusable="false"><path d="M231 230H108c-7 0-14 6-14 13v105H53c-7 0-14 7-14 14v100c0 7 7 14 14 14h137c7 0 14-7 14-14V362c0-7-7-14-14-14h-41v-64h219v64h-41c-7 0-14 7-14 14v100c0 7 7 14 14 14h137c7 0 13-7 13-14V362c0-7-6-14-13-14h-42V243c0-7-7-13-14-13H286v-64h41c7 0 13-7 13-14V52c0-7-6-14-13-14H190c-7 0-14 7-14 14v100c0 7 7 14 14 14h42v64z"/></svg>
       </button>
@@ -1264,13 +1270,39 @@ function otherProfiles() {
 }
 
 /** Profiles whose list already contains this id. */
+/**
+ * Every other profile's tab list, in one pass.
+ *
+ * getProfileTabs resolves the storage preference internally, which is itself a
+ * read, so calling it per profile cost two round trips each and did them one
+ * after another. Opening the edit form with eight profiles made fourteen
+ * sequential reads, and saving made fourteen more.
+ *
+ * A profile whose tabs could not be read is left out of the map rather than
+ * recorded as empty. That distinction matters downstream: writing membership
+ * for a profile we failed to read would replace its list with what we guessed.
+ */
+async function otherProfileTabs() {
+  const utils = SFTabs.utils;
+  const preferSync = await utils.storagePreference();
+
+  const entries = await Promise.all(otherProfiles().map(async profile => {
+    try {
+      const tabs = await utils.readStoredValue(`profile_${profile.id}_tabs`, preferSync);
+      return [profile.id, tabs || []];
+    } catch {
+      return null;   // torn read — omit, do not claim it is empty
+    }
+  }));
+
+  return new Map(entries.filter(Boolean));
+}
+
 async function profilesHoldingTab(tabId) {
-  const held = [];
-  for (const profile of otherProfiles()) {
-    const tabs = (await SFTabs.storage.getProfileTabs(profile.id)) || [];
-    if (tabs.some(t => t.id === tabId)) held.push(profile.id);
-  }
-  return held;
+  const byProfile = await otherProfileTabs();
+  return [...byProfile.entries()]
+    .filter(([, tabs]) => tabs.some(t => t.id === tabId))
+    .map(([profileId]) => profileId);
 }
 
 /**
@@ -1282,11 +1314,14 @@ async function profilesHoldingTab(tabId) {
  */
 async function applyTabMembership(tab, wanted) {
   const want = new Set(wanted);
-  for (const profile of otherProfiles()) {
-    const tabs = (await SFTabs.storage.getProfileTabs(profile.id)) || [];
-    const next = SFTabs.utils.withTabMembership(tabs, tab, want.has(profile.id));
+  const byProfile = await otherProfileTabs();
+
+  // Only profiles that were read successfully. One left out was unreadable, and
+  // writing a membership decision over a list we could not see would replace it.
+  for (const [profileId, tabs] of byProfile) {
+    const next = SFTabs.utils.withTabMembership(tabs, tab, want.has(profileId));
     // Returned unchanged when there is nothing to do, so this skips the write
-    if (next !== tabs) await SFTabs.storage.saveProfileTabs(profile.id, next);
+    if (next !== tabs) await SFTabs.storage.saveProfileTabs(profileId, next);
   }
 }
 
@@ -1572,7 +1607,7 @@ function openEditTab(tabId) {
   state.editingTabId = tabId;
 
   // Highlight the tab being edited, dim the others
-  document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('is-editing'));
+  clearEditingHighlight();
   document.getElementById('tab-list').classList.add('has-editing');
   const tabEl = document.querySelector(`.tab-item[data-id="${tabId}"]`);
   if (tabEl) tabEl.classList.add('is-editing');
@@ -1619,7 +1654,7 @@ function openDropdownManagement(tabId) {
   state.editingTabId = tabId;
 
   // Highlight the tab being edited
-  document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('is-editing'));
+  clearEditingHighlight();
   document.getElementById('tab-list').classList.add('has-editing');
   const tabEl = document.querySelector(`.tab-item[data-id="${tabId}"]`);
   if (tabEl) tabEl.classList.add('is-editing');
