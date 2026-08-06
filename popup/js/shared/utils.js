@@ -587,6 +587,37 @@ function matchTabsToUrl(candidates, currentUrl) {
 }
 
 /**
+ * Does this settings change alter what the Salesforce tab bar draws?
+ *
+ * Tab colours, the quick-add button and which profile applies all live in
+ * userSettings, not in the tab keys — so the storage listener that watches tabs
+ * never saw them. Redrawing was left to the popup remembering to broadcast, and
+ * it remembered for the quick-add toggle and not for either colour control:
+ * turning colours off left every tab still coloured until the page was
+ * reloaded, and switching dot/fill did nothing at all.
+ *
+ * Compared field by field rather than reacting to any userSettings write, so
+ * changing the theme or the floating button does not rebuild the tab bar for
+ * nothing. oldValue is absent on a first write, which correctly reads as a
+ * change.
+ */
+const TAB_BAR_SETTINGS = [
+  'tabColors',        // enabled, and dot vs fill
+  'menuBarQuickAdd',  // the "+" at the end of the bar
+  'activeProfileId',  // which tabs belong here
+  'profilesEnabled',
+  'autoSwitchProfiles',
+];
+
+function settingsAffectTabBar(change) {
+  if (!change) return false;
+  const before = change.oldValue || {};
+  const after = change.newValue || {};
+  return TAB_BAR_SETTINGS.some(key =>
+    JSON.stringify(before[key]) !== JSON.stringify(after[key]));
+}
+
+/**
  * Does this batch of storage changes affect a profile's tabs?
  *
  * Four surfaces asked this and three phrased it differently. Two of them
@@ -1020,6 +1051,7 @@ if (typeof module !== 'undefined' && module.exports) {
   floatingButtonAllowedHere,
   mergeUserSettings,
   tabStorageChanged,
+  settingsAffectTabBar,
   matchTabsToUrl,
   tabDestinationUrl,
   loadTabsForUrl,
@@ -1059,6 +1091,7 @@ if (typeof module !== 'undefined' && module.exports) {
     floatingButtonAllowedHere,
     mergeUserSettings,
     tabStorageChanged,
+    settingsAffectTabBar,
     matchTabsToUrl,
     tabDestinationUrl,
     loadTabsForUrl,

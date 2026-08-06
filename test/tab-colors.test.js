@@ -8,7 +8,8 @@
  *
  * Run: npm test
  */
-const { TAB_COLORS, tabColorVars, applyTabColor } = require('../popup/js/shared/utils.js');
+const { TAB_COLORS, tabColorVars, applyTabColor,
+        settingsAffectTabBar } = require('../popup/js/shared/utils.js');
 const { TAB_STRUCTURE, DEFAULT_SETTINGS } = require('../popup/js/shared/constants.js');
 
 const results = [];
@@ -134,6 +135,55 @@ check('re-painting a row replaces rather than stacks',
   !el.classList.contains('sftabs-tc--dot') &&
   el.props.get('--sftabs-tc') === TAB_COLORS.red.accent,
   el.classList.list().join(' '));
+
+
+// ── Turning colours off has to reach the page ──
+// The colour settings live in userSettings, which the tab-key storage predicate
+// does not cover, so nothing told the Salesforce tab bar to redraw. Turning
+// colours off left every tab coloured and switching dot/fill did nothing, both
+// until the page was reloaded. The quick-add toggle worked only because its
+// handler happened to broadcast a refresh — a call the colour handlers did not
+// make, and should not have to.
+const change = (before, after) => ({ oldValue: before, newValue: after });
+
+check('turning colours off asks the bar to redraw',
+  settingsAffectTabBar(change(
+    { tabColors: { enabled: true, style: 'dot' } },
+    { tabColors: { enabled: false, style: 'dot' } })) === true);
+
+check('switching dot to fill asks the bar to redraw',
+  settingsAffectTabBar(change(
+    { tabColors: { enabled: true, style: 'dot' } },
+    { tabColors: { enabled: true, style: 'fill' } })) === true);
+
+check('so does the menu-bar quick add, which used to be the only one that did',
+  settingsAffectTabBar(change({ menuBarQuickAdd: false }, { menuBarQuickAdd: true })) === true);
+
+check('and switching profile, which changes which tabs belong here',
+  settingsAffectTabBar(change({ activeProfileId: 'a' }, { activeProfileId: 'b' })) === true);
+
+// The other half matters too: this runs on every settings write, and rebuilding
+// the tab bar because someone changed the theme would be pure waste.
+check('a theme change does not rebuild the tab bar',
+  settingsAffectTabBar(change(
+    { themeMode: 'light', tabColors: { enabled: true } },
+    { themeMode: 'dark', tabColors: { enabled: true } })) === false);
+
+check('nor does a floating-button change',
+  settingsAffectTabBar(change(
+    { floatingButton: { enabled: false } },
+    { floatingButton: { enabled: true } })) === false);
+
+check('a write that changed nothing relevant is not a redraw',
+  settingsAffectTabBar(change(
+    { tabColors: { enabled: true, style: 'dot' } },
+    { tabColors: { enabled: true, style: 'dot' } })) === false);
+
+check('a first write, with no previous value, counts as a change',
+  settingsAffectTabBar({ newValue: { tabColors: { enabled: true } } }) === true);
+
+check('a missing change object is not a crash',
+  settingsAffectTabBar(undefined) === false && settingsAffectTabBar(null) === false);
 
 const failed = results.filter(x => !x).length;
 console.log(`\n${results.length - failed}/${results.length} passed`);

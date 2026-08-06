@@ -497,9 +497,17 @@ function handleNavigateToTab(message, sendResponse) {
 function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener((changes, area) => {
-      // One shared predicate, so every surface agrees on what a tab change is
-      if ((area === 'local' || area === 'sync') &&
-          window.SFTabs?.utils?.tabStorageChanged(changes)) {
+      // Two reasons to redraw: the tabs changed, or a setting that governs how
+      // they are drawn changed. The second was missing, so turning tab colours
+      // off left them coloured and switching dot/fill did nothing until the
+      // page was reloaded — the settings live in userSettings, which the tab
+      // predicate does not cover, and only the quick-add toggle happened to
+      // broadcast a refresh of its own.
+      const utils = window.SFTabs?.utils;
+      const redraw = utils && (utils.tabStorageChanged(changes) ||
+                               utils.settingsAffectTabBar(changes.userSettings));
+
+      if ((area === 'local' || area === 'sync') && redraw) {
         // Shares the timer with the message path, so a write and the broadcast
         // that follows it collapse into a single rebuild
         refreshTabsSoon();
