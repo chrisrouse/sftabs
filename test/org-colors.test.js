@@ -133,5 +133,28 @@ check('it declares the SVG namespace, or the browser will not render it',
 check('the URL is escaped — a raw # would truncate it at the fragment',
   !url.includes('#'));
 
+
+// ── Experience Builder ──
+// The reported case: builder pages showed no tint at all. The manifest injects
+// there, but the host matcher did not know builder.salesforce-experience.com,
+// so the page belonged to no org and the favicon was left alone. Both real URLs
+// from the report:
+const BUILD_PROD = 'https://amplify.builder.salesforce-experience.com/sfsites/picasso/core/config/commeditor.jsp';
+const BUILD_SBX  = 'https://amplify--dev1.sandbox.builder.salesforce-experience.com/sfsites/picasso/core/config/commeditor.jsp';
+
+check('a production builder page takes the production colour',
+  resolveOrgColor(BUILD_PROD, on()) === DEFAULT_ENV_COLORS.production);
+check('a sandbox builder page takes the sandbox colour',
+  resolveOrgColor(BUILD_SBX, on()) === DEFAULT_ENV_COLORS.sandbox);
+check('so the two are told apart, which is the whole point',
+  resolveOrgColor(BUILD_PROD, on()) !== resolveOrgColor(BUILD_SBX, on()));
+
+// A per-org override set from a Lightning URL has to apply on the builder too —
+// the identifier is the same org either way.
+check('a per-org override reaches the builder page as well',
+  resolveOrgColor(BUILD_SBX, on({
+    orgs: [{ identifier: 'amplify--dev1', environment: 'sandbox', color: '#8430ce' }],
+  })) === '#8430ce');
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

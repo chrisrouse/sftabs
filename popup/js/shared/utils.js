@@ -146,8 +146,15 @@ const ORG_PARTITIONS = {
   trailblaze: 'playground',   // Trailhead Playground
 };
 
-/** Longest first, so `my.salesforce.com` is not mistaken for `salesforce.com`. */
+/**
+ * Longest first, so `my.salesforce.com` is not mistaken for `salesforce.com`.
+ *
+ * Experience Builder is on its own domain entirely — the manifest injects there
+ * but this list did not know the host, so every builder page resolved to no org
+ * at all: no favicon tint, and no profile match either.
+ */
 const SALESFORCE_HOST_SUFFIXES = [
+  'builder.salesforce-experience.com',   // Experience Builder
   'my.salesforce-setup.com',
   'my.salesforce.com',
   'lightning.force.com',

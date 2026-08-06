@@ -85,6 +85,31 @@ check('utils.js is listed before background.js for Firefox',
   Boolean(declared) &&
   declared[1].indexOf('utils.js') < declared[1].indexOf('background.js'));
 
+
+// ── An org is one org, whichever of its hosts you are on ──
+// Experience Builder sits on a different domain from Lightning, so a profile
+// configured against the org has to claim the builder page too — otherwise the
+// floating panel and header menu fall back to whatever profile is globally
+// active and list another org's tabs.
+const SAME_ORG = [
+  ['sandbox',   'https://acme--dev1.sandbox.my.salesforce.com/x',
+                'https://acme--dev1.sandbox.builder.salesforce-experience.com/y'],
+  ['production','https://acme.lightning.force.com/x',
+                'https://acme.builder.salesforce-experience.com/y'],
+];
+for (const [label, lightning, builder] of SAME_ORG) {
+  check(`a ${label} builder page is the same org as its Lightning page`,
+    extractOrgIdentifier(lightning) === extractOrgIdentifier(builder) &&
+    detectOrgEnvironment(lightning) === detectOrgEnvironment(builder),
+    extractOrgIdentifier(builder) + '/' + detectOrgEnvironment(builder));
+}
+
+check('so a profile matching the org also matches its builder page',
+  resolveProfileForUrl(
+    'https://acme--dev1.sandbox.builder.salesforce-experience.com/sfsites/picasso/core/config/commeditor.jsp',
+    [{ id: 'p1', name: 'Dev1', urlPatterns: ['acme--dev1'] }],
+    { profilesEnabled: true, autoSwitchProfiles: true, activeProfileId: 'other' }) === 'p1');
+
 // ── Every org host shape Salesforce hands out ──
 // A shape that resolves to no identifier resolves to no profile, silently. Four
 // of these returned null until the matcher was rewritten: Developer Edition on
@@ -103,6 +128,11 @@ const HOSTS = [
   ['acme.demo.my.salesforce.com',                'acme',       'demo'],
   ['acme.trailblaze.my.salesforce.com',          'acme',       'playground'],
   ['acme.patch.my.salesforce.com',               'acme',       'patch'],
+  // Experience Builder is on its own domain. The manifest injects there, but
+  // this list did not know the host, so every builder page resolved to no org:
+  // no favicon tint, and no profile match either.
+  ['acme.builder.salesforce-experience.com',            'acme',       'production'],
+  ['acme--dev1.sandbox.builder.salesforce-experience.com', 'acme--dev1', 'sandbox'],
 ];
 for (const [host, id, env] of HOSTS) {
   const url = `https://${host}/lightning/setup/Flows/home`;
