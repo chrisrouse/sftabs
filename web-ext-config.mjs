@@ -64,12 +64,27 @@ export default {
     'test/**',
     // Salesforce CLI config
     '.sfdx/**',
-    // Beta icons (not included in production release)
-    'icons/sftabs-beta-icon-16.png',
-    'icons/sftabs-beta-icon-48.png',
-    'icons/sftabs-beta-icon-96.png',
-    'icons/sftabs-beta.png',
-    'icons/sftabs_beta.svg'
+
+    // ── Repo-only assets ──
+    // Kept in version control, not shipped. Each was going into the package
+    // for want of a line here; between them they were about a tenth of it.
+
+    // The translation round-trip: npm run i18n:export writes this, i18n:build
+    // reads it back into the three messages.json. Working file, not a runtime
+    // one, and the largest single thing that was shipping by mistake.
+    '_locales/messages.csv',
+    '_locales/messages.gsheet',
+
+    // Vendored SLDS source. The extension inlines these paths into its own
+    // markup rather than fetching the files, so they are provenance for
+    // whoever next needs to check a glyph against the original.
+    'icons/slds',
+    'icons/slds/**',
+
+    // Referenced only by the GitHub Pages site under docs/, which is itself
+    // excluded above.
+    'icons/invert.png',
+    'icons/sftabs_blue.svg'
   ],
 
   // Build configuration
