@@ -489,6 +489,32 @@
   border-right: 3px solid #288aff;
 }
 
+/* Closed handle wears the same blue-and-white identity as the open state, so
+   the control reads as one thing in both — it used to be a white tab with a
+   blue mark, which looked like a different control entirely.
+
+   Muted until pointed at: saturate() on the button dims the blue without
+   needing a second colour, and leaves the white logo untouched, since white has
+   no saturation to lose. */
+.sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button {
+  height: 27px;                       /* 36px, a quarter shorter */
+  background: #288aff;
+  filter: saturate(0.55);
+  transition: background var(--sft-duration-promptly, 0.2s) ease,
+              filter var(--sft-duration-promptly, 0.2s) ease;
+}
+.sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button:hover,
+.sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button:focus-visible {
+  background: #288aff;                /* beats the neutral hover on the base rule */
+  filter: saturate(1);
+}
+.sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button img {
+  /* Single-colour logo, so this is a clean white silhouette — same treatment
+     the open state uses. The parent's saturate() applies after, and white is
+     unaffected by it. */
+  filter: brightness(0) invert(1);
+}
+
 /* ── Open: the assembly becomes one clipped, elevated surface ── */
 .sftabs-floating-modal[data-layout="handle"].open .modal-content {
   box-shadow: 0 0 7px rgba(0, 0, 0, 0.16), 0 5px 5px rgba(0, 0, 0, 0.16);

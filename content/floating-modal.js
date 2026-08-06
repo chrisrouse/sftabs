@@ -721,6 +721,29 @@
       };
       document.addEventListener('click', this.outsideClickHandler);
 
+      /**
+       * Close when focus moves into an iframe.
+       *
+       * A click inside an iframe never reaches this document, so the handler
+       * above cannot see it — Experience Builder renders its canvas in one, and
+       * clicking the canvas left the panel sitting open over it. Focus entering
+       * a frame does raise blur here, and activeElement then names the frame,
+       * which distinguishes it from the user switching to another window.
+       *
+       * Deferred a tick because activeElement is not always updated by the time
+       * blur fires.
+       */
+      this.frameBlurHandler = () => {
+        if (!this.isOpen) return;
+        setTimeout(() => {
+          if (this.isOpen && document.activeElement &&
+              document.activeElement.tagName === 'IFRAME') {
+            this.close();
+          }
+        }, 0);
+      };
+      window.addEventListener('blur', this.frameBlurHandler);
+
       // Trap focus within modal when open
       this.modal.addEventListener('keydown', (e) => {
         if (e.key === 'Tab' && this.isOpen) {
@@ -833,6 +856,10 @@
       if (this.outsideClickHandler) {
         document.removeEventListener('click', this.outsideClickHandler);
         this.outsideClickHandler = null;
+      }
+      if (this.frameBlurHandler) {
+        window.removeEventListener('blur', this.frameBlurHandler);
+        this.frameBlurHandler = null;
       }
 
       if (this.modal) {

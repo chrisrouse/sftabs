@@ -190,5 +190,37 @@ check('and leaves the panel to re-render itself',
   !/modal\.renderTabs\(\)/.test(floatingButtonSrc),
   'both doing it drew every row twice');
 
+
+// ── Dismissing a menu when the click lands in an iframe ──
+// A click inside an iframe never reaches the parent document, so a
+// click-outside handler on `document` cannot see it. Experience Builder renders
+// its canvas in one, so clicking the canvas left both the floating panel and
+// the header menu sitting open on top of it — everywhere else on the page they
+// closed correctly, which is what made it look like a Builder-specific quirk.
+//
+// Focus entering a frame does raise blur on the window, and activeElement then
+// names the frame, which distinguishes it from switching to another window.
+const DISMISSABLE = [
+  ['content/floating-modal.js', 'frameBlurHandler'],
+  ['content/header-menu.js', 'onWindowBlur'],
+];
+
+for (const [rel, handler] of DISMISSABLE) {
+  const src = read(rel);
+  const name = rel.split('/').pop();
+
+  check(`${name} closes when focus moves into an iframe`,
+    new RegExp("addEventListener\\('blur', (this\\.)?" + handler).test(src),
+    'a document click listener cannot see a click inside a frame');
+
+  check(`${name} checks it was a frame, not another window`,
+    /activeElement\.tagName === 'IFRAME'/.test(src),
+    'switching apps also blurs the window and must not close the menu');
+
+  check(`${name} releases that listener`,
+    new RegExp("removeEventListener\\('blur', (this\\.)?" + handler).test(src),
+    'window outlives every instance');
+}
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

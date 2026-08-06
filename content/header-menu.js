@@ -118,11 +118,33 @@
     if (button) button.setAttribute('aria-expanded', 'false');
     document.removeEventListener('click', onDocumentClick, true);
     document.removeEventListener('keydown', onKeydown, true);
+    window.removeEventListener('blur', onWindowBlur);
   }
 
   const onDocumentClick = event => {
     const menu = document.getElementById(MENU_ID);
     if (menu && !menu.contains(event.target) && !event.target.closest(`#${ITEM_ID}`)) closeMenu();
+  };
+
+  /**
+   * Close when focus moves into an iframe.
+   *
+   * A click inside an iframe never reaches this document, so onDocumentClick
+   * cannot see it. Experience Builder renders its canvas in one, so clicking
+   * the canvas left this menu open on top of it. Focus entering a frame does
+   * raise blur on the window, and activeElement then names the frame, which
+   * separates it from the user switching to another window.
+   *
+   * Deferred a tick: activeElement is not reliably updated when blur fires.
+   */
+  const onWindowBlur = () => {
+    if (!menuIsOpen) return;
+    setTimeout(() => {
+      if (menuIsOpen && document.activeElement &&
+          document.activeElement.tagName === 'IFRAME') {
+        closeMenu();
+      }
+    }, 0);
   };
 
   /**
@@ -333,6 +355,7 @@
     setTimeout(() => {
       document.addEventListener('click', onDocumentClick, true);
       document.addEventListener('keydown', onKeydown, true);
+      window.addEventListener('blur', onWindowBlur);
     }, 0);
 
     const first = menu.querySelector('a[role="menuitem"]');
