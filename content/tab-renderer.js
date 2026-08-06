@@ -5,6 +5,21 @@
 let isRenderingTabs = false;
 
 /**
+ * A render asked for while one was already running.
+ *
+ * Renders take 200ms to settle and the guard above drops anything arriving in
+ * that window. It dropped them silently, and nothing retried — so a change
+ * landing mid-render was simply lost, and the bar stayed stale until something
+ * unrelated triggered another render or the page was reloaded. That is almost
+ * certainly what "saving a tab does not reach open pages" really was; the fix
+ * at the time was to have the popup broadcast as well as write, which cannot
+ * help, because both signals collapse into the same debounce.
+ *
+ * One re-run is enough however many arrive: the last one reads current storage.
+ */
+let renderQueued = false;
+
+/**
  * Submenus live on document.body, not inside the tab that opens them, because
  * the tab bar clips overflow. That puts them outside everything initTabs
  * cleans up: re-rendering removed the tabs and left every submenu and hover
@@ -63,8 +78,9 @@ async function initTabs(tabContainer) {
     return;
   }
 
-  // Prevent concurrent renders
+  // Prevent concurrent renders, but do not lose this one
   if (isRenderingTabs) {
+    renderQueued = true;
     return;
   }
 
@@ -191,6 +207,7 @@ async function initTabs(tabContainer) {
         // Always clear it. A throw above used to leave it set, and every later
         // render then early-returned — the bar stopped updating until reload.
         isRenderingTabs = false;
+        runQueuedRender();
       }
     }, 200);
 
@@ -204,7 +221,20 @@ async function initTabs(tabContainer) {
   } catch (error) {
     // Reset flag on error
     isRenderingTabs = false;
+    runQueuedRender();
   }
+}
+
+/**
+ * Run the render that was dropped while this one was in flight, if there was
+ * one. The container is re-queried rather than reused: Salesforce may have
+ * replaced it in the meantime, and rendering into a detached node draws nothing.
+ */
+function runQueuedRender() {
+  if (!renderQueued) return;
+  renderQueued = false;
+  const container = document.querySelector('.tabBarItems.slds-grid');
+  if (container) initTabs(container);
 }
 
 /**

@@ -375,12 +375,14 @@ async function closeReleaseNotes() {
  */
 async function persistTabs() {
   try {
+    // No broadcast. Writing the tabs is the signal — the content script's
+    // storage listener sees the profile's tab key change and rebuilds. This
+    // used to send refresh_tabs as well, added when saving a tab appeared not
+    // to reach open pages; that was really a render being dropped mid-flight
+    // and never retried, which the renderQueued path in tab-renderer.js now
+    // handles. A second signal could never have helped: both arrive at the same
+    // debounced entry point and collapse into one rebuild.
     await SFTabs.storage.saveTabs(state.tabs);
-    // Open pages were relying solely on storage.onChanged to notice an edit,
-    // which left a renamed or colored tab looking stale until a reload.
-    // Switching profile has always sent this; saving a tab never did.
-    // Rebuilding is idempotent, so arriving twice costs nothing.
-    broadcastTabRefresh();
   } catch (err) {
     showStatus(t('errorCouldNotSave', err.message), 'error');
   }
@@ -1101,7 +1103,6 @@ async function deleteProfileFlow(profileId) {
     renderProfilesList();
     showStatus(t('profileDeleted', profile.name));
     if (state.activeView === 'edit-profile') openProfilesList();
-    broadcastTabRefresh();
   } catch (err) {
     showStatus(t('errorDeletingProfile', err.message), 'error');
   }
@@ -2075,7 +2076,6 @@ async function saveTab(e) {
   if (wanted) {
     try {
       await applyTabMembership(saved, wanted);
-      broadcastTabRefresh();
     } catch (err) {
       showStatus(t('errorCouldNotSave', err.message), 'error');
     }
@@ -2150,31 +2150,7 @@ async function switchProfile(profileId) {
   renderProfileChip();
   renderProfileDropdown();
   closeProfileDropdown();
-  broadcastTabRefresh();
   showStatus(t('switchedToProfile', state.profiles.find(p => p.id === profileId)?.name || ''));
-}
-
-/**
- * Tell open Salesforce pages to rebuild their injected nav. Without this a page
- * keeps the previous profile's tabs until it is reloaded.
- *
- * Same URL set production broadcasts to, and the receivers already exist in
- * content-main.js and navigation-parser.js. Failures are expected and ignored:
- * a matching tab may predate the content script, in which case there is nobody
- * listening and nothing to fix.
- */
-function broadcastTabRefresh() {
-  const SETUP_PAGES = [
-    '*://*.lightning.force.com/lightning/setup/*',
-    '*://*.salesforce-setup.com/lightning/setup/*',
-    '*://*.my.salesforce-setup.com/lightning/setup/*',
-    '*://*.salesforce.com/lightning/setup/*',
-    '*://*.my.salesforce.com/lightning/setup/*'
-  ];
-  browser.tabs.query({ url: SETUP_PAGES })
-    .then(tabs => tabs.forEach(tab =>
-      browser.tabs.sendMessage(tab.id, { action: 'refresh_tabs' }).catch(() => {})))
-    .catch(() => {});
 }
 
 function openProfileDropdown() {
@@ -2456,7 +2432,6 @@ async function disableProfilesKeeping(keepId) {
   renderTabList();
   renderProfileChip();
   applyProfilesVisibility(false);
-  broadcastTabRefresh();
 }
 
 /**
@@ -2864,7 +2839,6 @@ function bindEvents() {
     try {
       const everyOther = otherProfiles().map(p => p.id);
       for (const tab of added) await applyTabMembership(tab, everyOther);
-      broadcastTabRefresh();
       showStatus(t('quickAddFannedOut', String(everyOther.length)));
     } catch (err) {
       showStatus(t('errorCouldNotSave', err.message), 'error');
@@ -2995,7 +2969,6 @@ function bindEvents() {
 
   document.getElementById('setting-menu-bar-quick-add').addEventListener('change', async e => {
     await patchSettings({ menuBarQuickAdd: e.target.checked });
-    broadcastTabRefresh();   // the bar has to redraw to gain or lose the button
   });
 
   document.getElementById('setting-quick-add-all').addEventListener('change', e => {
