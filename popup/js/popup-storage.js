@@ -30,40 +30,6 @@ async function getStoragePreference() {
 }
 
 /**
- * Get tabs from browser storage
- * Reads from sync (with chunking) or local storage based on user preference
- */
-async function getTabs() {
-  try {
-    const useSyncStorage = await getStoragePreference();
-
-    if (useSyncStorage) {
-      // Read from sync storage with chunking support
-      const tabs = await SFTabs.storageChunking.readChunkedSync('customTabs');
-
-      if (tabs && tabs.length > 0) {
-        const customCount = tabs.filter(t => !t.id?.startsWith('default_tab_')).length;
-        return tabs;
-      }
-
-      return [];
-    } else {
-      // Read from local storage
-      const localResult = await browser.storage.local.get('customTabs');
-
-      if (localResult.customTabs && localResult.customTabs.length > 0) {
-        const customCount = localResult.customTabs.filter(t => !t.id?.startsWith('default_tab_')).length;
-        return localResult.customTabs;
-      }
-
-      return [];
-    }
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
  * Clean temporary UI state fields from a tab before saving
  * Removes fields that should not be persisted to storage
  */
@@ -127,8 +93,9 @@ async function saveTabs(tabs) {
       throw new Error('No active profile ID found');
     }
 
-    // Always save to profile-specific storage
-    await saveProfileTabs(settings.activeProfileId, cleanedTabs);
+    // getUserSettings already resolved the storage preference and returns it,
+    // so hand it on rather than making saveProfileTabs read it again.
+    await saveProfileTabs(settings.activeProfileId, cleanedTabs, settings.useSyncStorage);
 
     // Update the main state with cleaned tabs (only in popup context)
     if (SFTabs.main && SFTabs.main.setTabs) {
@@ -246,97 +213,6 @@ async function saveUserSettings(settings, skipMigration = false, showToast = tru
     // Show error message (only in popup context)
     if (SFTabs.main && SFTabs.main.showStatus) {
       SFTabs.main.showStatus('Error saving settings: ' + error.message, true);
-    }
-    throw error;
-  }
-}
-
-/**
- * Clear all storage (reset to defaults)
- */
-async function clearAllStorage() {
-  try {
-    await browser.storage.local.clear();
-
-    // Reset main state (only in popup context)
-    if (SFTabs.main && SFTabs.main.setTabs) {
-      SFTabs.main.setTabs([]);
-    }
-    if (SFTabs.main && SFTabs.main.setUserSettings) {
-      SFTabs.main.setUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS });
-    }
-
-    return true;
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
- * Export configuration to JSON
- */
-function exportConfiguration() {
-  const tabs = SFTabs.main.getTabs();
-  const settings = SFTabs.main.getUserSettings();
-
-  // Clean temporary fields from tabs before export
-  const cleanedTabs = tabs.map(tab => cleanTabForStorage(tab));
-
-  const config = {
-    customTabs: cleanedTabs,
-    userSettings: settings,
-    exportedAt: new Date().toISOString(),
-    version: '2.0.0'
-  };
-
-  return config;
-}
-
-/**
- * Import configuration from JSON
- */
-async function importConfiguration(configData) {
-  try {
-    // Validate configuration
-    if (!configData.customTabs || !Array.isArray(configData.customTabs)) {
-      throw new Error('Invalid configuration format: missing customTabs array');
-    }
-
-
-    // Clear existing data
-    await clearAllStorage();
-
-    // Import tabs (saveTabs will handle routing to correct storage)
-    if (configData.customTabs.length > 0) {
-      await saveTabs(configData.customTabs);
-    } else {
-      // Even with no tabs, mark as installed so we don't reset to defaults
-      const useSyncStorage = await getStoragePreference();
-      if (!useSyncStorage) {
-        await browser.storage.local.set({ extensionVersion: '2.0.0' });
-      }
-    }
-
-    // Import settings (suppress toast since import shows its own success message)
-    if (configData.userSettings) {
-      await saveUserSettings({ ...SFTabs.constants.DEFAULT_SETTINGS, ...configData.userSettings }, false, false);
-    }
-
-    // Show success message (only in popup context)
-    if (SFTabs.main && SFTabs.main.showStatus) {
-      SFTabs.main.showStatus('Configuration imported successfully. Extension will reload.', false);
-    }
-
-    // Reload the popup to reflect changes
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
-
-    return true;
-  } catch (error) {
-    // Show error message (only in popup context)
-    if (SFTabs.main && SFTabs.main.showStatus) {
-      SFTabs.main.showStatus('Error importing configuration: ' + error.message, true);
     }
     throw error;
   }
@@ -602,7 +478,14 @@ async function getProfileTabs(profileId) {
  * @param {Array} tabs - Array of tab objects
  * @returns {Promise<Array>} The saved tabs
  */
-async function saveProfileTabs(profileId, tabs) {
+/**
+ * @param {boolean} [preferSync] the caller's already-resolved storage
+ *   preference. Passed rather than cached: a cache would need invalidating at
+ *   exactly the moment migrateBetweenStorageTypes depends on this still holding
+ *   the old value, and getting that wrong makes a user's whole configuration
+ *   look like it vanished. A parameter cannot go stale.
+ */
+async function saveProfileTabs(profileId, tabs, preferSync) {
   try {
     // Sort tabs by position before saving
     const sortedTabs = [...tabs].sort((a, b) => a.position - b.position);
@@ -610,7 +493,9 @@ async function saveProfileTabs(profileId, tabs) {
     // Clean temporary fields from each tab before saving
     const cleanedTabs = sortedTabs.map(tab => cleanTabForStorage(tab));
 
-    const useSyncStorage = await getStoragePreference();
+    const useSyncStorage = typeof preferSync === 'boolean'
+      ? preferSync
+      : await getStoragePreference();
     const storageKey = `profile_${profileId}_tabs`;
 
     if (useSyncStorage) {
@@ -659,14 +544,10 @@ async function resetEverything() {
 
 window.SFTabs.storage = {
   getStoragePreference,
-  getTabs,
   saveTabs,
   getUserSettings,
   saveUserSettings,
-  clearAllStorage,
   resetEverything,
-  exportConfiguration,
-  importConfiguration,
   migrateBetweenStorageTypes,
   setupStorageListeners,
   // Profile storage functions
