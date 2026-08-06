@@ -226,10 +226,25 @@ async function saveUserSettings(settings, skipMigration = false, showToast = tru
  */
 async function migrateBetweenStorageTypes(fromSync, toSync) {
   try {
-    // Get profiles list
-    const profiles = await getProfiles();
+    // Read the list from the source named by the parameter, not through
+    // getProfiles(), which resolves the area from the stored preference.
+    //
+    // That indirection made this function's correctness depend on the order its
+    // caller did things in: saveUserSettings persists the new preference before
+    // calling here, so getProfiles() read the destination, found it empty,
+    // returned "nothing to migrate", and left every tab in the area the
+    // preference had just stopped pointing at. The data was intact and
+    // unreachable, which from the user's side is indistinguishable from losing
+    // it. changeStorageLocation() worked around it by migrating first and
+    // passing skipMigration, and a test pinned the naive order as unsafe.
+    //
+    // Taking the source from fromSync removes the dependency rather than
+    // documenting it. Both orders are now correct.
+    const profiles = (fromSync
+      ? await SFTabs.utils.readChunkedSyncValue('profiles')
+      : (await browser.storage.local.get('profiles')).profiles) || [];
 
-    if (!profiles || profiles.length === 0) {
+    if (!profiles.length) {
       return; // Nothing to migrate
     }
 

@@ -2248,14 +2248,16 @@ async function reloadTabsFromStorage() {
 /**
  * Move tabs and profiles between sync and local storage.
  *
- * Order matters and is the whole reason this is not a one-liner.
- * migrateBetweenStorageTypes() finds its source by calling getProfiles(),
- * which reads getStoragePreference() — so the preference must still hold the
- * OLD value while it runs, or it reads the destination, finds nothing, and
- * returns having moved no data. The shipped settings page migrates first and
- * saves the preference second for exactly this reason; we do the same, then
- * pass skipMigration so saveUserSettings does not run it again against the
- * flipped preference.
+ * Migrate first, then persist the preference, then skipMigration so
+ * saveUserSettings does not run it a second time.
+ *
+ * That order used to be load-bearing: migrateBetweenStorageTypes located its
+ * source through getProfiles(), which resolves the area from the stored
+ * preference, so persisting first made it read the empty destination and move
+ * nothing. It takes its source from its own fromSync argument now, so either
+ * order is safe — but this one is kept because it is what the settings page
+ * has always done and what the tests exercise, and because doing the risky
+ * thing first means a failure leaves the preference untouched.
  */
 async function changeStorageLocation(toSync) {
   const fromSync = !!state.settings.useSyncStorage;

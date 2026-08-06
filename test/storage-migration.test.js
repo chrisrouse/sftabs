@@ -5,12 +5,20 @@
  * Exercises the real production storage modules against a fake storage backend,
  * because this is the one code path that can silently destroy a user's tabs.
  *
- * What it pins down: migrateBetweenStorageTypes() locates its source by calling
- * getProfiles(), which reads getStoragePreference(). So the preference must
- * still hold the OLD value while the migration runs. Persist the new preference
- * first — the obvious thing to do — and the migration reads the empty
- * destination, finds no profiles, returns having moved nothing, and the user
- * opens the popup to an empty list with their tabs stranded in the other area.
+ * What it pins down: migrateBetweenStorageTypes() must move the data whichever
+ * order its caller does things in.
+ *
+ * It used to locate its source through getProfiles(), which resolves the area
+ * from the stored preference — so persisting the new preference first, the
+ * obvious thing to do, made the migration read the empty destination, find no
+ * profiles, and return having moved nothing. The tabs stayed in the area the
+ * preference had just stopped pointing at: intact, unreachable, and from the
+ * user's side indistinguishable from lost. The caller worked around it by
+ * migrating first, and this file pinned the other order as unsafe.
+ *
+ * The function now takes its source from the fromSync argument it was already
+ * being given, so neither order can get it wrong. Both are tested below,
+ * because the workaround is still what production does and both have to hold.
  *
  * Run: npm test
  */
@@ -67,7 +75,7 @@ async function switchStorage(toSync) {
   settings = merged;
 }
 
-/** The tempting shortcut: let saveUserSettings do the migrating. */
+/** The other order: let saveUserSettings do the migrating. Also correct now. */
 async function switchStorageNaive(toSync) {
   const merged = { ...settings, useSyncStorage: toSync };
   await S.saveUserSettings(merged, false, false);
@@ -173,12 +181,20 @@ const counts = async () => ({
   await sync.set({ profile_other_tabs: [{ id: 'x', label: 'From another device', path: 'X', position: 0 }] });
   check('another device\'s tabs in sync are detected', (await syncHasForeignTabs()) === true);
 
-  // 4. The naive order must be shown to lose data, so nobody "simplifies" the
-  //    real one back into it.
+  // 4. The other order — persist the preference, then migrate — has to work
+  //    too. It used to lose everything, because the migration resolved its
+  //    source from the preference that had just been changed.
   await seedLocal();
   await switchStorageNaive(true);
   c = await counts();
-  check('naive order (persist first) loses the tabs — do not use it', c.tabs === 0, `tabs=${c.tabs}`);
+  check('persisting the preference before migrating keeps the tabs',
+    c.tabs === 2 && c.profiles === 1, `tabs=${c.tabs} profiles=${c.profiles}`);
+
+  // And back, so the fix is not one-directional.
+  await switchStorageNaive(false);
+  c = await counts();
+  check('and the same in reverse', c.tabs === 2 && c.profiles === 1,
+    `tabs=${c.tabs} profiles=${c.profiles}`);
 
   // ── Profile deletion ──
   let profiles = await seedTwoProfiles();
