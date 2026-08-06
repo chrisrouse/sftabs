@@ -222,5 +222,54 @@ for (const [rel, handler] of DISMISSABLE) {
     'window outlives every instance');
 }
 
+
+// ── One flyout builder, not two ──
+// The submenu machinery existed twice — inside renderDropdownItemsRecursive for
+// nested items and as createOverflowSubmenu for the chevron — at roughly 240
+// lines each. They had already diverged on two things the nested copy got
+// wrong, which is what duplication of this size does.
+const rendererSrc = read('content/tab-renderer.js');
+
+check('there is one submenu builder',
+  (rendererSrc.match(/submenuContainer\.className = 'submenu-container/g) || []).length === 1,
+  'two copies is how the nesting bug survived in only one of them');
+
+// Calls open the object on a new line; the declaration destructures inline.
+check('both call sites go through it',
+  (rendererSrc.match(/attachSubmenu\(\{\n/g) || []).length === 2);
+
+// bodyOf would brace-match the destructured parameter list, so skip past it.
+const attach = (() => {
+  const decl = /function attachSubmenu\([^)]*\)\s*\{/.exec(rendererSrc);
+  if (!decl) return null;
+  let i = decl.index + decl[0].length - 1;
+  for (let depth = 0; i < rendererSrc.length; i++) {
+    if (rendererSrc[i] === '{') depth++;
+    else if (rendererSrc[i] === '}' && --depth === 0) return rendererSrc.slice(decl.index, i + 1);
+  }
+  return null;
+})();
+check('attachSubmenu exists', Boolean(attach));
+
+// The nested copy passed the grandparent menu down, so a third level positioned
+// against the wrong element and could not hold its parent open.
+check('a flyout gives its own container to whatever nests inside it',
+  /fill\(ul, submenuContainer\)/.test(attach || ''),
+  'passing the level above is why a third level opened beside the wrong menu');
+
+// Measured, not guessed: offsetHeight is 0 while display is none.
+check('the flyout height is measured before the off-screen clamp',
+  /visibility', 'hidden', 'important'\)[\s\S]{0,140}offsetHeight/.test(attach || ''));
+
+// The bridge is what lets the pointer travel to the flyout without crossing the
+// page. Once the flyout is pushed up to fit, that path is diagonal.
+check('the bridge spans the row and the flyout, not just the row',
+  /Math\.min\(itemRect\.top, top\)/.test(attach || '') &&
+  /Math\.max\(itemRect\.bottom, top \+ submenuHeight\)/.test(attach || ''));
+
+check('the two call sites differ only in which side they try first',
+  /preferSide: 'right'/.test(rendererSrc) && /preferSide: 'left'/.test(rendererSrc),
+  'nested prefers right; the chevron sits at the end of the bar so it prefers left');
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

@@ -4,6 +4,12 @@
 // Flag to prevent concurrent renders
 let isRenderingTabs = false;
 
+/** Flyout width, set in CSS and needed before the element is measurable. */
+const SUBMENU_WIDTH = 240;
+
+/** Grace period before a flyout closes, so the pointer can cross the gap. */
+const SUBMENU_HIDE_DELAY = 300;
+
 /**
  * A render asked for while one was already running.
  *
@@ -368,6 +374,234 @@ function createTabElementWithDropdown(tab) {
 }
 
 /**
+ * Attach a hover flyout to a menu item.
+ *
+ * This existed twice — once inside renderDropdownItemsRecursive for nested
+ * items, once as createOverflowSubmenu for the overflow chevron — at roughly
+ * 240 lines each, differing only in which side they tried first and in two
+ * details the nested copy had wrong.
+ *
+ * The container and bridge live on document.body, because the tab bar clips
+ * overflow. clearSubmenus() sweeps them at the start of every render; nothing
+ * here is expected to outlive one.
+ *
+ * @param {object}   o
+ * @param {Element}  o.itemLi           the row that opens the flyout
+ * @param {Element}  o.anchorMenu       the menu the row sits in — positioned
+ *                                      against, and watched so the flyout hides
+ *                                      when it closes
+ * @param {string}   o.parentSubmenuId  'root' when the parent is a top-level
+ *                                      menu, otherwise the parent flyout's id
+ * @param {string}   o.preferSide       'right' | 'left', tried first
+ * @param {Function} o.fill             (ul, container) => void, populates it
+ */
+function attachSubmenu({ itemLi, anchorMenu, parentSubmenuId, preferSide, fill }) {
+  // Replacing an earlier flyout for this row, if a re-render left one
+  if (itemLi.submenuElement) itemLi.submenuElement.remove();
+  if (itemLi.bridgeElement) itemLi.bridgeElement.remove();
+
+  const submenuContainer = document.createElement('div');
+  submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
+  submenuContainer.style.cssText = `
+    display: none !important;
+    position: fixed !important;
+    min-width: 200px !important;
+    width: ${SUBMENU_WIDTH}px !important;
+    z-index: 10001 !important;
+    background-color: rgb(255, 255, 255) !important;
+    border: 1px solid rgb(221, 219, 218) !important;
+    border-radius: 0.25rem !important;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16) !important;
+    padding: 0.5rem 0 !important;
+    transform: none !important;
+    margin: 0 !important;
+  `;
+  submenuContainer.dataset.parentSubmenu = parentSubmenuId;
+  submenuContainer.dataset.submenuId = `submenu-${Date.now()}-${Math.random()}`;
+
+  const submenuInner = document.createElement('div');
+  submenuInner.setAttribute('role', 'menu');
+
+  const ul = document.createElement('ul');
+  ul.setAttribute('role', 'presentation');
+  ul.className = 'scrollable';
+  ul.style.listStyle = 'none';
+  ul.style.margin = '0';
+  ul.style.padding = '0';
+
+  // Given the container, so anything nested inside positions against this
+  // flyout rather than against the menu further up. The nested copy passed the
+  // grandparent here, which is why a third level opened beside the wrong menu
+  // and could not keep its parent open.
+  fill(ul, submenuContainer);
+
+  submenuInner.appendChild(ul);
+  submenuContainer.appendChild(submenuInner);
+  document.body.appendChild(submenuContainer);
+
+  // An invisible strip spanning the gap, so the pointer can cross without
+  // passing over the page and triggering mouseleave.
+  const bridge = document.createElement('div');
+  bridge.className = 'submenu-bridge';
+  bridge.style.cssText = `
+    position: fixed !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+    z-index: 10000 !important;
+    display: none !important;
+  `;
+  document.body.appendChild(bridge);
+
+  itemLi.submenuElement = submenuContainer;
+  itemLi.bridgeElement = bridge;
+
+  /**
+   * Place the flyout beside its anchor, flipping if it would leave the
+   * viewport, and stretch the bridge across the gap.
+   *
+   * A flyout inherits the direction its parent opened in — once a chain has
+   * turned left it keeps going left, rather than doubling back across itself.
+   * preferSide is only the starting choice: nested items prefer right, the
+   * overflow chevron prefers left because it sits at the end of the bar.
+   */
+  const positionSubmenu = () => {
+    const itemRect = itemLi.getBoundingClientRect();
+    const anchorRect = anchorMenu.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const gap = 2;
+
+    // The set width, not offsetWidth: the element is display:none until now
+    const submenuWidth = SUBMENU_WIDTH;
+
+    const inherited = anchorMenu.dataset && anchorMenu.dataset.openDirection;
+    const wanted = inherited || preferSide;
+
+    let openRight = wanted !== 'left';
+    let left = openRight ? anchorRect.right + gap : anchorRect.left - submenuWidth - gap;
+
+    if (openRight && left + submenuWidth > viewportWidth) {
+      left = anchorRect.left - submenuWidth - gap;   // no room right, go left
+      openRight = false;
+    } else if (!openRight && left < 0) {
+      left = anchorRect.right + gap;                 // no room left, go right
+      openRight = true;
+    }
+
+    // Neither side fits: clamp to the viewport rather than render off-screen
+    if (left < 0) left = 0;
+    if (left + submenuWidth > viewportWidth) left = Math.max(0, viewportWidth - submenuWidth);
+
+    submenuContainer.dataset.openDirection = openRight ? 'right' : 'left';
+
+    // Vertically aligned to the row, pulled up if it would run off the bottom.
+    // Measured by showing it invisibly: offsetHeight is 0 while display is none,
+    // and guessing a height puts the clamp in the wrong place.
+    let top = itemRect.top;
+    submenuContainer.style.setProperty('display', 'block', 'important');
+    submenuContainer.style.setProperty('visibility', 'hidden', 'important');
+    const submenuHeight = submenuContainer.offsetHeight;
+    submenuContainer.style.setProperty('display', 'none', 'important');
+    submenuContainer.style.setProperty('visibility', 'visible', 'important');
+
+    if (top + submenuHeight > viewportHeight) {
+      top = Math.max(0, viewportHeight - submenuHeight - 10);
+    }
+
+    submenuContainer.style.setProperty('left', `${left}px`, 'important');
+    submenuContainer.style.setProperty('top', `${top}px`, 'important');
+    submenuContainer.style.setProperty('right', 'auto', 'important');
+    submenuContainer.style.setProperty('bottom', 'auto', 'important');
+
+    // The bridge spans the whole vertical range between the row and the flyout,
+    // not just the row: once the flyout has been pushed up to fit, the pointer
+    // travels diagonally, and a row-height strip would not be under it.
+    const bridgeTop = Math.min(itemRect.top, top);
+    const bridgeHeight = Math.max(itemRect.bottom, top + submenuHeight) - bridgeTop;
+    const bridgeLeft = openRight ? anchorRect.right : left + submenuWidth;
+    const bridgeWidth = openRight
+      ? left - anchorRect.right
+      : anchorRect.left - (left + submenuWidth);
+
+    bridge.style.setProperty('left', `${bridgeLeft}px`, 'important');
+    bridge.style.setProperty('top', `${bridgeTop}px`, 'important');
+    bridge.style.setProperty('width', `${Math.max(0, bridgeWidth)}px`, 'important');
+    bridge.style.setProperty('height', `${bridgeHeight}px`, 'important');
+  };
+
+  // ── Hover ──
+  let hideTimeout;
+
+  const show = () => {
+    positionSubmenu();
+    submenuContainer.style.setProperty('display', 'block', 'important');
+    bridge.style.setProperty('display', 'block', 'important');
+  };
+  const hide = () => {
+    submenuContainer.style.setProperty('display', 'none', 'important');
+    bridge.style.setProperty('display', 'none', 'important');
+  };
+  const hideAfterDelay = () => {
+    hideTimeout = setTimeout(hide, SUBMENU_HIDE_DELAY);
+    // Stored on the element so a child flyout can cancel its parent's hide
+    submenuContainer.hideTimeout = hideTimeout;
+  };
+
+  /** Keep this flyout, and the chain above it, from closing underneath us. */
+  const keepOpen = () => {
+    clearTimeout(hideTimeout);
+    clearTimeout(submenuContainer.hideTimeout);
+    if (parentSubmenuId === 'root') return;
+    const parent = document.querySelector(`.submenu-container[data-submenu-id="${parentSubmenuId}"]`);
+    if (parent && parent.hideTimeout) clearTimeout(parent.hideTimeout);
+  };
+
+  itemLi.addEventListener('mouseenter', () => {
+    keepOpen();
+    // Only one flyout open per level
+    itemLi.parentElement.querySelectorAll(':scope > li').forEach(sibling => {
+      if (sibling === itemLi) return;
+      sibling.submenuElement?.style.setProperty('display', 'none', 'important');
+      sibling.bridgeElement?.style.setProperty('display', 'none', 'important');
+    });
+    show();
+  });
+
+  itemLi.addEventListener('mouseleave', () => { hideTimeout = setTimeout(hide, SUBMENU_HIDE_DELAY); });
+
+  submenuContainer.addEventListener('mouseenter', keepOpen);
+  bridge.addEventListener('mouseenter', keepOpen);
+
+  submenuContainer.addEventListener('mouseleave', event => {
+    const to = event.relatedTarget;
+    if (to) {
+      const staying = submenuContainer.contains(to) || itemLi.contains(to);
+      const toChild = to.closest?.('.submenu-container')?.dataset.parentSubmenu
+                      === submenuContainer.dataset.submenuId;
+      const toBridge = Boolean(to.closest?.('.submenu-bridge'));
+      if (staying || toChild || toBridge) return;
+    }
+    hideAfterDelay();
+  });
+
+  bridge.addEventListener('mouseleave', event => {
+    // Where the pointer actually landed decides it — relatedTarget is null when
+    // it crosses onto the page itself.
+    const { clientX, clientY } = event;
+    setTimeout(() => {
+      const under = document.elementFromPoint(clientX, clientY);
+      if (!submenuContainer.contains(under) && !itemLi.contains(under)) hide();
+    }, 50);
+  });
+
+  // Hide with the menu that owns the row
+  const observer = trackSubmenuObserver(new MutationObserver(() => {
+    if (anchorMenu.style.display === 'none') hide();
+  }));
+  observer.observe(anchorMenu, { attributes: true, attributeFilter: ['style'] });
+}
+
+/**
  * Recursively render dropdown items with nesting support
  * @param {Array} items - Dropdown items to render
  * @param {HTMLElement} container - Container to append items to
@@ -469,302 +703,16 @@ function renderDropdownItemsRecursive(items, container, parentTab, menu, level) 
     itemLi.appendChild(link);
     container.appendChild(itemLi);
 
-    // Recursively render nested items as flyout submenu if they exist
+    // Nested items open as a flyout beside this row
     if (hasNestedItems && level < 2) { // Support up to 3 levels (0, 1, 2)
-      const submenuContainer = document.createElement('div');
-      submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
-      // Calculate z-index: base 10000 + (level * 100) to ensure deeper levels appear on top
-      const zIndex = 10000 + (level * 100);
-      submenuContainer.style.cssText = `
-        display: none !important;
-        position: fixed !important;
-        min-width: 200px !important;
-        width: 240px !important;
-        z-index: ${zIndex} !important;
-        background-color: rgb(255, 255, 255) !important;
-        border: 1px solid rgb(221, 219, 218) !important;
-        border-radius: 0.25rem !important;
-        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16) !important;
-        padding: 0.5rem 0 !important;
-        transform: none !important;
-        margin: 0 !important;
-      `;
-
-      // Create nested menu inner wrapper
-      const submenuInner = document.createElement('div');
-      submenuInner.setAttribute('role', 'menu');
-
-      // Create nested ul
-      const nestedUl = document.createElement('ul');
-      nestedUl.setAttribute('role', 'presentation');
-      nestedUl.className = 'scrollable';
-      nestedUl.style.listStyle = 'none';
-      nestedUl.style.margin = '0';
-      nestedUl.style.padding = '0';
-
-      renderDropdownItemsRecursive(navItem.dropdownItems, nestedUl, parentTab, menu, level + 1);
-
-      submenuInner.appendChild(nestedUl);
-      submenuContainer.appendChild(submenuInner);
-
-      // Clean up any existing submenu for this item before creating new one
-      if (itemLi.submenuElement) {
-        itemLi.submenuElement.remove();
-      }
-
-      // Store parent-child relationship for hover logic
-      // The menu parameter is the parent submenu container
-      const parentSubmenuId = menu?.dataset?.submenuId || 'root';
-      submenuContainer.dataset.parentSubmenu = parentSubmenuId;
-      submenuContainer.dataset.submenuId = `submenu-${Date.now()}-${Math.random()}`;
-
-      // Append submenu to document body to avoid overflow clipping
-      document.body.appendChild(submenuContainer);
-
-      // Create invisible bridge element between parent item and submenu
-      const bridge = document.createElement('div');
-      bridge.className = 'submenu-bridge';
-      // Bridge should be just below its submenu in z-index
-      const bridgeZIndex = zIndex - 1;
-      bridge.style.cssText = `
-        position: fixed !important;
-        background: transparent !important;
-        pointer-events: auto !important;
-        z-index: ${bridgeZIndex} !important;
-        display: none !important;
-      `;
-      document.body.appendChild(bridge);
-
-      // Store references for cleanup
-      itemLi.submenuElement = submenuContainer;
-      itemLi.bridgeElement = bridge;
-
-      // Function to position submenu next to parent item with smart positioning
-      const positionSubmenu = () => {
-        const itemRect = itemLi.getBoundingClientRect();
-
-        // Get the parent menu's bounding box (the actual dropdown menu, not just the ul)
-        const parentMenu = menu;
-        const parentMenuRect = parentMenu.getBoundingClientRect();
-
-        const submenuWidth = 240;
-        const gap = 2;
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // Check if parent menu has a preferred direction (stored from its own positioning)
-        const parentDirection = parentMenu.dataset.openDirection; // 'left' or 'right'
-
-        let left;
-        let openRight;
-
-        if (parentDirection === 'left') {
-          // Parent opened to the left, so continue opening to the left
-          left = parentMenuRect.left - submenuWidth - gap;
-          openRight = false;
-        } else {
-          // Default: try positioning to the right first (preferred for regular menus)
-          left = parentMenuRect.right + gap;
-          openRight = true;
-
-          // Check if it would go off the right edge
-          if (left + submenuWidth > viewportWidth) {
-            // Flip to the left side instead
-            left = parentMenuRect.left - submenuWidth - gap;
-            openRight = false;
-          }
-
-          // Check if opening left would go off the left edge
-          if (!openRight && left < 0) {
-            // Force right positioning even if it clips slightly
-            left = Math.min(viewportWidth - submenuWidth, parentMenuRect.right + gap);
-            openRight = true;
-          }
-        }
-
-        // Calculate top position aligned with hovered item
-        let top = itemRect.top;
-
-        // Check if menu would go off bottom of viewport
-        // Temporarily show to get actual height
-        submenuContainer.style.setProperty('display', 'block', 'important');
-        submenuContainer.style.setProperty('visibility', 'hidden', 'important');
-        const submenuHeight = submenuContainer.offsetHeight;
-        submenuContainer.style.setProperty('display', 'none', 'important');
-        submenuContainer.style.setProperty('visibility', 'visible', 'important');
-
-        // Adjust top if would go off bottom
-        if (top + submenuHeight > viewportHeight) {
-          top = Math.max(0, viewportHeight - submenuHeight - 10);
-        }
-
-        // Store the direction this submenu opened for child submenus
-        submenuContainer.dataset.openDirection = openRight ? 'right' : 'left';
-
-        // Apply positioning
-        submenuContainer.style.setProperty('left', `${left}px`, 'important');
-        submenuContainer.style.setProperty('top', `${top}px`, 'important');
-        submenuContainer.style.setProperty('right', 'auto', 'important');
-        submenuContainer.style.setProperty('bottom', 'auto', 'important');
-
-        // Position the bridge between parent item and submenu
-        // Make it taller to cover the area between parent menu and submenu
-        const bridgeTop = Math.min(itemRect.top, top);
-        const bridgeBottom = Math.max(itemRect.bottom, top + submenuHeight);
-        const bridgeHeight = bridgeBottom - bridgeTop;
-        let bridgeLeft, bridgeWidth;
-
-        if (openRight) {
-          // Bridge from parent right edge to submenu left edge
-          bridgeLeft = parentMenuRect.right;
-          bridgeWidth = left - parentMenuRect.right;
-        } else {
-          // Bridge from submenu right edge to parent left edge
-          bridgeLeft = left + submenuWidth;
-          bridgeWidth = parentMenuRect.left - (left + submenuWidth);
-        }
-
-        bridge.style.setProperty('left', `${bridgeLeft}px`, 'important');
-        bridge.style.setProperty('top', `${bridgeTop}px`, 'important');
-        bridge.style.setProperty('width', `${bridgeWidth}px`, 'important');
-        bridge.style.setProperty('height', `${bridgeHeight}px`, 'important');
-      };
-
-      // Add hover delay management
-      // Store timeout on submenu element so children can access it
-      let hideTimeout;
-
-      // Set up mouseenter handler to show and position submenu
-      itemLi.addEventListener('mouseenter', () => {
-        // Clear any pending hide timeout for this submenu
-        clearTimeout(hideTimeout);
-        clearTimeout(submenuContainer.hideTimeout);
-
-        // Also clear parent's hide timeout to prevent parent from closing
-        const parentSubmenuId = submenuContainer.dataset.parentSubmenu;
-        if (parentSubmenuId && parentSubmenuId !== 'root') {
-          const parentSubmenu = document.querySelector(`.submenu-container[data-submenu-id="${parentSubmenuId}"]`);
-          if (parentSubmenu && parentSubmenu.hideTimeout) {
-            clearTimeout(parentSubmenu.hideTimeout);
-          }
-        }
-
-        // Close other submenus at the same level
-        const siblings = container.querySelectorAll(':scope > li');
-        siblings.forEach(sibling => {
-          if (sibling !== itemLi && sibling.submenuElement) {
-            sibling.submenuElement.style.setProperty('display', 'none', 'important');
-            if (sibling.bridgeElement) {
-              sibling.bridgeElement.style.setProperty('display', 'none', 'important');
-            }
-          }
-        });
-
-        // Position and show this submenu and bridge
-        positionSubmenu();
-        submenuContainer.style.setProperty('display', 'block', 'important');
-        bridge.style.setProperty('display', 'block', 'important');
+      attachSubmenu({
+        itemLi,
+        anchorMenu: menu,
+        parentSubmenuId: menu?.dataset?.submenuId || 'root',
+        preferSide: 'right',
+        fill: (ul, container) =>
+          renderDropdownItemsRecursive(navItem.dropdownItems, ul, parentTab, container, level + 1),
       });
-
-      // Hide submenu when mouse leaves the parent item
-      itemLi.addEventListener('mouseleave', () => {
-        // Only hide if not moving to the submenu or bridge
-        hideTimeout = setTimeout(() => {
-          submenuContainer.style.setProperty('display', 'none', 'important');
-          bridge.style.setProperty('display', 'none', 'important');
-        }, 300);
-      });
-
-      // Keep submenu visible when hovering over it or the bridge
-      submenuContainer.addEventListener('mouseenter', () => {
-        clearTimeout(hideTimeout);
-        clearTimeout(submenuContainer.hideTimeout);
-
-        // Also clear parent's hide timeout
-        const parentSubmenuId = submenuContainer.dataset.parentSubmenu;
-        if (parentSubmenuId && parentSubmenuId !== 'root') {
-          const parentSubmenu = document.querySelector(`.submenu-container[data-submenu-id="${parentSubmenuId}"]`);
-          if (parentSubmenu && parentSubmenu.hideTimeout) {
-            clearTimeout(parentSubmenu.hideTimeout);
-          }
-        }
-      });
-
-      bridge.addEventListener('mouseenter', () => {
-        clearTimeout(hideTimeout);
-        clearTimeout(submenuContainer.hideTimeout);
-
-        // Also clear parent's hide timeout
-        const parentSubmenuId = submenuContainer.dataset.parentSubmenu;
-        if (parentSubmenuId && parentSubmenuId !== 'root') {
-          const parentSubmenu = document.querySelector(`.submenu-container[data-submenu-id="${parentSubmenuId}"]`);
-          if (parentSubmenu && parentSubmenu.hideTimeout) {
-            clearTimeout(parentSubmenu.hideTimeout);
-          }
-        }
-      });
-
-      // Hide submenu when leaving the submenu (with delay)
-      submenuContainer.addEventListener('mouseleave', (e) => {
-        // Check if we're moving to a child submenu
-        const relatedTarget = e.relatedTarget;
-        if (relatedTarget) {
-          // Check if the target is inside this menu (including nested children)
-          const isInsideThisMenu = submenuContainer.contains(relatedTarget);
-
-          // Check if we're moving to the parent item
-          const isParentItem = itemLi.contains(relatedTarget);
-
-          // Check if we're moving to a child submenu (by checking parent relationship)
-          let isMovingToChildSubmenu = false;
-          const targetSubmenu = relatedTarget.closest?.('.submenu-container');
-          if (targetSubmenu) {
-            // Check if this target submenu is a logical child of the current submenu
-            const currentSubmenuId = submenuContainer.dataset.submenuId;
-            if (targetSubmenu.dataset.parentSubmenu === currentSubmenuId) {
-              isMovingToChildSubmenu = true;
-            }
-          }
-
-          // Check if we're moving to a bridge
-          const isMovingToBridge = relatedTarget.closest?.('.submenu-bridge');
-
-          if (isInsideThisMenu || isParentItem || isMovingToChildSubmenu || isMovingToBridge) {
-            // Moving to child, staying inside, back to parent, or to bridge - don't hide
-            return;
-          }
-        }
-
-        hideTimeout = setTimeout(() => {
-          submenuContainer.style.setProperty('display', 'none', 'important');
-          bridge.style.setProperty('display', 'none', 'important');
-        }, 300);
-
-        // Store timeout on submenu element so children can cancel it
-        submenuContainer.hideTimeout = hideTimeout;
-      });
-
-      bridge.addEventListener('mouseleave', (e) => {
-        // Check if we're not entering the submenu
-        const clientX = e.clientX;
-        const clientY = e.clientY;
-        setTimeout(() => {
-          const hoveredElement = document.elementFromPoint(clientX, clientY);
-          if (!submenuContainer.contains(hoveredElement) && !itemLi.contains(hoveredElement)) {
-            submenuContainer.style.setProperty('display', 'none', 'important');
-            bridge.style.setProperty('display', 'none', 'important');
-          }
-        }, 50);
-      });
-
-      // Clean up submenu and bridge when menu is hidden
-      const observer = trackSubmenuObserver(new MutationObserver(() => {
-        if (menu.style.display === 'none') {
-          submenuContainer.style.setProperty('display', 'none', 'important');
-          bridge.style.setProperty('display', 'none', 'important');
-        }
-      }));
-      observer.observe(menu, { attributes: true, attributeFilter: ['style'] });
     }
   });
 }
@@ -1524,251 +1472,20 @@ function createOverflowButton(hiddenTabs) {
 }
 
 /**
- * Create flyout submenu for overflow menu item (opens to the left)
+ * The overflow chevron's flyout, listing a hidden tab's sub-items.
+ *
+ * Prefers opening left: the chevron sits at the right end of the tab bar, so
+ * there is rarely room on that side.
  */
 function createOverflowSubmenu(itemLi, tab, parentMenu) {
-  const submenuContainer = document.createElement('div');
-  submenuContainer.className = 'submenu-container popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default';
-  submenuContainer.style.cssText = `
-    display: none !important;
-    position: fixed !important;
-    min-width: 200px !important;
-    width: 240px !important;
-    z-index: 10001 !important;
-    background-color: rgb(255, 255, 255) !important;
-    border: 1px solid rgb(221, 219, 218) !important;
-    border-radius: 0.25rem !important;
-    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16) !important;
-    padding: 0.5rem 0 !important;
-    transform: none !important;
-    margin: 0 !important;
-  `;
-
-  // Create submenu inner wrapper
-  const submenuInner = document.createElement('div');
-  submenuInner.setAttribute('role', 'menu');
-
-  // Create ul
-  const ul = document.createElement('ul');
-  ul.setAttribute('role', 'presentation');
-  ul.className = 'scrollable';
-  ul.style.listStyle = 'none';
-  ul.style.margin = '0';
-  ul.style.padding = '0';
-
-  // Store parent-child relationship for hover logic (needed for nested items to find parent)
-  submenuContainer.dataset.parentSubmenu = 'root'; // This is a top-level overflow submenu
-  submenuContainer.dataset.submenuId = `overflow-submenu-${Date.now()}-${Math.random()}`;
-
-  // Render dropdown items using the existing recursive renderer
-  // Pass submenuContainer as the menu so nested items position relative to this submenu
-  renderDropdownItemsRecursive(tab.dropdownItems, ul, tab, submenuContainer, 0);
-
-  submenuInner.appendChild(ul);
-  submenuContainer.appendChild(submenuInner);
-
-  // Append to body
-  document.body.appendChild(submenuContainer);
-
-  // Create invisible bridge element between parent item and submenu
-  const bridge = document.createElement('div');
-  bridge.className = 'submenu-bridge';
-  bridge.style.cssText = `
-    position: fixed !important;
-    background: transparent !important;
-    pointer-events: auto !important;
-    z-index: 10000 !important;
-    display: none !important;
-  `;
-  document.body.appendChild(bridge);
-
-  // Store references for cleanup
-  itemLi.submenuElement = submenuContainer;
-  itemLi.bridgeElement = bridge;
-
-  // Position submenu with smart positioning (flip sides if needed)
-  const positionSubmenu = () => {
-    const itemRect = itemLi.getBoundingClientRect();
-    const parentMenuRect = parentMenu.getBoundingClientRect();
-
-    // Use the fixed width we set (240px) since offsetWidth may be 0 before display
-    const submenuWidth = 240;
-    const gap = 2;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    // Try positioning to the left first (preferred for overflow menu)
-    let left = parentMenuRect.left - submenuWidth - gap;
-    let openLeft = true;
-
-    // Check if it would go off the left edge
-    if (left < 0) {
-      // Flip to the right side instead
-      left = parentMenuRect.right + gap;
-      openLeft = false;
-    }
-
-    // Check if opening right would go off the right edge
-    if (!openLeft && (left + submenuWidth) > viewportWidth) {
-      // Force left positioning even if it clips slightly
-      left = Math.max(0, parentMenuRect.left - submenuWidth - gap);
-      openLeft = true;
-    }
-
-    // Calculate top position aligned with hovered item
-    let top = itemRect.top;
-
-    // Check if menu would go off bottom of viewport
-    // Temporarily show to get actual height
-    submenuContainer.style.setProperty('display', 'block', 'important');
-    submenuContainer.style.setProperty('visibility', 'hidden', 'important');
-    const submenuHeight = submenuContainer.offsetHeight;
-    submenuContainer.style.setProperty('display', 'none', 'important');
-    submenuContainer.style.setProperty('visibility', 'visible', 'important');
-
-    // Adjust top if would go off bottom
-    if (top + submenuHeight > viewportHeight) {
-      top = Math.max(0, viewportHeight - submenuHeight - 10);
-    }
-
-    // Store the direction this submenu opened for child submenus
-    submenuContainer.dataset.openDirection = openLeft ? 'left' : 'right';
-
-    // Apply positioning
-    submenuContainer.style.setProperty('left', `${left}px`, 'important');
-    submenuContainer.style.setProperty('top', `${top}px`, 'important');
-    submenuContainer.style.setProperty('right', 'auto', 'important');
-    submenuContainer.style.setProperty('bottom', 'auto', 'important');
-
-    // Position the bridge between parent item and submenu
-    // Make it taller to cover the area between parent menu and submenu
-    const bridgeTop = Math.min(itemRect.top, top);
-    const bridgeBottom = Math.max(itemRect.bottom, top + submenuHeight);
-    const bridgeHeight = bridgeBottom - bridgeTop;
-    let bridgeLeft, bridgeWidth;
-
-    if (openLeft) {
-      // Bridge from submenu right edge to parent left edge
-      bridgeLeft = left + submenuWidth;
-      bridgeWidth = parentMenuRect.left - (left + submenuWidth);
-    } else {
-      // Bridge from parent right edge to submenu left edge
-      bridgeLeft = parentMenuRect.right;
-      bridgeWidth = left - parentMenuRect.right;
-    }
-
-    bridge.style.setProperty('left', `${bridgeLeft}px`, 'important');
-    bridge.style.setProperty('top', `${bridgeTop}px`, 'important');
-    bridge.style.setProperty('width', `${bridgeWidth}px`, 'important');
-    bridge.style.setProperty('height', `${bridgeHeight}px`, 'important');
-  };
-
-  // Hover delay management
-  let hideTimeout;
-
-  // Show submenu on hover
-  itemLi.addEventListener('mouseenter', () => {
-    // Clear any pending hide timeout for this submenu
-    clearTimeout(hideTimeout);
-    clearTimeout(submenuContainer.hideTimeout);
-
-    // Close other submenus
-    const siblings = itemLi.parentElement.querySelectorAll(':scope > li');
-    siblings.forEach(sibling => {
-      if (sibling !== itemLi && sibling.submenuElement) {
-        sibling.submenuElement.style.setProperty('display', 'none', 'important');
-        if (sibling.bridgeElement) {
-          sibling.bridgeElement.style.setProperty('display', 'none', 'important');
-        }
-      }
-    });
-
-    // Position and show this submenu and bridge
-    positionSubmenu();
-    submenuContainer.style.setProperty('display', 'block', 'important');
-    bridge.style.setProperty('display', 'block', 'important');
+  attachSubmenu({
+    itemLi,
+    anchorMenu: parentMenu,
+    parentSubmenuId: 'root',
+    preferSide: 'left',
+    fill: (ul, container) =>
+      renderDropdownItemsRecursive(tab.dropdownItems, ul, tab, container, 0),
   });
-
-  // Hide submenu when leaving item
-  itemLi.addEventListener('mouseleave', () => {
-    hideTimeout = setTimeout(() => {
-      submenuContainer.style.setProperty('display', 'none', 'important');
-      bridge.style.setProperty('display', 'none', 'important');
-    }, 300);
-  });
-
-  // Keep submenu visible when hovering over it or the bridge
-  submenuContainer.addEventListener('mouseenter', () => {
-    clearTimeout(hideTimeout);
-    clearTimeout(submenuContainer.hideTimeout);
-  });
-
-  bridge.addEventListener('mouseenter', () => {
-    clearTimeout(hideTimeout);
-    clearTimeout(submenuContainer.hideTimeout);
-  });
-
-  // Hide when leaving submenu (with delay)
-  submenuContainer.addEventListener('mouseleave', (e) => {
-    const relatedTarget = e.relatedTarget;
-
-    // Check if we're moving to a child submenu
-    if (relatedTarget) {
-      // Check if the target is inside this menu (including nested children)
-      const isInsideThisMenu = submenuContainer.contains(relatedTarget);
-
-      // Check if we're moving back to the parent item
-      const isParentItem = itemLi.contains(relatedTarget);
-
-      // Check if we're moving to a child submenu (by checking if target is inside any submenu that's a child of this one)
-      let isMovingToChildSubmenu = false;
-      const targetSubmenu = relatedTarget.closest?.('.submenu-container');
-      if (targetSubmenu) {
-        // Check if this target submenu is a logical child of the current submenu
-        const currentSubmenuId = submenuContainer.dataset.submenuId;
-        if (targetSubmenu.dataset.parentSubmenu === currentSubmenuId) {
-          isMovingToChildSubmenu = true;
-        }
-      }
-
-      // Check if we're moving to a bridge
-      const isMovingToBridge = relatedTarget.closest?.('.submenu-bridge');
-
-      if (isInsideThisMenu || isParentItem || isMovingToChildSubmenu || isMovingToBridge) {
-        // Moving to child, staying inside, back to parent, or to bridge - don't hide
-        return;
-      }
-    }
-
-    hideTimeout = setTimeout(() => {
-      submenuContainer.style.setProperty('display', 'none', 'important');
-      bridge.style.setProperty('display', 'none', 'important');
-    }, 300);
-
-    // Store timeout on submenu element so children can cancel it
-    submenuContainer.hideTimeout = hideTimeout;
-  });
-
-  bridge.addEventListener('mouseleave', (e) => {
-    const clientX = e.clientX;
-    const clientY = e.clientY;
-    setTimeout(() => {
-      const hoveredElement = document.elementFromPoint(clientX, clientY);
-      if (!submenuContainer.contains(hoveredElement) && !itemLi.contains(hoveredElement)) {
-        submenuContainer.style.setProperty('display', 'none', 'important');
-        bridge.style.setProperty('display', 'none', 'important');
-      }
-    }, 50);
-  });
-
-  // Clean up when parent menu closes
-  const observer = trackSubmenuObserver(new MutationObserver(() => {
-    if (parentMenu.style.display === 'none') {
-      submenuContainer.style.setProperty('display', 'none', 'important');
-      bridge.style.setProperty('display', 'none', 'important');
-    }
-  }));
-  observer.observe(parentMenu, { attributes: true, attributeFilter: ['style'] });
 }
 
 /**
