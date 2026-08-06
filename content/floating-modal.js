@@ -746,21 +746,31 @@
       this.resizeHandler = resizeHandler;
 
       // Listen for storage changes to update tabs in real-time
-      const storageChangeHandler = async (changes, areaName) => {
-        // Same fix as floating-button.js: the old endsWith('_tabs') missed
-        // every chunked profile.
-        const tabsChanged = window.SFTabs?.utils?.tabStorageChanged(changes) ||
-          Boolean(changes.userSettings);
+      /**
+       * Re-read and redraw when something this panel shows has changed.
+       *
+       * Scoped to the settings it actually renders from. Reacting to any
+       * userSettings write meant a theme change reloaded storage and rebuilt
+       * every row, and because a settings write fires twice — sync, then the
+       * local mirror — it did so twice.
+       *
+       * The tab test was endsWith('_tabs') before, which is the one key that
+       * stops existing once a profile is chunked, so a large profile's edits
+       * never reached this panel at all.
+       */
+      const storageChangeHandler = debounce(async (changes) => {
+        const utils = window.SFTabs?.utils;
+        if (!utils) return;
 
-        if (tabsChanged) {
-          // Reload data and re-render tabs
-          await this.loadData();
-          this.renderTabs();
+        const relevant = utils.tabStorageChanged(changes) ||
+          utils.settingsChanged(changes.userSettings,
+            ['tabColors', 'floatingButton', ...utils.PROFILE_SETTINGS]);
+        if (!relevant) return;
 
-          // Update position in case settings changed
-          this.updatePosition();
-        }
-      };
+        await this.loadData();
+        this.renderTabs();
+        this.updatePosition();   // floatingButton settings can move it
+      }, 150);
 
       browser.storage.onChanged.addListener(storageChangeHandler);
 

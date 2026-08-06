@@ -601,20 +601,40 @@ function matchTabsToUrl(candidates, currentUrl) {
  * nothing. oldValue is absent on a first write, which correctly reads as a
  * change.
  */
-const TAB_BAR_SETTINGS = [
-  'tabColors',        // enabled, and dot vs fill
-  'menuBarQuickAdd',  // the "+" at the end of the bar
-  'activeProfileId',  // which tabs belong here
-  'profilesEnabled',
-  'autoSwitchProfiles',
-];
-
-function settingsAffectTabBar(change) {
+/**
+ * Did any of these settings actually change?
+ *
+ * Every surface listens to userSettings, and a settings write fires twice —
+ * once for sync and once for the local mirror saveUserSettings keeps. Surfaces
+ * that reacted to the bare presence of `changes.userSettings` therefore rebuilt
+ * themselves twice for any setting at all, related or not. Toggling tab colours
+ * tore down and re-injected the header-menu item, which reflows
+ * ul.slds-global-actions and visibly shifted Salesforce's own search bar, and
+ * destroyed and recreated the floating handle, which blinked.
+ *
+ * Comparing the named keys answers both problems at once: an unrelated setting
+ * is not a change, and the second write of the same value is not a change
+ * either.
+ */
+function settingsChanged(change, keys) {
   if (!change) return false;
   const before = change.oldValue || {};
   const after = change.newValue || {};
-  return TAB_BAR_SETTINGS.some(key =>
-    JSON.stringify(before[key]) !== JSON.stringify(after[key]));
+  return keys.some(key => JSON.stringify(before[key]) !== JSON.stringify(after[key]));
+}
+
+/** Settings that decide which tabs a surface shows. */
+const PROFILE_SETTINGS = ['activeProfileId', 'profilesEnabled', 'autoSwitchProfiles'];
+
+/** Settings that change what the Salesforce tab bar draws. */
+const TAB_BAR_SETTINGS = [
+  'tabColors',        // enabled, and dot vs fill
+  'menuBarQuickAdd',  // the "+" at the end of the bar
+  ...PROFILE_SETTINGS,
+];
+
+function settingsAffectTabBar(change) {
+  return settingsChanged(change, TAB_BAR_SETTINGS);
 }
 
 /**
@@ -1052,6 +1072,8 @@ if (typeof module !== 'undefined' && module.exports) {
   mergeUserSettings,
   tabStorageChanged,
   settingsAffectTabBar,
+  PROFILE_SETTINGS,
+  settingsChanged,
   matchTabsToUrl,
   tabDestinationUrl,
   loadTabsForUrl,
@@ -1092,6 +1114,8 @@ if (typeof module !== 'undefined' && module.exports) {
     mergeUserSettings,
     tabStorageChanged,
     settingsAffectTabBar,
+    PROFILE_SETTINGS,
+    settingsChanged,
     matchTabsToUrl,
     tabDestinationUrl,
     loadTabsForUrl,

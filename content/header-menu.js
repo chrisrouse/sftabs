@@ -33,6 +33,9 @@
   // Held so row rendering can read tabColors without another storage read
   let menuSettings = {};
 
+  /** Tabs the menu draws, read at open time so a refresh needs no DOM churn. */
+  let menuTabs = [];
+
   const msg = (key, subs) => {
     try {
       return chrome.i18n.getMessage(key, subs) || key;
@@ -88,9 +91,11 @@
       </button>`;
     list.insertBefore(li, list.firstChild);
 
+    // Reads the module-level list rather than closing over this one, so new
+    // tabs or colours can be picked up without touching the injected element.
     li.querySelector('button').addEventListener('click', event => {
       event.stopPropagation();
-      toggleMenu(tabs);
+      toggleMenu(menuTabs);
     });
     return true;
   }
@@ -466,6 +471,7 @@
 
       const { tabs, settings } = await loader();
       menuSettings = settings || {};
+      menuTabs = tabs || [];
       if (!settings || !settings.headerMenu || !settings.headerMenu.enabled) {
         teardown();
         return;
@@ -481,14 +487,44 @@
   }
 
   if (browser.storage && browser.storage.onChanged) {
-    browser.storage.onChanged.addListener((changes, area) => {
-      if (area !== 'local' && area !== 'sync') return;
-      const touched = changes.userSettings ||
-        window.SFTabs?.utils?.tabStorageChanged(changes);
-      if (touched) {
+    /**
+     * Refresh without touching the header.
+     *
+     * teardown() + init() used to run for any userSettings write at all. That
+     * removes our <li> from ul.slds-global-actions and re-inserts it, which
+     * reflows the header and visibly shifts Salesforce's own search bar — and
+     * a settings write fires twice, once for sync and once for the local
+     * mirror, so it happened twice per toggle.
+     *
+     * Only whether the feature is on can change the header's contents. Anything
+     * else changes what is inside the menu, which is built on demand from
+     * menuTabs when it opens, so updating those two variables is the whole job.
+     */
+    const onChange = debounce(async (changes) => {
+      const utils = window.SFTabs?.utils;
+      if (!utils) return;
+
+      if (utils.settingsChanged(changes.userSettings, ['headerMenu'])) {
         teardown();
         init();
+        return;
       }
+
+      const contents = utils.tabStorageChanged(changes) ||
+        utils.settingsChanged(changes.userSettings, ['tabColors', ...utils.PROFILE_SETTINGS]);
+      if (!contents) return;
+
+      const loader = window.SFTabsFloating && window.SFTabsFloating.loadTabsAndSettings;
+      if (typeof loader !== 'function') return;
+      const { tabs, settings } = await loader();
+      menuTabs = tabs || [];
+      menuSettings = settings || {};
+      if (menuIsOpen) { closeMenu(); openMenu(menuTabs); }   // only redraw what is on screen
+    }, 150);
+
+    browser.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local' && area !== 'sync') return;
+      onChange(changes);
     });
   }
 

@@ -94,34 +94,51 @@
 
   // Listen for storage changes to update button
   if (browser.storage && browser.storage.onChanged) {
-    browser.storage.onChanged.addListener(async (changes, area) => {
-      const floatingButton = window.SFTabsFloating?.button;
+    /**
+     * Rebuild only when the surface itself changed; otherwise refresh its data.
+     *
+     * This used to destroy and recreate the modal for any userSettings write,
+     * and a settings write fires twice — once for sync, once for the local
+     * mirror — so toggling something unrelated like tab colours blinked the
+     * handle twice. Only the floatingButton settings change what is built;
+     * everything else changes what it lists, which is a re-read, not a rebuild.
+     *
+     * endsWith('_tabs') used to be the tab test here, which is the one key that
+     * stops existing once a profile is chunked — so a large profile's edits
+     * never reached this surface at all.
+     */
+    const onChange = debounce(async (changes) => {
+      const utils = window.SFTabs?.utils;
+      if (!utils) return;
 
-      // endsWith('_tabs') used to be the test here, which is the one key that
-      // stops existing once a profile is chunked — so a large profile's edits
-      // never reached this surface.
-      const tabsChanged = window.SFTabs?.utils?.tabStorageChanged(changes);
-
-      if (tabsChanged && floatingButton) {
-        // Reload tabs data
-        const data = await loadTabsAndSettings();
-        floatingButton.tabs = data.tabs;
-        floatingButton.settings = data.settings;
-      }
-
-      // Check if settings changed
-      if (changes.userSettings) {
-        if (floatingButton) {
-          floatingButton.destroy();
-        }
+      if (utils.settingsChanged(changes.userSettings, ['floatingButton'])) {
+        window.SFTabsFloating?.button?.destroy();
         initFloatingButton();
-
         // The modal is the rendered artifact, so bring it back with the new
         // settings applied
         if (typeof window.SFTabsFloating?.initModal === 'function') {
           window.SFTabsFloating.initModal();
         }
+        return;
       }
+
+      const contents = utils.tabStorageChanged(changes) ||
+        utils.settingsChanged(changes.userSettings, ['tabColors', ...utils.PROFILE_SETTINGS]);
+      if (!contents) return;
+
+      // Only this instance's copy. The modal keeps its own listener and
+      // re-renders itself; doing it here as well drew the rows twice.
+      const floatingButton = window.SFTabsFloating?.button;
+      if (floatingButton) {
+        const data = await loadTabsAndSettings();
+        floatingButton.tabs = data.tabs;
+        floatingButton.settings = data.settings;
+      }
+    }, 150);
+
+    browser.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local' && area !== 'sync') return;
+      onChange(changes);
     });
   }
 

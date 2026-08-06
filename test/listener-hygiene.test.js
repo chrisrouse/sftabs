@@ -135,5 +135,60 @@ check('and coalesces to one reposition per frame',
 check('open state is a flag, not a DOM lookup per scroll event',
   /^  let menuIsOpen = false;/m.test(header));
 
+
+// ── No surface rebuilds itself for a setting it does not use ──
+// Every content surface listens to userSettings, and a settings write fires
+// twice: once for sync, once for the local mirror saveUserSettings keeps. A
+// surface reacting to the bare presence of changes.userSettings therefore tore
+// itself down and rebuilt twice for any setting at all.
+//
+// That was visible. Toggling tab colours removed and re-inserted the
+// header-menu <li> in ul.slds-global-actions, which reflows the header and
+// shifted Salesforce's own global search bar, and destroyed and recreated the
+// floating handle, which blinked. Neither surface uses that setting for its
+// structure — only for what it lists.
+const SURFACES = ['content/content-main.js', 'content/header-menu.js',
+                  'content/floating-button.js', 'content/floating-modal.js'];
+
+for (const rel of SURFACES) {
+  const src = read(rel);
+  const name = rel.split('/').pop();
+
+  check(`${name} does not react to the bare presence of a settings write`,
+    !/Boolean\(changes\.userSettings\)/.test(src) &&
+    !/changes\.userSettings\s*\|\|/.test(src) &&
+    !/if\s*\(changes\.userSettings\)/.test(src),
+    'a settings write fires twice and most settings do not concern any one surface');
+
+  check(`${name} names the settings it depends on`,
+    /settingsChanged\(|settingsAffectTabBar\(/.test(src));
+
+  check(`${name} debounces its storage listener`,
+    /debounce\(/.test(src),
+    'collapses the sync write and its local mirror into one response');
+}
+
+// The header item itself must survive a refresh — removing and re-adding it is
+// what moved the search bar.
+const headerListener = /const onChange = debounce\([\s\S]*?\}, \d+\);/.exec(header);
+check('the header menu tears down only when the feature is switched off',
+  Boolean(headerListener) &&
+  /settingsChanged\(changes\.userSettings, \['headerMenu'\]\)[\s\S]{0,120}teardown\(\)/.test(headerListener[0]),
+  'anything else changes the menu contents, not the injected element');
+check('and refreshes its contents without touching the DOM otherwise',
+  Boolean(headerListener) && /menuTabs = tabs/.test(headerListener[0]));
+check('the menu reads those tabs at open time rather than closing over them',
+  /toggleMenu\(menuTabs\)/.test(header),
+  'closing over the list is why a refresh needed a re-inject');
+
+// The floating surface: rebuild is for its own settings, everything else is a
+// re-read.
+const floatingButtonSrc = read('content/floating-button.js');
+check('the floating button rebuilds only for floatingButton settings',
+  /settingsChanged\(changes\.userSettings, \['floatingButton'\]\)[\s\S]{0,200}destroy\(\)/.test(floatingButtonSrc));
+check('and leaves the panel to re-render itself',
+  !/modal\.renderTabs\(\)/.test(floatingButtonSrc),
+  'both doing it drew every row twice');
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);
