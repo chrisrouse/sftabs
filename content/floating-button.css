@@ -383,8 +383,15 @@
 .sftabs-floating-modal[data-side="left"] .modal-content { transform: translateX(-280px); }
 .sftabs-floating-modal[data-side="left"].open .modal-content { transform: translateX(0); }
 
-/* Nested flyouts open away from the anchored edge */
-.sftabs-floating-modal[data-side="left"] .dropdown-indicator { order: 0; }
+/* The disclosure chevron leads the row on both sides — it is not mirrored with
+   the panel. This used to set order: 0 when docked left, which pushed the
+   chevron past the flex-filling label to the trailing edge, so the same menu
+   read differently depending on which edge the button was on.
+
+   The reasoning behind it was about flyouts opening away from the anchored
+   edge, and that does apply to the Setup tab bar's menus, which fly out
+   sideways. This panel expands inline, like the header menu, and there the
+   chevron always leads. */
 
 /* ── Detached layouts (round + pill) ──
    Trigger and panel stack vertically, edge-aligned to the anchor side. */

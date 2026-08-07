@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>v2 migration screen — reconstructed</title>
+<style>
+:root {
+	/* ===== SLDS Base Colors ===== */
+	--slds-brand-primary: #288aff; /* Used for primary buttons, active states */
+	--slds-brand-secondary: #1a6ee6; /* Used for hover states */
+	--slds-gray-1: #FFFFFF; /* White backgrounds */
+	--slds-gray-2: #F3F3F3; /* Light backgrounds */
+	--slds-gray-3: #E5E5E5; /* Borders */
+	--slds-gray-4: #D3D3D3; /* Toggle background */
+	--slds-gray-5: #A8A8A8; /* Icon fills */
+	--slds-gray-6: #747474; /* Secondary text */
+	--slds-gray-7: #444444; /* Primary text */
+
+	/* Functional colors that are actually used */
+	--slds-color-error: #C23934; /* Used for error states and delete buttons */
+	--slds-color-success: #04844B; /* Used for object badges */
+	--slds-color-custom: #9061F9; /* Used for custom URL badges */
+
+	/* ===== Surface Elevation System (Material Design 3 inspired) ===== */
+	--surface-base: #F3F3F3;        /* Main background */
+	--surface-1: #FFFFFF;           /* Cards, panels */
+	--surface-2: #FFFFFF;           /* Elevated cards */
+	--surface-3: #FFFFFF;           /* Highest elevation (modals) */
+
+	/* ===== Border System (Tailwind inspired) ===== */
+	--border-subtle: #E5E5E5;       /* Barely visible borders */
+	--border-medium: #D3D3D3;       /* Standard dividers */
+	--border-strong: #A8A8A8;       /* Emphasized borders */
+
+	/* ===== Shadow System (Material Design 3 + Tailwind) ===== */
+	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+	/* ===== Interactive Colors ===== */
+	--color-primary: #288aff;
+	--color-primary-hover: #0176d3;
+	--color-primary-active: #014486;
+	--color-success: #04844B;
+	--color-error: #C23934;
+
+	/* ===== State Layers (Material Design 3) ===== */
+	--state-hover: rgba(0, 0, 0, 0.04);
+	--state-pressed: rgba(0, 0, 0, 0.08);
+	--state-focus: rgba(40, 138, 255, 0.12);
+	--state-hover-primary: rgba(40, 138, 255, 0.12);
+	--state-hover-primary-light: rgba(194, 222, 255, 0.3);  /* Light blue from drag handle */
+	--state-hover-primary-dark: rgba(15, 124, 255, 0.15);   /* Darker blue from drag handle */
+	--state-hover-error: rgba(194, 57, 52, 0.12);
+
+	/* ===== Focus Ring ===== */
+	--focus-ring: 0 0 0 3px rgba(40, 138, 255, 0.3);
+
+	/* ===== Selection Colors ===== */
+	--selection-bg: rgba(40, 138, 255, 0.3);
+	--selection-text: inherit;
+
+	/* ===== Semantic Theme Colors ===== */
+	--color-background: var(--surface-base);
+	--color-text: var(--slds-gray-7);
+	--color-text-weak: var(--slds-gray-6);
+	--color-border: var(--border-subtle);
+	--color-input-background: var(--slds-gray-2);
+	--color-header: var(--slds-brand-primary);
+	--color-header-text: var(--slds-gray-1);
+	--color-section-header: var(--surface-1);
+	--color-item-background: var(--surface-1);
+	--color-toggle-background: var(--slds-gray-4);
+	--color-modal-overlay: rgba(0, 0, 0, 0.5);
+	--color-icon-fill: var(--slds-gray-5);
+
+	/* ===== Component Colors ===== */
+	--color-drag-handle-bg: #c2deff;
+	--color-drag-handle-dot: #0f7cff;
+	--color-drag-handle-hover-bg: #0f7cff;
+	--color-drag-handle-hover-dot: #c2deff;
+  }
+
+/* ── Reconstructed from git: popup/popup.css at b005f7f~1 ────────────────
+   The screen itself is unchanged; only the page around it is new. Markup
+   comes from popup/popup.html at the same commit, with the __MSG_ tokens
+   resolved from _locales/en/messages.json the way the extension resolves
+   them at load. */
+.form-group {
+	margin-bottom: 16px;
+  }
+.settings-form .form-group {
+	margin-bottom: 24px;
+  }
+.settings-form .form-group:last-child {
+	margin-bottom: 0;
+  }
+.primary-button {
+	background-color: var(--color-primary);
+	color: white;
+	border: none;
+	border-radius: 4px;
+	padding: 8px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.2s;
+  }
+.primary-button:hover {
+	background-color: var(--color-primary-hover);
+  }
+.primary-button:active {
+	background-color: var(--color-primary-active);
+  }
+.secondary-button {
+	background-color: transparent;
+	color: var(--color-text);
+	border: 1px solid var(--color-text-weak);
+	border-radius: 4px;
+	padding: 8px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	margin-right: 8px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+  }
+.secondary-button:hover {
+	background-color: var(--color-border);
+  }
+/* Modal Styles */
+  .modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: var(--color-modal-overlay);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+  }
+.modal.show {
+	display: flex;
+  }
+.modal-content {
+	background-color: var(--surface-3);
+	border-radius: 8px;
+	max-width: 90%;
+	width: 300px;
+	border: 1px solid var(--border-medium);
+	box-shadow: var(--shadow-xl);
+	animation: modalFadeIn 0.3s;
+  }
+.modal-header {
+	background-color: var(--color-header);
+	color: var(--color-header-text);
+	padding: 12px 16px;
+	border-radius: 8px 8px 0 0;
+  }
+.modal-body {
+	padding: 16px;
+	color: var(--color-text);
+  }
+.modal-body p {
+	margin: 0;
+	line-height: 1.5;
+  }
+.modal-footer {
+	padding: 12px 16px;
+	display: flex;
+	justify-content: flex-end;
+	border-top: 1px solid var(--color-border);
+	border-radius: 0 0 8px 8px;
+  }
+#modal-confirm-button,
+  #delete-modal-confirm-button {
+	background-color: var(--slds-color-error);
+  }
+#modal-confirm-button:hover,
+  #delete-modal-confirm-button:hover {
+	background-color: #AA0000;
+  }
+/* Enhanced Modal Styles for Dark Mode */
+[data-theme="dark"] .modal {
+	background-color: var(--color-modal-overlay);
+  }
+[data-theme="dark"] .modal-content {
+	box-shadow: var(--shadow-xl), var(--shadow-glow);
+  }
+[data-theme="dark"] .modal-header {
+	background-color: #0F6BAE; /* Darker blue header */
+	border-bottom: 1px solid #444;
+  }
+[data-theme="dark"] .modal-body {
+	color: #FFFFFF; /* Brighter text */
+  }
+[data-theme="dark"] .modal-footer {
+	border-top-color: #444; /* More visible separator */
+  }
+.migration-modal-content {
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	border-radius: 0;
+	box-shadow: none;
+	display: flex;
+	flex-direction: column;
+	animation: none;
+	background-color: var(--color-background);
+  }
+#migration-modal .modal-header {
+	flex-shrink: 0;
+	padding: 10px 14px;
+  }
+#migration-modal .modal-body {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 6px 14px 10px 14px;
+  }
+#migration-modal .modal-footer {
+	flex-shrink: 0;
+  }
+#first-launch-modal .modal-header {
+	flex-shrink: 0;
+	padding: 10px 14px;
+  }
+#first-launch-modal .modal-body {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 6px 14px 10px 14px;
+  }
+#first-launch-modal .modal-footer {
+	flex-shrink: 0;
+  }
+.migration-screen {
+	text-align: center;
+	padding: 0;
+  }
+.migration-icon {
+	font-size: 26px;
+	margin-bottom: 4px;
+  }
+.migration-screen h3 {
+	margin: 0 0 6px 0;
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--color-text);
+  }
+.migration-description {
+	margin: 0 0 8px 0;
+	font-size: 13px;
+	color: var(--color-text-weak);
+	line-height: 1.4;
+  }
+.migration-info-box {
+	background-color: var(--color-section-header);
+	border-radius: 6px;
+	padding: 8px;
+	margin: 8px 0;
+	text-align: left;
+  }
+.migration-info-box.success {
+	background-color: rgba(4, 132, 75, 0.1);
+	border: 1px solid var(--slds-color-success);
+  }
+.migration-info-box.error {
+	background-color: rgba(194, 57, 52, 0.1);
+	border: 1px solid var(--slds-color-error);
+  }
+.migration-info-box p {
+	margin: 0 0 6px 0;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--color-text);
+  }
+.migration-info-box ul {
+	margin: 0;
+	padding-left: 18px;
+	font-size: 12px;
+	color: var(--color-text);
+  }
+.migration-info-box li {
+	margin: 3px 0;
+	line-height: 1.3;
+  }
+.migration-steps {
+	margin: 12px 0;
+	text-align: left;
+  }
+.migration-step {
+	display: flex;
+	align-items: center;
+	padding: 5px 8px;
+	margin: 4px 0;
+	background-color: var(--color-section-header);
+	border-radius: 4px;
+	font-size: 12px;
+  }
+.migration-step .step-icon {
+	margin-right: 12px;
+	font-size: 16px;
+  }
+.migration-step.completed .step-icon {
+	filter: grayscale(0);
+  }
+.migration-step.active {
+	background-color: rgba(0, 112, 210, 0.1);
+	border: 1px solid var(--slds-brand-primary);
+  }
+.migration-step.completed {
+	opacity: 0.6;
+  }
+.migration-spinner {
+	width: 32px;
+	height: 32px;
+	margin: 16px auto;
+	border: 4px solid var(--color-section-header);
+	border-top: 4px solid var(--slds-brand-primary);
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+  }
+/* Dark theme adjustments for migration modal */
+  [data-theme="dark"] .migration-info-box {
+	background-color: #2A2C35;
+  }
+[data-theme="dark"] .migration-info-box.success {
+	background-color: rgba(69, 198, 90, 0.15);
+	border-color: var(--slds-color-success);
+  }
+[data-theme="dark"] .migration-info-box.error {
+	background-color: rgba(255, 82, 82, 0.15);
+	border-color: var(--slds-color-error);
+  }
+[data-theme="dark"] .migration-step {
+	background-color: #2A2C35;
+  }
+[data-theme="dark"] .migration-step.active {
+	background-color: rgba(15, 107, 174, 0.2);
+	border-color: var(--color-header);
+  }
+[data-theme="dark"] .migration-spinner {
+	border-color: #2A2C35;
+	border-top-color: var(--color-header);
+  }
+/* ===== Enhanced Focus States (Material Design 3 inspired) ===== */
+
+/* Focus-visible for keyboard navigation - combines shadow with ring */
+.tab-item:focus-visible,
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.action-button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-md), var(--focus-ring);
+}
+/* Option button (used for profiles and storage) */
+.option-button {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: var(--color-section-header);
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  margin-bottom: 10px;
+}
+.option-button:hover {
+  background-color: rgba(0, 112, 210, 0.05);
+  border-color: var(--slds-brand-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.option-button.active {
+  background-color: rgba(0, 112, 210, 0.1);
+  border-color: var(--slds-brand-primary);
+  border-width: 2px;
+}
+.option-button-icon {
+  font-size: 24px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.option-button-content {
+  flex: 1;
+}
+.option-button-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 3px;
+}
+.option-button-description {
+  font-size: 12px;
+  color: var(--color-text-weak);
+  line-height: 1.3;
+}
+/* Hide actual radio/checkbox inputs inside option buttons */
+.option-button input[type="radio"],
+.option-button input[type="checkbox"] {
+  display: none;
+}
+/* Dark theme adjustments */
+[data-theme="dark"] .setup-option,
+[data-theme="dark"] .option-button {
+  background-color: #2A2C35;
+  border-color: #444;
+}
+[data-theme="dark"] .setup-option:hover,
+[data-theme="dark"] .option-button:hover {
+  background-color: rgba(15, 107, 174, 0.15);
+  border-color: var(--color-header);
+}
+[data-theme="dark"] .setup-option.active,
+[data-theme="dark"] .option-button.active {
+  background-color: rgba(15, 107, 174, 0.2);
+  border-color: var(--color-header);
+}
+
+/* ── Preview scaffolding, not part of the original ── */
+body {
+  margin: 0; padding: 28px;
+  background: #f3f3f3;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #2e2e2e;
+}
+h1 { font-size: 19px; margin: 0 0 4px; }
+.lede { font-size: 13px; color: #5c5c5c; margin: 0 0 24px; max-width: 62ch; line-height: 1.5; }
+.lede code { background: #e5e5e5; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+.row { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; }
+.frame { margin: 0; }
+figcaption { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; max-width: 410px; }
+figcaption b { font-size: 13px; }
+figcaption span { font-size: 12px; color: #757575; line-height: 1.4; }
+/* The popup's real footprint: 410px wide, and the modal filled it */
+.popup {
+  width: 410px; height: 560px;
+  background: #fff;
+  border: 1px solid #c9c9c9;
+  border-radius: 6px;
+  overflow: auto;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.10);
+  position: relative;
+}
+.popup .modal { position: absolute; inset: 0; display: flex; }
+</style>
+</head>
+<body>
+  <h1>SF Tabs v2 — migration screen</h1>
+  <p class="lede">
+    Reconstructed from git for reference; removed in <code>b005f7f</code> with the rest of the
+    v2 popup. Blocking modal at the popup's real 410px width. It ran before anything else loaded
+    and asked two questions — enable profiles, and sync or local — both of which now live in
+    Settings. The data migration it performed still happens, silently, in <code>js/popup.js</code>.
+  </p>
+  <div class="row">
+    <figure class="frame">
+      <figcaption><b>welcome</b><span>What an upgrading user met first. Nothing loaded behind it until they chose.</span></figcaption>
+      <div class="popup">
+        <div class="modal" style="display:flex">
+          <div class="modal-content migration-modal-content">
+            <div class="modal-header">
+              <h2 style="font-size:16px;margin:0;">Welcome to SF Tabs v2.0.0!</h2>
+            </div>
+            <div class="modal-body"><div id="migration-welcome" class="migration-screen">
+                        <!-- New Features Card -->
+                        <div class="form-group" style="margin: 0 0 24px 0;">
+                            <div style="background-color: var(--color-section-header); border: 2px solid var(--color-border); border-radius: 8px; padding: 16px; text-align: center;">
+                                <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
+                                <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 6px 0; color: var(--color-text);">New in v2.0</h3>
+                                <p style="font-size: 13px; color: var(--color-text-weak); margin: 0 0 14px 0; line-height: 1.5;">
+                                    Profiles, dropdown menus, and flexible storage options—all new features!
+                                </p>
+                                <button id="migration-learn-more-button" class="primary-button" style="margin: 0;">Learn More</button>
+                            </div>
+                        </div>
+
+                        <!-- Profiles Option -->
+                        <div class="form-group" style="margin: 24px 0;">
+                            <div class="option-button" data-option="profiles" id="migration-profiles-option">
+                                <input type="checkbox" id="migration-enable-profiles">
+                                <div class="option-button-icon">👥</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title">Enable Profiles</div>
+                                    <div class="option-button-description">
+                                        Profiles let you manage different tab configurations
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Storage Selection -->
+                        <div class="form-group" style="margin: 16px 0 0 0;">
+                            <div class="option-button active" data-storage="sync" id="migration-storage-option-sync">
+                                <input type="radio" name="migration-storage-choice" id="migration-storage-sync" value="sync" checked>
+                                <div class="option-button-icon">☁️</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title" id="migration-sync-storage-title">Sync Storage</div>
+                                    <div class="option-button-description">
+                                        Your tabs can sync across devices
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="option-button" data-storage="local" id="migration-storage-option-local">
+                                <input type="radio" name="migration-storage-choice" id="migration-storage-local" value="local">
+                                <div class="option-button-icon">💾</div>
+                                <div class="option-button-content">
+                                    <div class="option-button-title" id="migration-local-storage-title">Local Storage</div>
+                                    <div class="option-button-description">
+                                        Stored on this device only
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Migration in progress screen -->
+                    </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+    <figure class="frame">
+      <figcaption><b>progress</b><span>Shown while tabs moved into the new Default profile.</span></figcaption>
+      <div class="popup">
+        <div class="modal" style="display:flex">
+          <div class="modal-content migration-modal-content">
+            <div class="modal-header">
+              <h2 style="font-size:16px;margin:0;">Welcome to SF Tabs v2.0.0!</h2>
+            </div>
+            <div class="modal-body"><div id="migration-progress" class="migration-screen" >
+                        <div class="migration-spinner"></div>
+                        <h3 id="migration-progress-title">Migrating your data...</h3>
+                        <p id="migration-progress-message" class="migration-description">This will only take a moment.</p>
+                        <div class="migration-steps">
+                            <div class="migration-step" id="migration-step-1">
+                                <span class="step-icon">⏳</span>
+                                <span class="step-text">Reading existing data</span>
+                            </div>
+                            <div class="migration-step" id="migration-step-2">
+                                <span class="step-icon">⏳</span>
+                                <span class="step-text">Creating Default profile</span>
+                            </div>
+                            <div class="migration-step" id="migration-step-3">
+                                <span class="step-icon">⏳</span>
+                                <span class="step-text">Saving new format</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Migration success screen -->
+                    </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+    <figure class="frame">
+      <figcaption><b>success</b><span>Confirmation, with a note about where things went.</span></figcaption>
+      <div class="popup">
+        <div class="modal" style="display:flex">
+          <div class="modal-content migration-modal-content">
+            <div class="modal-header">
+              <h2 style="font-size:16px;margin:0;">Welcome to SF Tabs v2.0.0!</h2>
+            </div>
+            <div class="modal-body"><div id="migration-success" class="migration-screen" >
+                        <div class="migration-icon">✅</div>
+                        <h3>Migration Complete!</h3>
+                        <p class="migration-description">
+                            Your tabs have been successfully migrated to the new profile system.
+                        </p>
+                        <div class="migration-info-box success">
+                            <p><strong>What&#x27;s next:</strong></p>
+                            <ul>
+                                <li>All your tabs are now in the &quot;Default&quot; profile</li>
+                                <li id="migration-profiles-enabled-msg" style="display: none;">Profiles feature is now enabled</li>
+                                <li id="migration-profiles-disabled-msg">You can enable profiles in Settings anytime</li>
+                                <li>Create additional profiles for different orgs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Migration error screen -->
+                    </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+    <figure class="frame">
+      <figcaption><b>error</b><span>The failure path, offering a retry.</span></figcaption>
+      <div class="popup">
+        <div class="modal" style="display:flex">
+          <div class="modal-content migration-modal-content">
+            <div class="modal-header">
+              <h2 style="font-size:16px;margin:0;">Welcome to SF Tabs v2.0.0!</h2>
+            </div>
+            <div class="modal-body"><div id="migration-error" class="migration-screen" >
+                        <div class="migration-icon">⚠️</div>
+                        <h3>Migration Failed</h3>
+                        <p class="migration-description">
+                            An error occurred during migration. Your original data is still intact.
+                        </p>
+                        <div class="migration-info-box error">
+                            <p><strong>Error details:</strong></p>
+                            <p id="migration-error-message" style="font-family: monospace; font-size: 11px; margin-top: 8px;"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="migration-modal-footer">
+                    <!-- Welcome screen buttons -->
+                    <div id="migration-welcome-buttons">
+                        <button id="migration-export-button" class="secondary-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 6px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Backup
+                        </button>
+                        <button id="migration-start-button" class="primary-button">Migrate Now</button>
+                    </div>
+                    <!-- Progress screen buttons (hidden) -->
+                    <div id="migration-progress-buttons" style="display: none;"></div>
+                    <!-- Success screen buttons -->
+                    <div id="migration-success-buttons" style="display: none;">
+                        <button id="migration-done-button" class="primary-button">Get Started</button>
+                    </div>
+                    <!-- Error screen buttons -->
+                    <div id="migration-error-buttons" style="display: none;">
+                        <button id="migration-retry-button" class="primary-button">Retry Migration</button>
+                        <button id="migration-skip-button" class="secondary-button">Continue Without Migrating</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+          </div>
+        </div>
+      </div>
+    </figure>
+  </div>
+</body>
+</html>
