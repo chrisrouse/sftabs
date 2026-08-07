@@ -1103,97 +1103,9 @@
     "message": "Profile deaktivieren",
     "description": "Confirm button in the disable profiles modal"
   },
-  "migrationNewFeaturesTitle": {
-    "message": "Neu in v2.0",
-    "description": "Title of the new features card in the migration welcome screen"
-  },
-  "migrationNewFeaturesDesc": {
-    "message": "Profile, Dropdown-Menüs und flexible Speicheroptionen – alles neue Funktionen!",
-    "description": "Description of new features in the migration welcome screen"
-  },
-  "migrationSyncStorageDesc": {
-    "message": "Ihre Tabs können geräteübergreifend synchronisiert werden",
-    "description": "Description for sync storage option in the migration modal"
-  },
-  "migrationLocalStorageDesc": {
-    "message": "Nur auf diesem Gerät gespeichert",
-    "description": "Description for local storage option in the migration modal"
-  },
-  "migrationProgressTitle": {
-    "message": "Daten werden migriert...",
-    "description": "Title shown during migration progress (also set by JS)"
-  },
-  "migrationProgressMessage": {
-    "message": "Dies dauert nur einen Moment.",
-    "description": "Message shown during migration progress (also set by JS)"
-  },
-  "migrationStep1": {
-    "message": "Vorhandene Daten lesen",
-    "description": "First step label in migration progress steps"
-  },
-  "migrationStep2": {
-    "message": "Standardprofil erstellen",
-    "description": "Second step label in migration progress"
-  },
-  "migrationStep3": {
-    "message": "Neues Format speichern",
-    "description": "Third step label in migration progress"
-  },
-  "migrationSuccessTitle": {
-    "message": "Migration abgeschlossen!",
-    "description": "Heading on the migration success screen"
-  },
-  "migrationSuccessMessage": {
-    "message": "Ihre Tabs wurden erfolgreich in das neue Profilsystem migriert.",
-    "description": "Description on the migration success screen"
-  },
-  "migrationWhatsNext": {
-    "message": "Was kommt als Nächstes:",
-    "description": "Heading for the what's next section on migration success screen"
-  },
-  "migrationDefaultProfileNote": {
-    "message": "Alle Ihre Tabs befinden sich jetzt im Profil \"Standard\"",
-    "description": "First bullet point in the what's next section on migration success"
-  },
-  "migrationProfilesEnabledNote": {
-    "message": "Die Profilefunktion ist jetzt aktiviert",
-    "description": "Second bullet in what's next (shown when user enabled profiles)"
-  },
-  "migrationCanEnableLaterNote": {
-    "message": "Sie können Profile jederzeit in den Einstellungen aktivieren",
-    "description": "Third bullet in what's next (shown when user did not enable profiles)"
-  },
-  "migrationCreateProfilesNote": {
-    "message": "Erstellen Sie zusätzliche Profile für verschiedene Orgs",
-    "description": "Fourth bullet in the what's next section"
-  },
-  "migrationErrorTitle": {
-    "message": "Migration fehlgeschlagen",
-    "description": "Heading on the migration error screen"
-  },
-  "migrationErrorMessage": {
-    "message": "Während der Migration ist ein Fehler aufgetreten. Ihre ursprünglichen Daten sind noch vorhanden.",
-    "description": "Message on the migration error screen"
-  },
-  "migrationErrorDetailsLabel": {
-    "message": "Fehlerdetails:",
-    "description": "Label for the error details section on the migration error screen"
-  },
   "exportBackupButton": {
     "message": "Sicherung exportieren",
     "description": "Button to export a backup before migrating"
-  },
-  "migrateNowButton": {
-    "message": "Jetzt migrieren",
-    "description": "Button to start the migration process"
-  },
-  "retryMigrationButton": {
-    "message": "Migration wiederholen",
-    "description": "Button to retry a failed migration"
-  },
-  "continueWithoutMigratingButton": {
-    "message": "Ohne Migration fortfahren",
-    "description": "Button to skip migration and continue with existing data"
   },
   "profilesUiDisabledKept": {
     "message": "Profile-UI deaktiviert. Profil \"$NAME$\" beibehalten",
@@ -1428,38 +1340,6 @@
         "content": "$1"
       }
     }
-  },
-  "migrationSyncStorageCurrent": {
-    "message": "Synchronisierter Speicher (Aktuell)",
-    "description": "Label shown when sync storage is the user's current storage type in migration modal"
-  },
-  "migrationLocalStorageNew": {
-    "message": "Lokaler Speicher (Neu)",
-    "description": "Label for local storage when sync storage is currently active in migration modal"
-  },
-  "migrationLocalStorageCurrent": {
-    "message": "Lokaler Speicher (Aktuell)",
-    "description": "Label when local storage is the user's current storage type in migration modal"
-  },
-  "migrationExporting": {
-    "message": "Wird exportiert...",
-    "description": "Temporary button text while backup export is in progress"
-  },
-  "migrationBackupExported": {
-    "message": "✓ Sicherung exportiert",
-    "description": "Temporary button text after a backup has been successfully exported"
-  },
-  "migrationExportBackup": {
-    "message": "Sicherung exportieren",
-    "description": "Default label on the Export Backup button in the migration modal"
-  },
-  "migrationExportFailed": {
-    "message": "Export fehlgeschlagen",
-    "description": "Temporary button text when a backup export fails"
-  },
-  "migrationUnknownError": {
-    "message": "Unbekannter Fehler aufgetreten",
-    "description": "Fallback error message in migration error screen when no specific error is available"
   },
   "firstLaunchSyncProfileCountSingular": {
     "message": "$COUNT$ Profil mit Tabs",
@@ -1844,15 +1724,6 @@
   "selectImportOptionError": {
     "message": "Bitte wählen Sie mindestens eine Option zum Importieren aus",
     "description": "Error when user tries to import without selecting any items"
-  },
-  "errorMigrateTabs": {
-    "message": "Migration der Tabs fehlgeschlagen: $ERROR$",
-    "description": "Error thrown when storage migration fails; {$ERROR$}=error message",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
   },
   "syncConflictTitle": {
     "message": "Synchronisierungskonflikt erkannt!",

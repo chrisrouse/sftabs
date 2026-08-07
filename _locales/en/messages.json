@@ -1103,97 +1103,9 @@
     "message": "Disable Profiles",
     "description": "Confirm button in the disable profiles modal"
   },
-  "migrationNewFeaturesTitle": {
-    "message": "New in v2.0",
-    "description": "Title of the new features card in the migration welcome screen"
-  },
-  "migrationNewFeaturesDesc": {
-    "message": "Profiles, dropdown menus, and flexible storage options—all new features!",
-    "description": "Description of new features in the migration welcome screen"
-  },
-  "migrationSyncStorageDesc": {
-    "message": "Your tabs can sync across devices",
-    "description": "Description for sync storage option in the migration modal"
-  },
-  "migrationLocalStorageDesc": {
-    "message": "Stored on this device only",
-    "description": "Description for local storage option in the migration modal"
-  },
-  "migrationProgressTitle": {
-    "message": "Migrating your data...",
-    "description": "Title shown during migration progress (also set by JS)"
-  },
-  "migrationProgressMessage": {
-    "message": "This will only take a moment.",
-    "description": "Message shown during migration progress (also set by JS)"
-  },
-  "migrationStep1": {
-    "message": "Reading existing data",
-    "description": "First step label in migration progress steps"
-  },
-  "migrationStep2": {
-    "message": "Creating Default profile",
-    "description": "Second step label in migration progress"
-  },
-  "migrationStep3": {
-    "message": "Saving new format",
-    "description": "Third step label in migration progress"
-  },
-  "migrationSuccessTitle": {
-    "message": "Migration Complete!",
-    "description": "Heading on the migration success screen"
-  },
-  "migrationSuccessMessage": {
-    "message": "Your tabs have been successfully migrated to the new profile system.",
-    "description": "Description on the migration success screen"
-  },
-  "migrationWhatsNext": {
-    "message": "What's next:",
-    "description": "Heading for the what's next section on migration success screen"
-  },
-  "migrationDefaultProfileNote": {
-    "message": "All your tabs are now in the \"Default\" profile",
-    "description": "First bullet point in the what's next section on migration success"
-  },
-  "migrationProfilesEnabledNote": {
-    "message": "Profiles feature is now enabled",
-    "description": "Second bullet in what's next (shown when user enabled profiles)"
-  },
-  "migrationCanEnableLaterNote": {
-    "message": "You can enable profiles in Settings anytime",
-    "description": "Third bullet in what's next (shown when user did not enable profiles)"
-  },
-  "migrationCreateProfilesNote": {
-    "message": "Create additional profiles for different orgs",
-    "description": "Fourth bullet in the what's next section"
-  },
-  "migrationErrorTitle": {
-    "message": "Migration Failed",
-    "description": "Heading on the migration error screen"
-  },
-  "migrationErrorMessage": {
-    "message": "An error occurred during migration. Your original data is still intact.",
-    "description": "Message on the migration error screen"
-  },
-  "migrationErrorDetailsLabel": {
-    "message": "Error details:",
-    "description": "Label for the error details section on the migration error screen"
-  },
   "exportBackupButton": {
     "message": "Export Backup",
     "description": "Button to export a backup before migrating"
-  },
-  "migrateNowButton": {
-    "message": "Migrate Now",
-    "description": "Button to start the migration process"
-  },
-  "retryMigrationButton": {
-    "message": "Retry Migration",
-    "description": "Button to retry a failed migration"
-  },
-  "continueWithoutMigratingButton": {
-    "message": "Continue Without Migrating",
-    "description": "Button to skip migration and continue with existing data"
   },
   "profilesUiDisabledKept": {
     "message": "Profiles UI disabled. Kept \"$NAME$\" profile",
@@ -1428,38 +1340,6 @@
         "content": "$1"
       }
     }
-  },
-  "migrationSyncStorageCurrent": {
-    "message": "Sync Storage (Current)",
-    "description": "Label shown when sync storage is the user's current storage type in migration modal"
-  },
-  "migrationLocalStorageNew": {
-    "message": "Local Storage (New)",
-    "description": "Label for local storage when sync storage is currently active in migration modal"
-  },
-  "migrationLocalStorageCurrent": {
-    "message": "Local Storage (Current)",
-    "description": "Label when local storage is the user's current storage type in migration modal"
-  },
-  "migrationExporting": {
-    "message": "Exporting...",
-    "description": "Temporary button text while backup export is in progress"
-  },
-  "migrationBackupExported": {
-    "message": "✓ Backup Exported",
-    "description": "Temporary button text after a backup has been successfully exported"
-  },
-  "migrationExportBackup": {
-    "message": "Export Backup",
-    "description": "Default label on the Export Backup button in the migration modal"
-  },
-  "migrationExportFailed": {
-    "message": "Export Failed",
-    "description": "Temporary button text when a backup export fails"
-  },
-  "migrationUnknownError": {
-    "message": "Unknown error occurred",
-    "description": "Fallback error message in migration error screen when no specific error is available"
   },
   "firstLaunchSyncProfileCountSingular": {
     "message": "$COUNT$ profile with tabs",
@@ -1844,15 +1724,6 @@
   "selectImportOptionError": {
     "message": "Please select at least one option to import",
     "description": "Error when user tries to import without selecting any items"
-  },
-  "errorMigrateTabs": {
-    "message": "Failed to migrate tabs: $ERROR$",
-    "description": "Error thrown when storage migration fails; {$ERROR$}=error message",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
   },
   "syncConflictTitle": {
     "message": "Sync Conflict Detected!",

@@ -1103,97 +1103,9 @@
     "message": "Deshabilitar perfiles",
     "description": "Confirm button in the disable profiles modal"
   },
-  "migrationNewFeaturesTitle": {
-    "message": "Novedades en v2.0",
-    "description": "Title of the new features card in the migration welcome screen"
-  },
-  "migrationNewFeaturesDesc": {
-    "message": "Perfiles, menús desplegables y opciones de almacenamiento flexibles, ¡todas nuevas funciones!",
-    "description": "Description of new features in the migration welcome screen"
-  },
-  "migrationSyncStorageDesc": {
-    "message": "Sus pestañas pueden sincronizarse entre dispositivos",
-    "description": "Description for sync storage option in the migration modal"
-  },
-  "migrationLocalStorageDesc": {
-    "message": "Almacenado solo en este dispositivo",
-    "description": "Description for local storage option in the migration modal"
-  },
-  "migrationProgressTitle": {
-    "message": "Migrando sus datos...",
-    "description": "Title shown during migration progress (also set by JS)"
-  },
-  "migrationProgressMessage": {
-    "message": "Esto tardará solo un momento.",
-    "description": "Message shown during migration progress (also set by JS)"
-  },
-  "migrationStep1": {
-    "message": "Leyendo datos existentes",
-    "description": "First step label in migration progress steps"
-  },
-  "migrationStep2": {
-    "message": "Creando perfil predeterminado",
-    "description": "Second step label in migration progress"
-  },
-  "migrationStep3": {
-    "message": "Guardando nuevo formato",
-    "description": "Third step label in migration progress"
-  },
-  "migrationSuccessTitle": {
-    "message": "¡Migración completada!",
-    "description": "Heading on the migration success screen"
-  },
-  "migrationSuccessMessage": {
-    "message": "Sus pestañas se han migrado correctamente al nuevo sistema de perfiles.",
-    "description": "Description on the migration success screen"
-  },
-  "migrationWhatsNext": {
-    "message": "Próximos pasos:",
-    "description": "Heading for the what's next section on migration success screen"
-  },
-  "migrationDefaultProfileNote": {
-    "message": "Todas sus pestañas están ahora en el perfil \"Predeterminado\"",
-    "description": "First bullet point in the what's next section on migration success"
-  },
-  "migrationProfilesEnabledNote": {
-    "message": "La función de perfiles está ahora habilitada",
-    "description": "Second bullet in what's next (shown when user enabled profiles)"
-  },
-  "migrationCanEnableLaterNote": {
-    "message": "Puede habilitar los perfiles en cualquier momento desde Configuración",
-    "description": "Third bullet in what's next (shown when user did not enable profiles)"
-  },
-  "migrationCreateProfilesNote": {
-    "message": "Cree perfiles adicionales para distintas organizaciones",
-    "description": "Fourth bullet in the what's next section"
-  },
-  "migrationErrorTitle": {
-    "message": "Error en la migración",
-    "description": "Heading on the migration error screen"
-  },
-  "migrationErrorMessage": {
-    "message": "Se produjo un error durante la migración. Sus datos originales siguen intactos.",
-    "description": "Message on the migration error screen"
-  },
-  "migrationErrorDetailsLabel": {
-    "message": "Detalles del error:",
-    "description": "Label for the error details section on the migration error screen"
-  },
   "exportBackupButton": {
     "message": "Exportar copia de seguridad",
     "description": "Button to export a backup before migrating"
-  },
-  "migrateNowButton": {
-    "message": "Migrar ahora",
-    "description": "Button to start the migration process"
-  },
-  "retryMigrationButton": {
-    "message": "Reintentar migración",
-    "description": "Button to retry a failed migration"
-  },
-  "continueWithoutMigratingButton": {
-    "message": "Continuar sin migrar",
-    "description": "Button to skip migration and continue with existing data"
   },
   "profilesUiDisabledKept": {
     "message": "Interfaz de perfiles deshabilitada. Conservar \"$NAME$\" del perfil",
@@ -1428,38 +1340,6 @@
         "content": "$1"
       }
     }
-  },
-  "migrationSyncStorageCurrent": {
-    "message": "Almacenamiento sincronizado (Actual)",
-    "description": "Label shown when sync storage is the user's current storage type in migration modal"
-  },
-  "migrationLocalStorageNew": {
-    "message": "Almacenamiento local (Nuevo)",
-    "description": "Label for local storage when sync storage is currently active in migration modal"
-  },
-  "migrationLocalStorageCurrent": {
-    "message": "Almacenamiento local (Actual)",
-    "description": "Label when local storage is the user's current storage type in migration modal"
-  },
-  "migrationExporting": {
-    "message": "Exportando...",
-    "description": "Temporary button text while backup export is in progress"
-  },
-  "migrationBackupExported": {
-    "message": "✓ Copia de seguridad exportada",
-    "description": "Temporary button text after a backup has been successfully exported"
-  },
-  "migrationExportBackup": {
-    "message": "Exportar copia de seguridad",
-    "description": "Default label on the Export Backup button in the migration modal"
-  },
-  "migrationExportFailed": {
-    "message": "Error al exportar",
-    "description": "Temporary button text when a backup export fails"
-  },
-  "migrationUnknownError": {
-    "message": "Se produjo un error desconocido",
-    "description": "Fallback error message in migration error screen when no specific error is available"
   },
   "firstLaunchSyncProfileCountSingular": {
     "message": "$COUNT$ perfil con pestañas",
@@ -1844,15 +1724,6 @@
   "selectImportOptionError": {
     "message": "Por favor, seleccione al menos una opción para importar",
     "description": "Error when user tries to import without selecting any items"
-  },
-  "errorMigrateTabs": {
-    "message": "Error al migrar las pestañas: $ERROR$",
-    "description": "Error thrown when storage migration fails; {$ERROR$}=error message",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
   },
   "syncConflictTitle": {
     "message": "¡Conflicto de sincronización detectado!",

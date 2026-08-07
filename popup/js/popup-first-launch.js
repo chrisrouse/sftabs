@@ -8,7 +8,7 @@
 async function checkFirstLaunch() {
   try {
     // Check if firstLaunchCompleted flag exists in BOTH local and sync storage
-    const localData = await browser.storage.local.get(['firstLaunchCompleted', 'extensionVersion', 'migrationCompleted']);
+    const localData = await browser.storage.local.get(['firstLaunchCompleted', 'migrationCompleted']);
     const syncCompletedCheck = await browser.storage.sync.get(['firstLaunchCompleted']);
 
     // If firstLaunchCompleted flag is set in either storage, they've already completed first-launch
@@ -24,9 +24,9 @@ async function checkFirstLaunch() {
     const syncData = await browser.storage.sync.get(['userSettings', 'profiles', 'customTabs']);
     const localStorageData = await browser.storage.local.get(['userSettings', 'profiles', 'customTabs']);
 
-    // Check if this is an upgrade from an older version
-    // Only consider it an upgrade if they have REAL data (profiles or tabs), not just empty settings
-    // Note: extensionVersion is set during installation, NOT a reliable upgrade indicator
+    // Only an upgrade if they have REAL data — profiles or tabs — not just empty
+    // settings. extensionVersion is written on install too, so it says nothing
+    // about whether this is an upgrade; it used to be read here and ignored.
     const hasProfiles = (syncData.profiles && Array.isArray(syncData.profiles) && syncData.profiles.length > 0) ||
                         (localStorageData.profiles && Array.isArray(localStorageData.profiles) && localStorageData.profiles.length > 0);
 
