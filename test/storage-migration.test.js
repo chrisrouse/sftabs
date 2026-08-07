@@ -196,6 +196,23 @@ const counts = async () => ({
   check('and the same in reverse', c.tabs === 2 && c.profiles === 1,
     `tabs=${c.tabs} profiles=${c.profiles}`);
 
+  // ── A move leaves nothing behind ──
+  // The tabs were always removed from the area being left. The profile list was
+  // not, when moving to local — a list of profiles whose tabs had just gone.
+  await seedLocal();
+  await switchStorage(true);                       // local -> sync
+  let leftover = Object.keys(local._data).filter(k => /^profile|^profiles/.test(k));
+  check('local -> sync leaves nothing in local',
+    leftover.length === 0, leftover.join(', ') || 'clean');
+
+  await switchStorage(false);                      // sync -> local
+  leftover = Object.keys(sync._data).filter(k => /^profile|^profiles/.test(k));
+  check('sync -> local leaves nothing in sync',
+    leftover.length === 0, leftover.join(', ') || 'clean');
+
+  c = await counts();
+  check('and the tabs are still all there afterwards', c.tabs === 2, `tabs=${c.tabs}`);
+
   // ── An empty profile must not leave its key behind ──
   // The write and the removal shared one `if (tabs.length > 0)` guard, so a
   // profile with no tabs kept its empty key in the area being left. Nothing

@@ -289,13 +289,18 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
       }
     }
 
-    // Migrate profiles list
+    // Migrate the profile list, and clear it from the area being left.
+    //
+    // Moving to sync always did that. Moving to local did not, on the grounds
+    // of keeping a copy "for a potential future migration" — but the tabs
+    // themselves are removed in that direction, so the copy left behind was a
+    // list of profiles with nothing in them. A move should leave nothing.
     if (toSync) {
       await browser.storage.sync.set({ profiles });
       await browser.storage.local.remove(['profiles']);
     } else {
       await browser.storage.local.set({ profiles });
-      // Note: Don't remove profiles from sync - keep for potential future migration
+      await SFTabs.storageChunking.clearChunkedSync('profiles');
     }
 
     // NOTE: userSettings are NOT migrated because they always stay in sync storage
