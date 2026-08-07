@@ -54,8 +54,10 @@
       if (r.chunks) chunked++;
       tabs += Array.isArray(r.value) ? r.value.length : 0;
     }
+    const list = Array.isArray(profiles?.value) ? profiles.value : [];
     return { keys, tabs, chunked, broken,
-             profiles: profiles?.value?.length ?? 0 };
+             profiles: list.length,
+             profileIds: list.map(p => p && p.id).filter(Boolean) };
   };
 
   const L = survey(local), S = survey(sync);
@@ -78,9 +80,25 @@
     console.error('  MISMATCH — the area in use holds no tabs and ' + other.tabs +
                   ' sit in the other one. A switch did not move the data.');
   } else if (husks) {
-    console.log('  ' + other.keys.length + ' empty tab key(s) in ' + (preferSync ? 'local' : 'sync') +
-                ' — residue from an earlier switch, not data. Versions before 3.0.0 left one ' +
-                'behind per empty profile; switching again with this build clears them.');
+    // Whether a switch will clear them depends on who they belonged to. The
+    // migration walks the profile list, so a key whose profile still exists gets
+    // overwritten with real tabs — but one left by a deleted profile is never
+    // visited, in either direction, and stays until it is removed by hand.
+    const known = new Set((live.profileIds || []).map(id => `profile_${id}_tabs`));
+    const orphans = other.keys.filter(k => !known.has(k));
+    const area = preferSync ? 'local' : 'sync';
+
+    console.log('  ' + other.keys.length + ' empty tab key(s) in ' + area + ' — residue, not data:');
+    other.keys.forEach(k => console.log('      ' + k + (known.has(k) ? '   (profile still exists)' : '   (orphan)')));
+
+    if (orphans.length !== other.keys.length) {
+      console.log('  The ones with a live profile clear themselves on the next switch.');
+    }
+    if (orphans.length) {
+      console.log('  The orphans will not: the migration only visits profiles in the list.');
+      console.log('  Safe to remove — every one is empty:');
+      console.log('      chrome.storage.' + area + '.remove(' + JSON.stringify(orphans) + ')');
+    }
   } else if (live.tabs && other.tabs) {
     console.warn('  Tabs in BOTH areas. Expected right after switching to local — the sync ' +
                  'copies are left behind deliberately — but the live ones are the ' +
