@@ -198,15 +198,13 @@ async function migrateLegacyTabs(tabs, settings) {
     true, false
   );
 
-  // migrationCompleted is what checkFirstLaunch reads to tell an upgrade from a
-  // fresh install. extensionVersion records which version last wrote this data,
-  // which nothing reads today but is the marker a future migration would look
-  // for. migrationPending used to coordinate the v2 migration modal, which no
-  // longer exists — nothing has read it since, so it is no longer written.
-  const version = browser.runtime.getManifest().version;
+  // One key, and it is read: checkFirstLaunch uses it to tell an upgrade from a
+  // fresh install. Two others used to be written here and are not any more —
+  // migrationPending, which coordinated the v2 migration modal that no longer
+  // exists, and extensionVersion, which held this same version string under a
+  // second name and was read by nothing.
   await browser.storage.local.set({
-    extensionVersion: version,
-    migrationCompleted: version
+    migrationCompleted: browser.runtime.getManifest().version
   });
 
   showStatus(t(tabs.length === 1 ? 'migratedTabsForwardOne' : 'migratedTabsForwardMany', String(tabs.length)));

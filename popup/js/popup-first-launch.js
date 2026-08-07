@@ -24,9 +24,8 @@ async function checkFirstLaunch() {
     const syncData = await browser.storage.sync.get(['userSettings', 'profiles', 'customTabs']);
     const localStorageData = await browser.storage.local.get(['userSettings', 'profiles', 'customTabs']);
 
-    // Only an upgrade if they have REAL data — profiles or tabs — not just empty
-    // settings. extensionVersion is written on install too, so it says nothing
-    // about whether this is an upgrade; it used to be read here and ignored.
+    // Only an upgrade if they have REAL data — profiles or tabs — not just
+    // empty settings, which a fresh install has too.
     const hasProfiles = (syncData.profiles && Array.isArray(syncData.profiles) && syncData.profiles.length > 0) ||
                         (localStorageData.profiles && Array.isArray(localStorageData.profiles) && localStorageData.profiles.length > 0);
 
