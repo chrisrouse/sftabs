@@ -69,12 +69,21 @@
   const live = preferSync ? S : L, other = preferSync ? L : S;
   [...L.broken, ...S.broken].forEach(b => console.error('  TORN:', b));
 
-  if (!live.keys.length && other.keys.length) {
-    console.error('  MISMATCH — the area in use is empty and ' + other.tabs +
-                  ' tab(s) sit in the other one. A switch did not move the data.');
-  } else if (live.keys.length && other.keys.length) {
-    console.warn('  Tabs in BOTH areas. Expected right after switching to local — sync copies ' +
-                 'are left behind deliberately — but the ones in use are the ' +
+  // Judge by tabs, not by keys. A key holding an empty array is residue, not
+  // data, and treating the two alike reads as "your tabs are in both places"
+  // when one side is empty husks.
+  const husks = other.keys.length && other.tabs === 0;
+
+  if (!live.tabs && other.tabs) {
+    console.error('  MISMATCH — the area in use holds no tabs and ' + other.tabs +
+                  ' sit in the other one. A switch did not move the data.');
+  } else if (husks) {
+    console.log('  ' + other.keys.length + ' empty tab key(s) in ' + (preferSync ? 'local' : 'sync') +
+                ' — residue from an earlier switch, not data. Versions before 3.0.0 left one ' +
+                'behind per empty profile; switching again with this build clears them.');
+  } else if (live.tabs && other.tabs) {
+    console.warn('  Tabs in BOTH areas. Expected right after switching to local — the sync ' +
+                 'copies are left behind deliberately — but the live ones are the ' +
                  (preferSync ? 'sync' : 'local') + ' copies.');
   } else {
     console.log('%c  consistent — ' + live.tabs + ' tab(s) in the area actually in use', 'color:green');

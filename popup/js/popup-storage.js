@@ -265,20 +265,27 @@ async function migrateBetweenStorageTypes(fromSync, toSync) {
         tabs = result[tabsKey] || [];
       }
 
-      // Save to destination
+      // Write only if there is something to write — an empty list needs no key
+      // in the destination.
       if (tabs && tabs.length > 0) {
         if (toSync) {
           await SFTabs.storageChunking.saveChunkedSync(tabsKey, tabs);
         } else {
           await destStorage.set({ [tabsKey]: tabs });
         }
+      }
 
-        // Remove from source
-        if (fromSync) {
-          await SFTabs.storageChunking.clearChunkedSync(tabsKey);
-        } else {
-          await sourceStorage.remove([tabsKey]);
-        }
+      // Clear the source either way. This used to sit inside the guard above,
+      // so a profile with no tabs kept its empty key in the area being left.
+      // Those husks were never revisited: the loop walks the profile list from
+      // the source, and that list moves across on the first switch, so the next
+      // migration does not know they exist. Harmless — nothing reads them — but
+      // they accumulate one per empty profile per switch, and they make the
+      // storage genuinely hard to reason about when something does go wrong.
+      if (fromSync) {
+        await SFTabs.storageChunking.clearChunkedSync(tabsKey);
+      } else {
+        await sourceStorage.remove([tabsKey]);
       }
     }
 

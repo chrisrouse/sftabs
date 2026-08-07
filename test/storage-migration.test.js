@@ -196,6 +196,29 @@ const counts = async () => ({
   check('and the same in reverse', c.tabs === 2 && c.profiles === 1,
     `tabs=${c.tabs} profiles=${c.profiles}`);
 
+  // ── An empty profile must not leave its key behind ──
+  // The write and the removal shared one `if (tabs.length > 0)` guard, so a
+  // profile with no tabs kept its empty key in the area being left. Nothing
+  // ever collected those: the loop walks the profile list from the source, and
+  // that list moves across on the first switch, so the next migration does not
+  // know they exist. One husk per empty profile per switch, accumulating.
+  await seedLocal();
+  await local.set({
+    profiles: [PROFILE, { id: 'p2', name: 'Empty', urlPatterns: [], createdAt: new Date(0).toISOString() }],
+    profile_p2_tabs: [],
+  });
+  await switchStorage(true);
+
+  const leftInLocal = Object.keys(local._data).filter(k => /^profile_.+_tabs/.test(k));
+  check('an empty profile leaves no key in the area being left',
+    leftInLocal.length === 0,
+    leftInLocal.length ? 'left behind: ' + leftInLocal.join(', ') : 'local is clean');
+
+  // The profile that did have tabs still arrived intact.
+  c = await counts();
+  check('and the profile that had tabs still made it across',
+    c.tabs === 2, `tabs=${c.tabs}`);
+
   // ── Profile deletion ──
   let profiles = await seedTwoProfiles();
   let r = await deleteProfile('p2', profiles);
