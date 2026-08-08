@@ -457,13 +457,33 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
 .tab-btn--newtab.is-on       { color: var(--c-primary); }
 .tab-btn--delete:hover       { background: var(--c-error-bg); color: var(--c-error-on-bg); }
 
-/* Move buttons: only on keyboard focus */
+/* Move buttons: out of sight until wanted, but never out of the tab order.
+ *
+ * These were display:none, revealed on hover or :focus-within. That removed them
+ * from the tab order entirely, and :focus-within cannot be true until focus is
+ * already inside the row — so tabbing forward stepped straight over them onto
+ * the next button, at which point they appeared behind the cursor and only
+ * Shift-Tab could reach them. A keyboard user moving forward would never find
+ * the only way to reorder without a mouse.
+ *
+ * Clipped to a pixel instead. They stay focusable, so Tab meets them in DOM
+ * order, and land visible because focus reveals them in the same frame.
+ */
 .tab-btn--move {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 .tab-item:hover .tab-btn--move,
-.tab-item:focus-within .tab-btn--move {
-  display: flex;
+.tab-item:focus-within .tab-btn--move,
+.tab-btn--move:focus-visible {
+  position: static;
+  width: 26px;                /* .tab-btn's own size */
+  height: 26px;
+  overflow: visible;
+  clip-path: none;
 }
 
 /* ── 11. Tray (right panel, expands on demand) ── */
