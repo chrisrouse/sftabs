@@ -164,15 +164,42 @@
     unpadBody();
   }
 
+  function paint(bar, color, text) {
+    bar.textContent = text;
+    bar.style.setProperty('background', color, 'important');
+    bar.style.setProperty('color', utils().readableInk(color), 'important');
+  }
+
+  /**
+   * Update the bar in place when there is already one.
+   *
+   * Removing and re-inserting is visible twice over: the slide-in replays, and
+   * inside Lightning's header the removal reflows it. Turning the org name off
+   * changes nothing but the text, so it should change nothing but the text.
+   *
+   * A rebuild is only needed when there is no bar to update — the first draw,
+   * or the first one after the feature was switched off.
+   */
   function draw(color, text) {
+    const existing = active ? document.getElementById(BANNER_ID) : null;
+    if (existing) {
+      paint(existing, color, text);
+      // Overlaid, the page is held down by a padding sized to the old text; a
+      // shorter label that no longer wraps would leave a gap. In flow, the
+      // header resizes itself and there is nothing to correct.
+      if (existing.dataset.placement === 'fixed') {
+        unpadBody();
+        padBody(existing);
+      }
+      return;
+    }
+
     remove();
 
     const bar = document.createElement('div');
     bar.id = BANNER_ID;
     bar.setAttribute('role', 'status');
-    bar.textContent = text;
-    bar.style.setProperty('background', color, 'important');
-    bar.style.setProperty('color', utils().readableInk(color), 'important');
+    paint(bar, color, text);
 
     active = true;
     settle(bar);

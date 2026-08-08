@@ -324,8 +324,17 @@ check('and puts it back on removal, rather than clearing outright',
   /removeProperty\('padding-top'\)/.test(banner) &&
   /setProperty\('padding-top', appliedPadding\)/.test(banner),
   'Salesforce sets its own padding on body in some layouts');
-check('removal runs before every draw, so nothing stacks',
-  /function draw\([^)]*\) \{\s*\n\s*remove\(\);/.test(banner));
+// Changing the text must not rebuild the element. Remove-and-reinsert replays
+// the slide-in and, inside Lightning's header, reflows it — so turning the org
+// name off flashed the whole bar to change two words.
+check('an existing bar is repainted rather than replaced',
+  /const existing = active \? document\.getElementById\(BANNER_ID\) : null;[\s\S]{0,80}if \(existing\) \{[\s\S]{0,120}paint\(existing, color, text\)/.test(banner));
+check('and the overlay resizes the padding it owns when the text changes',
+  /existing\.dataset\.placement === 'fixed'[\s\S]{0,80}unpadBody\(\);\s*\n\s*padBody\(existing\)/.test(banner),
+  'a shorter label that stops wrapping would otherwise leave a gap');
+check('a fresh bar still clears anything left behind first',
+  /return;\s*\n\s*\}\s*\n\s*remove\(\);\s*\n\s*const bar = document\.createElement/.test(banner),
+  'nothing stacks on the path that does build an element');
 check('and the bar is removed when no color applies',
   (banner.match(/remove\(\); return;/g) || []).length >= 2,
   'switching the banner off has to take it away, not just stop redrawing it');
