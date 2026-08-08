@@ -256,8 +256,17 @@ async function performExportFromInline() {
  */
 async function performExport(exportEverything, exportSettings, selectedProfileIds) {
 	try {
+		// `version` is the export FORMAT, not the extension's, and the importer
+		// branches on it: absent means a v1 file keyed on customTabs, or the
+		// simple tabTitle/url shape. It stays at 2.0.0 because the shape has not
+		// changed — bumping it with each release would imply a format change and
+		// eventually confuse an older build reading a newer file.
+		//
+		// appVersion is the extension that wrote the file. Nothing reads it; it is
+		// there so a file can be identified when someone sends one in.
 		const exportData = {
 			version: '2.0.0',
+			appVersion: browser.runtime.getManifest().version,
 			exportDate: new Date().toISOString()
 		};
 

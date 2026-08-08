@@ -22,6 +22,8 @@
  *
  * Run: npm test
  */
+const fs = require('fs');
+const path = require('path');
 const { mergeUserSettings } = require('../popup/js/shared/utils.js');
 
 let passed = 0;
@@ -107,6 +109,36 @@ check('the inputs are not mutated', (() => {
   mergeUserSettings(source, { orgColors: { enabled: false, orgs: [] } });
   return source.orgColors.enabled === true && source.orgColors.orgs.length === 2;
 })());
+
+
+// ── What an exported file says about itself ──
+// Two different versions, and conflating them is the trap. `version` describes
+// the FILE FORMAT and the importer branches on it — absent means a v1 file keyed
+// on customTabs, or the simple tabTitle/url shape. Tying it to the release would
+// declare a format change on every version bump and eventually make an older
+// build reject a file it could have read.
+//
+// So the release goes in its own field. A 3.0.0 export reading "version: 2.0.0"
+// looks stale otherwise, which is what prompted this.
+const exportSrc = fs.readFileSync(path.join(__dirname, '..', 'popup/settings.js'), 'utf8');
+const payload = /const exportData = \{[\s\S]*?\};/.exec(exportSrc);
+
+check('the export declares a format version', Boolean(payload) && /version: '\d/.test(payload[0]));
+check('and that version is a literal, not the manifest',
+  Boolean(payload) && !/version: browser\.runtime\.getManifest/.test(payload[0]),
+  'the format has not changed; only the release has');
+check('the release is recorded separately',
+  Boolean(payload) && /appVersion: browser\.runtime\.getManifest\(\)\.version/.test(payload[0]));
+
+// The importer must not care about the new field. Comments are stripped first,
+// or the prose explaining appVersion counts as a use of it.
+const codeOnly = exportSrc
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/^[ \t]*\/\/.*$/gm, '')
+  .replace(payload ? payload[0] : '', '');
+check('the importer branches on version, never on appVersion',
+  !/appVersion/.test(codeOnly),
+  'a field nothing reads cannot change how a file is interpreted');
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);
