@@ -1,0 +1,971 @@
+{
+  "version": "2.0.0",
+  "appVersion": "3.0.0",
+  "exportDate": "2026-08-01T16:00:00.000Z",
+  "settings": {},
+  "profiles": [
+    {
+      "id": "1785600000000_chunktest",
+      "name": "Chunk Test",
+      "isDefault": false,
+      "urlPatterns": [],
+      "createdAt": "2026-08-01T16:00:00.000Z",
+      "updatedAt": "2026-08-01T16:00:00.000Z"
+    }
+  ],
+  "profileData": {
+    "1785600000000_chunktest": [
+      {
+        "id": "tab_1785600000000_0",
+        "label": "Flows",
+        "path": "Flows",
+        "position": 0,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_0_0",
+            "label": "New",
+            "path": "Flows/New"
+          },
+          {
+            "id": "item_1785600000000_0_1",
+            "label": "Fields & Relationships",
+            "path": "Flows/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_0_2",
+            "label": "Page Layouts",
+            "path": "Flows/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_0_3",
+            "label": "Validation Rules",
+            "path": "Flows/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_0_4",
+            "label": "Record Types",
+            "path": "Flows/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_0_5",
+            "label": "Triggers",
+            "path": "Flows/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_1",
+        "label": "Manage Users",
+        "path": "ManageUsers",
+        "position": 1,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_1_0",
+            "label": "New",
+            "path": "ManageUsers/New"
+          },
+          {
+            "id": "item_1785600000000_1_1",
+            "label": "Fields & Relationships",
+            "path": "ManageUsers/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_1_2",
+            "label": "Page Layouts",
+            "path": "ManageUsers/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_1_3",
+            "label": "Validation Rules",
+            "path": "ManageUsers/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_1_4",
+            "label": "Record Types",
+            "path": "ManageUsers/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_1_5",
+            "label": "Triggers",
+            "path": "ManageUsers/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_2",
+        "label": "Profiles",
+        "path": "Profiles",
+        "position": 2,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_2_0",
+            "label": "New",
+            "path": "Profiles/New"
+          },
+          {
+            "id": "item_1785600000000_2_1",
+            "label": "Fields & Relationships",
+            "path": "Profiles/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_2_2",
+            "label": "Page Layouts",
+            "path": "Profiles/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_2_3",
+            "label": "Validation Rules",
+            "path": "Profiles/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_2_4",
+            "label": "Record Types",
+            "path": "Profiles/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_2_5",
+            "label": "Triggers",
+            "path": "Profiles/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_3",
+        "label": "Perm Sets",
+        "path": "PermSets",
+        "position": 3,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_3_0",
+            "label": "New",
+            "path": "PermSets/New"
+          },
+          {
+            "id": "item_1785600000000_3_1",
+            "label": "Fields & Relationships",
+            "path": "PermSets/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_3_2",
+            "label": "Page Layouts",
+            "path": "PermSets/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_3_3",
+            "label": "Validation Rules",
+            "path": "PermSets/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_3_4",
+            "label": "Record Types",
+            "path": "PermSets/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_3_5",
+            "label": "Triggers",
+            "path": "PermSets/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_4",
+        "label": "Email Admin",
+        "path": "EmailAdmin",
+        "position": 4,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_4_0",
+            "label": "New",
+            "path": "EmailAdmin/New"
+          },
+          {
+            "id": "item_1785600000000_4_1",
+            "label": "Fields & Relationships",
+            "path": "EmailAdmin/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_4_2",
+            "label": "Page Layouts",
+            "path": "EmailAdmin/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_4_3",
+            "label": "Validation Rules",
+            "path": "EmailAdmin/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_4_4",
+            "label": "Record Types",
+            "path": "EmailAdmin/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_4_5",
+            "label": "Triggers",
+            "path": "EmailAdmin/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_5",
+        "label": "Deploy Status",
+        "path": "DeployStatus",
+        "position": 5,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_5_0",
+            "label": "New",
+            "path": "DeployStatus/New"
+          },
+          {
+            "id": "item_1785600000000_5_1",
+            "label": "Fields & Relationships",
+            "path": "DeployStatus/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_5_2",
+            "label": "Page Layouts",
+            "path": "DeployStatus/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_5_3",
+            "label": "Validation Rules",
+            "path": "DeployStatus/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_5_4",
+            "label": "Record Types",
+            "path": "DeployStatus/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_5_5",
+            "label": "Triggers",
+            "path": "DeployStatus/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_6",
+        "label": "Apex Classes",
+        "path": "ApexClasses",
+        "position": 6,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_6_0",
+            "label": "New",
+            "path": "ApexClasses/New"
+          },
+          {
+            "id": "item_1785600000000_6_1",
+            "label": "Fields & Relationships",
+            "path": "ApexClasses/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_6_2",
+            "label": "Page Layouts",
+            "path": "ApexClasses/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_6_3",
+            "label": "Validation Rules",
+            "path": "ApexClasses/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_6_4",
+            "label": "Record Types",
+            "path": "ApexClasses/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_6_5",
+            "label": "Triggers",
+            "path": "ApexClasses/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_7",
+        "label": "Apex Triggers",
+        "path": "ApexTriggers",
+        "position": 7,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_7_0",
+            "label": "New",
+            "path": "ApexTriggers/New"
+          },
+          {
+            "id": "item_1785600000000_7_1",
+            "label": "Fields & Relationships",
+            "path": "ApexTriggers/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_7_2",
+            "label": "Page Layouts",
+            "path": "ApexTriggers/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_7_3",
+            "label": "Validation Rules",
+            "path": "ApexTriggers/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_7_4",
+            "label": "Record Types",
+            "path": "ApexTriggers/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_7_5",
+            "label": "Triggers",
+            "path": "ApexTriggers/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_8",
+        "label": "Custom Labels",
+        "path": "CustomLabels",
+        "position": 8,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_8_0",
+            "label": "New",
+            "path": "CustomLabels/New"
+          },
+          {
+            "id": "item_1785600000000_8_1",
+            "label": "Fields & Relationships",
+            "path": "CustomLabels/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_8_2",
+            "label": "Page Layouts",
+            "path": "CustomLabels/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_8_3",
+            "label": "Validation Rules",
+            "path": "CustomLabels/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_8_4",
+            "label": "Record Types",
+            "path": "CustomLabels/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_8_5",
+            "label": "Triggers",
+            "path": "CustomLabels/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_9",
+        "label": "Named Credential",
+        "path": "NamedCredential",
+        "position": 9,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_9_0",
+            "label": "New",
+            "path": "NamedCredential/New"
+          },
+          {
+            "id": "item_1785600000000_9_1",
+            "label": "Fields & Relationships",
+            "path": "NamedCredential/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_9_2",
+            "label": "Page Layouts",
+            "path": "NamedCredential/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_9_3",
+            "label": "Validation Rules",
+            "path": "NamedCredential/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_9_4",
+            "label": "Record Types",
+            "path": "NamedCredential/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_9_5",
+            "label": "Triggers",
+            "path": "NamedCredential/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_10",
+        "label": "Remote Proxy",
+        "path": "RemoteProxy",
+        "position": 10,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_10_0",
+            "label": "New",
+            "path": "RemoteProxy/New"
+          },
+          {
+            "id": "item_1785600000000_10_1",
+            "label": "Fields & Relationships",
+            "path": "RemoteProxy/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_10_2",
+            "label": "Page Layouts",
+            "path": "RemoteProxy/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_10_3",
+            "label": "Validation Rules",
+            "path": "RemoteProxy/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_10_4",
+            "label": "Record Types",
+            "path": "RemoteProxy/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_10_5",
+            "label": "Triggers",
+            "path": "RemoteProxy/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_11",
+        "label": "Connected Apps",
+        "path": "ConnectedApps",
+        "position": 11,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_11_0",
+            "label": "New",
+            "path": "ConnectedApps/New"
+          },
+          {
+            "id": "item_1785600000000_11_1",
+            "label": "Fields & Relationships",
+            "path": "ConnectedApps/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_11_2",
+            "label": "Page Layouts",
+            "path": "ConnectedApps/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_11_3",
+            "label": "Validation Rules",
+            "path": "ConnectedApps/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_11_4",
+            "label": "Record Types",
+            "path": "ConnectedApps/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_11_5",
+            "label": "Triggers",
+            "path": "ConnectedApps/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_12",
+        "label": "Auth Providers",
+        "path": "AuthProviders",
+        "position": 12,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_12_0",
+            "label": "New",
+            "path": "AuthProviders/New"
+          },
+          {
+            "id": "item_1785600000000_12_1",
+            "label": "Fields & Relationships",
+            "path": "AuthProviders/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_12_2",
+            "label": "Page Layouts",
+            "path": "AuthProviders/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_12_3",
+            "label": "Validation Rules",
+            "path": "AuthProviders/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_12_4",
+            "label": "Record Types",
+            "path": "AuthProviders/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_12_5",
+            "label": "Triggers",
+            "path": "AuthProviders/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_13",
+        "label": "Saml Sso Config",
+        "path": "SamlSsoConfig",
+        "position": 13,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_13_0",
+            "label": "New",
+            "path": "SamlSsoConfig/New"
+          },
+          {
+            "id": "item_1785600000000_13_1",
+            "label": "Fields & Relationships",
+            "path": "SamlSsoConfig/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_13_2",
+            "label": "Page Layouts",
+            "path": "SamlSsoConfig/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_13_3",
+            "label": "Validation Rules",
+            "path": "SamlSsoConfig/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_13_4",
+            "label": "Record Types",
+            "path": "SamlSsoConfig/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_13_5",
+            "label": "Triggers",
+            "path": "SamlSsoConfig/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_14",
+        "label": "Login History",
+        "path": "LoginHistory",
+        "position": 14,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_14_0",
+            "label": "New",
+            "path": "LoginHistory/New"
+          },
+          {
+            "id": "item_1785600000000_14_1",
+            "label": "Fields & Relationships",
+            "path": "LoginHistory/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_14_2",
+            "label": "Page Layouts",
+            "path": "LoginHistory/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_14_3",
+            "label": "Validation Rules",
+            "path": "LoginHistory/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_14_4",
+            "label": "Record Types",
+            "path": "LoginHistory/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_14_5",
+            "label": "Triggers",
+            "path": "LoginHistory/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_15",
+        "label": "Setup Audit Trail",
+        "path": "SetupAuditTrail",
+        "position": 15,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_15_0",
+            "label": "New",
+            "path": "SetupAuditTrail/New"
+          },
+          {
+            "id": "item_1785600000000_15_1",
+            "label": "Fields & Relationships",
+            "path": "SetupAuditTrail/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_15_2",
+            "label": "Page Layouts",
+            "path": "SetupAuditTrail/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_15_3",
+            "label": "Validation Rules",
+            "path": "SetupAuditTrail/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_15_4",
+            "label": "Record Types",
+            "path": "SetupAuditTrail/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_15_5",
+            "label": "Triggers",
+            "path": "SetupAuditTrail/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_16",
+        "label": "Schedulable Jobs",
+        "path": "SchedulableJobs",
+        "position": 16,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_16_0",
+            "label": "New",
+            "path": "SchedulableJobs/New"
+          },
+          {
+            "id": "item_1785600000000_16_1",
+            "label": "Fields & Relationships",
+            "path": "SchedulableJobs/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_16_2",
+            "label": "Page Layouts",
+            "path": "SchedulableJobs/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_16_3",
+            "label": "Validation Rules",
+            "path": "SchedulableJobs/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_16_4",
+            "label": "Record Types",
+            "path": "SchedulableJobs/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_16_5",
+            "label": "Triggers",
+            "path": "SchedulableJobs/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_17",
+        "label": "Async Apex Jobs",
+        "path": "AsyncApexJobs",
+        "position": 17,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_17_0",
+            "label": "New",
+            "path": "AsyncApexJobs/New"
+          },
+          {
+            "id": "item_1785600000000_17_1",
+            "label": "Fields & Relationships",
+            "path": "AsyncApexJobs/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_17_2",
+            "label": "Page Layouts",
+            "path": "AsyncApexJobs/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_17_3",
+            "label": "Validation Rules",
+            "path": "AsyncApexJobs/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_17_4",
+            "label": "Record Types",
+            "path": "AsyncApexJobs/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_17_5",
+            "label": "Triggers",
+            "path": "AsyncApexJobs/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_18",
+        "label": "Platform Events",
+        "path": "PlatformEvents",
+        "position": 18,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_18_0",
+            "label": "New",
+            "path": "PlatformEvents/New"
+          },
+          {
+            "id": "item_1785600000000_18_1",
+            "label": "Fields & Relationships",
+            "path": "PlatformEvents/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_18_2",
+            "label": "Page Layouts",
+            "path": "PlatformEvents/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_18_3",
+            "label": "Validation Rules",
+            "path": "PlatformEvents/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_18_4",
+            "label": "Record Types",
+            "path": "PlatformEvents/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_18_5",
+            "label": "Triggers",
+            "path": "PlatformEvents/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_19",
+        "label": "Custom Metadata",
+        "path": "CustomMetadata",
+        "position": 19,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_19_0",
+            "label": "New",
+            "path": "CustomMetadata/New"
+          },
+          {
+            "id": "item_1785600000000_19_1",
+            "label": "Fields & Relationships",
+            "path": "CustomMetadata/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_19_2",
+            "label": "Page Layouts",
+            "path": "CustomMetadata/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_19_3",
+            "label": "Validation Rules",
+            "path": "CustomMetadata/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_19_4",
+            "label": "Record Types",
+            "path": "CustomMetadata/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_19_5",
+            "label": "Triggers",
+            "path": "CustomMetadata/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_20",
+        "label": "Static Resources",
+        "path": "StaticResources",
+        "position": 20,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_20_0",
+            "label": "New",
+            "path": "StaticResources/New"
+          },
+          {
+            "id": "item_1785600000000_20_1",
+            "label": "Fields & Relationships",
+            "path": "StaticResources/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_20_2",
+            "label": "Page Layouts",
+            "path": "StaticResources/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_20_3",
+            "label": "Validation Rules",
+            "path": "StaticResources/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_20_4",
+            "label": "Record Types",
+            "path": "StaticResources/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_20_5",
+            "label": "Triggers",
+            "path": "StaticResources/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_21",
+        "label": "Visualforce Pages",
+        "path": "VisualforcePages",
+        "position": 21,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_21_0",
+            "label": "New",
+            "path": "VisualforcePages/New"
+          },
+          {
+            "id": "item_1785600000000_21_1",
+            "label": "Fields & Relationships",
+            "path": "VisualforcePages/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_21_2",
+            "label": "Page Layouts",
+            "path": "VisualforcePages/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_21_3",
+            "label": "Validation Rules",
+            "path": "VisualforcePages/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_21_4",
+            "label": "Record Types",
+            "path": "VisualforcePages/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_21_5",
+            "label": "Triggers",
+            "path": "VisualforcePages/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_22",
+        "label": "Sites And Domains",
+        "path": "SitesAndDomains",
+        "position": 22,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_22_0",
+            "label": "New",
+            "path": "SitesAndDomains/New"
+          },
+          {
+            "id": "item_1785600000000_22_1",
+            "label": "Fields & Relationships",
+            "path": "SitesAndDomains/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_22_2",
+            "label": "Page Layouts",
+            "path": "SitesAndDomains/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_22_3",
+            "label": "Validation Rules",
+            "path": "SitesAndDomains/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_22_4",
+            "label": "Record Types",
+            "path": "SitesAndDomains/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_22_5",
+            "label": "Triggers",
+            "path": "SitesAndDomains/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_23",
+        "label": "Community Setup",
+        "path": "CommunitySetup",
+        "position": 23,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_23_0",
+            "label": "New",
+            "path": "CommunitySetup/New"
+          },
+          {
+            "id": "item_1785600000000_23_1",
+            "label": "Fields & Relationships",
+            "path": "CommunitySetup/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_23_2",
+            "label": "Page Layouts",
+            "path": "CommunitySetup/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_23_3",
+            "label": "Validation Rules",
+            "path": "CommunitySetup/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_23_4",
+            "label": "Record Types",
+            "path": "CommunitySetup/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_23_5",
+            "label": "Triggers",
+            "path": "CommunitySetup/Triggers"
+          }
+        ]
+      },
+      {
+        "id": "tab_1785600000000_24",
+        "label": "Territory2Model",
+        "path": "Territory2Model",
+        "position": 24,
+        "dropdownItems": [
+          {
+            "id": "item_1785600000000_24_0",
+            "label": "New",
+            "path": "Territory2Model/New"
+          },
+          {
+            "id": "item_1785600000000_24_1",
+            "label": "Fields & Relationships",
+            "path": "Territory2Model/FieldsRelationships"
+          },
+          {
+            "id": "item_1785600000000_24_2",
+            "label": "Page Layouts",
+            "path": "Territory2Model/PageLayouts"
+          },
+          {
+            "id": "item_1785600000000_24_3",
+            "label": "Validation Rules",
+            "path": "Territory2Model/ValidationRules"
+          },
+          {
+            "id": "item_1785600000000_24_4",
+            "label": "Record Types",
+            "path": "Territory2Model/RecordTypes"
+          },
+          {
+            "id": "item_1785600000000_24_5",
+            "label": "Triggers",
+            "path": "Territory2Model/Triggers"
+          }
+        ]
+      }
+    ]
+  },
+  "tabs": []
+}
