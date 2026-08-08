@@ -1416,6 +1416,68 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 
 /* ── 17. Footer ── */
+/* Review prompt — a strip attached to the top of the footer.
+
+   Deliberately not fixed-height like the footer below it: it appears once and
+   is gone for good, so it can take the room the sentence needs rather than
+   forcing the copy to fit a line count. */
+.review-prompt {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sft-spacing-2);
+  padding: 8px 12px;
+  background: var(--footer-bg);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.review-prompt-text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--sft-font-size-xs);
+  line-height: var(--sft-line-height-snug);
+  color: var(--footer-fg);
+}
+
+.review-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.review-prompt-yes,
+.review-prompt-no {
+  padding: 4px 10px;
+  border: none;
+  border-radius: var(--sft-radius-sm);
+  font-size: var(--sft-font-size-xs);
+  font-weight: var(--sft-font-weight-medium);
+  line-height: var(--sft-line-height-snug);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.review-prompt-yes {
+  background: var(--c-primary);
+  color: #ffffff;
+  text-decoration: none;
+}
+.review-prompt-yes:hover { filter: brightness(1.1); }
+
+.review-prompt-no {
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+}
+.review-prompt-no:hover { background: rgba(255,255,255,0.09); color: var(--footer-fg-hover); }
+
+.review-prompt-yes:focus-visible,
+.review-prompt-no:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.55);
+  outline-offset: 2px;
+}
+
 .app-footer {
   /* Fixed at two lines of status text (2 x 16.5px + 12px padding + border)
      so a wrapping message never shifts the layout */

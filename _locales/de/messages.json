@@ -1810,5 +1810,17 @@
   "orgBannerLocationOutsideSetupDescription": {
     "message": "Banner überall außer auf Setup-Seiten anzeigen",
     "description": "Location choice for the environment banner: everything but Setup"
+  },
+  "reviewPromptText": {
+    "message": "Ist SF Tabs für Sie nützlich? Eine kurze Bewertung hilft anderen Admins, es zu finden.",
+    "description": "One-time prompt above the popup footer asking for a store review"
+  },
+  "reviewPromptYes": {
+    "message": "Bewertung abgeben",
+    "description": "Opens the Chrome Web Store or AMO listing for this extension"
+  },
+  "reviewPromptNo": {
+    "message": "Nein, danke",
+    "description": "Dismisses the review prompt permanently"
   }
 }

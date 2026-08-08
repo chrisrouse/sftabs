@@ -862,6 +862,19 @@
     </div><!-- /.app-body -->
 
     <!-- ═══════════════ FOOTER ═══════════════ -->
+    <!-- Sits above the footer and shares its treatment. Hidden until the clock
+         started on first open runs out, and gone for good after either button —
+         see initReviewPrompt() and reviewPromptDecision() in shared utils. The
+         href is set from the browser at that point, since the two stores have
+         separate listings. -->
+    <div class="review-prompt" id="review-prompt" hidden>
+      <p class="review-prompt-text">__MSG_reviewPromptText__</p>
+      <div class="review-prompt-actions">
+        <button class="review-prompt-no" id="review-prompt-no">__MSG_reviewPromptNo__</button>
+        <a class="review-prompt-yes" id="review-prompt-yes" target="_blank" rel="noopener">__MSG_reviewPromptYes__</a>
+      </div>
+    </div>
+
     <footer class="app-footer" role="contentinfo">
       <div class="footer-status">
         <div class="status-region" role="status" aria-live="polite" aria-atomic="true" id="status-region"></div>

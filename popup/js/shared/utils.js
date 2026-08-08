@@ -694,6 +694,48 @@ function mergeUserSettings(current, incoming) {
 }
 
 /**
+ * Where to send someone who wants to leave a review.
+ *
+ * The listing differs by store, and nothing in the extension's own metadata
+ * says which one it came from — but the URL scheme of its own pages does, and
+ * that is decided by the browser rather than by anything we ship.
+ *
+ * Chromium browsers other than Chrome resolve here too. Edge and Brave both use
+ * chrome-extension:// and neither has its own listing for this extension, so the
+ * Chrome Web Store is the right destination for them as well as the honest one.
+ */
+const CHROME_REVIEW_URL =
+  'https://chromewebstore.google.com/detail/sf-tabs/lkimhffllnjkacnhjfehaihcjilcmdlo/reviews';
+const FIREFOX_REVIEW_URL =
+  'https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/reviews/';
+
+function storeReviewUrl(extensionUrl) {
+  return String(extensionUrl || '').startsWith('moz-extension://')
+    ? FIREFOX_REVIEW_URL
+    : CHROME_REVIEW_URL;
+}
+
+/**
+ * What to do about the review prompt: 'never' | 'start' | 'wait' | 'show'.
+ *
+ * Asking on the day someone installs is how a review prompt earns a one-star
+ * review, so the first sighting only starts a clock — `start` writes the
+ * timestamp and shows nothing. Either button then answers it for good.
+ *
+ * Deliberately not derived from an install date: there isn't one to read, and a
+ * clock that starts when the popup is first opened measures the thing that
+ * actually matters, which is use rather than presence.
+ *
+ * Unparseable state restarts the clock rather than showing the prompt. Nagging
+ * someone whose storage is in an odd shape is the worse failure here.
+ */
+function reviewPromptDecision(stored, now) {
+  if (stored && stored.answered) return 'never';
+  if (!stored || typeof stored.after !== 'number') return 'start';
+  return now >= stored.after ? 'show' : 'wait';
+}
+
+/**
  * Whether an on-page surface belongs at this URL.
  *
  * `everywhere` | `setup-only` | `outside-setup`. Shared by the floating button
@@ -1145,6 +1187,8 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    storeReviewUrl,
+    reviewPromptDecision,
     locationAllows,
     floatingButtonAllowedHere,
     mergeUserSettings,
@@ -1191,6 +1235,8 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    storeReviewUrl,
+    reviewPromptDecision,
     locationAllows,
     floatingButtonAllowedHere,
     mergeUserSettings,

@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   showView('empty');
   bindEvents();
   await initReleaseNotes();
+  await initReviewPrompt();
   installStorageListener();
   if (state.loadError) showStatus(state.loadError, 'error');
 });
@@ -317,6 +318,67 @@ async function applyFirstLaunchChoice(setup, enableProfiles) {
   if (setup === 'import') {
     browser.tabs.create({ url: browser.runtime.getURL('popup/settings.html') });
   }
+}
+
+// ── Review prompt ──────────────────────────────────────────────
+
+/**
+ * Two weeks of having the popup open at least once before it asks.
+ *
+ * Long enough that whoever sees it has actually used the thing, short enough
+ * that it still lands while they remember installing it. The clock starts on
+ * first open rather than on install — there is no install date to read, and use
+ * is the better trigger anyway.
+ */
+const REVIEW_PROMPT_DELAY_MS = 14 * 24 * 60 * 60 * 1000;
+
+/**
+ * Ask for a review, once.
+ *
+ * Kept in local storage rather than in userSettings: it is not a preference, it
+ * has no business in an export file, and importing someone else's settings must
+ * not decide whether you have been asked. It is also genuinely per-device — the
+ * answer is tied to the store this copy came from.
+ */
+async function initReviewPrompt() {
+  const prompt = document.getElementById('review-prompt');
+  if (!prompt) return;
+
+  let stored;
+  try {
+    stored = (await browser.storage.local.get('reviewPrompt')).reviewPrompt;
+  } catch {
+    return;   // unreadable storage is not a reason to nag
+  }
+
+  const decision = SFTabs.utils.reviewPromptDecision(stored, Date.now());
+  if (decision === 'never' || decision === 'wait') return;
+
+  if (decision === 'start') {
+    try {
+      await browser.storage.local.set({
+        reviewPrompt: { after: Date.now() + REVIEW_PROMPT_DELAY_MS }
+      });
+    } catch {
+      // Failing to start the clock just means asking later, which is fine
+    }
+    return;
+  }
+
+  const yes = document.getElementById('review-prompt-yes');
+  const no = document.getElementById('review-prompt-no');
+  yes.href = SFTabs.utils.storeReviewUrl(browser.runtime.getURL(''));
+  prompt.hidden = false;
+
+  // Either answer settles it. "No thanks" is not "ask me again next month":
+  // being asked twice is worse than never being asked, and the link is still
+  // in the release notes and on the site for anyone who changes their mind.
+  const answered = () => {
+    prompt.hidden = true;
+    browser.storage.local.set({ reviewPrompt: { answered: true } }).catch(() => {});
+  };
+  yes.addEventListener('click', answered);
+  no.addEventListener('click', answered);
 }
 
 // ── Release notes ──────────────────────────────────────────────
