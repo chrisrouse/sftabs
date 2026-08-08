@@ -52,6 +52,7 @@
         "popup/js/shared/browser-compat.js",
         "popup/js/shared/constants.js",
         "popup/js/shared/utils.js",
+        "content/env-banner.js",
         "content/favicon.js",
         "content/floating-button.js",
         "content/floating-modal.js",
@@ -60,7 +61,8 @@
       "css": [
         "content/floating-button.css",
         "content/header-menu.css",
-        "content/tab-colors.css"
+        "content/tab-colors.css",
+        "content/env-banner.css"
       ],
       "run_at": "document_idle"
     },

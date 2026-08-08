@@ -148,7 +148,8 @@ check('open state is a flag, not a DOM lookup per scroll event',
 // floating handle, which blinked. Neither surface uses that setting for its
 // structure — only for what it lists.
 const SURFACES = ['content/content-main.js', 'content/header-menu.js',
-                  'content/floating-button.js', 'content/floating-modal.js'];
+                  'content/floating-button.js', 'content/floating-modal.js',
+                  'content/env-banner.js'];
 
 for (const rel of SURFACES) {
   const src = read(rel);
@@ -270,6 +271,28 @@ check('the bridge spans the row and the flyout, not just the row',
 check('the two call sites differ only in which side they try first',
   /preferSide: 'right'/.test(rendererSrc) && /preferSide: 'left'/.test(rendererSrc),
   'nested prefers right; the chevron sits at the end of the bar so it prefers left');
+
+
+// ── The environment banner leaves the page as it found it ──
+// It pushes the page down with padding on body, which is the one thing it does
+// that outlives the element itself. Removing the bar without restoring that
+// padding would leave a strip of blank page at the top for the rest of the
+// session, on a surface the user has just switched off.
+const banner = read('content/env-banner.js');
+
+check('the banner records the padding it replaced',
+  /appliedPadding = document\.body\.style\.paddingTop/.test(banner));
+check('and puts it back on removal, rather than clearing outright',
+  /removeProperty\('padding-top'\)/.test(banner) &&
+  /setProperty\('padding-top', appliedPadding\)/.test(banner),
+  'Salesforce sets its own padding on body in some layouts');
+check('removal runs before every draw, so nothing stacks',
+  /function draw\([^)]*\) \{\s*\n\s*remove\(\);/.test(banner));
+check('and the bar is removed when no colour applies',
+  (banner.match(/remove\(\); return;/g) || []).length >= 2,
+  'switching the banner off has to take it away, not just stop redrawing it');
+check('it never intercepts clicks meant for the header beneath it',
+  /pointer-events: none/.test(read('content/env-banner.css')));
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

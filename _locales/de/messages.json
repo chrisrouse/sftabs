@@ -1786,5 +1786,17 @@
         "example": "3"
       }
     }
+  },
+  "orgBannerLabel": {
+    "message": "Banner auf der Seite anzeigen"
+  },
+  "orgBannerDesc": {
+    "message": "Ein farbiger Balken oben auf jeder Salesforce-Seite, in derselben Farbe wie das Tab-Symbol"
+  },
+  "orgBannerNameLabel": {
+    "message": "Org-Namen einbeziehen"
+  },
+  "orgBannerNameDesc": {
+    "message": "Zeigt \"ACME--DEV1 · SANDBOX\" statt nur \"SANDBOX\" — hilfreich bei mehreren Sandboxes einer Org"
   }
 }

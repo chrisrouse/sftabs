@@ -597,7 +597,35 @@
                   </div>
                 </div>
 
-                <!-- Everything below is meaningless while the feature is off -->
+                <div class="settings-row">
+                  <label class="settings-row-label" for="setting-org-banner">
+                    <span class="settings-label">__MSG_orgBannerLabel__</span>
+                    <span class="settings-desc">__MSG_orgBannerDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_orgBannerLabel__">
+                      <input type="checkbox" id="setting-org-banner" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Only meaningful while the banner is on -->
+                <div class="settings-row settings-row--sub" id="row-org-banner-name">
+                  <label class="settings-row-label" for="setting-org-banner-name">
+                    <span class="settings-label">__MSG_orgBannerNameLabel__</span>
+                    <span class="settings-desc">__MSG_orgBannerNameDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_orgBannerNameLabel__">
+                      <input type="checkbox" id="setting-org-banner-name" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- The colours below feed both surfaces, so this stays visible
+                     while either one is on. -->
                 <div id="org-colors-body">
                   <h4 class="settings-subhead">
                     <span>__MSG_orgColorsByEnvironment__</span>

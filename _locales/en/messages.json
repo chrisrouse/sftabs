@@ -1947,5 +1947,17 @@
         "example": "3"
       }
     }
+  },
+  "orgBannerLabel": {
+    "message": "Show a banner on the page"
+  },
+  "orgBannerDesc": {
+    "message": "A coloured bar across the top of every Salesforce page, in the same color as the tab icon"
+  },
+  "orgBannerNameLabel": {
+    "message": "Include the org name"
+  },
+  "orgBannerNameDesc": {
+    "message": "Shows \"ACME--DEV1 · SANDBOX\" rather than just \"SANDBOX\" — useful across several sandboxes of one org"
   }
 }

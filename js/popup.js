@@ -2531,7 +2531,9 @@ function syncFloatingButtonSection() {
 function orgColorConfig() {
   const stored = state.settings.orgColors || {};
   return {
-    enabled: !!stored.enabled,
+    enabled: !!stored.enabled,                                  // favicon tint
+    banner: !!stored.banner,                                    // page banner
+    bannerShowOrgName: stored.bannerShowOrgName !== false,      // defaults on
     environments: stored.environments || {},
     orgs: Array.isArray(stored.orgs) ? stored.orgs : [],
   };
@@ -2697,10 +2699,22 @@ async function captureOrgColor() {
 function syncOrgColorsSection() {
   const toggle = document.getElementById('setting-org-colors');
   if (!toggle) return;
-  const { enabled } = orgColorConfig();
+  const { enabled, banner, bannerShowOrgName } = orgColorConfig();
+
   toggle.checked = enabled;
-  document.getElementById('org-colors-body').hidden = !enabled;
-  if (!enabled) return;
+  document.getElementById('setting-org-banner').checked = banner;
+  document.getElementById('setting-org-banner-name').checked = bannerShowOrgName;
+
+  // Only meaningful while the banner is on
+  document.getElementById('row-org-banner-name').hidden = !banner;
+
+  // The colours feed both surfaces, so they stay while either is on. Hiding
+  // them whenever the favicon was off would have hidden the configuration the
+  // banner was still using.
+  const anySurface = enabled || banner;
+  document.getElementById('org-colors-body').hidden = !anySurface;
+  if (!anySurface) return;
+
   renderEnvColors();
   renderOrgColors();
 }
@@ -2949,6 +2963,15 @@ function bindEvents() {
   document.getElementById('setting-org-colors').addEventListener('change', async e => {
     await patchSettings({ orgColors: { ...orgColorConfig(), enabled: e.target.checked } });
     syncOrgColorsSection();
+  });
+
+  document.getElementById('setting-org-banner').addEventListener('change', async e => {
+    await patchSettings({ orgColors: { ...orgColorConfig(), banner: e.target.checked } });
+    syncOrgColorsSection();
+  });
+
+  document.getElementById('setting-org-banner-name').addEventListener('change', async e => {
+    await patchSettings({ orgColors: { ...orgColorConfig(), bannerShowOrgName: e.target.checked } });
   });
 
   document.getElementById('env-color-rows').addEventListener('change', async e => {

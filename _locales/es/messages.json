@@ -1786,5 +1786,17 @@
         "example": "3"
       }
     }
+  },
+  "orgBannerLabel": {
+    "message": "Mostrar un banner en la página"
+  },
+  "orgBannerDesc": {
+    "message": "Una barra de color en la parte superior de cada página de Salesforce, del mismo color que el icono de la pestaña"
+  },
+  "orgBannerNameLabel": {
+    "message": "Incluir el nombre de la organización"
+  },
+  "orgBannerNameDesc": {
+    "message": "Muestra \"ACME--DEV1 · SANDBOX\" en lugar de solo \"SANDBOX\" — útil con varios sandboxes de una organización"
   }
 }

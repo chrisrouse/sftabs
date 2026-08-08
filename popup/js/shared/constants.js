@@ -91,7 +91,9 @@ const DEFAULT_SETTINGS = {
   // overrides that for one org — which is the only way to separate sandboxes,
   // since the hostname never says which tier a sandbox is.
   orgColors: {
-    enabled: false,
+    enabled: false,     // tint the browser tab's favicon
+    banner: false,      // and/or show a bar across the top of the page
+    bannerShowOrgName: true,   // "ACME--DEV1 · SANDBOX" rather than "SANDBOX"
     environments: {},   // environment -> hex; empty means use DEFAULT_ENV_COLORS
     orgs: []            // { identifier, environment, color }
   },

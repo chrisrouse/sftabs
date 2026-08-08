@@ -817,6 +817,12 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   gap: var(--sft-spacing-2);
 }
 
+/* A row that only means anything while the row above it is on. The indent is
+   the whole signal, so it has to survive compact density. */
+.settings-row--sub {
+  padding-left: var(--sft-spacing-4);
+}
+
 /* ── 15. Settings ── */
 .settings-body {
   flex: 1;

@@ -987,9 +987,42 @@ function orgFaviconDataUrl(color) {
  * collides: `acme.lightning.force.com` and `acme.develop.lightning.force.com`
  * both reduce to `acme`, and they are different orgs.
  */
-function resolveOrgColor(url, orgColors) {
+/**
+ * White or near-black, whichever the given background can actually carry.
+ *
+ * The org palette is configurable and someone will pick a pale yellow, on which
+ * white text is unreadable — so the banner cannot simply always use white the
+ * way the extension it grew out of did, which only ever had two fixed colours.
+ *
+ * Relative luminance per WCAG, with the usual 0.179 crossover: that is the
+ * point where white and near-black give the same contrast ratio, so either side
+ * of it the better choice wins.
+ */
+function readableInk(hex) {
+  const value = String(hex || '').replace('#', '');
+  if (value.length !== 6) return '#ffffff';
+
+  const channel = index => {
+    const c = parseInt(value.slice(index, index + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  const luminance = 0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
+  return luminance > 0.179 ? '#181818' : '#ffffff';
+}
+
+/**
+ * The colour configured for the org a URL belongs to, whatever it is being
+ * drawn on.
+ *
+ * Separate from resolveOrgColor, which additionally asks whether favicon
+ * tinting is switched on. Two surfaces want this colour now — the favicon and
+ * the environment banner — and each has its own toggle, so "which colour is
+ * this org" and "should the favicon be tinted" had to stop being one question.
+ *
+ * Returns null for a page that belongs to no org.
+ */
+function orgColorFor(url, orgColors) {
   const config = orgColors || {};
-  if (!config.enabled) return null;
 
   const environment = detectOrgEnvironment(url);
   if (!environment) return null;
@@ -1003,6 +1036,18 @@ function resolveOrgColor(url, orgColors) {
 
   const environments = config.environments || {};
   return environments[environment] || DEFAULT_ENV_COLORS[environment] || null;
+}
+
+/** The colour to tint the favicon with, or null when that is switched off. */
+function resolveOrgColor(url, orgColors) {
+  if (!orgColors || !orgColors.enabled) return null;
+  return orgColorFor(url, orgColors);
+}
+
+/** The colour for the environment banner, or null when that is switched off. */
+function orgBannerColor(url, orgColors) {
+  if (!orgColors || !orgColors.banner) return null;
+  return orgColorFor(url, orgColors);
 }
 
 /**
@@ -1068,6 +1113,9 @@ if (typeof module !== 'undefined' && module.exports) {
     detectOrgEnvironment,
     DEFAULT_ENV_COLORS,
     resolveOrgColor,
+    orgBannerColor,
+    readableInk,
+    orgColorFor,
     orgFaviconDataUrl,
     ORG_PARTITIONS,
     TAB_COLORS,
@@ -1110,6 +1158,9 @@ if (typeof module !== 'undefined' && module.exports) {
     detectOrgEnvironment,
     DEFAULT_ENV_COLORS,
     resolveOrgColor,
+    orgBannerColor,
+    readableInk,
+    orgColorFor,
     orgFaviconDataUrl,
     ORG_PARTITIONS,
     TAB_COLORS,

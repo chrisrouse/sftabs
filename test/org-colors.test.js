@@ -13,7 +13,8 @@
  *
  * Run: npm test
  */
-const { resolveOrgColor, orgFaviconDataUrl, DEFAULT_ENV_COLORS, DEFAULT_SETTINGS } = (() => ({
+const { resolveOrgColor, orgColorFor, orgBannerColor, readableInk,
+        orgFaviconDataUrl, DEFAULT_ENV_COLORS, DEFAULT_SETTINGS } = (() => ({
   ...require('../popup/js/shared/utils.js'),
   ...require('../popup/js/shared/constants.js'),
 }))();
@@ -155,6 +156,59 @@ check('a per-org override reaches the builder page as well',
   resolveOrgColor(BUILD_SBX, on({
     orgs: [{ identifier: 'amplify--dev1', environment: 'sandbox', color: '#8430ce' }],
   })) === '#8430ce');
+
+
+// ── Two surfaces, one palette ──
+// The favicon tint and the page banner each have their own switch, and both
+// draw the org's colour. That means "which colour is this org" and "should the
+// favicon be tinted" cannot be the same question — they were, and the banner
+// could not have got a colour with tinting off.
+const cfg = extra => ({ environments: {}, orgs: [], ...extra });
+
+check('the banner ships off, like the tint',
+  DEFAULT_SETTINGS.orgColors.banner === false);
+check('and shows the org name by default when it is on',
+  DEFAULT_SETTINGS.orgColors.bannerShowOrgName === true,
+  'two sandboxes of one org are indistinguishable without it');
+
+check('the lookup itself does not care which surface is asking',
+  orgColorFor(DEV1, cfg()) === DEFAULT_ENV_COLORS.sandbox);
+
+check('the banner works with the favicon tint switched off',
+  orgBannerColor(DEV1, cfg({ enabled: false, banner: true })) === DEFAULT_ENV_COLORS.sandbox);
+check('and the tint works with the banner off',
+  resolveOrgColor(DEV1, cfg({ enabled: true, banner: false })) === DEFAULT_ENV_COLORS.sandbox);
+check('each surface stays dark when only the other is on',
+  resolveOrgColor(DEV1, cfg({ enabled: false, banner: true })) === null &&
+  orgBannerColor(DEV1, cfg({ enabled: true, banner: false })) === null);
+
+check('with both on they agree exactly',
+  resolveOrgColor(DEV1, cfg({ enabled: true, banner: true })) ===
+  orgBannerColor(DEV1, cfg({ enabled: true, banner: true })));
+
+// A per-org override is the whole point of the feature; it has to reach both.
+const overridden = cfg({ enabled: true, banner: true,
+  orgs: [{ identifier: 'acme--dev2', environment: 'sandbox', color: '#8430ce' }] });
+check('a per-org override reaches the banner as well as the favicon',
+  orgBannerColor(DEV2, overridden) === '#8430ce' &&
+  resolveOrgColor(DEV2, overridden) === '#8430ce');
+
+check('a page belonging to no org gets no banner',
+  orgBannerColor('https://example.com/', cfg({ banner: true })) === null);
+
+// ── The banner's text has to stay legible on any colour ──
+// The palette is configurable, so white-on-anything is not safe: the extension
+// this grew from had two fixed colours and could hardcode white.
+check('white on the darker defaults',
+  ['production', 'scratch', 'demo', 'patch'].every(e => readableInk(DEFAULT_ENV_COLORS[e]) === '#ffffff'));
+check('near-black on the lighter ones',
+  ['sandbox', 'developer', 'playground'].every(e => readableInk(DEFAULT_ENV_COLORS[e]) === '#181818'));
+check('a pale colour someone might pick gets dark text',
+  readableInk('#ffe680') === '#181818' && readableInk('#ffffff') === '#181818');
+check('and a very dark one gets white',
+  readableInk('#000000') === '#ffffff' && readableInk('#1a1a1a') === '#ffffff');
+check('a malformed colour falls back rather than throwing',
+  readableInk('nope') === '#ffffff' && readableInk('') === '#ffffff' && readableInk(null) === '#ffffff');
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

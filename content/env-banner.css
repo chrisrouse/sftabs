@@ -1,0 +1,51 @@
+/* content/env-banner.css
+   The environment bar. Colour and text colour are set inline from the org's
+   configured colour; everything structural lives here.
+
+   z-index sits above Salesforce's own fixed header (SLDS tops out at 10000 for
+   popups) so the bar is never covered, but below the floating panel at 10001 —
+   that panel is something the user has just opened and it should win. */
+
+#sftabs-env-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 1rem;
+
+  font-family: 'Salesforce Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-align: center;
+
+  /* A long org name wraps rather than spilling; the script measures the
+     rendered height, so the page is pushed down by however tall it ends up. */
+  overflow-wrap: anywhere;
+
+  /* Not interactive, and must never intercept a click meant for the page
+     beneath — Salesforce's own header sits directly under this strip. */
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #sftabs-env-banner {
+    animation: sftabs-env-banner-in 0.18s ease-out;
+  }
+}
+
+@keyframes sftabs-env-banner-in {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@media print {
+  #sftabs-env-banner { display: none; }
+}
