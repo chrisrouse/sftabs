@@ -196,6 +196,27 @@ const counts = async () => ({
   check('and the same in reverse', c.tabs === 2 && c.profiles === 1,
     `tabs=${c.tabs} profiles=${c.profiles}`);
 
+
+// ── Profile ids do not carry the prefix the key template adds ──
+// Every tab key is built as `profile_${id}_tabs`. An id that already starts
+// with "profile_" therefore yields profile_profile_<id>_tabs. Nothing breaks —
+// the key is derived from the id consistently either way, and nothing parses
+// the prefix back out — but two conventions in one codebase is how storage
+// stops being readable, and the import path was creating the doubled form for
+// every profile in a file.
+const idSources = [
+  ['js/popup.js', 'the legacy migration and New Profile'],
+  ['popup/settings.js', 'importing profiles from a file'],
+];
+for (const [rel, what] of idSources) {
+  const src = fs.readFileSync(path.join(root, rel), 'utf8');
+  const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+  const offenders = [...code.matchAll(/(?:profileId|newProfileId)\s*=\s*'profile_'/g)];
+  check(`${rel.split('/').pop()} generates ids without the prefix — ${what}`,
+    offenders.length === 0,
+    offenders.length ? offenders.length + ' still prefixed' : 'consistent');
+}
+
   // ── A move leaves nothing behind ──
   // The tabs were always removed from the area being left. The profile list was
   // not, when moving to local — a list of profiles whose tabs had just gone.

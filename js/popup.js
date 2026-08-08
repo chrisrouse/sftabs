@@ -182,7 +182,9 @@ async function readLegacyTabs() {
  * place as a backup, exactly as production leaves it.
  */
 async function migrateLegacyTabs(tabs, settings) {
-  const profileId = 'profile_' + Date.now() + '_default';
+  // No 'profile_' prefix — the storage layer adds one when forming the key, and
+  // this matches the ids the New Profile flow generates.
+  const profileId = Date.now() + '_default';
   await SFTabs.storage.saveProfiles([{
     id: profileId,
     name: 'Default',

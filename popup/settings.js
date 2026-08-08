@@ -799,8 +799,12 @@ async function importSelectedProfiles(importData, selectedProfileIds, importSett
 
 	// Add imported profiles to current profiles
 	for (const profile of profilesToImport) {
-		// Generate new ID to avoid conflicts
-		const newProfileId = 'profile_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+		// New id, so an import cannot collide with a profile already here.
+		// No 'profile_' prefix: the storage layer adds one when it builds the key,
+		// so including it here produced profile_profile_<id>_tabs. Harmless, since
+		// the key is derived from the id either way, but inconsistent with the ids
+		// the popup's own New Profile flow generates.
+		const newProfileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 		const newProfile = {
 			...profile,
 			id: newProfileId,
@@ -967,7 +971,9 @@ async function importTabsToDestination(importData, importSettings) {
 
 			const profiles = await SFTabs.storage.getProfiles() || [];
 
-			const newProfileId = 'profile_' + Date.now();
+			// Random suffix as well as the timestamp: two imports inside the same
+			// millisecond would otherwise land on the same id.
+			const newProfileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 			const newProfile = {
 				id: newProfileId,
 				name: profileName,
