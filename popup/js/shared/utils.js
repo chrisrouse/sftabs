@@ -709,10 +709,22 @@ const CHROME_REVIEW_URL =
 const FIREFOX_REVIEW_URL =
   'https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/reviews/';
 
+/**
+ * Which engine this copy is running on, from the URL of its own pages.
+ *
+ * Firefox is the only one that serves them over moz-extension://, and unlike a
+ * user-agent string it cannot be spoofed or changed by the page. Two things
+ * need to know: which store to send a review to, and one popup CSS rule.
+ *
+ * Anything unreadable answers "not Firefox", which is the majority case and the
+ * one whose fallbacks are harmless.
+ */
+function isFirefox(extensionUrl) {
+  return String(extensionUrl || '').startsWith('moz-extension://');
+}
+
 function storeReviewUrl(extensionUrl) {
-  return String(extensionUrl || '').startsWith('moz-extension://')
-    ? FIREFOX_REVIEW_URL
-    : CHROME_REVIEW_URL;
+  return isFirefox(extensionUrl) ? FIREFOX_REVIEW_URL : CHROME_REVIEW_URL;
 }
 
 /**
@@ -1187,6 +1199,7 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    isFirefox,
     storeReviewUrl,
     reviewPromptDecision,
     locationAllows,
@@ -1235,6 +1248,7 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    isFirefox,
     storeReviewUrl,
     reviewPromptDecision,
     locationAllows,

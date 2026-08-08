@@ -511,6 +511,17 @@ nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-med
   animation: trayContentFadeIn 0.18s ease 0.08s both;
 }
 
+/* Firefox opens and closes instantly. The width being animated is the width of
+   the popup window itself, and Firefox re-lays-out the window per frame, so the
+   transition is steppy on the way out and leaves the popup stuck wider than it
+   started. Class set by markEngine() in js/popup.js. */
+.is-firefox .panel-tray {
+  transition: none;
+}
+.is-firefox .panel-tray.is-open .panel-view:not([hidden]) {
+  animation: none;
+}
+
 @keyframes trayContentFadeIn {
   from { opacity: 0; transform: translateX(8px); }
   to   { opacity: 1; transform: translateX(0); }

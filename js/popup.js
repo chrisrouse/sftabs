@@ -65,6 +65,7 @@ let state = {
 // ── Init ───────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   installProductionHooks();
+  markEngine();
   renderVersion();
   // Must precede loadFromStorage: ensureUsableState() would otherwise seed
   // defaults silently and there would be nothing left to choose.
@@ -83,6 +84,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   installStorageListener();
   if (state.loadError) showStatus(state.loadError, 'error');
 });
+
+/**
+ * Tell the stylesheet which browser it is in. One rule needs it.
+ *
+ * Opening the tray animates the width of the document, and a browser action
+ * popup is a real window rather than a box on a page. Chrome grows and shrinks
+ * it smoothly. Firefox re-lays-out the window on every frame — visibly steppy —
+ * and then settles on a size sampled part-way through, so closing the tray
+ * leaves the popup wider than it started and it never recovers.
+ *
+ * The animation is the thing that has to go, not the layout: with the
+ * transition off, Firefox resizes once, in the right direction, to the right
+ * width. Chrome keeps the animation.
+ */
+function markEngine() {
+  if (SFTabs.utils.isFirefox(browser.runtime.getURL(''))) {
+    document.documentElement.classList.add('is-firefox');
+  }
+}
 
 /** Single source of truth for the displayed version: the manifest. */
 function renderVersion() {

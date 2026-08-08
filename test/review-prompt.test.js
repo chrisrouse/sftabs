@@ -14,7 +14,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { storeReviewUrl, reviewPromptDecision } = require('../popup/js/shared/utils.js');
+const { storeReviewUrl, reviewPromptDecision, isFirefox } = require('../popup/js/shared/utils.js');
 
 let passed = 0;
 let failed = 0;
@@ -60,6 +60,29 @@ check('the Chrome listing matches the one the docs link to',
   'a typo in the extension ID is a 404 on the one page meant to collect reviews');
 check('and so does the Firefox listing',
   install.includes(firefox.replace('reviews/', '')));
+
+// ── Knowing the engine ──
+// The same fact also drives one popup CSS rule, so it is worth being one
+// function rather than two copies of a startsWith.
+check('the engine is read from the extension\'s own URL scheme',
+  isFirefox('moz-extension://abc/popup.html') === true &&
+  isFirefox('chrome-extension://abc/popup.html') === false,
+  'a user agent string can be changed by the user; this cannot');
+check('and an unreadable one is not Firefox',
+  isFirefox('') === false && isFirefox(null) === false);
+
+// Firefox re-lays-out the popup window per animation frame and settles on a
+// width sampled mid-transition, so the tray has to open instantly there.
+const popupCss = fs.readFileSync(path.join(ROOT, 'css/popup.css'), 'utf8');
+const popupJs = fs.readFileSync(path.join(ROOT, 'js/popup.js'), 'utf8');
+check('the popup tells the stylesheet which engine it is on',
+  /SFTabs\.utils\.isFirefox\(browser\.runtime\.getURL\(''\)\)/.test(popupJs) &&
+  /classList\.add\('is-firefox'\)/.test(popupJs));
+check('and Firefox gets no width animation on the tray',
+  /\.is-firefox \.panel-tray \{\s*\n\s*transition: none;/.test(popupCss),
+  'animating the width animates the popup window, which Firefox does not do smoothly');
+check('while every other browser keeps it',
+  /^\.panel-tray \{[\s\S]*?transition: width/m.test(popupCss));
 
 // ── When to ask ──
 check('a fresh install is not asked, it starts a clock',
