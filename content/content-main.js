@@ -258,9 +258,9 @@ function navigateToNavigationItem(navItem, parentTab) {
   }
 }
 
-// Debounce tracking for highlightActiveTab to prevent duplicate calls
-let lastHighlightTime = 0;
-const HIGHLIGHT_DEBOUNCE_MS = 1000; // Increased to 1 second to catch re-initialization
+// The highlight is coalesced by holding the pending timer, not by comparing
+// timestamps — lastHighlightTime and HIGHLIGHT_DEBOUNCE_MS sat here unread once
+// that changed.
 let pendingHighlightTimeout = null;
 
 
