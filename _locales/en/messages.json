@@ -1973,7 +1973,7 @@
     "description": "Location choice for the environment banner: everything but Setup"
   },
   "reviewPromptText": {
-    "message": "Finding SF Tabs useful? A quick review helps other admins find it.",
+    "message": "Finding SF Tabs useful? Please leave a review.",
     "description": "One-time prompt above the popup footer asking for a store review"
   },
   "reviewPromptYes": {

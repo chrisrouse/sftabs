@@ -1812,7 +1812,7 @@
     "description": "Location choice for the environment banner: everything but Setup"
   },
   "reviewPromptText": {
-    "message": "¿Le resulta útil SF Tabs? Una breve reseña ayuda a otros administradores a descubrirlo.",
+    "message": "¿Le resulta útil SF Tabs? Deje una reseña, por favor.",
     "description": "One-time prompt above the popup footer asking for a store review"
   },
   "reviewPromptYes": {
