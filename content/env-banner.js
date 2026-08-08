@@ -41,6 +41,17 @@
   let poll = null;
   let pollsLeft = 0;
 
+  /**
+   * `color|text` of what is on screen, or null for nothing.
+   *
+   * Redrawing is remove-then-insert, which flashes, so apply() has to be able to
+   * tell "nothing I render has changed" from "this is the same settings write
+   * arriving twice". Comparing against what is actually rendered does that
+   * better than diffing the stored value can: it cannot be fooled by a change
+   * record, and it self-heals if the two ever drift apart.
+   */
+  let rendered = null;
+
   const utils = () => window.SFTabs && window.SFTabs.utils;
 
   /**
@@ -143,6 +154,7 @@
 
   function remove() {
     active = false;
+    rendered = null;
     stopPolling();
     if (placementObserver) {
       placementObserver.disconnect();
@@ -184,25 +196,52 @@
     const text = bannerText(window.location.href, showOrgName);
     if (!text) { remove(); return; }
 
+    // Nothing to do if this is already what is on screen.
+    const signature = `${color}|${text}`;
+    if (signature === rendered && document.getElementById(BANNER_ID)) return;
+
     draw(color, text);
+    rendered = signature;
+  }
+
+  /**
+   * Lightning is a single-page app, so moving between Setup and a record page
+   * never reloads this script — and `bannerLocation` is decided from the URL.
+   * Without this, "Only in Setup" was only ever evaluated against whichever page
+   * happened to be open when the tab was loaded.
+   *
+   * Polling the href rather than patching history: same approach favicon.js
+   * takes, and the read below only happens when the URL has actually moved.
+   */
+  function watchUrl() {
+    let last = window.location.href;
+    setInterval(() => {
+      if (window.location.href === last) return;
+      last = window.location.href;
+      apply();
+    }, 1000);
   }
 
   function start() {
     apply();
+    watchUrl();
 
     if (browser.storage && browser.storage.onChanged) {
-      // Only the settings this bar draws from. A settings write fires twice —
-      // sync, then the local mirror — and redrawing for an unrelated change
-      // would flash the bar, which is the exact fault fixed elsewhere in these
-      // content scripts.
-      const onChange = debounce(changes => {
-        if (window.SFTabs?.utils?.settingsChanged(changes.userSettings,
-              ['orgColors'])) apply();
-      }, 150);
+      // Any settings write, not just the ones this bar reads.
+      //
+      // The narrower gate other surfaces use — settingsChanged(changes, [...]) —
+      // exists because a redraw is destructive and a settings write fires twice,
+      // once for sync and once for the local mirror. apply() now compares
+      // against what is rendered, so a redundant call costs one storage read and
+      // touches nothing. That makes the gate no longer worth its failure mode:
+      // when it is wrong, the bar silently stops responding, and the user has to
+      // reload the page to see a setting they just changed.
+      const onChange = debounce(() => apply(), 150);
 
       browser.storage.onChanged.addListener((changes, area) => {
         if (area !== 'local' && area !== 'sync') return;
-        onChange(changes);
+        if (!changes.userSettings) return;
+        onChange();
       });
     }
   }

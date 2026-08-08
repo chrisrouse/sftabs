@@ -147,12 +147,19 @@ check('open state is a flag, not a DOM lookup per scroll event',
 // shifted Salesforce's own global search bar, and destroyed and recreated the
 // floating handle, which blinked. Neither surface uses that setting for its
 // structure — only for what it lists.
+//
+// env-banner.js is deliberately not in this list; see the rule below it. The
+// sources are stripped of comments first, or prose explaining the gate counts
+// as using it.
 const SURFACES = ['content/content-main.js', 'content/header-menu.js',
-                  'content/floating-button.js', 'content/floating-modal.js',
-                  'content/env-banner.js'];
+                  'content/floating-button.js', 'content/floating-modal.js'];
+
+const codeOf = rel => read(rel)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/^[ \t]*\/\/.*$/gm, '');
 
 for (const rel of SURFACES) {
-  const src = read(rel);
+  const src = codeOf(rel);
   const name = rel.split('/').pop();
 
   check(`${name} does not react to the bare presence of a settings write`,
@@ -168,6 +175,36 @@ for (const rel of SURFACES) {
     /debounce\(/.test(src),
     'collapses the sync write and its local mirror into one response');
 }
+
+// ── The banner earns the right to skip that gate ──
+// Naming the settings you depend on is a proxy for "do not redraw when nothing
+// you show has changed". The banner answers that question directly instead, by
+// comparing against what is on screen — which is strictly stronger, since it
+// also catches a redundant redraw the gate would have allowed, and self-heals
+// if the DOM and the settings ever disagree.
+//
+// Worth the swap because the gate's failure mode is silent: when it wrongly
+// says no, the bar stops responding to the popup and the only way to see a
+// setting you just changed is to reload the page.
+const bannerSrc = codeOf('content/env-banner.js');
+
+check('the banner compares against what is rendered before touching the DOM',
+  /signature === rendered && document\.getElementById\(BANNER_ID\)/.test(bannerSrc),
+  'this is what makes reacting to every settings write free');
+check('and that record is cleared when the bar goes away',
+  /function remove\(\) \{[\s\S]{0,120}rendered = null/.test(bannerSrc),
+  'a stale signature would suppress the redraw that puts the bar back');
+check('the banner still debounces, and still ignores non-settings writes',
+  /debounce\(\(\) => apply\(\), \d+\)/.test(bannerSrc) &&
+  /if \(!changes\.userSettings\) return;/.test(bannerSrc));
+
+// Lightning never reloads the page, and bannerLocation is decided from the URL.
+check('the banner re-evaluates its location on SPA navigation',
+  /function watchUrl\(\)/.test(bannerSrc) &&
+  /window\.location\.href === last/.test(bannerSrc),
+  '"Only in Setup" was otherwise judged once, against whatever page loaded first');
+check('and only reads storage when the URL has actually moved',
+  /if \(window\.location\.href === last\) return;\s*\n\s*last = window\.location\.href;/.test(bannerSrc));
 
 // The header item itself must survive a refresh — removing and re-adding it is
 // what moved the search bar.
