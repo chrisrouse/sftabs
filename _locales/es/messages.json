@@ -1611,7 +1611,7 @@
   },
   "orgColorsAlreadyAdded": {
     "message": "$ORG$ ya está en la lista.",
-    "description": "Toast when the current org already has a colour entry",
+    "description": "Toast when the current org already has a color entry",
     "placeholders": {
       "org": {
         "content": "$1"
@@ -1798,5 +1798,17 @@
   },
   "orgBannerNameDesc": {
     "message": "Muestra \"ACME--DEV1 · SANDBOX\" en lugar de solo \"SANDBOX\" — útil con varios sandboxes de una organización"
+  },
+  "orgBannerLocationEverywhereDescription": {
+    "message": "Mostrar el banner en todas las páginas de Salesforce",
+    "description": "Location choice for the environment banner: every Salesforce page"
+  },
+  "orgBannerLocationSetupOnlyDescription": {
+    "message": "Mostrar el banner solo en las páginas de Configuración",
+    "description": "Location choice for the environment banner: Setup pages only"
+  },
+  "orgBannerLocationOutsideSetupDescription": {
+    "message": "Mostrar el banner en todas las páginas excepto las de Configuración",
+    "description": "Location choice for the environment banner: everything but Setup"
   }
 }

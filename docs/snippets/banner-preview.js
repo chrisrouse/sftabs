@@ -7,13 +7,13 @@
 // Nothing is stored and nothing is installed. It draws, you look, you undo.
 //
 //   sftabsPreview.bar()     fixed bar across the top, the chosen approach
-//   sftabsPreview.tint()    recolour Salesforce's own header instead
+//   sftabsPreview.tint()    recolor Salesforce's own header instead
 //   sftabsPreview.both()
-//   sftabsPreview.colour('#8430ce')   try a different colour
+//   sftabsPreview.color('#8430ce')   try a different color
 //   sftabsPreview.off()     put everything back
 //
 // Environment detection and the default palette are copied from the extension,
-// so the colour you see is the colour it would use.
+// so the color you see is the color it would use.
 
 window.sftabsPreview = (() => {
   const ORG_PARTITIONS = { sandbox:'sandbox', develop:'developer', patch:'patch',
@@ -45,7 +45,7 @@ window.sftabsPreview = (() => {
   const current = () => {
     const o = org();
     if (!o) { console.warn('[preview] not a Salesforce org host:', location.hostname); return null; }
-    return { ...o, colour: override || COLOURS[o.env] };
+    return { ...o, color: override || COLOURS[o.env] };
   };
 
   function bar(showOrgName = true) {
@@ -62,12 +62,12 @@ window.sftabsPreview = (() => {
       padding: 0.5rem 1rem;
       font-family: 'Salesforce Sans', Arial, sans-serif;
       font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.025rem;
-      color: #fff; background: ${o.colour};`;
+      color: #fff; background: ${o.color};`;
     document.body.appendChild(el);
     // What the banner extension does today, and the part most likely to fight
     // Lightning: the page is pushed down by overriding its padding.
     document.body.style.setProperty('padding-top', el.offsetHeight + 'px', 'important');
-    console.log('[preview] bar:', o.id, o.env, o.colour);
+    console.log('[preview] bar:', o.id, o.env, o.color);
   }
 
   function tint() {
@@ -78,10 +78,10 @@ window.sftabsPreview = (() => {
                        '.slds-context-bar', '.oneAppNavContainer']) {
       document.querySelectorAll(sel).forEach(el => {
         tinted.push([el, el.style.background]);
-        el.style.setProperty('background', o.colour, 'important');
+        el.style.setProperty('background', o.color, 'important');
       });
     }
-    console.log('[preview] tinted', tinted.length, 'element(s):', o.id, o.env, o.colour);
+    console.log('[preview] tinted', tinted.length, 'element(s):', o.id, o.env, o.color);
     if (!tinted.length) console.warn('[preview] no header found — is this an Experience Builder page?');
   }
 
@@ -97,7 +97,7 @@ window.sftabsPreview = (() => {
   return {
     bar, tint,
     both: () => { bar(); tint(); },
-    colour: c => { override = c; if (document.getElementById(BAR_ID)) bar(); if (tinted.length) tint(); },
+    color: c => { override = c; if (document.getElementById(BAR_ID)) bar(); if (tinted.length) tint(); },
     off: () => { off_bar(); off_tint(); override = null; console.log('[preview] reverted'); },
     org: current,
   };

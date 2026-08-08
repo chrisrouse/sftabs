@@ -1,12 +1,12 @@
 // content/favicon.js
 // Tints the browser tab's favicon so orgs can be told apart in the tab strip.
 //
-// Neither Chrome nor Firefox lets an extension colour a tab, put a border on
+// Neither Chrome nor Firefox lets an extension color a tab, put a border on
 // one, or style the tab strip at all. The favicon is the only pixels a page can
-// hand the browser, which is why every extension that appears to colour a tab
+// hand the browser, which is why every extension that appears to color a tab
 // is really doing this.
 //
-// The colour comes from shared utils: an org's environment supplies a default,
+// The color comes from shared utils: an org's environment supplies a default,
 // and a per-org entry overrides it. Both are resolved from the URL, so this
 // file holds no matching logic of its own.
 
@@ -27,7 +27,7 @@
    * saveUserSettings mirrors the whole settings object to local on every write,
    * whichever area is preferred, so one read covers both. The gap is a change
    * made on another device: it lands in sync, and this copy stays stale until
-   * something writes locally. Acceptable for a colour; it would not be for tabs.
+   * something writes locally. Acceptable for a color; it would not be for tabs.
    */
   async function readOrgColors() {
     try {

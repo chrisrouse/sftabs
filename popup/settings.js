@@ -771,7 +771,7 @@ async function importSelectedProfiles(importData, selectedProfileIds, importSett
 	if (importSettings && importData.settings) {
 		const mergedSettings = {
 			// Deep merge, or a nested object in the file replaces the live one
-			// wholesale — that is how importing with org colours off wiped every
+			// wholesale — that is how importing with org colors off wiped every
 			// per-org override.
 			...SFTabs.utils.mergeUserSettings(userSettings, importData.settings),
 			// Enable profiles if importing profiles

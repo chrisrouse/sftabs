@@ -137,16 +137,16 @@ check('re-painting a row replaces rather than stacks',
   el.classList.list().join(' '));
 
 
-// ── Turning colours off has to reach the page ──
-// The colour settings live in userSettings, which the tab-key storage predicate
+// ── Turning colors off has to reach the page ──
+// The color settings live in userSettings, which the tab-key storage predicate
 // does not cover, so nothing told the Salesforce tab bar to redraw. Turning
-// colours off left every tab coloured and switching dot/fill did nothing, both
+// colors off left every tab colored and switching dot/fill did nothing, both
 // until the page was reloaded. The quick-add toggle worked only because its
-// handler happened to broadcast a refresh — a call the colour handlers did not
+// handler happened to broadcast a refresh — a call the color handlers did not
 // make, and should not have to.
 const change = (before, after) => ({ oldValue: before, newValue: after });
 
-check('turning colours off asks the bar to redraw',
+check('turning colors off asks the bar to redraw',
   settingsAffectTabBar(change(
     { tabColors: { enabled: true, style: 'dot' } },
     { tabColors: { enabled: false, style: 'dot' } })) === true);

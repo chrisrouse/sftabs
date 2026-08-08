@@ -85,7 +85,7 @@
 
   /* Two values with no token behind them, named here rather than repeated.
      The yellow is SLDS palette-yellow-80, used for the notification dot and the
-     "default tab" star; the hairline is the inset ring on the colour swatches,
+     "default tab" star; the hairline is the inset ring on the color swatches,
      which has to read against both a light and a dark swatch and so cannot be
      a themed border token. */
   --c-star:     #fcc003;
@@ -984,13 +984,13 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 /* ── Tinted rows in dark mode ──
    The palette's dark wash is a near-black version of the hue — red is #300c01 —
    which on a #2e2e2e card reads as a hole punched in the list rather than a
-   coloured card. So in dark mode the accent is mixed into the card surface
+   colored card. So in dark mode the accent is mixed into the card surface
    instead, and the row stays a dark card that has taken on the hue.
 
    The label goes back to ordinary text at the same time, and that part is not
    cosmetic: a bright accent label on a tint of the same hue converges as the
    mix rises, and fails AA at every level worth using — 4.05 even at 6%, where
-   the tint is invisible. Letting the card carry the colour and the text carry
+   the tint is invisible. Letting the card carry the color and the text carry
    the words gives 6.7 on the title at a 20% mix, where the hue is obvious.
 
    Light mode keeps the palette wash, which works there: the wash is pale and
@@ -1028,7 +1028,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   width: 22px;
   height: 22px;
   padding: 0;
-  margin-right: 6px;   /* lines up over the colour wells, not the panel edge */
+  margin-right: 6px;   /* lines up over the color wells, not the panel edge */
   background: none;
   border: 0;
   border-radius: var(--r-sm);

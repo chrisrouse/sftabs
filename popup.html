@@ -610,26 +610,61 @@
                   </div>
                 </div>
 
-                <!-- Only meaningful while the banner is on -->
-                <div class="settings-row settings-row--sub" id="row-org-banner-name">
-                  <label class="settings-row-label" for="setting-org-banner-name">
-                    <span class="settings-label">__MSG_orgBannerNameLabel__</span>
-                    <span class="settings-desc">__MSG_orgBannerNameDesc__</span>
-                  </label>
-                  <div class="settings-row-control">
-                    <label class="toggle" aria-label="__MSG_orgBannerNameLabel__">
-                      <input type="checkbox" id="setting-org-banner-name" role="switch" />
-                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <!-- Nothing below applies while the banner is off -->
+                <div id="org-banner-options">
+                  <div class="settings-row settings-row--sub" id="row-org-banner-name">
+                    <label class="settings-row-label" for="setting-org-banner-name">
+                      <span class="settings-label">__MSG_orgBannerNameLabel__</span>
+                      <span class="settings-desc">__MSG_orgBannerNameDesc__</span>
+                    </label>
+                    <div class="settings-row-control">
+                      <label class="toggle" aria-label="__MSG_orgBannerNameLabel__">
+                        <input type="checkbox" id="setting-org-banner-name" role="switch" />
+                        <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- The same three choices the floating button offers, in the
+                       same cards, resolved by the same locationAllows(). -->
+                  <h4 class="settings-subhead"><span>__MSG_floatingButtonLocationSection__</span></h4>
+                  <div class="choice-cards" role="radiogroup" aria-label="__MSG_floatingButtonLocationSection__">
+                    <label class="choice-card">
+                      <input type="radio" name="banner-location" value="everywhere" checked />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLocationEverywhere__</span>
+                          <span class="choice-card-desc">__MSG_orgBannerLocationEverywhereDescription__</span>
+                        </div>
+                      </div>
+                    </label>
+                    <label class="choice-card">
+                      <input type="radio" name="banner-location" value="setup-only" />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLocationSetupOnly__</span>
+                          <span class="choice-card-desc">__MSG_orgBannerLocationSetupOnlyDescription__</span>
+                        </div>
+                      </div>
+                    </label>
+                    <label class="choice-card">
+                      <input type="radio" name="banner-location" value="outside-setup" />
+                      <div class="choice-card-body">
+                        <div>
+                          <span class="choice-card-title">__MSG_floatingButtonLocationOutsideSetup__</span>
+                          <span class="choice-card-desc">__MSG_orgBannerLocationOutsideSetupDescription__</span>
+                        </div>
+                      </div>
                     </label>
                   </div>
                 </div>
 
-                <!-- The colours below feed both surfaces, so this stays visible
+                <!-- The colors below feed both surfaces, so this stays visible
                      while either one is on. -->
                 <div id="org-colors-body">
                   <h4 class="settings-subhead">
                     <span>__MSG_orgColorsByEnvironment__</span>
-                    <!-- Above the colour column, and disabled while nothing is
+                    <!-- Above the color column, and disabled while nothing is
                          customized so the row also says the defaults are in effect. -->
                     <button type="button" class="subhead-action" id="btn-reset-env-colors" disabled
                       aria-label="__MSG_orgColorsResetDefaults__" title="__MSG_orgColorsResetDefaults__">

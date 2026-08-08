@@ -2534,6 +2534,7 @@ function orgColorConfig() {
     enabled: !!stored.enabled,                                  // favicon tint
     banner: !!stored.banner,                                    // page banner
     bannerShowOrgName: stored.bannerShowOrgName !== false,      // defaults on
+    bannerLocation: stored.bannerLocation || 'everywhere',
     environments: stored.environments || {},
     orgs: Array.isArray(stored.orgs) ? stored.orgs : [],
   };
@@ -2578,11 +2579,11 @@ function renderEnvColors() {
 }
 
 /**
- * Orgs with a colour of their own, plus every org any profile is linked to.
+ * Orgs with a color of their own, plus every org any profile is linked to.
  *
  * Profiles already carry org identifiers in urlPatterns, so listing them costs
- * nothing and saves retyping `acme--dev1` by hand. A profile org with no colour
- * set yet shows its environment's colour, same as it would in the tab strip.
+ * nothing and saves retyping `acme--dev1` by hand. A profile org with no color
+ * set yet shows its environment's color, same as it would in the tab strip.
  */
 function orgColorRows() {
   const { orgs } = orgColorConfig();
@@ -2638,7 +2639,7 @@ function renderOrgColors() {
   });
 }
 
-/** Write one org's colour, adding the entry if it only existed as a profile link. */
+/** Write one org's color, adding the entry if it only existed as a profile link. */
 async function saveOrgColor(entry, color) {
   const config = orgColorConfig();
   const environment = entry.environment || 'sandbox';
@@ -2667,7 +2668,7 @@ async function removeOrgColor(entry) {
  * The same four outcomes as captureCurrentOrg on the profile form — no tab, not
  * Salesforce, already there, added — and it shares the strings for the three
  * that say nothing about profiles. The duplicate case gets its own: adding a
- * colour here does not touch profiles, so "already linked to this profile"
+ * color here does not touch profiles, so "already linked to this profile"
  * would be describing something that did not happen.
  */
 async function captureOrgColor() {
@@ -2699,16 +2700,19 @@ async function captureOrgColor() {
 function syncOrgColorsSection() {
   const toggle = document.getElementById('setting-org-colors');
   if (!toggle) return;
-  const { enabled, banner, bannerShowOrgName } = orgColorConfig();
+  const { enabled, banner, bannerShowOrgName, bannerLocation } = orgColorConfig();
 
   toggle.checked = enabled;
   document.getElementById('setting-org-banner').checked = banner;
   document.getElementById('setting-org-banner-name').checked = bannerShowOrgName;
 
   // Only meaningful while the banner is on
-  document.getElementById('row-org-banner-name').hidden = !banner;
+  document.getElementById('org-banner-options').hidden = !banner;
+  const locationRadio =
+    document.querySelector(`input[name="banner-location"][value="${bannerLocation}"]`);
+  if (locationRadio) locationRadio.checked = true;
 
-  // The colours feed both surfaces, so they stay while either is on. Hiding
+  // The colors feed both surfaces, so they stay while either is on. Hiding
   // them whenever the favicon was off would have hidden the configuration the
   // banner was still using.
   const anySurface = enabled || banner;
@@ -2970,6 +2974,11 @@ function bindEvents() {
     syncOrgColorsSection();
   });
 
+  document.querySelectorAll('input[name="banner-location"]').forEach(radio => {
+    radio.addEventListener('change', () =>
+      patchSettings({ orgColors: { ...orgColorConfig(), bannerLocation: radio.value } }));
+  });
+
   document.getElementById('setting-org-banner-name').addEventListener('change', async e => {
     await patchSettings({ orgColors: { ...orgColorConfig(), bannerShowOrgName: e.target.checked } });
   });
@@ -2982,7 +2991,7 @@ function bindEvents() {
       orgColors: { ...config, environments: { ...config.environments, [input.dataset.envColor]: input.value } },
     });
     renderEnvColors();
-    renderOrgColors();   // profile-linked rows show their environment's colour
+    renderOrgColors();   // profile-linked rows show their environment's color
   });
 
   document.getElementById('btn-reset-env-colors').addEventListener('click', async () => {

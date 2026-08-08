@@ -596,11 +596,11 @@ function matchTabsToUrl(candidates, currentUrl) {
 /**
  * Does this settings change alter what the Salesforce tab bar draws?
  *
- * Tab colours, the quick-add button and which profile applies all live in
+ * Tab colors, the quick-add button and which profile applies all live in
  * userSettings, not in the tab keys — so the storage listener that watches tabs
  * never saw them. Redrawing was left to the popup remembering to broadcast, and
- * it remembered for the quick-add toggle and not for either colour control:
- * turning colours off left every tab still coloured until the page was
+ * it remembered for the quick-add toggle and not for either color control:
+ * turning colors off left every tab still colored until the page was
  * reloaded, and switching dot/fill did nothing at all.
  *
  * Compared field by field rather than reacting to any userSettings write, so
@@ -614,7 +614,7 @@ function matchTabsToUrl(candidates, currentUrl) {
  * Every surface listens to userSettings, and a settings write fires twice —
  * once for sync and once for the local mirror saveUserSettings keeps. Surfaces
  * that reacted to the bare presence of `changes.userSettings` therefore rebuilt
- * themselves twice for any setting at all, related or not. Toggling tab colours
+ * themselves twice for any setting at all, related or not. Toggling tab colors
  * tore down and re-injected the header-menu item, which reflows
  * ul.slds-global-actions and visibly shifted Salesforce's own search bar, and
  * destroyed and recreated the floating handle, which blinked.
@@ -670,7 +670,7 @@ function tabStorageChanged(changes) {
  *
  * A spread is one level deep, so `{...current, ...incoming}` replaces whole
  * sub-objects rather than merging them. That silently destroys data: importing
- * a file exported before org colours existed — or with the feature switched
+ * a file exported before org colors existed — or with the feature switched
  * off, where `orgColors` serialises as `{enabled:false}` — replaced the live
  * `orgColors` outright and took `environments` and every per-org override with
  * it. The same shape applies to floatingButton, headerMenu and tabColors.
@@ -694,25 +694,34 @@ function mergeUserSettings(current, incoming) {
 }
 
 /**
+ * Whether an on-page surface belongs at this URL.
+ *
+ * `everywhere` | `setup-only` | `outside-setup`. Shared by the floating button
+ * and the environment banner, which offer the same three choices and must read
+ * them the same way — two copies of this would eventually disagree about what
+ * counts as a Setup page.
+ *
+ * An unrecognised value shows the surface. Hiding a feature the user has
+ * switched on is the worse failure of the two.
+ */
+function locationAllows(url, location) {
+  const inSetup = String(url || '').includes('/lightning/setup/');
+  if (location === 'setup-only') return inSetup;
+  if (location === 'outside-setup') return !inSetup;
+  return true;
+}
+
+/**
  * Whether the floating button belongs on this page.
  *
- * The popup offers everywhere / Setup only / outside Setup, and has always
- * saved the choice — but the only code that read it was a shouldShow() method
- * on a class nothing constructs, so the button appeared everywhere regardless.
- * Kept here, next to resolveFloatingSide, because it is the same kind of rule:
- * pure, derived from URL plus settings, and wanted by more than one surface.
- *
- * An unrecognised value shows the button. Hiding a feature the user has
- * switched on is the worse failure of the two.
+ * The popup has always saved the location choice — but the only code that read
+ * it was a shouldShow() method on a class nothing constructs, so the button
+ * appeared everywhere regardless.
  */
 function floatingButtonAllowedHere(url, floatingButton) {
   const fb = floatingButton || {};
   if (!fb.enabled) return false;
-
-  const inSetup = String(url || '').includes('/lightning/setup/');
-  if (fb.location === 'setup-only') return inSetup;
-  if (fb.location === 'outside-setup') return !inSetup;
-  return true;
+  return locationAllows(url, fb.location);
 }
 
 /**
@@ -945,14 +954,14 @@ function parsePageToTab(url, pageTitle) {
  * The Salesforce cloud, as one path on a 520 viewBox — SLDS utility
  * `salesforce1`, vendored at icons/slds/salesforce1.svg.
  *
- * Drawing our own copy rather than recolouring the org's real favicon avoids
+ * Drawing our own copy rather than recoloring the org's real favicon avoids
  * the whole canvas problem: that icon is served cross-origin, and drawing it
  * taints the canvas so toDataURL() throws. This is the same silhouette, and it
  * needs no fetch, no canvas and no re-encoding.
  */
 const SALESFORCE_CLOUD_PATH = 'M217 119c17-17 40-28 66-28 34 0 64 19 80 47 14-6 29-10 45-10 62 0 112 50 112 112s-50 112-112 112c-8 0-15-1-22-2a82.4 82.4 0 0 1-72 42c-13 0-25-3-36-8a92.7 92.7 0 0 1-86 56c-40 0-75-25-88-61-6 1-12 2-18 2a87 87 0 0 1-44-162 100.5 100.5 0 0 1 93-140c35 1 64 16 82 40';
 
-/** Colours for orgs nobody has configured. Chosen to stay apart at 16px. */
+/** Colors for orgs nobody has configured. Chosen to stay apart at 16px. */
 const DEFAULT_ENV_COLORS = {
   production: '#c5221f',   // the one worth hesitating over
   sandbox:    '#1e8e3e',
@@ -964,7 +973,7 @@ const DEFAULT_ENV_COLORS = {
 };
 
 /**
- * A favicon of the Salesforce cloud in one colour, as an SVG data URL.
+ * A favicon of the Salesforce cloud in one color, as an SVG data URL.
  *
  * SVG rather than a canvas PNG because both browsers have taken SVG favicons
  * for years and it removes every moving part — no image decode, no canvas, no
@@ -977,9 +986,9 @@ function orgFaviconDataUrl(color) {
 }
 
 /**
- * The colour an org's tab icon should take, or null to leave it alone.
+ * The color an org's tab icon should take, or null to leave it alone.
  *
- * A per-org entry wins over its environment's colour — that is the whole point
+ * A per-org entry wins over its environment's color — that is the whole point
  * of the override, and it is what lets three sandboxes in one org be told
  * apart when the hostname says only "sandbox" for all three.
  *
@@ -992,15 +1001,20 @@ function orgFaviconDataUrl(color) {
  *
  * The org palette is configurable and someone will pick a pale yellow, on which
  * white text is unreadable — so the banner cannot simply always use white the
- * way the extension it grew out of did, which only ever had two fixed colours.
+ * way the extension it grew out of did, which only ever had two fixed colors.
  *
  * Relative luminance per WCAG, with the usual 0.179 crossover: that is the
  * point where white and near-black give the same contrast ratio, so either side
- * of it the better choice wins.
+ * of it the better choice wins. The banner sets 12px bold, which is small text
+ * by WCAG, so the 4.5:1 target applies and the margin is worth having.
+ *
+ * Three-digit hex is expanded rather than rejected. Falling back to white on an
+ * unparsed color is a guess, and `#ffc` is exactly the case where it is wrong.
  */
 function readableInk(hex) {
-  const value = String(hex || '').replace('#', '');
-  if (value.length !== 6) return '#ffffff';
+  let value = String(hex || '').trim().replace('#', '');
+  if (value.length === 3) value = value.split('').map(c => c + c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(value)) return '#ffffff';
 
   const channel = index => {
     const c = parseInt(value.slice(index, index + 2), 16) / 255;
@@ -1011,12 +1025,12 @@ function readableInk(hex) {
 }
 
 /**
- * The colour configured for the org a URL belongs to, whatever it is being
+ * The color configured for the org a URL belongs to, whatever it is being
  * drawn on.
  *
  * Separate from resolveOrgColor, which additionally asks whether favicon
- * tinting is switched on. Two surfaces want this colour now — the favicon and
- * the environment banner — and each has its own toggle, so "which colour is
+ * tinting is switched on. Two surfaces want this color now — the favicon and
+ * the environment banner — and each has its own toggle, so "which color is
  * this org" and "should the favicon be tinted" had to stop being one question.
  *
  * Returns null for a page that belongs to no org.
@@ -1038,15 +1052,23 @@ function orgColorFor(url, orgColors) {
   return environments[environment] || DEFAULT_ENV_COLORS[environment] || null;
 }
 
-/** The colour to tint the favicon with, or null when that is switched off. */
+/** The color to tint the favicon with, or null when that is switched off. */
 function resolveOrgColor(url, orgColors) {
   if (!orgColors || !orgColors.enabled) return null;
   return orgColorFor(url, orgColors);
 }
 
-/** The colour for the environment banner, or null when that is switched off. */
+/**
+ * The color for the environment banner, or null when it does not belong here.
+ *
+ * Two gates, not one: the feature switch, and the same everywhere / Setup only
+ * / outside Setup choice the floating button offers. Both live here rather than
+ * in the content script so the rule is testable and so the popup could preview
+ * it without duplicating the logic.
+ */
 function orgBannerColor(url, orgColors) {
   if (!orgColors || !orgColors.banner) return null;
+  if (!locationAllows(url, orgColors.bannerLocation)) return null;
   return orgColorFor(url, orgColors);
 }
 
@@ -1123,8 +1145,9 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
-  floatingButtonAllowedHere,
-  mergeUserSettings,
+    locationAllows,
+    floatingButtonAllowedHere,
+    mergeUserSettings,
   tabStorageChanged,
   settingsAffectTabBar,
   PROFILE_SETTINGS,
@@ -1168,6 +1191,7 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    locationAllows,
     floatingButtonAllowedHere,
     mergeUserSettings,
     tabStorageChanged,

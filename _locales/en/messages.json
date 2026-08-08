@@ -1772,7 +1772,7 @@
   },
   "orgColorsAlreadyAdded": {
     "message": "$ORG$ is already in the list.",
-    "description": "Toast when the current org already has a colour entry",
+    "description": "Toast when the current org already has a color entry",
     "placeholders": {
       "org": {
         "content": "$1"
@@ -1952,12 +1952,24 @@
     "message": "Show a banner on the page"
   },
   "orgBannerDesc": {
-    "message": "A coloured bar across the top of every Salesforce page, in the same color as the tab icon"
+    "message": "A colored bar across the top of every Salesforce page, in the same color as the tab icon"
   },
   "orgBannerNameLabel": {
     "message": "Include the org name"
   },
   "orgBannerNameDesc": {
     "message": "Shows \"ACME--DEV1 · SANDBOX\" rather than just \"SANDBOX\" — useful across several sandboxes of one org"
+  },
+  "orgBannerLocationEverywhereDescription": {
+    "message": "Show the banner on all Salesforce pages",
+    "description": "Location choice for the environment banner: every Salesforce page"
+  },
+  "orgBannerLocationSetupOnlyDescription": {
+    "message": "Show the banner only on Setup pages",
+    "description": "Location choice for the environment banner: Setup pages only"
+  },
+  "orgBannerLocationOutsideSetupDescription": {
+    "message": "Show the banner everywhere except Setup pages",
+    "description": "Location choice for the environment banner: everything but Setup"
   }
 }

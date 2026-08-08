@@ -142,7 +142,7 @@ check('open state is a flag, not a DOM lookup per scroll event',
 // surface reacting to the bare presence of changes.userSettings therefore tore
 // itself down and rebuilt twice for any setting at all.
 //
-// That was visible. Toggling tab colours removed and re-inserted the
+// That was visible. Toggling tab colors removed and re-inserted the
 // header-menu <li> in ul.slds-global-actions, which reflows the header and
 // shifted Salesforce's own global search bar, and destroyed and recreated the
 // floating handle, which blinked. Neither surface uses that setting for its
@@ -289,7 +289,7 @@ check('and puts it back on removal, rather than clearing outright',
   'Salesforce sets its own padding on body in some layouts');
 check('removal runs before every draw, so nothing stacks',
   /function draw\([^)]*\) \{\s*\n\s*remove\(\);/.test(banner));
-check('and the bar is removed when no colour applies',
+check('and the bar is removed when no color applies',
   (banner.match(/remove\(\); return;/g) || []).length >= 2,
   'switching the banner off has to take it away, not just stop redrawing it');
 check('it never intercepts clicks meant for the header beneath it',

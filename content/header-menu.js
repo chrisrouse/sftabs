@@ -92,7 +92,7 @@
     list.insertBefore(li, list.firstChild);
 
     // Reads the module-level list rather than closing over this one, so new
-    // tabs or colours can be picked up without touching the injected element.
+    // tabs or colors can be picked up without touching the injected element.
     li.querySelector('button').addEventListener('click', event => {
       event.stopPropagation();
       toggleMenu(menuTabs);

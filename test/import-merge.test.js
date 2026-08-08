@@ -7,12 +7,12 @@
  * the live one whole rather than merging into it, and the settings that matter
  * most here are all nested: orgColors, floatingButton, headerMenu, tabColors.
  *
- * The concrete loss: turn org colours off and export, and `orgColors`
+ * The concrete loss: turn org colors off and export, and `orgColors`
  * serialises as `{enabled: false}` — the environments map and every per-org
  * override are simply not in the file. Import that anywhere and a spread
  * replaces the live orgColors with `{enabled: false}`, so the overrides are
  * gone from storage too. Same for a file exported before the feature existed.
- * The user asked to import settings, not to discard the colours they had, and
+ * The user asked to import settings, not to discard the colors they had, and
  * the standing rule for this extension is that turning a feature off never
  * removes its data.
  *
@@ -68,7 +68,7 @@ check('and so does the environment map',
 check('switching the feature back on restores what was there',
   mergeUserSettings(afterOff, { orgColors: { enabled: true } }).orgColors.orgs.length === 2);
 
-// A file exported before org colours existed mentions them not at all.
+// A file exported before org colors existed mentions them not at all.
 const legacy = { themeMode: 'light', profilesEnabled: false };
 const afterLegacy = mergeUserSettings(live(), legacy);
 check('a file predating the feature leaves it entirely alone',

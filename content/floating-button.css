@@ -501,7 +501,7 @@
    blue mark, which looked like a different control entirely.
 
    Muted until pointed at: saturate() on the button dims the blue without
-   needing a second colour, and leaves the white logo untouched, since white has
+   needing a second color, and leaves the white logo untouched, since white has
    no saturation to lose. */
 .sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button {
   height: 27px;                       /* 36px, a quarter shorter */
@@ -516,7 +516,7 @@
   filter: saturate(1);
 }
 .sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button img {
-  /* Single-colour logo, so this is a clean white silhouette — same treatment
+  /* Single-color logo, so this is a clean white silhouette — same treatment
      the open state uses. The parent's saturate() applies after, and white is
      unaffected by it. */
   filter: brightness(0) invert(1);

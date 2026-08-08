@@ -498,8 +498,8 @@ function setupStorageListeners() {
   if (browser.storage && browser.storage.onChanged) {
     browser.storage.onChanged.addListener((changes, area) => {
       // Two reasons to redraw: the tabs changed, or a setting that governs how
-      // they are drawn changed. The second was missing, so turning tab colours
-      // off left them coloured and switching dot/fill did nothing until the
+      // they are drawn changed. The second was missing, so turning tab colors
+      // off left them colored and switching dot/fill did nothing until the
       // page was reloaded — the settings live in userSettings, which the tab
       // predicate does not cover, and only the quick-add toggle happened to
       // broadcast a refresh of its own.

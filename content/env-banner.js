@@ -3,7 +3,7 @@
 //
 // The favicon tint answers "which org is this tab" at a glance in the tab strip.
 // This answers it while you are looking at the page, which is where an action
-// taken in the wrong org actually happens. Same colour for both, from the same
+// taken in the wrong org actually happens. Same color for both, from the same
 // per-org and per-environment configuration — orgColorFor in shared utils — so
 // the two can never disagree about what an org looks like.
 //
@@ -47,7 +47,7 @@
    * "ACME--DEV1 · SANDBOX", or just the environment.
    *
    * The org identifier is what distinguishes two sandboxes of the same org,
-   * which is the case per-org colour overrides exist for — so it is worth
+   * which is the case per-org color overrides exist for — so it is worth
    * showing by default, and the setting is there for people who find it noisy.
    */
   function bannerText(url, showOrgName) {

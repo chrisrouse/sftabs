@@ -81,7 +81,7 @@ for (const rel of shipped) {
     note(m[1]); note(m[2]);
   }
 
-  // t('prefix_' + something) — the colour names and the org environments are
+  // t('prefix_' + something) — the color names and the org environments are
   // built this way, so every key under that prefix is live. Missing this is how
   // a first pass at pruning nearly deleted all nineteen of them.
   for (const m of src.matchAll(/\b(?:t|msg|getMessage)\(\s*['"`]([A-Za-z0-9_]+_)['"`]\s*\+/g)) {
@@ -147,6 +147,23 @@ for (const locale of LOCALES) {
     broken.length === 0,
     broken.length ? broken.slice(0, 6).join(', ') : 'consistent');
 }
+
+// ── US spelling in the English strings ──
+// "colour" has reached shipped labels three times now, always alongside an
+// American "color" in the same sentence, which is what makes it look careless
+// rather than merely foreign. Only en is checked: "Organisation" is correct
+// German, and the same word list would fail de and es for being themselves.
+const BRITISH = /\b(colour|colours|coloured|colouring|centre|centred|behaviour|organise[sd]?|organisation|customise[sd]?|customisation|analyse[sd]?|licence|catalogue|grey|labelled|labelling|cancelled|initialise[sd]?|whilst|recognise[sd]?|prioritise[sd]?|summarise[sd]?|utilise[sd]?|favourite[s]?|defence|programme)\b/i;
+
+const britishStrings = Object.entries(messages.en)
+  .flatMap(([key, entry]) => ['message', 'description']
+    .filter(field => entry[field] && BRITISH.test(entry[field]))
+    .map(field => `${key}.${field}: "${BRITISH.exec(entry[field])[0]}"`));
+
+check('the English strings use US spelling',
+  britishStrings.length === 0,
+  britishStrings.length ? britishStrings.slice(0, 4).join(', ')
+                        : Object.keys(messages.en).length + ' strings');
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

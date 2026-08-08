@@ -99,7 +99,7 @@
      *
      * This used to destroy and recreate the modal for any userSettings write,
      * and a settings write fires twice — once for sync, once for the local
-     * mirror — so toggling something unrelated like tab colours blinked the
+     * mirror — so toggling something unrelated like tab colors blinked the
      * handle twice. Only the floatingButton settings change what is built;
      * everything else changes what it lists, which is a re-read, not a rebuild.
      *

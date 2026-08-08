@@ -87,13 +87,16 @@ const DEFAULT_SETTINGS = {
   // page without opening the popup.
   menuBarQuickAdd: false,
   // Tints the browser tab's favicon so orgs are told apart in the tab strip.
-  // Two layers: every org gets its environment's colour, and an entry in `orgs`
+  // Two layers: every org gets its environment's color, and an entry in `orgs`
   // overrides that for one org — which is the only way to separate sandboxes,
   // since the hostname never says which tier a sandbox is.
   orgColors: {
     enabled: false,     // tint the browser tab's favicon
     banner: false,      // and/or show a bar across the top of the page
     bannerShowOrgName: true,   // "ACME--DEV1 · SANDBOX" rather than "SANDBOX"
+    // Same three choices as floatingButton.location, read through the same
+    // locationAllows() so the two surfaces cannot disagree on what Setup is.
+    bannerLocation: 'everywhere',   // 'everywhere' | 'setup-only' | 'outside-setup'
     environments: {},   // environment -> hex; empty means use DEFAULT_ENV_COLORS
     orgs: []            // { identifier, environment, color }
   },

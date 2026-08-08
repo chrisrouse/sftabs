@@ -182,7 +182,7 @@ async function checkAndSwitchProfile(url) {
 
     // Re-read immediately before writing and change only activeProfileId. The
     // snapshot above may be seconds old by now, and writing it back whole would
-    // revert anything the popup changed in between — toggling tab colours while
+    // revert anything the popup changed in between — toggling tab colors while
     // a Salesforce page finished loading was enough to lose the toggle.
     const current = (await browser.storage.sync.get('userSettings')).userSettings || {};
     await browser.storage.sync.set({

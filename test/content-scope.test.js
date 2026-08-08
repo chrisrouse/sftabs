@@ -7,7 +7,7 @@
  * written in the losing file resolve to the winner's body.
  *
  * That is invisible in review, invisible to `node --check`, and it has already
- * cost real time here twice: a tab-colour cache assignment that never ran, and
+ * cost real time here twice: a tab-color cache assignment that never ran, and
  * a refresh investigation where a shadowed storage reader was the first
  * suspect to rule out. Worse, the shadowing can be load-bearing — reordering
  * the manifest changes which body wins without a single line of code changing.
