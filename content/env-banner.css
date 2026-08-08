@@ -2,17 +2,16 @@
    The environment bar. Colour and text colour are set inline from the org's
    configured colour; everything structural lives here.
 
-   z-index sits above Salesforce's own fixed header (SLDS tops out at 10000 for
-   popups) so the bar is never covered, but below the floating panel at 10001 —
-   that panel is something the user has just opened and it should win. */
+   Two placements, chosen by the script:
+
+   inline — inside Lightning's global header, above its own system messages.
+     The header sizes itself around the bar, so nothing is covered and nothing
+     needs pushing down.
+
+   fixed — a strip over the top of the page, for anything without that header
+     (Experience Builder). The script pads body to match. */
 
 #sftabs-env-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10000;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,14 +24,31 @@
   letter-spacing: 0.04em;
   text-align: center;
 
-  /* A long org name wraps rather than spilling; the script measures the
-     rendered height, so the page is pushed down by however tall it ends up. */
+  /* A long org name wraps rather than spilling. */
   overflow-wrap: anywhere;
 
   /* Not interactive, and must never intercept a click meant for the page
      beneath — Salesforce's own header sits directly under this strip. */
   pointer-events: none;
   user-select: none;
+}
+
+#sftabs-env-banner[data-placement="inline"] {
+  /* The header is a flex column in some layouts; do not let the bar stretch. */
+  flex: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#sftabs-env-banner[data-placement="fixed"] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Above Salesforce's own fixed chrome (SLDS tops out at 10000 for popups) but
+     below the floating panel at 10001 — that panel is something the user has
+     just opened and it should win. */
+  z-index: 10000;
 }
 
 @media (prefers-reduced-motion: no-preference) {

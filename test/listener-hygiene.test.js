@@ -279,6 +279,7 @@ check('the two call sites differ only in which side they try first',
 // padding would leave a strip of blank page at the top for the rest of the
 // session, on a surface the user has just switched off.
 const banner = read('content/env-banner.js');
+const bannerCss = read('content/env-banner.css');
 
 check('the banner records the padding it replaced',
   /appliedPadding = document\.body\.style\.paddingTop/.test(banner));
@@ -292,7 +293,41 @@ check('and the bar is removed when no colour applies',
   (banner.match(/remove\(\); return;/g) || []).length >= 2,
   'switching the banner off has to take it away, not just stop redrawing it');
 check('it never intercepts clicks meant for the header beneath it',
-  /pointer-events: none/.test(read('content/env-banner.css')));
+  /pointer-events: none/.test(bannerCss));
+
+// On a Lightning page the bar goes INSIDE the global header, where Salesforce
+// puts its own system messages. The first attempt overlaid the top of the page
+// and padded body, and Lightning lays out inside a full-height container that
+// body padding does not shift — so the bar sat on top of the Agentforce notice
+// and the DevOps Center strip rather than moving them down.
+check('the bar prefers to sit inside the global header',
+  /#oneHeader/.test(banner) && /insertBefore\(bar, header\.firstChild\)/.test(banner),
+  'the header sizes itself around its own banners, so nothing gets covered');
+check('and only overlays the page where there is no such header',
+  /placement = 'fixed'[\s\S]{0,80}padBody\(bar\)/.test(banner),
+  'Experience Builder renders its own chrome');
+check('the two placements are distinguishable in CSS',
+  /\[data-placement="inline"\]/.test(bannerCss) && /\[data-placement="fixed"\]/.test(bannerCss));
+const bannerBase = /^#sftabs-env-banner \{[^}]*\}/m.exec(bannerCss);
+check('only the overlay is positioned and stacked',
+  /\[data-placement="fixed"\][\s\S]{0,200}position: fixed/.test(bannerCss) &&
+  Boolean(bannerBase) && !/position:|z-index:/.test(bannerBase[0]),
+  'an in-flow bar that is also position:fixed would cover the header again');
+
+// Placement has to survive Aura, and the search for the header has to end.
+check('the placement watch is debounced and off the body',
+  /new MutationObserver\(debounce\(/.test(banner) &&
+  /observe\(header, \{ childList: true \}\)/.test(banner),
+  'Aura discards injected nodes; a subtree watch on body fires continuously');
+check('it watches the header and its parent, since Aura replaces either',
+  /observe\(header\.parentNode, \{ childList: true \}\)/.test(banner));
+check('waiting for Aura to boot gives up rather than polling forever',
+  /POLL_TRIES = \d+/.test(banner) && /pollsLeft-- <= 0/.test(banner),
+  'a page with no Lightning header must not be polled for the life of the tab');
+check('and removal stops both the poll and the observer',
+  /function remove\(\) \{[\s\S]{0,300}stopPolling\(\);[\s\S]{0,200}placementObserver\.disconnect\(\)/.test(banner));
+check('a pending debounced callback cannot resurrect a removed bar',
+  /if \(!active\) return;/.test(banner));
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);
