@@ -17,6 +17,19 @@ function showToast(message, isError = false, duration = 3000) {
   // Create toast element
   const toast = document.createElement('div');
   toast.className = `sftabs-toast ${isError ? 'error' : 'success'}`;
+
+  // Announced, not just drawn. Without these a screen reader gets nothing at
+  // all from this page — every import and export result, including the failures,
+  // arrived silently. The popup has said its status through role="status" all
+  // along; this page's toast never did.
+  //
+  // alert/assertive for a failure, because it interrupts and the user needs to
+  // know their import did not happen. status/polite for a success, which can
+  // wait for a pause in speech.
+  toast.setAttribute('role', isError ? 'alert' : 'status');
+  toast.setAttribute('aria-live', isError ? 'assertive' : 'polite');
+  toast.setAttribute('aria-atomic', 'true');
+
   toast.textContent = message;
 
   // Add to document
