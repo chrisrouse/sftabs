@@ -409,6 +409,7 @@
 </head>
 <body>
 
+{%- assign here = page.url | remove: '.html' -%}
 <header class="v3-header">
   <a class="v3-brand" href="{{ '/v3/' | relative_url }}">
     <img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="" aria-hidden="true">
@@ -416,10 +417,10 @@
     <span class="v3-badge">v{{ site.v3_version }}</span>
   </a>
   <nav class="v3-nav" aria-label="Documentation">
-    <a href="{{ '/v3/' | relative_url }}"{% if page.url == '/v3/' %} aria-current="page"{% endif %}>Home</a>
+    <a href="{{ '/v3/' | relative_url }}"{% if here == '/v3/' %} aria-current="page"{% endif %}>Home</a>
     {%- for s in site.data.v3_sections -%}
       {%- if s.ready %}
-    <a href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
+    <a href="{{ s.url | relative_url }}"{% if here == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
       {%- endif -%}
     {%- endfor %}
     <a href="{{ site.github.repository_url }}">GitHub</a>
@@ -438,10 +439,10 @@
   <div class="v3-body">
     <nav class="v3-side" aria-label="Sections">
       <span class="v3-side-label">Documentation</span>
-      <a class="v3-siderow" href="{{ '/v3/' | relative_url }}"{% if page.url == '/v3/' %} aria-current="page"{% endif %}>Home</a>
+      <a class="v3-siderow" href="{{ '/v3/' | relative_url }}"{% if here == '/v3/' %} aria-current="page"{% endif %}>Home</a>
       {%- for s in site.data.v3_sections %}
         {%- if s.ready %}
-      <a class="v3-siderow" href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
+      <a class="v3-siderow" href="{{ s.url | relative_url }}"{% if here == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
         {%- else %}
       <span class="v3-siderow is-pending" aria-disabled="true">{{ s.title }}</span>
         {%- endif %}
