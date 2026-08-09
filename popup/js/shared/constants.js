@@ -144,9 +144,7 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
   // Browser environment. globalThis, not window: the background worker loads
   // this file and a service worker has no window — `window.SFTabs` there is a
-  // ReferenceError that kills the whole worker. utils.js has always used
-  // globalThis for that reason; this file did not, and only got away with it
-  // because the worker did not load it until now.
+  // ReferenceError that kills the whole worker.
   globalThis.SFTabs = globalThis.SFTabs || {};
   globalThis.SFTabs.constants = {
     TAB_STRUCTURE,
@@ -155,4 +153,12 @@ if (typeof module !== 'undefined' && module.exports) {
     NAVIGATION_SELECTORS,
     CHUNK_SIZE
   };
+
+  // Every file in content/ reads these off `window`. On Firefox a content
+  // script's globalThis is its sandbox, not the page window, so a write to one
+  // is not a read from the other and the two must be pointed at one object.
+  // No-op in the worker (no window) and on Chrome (window === globalThis).
+  if (typeof window !== 'undefined' && window !== globalThis) {
+    window.SFTabs = globalThis.SFTabs;
+  }
 }

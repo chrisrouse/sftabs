@@ -1232,6 +1232,16 @@ if (typeof module !== 'undefined' && module.exports) {
   // globalThis rather than window: a service worker has no window, and the
   // background worker imports this file for its org matching.
   globalThis.SFTabs = globalThis.SFTabs || {};
+
+  // See the matching note in constants.js: on Firefox a content script's
+  // globalThis is its sandbox, not the page window, and every file in content/
+  // reads these off `window`. Pointing both at one object here is enough — the
+  // .utils assignment below mutates that shared object.
+  // No-op in the worker (no window) and on Chrome (window === globalThis).
+  if (typeof window !== 'undefined' && window !== globalThis) {
+    window.SFTabs = globalThis.SFTabs;
+  }
+
   globalThis.SFTabs.utils = {
     generateId,
     extractOrgIdentifier,
