@@ -397,20 +397,6 @@
                   </div>
                 </div>
 
-                <!-- Hidden with profiles off, where "all profiles" means one. -->
-                <div class="settings-row" id="row-quick-add-all">
-                  <label class="settings-row-label" for="setting-quick-add-all">
-                    <span class="settings-label">__MSG_quickAddAllProfilesLabel__</span>
-                    <span class="settings-desc">__MSG_quickAddAllProfilesDesc__</span>
-                  </label>
-                  <div class="settings-row-control">
-                    <label class="toggle" aria-label="__MSG_quickAddAllProfilesLabel__">
-                      <input type="checkbox" id="setting-quick-add-all" role="switch" />
-                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-                    </label>
-                  </div>
-                </div>
-
             </section>
 
             <section class="settings-section" data-settings-section="profiles"
@@ -448,6 +434,23 @@
                   </div>
                 </div>
                 <p class="form-hint" id="auto-switch-hint" hidden>__MSG_autoSwitchNeedsOrgs__</p>
+
+                <!-- Quick Add's own toggle lives in Tabs; this one is about
+                     which profiles it writes to, so it belongs here. Inside
+                     profiles-manage, so it hides with the rest of the block —
+                     "all profiles" says nothing when there is only ever one. -->
+                <div class="settings-row" id="row-quick-add-all">
+                  <label class="settings-row-label" for="setting-quick-add-all">
+                    <span class="settings-label">__MSG_quickAddAllProfilesLabel__</span>
+                    <span class="settings-desc">__MSG_quickAddAllProfilesDesc__</span>
+                  </label>
+                  <div class="settings-row-control">
+                    <label class="toggle" aria-label="__MSG_quickAddAllProfilesLabel__">
+                      <input type="checkbox" id="setting-quick-add-all" role="switch" />
+                      <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                    </label>
+                  </div>
+                </div>
 
                 <ul class="dropdown-items-list" role="list" id="profiles-list">
                   <!-- Populated by renderProfilesList() -->

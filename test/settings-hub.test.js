@@ -150,8 +150,11 @@ check('the storage radios survived the move',
 // moved to General a commit earlier.
 const BELONGS_IN = {
   general:  ['setting-compact', 'setting-skip-delete'],
-  tabs:     ['setting-tab-colors', 'row-tab-color-style', 'setting-quick-add-all'],
-  profiles: ['setting-profiles', 'setting-auto-switch', 'profiles-list'],
+  tabs:     ['setting-tab-colors', 'row-tab-color-style'],
+  // quick-add-all is about which profiles Quick Add writes to, not about Quick
+  // Add itself, so it sits with the profiles it names rather than in Tabs.
+  profiles: ['setting-profiles', 'setting-auto-switch', 'profiles-list',
+             'setting-quick-add-all'],
   'org-colors': ['setting-org-colors', 'org-colors-body', 'env-color-rows',
                  'org-color-rows', 'btn-capture-org-color'],
   button: ['setting-floating-button', 'setting-header-menu', 'floating-button-options',
@@ -219,7 +222,7 @@ if (refreshMap) {
 // A scrolling flex child needs min-height: 0 on every ancestor between it and
 // the fixed-height shell, or the chain refuses to shrink and the overflow never
 // materialises. And a second scroll container above it is not harmless: the
-// view used to scroll instead, with a companion rule cancelling the body's own
+// view used to scroll instead, with a companion rule canceling the body's own
 // overflow. Removing one without the other left nothing able to scroll, because
 // .panel-view clips.
 const rulesFor = selector =>
