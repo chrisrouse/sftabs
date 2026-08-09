@@ -10,6 +10,13 @@ theme: null
 # hardcodes 2.1.1 at default.html:46; this exists so the v3 side has one place.
 v3_version: "3.0.0"
 
+# The version the stores are still serving, named in the review notice.
+v2_version: "2.1.1"
+
+# Shows the "in review" banner at the top of every v3 page. Set to false the
+# day 3.0 is live in both stores — that is the whole switch.
+v3_in_review: true
+
 # Brand colors
 brand_color: "#288aff"
 brand_color_dark: "#1a6ee6"

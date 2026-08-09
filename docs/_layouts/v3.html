@@ -53,7 +53,8 @@
       --r-pill: 999px;
 
       --header-h: 56px;
-      --content-w: 1000px;
+      --side-w: 232px;
+      --content-w: 1180px;
       --ease: 0.15s ease;
     }
 
@@ -157,13 +158,93 @@
       width: 100%;
       max-width: var(--content-w);
       margin: 0 auto;
-      padding: 32px 20px 56px;
+      padding: 28px 20px 56px;
+    }
+    .v3-body {
+      display: grid;
+      grid-template-columns: var(--side-w) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+    .v3-content { min-width: 0; }
+
+    /* ── Sidebar ── the popup's tab list, as section navigation ──
+       Same anatomy as .tab-item in css/popup.css: a surface-1 card with a
+       subtle border, a 3px accent bar down the left edge, and s-hover on
+       hover. The bar is transparent until the row is the page you are on,
+       which is how the popup marks the active tab. */
+    .v3-side {
+      position: sticky;
+      top: calc(var(--header-h) + 20px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .v3-side-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--t-faint);
+      padding: 0 4px 4px;
+    }
+    .v3-siderow {
+      position: relative;
+      display: block;
+      padding: 9px 12px 9px 15px;
+      background: var(--s-1);
+      border: 1px solid var(--b-subtle);
+      border-radius: var(--r-md);
+      color: var(--t-base);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      overflow: hidden;
+      transition: background var(--ease), border-color var(--ease);
+    }
+    .v3-siderow::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: var(--r-md) 0 0 var(--r-md);
+      background: transparent;
+    }
+    a.v3-siderow:hover {
+      background: var(--s-hover);
+      border-color: var(--b-medium);
+      color: var(--t-base);
+      text-decoration: none;
+    }
+    .v3-siderow[aria-current="page"] {
+      background: var(--accent-tint);
+      border-color: var(--accent);
+      color: var(--accent-hover);
+      font-weight: 600;
+    }
+    .v3-siderow[aria-current="page"]::before { background: var(--accent); }
+    @media (prefers-color-scheme: dark) {
+      .v3-siderow[aria-current="page"] { color: #fff; }
+    }
+    /* Not written yet: present so the shape is visible, but inert. */
+    .v3-siderow.is-pending {
+      opacity: 0.5;
+      background: none;
+      border-style: dashed;
     }
 
-    .v3-hero { text-align: center; margin-bottom: 36px; }
+    @media (max-width: 860px) {
+      .v3-body { grid-template-columns: 1fr; gap: 20px; }
+      .v3-side { position: static; }
+      .v3-side.is-collapsed { display: none; }
+    }
+
+    .v3-hero { margin-bottom: 28px; }
     .v3-hero h1 {
       margin: 0 0 8px;
-      font-size: 2.25rem;
+      font-size: 2rem;
       font-weight: 700;
       letter-spacing: -0.02em;
     }
@@ -346,13 +427,37 @@
 </header>
 
 <main class="v3-main">
-  {%- if page.card == false %}
-  {{ content }}
-  {%- else %}
-  <article class="v3-card v3-prose">
-    {{ content }}
-  </article>
+
+  {%- if site.v3_in_review %}
+  <div class="v3-notice">
+    <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+    <p><strong>Version 3 is in review at the browser stores.</strong> These pages describe 3.0. If you are running {{ site.v2_version }} from the Chrome Web Store or Firefox Add-ons, the <a href="{{ '/' | relative_url }}">version 2 documentation</a> is the one you want &mdash; or install 3.0 early from the <a href="https://github.com/chrisrouse/sftabs/releases/tag/v{{ site.v3_version }}">GitHub release</a>.</p>
+  </div>
   {%- endif %}
+
+  <div class="v3-body">
+    <nav class="v3-side" aria-label="Sections">
+      <span class="v3-side-label">Documentation</span>
+      <a class="v3-siderow" href="{{ '/v3/' | relative_url }}"{% if page.url == '/v3/' %} aria-current="page"{% endif %}>Home</a>
+      {%- for s in site.data.v3_sections %}
+        {%- if s.ready %}
+      <a class="v3-siderow" href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
+        {%- else %}
+      <span class="v3-siderow is-pending" aria-disabled="true">{{ s.title }}</span>
+        {%- endif %}
+      {%- endfor %}
+    </nav>
+
+    <div class="v3-content">
+      {%- if page.card == false %}
+      {{ content }}
+      {%- else %}
+      <article class="v3-card v3-prose">
+        {{ content }}
+      </article>
+      {%- endif %}
+    </div>
+  </div>
 </main>
 
 <footer class="v3-footer">

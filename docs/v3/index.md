@@ -11,11 +11,6 @@ description: Documentation for SF Tabs 3.0 — custom tabs, org colors, profiles
   <p>Custom navigation for the Salesforce Setup menu — and a few ways to tell your orgs apart.</p>
 </div>
 
-<div class="v3-notice">
-  <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-  <p><strong>Version 3 is in review at the browser stores.</strong> These pages describe 3.0 and are being written now. If you are running 2.1.1 from the Chrome Web Store or Firefox Add-ons, the <a href="{{ '/' | relative_url }}">version 2 documentation</a> is the one you want. You can install 3.0 early from the <a href="https://github.com/chrisrouse/sftabs/releases/tag/v3.0.0">GitHub release</a>.</p>
-</div>
-
 <ul class="v3-tiles">
 {%- for s in site.data.v3_sections %}
   {%- if s.ready %}
