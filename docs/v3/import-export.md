@@ -8,7 +8,7 @@ description: Back up, share, or migrate your SF Tabs configuration, and choose w
 
 Import & Export is reached from the Settings hub in the popup — click the "Import & Export" tile. It's the only part of Settings that isn't in the popup: it opens as its own page in a browser tab, because extension popups handle file pickers badly.
 
-<div class="v3-shot">Screenshot: the Import & Export page opened in its own browser tab</div>
+<img width="767" height="503" alt="import-export-page" src="https://github.com/user-attachments/assets/ad44e22b-a397-4805-a3a4-d237886f9f8d" />
 
 ## Export Configuration
 
@@ -18,6 +18,8 @@ You can back up your configuration or share it with team members.
 - **Custom Selection** — Choose to export Settings (preferences, theme, and options) and/or specific profiles. Use this if you already use SF Tabs on another device and only need to export certain profiles, or if you're sharing a configuration with a co-worker.
 
 Exported files record which version of SF Tabs wrote them.
+
+<img width="774" height="803" alt="export-options" src="https://github.com/user-attachments/assets/c5d6cfe8-f0cf-4a92-bf4b-4db030886131" />
 
 ## Import Configuration
 
@@ -29,7 +31,7 @@ Import a JSON file that was exported from SF Tabs, whether it's an older file or
 
 If the imported file contains several profiles, Profiles are enabled and you choose which ones to import.
 
-<div class="v3-shot">Screenshot: the import options screen after selecting a file, showing add / overwrite / new profile choices</div>
+<img width="777" height="961" alt="import-options" src="https://github.com/user-attachments/assets/8e2cdb02-2a77-4e9c-9688-665cb3126275" />
 
 ## Migrate from the Why Salesforce Extension
 
