@@ -251,6 +251,14 @@
     }
 
     /* ── Prose ── */
+    .v3-prose > :first-child { margin-top: 0; }
+    .v3-prose > :last-child { margin-bottom: 0; }
+    .v3-main h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 16px;
+    }
     .v3-main h2 { font-size: 1.5rem; font-weight: 600; margin: 32px 0 12px; }
     .v3-main h3 { font-size: 1.175rem; font-weight: 600; margin: 24px 0 8px; }
     .v3-main code {
@@ -269,6 +277,26 @@
       overflow-x: auto;
     }
     .v3-main pre code { background: none; border: 0; padding: 0; }
+    .v3-main img { max-width: 100%; height: auto; border-radius: var(--r-md); }
+    /* Badge links sit inline in a row, so they must not pick up the block
+       treatment above. */
+    .v3-main p > a > img { border-radius: 0; vertical-align: middle; }
+    .v3-main ul, .v3-main ol { padding-left: 1.35rem; }
+    .v3-main li { margin: 4px 0; }
+    .v3-main hr { border: 0; border-top: 1px solid var(--b-subtle); margin: 28px 0; }
+    .v3-main blockquote {
+      margin: 16px 0;
+      padding: 4px 16px;
+      border-left: 3px solid var(--accent);
+      color: var(--t-weak);
+    }
+    .v3-main table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    .v3-main th, .v3-main td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--b-subtle);
+    }
+    .v3-main th { font-weight: 600; }
 
     /* ── Footer ── the popup's app-footer ── */
     .v3-footer {
@@ -318,7 +346,13 @@
 </header>
 
 <main class="v3-main">
+  {%- if page.card == false %}
   {{ content }}
+  {%- else %}
+  <article class="v3-card v3-prose">
+    {{ content }}
+  </article>
+  {%- endif %}
 </main>
 
 <footer class="v3-footer">

@@ -12,7 +12,7 @@
   url: /v3/installation
   icon: bi-download
   blurb: Install on Chrome, Edge or Firefox, or load the release build by hand.
-  ready: false
+  ready: true
 
 - title: Getting Started
   url: /v3/getting-started

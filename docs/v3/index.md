@@ -1,6 +1,8 @@
 ---
 layout: v3
 title: Home
+# Builds its own hero, tiles and cards, so it is not wrapped in one.
+card: false
 description: Documentation for SF Tabs 3.0 — custom tabs, org colors, profiles and quick access for the Salesforce Setup menu.
 ---
 
