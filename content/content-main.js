@@ -421,7 +421,7 @@ function handleLightningNavigate(message, sendResponse) {
  * discarded. That silently disabled the popup's guard against pulling
  * Contact's navigation into an Account tab.
  *
- * One endpoint now, with the better behaviour: the retrying async parse, and
+ * One endpoint now, with the better behavior: the retrying async parse, and
  * every field the popup reads.
  */
 function handleParseNavigation(sendResponse) {

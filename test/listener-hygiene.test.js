@@ -26,7 +26,7 @@
  *   destroy() could not remove them — and floating-button.js destroys and
  *   rebuilds that modal on every settings write.
  *
- * Asserted against the source: all of this is DOM lifetime behaviour with no
+ * Asserted against the source: all of this is DOM lifetime behavior with no
  * seam to observe from a unit test.
  *
  * Run: npm test

@@ -3126,7 +3126,7 @@ function bindEvents() {
 
   document.getElementById('btn-reset-env-colors').addEventListener('click', async () => {
     // Only the environment layer. Per-org colors were each set deliberately and
-    // are not something a button labelled "defaults" should be able to discard.
+    // are not something a button labeled "defaults" should be able to discard.
     await patchSettings({ orgColors: { ...orgColorConfig(), environments: {} } });
     renderEnvColors();
     renderOrgColors();   // profile-linked rows show their environment's color

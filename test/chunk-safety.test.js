@@ -189,7 +189,7 @@ const big = n => Array.from({ length: n }, (_, i) => ({ id: 'tab' + i, label: 'T
     check(`${rel.split('/').pop()} delegates rather than reimplementing`,
       src.includes(`utils.${reader}`) && src.includes(`utils.${writer}`) &&
       !/JSON\.stringify\(data\)[\s\S]{0,200}new Blob/.test(src),
-      'two implementations is how the torn-read behaviour came to differ');
+      'two implementations is how the torn-read behavior came to differ');
   }
 
   console.log('\n' + passed + '/' + (passed + failed) + ' passed');

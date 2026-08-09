@@ -24,7 +24,7 @@
  * so deliberately: they are the same values css/popup.css uses for the same
  * roles, where each is documented as a contrast choice the raw token does not
  * make — surface-3 in dark so cards separate from the panel behind them, and a
- * mid grey that clears AA on both surfaces. Replacing them with the raw tokens
+ * mid gray that clears AA on both surfaces. Replacing them with the raw tokens
  * would make this page disagree with the popup, which is the opposite of the
  * point. If they change, they change in both files together.
  *

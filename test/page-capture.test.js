@@ -9,8 +9,8 @@
  *
  * So the parsing lives once, in shared utils. These cases were taken from the
  * implementation that shipped inside popup-tabs.js and checked against it
- * before the extraction, so this file also pins the behaviour that already
- * existed rather than only the behaviour I intended.
+ * before the extraction, so this file also pins the behavior that already
+ * existed rather than only the behavior I intended.
  *
  * Run: npm test
  */

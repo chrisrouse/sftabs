@@ -106,13 +106,13 @@ check('a malformed entry does not throw',
 // ── Resetting the environment layer ──
 // Clearing `environments` is the whole reset: an empty map means the shipped
 // colors are in force, which is also how the feature starts. Per-org entries
-// are untouched, because each was set deliberately and a button labelled
+// are untouched, because each was set deliberately and a button labeled
 // "defaults" has no business discarding them.
-const customised = on({
+const customized = on({
   environments: { production: '#000000', sandbox: '#111111' },
   orgs: [{ identifier: 'acme--dev2', environment: 'sandbox', color: '#8430ce' }],
 });
-const afterReset = { ...customised, environments: {} };
+const afterReset = { ...customized, environments: {} };
 
 check('a reset returns every environment to its default',
   resolveOrgColor(PROD, afterReset) === DEFAULT_ENV_COLORS.production &&
@@ -235,7 +235,7 @@ check('outside Setup is the exact inverse',
 check('an install predating the setting shows everywhere',
   Boolean(banner(undefined, SETUP)) && Boolean(banner(undefined, RECORD)),
   'a stored config with no bannerLocation must not hide a banner already in use');
-check('and so does a value nothing recognises',
+check('and so does a value nothing recognizes',
   Boolean(banner('somewhere-else', SETUP)),
   'hiding a feature the user switched on is the worse failure');
 check('the default is everywhere',

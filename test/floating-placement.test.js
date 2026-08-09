@@ -62,7 +62,7 @@ check('the shipped default agrees', DEFAULT_SETTINGS.floatingButton.side === 'ri
 check('an explicit side beats a stale anchor',
   sideOf({ side: 'left', anchor: 'top-right' }) === 'left');
 check('an unrecognised side falls back rather than passing through',
-  sideOf({ side: 'centre' }) === 'right');
+  sideOf({ side: 'middle' }) === 'right');
 check('no settings at all resolves rather than throwing', sideOf(null) === 'right');
 check('an empty anchor string resolves rather than throwing', sideOf({ anchor: '' }) === 'right');
 

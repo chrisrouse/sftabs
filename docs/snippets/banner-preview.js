@@ -20,7 +20,7 @@ window.sftabsPreview = (() => {
                            scratch:'scratch', demo:'demo', trailblaze:'playground' };
   const SUFFIXES = ['builder.salesforce-experience.com','my.salesforce-setup.com',
                     'my.salesforce.com','lightning.force.com','salesforce-setup.com','salesforce.com'];
-  const COLOURS = { production:'#c5221f', sandbox:'#1e8e3e', developer:'#1a73e8',
+  const COLORS = { production:'#c5221f', sandbox:'#1e8e3e', developer:'#1a73e8',
                     scratch:'#7526e3', demo:'#b06000', patch:'#5c5c5c', playground:'#0d9dda' };
   const LABELS = { production:'Production', sandbox:'Sandbox', developer:'Developer Edition',
                    scratch:'Scratch org', demo:'Demo org', playground:'Trailhead Playground',
@@ -45,7 +45,7 @@ window.sftabsPreview = (() => {
   const current = () => {
     const o = org();
     if (!o) { console.warn('[preview] not a Salesforce org host:', location.hostname); return null; }
-    return { ...o, color: override || COLOURS[o.env] };
+    return { ...o, color: override || COLORS[o.env] };
   };
 
   function bar(showOrgName = true) {
