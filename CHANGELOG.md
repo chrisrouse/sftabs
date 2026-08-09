@@ -13,37 +13,31 @@ The popup derives its "new notes" badge from the newest version block in
 
 ---
 ## 3.0.0
-A new look, a pile of color, and a few things that quietly never worked before.
+New look, same great extension -- now with even more features! Thanks for using SF Tabs. 
 
-**Settings finally live where you'd look for them**
-No more hunting for a separate settings page in another browser tab. Everything's in the extension now, sorted into tiles — General, Tabs, Profiles, Org Colors, Button and Data — so you can find a switch without remembering where you left it. The standalone page still exists, but it's earned its retirement: Import & Export only.
+**Settings have moved back into the popup**
+All of your settings have been moved back into the popup to make it faster and easier to customize SF Tabs the way you want. Click on the gear icon in the bottom right corner to open the new settings panel and take a look around. All of your existing settings have been kept, they're just in a new place. Import/Export is still on a separate screen since extensions don't handle file browser popups very well.
 
-**Tell your orgs apart at a glance**
-Production and a sandbox look identical in a row of browser tabs, right up until the moment they really don't. Now every Salesforce tab's icon can carry a color, picked automatically from the kind of org you're in. Red for production, green for sandboxes, and you can change any of that. Got three sandboxes in the same org? Give each its own color — the web address can't tell them apart, so this is the only thing that can.
+**Tell your orgs apart with just a glance**
+If you have a separate extension installed for setting your org colors, you no longer need it! You can now set colors for every org you work in or just allow SF Tabs to set the colors for you using the built in default settings. Want to make it even more obvious where you are? Enable the org banner! You can see your org name and your environment name along with the matching color you set for your tabs. Banners work across setup, object pages, and Experience Cloud. Check Settings > Org Colors for all of the options. Want to highlight specific tabs in your custom tabs? Well, you can do that now, too. Go to Settings > Tabs to enable this feature. This setting plays nicely with org themes, allowing Salesforce to control the hover and active tab settings.
 
-**Color-code your tabs, too**
-Individual tabs in the Salesforce menu bar can each take a color, as a small dot or a full tint. Off unless you want it, and if you turn it off later your colors are still there waiting.
+**Get there faster**
+There is a new menu option that you can add to every page next to Salesforce's own Favorites menu. This gives you a faster way to access your favorite objects or setup pages. The floating menu button has also been improved and has some new options. Go to Settings > Button to configure the menus. 
 
-**SF Tabs, right in the Salesforce header**
-There's now an optional bookmark menu sitting next to Salesforce's own Favorites, styled to look like it belongs there. Use it instead of the floating panel, or run both.
+**New tabs in fewer clicks**
+You can still open the popup to add a new tab, but now you can enable a new button in the tab bar to add the current page. Go to Settings > Tabs to enable this feature. The SF Tabs header menu also gives you the ability to just click on the icon to add the current page without having to open the extension's popup.
 
-**Grab the page you're on, without stopping**
-Turn on the "+" at the end of your tabs and capture whatever page you're looking at without opening the extension at all. There's also a setting to drop captured pages into every profile at once, if you keep your profiles in sync.
+**Drag tabs to reorder**
+This one is less of a new feature and more taking advantage of something Salesforce just did for us. If you drag your tabs while in setup, you can re-arrange them. This order is now captured by SF Tabs and saved.
 
-**One tab, many profiles**
-Editing a tab now lets you tick the profiles it should appear in. No more building the same tab four times and getting the URL slightly wrong on the third one.
+**Improved profiles**
+New tabs can be added to one profile or all profiles. You can edit individual tabs and choose which profiles to include it in, or you can go to Settings > Profiles and choose to have new tabs added to all profiles automatically. Profile management hasn't changed much, but the UI has been cleaned up a bit. Profiles also support more org types, like Trailhead, scratch orgs, etc., for auto-switching. The new profile experience has also been improved. Profiles also support separate windows now. This didn't work before.
 
-**Pick a shape for the floating panel**
-Edge drawer, round button, or a labeled pill. Dock it left or right, and set how far down it sits in actual pixels — so it stops wandering when you resize the window or open devtools.
+**Leave a review**
+In 14 days, you'll be asked to leave a review if you're liking SF Tabs. This shows up in the popup above the footer, and either answer settles it for good — you won't be asked twice.
 
-**New profiles don't have to start from nothing**
-Start empty, start with the default tabs, or copy a profile you already have and prune from there.
-
-**Profiles now work in orgs where they never did**
-Scratch orgs, Developer Edition, demo orgs, patch orgs and Trailhead Playgrounds were invisible to profile matching, so auto-switching just sat there doing nothing. All recognized now.
-
-**Two orgs, two windows, two sets of tabs**
-Open different orgs in separate windows and each keeps its own tabs. Previously whichever profile you touched last hijacked every window.
+**Lots of code cleanup and performance improvements**
+The code has been cleaned up a lot and a lot of little bugs you may have never noticed have been found and fixed.
 
 ## 2.1.2
 **Fixes an issue with data storage**
