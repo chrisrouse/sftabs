@@ -26,7 +26,12 @@ Each shortcut is labeled "Tab 1" through "Tab 10" and maps to your first ten tab
 4. **Configure Shortcuts**
    Click in the input field next to each command (e.g., "Tab 1") and press your desired key combination
 
-<div class="v3-shot">Screenshot: Firefox's Manage Extension Shortcuts screen with SF Tabs' Tab 1–Tab 10 commands</div>
+
+<img width="1259" height="843" alt="firefox-shortcuts" src="https://github.com/user-attachments/assets/6ac98ede-1e68-480b-bd2e-593bd6d1dfb3" />
+
+<img width="988" height="485" alt="sftabs-shortcuts-firefox" src="https://github.com/user-attachments/assets/85a22550-f477-442a-b2a1-70aa2add0b2b" />
+
+
 
 ## Setting Up Shortcuts in Chrome
 
@@ -42,4 +47,4 @@ Each shortcut is labeled "Tab 1" through "Tab 10" and maps to your first ten tab
 4. **Configure Shortcuts**
    Click in the pencil icon next to each command (e.g., "Tab 1") and press your desired key combination
 
-<div class="v3-shot">Screenshot: Chrome's Keyboard shortcuts screen with SF Tabs' Tab 1–Tab 10 commands</div>
+<img width="1150" height="810" alt="chrome-extensions" src="https://github.com/user-attachments/assets/c2374a56-d519-4d3b-8b79-6a432c9bd594" />
