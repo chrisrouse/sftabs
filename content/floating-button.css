@@ -297,6 +297,13 @@
   background: #202020; /* surface-2 from popup — same as the handle */
 }
 
+.sftabs-floating-modal[data-layout="fab"][data-theme="dark"] .modal-panel,
+.sftabs-floating-modal[data-layout="pill"][data-theme="dark"] .modal-panel {
+  /* Just above the #202020 surface — the light border would read as an outline
+     against it rather than an edge. */
+  border-color: #3a3a3a;
+}
+
 .sftabs-floating-modal[data-theme="dark"] .modal-panel::-webkit-scrollbar-thumb {
   background: #4a4a4a;
 }
@@ -411,6 +418,10 @@
 .sftabs-floating-modal[data-layout="pill"] .modal-panel {
   display: none;
   border-radius: 12px;
+  /* The handle layout reads as a panel because it is attached to the trigger
+     and the pair carries a shadow. These two float free with neither, so a
+     white panel on a white Salesforce page had no visible edge at all. */
+  border: 1px solid var(--slds-g-color-border-base-1, var(--lwc-colorBorder, #c9c9c9));
 }
 .sftabs-floating-modal[data-layout="fab"].open .modal-panel,
 .sftabs-floating-modal[data-layout="pill"].open .modal-panel {
