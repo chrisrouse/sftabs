@@ -322,6 +322,16 @@
       }
     }
   },
+  "profileLinkedOrgNote": {
+    "message": "This org is linked to “$NAME$”, so auto-switch picks the profile here.",
+    "description": "Shown in the profile switcher when the current org is linked to a profile, so switching would not hold; {$NAME$}=profile name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Production"
+      }
+    }
+  },
   "editProfileTitle": {
     "message": "Edit this profile",
     "description": "Title attribute on the edit button in the profile list item"

@@ -60,6 +60,9 @@ let state = {
   profileFormIsNew: false,    // the profile form is creating, not editing
   editingItemPath: null,      // dropdown item currently open for inline edit
   addingItemUnder: null,      // parent path for a pending add ([] = root)
+  // The page the popup was opened over. Needed to answer "is this org linked to
+  // a profile", which decides whether switching here would hold.
+  currentUrl:      null,
 };
 
 // ── Init ───────────────────────────────────────────────────────
@@ -71,6 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // defaults silently and there would be nothing left to choose.
   await maybeRunFirstLaunch();
   await loadFromStorage();
+  await readCurrentUrl();
   renderTabList();
   renderProfileChip();
   renderProfileDropdown();
@@ -982,12 +986,22 @@ function renderProfileDropdown() {
   const dropdown = document.getElementById('profile-dropdown');
   const active   = state.settings.activeProfileId;
 
+  // Auto-switch owns the profile on a linked org, so offering the choice here
+  // would be offering something that reverts on the next navigation. The list
+  // still renders — seeing which profiles exist, and reaching New profile,
+  // are both still useful — but the options are inert and say why.
+  const linked = linkedProfileForCurrentPage();
+
   dropdown.innerHTML = `
     <div class="profile-dropdown-header">${t('profilesSection')}</div>
+    ${linked ? `
+      <p class="profile-dropdown-note">${esc(t('profileLinkedOrgNote', linked.name))}</p>
+    ` : ''}
     ${orderedProfiles().map(p => `
       <button class="profile-option" role="option"
         aria-selected="${p.id === active}"
-        data-profile-id="${p.id}">
+        ${linked ? 'disabled aria-disabled="true"' : ''}
+        ${linked ? '' : `data-profile-id="${p.id}"`}>
         <span class="profile-option-dot" style="background:${profileColor(p.id)}"></span>
         <span>${esc(p.name)}</span>
         ${p.id === active ? `<span class="profile-option-check" aria-hidden="true">✓</span>` : ''}
@@ -2228,8 +2242,44 @@ function moveTab(tabId, direction) {
 
 // ── Profile switching ──────────────────────────────────────────
 
+/** The page the popup was opened over. Absent for a detached popup. */
+async function readCurrentUrl() {
+  try {
+    const [active] = await browser.tabs.query({ active: true, currentWindow: true });
+    state.currentUrl = (active && active.url) || null;
+  } catch {
+    state.currentUrl = null;   // no tabs permission, or no active tab
+  }
+}
+
+/**
+ * The profile this org is linked to, if auto-switch would claim the page.
+ *
+ * When one exists, switching here cannot hold: resolveProfileForUrl returns the
+ * linked profile whatever activeProfileId says, and the worker re-switches on
+ * the next navigation. Answered with the same helpers both of those use, so the
+ * popup cannot disagree with them about what "linked" means.
+ *
+ * Returns null when auto-switch is off, no page is known, or nothing matches —
+ * all cases where a manual switch does hold.
+ */
+function linkedProfileForCurrentPage() {
+  const s = state.settings;
+  if (!s || !s.profilesEnabled || !s.autoSwitchProfiles || !state.currentUrl) return null;
+
+  const org = SFTabs.utils.extractOrgIdentifier(state.currentUrl);
+  if (!org) return null;
+
+  return state.profiles.find(p => (p.urlPatterns || []).some(
+    pattern => String(pattern).toLowerCase() === org.toLowerCase())) || null;
+}
+
 async function switchProfile(profileId) {
   if (!profileId) return;   // never persist an undefined active profile
+  // Belt and braces: the options are already inert in the dropdown, but a
+  // keyboard path or a stale render must not write a choice that will be
+  // undone by the next navigation.
+  if (linkedProfileForCurrentPage()) return;
   await patchSettings({ activeProfileId: profileId });
   state.tabs = await SFTabs.storage.getProfileTabs(profileId) || [];
   renderTabList();

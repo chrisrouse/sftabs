@@ -1608,6 +1608,24 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 .profile-option:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: -2px; }
 .profile-option[aria-selected="true"] { color: var(--c-primary); }
 .profile-option-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Auto-switch owns the profile on a linked org, so the options are inert and
+   the note above says why. Dimmed rather than removed: which profiles exist,
+   and which one is in force, are both still worth seeing. */
+.profile-dropdown-note {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: var(--sft-font-size-xs);
+  line-height: 1.4;
+  color: var(--t-weak);
+  border-bottom: 1px solid var(--b-subtle);
+}
+.profile-option[disabled] {
+  cursor: default;
+  opacity: 0.5;
+}
+.profile-option[disabled]:hover { background: transparent; }
+
 .profile-option-check { margin-left: auto; color: var(--c-primary); font-size: var(--sft-font-size-base); }
 
 /* ── 19. Modals ── */
