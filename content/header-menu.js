@@ -17,6 +17,10 @@
   // SLDS new_window, the same glyph Salesforce puts on menu items that leave the
   // page. Shown only on hover or focus, as theirs is.
   const NEW_WINDOW = 'M487 20H296c-8 0-16 5-16 13v30c0 8 7 17 16 17h79c9 0 14 10 7 16L212 266c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l170-170c6-6 16-2 16 7v79c0 8 8 17 16 17h29c8 0 15-9 15-17V34c0-9-5-14-13-14M363 255l-34 35q-9 9-9 21v114c0 8-7 15-15 15H95c-8 0-15-7-15-15V215c0-8 7-15 15-15h115c8 0 16-3 21-9l34-34c6-6 2-17-7-17H60a40 40 0 0 0-40 40v280a40 40 0 0 0 40 40h280a40 40 0 0 0 40-40V262c0-9-11-13-17-7';
+  // SLDS utility:down — the exact glyph Salesforce puts on the Favorites
+  // disclosure half, so the two split buttons sit side by side without one
+  // looking hand-drawn.
+  const DOWN = 'M83 140h354c10 0 17 13 9 22L273 374c-6 8-19 8-25 0L73 162c-7-9-1-22 10-22';
   // Disclosure chevron, matching the floating panel's .dropdown-indicator: a
   // stroked polyline rather than a filled path, rotated 90deg when open.
   const CHEVRON = '<svg class="sftabs-hm-chev-icon" viewBox="0 0 24 24" fill="none" ' +
@@ -30,6 +34,8 @@
   const NUBBIN_GAP = 13;
 
   let observer = null;
+  /** setInterval id for the URL watch, held so teardown can stop it. */
+  let urlTimer = null;
   // Held so row rendering can read tabColors without another storage read
   let menuSettings = {};
 
@@ -74,6 +80,89 @@
    * a sibling would break wherever the row differs. Prepending is indifferent to
    * what else is present.
    */
+  /**
+   * One half of the split button, wrapped the way Salesforce wraps its own.
+   *
+   * Favorites' button is two parts: the <button>, and a <div> inside it holding
+   * the icon and the tooltip together. That inner div is not incidental — it is
+   * the button's only child, so it is what the button sizes itself around. An
+   * earlier attempt here put the icon directly in the button and the tooltip
+   * beside it, which gave the button a different content box and would not match
+   * however the geometry was tuned.
+   *
+   * `title` is deliberately absent. It produced the operating system's gray
+   * tooltip next to Salesforce's dark one — two different tooltips on adjacent
+   * buttons in the same row. The span below replaces it, and aria-describedby
+   * is what makes it reach a screen reader in its place.
+   */
+  function half(id, path, tip, label, extraAttrs) {
+    const tipId = `${id}-tip`;
+    return `
+      <button type="button" id="${id}" ${extraAttrs}
+        aria-describedby="${tipId}"
+        aria-label="${esc(label)}"
+        class="slds-button slds-button_icon slds-button_icon-border slds-button_icon-small">
+        <div class="sftabs-hm-tipwrap">
+          ${svg(path, 'slds-button__icon slds-icon slds-icon_xx-small sftabs-hm-btn-icon')}
+          <span role="tooltip" id="${tipId}" class="sftabs-hm-tip">${esc(tip)}</span>
+        </div>
+      </button>`;
+  }
+
+  /**
+   * Light the bookmark half when the page you are on is already a tab.
+   *
+   * The same question the Setup tab bar and the floating panel answer, asked
+   * the same way — matchTabsToUrl scores every tab and returns the most
+   * specific, rather than testing one at a time, so an object tab does not
+   * claim every page beneath it. Only whether anything matched matters here.
+   *
+   * Every tab, not just top-level ones: a child tab is as much "this page is
+   * bookmarked" as its parent is.
+   *
+   * slds-is-selected and aria-pressed are what Favorites sets on its own star,
+   * so the state reads the same to a screen reader as it does on screen.
+   */
+  function syncBookmarkState() {
+    const add = document.getElementById(`${ITEM_ID}-add`);
+    if (!add) return;
+
+    const utils = window.SFTabs && window.SFTabs.utils;
+    let active = false;
+    if (utils && utils.matchTabsToUrl && utils.tabDestinationUrl) {
+      const origin = window.location.origin;
+      // Children hang off dropdownItems rather than sitting in the array, so a
+      // plain map would only ever see top-level tabs and a page bookmarked as a
+      // child would leave the button dark.
+      const candidates = [];
+      const collect = list => (list || []).forEach(tab => {
+        if (!tab) return;
+        candidates.push({ id: tab.id, url: utils.tabDestinationUrl(tab, origin) });
+        collect(childrenOf(tab));
+      });
+      collect(menuTabs);
+      active = utils.matchTabsToUrl(candidates, window.location.href).length > 0;
+    }
+
+    add.classList.toggle('slds-is-selected', active);
+    add.setAttribute('aria-pressed', String(active));
+  }
+
+  /**
+   * Lightning navigates without a page load, so the answer above goes stale
+   * silently. Polled rather than hooked: Aura routes through several mechanisms
+   * and env-banner.js already settled on this for the same reason.
+   */
+  function watchUrl() {
+    if (urlTimer) return;
+    let last = window.location.href;
+    urlTimer = setInterval(() => {
+      if (window.location.href === last) return;
+      last = window.location.href;
+      syncBookmarkState();
+    }, 1000);
+  }
+
   function inject(tabs, settings) {
     const list = actionsList();
     if (!list) return false;                       // header not rendered yet
@@ -82,21 +171,51 @@
     const li = document.createElement('li');
     li.id = ITEM_ID;
     li.className = 'slds-global-actions__item slds-dropdown-trigger slds-dropdown-trigger_click';
+
+    // Favorites' own split-button anatomy: a role=group holding two bordered
+    // icon buttons, capture on the left and the disclosure on the right. Taken
+    // from the shipped markup (docs/mockups/global-header-menu.md), but built
+    // from SLDS classes only — `oneFavorites` and the `branding-favorites-*`
+    // hooks are Aura's, and carry behavior we would be inheriting blind.
+    //
+    // The chevron keeps the `-button` id: it is the dropdown trigger, and
+    // positioning, aria-expanded and focus all resolve the menu's anchor
+    // through that one element.
     li.innerHTML = `
-      <button type="button" id="${ITEM_ID}-button" aria-haspopup="true" aria-expanded="false"
-        title="${esc(msg('extensionName'))}"
-        aria-label="${esc(msg('headerMenuAriaLabel'))}"
-        class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__item-action">
-        ${svg(BOOKMARK, 'slds-icon slds-icon_xx-small')}
-      </button>`;
+      <div role="group" class="slds-button-group-list sftabs-hm-group"
+        aria-label="${esc(msg('extensionName'))}">
+        ${half(`${ITEM_ID}-add`, BOOKMARK, msg('quickAddTitle'), msg('ariaQuickAdd'), '')}
+        ${half(`${ITEM_ID}-button`, DOWN, msg('extensionName'), msg('headerMenuAriaLabel'),
+               'aria-haspopup="true" aria-expanded="false"')}
+      </div>`;
     list.insertBefore(li, list.firstChild);
 
     // Reads the module-level list rather than closing over this one, so new
     // tabs or colors can be picked up without touching the injected element.
-    li.querySelector('button').addEventListener('click', event => {
+    li.querySelector(`#${ITEM_ID}-button`).addEventListener('click', event => {
       event.stopPropagation();
       toggleMenu(menuTabs);
     });
+
+    // Capture is deliberately silent — no toast, no change of icon. The page
+    // appears in the menu, which is the same confirmation the Setup bar's "+"
+    // gives. Disabled while the write is in flight so a double click cannot
+    // store the page twice.
+    const add = li.querySelector(`#${ITEM_ID}-add`);
+    add.addEventListener('click', async event => {
+      event.stopPropagation();
+      if (add.disabled) return;
+      add.disabled = true;
+      try {
+        await window.SFTabs.utils.quickAddPage(window.location.href, document.title);
+        syncBookmarkState();   // it is a tab now; light the button at once
+      } finally {
+        add.disabled = false;
+      }
+    });
+
+    syncBookmarkState();
+    watchUrl();
     return true;
   }
 
@@ -482,6 +601,10 @@
       observer.disconnect();
       observer = null;
     }
+    if (urlTimer) {
+      clearInterval(urlTimer);
+      urlTimer = null;
+    }
     closeMenu();
     const item = document.getElementById(ITEM_ID);
     if (item) item.remove();
@@ -542,6 +665,7 @@
       const { tabs, settings } = await loader();
       menuTabs = tabs || [];
       menuSettings = settings || {};
+      syncBookmarkState();   // a tab added or removed elsewhere changes this
       if (menuIsOpen) { closeMenu(); openMenu(menuTabs); }   // only redraw what is on screen
     }, 150);
 

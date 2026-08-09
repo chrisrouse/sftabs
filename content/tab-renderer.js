@@ -1129,7 +1129,7 @@ function areTabsLoaded() {
  * Setting `draggable` on the element is not enough: these controls are an <li>
  * wrapping an <a href>, and an anchor with an href is draggable by default —
  * `draggable = false` on the parent does not reach the child that is actually
- * being grabbed. Cancelling dragstart at the container does, because the event
+ * being grabbed. Canceling dragstart at the container does, because the event
  * bubbles, so this covers any drag a descendant starts however it was wired.
  */
 function refuseDrag(li) {
@@ -1193,30 +1193,18 @@ function createQuickAddButton() {
   return li;
 }
 
-/** Capture this page and hand it to the background worker to store. */
+/**
+ * Capture this page and hand it to the background worker to store.
+ *
+ * The work moved to shared utils when the header menu gained the same button:
+ * that surface loads from the other content_scripts entry and cannot reach this
+ * file, and two copies of the profile-targeting rule is exactly how the two
+ * would come to disagree about where a captured page lands.
+ */
 async function quickAddCurrentPage() {
   const utils = window.SFTabs && window.SFTabs.utils;
-  if (!utils || !utils.parsePageToTab) return;
-
-  const parsed = utils.parsePageToTab(window.location.href, document.title);
-  if (!parsed) return;
-
-  const settings = await readUserSettings();
-  const profiles = await readProfiles();
-  const active = utils.resolveProfileForUrl
-    ? utils.resolveProfileForUrl(window.location.href, profiles, settings)
-    : settings.activeProfileId;
-
-  // Same rule the popup's Quick Add follows, read from the same setting
-  const targets = settings.quickAddAllProfiles && profiles.length
-    ? profiles.map(p => p.id)
-    : (active ? [active] : []);
-
-  await browser.runtime.sendMessage({
-    action: 'quick_add_tab',
-    tab: { ...parsed, id: utils.generateId(), openInNewTab: false, dropdownItems: [] },
-    profileIds: targets,
-  });
+  if (!utils || !utils.quickAddPage) return;
+  await utils.quickAddPage(window.location.href, document.title);
 }
 
 /** Settings, wherever this install keeps them. */

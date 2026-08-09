@@ -168,3 +168,159 @@
 }
 #sftabs-header-menu .sftabs-hm-chev-icon { width: 14px; height: 14px; }
 #sftabs-header-menu li.is-open > a .sftabs-hm-chev { transform: rotate(90deg); }
+
+/* ── The trigger, as a split button ──────────────────────────────────────
+   Mirrors Favorites' anatomy: a role=group holding two 24px bordered icon
+   buttons, each containing a single <div> that holds the icon and its tooltip.
+   That inner div is what the button sizes itself around, so it is structural.
+
+   Every value below was read off a live header with
+   docs/snippets/dump-favorites-styles.js, and is written as Salesforce writes
+   it — their custom property first, their own fallback second — so this tracks
+   the theme instead of freezing one org's palette. Two earlier passes at this
+   were estimated from screenshots and both were wrong; measure before changing
+   anything here.
+
+   The joining is ours because the rounded outer edge comes from oneFavorites,
+   Salesforce's branding CSS, which we are deliberately not borrowing.
+   `.slds-button-group-list .slds-button` does supply border-radius: 0 and the
+   1px border width, so only the outer corners and the overlap are set here. */
+#sftabs-header-item .sftabs-hm-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The header's own weight for a control border. Without this the buttons
+   inherit slds-button_icon-border's --slds-g-color-border-base-4 (#747474) and
+   read visibly heavier than Favorites sitting next to them. */
+#sftabs-header-item .sftabs-hm-group > .slds-button {
+  margin: 0;
+  border-radius: 0;
+  border-color: var(--lwc-brandHeaderContrastWeak, rgba(145, 145, 145, 1));
+}
+
+#sftabs-header-item .sftabs-hm-group > .slds-button:first-child {
+  border-radius: var(--slds-s-button-radius-border, var(--lwc-buttonBorderRadius, 0.25rem)) 0 0
+                 var(--slds-s-button-radius-border, var(--lwc-buttonBorderRadius, 0.25rem));
+}
+
+/* The disclosure half, exactly as .slds-global-actions__favorites-more is
+   built: tighter side padding, and pulled back one border width so the two
+   1px edges land on each other and read as a single divider. */
+#sftabs-header-item .sftabs-hm-group > .slds-button:last-child {
+  border-radius: 0 var(--slds-s-button-radius-border, var(--lwc-buttonBorderRadius, 0.25rem))
+                   var(--slds-s-button-radius-border, var(--lwc-buttonBorderRadius, 0.25rem)) 0;
+  padding-left: var(--lwc-spacingXxxSmall, 0.125rem);
+  padding-right: var(--lwc-spacingXxxSmall, 0.125rem);
+  margin-inline-start: calc(-1 * var(--slds-g-sizing-border-1, var(--lwc-borderWidthThin, 1px)));
+}
+
+/* Selected: the page you are on is already a tab.
+   Favorites' own treatment for its lit star, read from
+   .branding-header .branding-favorites-star-button.slds-is-selected and its
+   :hover/:focus pair. Accent tokens first, the brand-header fallbacks second,
+   so an org that has themed its header gets its own blue rather than ours. */
+#sftabs-header-item .sftabs-hm-group > .slds-button.slds-is-selected {
+  background-color: var(--slds-g-color-accent-2, var(--lwc-brandHeaderContrastCool, rgba(13, 112, 165, 1)));
+  border-color: var(--slds-g-color-accent-2, var(--lwc-brandHeaderContrastCool, rgba(13, 112, 165, 1)));
+  color: var(--slds-g-color-neutral-base-100, var(--lwc-colorTextBrandPrimary, rgb(255, 255, 255)));
+}
+
+#sftabs-header-item .sftabs-hm-group > .slds-button.slds-is-selected:hover,
+#sftabs-header-item .sftabs-hm-group > .slds-button.slds-is-selected:focus {
+  background-color: var(--slds-g-color-accent-3, var(--lwc-brandHeaderContrastCoolActive, rgba(0, 97, 149, 1)));
+  border-color: var(--slds-g-color-accent-3, var(--lwc-brandHeaderContrastCoolActive, rgba(0, 97, 149, 1)));
+}
+
+/* Whichever half is hovered or focused owns the shared edge — without this the
+   overlap above clips its border down one side.
+
+   The value has to clear the environment banner, not merely the sibling. A
+   positioned element with a z-index opens a stacking context, so the tooltip
+   inside is ordered only against this button's own descendants; the button as a
+   whole is what competes with the page. At z-index 1 that put the tooltip
+   behind the banner at 10000 however high the tooltip's own z-index went.
+   Above the banner and the floating panel (10001), and only while hovered or
+   focused, so nothing sits permanently on top of the page. */
+#sftabs-header-item .sftabs-hm-group > .slds-button:hover,
+#sftabs-header-item .sftabs-hm-group > .slds-button:focus {
+  position: relative;
+  z-index: 10002;
+}
+
+/* The button's only child, and the tooltip's positioning context.
+   .forceHeaderButton .tooltipTrigger is inline-block/middle; .uiTooltip adds
+   position: relative. Both, since we have neither class. */
+#sftabs-header-item .sftabs-hm-tipwrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+/* 0.875rem — .slds-button__icon's own size, which the bookmark takes. */
+#sftabs-header-item .sftabs-hm-btn-icon {
+  width: var(--lwc-squareIconMediumContentAlt, 0.875rem);
+  height: var(--lwc-squareIconMediumContentAlt, 0.875rem);
+}
+
+/* 0.75rem. The disclosure glyph is smaller than a normal button icon —
+   Favorites does this with `.oneFavorites .dropdown`, and missing it is why our
+   arrow read as oversized beside theirs. */
+#sftabs-header-item .sftabs-hm-group > .slds-button:last-child .sftabs-hm-btn-icon {
+  width: var(--lwc-squareIconSmallContent, 0.75rem);
+  height: var(--lwc-squareIconSmallContent, 0.75rem);
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────────
+   Salesforce's is an Aura uiTooltip whose visibility is driven by Aura's own
+   JavaScript, so adopting its class names would give us the appearance hooks
+   without the behavior. This is the same look, shown on hover and keyboard
+   focus, and it replaces the `title` attribute rather than joining it — the two
+   together produced the operating system's gray tooltip beside Salesforce's
+   dark one on adjacent buttons.
+
+   The color is Salesforce's, taken from a live tooltip. Padding and the 10px
+   offset are still estimated; everything above this block is measured. */
+#sftabs-header-item .sftabs-hm-tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  /* Orders the tooltip against the button's other children only — the button's
+     own z-index above is what lifts the pair over the page. */
+  z-index: 1;
+
+  padding: 8px 12px;
+  border-radius: var(--lwc-borderRadiusMedium, 0.25rem);
+  background: #022d5f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-align: center;
+
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .1s linear;
+  pointer-events: none;
+}
+
+/* The nubbin, drawn rather than imaged so it takes the background above. */
+#sftabs-header-item .sftabs-hm-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #022d5f;
+}
+
+#sftabs-header-item .slds-button:hover .sftabs-hm-tip,
+#sftabs-header-item .slds-button:focus-visible .sftabs-hm-tip {
+  visibility: visible;
+  opacity: 1;
+}

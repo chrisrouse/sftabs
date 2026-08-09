@@ -182,7 +182,7 @@ function splitOrgHost(url) {
     if (labels.length === 2 && ORG_PARTITIONS[labels[1]]) {
       return { identifier: labels[0], partition: labels[1] };
     }
-    return null;   // a host shape we do not recognise; better null than a guess
+    return null;   // a host shape we do not recognize; better null than a guess
   } catch {
     return null;
   }
@@ -967,7 +967,7 @@ function generateTabName(path, pageTitle, isObject, isCustomUrl, isSetupObject) 
  * Returns null for anything that is not a Salesforce page, and for Salesforce
  * pages with no usable path — the caller decides what to say about that.
  *
- * The shapes it recognises: /lightning/setup/ paths (with ObjectManager kept
+ * The shapes it recognizes: /lightning/setup/ paths (with ObjectManager kept
  * whole, so the tab lands on the exact section that was open), /lightning/o/
  * object pages, and anything else on a Salesforce host as a custom URL.
  */
@@ -1011,6 +1011,41 @@ function parsePageToTab(url, pageTitle) {
     isCustomUrl,
     isSetupObject
   };
+}
+
+/**
+ * Capture a page as a tab and hand it to the background worker to store.
+ *
+ * Lives here rather than beside a caller because it now has two, injected from
+ * different content_scripts entries: the Setup tab bar's "+", which only loads
+ * on Setup pages, and the header menu's capture button, which loads on every
+ * Salesforce page. Keeping one copy is also what stops the two disagreeing
+ * about which profiles receive the page.
+ *
+ * The write itself belongs to the worker, which owns the chunk-aware storage
+ * helpers; this only decides what to store and who gets it.
+ *
+ * Takes the url and title rather than reading `location` so it stays callable
+ * from the worker and testable without a DOM. Returns the stored tab, or null
+ * when the page yields nothing worth capturing.
+ */
+async function quickAddPage(url, title) {
+  const parsed = parsePageToTab(url, title);
+  if (!parsed) return null;
+
+  const preferSync = await storagePreference();
+  const settings = await readStoredValue('userSettings', preferSync) || {};
+  const profiles = await readStoredValue('profiles', preferSync) || [];
+  const active = resolveProfileForUrl(url, profiles, settings) || settings.activeProfileId;
+
+  // Same rule the popup's Quick Add follows, read from the same setting
+  const profileIds = settings.quickAddAllProfiles && profiles.length
+    ? profiles.map(p => p.id)
+    : (active ? [active] : []);
+
+  const tab = { ...parsed, id: generateId(), openInNewTab: false, dropdownItems: [] };
+  await browser.runtime.sendMessage({ action: 'quick_add_tab', tab, profileIds });
+  return tab;
 }
 
 /**
@@ -1231,6 +1266,7 @@ if (typeof module !== 'undefined' && module.exports) {
     tabOrderMatches,
     generateTabName,
     parsePageToTab,
+    quickAddPage,
     getCurrentPageInfo,
     buildFullUrl,
     isLightningNavigationEnabled,
@@ -1290,6 +1326,7 @@ if (typeof module !== 'undefined' && module.exports) {
     tabOrderMatches,
     generateTabName,
     parsePageToTab,
+    quickAddPage,
     getCurrentPageInfo,
     buildFullUrl,
     isLightningNavigationEnabled,
