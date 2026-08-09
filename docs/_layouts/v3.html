@@ -313,6 +313,30 @@
       padding: 1px 8px;
     }
 
+    /* ── Screenshot placeholder ──
+       Every image slot in the v3 pages is one of these until a real 3.0
+       screenshot replaces it. Deliberately loud: an empty slot that looks
+       finished is one that never gets filled. */
+    .v3-shot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0;
+      padding: 18px 16px;
+      border: 2px dashed var(--b-medium);
+      border-radius: var(--r-md);
+      background: var(--s-base);
+      color: var(--t-weak);
+      font-size: 0.875rem;
+    }
+    .v3-shot::before {
+      content: '\F41A';   /* bi-image */
+      font-family: 'bootstrap-icons';
+      font-size: 1.25rem;
+      color: var(--t-faint);
+      flex-shrink: 0;
+    }
+
     /* ── Notice ── */
     .v3-notice {
       display: flex;

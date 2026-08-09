@@ -18,40 +18,58 @@
   url: /v3/getting-started
   icon: bi-rocket-takeoff
   blurb: Add your first tab and find your way around the popup.
-  ready: false
+  ready: true
 
 - title: Tabs
   url: /v3/tabs
   icon: bi-bookmark
   blurb: Add, order, nest and colour-code the tabs in your Setup menu.
-  ready: false
+  ready: true
 
 - title: Profiles
   url: /v3/profiles
   icon: bi-person-circle
   blurb: Separate sets of tabs, and linking them to the orgs they belong to.
-  ready: false
+  ready: true
 
 - title: Org Colors
   url: /v3/org-colors
   icon: bi-palette
   blurb: Tint the browser tab and show a banner naming the org you are in.
-  ready: false
+  ready: true
 
 - title: Quick Access
   url: /v3/quick-access
   icon: bi-lightning-charge
   blurb: The header menu, the floating button, and capturing a page in one click.
-  ready: false
+  ready: true
 
 - title: Settings
   url: /v3/settings
   icon: bi-gear
   blurb: Every switch in the popup, and what it changes.
-  ready: false
+  ready: true
 
 - title: Import & Export
   url: /v3/import-export
   icon: bi-arrow-down-up
   blurb: Move your tabs between browsers, and where they are stored.
-  ready: false
+  ready: true
+
+- title: Keyboard Shortcuts
+  url: /v3/keyboard-shortcuts
+  icon: bi-keyboard
+  blurb: Jump to your first ten tabs with a key combination, set in your browser.
+  ready: true
+
+- title: Translations
+  url: /v3/translations
+  icon: bi-translate
+  blurb: The languages SF Tabs speaks, and how to ask for another.
+  ready: true
+
+- title: Troubleshooting
+  url: /v3/troubleshooting
+  icon: bi-life-preserver
+  blurb: What to check when something is not showing up where you expect it.
+  ready: true
