@@ -159,16 +159,23 @@ async function checkAndSwitchProfile(url) {
     if (matchingProfile) {
       // Found a matching profile
       targetProfile = matchingProfile;
-    } else {
-      // No match found - fall back to default profile
+    } else if (!settings.activeProfileId) {
+      // Nothing has been picked yet, so the default is the only answer there is
       const defaultProfile = profiles.find(p => p.isDefault) ||
                            profiles.find(p => p.id === settings.defaultProfileId);
-
-      if (defaultProfile) {
-        targetProfile = defaultProfile;
-      } else {
+      if (!defaultProfile) {
         return; // No default profile found
       }
+      targetProfile = defaultProfile;
+    } else {
+      // No linked org claims this page, so leave the user's choice alone.
+      //
+      // This branch used to switch to the starred default, which did not merely
+      // render the wrong tabs — it wrote activeProfileId back to storage and
+      // destroyed the choice. Switching profiles in the popup therefore held
+      // only until the next navigation to any unlinked org, which is what made
+      // it look intermittent rather than broken.
+      return;
     }
 
     // Check if this profile is already active

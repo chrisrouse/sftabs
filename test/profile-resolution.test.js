@@ -43,7 +43,16 @@ const r = (url, s) => resolveProfileForUrl(url, PROFILES, s);
 check('linked org resolves to its own profile', r(DEV1, ON) === 'p_default', r(DEV1, ON));
 check('a second linked org resolves independently', r(QA, ON) === 'p_test', r(QA, ON));
 check('two orgs do not share one profile', r(DEV1, ON) !== r(QA, ON));
-check('unlinked org falls back to the starred default', r(OTHER, ON) === 'p_default', r(OTHER, ON));
+// An unlinked org has no opinion, so the profile you picked stands.
+//
+// This asserted the starred default before, and could not have caught the bug:
+// ON.activeProfileId and the starred default are both p_default, so the check
+// passed whichever the code returned. PICKED separates them.
+const PICKED = { profilesEnabled: true, autoSwitchProfiles: true, activeProfileId: 'p_test', defaultProfileId: 'p_default' };
+check('unlinked org keeps the profile you picked', r(OTHER, PICKED) === 'p_test', r(OTHER, PICKED));
+check('a linked org still overrides what you picked', r(DEV1, PICKED) === 'p_default', r(DEV1, PICKED));
+check('with nothing picked yet, the starred default answers',
+  resolveProfileForUrl(OTHER, PROFILES, { profilesEnabled: true, autoSwitchProfiles: true }) === 'p_default');
 
 // Anyone not using linked orgs must see no change at all.
 check('auto-switch off: global active profile governs', r(DEV1, OFF) === 'p_test' && r(QA, OFF) === 'p_test');
@@ -66,6 +75,13 @@ check('pattern match is case-insensitive',
 
 // ── The background worker shares this matching rather than copying it ──
 const bg = fs.readFileSync(path.join(__dirname, '..', 'background.js'), 'utf8');
+// The worker does not merely render the wrong profile on an unlinked org — it
+// wrote activeProfileId back to storage, so a manual switch survived only until
+// the next navigation. Pinned by absence: no default lookup on the no-match path.
+check('background.js leaves the active profile alone on an unlinked org',
+  /No linked org claims this page, so leave the user's choice alone/.test(bg));
+check('and only reaches for the default when nothing has been picked',
+  /else if \(!settings\.activeProfileId\)/.test(bg));
 check('background.js still compares org identifiers by exact equality',
   /pattern\.toLowerCase\(\) === orgIdentifier\.toLowerCase\(\)/.test(bg));
 check('background.js has no copy of extractOrgIdentifier',

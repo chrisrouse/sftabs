@@ -249,10 +249,19 @@ function resolveProfileForUrl(url, profiles, settings) {
     if (match) return match.id;
   }
 
-  // No linked org matches, so fall back the same way background.js does
+  // No linked org claims this page, so the org has no opinion and the profile
+  // you last picked stands. This used to return the starred default instead,
+  // which meant switching profiles in the popup did nothing on any org that was
+  // not linked — the popup listed one profile's tabs while the page drew
+  // another's. Auto-switch is "the org decides when it can", not "the org
+  // decides, and otherwise so does the default".
+  //
+  // The default is still the answer before anything has been picked, which is
+  // the only time there is no active profile to honour.
+  if (active) return active;
   const fallback = list.find(p => p.isDefault) ||
                    list.find(p => p.id === (settings.defaultProfileId || null));
-  return fallback ? fallback.id : active;
+  return fallback ? fallback.id : null;
 }
 
 /**
