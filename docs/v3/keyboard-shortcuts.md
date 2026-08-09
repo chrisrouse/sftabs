@@ -26,12 +26,9 @@ Each shortcut is labeled "Tab 1" through "Tab 10" and maps to your first ten tab
 4. **Configure Shortcuts**
    Click in the input field next to each command (e.g., "Tab 1") and press your desired key combination
 
-
-<img width="1259" height="843" alt="firefox-shortcuts" src="https://github.com/user-attachments/assets/6ac98ede-1e68-480b-bd2e-593bd6d1dfb3" />
+<img width="1243" height="843" alt="firefox-shortcuts" src="https://github.com/user-attachments/assets/ed2c58d2-8ce5-4cd4-aebd-cfda84140e68" />
 
 <img width="988" height="485" alt="sftabs-shortcuts-firefox" src="https://github.com/user-attachments/assets/85a22550-f477-442a-b2a1-70aa2add0b2b" />
-
-
 
 ## Setting Up Shortcuts in Chrome
 
