@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} | {{ site.title }} v3</title>
+    <meta name="description" content="{{ page.description | default: site.description }}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    <meta property="og:title" content="{{ page.title }} | {{ site.title }} v3">
+    <meta property="og:description" content="{{ page.description | default: site.description }}">
+    <meta property="og:image" content="{{ '/assets/images/invert.png' | absolute_url }}">
+
+    <!-- Icons only. v2 pulls in the whole of Bootstrap; this layout does not,
+         because the popup's look is a handful of tokens and a grid, and
+         overriding a framework to reach it costs more than writing it. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+    /* ── Tokens ───────────────────────────────────────────────────────────
+       Lifted from css/popup.css so the site and the extension cannot drift.
+       Written as plain custom properties with a prefers-color-scheme override
+       rather than light-dark(): same result, no support question on a page
+       that has to render for everyone.
+
+       If you change a value here, change it in the popup too — these are
+       copies, not imports. There is no build step that could share them. */
+    :root {
+      --brand:        #022ac0;   /* --c-brand      : header bar            */
+      --accent:       #066afe;   /* --sft-accent   : links, icons          */
+      --accent-hover: #0250d9;   /* --sft-accent-hover                     */
+      --accent-tint:  #d6e6ff;   /* --c-primary-tint                       */
+      --footer-bg:    #03234d;   /* --footer-bg                            */
+
+      --s-base:  #f3f3f3;        /* page background                        */
+      --s-1:     #ffffff;        /* cards                                  */
+      --s-hover: #f3f3f3;        /* card hover                             */
+
+      --t-base:  #2e2e2e;
+      --t-weak:  #5c5c5c;
+      --t-faint: #757575;
+      --t-on-accent: #ffffff;
+
+      --b-subtle: #e5e5e5;
+      --b-medium: #c9c9c9;
+
+      --r-md: 0.5rem;
+      --r-lg: 0.75rem;
+      --r-pill: 999px;
+
+      --header-h: 56px;
+      --content-w: 1000px;
+      --ease: 0.15s ease;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --brand:        #001e5b;
+        --accent:       #066afe;
+        --accent-hover: #d6e6ff;
+        --accent-tint:  #022ac0;
+        --footer-bg:    #020202;
+
+        --s-base:  #181818;
+        --s-1:     #242424;
+        --s-hover: #2e2e2e;
+
+        --t-base:  #e5e5e5;
+        --t-weak:  #aeaeae;
+        --t-faint: #939393;
+
+        --b-subtle: #444;
+        --b-medium: #444;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--t-base);
+      background: var(--s-base);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* ── Header ── the popup's app-header, widened ── */
+    .v3-header {
+      height: var(--header-h);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px;
+      background: var(--brand);
+      color: var(--t-on-accent);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .v3-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--t-on-accent);
+      font-weight: 600;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+    .v3-brand:hover { color: var(--t-on-accent); text-decoration: none; }
+    .v3-brand img { width: 22px; height: 22px; display: block; }
+    .v3-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: var(--r-pill);
+      background: rgba(255,255,255,0.16);
+    }
+    .v3-nav {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .v3-nav a {
+      color: rgba(255,255,255,0.85);
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 6px 10px;
+      border-radius: var(--r-md);
+      transition: background var(--ease), color var(--ease);
+    }
+    .v3-nav a:hover,
+    .v3-nav a[aria-current="page"] {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    /* ── Content ── */
+    .v3-main {
+      flex: 1;
+      width: 100%;
+      max-width: var(--content-w);
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    .v3-hero { text-align: center; margin-bottom: 36px; }
+    .v3-hero h1 {
+      margin: 0 0 8px;
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .v3-hero p { margin: 0; font-size: 1.125rem; color: var(--t-weak); }
+
+    /* A card, the popup's surface-1 on surface-base with a subtle border. */
+    .v3-card {
+      background: var(--s-1);
+      border: 1px solid var(--b-subtle);
+      border-radius: var(--r-lg);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .v3-card > :first-child { margin-top: 0; }
+    .v3-card > :last-child { margin-bottom: 0; }
+
+    /* ── Section tiles ── the Settings hub, as navigation ── */
+    .v3-tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+      gap: 14px;
+      margin: 0 0 32px;
+      padding: 0;
+      list-style: none;
+    }
+    .v3-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: 100%;
+      padding: 18px 16px;
+      background: var(--s-1);
+      border: 1px solid var(--b-subtle);
+      border-radius: var(--r-md);
+      color: var(--t-base);
+      transition: background var(--ease), border-color var(--ease);
+    }
+    a.v3-tile:hover {
+      background: var(--s-hover);
+      border-color: var(--b-medium);
+      color: var(--t-base);
+      text-decoration: none;
+    }
+    .v3-tile i {
+      font-size: 1.5rem;
+      line-height: 1;
+      color: var(--accent);
+    }
+    .v3-tile-title { font-weight: 600; }
+    .v3-tile-blurb { font-size: 0.875rem; color: var(--t-weak); }
+
+    /* Not written yet. Dimmed and inert rather than absent, so the shape of
+       the finished docs is visible while they are being written. */
+    .v3-tile.is-pending { opacity: 0.55; }
+    .v3-tile.is-pending i { color: var(--t-faint); }
+    .v3-tile-soon {
+      align-self: flex-start;
+      margin-top: auto;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--t-faint);
+      border: 1px solid var(--b-medium);
+      border-radius: var(--r-pill);
+      padding: 1px 8px;
+    }
+
+    /* ── Notice ── */
+    .v3-notice {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: var(--accent-tint);
+      border: 1px solid var(--accent);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+      margin-bottom: 28px;
+      font-size: 0.9375rem;
+    }
+    .v3-notice i { color: var(--accent); font-size: 1.1rem; line-height: 1.4; }
+    .v3-notice p { margin: 0; }
+    @media (prefers-color-scheme: dark) {
+      .v3-notice { color: #e5e5e5; }
+    }
+
+    /* ── Prose ── */
+    .v3-main h2 { font-size: 1.5rem; font-weight: 600; margin: 32px 0 12px; }
+    .v3-main h3 { font-size: 1.175rem; font-weight: 600; margin: 24px 0 8px; }
+    .v3-main code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.875em;
+      background: var(--s-base);
+      border: 1px solid var(--b-subtle);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    .v3-main pre {
+      background: var(--s-base);
+      border: 1px solid var(--b-subtle);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+      overflow-x: auto;
+    }
+    .v3-main pre code { background: none; border: 0; padding: 0; }
+
+    /* ── Footer ── the popup's app-footer ── */
+    .v3-footer {
+      flex-shrink: 0;
+      background: var(--footer-bg);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.8125rem;
+    }
+    .v3-footer-inner {
+      max-width: var(--content-w);
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .v3-footer a { color: rgba(255,255,255,0.85); }
+    .v3-footer a:hover { color: #fff; }
+    .v3-footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    @media (max-width: 560px) {
+      .v3-nav { gap: 0; }
+      .v3-nav a { padding: 6px 8px; }
+      .v3-hero h1 { font-size: 1.75rem; }
+    }
+    </style>
+</head>
+<body>
+
+<header class="v3-header">
+  <a class="v3-brand" href="{{ '/v3/' | relative_url }}">
+    <img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="" aria-hidden="true">
+    <span>SF Tabs</span>
+    <span class="v3-badge">v{{ site.v3_version }}</span>
+  </a>
+  <nav class="v3-nav" aria-label="Documentation">
+    <a href="{{ '/v3/' | relative_url }}"{% if page.url == '/v3/' %} aria-current="page"{% endif %}>Home</a>
+    {%- for s in site.data.v3_sections -%}
+      {%- if s.ready %}
+    <a href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
+      {%- endif -%}
+    {%- endfor %}
+    <a href="{{ site.github.repository_url }}">GitHub</a>
+  </nav>
+</header>
+
+<main class="v3-main">
+  {{ content }}
+</main>
+
+<footer class="v3-footer">
+  <div class="v3-footer-inner">
+    <div>SF Tabs v{{ site.v3_version }} &middot; documentation for version 3</div>
+    <div class="v3-footer-links">
+      <a href="{{ '/' | relative_url }}">Version 2 docs</a>
+      <a href="{{ site.github.repository_url }}">GitHub</a>
+      <a href="{{ site.github.issues_url }}">Report an issue</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

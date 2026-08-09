@@ -6,6 +6,10 @@ url: "https://chrisrouse.github.io"
 # Theme settings
 theme: null
 
+# Version shown in the v3 layout's header badge and footer. The v2 layout
+# hardcodes 2.1.1 at default.html:46; this exists so the v3 side has one place.
+v3_version: "3.0.0"
+
 # Brand colors
 brand_color: "#288aff"
 brand_color_dark: "#1a6ee6"

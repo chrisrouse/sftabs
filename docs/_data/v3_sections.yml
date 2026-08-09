@@ -1,0 +1,57 @@
+# Sections of the v3 documentation.
+#
+# Drives both the home-page tiles and the header nav, so a new page is added
+# here once rather than in two places.
+#
+# `ready: false` renders the tile greyed out and unclickable and keeps the item
+# out of the nav — the v3 docs are being written while v3 is in store review,
+# and a tile that 404s is worse than one that says it is not written yet.
+# Flip it to true in the same commit that adds the page.
+
+- title: Installation
+  url: /v3/installation
+  icon: bi-download
+  blurb: Install on Chrome, Edge or Firefox, or load the release build by hand.
+  ready: false
+
+- title: Getting Started
+  url: /v3/getting-started
+  icon: bi-rocket-takeoff
+  blurb: Add your first tab and find your way around the popup.
+  ready: false
+
+- title: Tabs
+  url: /v3/tabs
+  icon: bi-bookmark
+  blurb: Add, order, nest and colour-code the tabs in your Setup menu.
+  ready: false
+
+- title: Profiles
+  url: /v3/profiles
+  icon: bi-person-circle
+  blurb: Separate sets of tabs, and linking them to the orgs they belong to.
+  ready: false
+
+- title: Org Colors
+  url: /v3/org-colors
+  icon: bi-palette
+  blurb: Tint the browser tab and show a banner naming the org you are in.
+  ready: false
+
+- title: Quick Access
+  url: /v3/quick-access
+  icon: bi-lightning-charge
+  blurb: The header menu, the floating button, and capturing a page in one click.
+  ready: false
+
+- title: Settings
+  url: /v3/settings
+  icon: bi-gear
+  blurb: Every switch in the popup, and what it changes.
+  ready: false
+
+- title: Import & Export
+  url: /v3/import-export
+  icon: bi-arrow-down-up
+  blurb: Move your tabs between browsers, and where they are stored.
+  ready: false

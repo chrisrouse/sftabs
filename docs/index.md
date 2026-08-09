@@ -8,6 +8,19 @@ title: Home
   <p class="lead fs-4">Customize your Salesforce Setup menu with quick-access tabs</p>
 </div>
 
+<!-- Version 3 preview. Remove this block, and these pages, once 3.0 has
+     cleared review in both stores and /v3/ becomes the site root. -->
+<div class="alert alert-primary d-flex align-items-center gap-3 mb-5" role="note">
+  <i class="bi bi-stars fs-4 flex-shrink-0" aria-hidden="true"></i>
+  <div>
+    <strong>SF Tabs 3.0 is on the way.</strong>
+    Settings back in the popup, org colors and banners, a menu in the Salesforce header, and one-click page capture.
+    It is in review at the browser stores now &mdash; you can
+    <a href="{{ '/v3/' | relative_url }}" class="alert-link">read the 3.0 documentation</a>
+    or <a href="https://github.com/chrisrouse/sftabs/releases/tag/v3.0.0" class="alert-link">install it early from GitHub</a>.
+  </div>
+</div>
+
 <!-- Feature Tiles -->
 <div class="row g-4 mb-5">
   <!-- Installation -->
