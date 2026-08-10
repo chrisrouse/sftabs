@@ -1615,6 +1615,14 @@
     "message": "Auf Standardfarben zurücksetzen",
     "description": "Button that clears customized environment colors"
   },
+  "orgColorPickerLabel": {
+    "message": "Farbe wählen",
+    "description": "Accessible name for the color picker that opens under an org or environment row"
+  },
+  "orgColorHexLabel": {
+    "message": "Hex",
+    "description": "Label for the hex code field in the color picker; the word is the same in most languages"
+  },
   "orgColorsResetDone": {
     "message": "Umgebungsfarben zurückgesetzt",
     "description": "Toast after resetting environment colors"

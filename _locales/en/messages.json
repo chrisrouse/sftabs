@@ -1776,6 +1776,14 @@
     "message": "Reset to default colors",
     "description": "Button that clears customized environment colors"
   },
+  "orgColorPickerLabel": {
+    "message": "Choose a color",
+    "description": "Accessible name for the color picker that opens under an org or environment row"
+  },
+  "orgColorHexLabel": {
+    "message": "Hex",
+    "description": "Label for the hex code field in the color picker; the word is the same in most languages"
+  },
   "orgColorsResetDone": {
     "message": "Environment colors reset",
     "description": "Toast after resetting environment colors"

@@ -2672,6 +2672,91 @@ function orgColorConfig() {
   };
 }
 
+
+/**
+ * Presets for the org color picker.
+ *
+ * A flat list of hex values, deliberately not TAB_COLORS: those are
+ * light-dark() pairs, and an org color has to resolve to one hex — it is baked
+ * into the favicon's data URL and used as the banner background, neither of
+ * which can carry a CSS function.
+ *
+ * The seven environment defaults are in here so a row can be put back to what
+ * it shipped with, plus enough distinct hues to tell a dozen orgs apart at
+ * 16px in a tab strip.
+ */
+const ORG_COLOR_PRESETS = [
+  '#c5221f', '#d93025', '#e8710a', '#b06000', '#f9ab00', '#1e8e3e',
+  '#0b8043', '#007b83', '#0d9dda', '#1a73e8', '#0176d3', '#3f51b5',
+  '#7526e3', '#9334e6', '#d01884', '#5c5c5c', '#3e3e3c', '#181818',
+];
+
+/**
+ * The swatch that opens a row's picker.
+ *
+ * This replaces <input type="color">. On Firefox that opens the operating
+ * system's color dialog, and a browser-action popup closes the moment it loses
+ * focus — so the picker took the popup with it and the color could never be
+ * set. Chrome renders the same input inline, which is why it only ever failed
+ * on one browser.
+ */
+function orgColorTrigger(id, color, label) {
+  return `<button type="button" class="color-well" data-color-open="${esc(id)}"
+    aria-expanded="false" aria-label="${esc(label)}" title="${esc(label)}"
+    style="--well: ${esc(color)}"></button>`;
+}
+
+/**
+ * The picker: presets and a hex field, in a row that expands underneath.
+ *
+ * A row rather than a floating panel because the settings section scrolls —
+ * anything absolutely positioned has to be re-placed on every scroll and
+ * clipped at the panel edge, and this needs none of that.
+ */
+function orgColorPickerRow(id, color, span) {
+  const current = String(color || '').toLowerCase();
+  return `<tr class="color-picker-row" data-color-panel="${esc(id)}" hidden>
+    <td colspan="${span}">
+      <div class="color-picker" role="group" aria-label="${esc(t('orgColorPickerLabel'))}">
+        <div class="color-picker-swatches">
+          ${ORG_COLOR_PRESETS.map(hex => `<button type="button" class="color-preset"
+            data-color-pick="${esc(id)}" data-hex="${hex}"
+            aria-pressed="${hex === current}" title="${hex}" aria-label="${hex}"
+            style="--well: ${hex}"></button>`).join('')}
+        </div>
+        <label class="color-picker-hex">
+          <span>${esc(t('orgColorHexLabel'))}</span>
+          <input type="text" data-color-hex="${esc(id)}" value="${esc(color)}"
+            maxlength="7" spellcheck="false" autocomplete="off" />
+        </label>
+      </div>
+    </td>
+  </tr>`;
+}
+
+/** Show or hide one picker, closing any other that is open. */
+function toggleOrgColorPicker(id, root) {
+  const panel = root.querySelector(`[data-color-panel="${CSS.escape(id)}"]`);
+  if (!panel) return;
+  const opening = panel.hidden;
+  root.querySelectorAll('[data-color-panel]').forEach(p => { p.hidden = true; });
+  root.querySelectorAll('[data-color-open]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  panel.hidden = !opening;
+  const trigger = root.querySelector(`[data-color-open="${CSS.escape(id)}"]`);
+  if (trigger) trigger.setAttribute('aria-expanded', String(opening));
+  if (opening) panel.querySelector('.color-preset')?.focus();
+}
+
+/** #rgb and #rrggbb, the two shapes a user is likely to paste. */
+function normalizeHex(value) {
+  const v = String(value || '').trim();
+  if (/^#[0-9a-f]{6}$/i.test(v)) return v.toLowerCase();
+  if (/^#[0-9a-f]{3}$/i.test(v)) {
+    return ('#' + v.slice(1).split('').map(c => c + c).join('')).toLowerCase();
+  }
+  return null;
+}
+
 /** A 16px preview of exactly what the browser tab will show. */
 function orgColorSwatch(color) {
   return `<img class="color-table-ico" alt="" src="${esc(SFTabs.utils.orgFaviconDataUrl(color))}" />`;
@@ -2699,14 +2784,15 @@ function renderEnvColors() {
 
   rows.innerHTML = ORG_COLOR_ENVIRONMENTS.map(env => {
     const color = environments[env] || defaults[env];
+    const id = 'env-' + env;
     return `<tr>
       <td class="color-table-swatch">${orgColorSwatch(color)}</td>
       <td class="color-table-name">${esc(t('orgEnv_' + env))}</td>
       <td class="color-table-input">
-        <input type="color" value="${esc(color)}" data-env-color="${esc(env)}"
-          aria-label="${esc(t('orgEnv_' + env))}" />
+        ${orgColorTrigger(id, color, t('orgEnv_' + env))}
       </td>
-    </tr>`;
+    </tr>
+    ${orgColorPickerRow(id, color, 3)}`;
   }).join('');
 }
 
@@ -2751,8 +2837,7 @@ function renderOrgColors() {
       <td class="color-table-swatch">${orgColorSwatch(color)}</td>
       <td class="color-table-name">${esc(entry.identifier)}<span class="color-table-note">${esc(note)}</span></td>
       <td class="color-table-input">
-        <input type="color" value="${esc(color)}" data-org-index="${index}"
-          aria-label="${esc(entry.identifier)}" />
+        ${orgColorTrigger('org-' + index, color, entry.identifier)}
       </td>
       <td class="color-table-del">
         ${entry.source === 'saved'
@@ -2760,11 +2845,25 @@ function renderOrgColors() {
                aria-label="${esc(t('removeButton'))}" title="${esc(t('removeButton'))}">${ICON_DELETE}</button>`
           : ''}
       </td>
-    </tr>`;
+    </tr>
+    ${orgColorPickerRow('org-' + index, color, 4)}`;
   }).join('');
 
-  rows.querySelectorAll('[data-org-index]').forEach(input => {
-    input.addEventListener('change', () => saveOrgColor(entries[+input.dataset.orgIndex], input.value));
+  rows.querySelectorAll('[data-color-open]').forEach(button => {
+    button.addEventListener('click', () => toggleOrgColorPicker(button.dataset.colorOpen, rows));
+  });
+  rows.querySelectorAll('[data-color-pick]').forEach(button => {
+    button.addEventListener('click', () =>
+      saveOrgColor(entries[+button.dataset.colorPick.slice(4)], button.dataset.hex));
+  });
+  rows.querySelectorAll('[data-color-hex]').forEach(input => {
+    input.addEventListener('change', () => {
+      const hex = normalizeHex(input.value);
+      // An unparseable value is put back rather than saved — silently storing
+      // something the favicon cannot render is the worse failure.
+      if (!hex) { input.value = entries[+input.dataset.colorHex.slice(4)].color || ''; return; }
+      saveOrgColor(entries[+input.dataset.colorHex.slice(4)], hex);
+    });
   });
   rows.querySelectorAll('[data-org-remove]').forEach(button => {
     button.addEventListener('click', () => removeOrgColor(entries[+button.dataset.orgRemove]));
@@ -3113,15 +3212,34 @@ function bindEvents() {
     await patchSettings({ orgColors: { ...orgColorConfig(), bannerShowOrgName: e.target.checked } });
   });
 
-  document.getElementById('env-color-rows').addEventListener('change', async e => {
-    const input = e.target.closest('[data-env-color]');
-    if (!input) return;
+  const envRows = document.getElementById('env-color-rows');
+
+  async function saveEnvColor(env, color) {
     const config = orgColorConfig();
     await patchSettings({
-      orgColors: { ...config, environments: { ...config.environments, [input.dataset.envColor]: input.value } },
+      orgColors: { ...config, environments: { ...config.environments, [env]: color } },
     });
     renderEnvColors();
     renderOrgColors();   // profile-linked rows show their environment's color
+  }
+
+  envRows.addEventListener('click', e => {
+    const trigger = e.target.closest('[data-color-open]');
+    if (trigger) { toggleOrgColorPicker(trigger.dataset.colorOpen, envRows); return; }
+
+    const preset = e.target.closest('[data-color-pick]');
+    if (preset) saveEnvColor(preset.dataset.colorPick.slice(4), preset.dataset.hex);
+  });
+
+  envRows.addEventListener('change', e => {
+    const input = e.target.closest('[data-color-hex]');
+    if (!input) return;
+    const env = input.dataset.colorHex.slice(4);
+    const hex = normalizeHex(input.value);
+    // Put an unreadable value back rather than storing something the favicon
+    // cannot render.
+    if (!hex) { renderEnvColors(); return; }
+    saveEnvColor(env, hex);
   });
 
   document.getElementById('btn-reset-env-colors').addEventListener('click', async () => {

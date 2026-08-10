@@ -1077,18 +1077,79 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   color: var(--t-weak);
 }
 .color-table-input { width: 42px; text-align: right; }
-/* Reset the platform chrome so the well reads as a swatch rather than a button */
-.color-table-input input[type="color"] {
+
+/* The swatch that opens the picker. Was <input type="color">, which on Firefox
+   handed off to the OS dialog and closed the popup with it. */
+.color-well {
   width: 34px;
   height: 22px;
   padding: 0;
   border: var(--sft-border-width-1) solid var(--b-medium);
   border-radius: var(--r-sm);
-  background: none;
+  background: var(--well);
   cursor: pointer;
+  vertical-align: middle;
 }
-.color-table-input input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
-.color-table-input input[type="color"]::-webkit-color-swatch { border: none; border-radius: 2px; }
+.color-well:hover { border-color: var(--b-strong); }
+.color-well:focus-visible {
+  outline: 2px solid var(--sft-focus-ring);
+  outline-offset: 1px;
+}
+
+/* The picker itself, in a row beneath the swatch. */
+.color-picker-row > td { padding-top: 0; }
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sft-spacing-2);
+  padding: var(--sft-spacing-2);
+  background: var(--s-2);
+  border: var(--sft-border-width-1) solid var(--b-subtle);
+  border-radius: var(--r-md);
+}
+.color-picker-swatches {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 5px;
+  justify-items: center;
+}
+.color-preset {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--well);
+  cursor: pointer;
+  /* A hairline inside, so a pale swatch still reads as a disc on the panel */
+  box-shadow: inset 0 0 0 1px var(--c-inset-hairline);
+  transition: box-shadow var(--ease);
+}
+.color-preset:hover {
+  box-shadow: inset 0 0 0 1px var(--c-inset-hairline),
+              0 0 0 2px var(--s-1), 0 0 0 3px var(--b-strong);
+}
+.color-preset[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1px var(--c-inset-hairline),
+              0 0 0 2px var(--s-1), 0 0 0 3px var(--c-primary);
+}
+.color-picker-hex {
+  display: flex;
+  align-items: center;
+  gap: var(--sft-spacing-2);
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-weak);
+}
+.color-picker-hex input {
+  width: 90px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--sft-font-size-xs);
+  padding: 3px 6px;
+  color: var(--t-base);
+  background: var(--s-1);
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--r-sm);
+}
 .color-table-del { width: 28px; text-align: right; }
 
 #btn-capture-org-color { margin-top: var(--sft-spacing-2); }
