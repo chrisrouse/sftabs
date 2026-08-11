@@ -1619,6 +1619,14 @@
     "message": "Elegir un color",
     "description": "Accessible name for the color picker that opens under an org or environment row"
   },
+  "orgColorAreaLabel": {
+    "message": "Saturación y brillo. Use las teclas de flecha para ajustar; mantenga Mayús para pasos mayores.",
+    "description": "Accessible name for the 2D saturation/brightness square in the org color picker"
+  },
+  "orgColorHueLabel": {
+    "message": "Tono",
+    "description": "Accessible name for the hue strip in the org color picker"
+  },
   "orgColorHexLabel": {
     "message": "Hex",
     "description": "Label for the hex code field in the color picker; the word is the same in most languages"

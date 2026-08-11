@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<title>SF Tabs — Org color picker, three shapes</title>
+<link rel="stylesheet" href="../../css/tokens.css" />
+<style>
+  /* ── Mockup page chrome (not part of the design) ───────────────── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sft-font-family);
+    font-size: var(--sft-font-size-base);
+    color: var(--sft-text);
+    background: var(--sft-surface-2);
+    padding: 32px;
+  }
+  .page-head { max-width: 1240px; margin: 0 auto 28px; }
+  .page-head h1 { font: var(--sft-type-style-title); color: var(--sft-text-strong); }
+  .page-head p { color: var(--sft-text-weak); margin-top: 8px; max-width: 74ch; }
+  .controls { display: flex; gap: 8px; margin-top: 16px; }
+  .controls button {
+    font: inherit; padding: 6px 16px; cursor: pointer;
+    border: 1px solid var(--sft-border-strong);
+    border-radius: var(--sft-radius-pill);
+    background: var(--sft-surface-container-1); color: var(--sft-text);
+  }
+  .controls button[aria-pressed="true"] {
+    background: var(--sft-accent-container-1); color: #fff; border-color: transparent;
+  }
+
+  .grid { max-width: 1240px; margin: 0 auto; display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .variant { width: 380px; }          /* the tray's real width */
+  .variant > h2 {
+    font-size: var(--sft-font-size-lg); font-weight: var(--sft-font-weight-regular);
+    color: var(--sft-text-strong); margin-bottom: 4px;
+  }
+  .variant > .why {
+    color: var(--sft-text-weak); font-size: var(--sft-font-size-xs);
+    margin-bottom: 12px; min-height: 5.4em;
+  }
+  .variant > .cost {
+    margin-top: 12px; font-size: var(--sft-font-size-xs); color: var(--sft-text-weak);
+    border-left: 2px solid var(--sft-border-medium); padding-left: 10px;
+  }
+  .variant > .cost b { color: var(--sft-text); font-weight: var(--sft-font-weight-semibold); }
+
+  /* ── The panel, as it appears in the popup ───────────────────── */
+  .panel {
+    background: var(--sft-surface-1);
+    border: 1px solid var(--sft-border-subtle);
+    border-radius: var(--sft-radius-md);
+    padding: 12px;
+  }
+  .subhead {
+    font-size: var(--sft-font-size-xs);
+    font-weight: var(--sft-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--sft-text-weak);
+    margin-bottom: 8px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 5px 4px; vertical-align: middle; }
+  .c-ico { width: 22px; }
+  .c-ico span {
+    display: block; width: 16px; height: 16px; border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
+  }
+  .c-name { font-size: var(--sft-font-size-base); color: var(--sft-text); }
+  .c-well { width: 42px; text-align: right; }
+
+  .well {
+    width: 34px; height: 22px; padding: 0;
+    border: 1px solid var(--sft-border-medium);
+    border-radius: var(--sft-radius-sm);
+    cursor: pointer; vertical-align: middle;
+  }
+  .well:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 1px; }
+
+  .picker {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 10px; margin-top: 2px;
+    background: var(--sft-surface-2);
+    border: 1px solid var(--sft-border-subtle);
+    border-radius: var(--sft-radius-md);
+  }
+
+  /* Sliders */
+  .slider-row {
+    display: grid; grid-template-columns: 42px 1fr 40px;
+    align-items: center; gap: 8px;
+    font-size: var(--sft-font-size-xs); color: var(--sft-text-weak);
+  }
+  .slider-row output { text-align: right; font-variant-numeric: tabular-nums; }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 12px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--sft-border-medium);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; border: 1px solid rgba(0,0,0,0.35);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35); cursor: grab;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; border: 1px solid rgba(0,0,0,0.35);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35); cursor: grab;
+  }
+  input[type="range"]:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+  .track-hue {
+    background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%,
+                #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  }
+
+  /* 2D area */
+  .area-wrap { display: flex; gap: 8px; }
+  .area {
+    position: relative; flex: 1; height: 120px;
+    border-radius: var(--sft-radius-sm);
+    border: 1px solid var(--sft-border-medium);
+    cursor: crosshair; touch-action: none;
+  }
+  .area:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+  .area .sat { position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(to right, #fff, transparent); }
+  .area .val { position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(to top, #000, transparent); }
+  .dot {
+    position: absolute; width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4);
+    transform: translate(-50%, -50%); pointer-events: none;
+  }
+  .hue-strip {
+    position: relative; width: 18px; height: 120px;
+    border-radius: var(--sft-radius-sm);
+    border: 1px solid var(--sft-border-medium);
+    cursor: pointer; touch-action: none;
+    background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%,
+                #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  }
+  .hue-strip:focus-visible { outline: 2px solid var(--sft-focus-ring); outline-offset: 2px; }
+  .hue-thumb {
+    position: absolute; left: -3px; right: -3px; height: 6px;
+    border: 2px solid #fff; border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.5); transform: translateY(-50%); pointer-events: none;
+  }
+
+  /* Hex + live preview */
+  .hexrow { display: flex; align-items: center; gap: 8px;
+            font-size: var(--sft-font-size-xs); color: var(--sft-text-weak); }
+  .hexrow input {
+    width: 92px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--sft-font-size-xs); padding: 3px 6px;
+    color: var(--sft-text); background: var(--sft-surface-1);
+    border: 1px solid var(--sft-border-medium); border-radius: var(--sft-radius-sm);
+  }
+  .live {
+    margin-left: auto; width: 46px; height: 22px;
+    border-radius: var(--sft-radius-sm); border: 1px solid var(--sft-border-medium);
+  }
+  .a11y { font-size: 11px; color: var(--sft-text-weak); }
+  .a11y b { color: var(--sft-text); font-weight: var(--sft-font-weight-semibold); }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Org color picker — three shapes</h1>
+  <p>
+    All three are plain DOM, so they behave identically in Chrome and Firefox — which is the
+    whole point, since <code>&lt;input type="color"&gt;</code> had to go because Firefox hands it
+    to the OS dialog and the popup closes with it. Each is shown at the tray's real 380px against
+    the real tokens. <b>They are live</b> — drag them.
+  </p>
+  <p style="margin-top:6px">
+    Presets are dropped in all three, as chosen. Restoring shipped colors is still possible:
+    the <em>reset</em> button already in the section header puts every environment back at once.
+  </p>
+  <div class="controls">
+    <button id="t-light" aria-pressed="true">Light</button>
+    <button id="t-dark" aria-pressed="false">Dark</button>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- ── A: sliders only ──────────────────────────────────────── -->
+  <section class="variant">
+    <h2>A · Sliders only</h2>
+    <p class="why">
+      Three native range inputs. Reaches every color, and every accessibility affordance —
+      arrow keys, Home/End, screen-reader announcement of the value — comes free from the
+      platform rather than being re-implemented.
+    </p>
+    <div class="panel">
+      <div class="subhead">By environment</div>
+      <table>
+        <tr>
+          <td class="c-ico"><span data-ico="A"></span></td>
+          <td class="c-name">Sandbox</td>
+          <td class="c-well"><button class="well" data-well="A" aria-expanded="true"></button></td>
+        </tr>
+        <tr><td colspan="3">
+          <div class="picker" data-picker="A">
+            <div class="slider-row">
+              <label for="A-h">Hue</label>
+              <input type="range" id="A-h" class="track-hue" min="0" max="360" data-ch="h" />
+              <output data-out="h">—</output>
+            </div>
+            <div class="slider-row">
+              <label for="A-s">Sat</label>
+              <input type="range" id="A-s" min="0" max="100" data-ch="s" />
+              <output data-out="s">—</output>
+            </div>
+            <div class="slider-row">
+              <label for="A-l">Light</label>
+              <input type="range" id="A-l" min="0" max="100" data-ch="l" />
+              <output data-out="l">—</output>
+            </div>
+            <div class="hexrow">
+              <label for="A-hex">Hex</label>
+              <input type="text" id="A-hex" data-hex maxlength="7" spellcheck="false" />
+              <span class="live" data-live></span>
+            </div>
+          </div>
+        </td></tr>
+        <tr>
+          <td class="c-ico"><span style="background:#c5221f"></span></td>
+          <td class="c-name">Production</td>
+          <td class="c-well"><button class="well" style="background:#c5221f"></button></td>
+        </tr>
+      </table>
+    </div>
+    <p class="cost">
+      <b>~40 lines.</b> Nothing custom to get wrong. The cost is that picking a color by eye
+      means reasoning in three numbers rather than pointing at it.
+    </p>
+  </section>
+
+  <!-- ── B: 2D square + hue strip ─────────────────────────────── -->
+  <section class="variant">
+    <h2>B · Square + hue strip</h2>
+    <p class="why">
+      What most people mean by a color picker. Point at the color you want. Keyboard support has
+      to be written by hand — the square is focusable and takes arrow keys here, with shift for
+      coarse steps — because nothing native does this.
+    </p>
+    <div class="panel">
+      <div class="subhead">By environment</div>
+      <table>
+        <tr>
+          <td class="c-ico"><span data-ico="B"></span></td>
+          <td class="c-name">Sandbox</td>
+          <td class="c-well"><button class="well" data-well="B" aria-expanded="true"></button></td>
+        </tr>
+        <tr><td colspan="3">
+          <div class="picker" data-picker="B">
+            <div class="area-wrap">
+              <div class="area" data-area tabindex="0" role="application"
+                   aria-label="Saturation and brightness. Arrow keys adjust.">
+                <div class="sat"></div><div class="val"></div>
+                <div class="dot" data-dot></div>
+              </div>
+              <div class="hue-strip" data-huestrip tabindex="0" role="slider"
+                   aria-label="Hue" aria-valuemin="0" aria-valuemax="360" aria-valuenow="0">
+                <div class="hue-thumb" data-huethumb></div>
+              </div>
+            </div>
+            <div class="hexrow">
+              <label for="B-hex">Hex</label>
+              <input type="text" id="B-hex" data-hex maxlength="7" spellcheck="false" />
+              <span class="live" data-live></span>
+            </div>
+          </div>
+        </td></tr>
+        <tr>
+          <td class="c-ico"><span style="background:#c5221f"></span></td>
+          <td class="c-name">Production</td>
+          <td class="c-well"><button class="well" style="background:#c5221f"></button></td>
+        </tr>
+      </table>
+    </div>
+    <p class="cost">
+      <b>~130 lines</b>, plus pointer capture, an ARIA story for the square, and a keyboard model
+      invented here rather than inherited. The one shape people already know how to use.
+    </p>
+  </section>
+
+  <!-- ── C: both ──────────────────────────────────────────────── -->
+  <section class="variant">
+    <h2>C · Square and sliders</h2>
+    <p class="why">
+      The square to choose by eye, the sliders to nudge one channel exactly — and as the
+      keyboard path, which means the square's own key handling stops being load-bearing.
+      They drive each other.
+    </p>
+    <div class="panel">
+      <div class="subhead">By environment</div>
+      <table>
+        <tr>
+          <td class="c-ico"><span data-ico="C"></span></td>
+          <td class="c-name">Sandbox</td>
+          <td class="c-well"><button class="well" data-well="C" aria-expanded="true"></button></td>
+        </tr>
+        <tr><td colspan="3">
+          <div class="picker" data-picker="C">
+            <div class="area-wrap">
+              <div class="area" data-area tabindex="0" role="application"
+                   aria-label="Saturation and brightness. Arrow keys adjust.">
+                <div class="sat"></div><div class="val"></div>
+                <div class="dot" data-dot></div>
+              </div>
+              <div class="hue-strip" data-huestrip tabindex="0" role="slider"
+                   aria-label="Hue" aria-valuemin="0" aria-valuemax="360" aria-valuenow="0">
+                <div class="hue-thumb" data-huethumb></div>
+              </div>
+            </div>
+            <div class="slider-row">
+              <label for="C-h">Hue</label>
+              <input type="range" id="C-h" class="track-hue" min="0" max="360" data-ch="h" />
+              <output data-out="h">—</output>
+            </div>
+            <div class="slider-row">
+              <label for="C-s">Sat</label>
+              <input type="range" id="C-s" min="0" max="100" data-ch="s" />
+              <output data-out="s">—</output>
+            </div>
+            <div class="slider-row">
+              <label for="C-l">Light</label>
+              <input type="range" id="C-l" min="0" max="100" data-ch="l" />
+              <output data-out="l">—</output>
+            </div>
+            <div class="hexrow">
+              <label for="C-hex">Hex</label>
+              <input type="text" id="C-hex" data-hex maxlength="7" spellcheck="false" />
+              <span class="live" data-live></span>
+            </div>
+          </div>
+        </td></tr>
+      </table>
+    </div>
+    <p class="cost">
+      <b>~160 lines</b> and roughly 70px more height in a panel that already scrolls.
+      Two controls for one value also means two places for them to disagree.
+    </p>
+  </section>
+
+</div>
+
+<p style="max-width:1240px;margin:32px auto 0;font-size:var(--sft-font-size-xs);color:var(--sft-text-weak)">
+  Note on B and C: the square is HSV, the sliders are HSL. That is the usual pairing and it is why
+  dragging the square moves the Light slider in ways that can look surprising — the two describe the
+  same color with different axes. Worth knowing before choosing C.
+</p>
+
+<script>
+// ── Color math ───────────────────────────────────────────────────
+const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+const hex2 = n => clamp(Math.round(n), 0, 255).toString(16).padStart(2, '0');
+
+function hsvToHex(h, s, v) {
+  const f = n => {
+    const k = (n + h / 60) % 6;
+    return v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
+  };
+  return '#' + hex2(f(5) * 255) + hex2(f(3) * 255) + hex2(f(1) * 255);
+}
+function hexToHsv(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim());
+  if (!m) return null;
+  const int = parseInt(m[1], 16);
+  const r = ((int >> 16) & 255) / 255, g = ((int >> 8) & 255) / 255, b = (int & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0;
+  if (d) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60; if (h < 0) h += 360;
+  }
+  return { h, s: max ? d / max : 0, v: max };
+}
+// HSV <-> HSL, so the sliders and the square can describe one color
+const hsvToHsl = ({ h, s, v }) => {
+  const l = v * (1 - s / 2);
+  return { h, s: (l === 0 || l === 1) ? 0 : (v - l) / Math.min(l, 1 - l), l };
+};
+const hslToHsv = ({ h, s, l }) => {
+  const v = l + s * Math.min(l, 1 - l);
+  return { h, s: v === 0 ? 0 : 2 * (1 - l / v), v };
+};
+
+// ── One picker instance ──────────────────────────────────────────
+function wire(root, startHex) {
+  const state = hexToHsv(startHex);
+  const area = root.querySelector('[data-area]');
+  const dot = root.querySelector('[data-dot]');
+  const strip = root.querySelector('[data-huestrip]');
+  const thumb = root.querySelector('[data-huethumb]');
+  const hexIn = root.querySelector('[data-hex]');
+  const live = root.querySelector('[data-live]');
+  const sliders = [...root.querySelectorAll('input[type=range]')];
+  const outs = Object.fromEntries([...root.querySelectorAll('[data-out]')]
+    .map(o => [o.dataset.out, o]));
+  const key = root.dataset.picker;
+  const well = document.querySelector(`[data-well="${key}"]`);
+  const ico = document.querySelector(`[data-ico="${key}"]`);
+
+  function paint() {
+    const hex = hsvToHex(state.h, state.s, state.v);
+    if (area) {
+      area.style.background = `hsl(${state.h} 100% 50%)`;
+      dot.style.left = (state.s * 100) + '%';
+      dot.style.top = ((1 - state.v) * 100) + '%';
+      dot.style.background = hex;
+    }
+    if (strip) {
+      thumb.style.top = (state.h / 360 * 100) + '%';
+      strip.setAttribute('aria-valuenow', Math.round(state.h));
+    }
+    const hsl = hsvToHsl(state);
+    for (const s of sliders) {
+      const ch = s.dataset.ch;
+      s.value = ch === 'h' ? Math.round(hsl.h)
+              : ch === 's' ? Math.round(hsl.s * 100)
+              : Math.round(hsl.l * 100);
+      if (outs[ch]) outs[ch].textContent = ch === 'h' ? s.value + '°' : s.value + '%';
+    }
+    // Saturation and lightness tracks show what they would produce
+    const sSl = root.querySelector('input[data-ch=s]');
+    if (sSl) sSl.style.background =
+      `linear-gradient(to right, hsl(${hsl.h} 0% ${hsl.l * 100}%), hsl(${hsl.h} 100% ${hsl.l * 100}%))`;
+    const lSl = root.querySelector('input[data-ch=l]');
+    if (lSl) lSl.style.background =
+      `linear-gradient(to right, #000, hsl(${hsl.h} ${hsl.s * 100}% 50%), #fff)`;
+
+    if (document.activeElement !== hexIn) hexIn.value = hex;
+    live.style.background = hex;
+    if (well) well.style.background = hex;
+    if (ico) ico.style.background = hex;
+  }
+
+  // Drag the square
+  if (area) {
+    const set = e => {
+      const r = area.getBoundingClientRect();
+      state.s = clamp((e.clientX - r.left) / r.width, 0, 1);
+      state.v = clamp(1 - (e.clientY - r.top) / r.height, 0, 1);
+      paint();
+    };
+    area.addEventListener('pointerdown', e => {
+      area.setPointerCapture(e.pointerId); set(e); area.focus();
+    });
+    area.addEventListener('pointermove', e => { if (area.hasPointerCapture(e.pointerId)) set(e); });
+    area.addEventListener('keydown', e => {
+      const step = e.shiftKey ? 0.1 : 0.02;
+      const moves = { ArrowLeft: ['s', -step], ArrowRight: ['s', step],
+                      ArrowUp: ['v', step], ArrowDown: ['v', -step] };
+      const m = moves[e.key];
+      if (!m) return;
+      e.preventDefault();
+      state[m[0]] = clamp(state[m[0]] + m[1], 0, 1);
+      paint();
+    });
+  }
+
+  // Drag the hue strip
+  if (strip) {
+    const set = e => {
+      const r = strip.getBoundingClientRect();
+      state.h = clamp((e.clientY - r.top) / r.height, 0, 1) * 360;
+      paint();
+    };
+    strip.addEventListener('pointerdown', e => {
+      strip.setPointerCapture(e.pointerId); set(e); strip.focus();
+    });
+    strip.addEventListener('pointermove', e => { if (strip.hasPointerCapture(e.pointerId)) set(e); });
+    strip.addEventListener('keydown', e => {
+      const step = e.shiftKey ? 15 : 3;
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { state.h = (state.h - step + 360) % 360; }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { state.h = (state.h + step) % 360; }
+      else return;
+      e.preventDefault(); paint();
+    });
+  }
+
+  // Sliders
+  for (const s of sliders) {
+    s.addEventListener('input', () => {
+      const hsl = hsvToHsl(state);
+      const next = { h: hsl.h, s: hsl.s, l: hsl.l };
+      if (s.dataset.ch === 'h') next.h = +s.value;
+      if (s.dataset.ch === 's') next.s = +s.value / 100;
+      if (s.dataset.ch === 'l') next.l = +s.value / 100;
+      Object.assign(state, hslToHsv(next));
+      paint();
+    });
+  }
+
+  // Hex, committed on blur or Enter — not per keystroke, which would fight typing
+  const commit = () => {
+    const parsed = hexToHsv(hexIn.value.startsWith('#') ? hexIn.value : '#' + hexIn.value);
+    if (parsed) Object.assign(state, parsed);
+    paint();
+  };
+  hexIn.addEventListener('blur', commit);
+  hexIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
+
+  paint();
+}
+
+for (const p of document.querySelectorAll('[data-picker]')) wire(p, '#1e8e3e');
+
+// Theme toggle
+const light = document.getElementById('t-light'), dark = document.getElementById('t-dark');
+const setTheme = mode => {
+  document.documentElement.dataset.theme = mode;
+  light.setAttribute('aria-pressed', String(mode === 'light'));
+  dark.setAttribute('aria-pressed', String(mode === 'dark'));
+};
+light.addEventListener('click', () => setTheme('light'));
+dark.addEventListener('click', () => setTheme('dark'));
+</script>
+</body>
+</html>

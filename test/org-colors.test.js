@@ -252,5 +252,86 @@ check('the floating button resolves location through the same rule',
       floatingButtonAllowedHere(url, { enabled: true, location: where }) ===
       locationAllows(url, where))));
 
+
+// ── The picker's color math ──
+// A saturation/brightness square with a hue strip. The square's two axes ARE
+// S and V, so the mapping is the geometry rather than a conversion laid on top,
+// which is why this is HSV and not HSL.
+const { hexToHsv, hsvToHex } = require('../popup/js/shared/utils.js');
+const roundTrip = hex => {
+  const hsv = hexToHsv(hex);
+  return hsv && hsvToHex(hsv.h, hsv.s, hsv.v);
+};
+
+// The property that matters: a color must survive storage and land back on the
+// same pixel of the square. Drift of one in the last channel would nudge the
+// dot every time the row was reopened.
+let drifted = null;
+for (let i = 0; i < 4096 && !drifted; i++) {
+  // Deterministic sweep rather than random, so a failure is reproducible.
+  const hex = '#' + ((i * 4093) % 0x1000000).toString(16).padStart(6, '0');
+  if (roundTrip(hex) !== hex) drifted = hex;
+}
+check('every color survives a round trip through hex exactly',
+  drifted === null, drifted ? 'first drift at ' + drifted : '4096 colors, no drift');
+
+check('the shipped defaults round-trip too',
+  Object.values(DEFAULT_ENV_COLORS).every(hex => roundTrip(hex) === hex));
+
+// Grey has no hue to recover; black has neither hue nor saturation. Both must
+// come back as themselves rather than as NaN somewhere in the middle.
+check('achromatic colors do not produce a hue out of nothing',
+  hexToHsv('#000000').h === 0 && hexToHsv('#ffffff').s === 0 &&
+  roundTrip('#5c5c5c') === '#5c5c5c');
+check('the hue of a pure primary is where it should be',
+  Math.round(hexToHsv('#ff0000').h) === 0 &&
+  Math.round(hexToHsv('#00ff00').h) === 120 &&
+  Math.round(hexToHsv('#0000ff').h) === 240);
+check('shorthand hex opens the picker at the same place as its long form',
+  JSON.stringify(hexToHsv('#0f8')) === JSON.stringify(hexToHsv('#00ff88')));
+check('and a value that is not a color returns null rather than a guess',
+  hexToHsv('nope') === null && hexToHsv('') === null &&
+  hexToHsv(null) === null && hexToHsv('#12345') === null);
+check('out-of-range input is clamped, not wrapped',
+  hsvToHex(0, 2, 2) === '#ff0000' && hsvToHex(0, -1, -1) === '#000000');
+
+
+// ── Choosing must not write on every frame ──
+// A pointermove fires tens of times a second. Committing each one would spend
+// Chrome's ~120 storage.sync writes a minute in a single sweep of the square,
+// and repaint the banner on every Salesforce tab while the drag was happening —
+// including flipping its label between white and near-black across the
+// luminance threshold. The value reaches storage once, when the row closes.
+const popupSrc = require('fs')
+  .readFileSync(require('path').join(__dirname, '..', 'js/popup.js'), 'utf8');
+
+check('dragging paints locally and does not save',
+  /function mountOrgColorPicker\([\s\S]*?\n\}/.test(popupSrc) &&
+  !/mountOrgColorPicker[\s\S]{0,4000}?patchSettings/.test(popupSrc),
+  'nothing inside the picker may reach storage');
+check('the value is committed when the row closes',
+  /async function closeOrgColorPickers[\s\S]{0,700}live\.onCommit\(live\.hex\)/.test(popupSrc));
+check('an untouched picker commits nothing',
+  /live\.hex !== live\.start/.test(popupSrc),
+  'opening a row to look at it must not spend a write or repaint every tab');
+check('Escape closes without committing',
+  /closeOrgColorPickers\(root, \{ commit: false \}\)/.test(popupSrc),
+  'once the square has been dragged it is the only way back');
+
+// Leaving the panel is a save, not a discard.
+check('closing the tray commits an open picker',
+  /function showView\(viewName\)[\s\S]{0,400}closeOrgColorPickers\(\);/.test(popupSrc));
+check('and so does navigating out of the section',
+  /function showSettingsSection\(id\)[\s\S]{0,300}closeOrgColorPickers\(\);/.test(popupSrc));
+
+// A commit re-renders the table, so the order here is load-bearing.
+check('opening one picker waits for the previous commit to finish',
+  /await closeOrgColorPickers\(root\);\s*\n\s*if \(wasOpen\) return;/.test(popupSrc),
+  'mounting first would put the new picker into rows about to be replaced');
+
+check('the presets are gone, as are their handlers',
+  !/ORG_COLOR_PRESETS/.test(popupSrc) && !/data-color-pick=/.test(popupSrc),
+  'the reset button still restores every shipped color at once');
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

@@ -1107,31 +1107,85 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   border: var(--sft-border-width-1) solid var(--b-subtle);
   border-radius: var(--r-md);
 }
-.color-picker-swatches {
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  gap: 5px;
-  justify-items: center;
+/* The square and the hue strip beside it. Both are plain elements with CSS
+   gradients — no canvas, and nothing that hands off to the OS, which is what
+   made <input type="color"> unusable on Firefox in the first place. */
+.color-picker-body {
+  display: flex;
+  gap: var(--sft-spacing-2);
 }
-.color-preset {
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border: 0;
+
+.color-area {
+  position: relative;
+  flex: 1;
+  height: 116px;
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--r-sm);
+  cursor: crosshair;
+  /* Or the browser pans the panel instead of tracking the drag */
+  touch-action: none;
+  background: hsl(var(--hue, 0) 100% 50%);
+}
+.color-area:focus-visible {
+  outline: 2px solid var(--sft-focus-ring);
+  outline-offset: 2px;
+}
+/* White across, black up: saturation on x, brightness on y */
+.color-area-sat,
+.color-area-val {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.color-area-sat { background: linear-gradient(to right, #fff, transparent); }
+.color-area-val { background: linear-gradient(to top, #000, transparent); }
+
+.color-area-dot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
   border-radius: 50%;
-  background: var(--well);
+  /* Rings on both sides, so the dot is visible on white and on black */
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.color-hue {
+  position: relative;
+  width: 18px;
+  height: 116px;
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--r-sm);
   cursor: pointer;
-  /* A hairline inside, so a pale swatch still reads as a disc on the panel */
-  box-shadow: inset 0 0 0 1px var(--c-inset-hairline);
-  transition: box-shadow var(--ease);
+  touch-action: none;
+  background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%,
+              #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
 }
-.color-preset:hover {
-  box-shadow: inset 0 0 0 1px var(--c-inset-hairline),
-              0 0 0 2px var(--s-1), 0 0 0 3px var(--b-strong);
+.color-hue:focus-visible {
+  outline: 2px solid var(--sft-focus-ring);
+  outline-offset: 2px;
 }
-.color-preset[aria-pressed="true"] {
-  box-shadow: inset 0 0 0 1px var(--c-inset-hairline),
-              0 0 0 2px var(--s-1), 0 0 0 3px var(--c-primary);
+.color-hue-thumb {
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  height: 6px;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* What the favicon and the banner will actually be */
+.color-picker-live {
+  margin-left: auto;
+  width: 44px;
+  height: 20px;
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--r-sm);
 }
 .color-picker-hex {
   display: flex;

@@ -1617,6 +1617,11 @@ function showView(viewName) {
   const tray  = document.getElementById('panel-tray');
   const views = ['edit-tab', 'settings', 'release-notes', 'dropdowns', 'edit-profile'];
 
+  // Leaving the panel is the save. A color picked and then dismissed by closing
+  // the tray was chosen deliberately; discarding it because the row was never
+  // clicked shut again would lose work with no way to tell it had happened.
+  closeOrgColorPickers();
+
   if (viewName === 'empty') {
     tray.classList.remove('is-open');
     views.forEach(v => {
@@ -1674,6 +1679,9 @@ const SETTINGS_SECTION_REFRESH = {
 function showSettingsSection(id) {
   const hub = document.getElementById('settings-hub');
   if (!hub) return;
+
+  // Same rule as leaving the tray: navigating away from Org Colors saves.
+  closeOrgColorPickers();
 
   state.settingsSection = id;
   hub.hidden = Boolean(id);
@@ -2674,31 +2682,13 @@ function orgColorConfig() {
 
 
 /**
- * Presets for the org color picker.
- *
- * A flat list of hex values, deliberately not TAB_COLORS: those are
- * light-dark() pairs, and an org color has to resolve to one hex — it is baked
- * into the favicon's data URL and used as the banner background, neither of
- * which can carry a CSS function.
- *
- * The seven environment defaults are in here so a row can be put back to what
- * it shipped with, plus enough distinct hues to tell a dozen orgs apart at
- * 16px in a tab strip.
- */
-const ORG_COLOR_PRESETS = [
-  '#c5221f', '#d93025', '#e8710a', '#b06000', '#f9ab00', '#1e8e3e',
-  '#0b8043', '#007b83', '#0d9dda', '#1a73e8', '#0176d3', '#3f51b5',
-  '#7526e3', '#9334e6', '#d01884', '#5c5c5c', '#3e3e3c', '#181818',
-];
-
-/**
  * The swatch that opens a row's picker.
  *
  * This replaces <input type="color">. On Firefox that opens the operating
  * system's color dialog, and a browser-action popup closes the moment it loses
  * focus — so the picker took the popup with it and the color could never be
  * set. Chrome renders the same input inline, which is why it only ever failed
- * on one browser.
+ * on one browser. What is below is plain DOM, so it behaves the same on both.
  */
 function orgColorTrigger(id, color, label) {
   return `<button type="button" class="color-well" data-color-open="${esc(id)}"
@@ -2707,54 +2697,229 @@ function orgColorTrigger(id, color, label) {
 }
 
 /**
- * The picker: presets and a hex field, in a row that expands underneath.
+ * The picker: a saturation/brightness square, a hue strip, and a hex field.
  *
- * A row rather than a floating panel because the settings section scrolls —
- * anything absolutely positioned has to be re-placed on every scroll and
- * clipped at the panel edge, and this needs none of that.
+ * A row that expands underneath rather than a floating panel, because the
+ * settings section scrolls — anything absolutely positioned has to be re-placed
+ * on every scroll event and clipped at the panel edge, and this needs neither.
+ *
+ * The square is `role="application"`: it is a two-dimensional value, which no
+ * ARIA role describes, and the alternative — leaving it an unlabelled div —
+ * makes it invisible rather than merely unusual. Arrow keys move it, shift for
+ * coarse steps, and the hex field is the precise route for anyone who would
+ * rather type than aim.
  */
 function orgColorPickerRow(id, color, span) {
-  const current = String(color || '').toLowerCase();
   return `<tr class="color-picker-row" data-color-panel="${esc(id)}" hidden>
     <td colspan="${span}">
-      <div class="color-picker" role="group" aria-label="${esc(t('orgColorPickerLabel'))}">
-        <div class="color-picker-swatches">
-          ${ORG_COLOR_PRESETS.map(hex => `<button type="button" class="color-preset"
-            data-color-pick="${esc(id)}" data-hex="${hex}"
-            aria-pressed="${hex === current}" title="${hex}" aria-label="${hex}"
-            style="--well: ${hex}"></button>`).join('')}
+      <div class="color-picker" role="group" aria-label="${esc(t('orgColorPickerLabel'))}"
+        data-color-picker="${esc(id)}" data-start="${esc(color)}">
+        <div class="color-picker-body">
+          <div class="color-area" data-color-area tabindex="0" role="application"
+            aria-label="${esc(t('orgColorAreaLabel'))}">
+            <div class="color-area-sat"></div>
+            <div class="color-area-val"></div>
+            <div class="color-area-dot" data-color-dot></div>
+          </div>
+          <div class="color-hue" data-color-hue tabindex="0" role="slider"
+            aria-label="${esc(t('orgColorHueLabel'))}"
+            aria-valuemin="0" aria-valuemax="360" aria-valuenow="0">
+            <div class="color-hue-thumb" data-color-hue-thumb></div>
+          </div>
         </div>
         <label class="color-picker-hex">
           <span>${esc(t('orgColorHexLabel'))}</span>
           <input type="text" data-color-hex="${esc(id)}" value="${esc(color)}"
             maxlength="7" spellcheck="false" autocomplete="off" />
+          <span class="color-picker-live" data-color-live></span>
         </label>
       </div>
     </td>
   </tr>`;
 }
 
-/** Show or hide one picker, closing any other that is open. */
-function toggleOrgColorPicker(id, root) {
+/**
+ * Every picker currently mounted, by id, with what to do when it closes.
+ *
+ * Dragging must not write to storage. A pointermove fires tens of times a
+ * second, each commit is a storage.sync write, and Chrome allows about 120 of
+ * those a minute — one sweep across the square would exhaust the quota and
+ * start failing. It would also repaint the banner on every Salesforce tab
+ * continuously, and flip its label between white and near-black each time the
+ * drag crossed the luminance threshold.
+ *
+ * So the picker is entirely local while open. It paints its own square, its own
+ * swatch and its own preview, and the value reaches storage once, when the row
+ * closes. Escape closes without committing.
+ */
+const openOrgPickers = new Map();
+
+/**
+ * Show or hide one picker, committing whatever any other one was showing.
+ *
+ * Awaits the close before opening. A commit re-renders the table, so opening
+ * first would mount the new picker into rows that are about to be replaced —
+ * clicking one swatch while another was open would leave nothing open at all.
+ * The ids survive the re-render, so the panel is looked up again afterwards.
+ */
+async function toggleOrgColorPicker(id, root, onCommit) {
+  const wasOpen = !root.querySelector(`[data-color-panel="${CSS.escape(id)}"]`)?.hidden;
+
+  await closeOrgColorPickers(root);
+  if (wasOpen) return;
+
   const panel = root.querySelector(`[data-color-panel="${CSS.escape(id)}"]`);
   if (!panel) return;
-  const opening = panel.hidden;
-  root.querySelectorAll('[data-color-panel]').forEach(p => { p.hidden = true; });
-  root.querySelectorAll('[data-color-open]').forEach(b => b.setAttribute('aria-expanded', 'false'));
-  panel.hidden = !opening;
-  const trigger = root.querySelector(`[data-color-open="${CSS.escape(id)}"]`);
-  if (trigger) trigger.setAttribute('aria-expanded', String(opening));
-  if (opening) panel.querySelector('.color-preset')?.focus();
+
+  panel.hidden = false;
+  root.querySelector(`[data-color-open="${CSS.escape(id)}"]`)
+    ?.setAttribute('aria-expanded', 'true');
+  mountOrgColorPicker(panel.querySelector('[data-color-picker]'), root, onCommit);
+  panel.querySelector('[data-color-area]')?.focus();
 }
 
-/** #rgb and #rrggbb, the two shapes a user is likely to paste. */
-function normalizeHex(value) {
-  const v = String(value || '').trim();
-  if (/^#[0-9a-f]{6}$/i.test(v)) return v.toLowerCase();
-  if (/^#[0-9a-f]{3}$/i.test(v)) {
-    return ('#' + v.slice(1).split('').map(c => c + c).join('')).toLowerCase();
+/**
+ * Close any open picker, committing its value.
+ *
+ * Called when another row opens, when the section is left, and when the tray
+ * closes — all of which are "done choosing" from the user's side, and none of
+ * which should silently discard what they picked.
+ */
+async function closeOrgColorPickers(root, { commit = true } = {}) {
+  const scope = root || document;
+  const pending = [];
+
+  scope.querySelectorAll('[data-color-panel]').forEach(panel => {
+    if (panel.hidden) return;
+    panel.hidden = true;
+    const id = panel.dataset.colorPanel;
+    const live = openOrgPickers.get(id);
+    openOrgPickers.delete(id);
+    // Unchanged is not a write. Opening a row to look at it must not burn a
+    // storage.sync quota slot, and must not repaint every Salesforce tab.
+    if (live && commit && live.hex !== live.start) pending.push(live.onCommit(live.hex));
+  });
+
+  scope.querySelectorAll('[data-color-open]')
+    .forEach(b => b.setAttribute('aria-expanded', 'false'));
+
+  await Promise.all(pending);
+}
+
+/** Wire one picker's square, strip and hex field. Nothing here touches storage. */
+function mountOrgColorPicker(picker, root, onCommit) {
+  const id = picker.dataset.colorPicker;
+  const start = SFTabs.utils.hexToHsv(picker.dataset.start) || { h: 0, s: 0, v: 0.5 };
+  const state = { ...start };
+
+  const area = picker.querySelector('[data-color-area]');
+  const dot = picker.querySelector('[data-color-dot]');
+  const strip = picker.querySelector('[data-color-hue]');
+  const thumb = picker.querySelector('[data-color-hue-thumb]');
+  const hexField = picker.querySelector('[data-color-hex]');
+  const live = picker.querySelector('[data-color-live]');
+  const well = root.querySelector(`[data-color-open="${CSS.escape(id)}"]`);
+
+  const entry = { hex: picker.dataset.start, start: picker.dataset.start, onCommit };
+  openOrgPickers.set(id, entry);
+
+  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+
+  function paint() {
+    const hex = SFTabs.utils.hsvToHex(state.h, state.s, state.v);
+    entry.hex = hex;
+
+    area.style.setProperty('--hue', String(Math.round(state.h)));
+    dot.style.left = (state.s * 100) + '%';
+    dot.style.top = ((1 - state.v) * 100) + '%';
+    dot.style.background = hex;
+
+    thumb.style.top = (state.h / 360 * 100) + '%';
+    strip.setAttribute('aria-valuenow', String(Math.round(state.h)));
+    strip.setAttribute('aria-valuetext', hex);
+
+    // Typing in the field must not have its own value written back over it
+    if (document.activeElement !== hexField) hexField.value = hex;
+    live.style.background = hex;
+    if (well) well.style.setProperty('--well', hex);
   }
-  return null;
+
+  /** Pointer drag, shared by both surfaces. */
+  function draggable(el, read) {
+    el.addEventListener('pointerdown', e => {
+      el.setPointerCapture(e.pointerId);
+      read(e);
+      paint();
+      el.focus();
+    });
+    el.addEventListener('pointermove', e => {
+      if (!el.hasPointerCapture(e.pointerId)) return;
+      read(e);
+      paint();
+    });
+  }
+
+  draggable(area, e => {
+    const box = area.getBoundingClientRect();
+    state.s = clamp((e.clientX - box.left) / box.width, 0, 1);
+    state.v = clamp(1 - (e.clientY - box.top) / box.height, 0, 1);
+  });
+  draggable(strip, e => {
+    const box = strip.getBoundingClientRect();
+    state.h = clamp((e.clientY - box.top) / box.height, 0, 1) * 360;
+  });
+
+  area.addEventListener('keydown', e => {
+    const step = e.shiftKey ? 0.1 : 0.02;
+    const moves = {
+      ArrowLeft: ['s', -step], ArrowRight: ['s', step],
+      ArrowUp: ['v', step], ArrowDown: ['v', -step],
+    };
+    const move = moves[e.key];
+    if (!move) return;
+    e.preventDefault();
+    state[move[0]] = clamp(state[move[0]] + move[1], 0, 1);
+    paint();
+  });
+
+  strip.addEventListener('keydown', e => {
+    const step = e.shiftKey ? 15 : 3;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') state.h = (state.h - step + 360) % 360;
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') state.h = (state.h + step) % 360;
+    else if (e.key === 'Home') state.h = 0;
+    else if (e.key === 'End') state.h = 359;
+    else return;
+    e.preventDefault();
+    paint();
+  });
+
+  // On blur and Enter, not on input: committing per keystroke would fight
+  // someone halfway through typing a hex.
+  const readHex = () => {
+    const parsed = SFTabs.utils.hexToHsv(hexField.value);
+    // An unreadable value is put back rather than kept — storing something the
+    // favicon cannot render is the worse failure.
+    if (parsed) Object.assign(state, parsed);
+    paint();
+  };
+  hexField.addEventListener('blur', readHex);
+  hexField.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    readHex();
+  });
+
+  // Escape abandons the whole row, which is the only way back to the color it
+  // opened with once the square has been dragged.
+  picker.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    e.stopPropagation();
+    closeOrgColorPickers(root, { commit: false });
+    well?.style.setProperty('--well', entry.start);
+    well?.focus();
+  });
+
+  paint();
 }
 
 /** A 16px preview of exactly what the browser tab will show. */
@@ -2850,20 +3015,10 @@ function renderOrgColors() {
   }).join('');
 
   rows.querySelectorAll('[data-color-open]').forEach(button => {
-    button.addEventListener('click', () => toggleOrgColorPicker(button.dataset.colorOpen, rows));
-  });
-  rows.querySelectorAll('[data-color-pick]').forEach(button => {
+    const index = +button.dataset.colorOpen.slice(4);
     button.addEventListener('click', () =>
-      saveOrgColor(entries[+button.dataset.colorPick.slice(4)], button.dataset.hex));
-  });
-  rows.querySelectorAll('[data-color-hex]').forEach(input => {
-    input.addEventListener('change', () => {
-      const hex = normalizeHex(input.value);
-      // An unparseable value is put back rather than saved — silently storing
-      // something the favicon cannot render is the worse failure.
-      if (!hex) { input.value = entries[+input.dataset.colorHex.slice(4)].color || ''; return; }
-      saveOrgColor(entries[+input.dataset.colorHex.slice(4)], hex);
-    });
+      toggleOrgColorPicker(button.dataset.colorOpen, rows,
+        hex => saveOrgColor(entries[index], hex)));
   });
   rows.querySelectorAll('[data-org-remove]').forEach(button => {
     button.addEventListener('click', () => removeOrgColor(entries[+button.dataset.orgRemove]));
@@ -3225,21 +3380,9 @@ function bindEvents() {
 
   envRows.addEventListener('click', e => {
     const trigger = e.target.closest('[data-color-open]');
-    if (trigger) { toggleOrgColorPicker(trigger.dataset.colorOpen, envRows); return; }
-
-    const preset = e.target.closest('[data-color-pick]');
-    if (preset) saveEnvColor(preset.dataset.colorPick.slice(4), preset.dataset.hex);
-  });
-
-  envRows.addEventListener('change', e => {
-    const input = e.target.closest('[data-color-hex]');
-    if (!input) return;
-    const env = input.dataset.colorHex.slice(4);
-    const hex = normalizeHex(input.value);
-    // Put an unreadable value back rather than storing something the favicon
-    // cannot render.
-    if (!hex) { renderEnvColors(); return; }
-    saveEnvColor(env, hex);
+    if (!trigger) return;
+    const env = trigger.dataset.colorOpen.slice(4);
+    toggleOrgColorPicker(trigger.dataset.colorOpen, envRows, hex => saveEnvColor(env, hex));
   });
 
   document.getElementById('btn-reset-env-colors').addEventListener('click', async () => {

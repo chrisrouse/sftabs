@@ -719,6 +719,57 @@ const FIREFOX_REVIEW_URL =
   'https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/reviews/';
 
 /**
+ * Hex ⇄ HSV, for the org color picker.
+ *
+ * HSV rather than HSL because the picker is a saturation/brightness square with
+ * a hue strip beside it, and those two axes ARE S and V — the mapping is the
+ * geometry, not a conversion done on top of it.
+ *
+ * Here rather than in the popup because it is arithmetic with an exact
+ * property worth asserting: every color the picker can produce must survive a
+ * round trip through storage and back onto the square unchanged. A drift of one
+ * in the last channel would move the dot every time a row was reopened.
+ *
+ * @param {number} h  0–360
+ * @param {number} s  0–1
+ * @param {number} v  0–1
+ */
+function hsvToHex(h, s, v) {
+  const channel = n => {
+    const k = (n + h / 60) % 6;
+    const value = v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
+    return Math.min(255, Math.max(0, Math.round(value * 255))).toString(16).padStart(2, '0');
+  };
+  return '#' + channel(5) + channel(3) + channel(1);
+}
+
+/** The inverse. Returns null for anything that is not a hex color. */
+function hexToHsv(hex) {
+  const match = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex || '').trim());
+  if (!match) return null;
+
+  const full = match[1].length === 3
+    ? match[1].split('').map(c => c + c).join('')
+    : match[1];
+  const int = parseInt(full, 16);
+  const r = ((int >> 16) & 255) / 255;
+  const g = ((int >> 8) & 255) / 255;
+  const b = (int & 255) / 255;
+
+  const max = Math.max(r, g, b);
+  const span = max - Math.min(r, g, b);
+
+  let h = 0;
+  if (span) {
+    if (max === r) h = ((g - b) / span) % 6;
+    else if (max === g) h = (b - r) / span + 2;
+    else h = (r - g) / span + 4;
+    h = (h * 60 + 360) % 360;
+  }
+  return { h, s: max ? span / max : 0, v: max };
+}
+
+/**
  * Which engine this copy is running on, from the URL of its own pages.
  *
  * Firefox is the only one that serves them over moz-extension://, and unlike a
@@ -1243,6 +1294,8 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    hsvToHex,
+    hexToHsv,
     isFirefox,
     storeReviewUrl,
     reviewPromptDecision,
@@ -1303,6 +1356,8 @@ if (typeof module !== 'undefined' && module.exports) {
     applyTabColor,
     resolveProfileForUrl,
     resolveFloatingSide,
+    hsvToHex,
+    hexToHsv,
     isFirefox,
     storeReviewUrl,
     reviewPromptDecision,
