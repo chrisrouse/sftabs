@@ -23,6 +23,6 @@
   "author": "Chris Rouse",
   "license": "SEE LICENSE FILE",
   "devDependencies": {
-    "web-ext": "^8.3.0"
+    "web-ext": "^10.6.0"
   }
 }
