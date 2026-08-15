@@ -203,15 +203,27 @@ function extractOrgIdentifier(url) {
 /**
  * Which kind of org an URL is, from its host alone.
  *
- * Returns null for anything that is not a Salesforce host. A `--` in the
- * identifier means a sandbox even without a partition word, which is how
- * sandboxes look on orgs that never moved to enhanced domains.
+ * Returns null for anything that is not a Salesforce host.
+ *
+ * The partition word is the reliable signal, but it only exists on enhanced
+ * domains. Without one, two suffixes in the identifier still say what an org
+ * is, and both have to be read or the org falls through to `production` — the
+ * one answer that must never be wrong, since red is the colour that means
+ * hesitate.
+ *
+ *   `--`      a sandbox, on an org that never moved to enhanced domains
+ *   `-dev-ed` a Developer Edition org. Salesforce appends this to the My Domain
+ *             of every DE org and reserves it, so it cannot be a production org
+ *             that happens to be named that way. `smartbottechnology-dev-ed.my.salesforce-setup.com`
+ *             read as production until this was here.
  */
 function detectOrgEnvironment(url) {
   const parsed = splitOrgHost(url);
   if (!parsed) return null;
   if (parsed.partition) return ORG_PARTITIONS[parsed.partition];
-  return parsed.identifier.includes('--') ? 'sandbox' : 'production';
+  if (parsed.identifier.includes('--')) return 'sandbox';
+  if (parsed.identifier.endsWith('-dev-ed')) return 'developer';
+  return 'production';
 }
 
 /**

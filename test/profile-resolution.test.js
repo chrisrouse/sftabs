@@ -161,6 +161,33 @@ for (const [host, id, env] of HOSTS) {
 check('-- means sandbox even without a partition word',
   detectOrgEnvironment('https://acme--dev1.lightning.force.com/x') === 'sandbox');
 
+// Nor does a Developer Edition org, unless it moved. Salesforce appends -dev-ed
+// to the My Domain of every DE org and reserves the suffix, so it is as reliable
+// a signal as the partition word.
+//
+// This one mattered more than the sandbox case: with no partition and no --,
+// a DE org fell through to `production` and was painted red — the one colour
+// whose whole job is to make you stop and check where you are.
+for (const host of [
+  'smartbottechnology-dev-ed.my.salesforce-setup.com',
+  'smartbottechnology-dev-ed.my.salesforce.com',
+  'smartbottechnology-dev-ed.lightning.force.com',
+]) {
+  check(`${host} is developer, not production`,
+    detectOrgEnvironment(`https://${host}/x`) === 'developer',
+    String(detectOrgEnvironment(`https://${host}/x`)));
+}
+check('and the identifier still carries the suffix, so per-org overrides match',
+  extractOrgIdentifier('https://smartbottechnology-dev-ed.my.salesforce.com/x')
+    === 'smartbottechnology-dev-ed');
+check('a DE org that did move is unaffected',
+  detectOrgEnvironment('https://chrisrousepw-dev-ed.develop.my.salesforce-setup.com/x') === 'developer');
+
+// The suffix has to be the end of the identifier, not merely present in it.
+check('a production org is not mistaken for one',
+  detectOrgEnvironment('https://acme-development.my.salesforce.com/x') === 'production' &&
+  detectOrgEnvironment('https://dev-ed-partners.my.salesforce.com/x') === 'production');
+
 // Non-Salesforce and unrecognised shapes stay null rather than guessing.
 for (const host of ['example.com', 'foo.bar.lightning.force.com', 'not a url']) {
   check(`${host} yields no identifier`, extractOrgIdentifier(`https://${host}/`) === null);
