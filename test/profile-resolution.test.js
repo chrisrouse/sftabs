@@ -54,6 +54,75 @@ check('a linked org still overrides what you picked', r(DEV1, PICKED) === 'p_def
 check('with nothing picked yet, the starred default answers',
   resolveProfileForUrl(OTHER, PROFILES, { profilesEnabled: true, autoSwitchProfiles: true }) === 'p_default');
 
+// ── An auto-set profile belongs to the org that set it ──
+// Reported as "orgs with similar names get confused": Prod was linked to
+// `amplify`, and every `amplify--*` sandbox rendered Prod. The names were a red
+// herring — matching is exact and `amplify` never matched `amplify--dev1`.
+// Visiting `amplify` auto-switched to Prod and wrote it to storage, and the
+// rule for an unlinked org was "leave the user's choice alone", so it followed
+// them everywhere. One linked production org governed every sandbox beside it,
+// and an unrelated dev org too.
+//
+// activeProfileId alone cannot tell the two cases apart, hence the flag.
+const LINKED = [
+  { id: 'p_default', name: 'Default', isDefault: true,  urlPatterns: [] },
+  { id: 'p_prod',    name: 'Prod',    isDefault: false, urlPatterns: ['amplify'] },
+];
+const AMPLIFY  = 'https://amplify.my.salesforce-setup.com/lightning/setup/Home';
+const SANDBOX  = 'https://amplify--dev1.sandbox.my.salesforce-setup.com/x';
+const UNRELATED = 'https://smartbottechnology-dev-ed.my.salesforce-setup.com/x';
+const auto   = { profilesEnabled: true, autoSwitchProfiles: true, activeProfileId: 'p_prod',
+                 defaultProfileId: 'p_default', activeProfileAuto: true };
+const byHand = { ...auto, activeProfileAuto: false };
+
+check('the linked org still gets its own profile',
+  resolveProfileForUrl(AMPLIFY, LINKED, auto) === 'p_prod');
+check('a sandbox of that org does not inherit it',
+  resolveProfileForUrl(SANDBOX, LINKED, auto) === 'p_default',
+  resolveProfileForUrl(SANDBOX, LINKED, auto));
+check('nor does an unrelated org',
+  resolveProfileForUrl(UNRELATED, LINKED, auto) === 'p_default');
+
+check('but a profile picked by hand does follow you',
+  resolveProfileForUrl(SANDBOX, LINKED, byHand) === 'p_prod' &&
+  resolveProfileForUrl(UNRELATED, LINKED, byHand) === 'p_prod',
+  'this is the case that broke when unlinked orgs always took the default');
+check('and a linked org still overrules a hand-picked one',
+  resolveProfileForUrl(AMPLIFY, LINKED, byHand) === 'p_prod');
+
+// Installs predating the flag have no such field. Reading absent as "by hand"
+// keeps their behavior exactly as it was until the next auto-switch sets it.
+const legacy = { profilesEnabled: true, autoSwitchProfiles: true,
+                 activeProfileId: 'p_prod', defaultProfileId: 'p_default' };
+check('an install predating the flag is unchanged',
+  resolveProfileForUrl(SANDBOX, LINKED, legacy) === 'p_prod');
+check('the flag ships defaulted to by-hand',
+  require('../popup/js/shared/constants.js').DEFAULT_SETTINGS.activeProfileAuto === false);
+
+// With no default to fall back to, keeping the current profile beats none.
+check('no starred default leaves the active profile in place',
+  resolveProfileForUrl(SANDBOX, [{ id: 'p_prod', urlPatterns: ['amplify'] }], auto) === 'p_prod');
+
+// The worker has to mark its own writes, or the flag never becomes true.
+const bgSrc = fs.readFileSync(path.join(__dirname, '..', 'background.js'), 'utf8');
+check('the worker marks a profile it set as auto',
+  /activeProfileAuto: true/.test(bgSrc));
+check('and drops an auto-set profile on an org nothing claims',
+  /else if \(settings\.activeProfileAuto\)[\s\S]{0,320}defaultProfile/.test(bgSrc));
+check('while still leaving a hand-picked one alone',
+  /The active profile was picked by hand, so it stands/.test(bgSrc));
+
+const popupSrc = fs.readFileSync(path.join(__dirname, '..', 'js/popup.js'), 'utf8');
+check('the popup marks a manual switch as manual',
+  /activeProfileId: profileId, activeProfileAuto: false/.test(popupSrc));
+
+// A surface that ignores the flag would render the pre-fix answer.
+const { PROFILE_SETTINGS } = require('../popup/js/shared/utils.js');
+check('content surfaces re-render when the flag alone changes',
+  PROFILE_SETTINGS.includes('activeProfileAuto'),
+  'the same activeProfileId resolves differently either side of it');
+
+
 // Anyone not using linked orgs must see no change at all.
 check('auto-switch off: global active profile governs', r(DEV1, OFF) === 'p_test' && r(QA, OFF) === 'p_test');
 check('profiles disabled: global active profile governs',
@@ -78,8 +147,10 @@ const bg = fs.readFileSync(path.join(__dirname, '..', 'background.js'), 'utf8');
 // The worker does not merely render the wrong profile on an unlinked org — it
 // wrote activeProfileId back to storage, so a manual switch survived only until
 // the next navigation. Pinned by absence: no default lookup on the no-match path.
-check('background.js leaves the active profile alone on an unlinked org',
-  /No linked org claims this page, so leave the user's choice alone/.test(bg));
+// Narrowed: it leaves a HAND-PICKED profile alone on an unlinked org. An
+// auto-set one is dropped there, which is the fix above.
+check('background.js leaves a hand-picked profile alone on an unlinked org',
+  /The active profile was picked by hand, so it stands/.test(bg));
 check('and only reaches for the default when nothing has been picked',
   /else if \(!settings\.activeProfileId\)/.test(bg));
 check('background.js still compares org identifiers by exact equality',

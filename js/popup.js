@@ -2288,7 +2288,9 @@ async function switchProfile(profileId) {
   // keyboard path or a stale render must not write a choice that will be
   // undone by the next navigation.
   if (linkedProfileForCurrentPage()) return;
-  await patchSettings({ activeProfileId: profileId });
+  // Picked by hand, so it follows you onto any org no profile claims. An
+  // auto-set one would be dropped there in favour of the default.
+  await patchSettings({ activeProfileId: profileId, activeProfileAuto: false });
   state.tabs = await SFTabs.storage.getProfileTabs(profileId) || [];
   renderTabList();
   renderProfileChip();

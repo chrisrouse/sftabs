@@ -167,33 +167,49 @@ async function checkAndSwitchProfile(url) {
         return; // No default profile found
       }
       targetProfile = defaultProfile;
+    } else if (settings.activeProfileAuto) {
+      // No linked org claims this page, and the profile that is active was put
+      // there by this function for a different org. It does not follow — one
+      // linked production org would otherwise govern every sandbox beside it.
+      const defaultProfile = profiles.find(p => p.isDefault) ||
+                           profiles.find(p => p.id === settings.defaultProfileId);
+      if (!defaultProfile) {
+        return;   // nothing to fall back to; leave what is there
+      }
+      targetProfile = defaultProfile;
     } else {
-      // No linked org claims this page, so leave the user's choice alone.
+      // The active profile was picked by hand, so it stands.
       //
-      // This branch used to switch to the starred default, which did not merely
-      // render the wrong tabs — it wrote activeProfileId back to storage and
-      // destroyed the choice. Switching profiles in the popup therefore held
-      // only until the next navigation to any unlinked org, which is what made
-      // it look intermittent rather than broken.
+      // This branch used to switch to the starred default unconditionally,
+      // which did not merely render the wrong tabs — it wrote activeProfileId
+      // back to storage and destroyed the choice. Switching profiles in the
+      // popup therefore held only until the next navigation to any unlinked
+      // org, which is what made it look intermittent rather than broken.
       return;
     }
 
     // Check if this profile is already active
-    if (settings.activeProfileId === targetProfile.id) {
-      return; // Already on this profile
+    if (settings.activeProfileId === targetProfile.id && settings.activeProfileAuto) {
+      return; // Already on this profile, and already marked as ours
     }
 
     // Switch to the target profile
     settings.activeProfileId = targetProfile.id;
     targetProfile.lastActive = new Date().toISOString();
 
-    // Re-read immediately before writing and change only activeProfileId. The
-    // snapshot above may be seconds old by now, and writing it back whole would
-    // revert anything the popup changed in between — toggling tab colors while
-    // a Salesforce page finished loading was enough to lose the toggle.
+    // Re-read immediately before writing and change only the two fields that
+    // belong to this decision. The snapshot above may be seconds old by now,
+    // and writing it back whole would revert anything the popup changed in
+    // between — toggling tab colors while a Salesforce page finished loading
+    // was enough to lose the toggle.
     const current = (await browser.storage.sync.get('userSettings')).userSettings || {};
     await browser.storage.sync.set({
-      userSettings: { ...current, activeProfileId: targetProfile.id }
+      userSettings: {
+        ...current,
+        activeProfileId: targetProfile.id,
+        // Ours, not the user's — so it will not follow them off this org.
+        activeProfileAuto: true,
+      }
     });
 
     // saveChunkedSync, not a raw set: writing the direct key beside stale chunk

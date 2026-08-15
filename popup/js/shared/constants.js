@@ -79,6 +79,13 @@ const DEFAULT_SETTINGS = {
   profilesEnabled: false, // Enable profiles feature
   autoSwitchProfiles: false, // Enable auto-switching based on URL patterns
   activeProfileId: null, // Currently active profile ID (null = no profiles mode)
+  // Whether activeProfileId was chosen by auto-switch or by the user. An
+  // auto-set profile belongs to the org that set it and does not follow you to
+  // an org no profile claims; a profile picked by hand does. Without this the
+  // two are indistinguishable, and one of them has to be wrong.
+  // Absent on installs predating it, which reads as "picked by hand" — the
+  // behavior those users already have, until the next auto-switch says otherwise.
+  activeProfileAuto: false,
   defaultProfileId: null, // Default profile to use when auto-switch doesn't match
   // Quick Add writes to the active profile only unless this is on, in which
   // case a captured page lands in every profile at once.

@@ -261,19 +261,28 @@ function resolveProfileForUrl(url, profiles, settings) {
     if (match) return match.id;
   }
 
-  // No linked org claims this page, so the org has no opinion and the profile
-  // you last picked stands. This used to return the starred default instead,
-  // which meant switching profiles in the popup did nothing on any org that was
-  // not linked — the popup listed one profile's tabs while the page drew
-  // another's. Auto-switch is "the org decides when it can", not "the org
-  // decides, and otherwise so does the default".
+  // No linked org claims this page. What happens next depends on how the
+  // active profile came to be active, which is the whole reason
+  // activeProfileAuto exists.
   //
-  // The default is still the answer before anything has been picked, which is
-  // the only time there is no active profile to honour.
-  if (active) return active;
+  // Picked by hand, it stands. Returning the starred default here instead is
+  // what made switching profiles in the popup do nothing on an unlinked org —
+  // the popup listed one profile's tabs while the page drew another's.
+  //
+  // Set by auto-switch, it does not. It belongs to the org that matched, and
+  // carrying it onto an org that matched nothing meant one linked production
+  // org quietly governed every sandbox beside it: link a profile to `amplify`,
+  // visit it once, and `amplify--dev1`, `amplify--qa` and every unrelated org
+  // rendered that profile until something else claimed them.
+  //
+  // The default also answers before anything has been picked at all, which is
+  // the only other time there is no choice to honour.
+  if (active && !settings.activeProfileAuto) return active;
+
   const fallback = list.find(p => p.isDefault) ||
                    list.find(p => p.id === (settings.defaultProfileId || null));
-  return fallback ? fallback.id : null;
+  if (fallback) return fallback.id;
+  return active;   // no default to fall back to; better the current one than none
 }
 
 /**
@@ -651,8 +660,15 @@ function settingsChanged(change, keys) {
   return keys.some(key => JSON.stringify(before[key]) !== JSON.stringify(after[key]));
 }
 
-/** Settings that decide which tabs a surface shows. */
-const PROFILE_SETTINGS = ['activeProfileId', 'profilesEnabled', 'autoSwitchProfiles'];
+/**
+ * Settings that decide which tabs a surface shows.
+ *
+ * activeProfileAuto is in here because on an unlinked org it changes the answer
+ * on its own: the same activeProfileId resolves to the starred default when
+ * auto-switch set it and to itself when you did.
+ */
+const PROFILE_SETTINGS =
+  ['activeProfileId', 'activeProfileAuto', 'profilesEnabled', 'autoSwitchProfiles'];
 
 /** Settings that change what the Salesforce tab bar draws. */
 const TAB_BAR_SETTINGS = [
