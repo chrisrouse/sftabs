@@ -1,0 +1,103 @@
+{
+  "_comment": [
+    "A realistic SF Tabs 2.1.1 install, as it sits in storage the moment before",
+    "3.0.0 replaces it. Used two ways:",
+    "",
+    "  test/v2-upgrade.test.js   runs v3's readers over it on every npm test",
+    "  docs/snippets/seed-v2-install.js  writes it into a browser so the upgrade",
+    "                                     can be walked by hand before release",
+    "",
+    "Chosen to be awkward on purpose, since the easy shape proves nothing:",
+    "  - sync storage, which is what most installs use",
+    "  - a chunked profile, whose tabs live in _chunk_N and not under the key",
+    "  - a floatingButton written before side/offset/layout existed, carrying",
+    "    only the legacy `position` percentage",
+    "  - profiles with linked orgs, so auto-switch has something to resolve",
+    "  - a v1-era customTabs list still sitting there, as it does on old installs",
+    "  - none of the six settings keys 3.0.0 added"
+  ],
+
+  "local": {
+    "deviceSettings": { "useSyncStorage": true },
+    "userSettings": {
+      "themeMode": "dark",
+      "compactMode": false,
+      "skipDeleteConfirmation": true,
+      "useSyncStorage": true,
+      "profilesEnabled": true,
+      "autoSwitchProfiles": true,
+      "activeProfileId": "1699999999999_prodv2",
+      "defaultProfileId": "1699999999998_defaultv2",
+      "floatingButton": {
+        "enabled": true,
+        "position": 40,
+        "location": "setup-only",
+        "defaultVisibility": true,
+        "visibilityRules": [],
+        "buttonSize": "medium",
+        "showLabel": false
+      }
+    },
+    "migrationCompleted": "2.1.1",
+    "seenReleaseNotesVersion": "2.1.0",
+    "firstLaunchCompleted": true
+  },
+
+  "sync": {
+    "userSettings": {
+      "themeMode": "dark",
+      "compactMode": false,
+      "skipDeleteConfirmation": true,
+      "profilesEnabled": true,
+      "autoSwitchProfiles": true,
+      "activeProfileId": "1699999999999_prodv2",
+      "defaultProfileId": "1699999999998_defaultv2",
+      "floatingButton": {
+        "enabled": true,
+        "position": 40,
+        "location": "setup-only",
+        "defaultVisibility": true,
+        "visibilityRules": [],
+        "buttonSize": "medium",
+        "showLabel": false
+      }
+    },
+    "firstLaunchCompleted": true,
+    "profiles": [
+      {
+        "id": "1699999999998_defaultv2",
+        "name": "Default",
+        "isDefault": true,
+        "urlPatterns": [],
+        "createdAt": "2025-11-14T09:00:00.000Z",
+        "lastActive": "2026-08-01T12:00:00.000Z"
+      },
+      {
+        "id": "1699999999999_prodv2",
+        "name": "Prod",
+        "isDefault": false,
+        "urlPatterns": ["acme"],
+        "createdAt": "2025-11-14T09:05:00.000Z",
+        "lastActive": "2026-08-02T12:00:00.000Z"
+      }
+    ],
+    "profile_1699999999998_defaultv2_tabs": [
+      { "id": "t_flows", "label": "Flows", "path": "Flows", "position": 0,
+        "openInNewTab": false, "isObject": false, "isCustomUrl": false, "isSetupObject": false },
+      { "id": "t_users", "label": "Users", "path": "ManageUsers", "position": 1,
+        "openInNewTab": false, "isObject": false, "isCustomUrl": false, "isSetupObject": false },
+      { "id": "t_obj", "label": "Account", "path": "ObjectManager/Account", "position": 2,
+        "openInNewTab": false, "isObject": false, "isCustomUrl": false, "isSetupObject": true,
+        "dropdownItems": [
+          { "id": "t_obj_fields", "label": "Fields & Relationships",
+            "path": "ObjectManager/Account/FieldsAndRelationships/view", "parentId": "t_obj" }
+        ] }
+    ],
+    "profile_1699999999999_prodv2_tabs_metadata": { "chunked": true, "chunkCount": 2 },
+    "profile_1699999999999_prodv2_tabs_chunk_0": "[{\"id\":\"p_flows\",\"label\":\"Flows\",\"path\":\"Flows\",\"position\":0,\"openInNewTab\":false,\"isObject\":false,\"isCustomUrl\":false,\"isSetupObject\":false},{\"id\":\"p_perm\",\"label\":\"Permission Sets\",\"path\":\"PermSets\",\"position\":1,\"openInNewTab\":false,\"isObject\":false,\"isCustomUrl\":false,\"isSetupObject\":false},",
+    "profile_1699999999999_prodv2_tabs_chunk_1": "{\"id\":\"p_url\",\"label\":\"Status\",\"path\":\"https://status.salesforce.com\",\"position\":2,\"openInNewTab\":true,\"isObject\":false,\"isCustomUrl\":true,\"isSetupObject\":false}]",
+    "customTabs": [
+      { "id": "v1_flows", "label": "Flows (v1)", "path": "Flows", "position": 0 }
+    ]
+  }
+}
