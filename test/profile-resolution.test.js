@@ -166,7 +166,7 @@ check('-- means sandbox even without a partition word',
 // a signal as the partition word.
 //
 // This one mattered more than the sandbox case: with no partition and no --,
-// a DE org fell through to `production` and was painted red — the one colour
+// a DE org fell through to `production` and was painted red — the one color
 // whose whole job is to make you stop and check where you are.
 for (const host of [
   'smartbottechnology-dev-ed.my.salesforce-setup.com',

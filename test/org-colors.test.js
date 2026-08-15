@@ -199,12 +199,26 @@ check('a page belonging to no org gets no banner',
 // ── The banner's text has to stay legible on any color ──
 // The palette is configurable, so white-on-anything is not safe: the extension
 // this grew from had two fixed colors and could hardcode white.
-check('white on the darker defaults',
-  ['production', 'scratch', 'demo', 'patch'].every(e => readableInk(DEFAULT_ENV_COLORS[e]) === '#ffffff'));
-check('near-black on the lighter ones',
-  ['sandbox', 'developer', 'playground'].every(e => readableInk(DEFAULT_ENV_COLORS[e]) === '#181818'));
-check('a pale color someone might pick gets dark text',
-  readableInk('#ffe680') === '#181818' && readableInk('#ffffff') === '#181818');
+check('every shipped default carries white',
+  Object.values(DEFAULT_ENV_COLORS).every(hex => readableInk(hex) === '#ffffff'),
+  'they were all chosen as backgrounds for a bold label');
+
+// The rule was WCAG 2 relative luminance, and it was wrong in the way that
+// formula is known to be wrong: its coefficients treat blue as contributing
+// almost nothing to lightness, so saturated blues score as darker than they
+// look. On the Developer Edition blue it put black at 4.66 and white at 4.51 —
+// a hair apart, decided for black — and black was visibly the worse of the two.
+// APCA, the model behind WCAG 3, scores that pair 33 and 76.
+const FLIPPED = { sandbox: '#1e8e3e', developer: '#1a73e8', playground: '#0d9dda' };
+for (const [env, hex] of Object.entries(FLIPPED)) {
+  check(`${env} ${hex} takes white, which luminance alone got wrong`,
+    readableInk(hex) === '#ffffff');
+}
+
+// …without giving up the case the function exists for.
+check('a pale color someone might pick still gets dark text',
+  ['#ffe680', '#ffffff', '#ffc0cb', '#f9ab00', '#e0e0e0']
+    .every(hex => readableInk(hex) === '#181818'));
 check('and a very dark one gets white',
   readableInk('#000000') === '#ffffff' && readableInk('#1a1a1a') === '#ffffff');
 check('a malformed color falls back rather than throwing',
@@ -215,6 +229,23 @@ check('shorthand hex is expanded, not rejected',
   readableInk('#ffc') === readableInk('#ffffcc') && readableInk('#ffc') === '#181818');
 check('and a stray space or missing hash is tolerated',
   readableInk(' #000000 ') === '#ffffff' && readableInk('ffe680') === '#181818');
+
+// The APCA constants were fitted to reading experiments; they are not knobs.
+// Pinned so a future tidy-up cannot round one off and quietly change every
+// banner's text color.
+const { apcaContrast } = require('../popup/js/shared/utils.js');
+check('APCA reports the polarity in the sign',
+  apcaContrast(0, 1) > 0 && apcaContrast(1, 0) < 0,
+  'dark-on-light is positive, light-on-dark negative');
+check('and the extremes score near the top of the scale',
+  Math.abs(apcaContrast(0, 1)) > 100 && Math.abs(apcaContrast(1, 0)) > 100);
+check('two identical colors have no contrast at all',
+  apcaContrast(0.5, 0.5) === 0 && apcaContrast(0, 0) === 0);
+check('the shape of the curve is the published one',
+  /Math\.pow\(background, 0\.56\)[\s\S]{0,60}Math\.pow\(text, 0\.57\)/.test(
+    require('fs').readFileSync(require('path').join(__dirname, '..',
+      'popup/js/shared/utils.js'), 'utf8')),
+  'normal polarity uses 0.56/0.57; reverse uses 0.65/0.62');
 
 
 // ── Where the banner appears ──

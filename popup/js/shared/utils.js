@@ -208,7 +208,7 @@ function extractOrgIdentifier(url) {
  * The partition word is the reliable signal, but it only exists on enhanced
  * domains. Without one, two suffixes in the identifier still say what an org
  * is, and both have to be read or the org falls through to `production` — the
- * one answer that must never be wrong, since red is the colour that means
+ * one answer that must never be wrong, since red is the color that means
  * hesitate.
  *
  *   `--`      a sandbox, on an org that never moved to enhanced domains
@@ -1158,16 +1158,50 @@ function orgFaviconDataUrl(color) {
  * both reduce to `acme`, and they are different orgs.
  */
 /**
+ * Perceptual lightness contrast, per APCA — the model behind WCAG 3.
+ *
+ * Returns Lc, roughly -108…108. The sign is the polarity; only the magnitude
+ * matters here. Constants are APCA 0.1.9 and are not adjustable: they were fit
+ * to reading experiments, and changing one silently makes the number mean
+ * something other than what its scale says.
+ *
+ * @param {number} textY  luminance of the text, 0–1
+ * @param {number} bgY    luminance of the background, 0–1
+ */
+function apcaContrast(textY, bgY) {
+  // Very dark backgrounds are flattened towards black, or the curve overstates
+  // how much contrast is available down there.
+  const clamp = y => (y > 0.022 ? y : y + Math.pow(0.022 - y, 1.414));
+  const text = clamp(textY);
+  const background = clamp(bgY);
+  if (Math.abs(background - text) < 0.0005) return 0;
+
+  if (background > text) {   // dark text on a light background
+    const raw = (Math.pow(background, 0.56) - Math.pow(text, 0.57)) * 1.14;
+    return raw < 0.1 ? 0 : (raw - 0.027) * 100;
+  }
+  const raw = (Math.pow(background, 0.65) - Math.pow(text, 0.62)) * 1.14;
+  return raw > -0.1 ? 0 : (raw + 0.027) * 100;
+}
+
+/**
  * White or near-black, whichever the given background can actually carry.
  *
  * The org palette is configurable and someone will pick a pale yellow, on which
  * white text is unreadable — so the banner cannot simply always use white the
  * way the extension it grew out of did, which only ever had two fixed colors.
  *
- * Relative luminance per WCAG, with the usual 0.179 crossover: that is the
- * point where white and near-black give the same contrast ratio, so either side
- * of it the better choice wins. The banner sets 12px bold, which is small text
- * by WCAG, so the 4.5:1 target applies and the margin is worth having.
+ * This used to be WCAG 2 relative luminance with the 0.179 crossover, and it
+ * was wrong in a way that is well known: that formula systematically under-
+ * rates saturated blues, because its coefficients treat blue as contributing
+ * almost nothing to lightness. On the Developer Edition blue it scored black at
+ * 4.66 and white at 4.51 — a hair apart, decided for black — and the result was
+ * visibly less legible than white. APCA scores the same pair 33 and 76.
+ *
+ * It also flipped the sandbox green and the Playground blue, both of which had
+ * the same complaint against them. Pale colors are unaffected: white text on
+ * #ffe680 or #ffc0cb still loses, which is the case the whole function exists
+ * for.
  *
  * Three-digit hex is expanded rather than rejected. Falling back to white on an
  * unparsed color is a guess, and `#ffc` is exactly the case where it is wrong.
@@ -1177,12 +1211,17 @@ function readableInk(hex) {
   if (value.length === 3) value = value.split('').map(c => c + c).join('');
   if (!/^[0-9a-fA-F]{6}$/.test(value)) return '#ffffff';
 
-  const channel = index => {
-    const c = parseInt(value.slice(index, index + 2), 16) / 255;
-    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  };
-  const luminance = 0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
-  return luminance > 0.179 ? '#181818' : '#ffffff';
+  // APCA's own transfer function: a plain 2.4 exponent, not WCAG's piecewise
+  // one. Mixing the two would put the luminance on a scale the constants above
+  // were not fitted against.
+  const channel = (index, weight) =>
+    weight * Math.pow(parseInt(value.slice(index, index + 2), 16) / 255, 2.4);
+  const background =
+    channel(0, 0.2126729) + channel(2, 0.7151522) + channel(4, 0.0721750);
+
+  const onBlack = Math.abs(apcaContrast(0, background));
+  const onWhite = Math.abs(apcaContrast(1, background));
+  return onBlack > onWhite ? '#181818' : '#ffffff';
 }
 
 /**
@@ -1297,6 +1336,7 @@ if (typeof module !== 'undefined' && module.exports) {
     DEFAULT_ENV_COLORS,
     resolveOrgColor,
     orgBannerColor,
+    apcaContrast,
     readableInk,
     orgColorFor,
     orgFaviconDataUrl,
@@ -1359,6 +1399,7 @@ if (typeof module !== 'undefined' && module.exports) {
     DEFAULT_ENV_COLORS,
     resolveOrgColor,
     orgBannerColor,
+    apcaContrast,
     readableInk,
     orgColorFor,
     orgFaviconDataUrl,
