@@ -1206,6 +1206,27 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 }
 .color-table-del { width: 28px; text-align: right; }
 
+/* Add an environment. Sits under the table, not in it, because it belongs to
+   the list rather than to any row. */
+.env-add {
+  margin-top: var(--sft-spacing-2);
+}
+.env-add select {
+  width: 100%;
+  padding: 5px 8px;
+  font-size: var(--sft-font-size-xs);
+  color: var(--t-base);
+  background: var(--s-1);
+  border: var(--sft-border-width-1) solid var(--b-medium);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.env-add select:hover { border-color: var(--b-strong); }
+.env-add select:focus-visible {
+  outline: 2px solid var(--sft-focus-ring);
+  outline-offset: 1px;
+}
+
 #btn-capture-org-color { margin-top: var(--sft-spacing-2); }
 
 /* ── Which profiles hold this tab ──

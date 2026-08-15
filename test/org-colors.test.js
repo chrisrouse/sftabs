@@ -329,6 +329,43 @@ check('opening one picker waits for the previous commit to finish',
   /await closeOrgColorPickers\(root\);\s*\n\s*if \(wasOpen\) return;/.test(popupSrc),
   'mounting first would put the new picker into rows about to be replaced');
 
+
+// ── The environment table starts at two rows ──
+// Seven rows was the whole section, and five were dead weight for most people:
+// scratch, patch and Playground orgs are not what a typical admin has open, and
+// they pushed the per-org list below the fold.
+const listOf = name =>
+  JSON.parse((new RegExp(`const ${name} = (\\[[^\\]]*\\])`).exec(popupSrc) || [])[1]
+    .replace(/'/g, '"'));
+const alwaysShown = listOf('ORG_COLOR_ENVIRONMENTS');
+const optional = listOf('ORG_COLOR_OPTIONAL_ENVIRONMENTS');
+
+check('only Production and Sandbox are always listed',
+  JSON.stringify(alwaysShown) === JSON.stringify(['production', 'sandbox']));
+check('the picklist offers Developer Edition and Trailhead Playground first',
+  optional[0] === 'developer' && optional[1] === 'playground',
+  'between them they cover almost everyone who needs a third row');
+check('and every environment is reachable one way or the other',
+  [...alwaysShown, ...optional].sort().join() ===
+  Object.keys(DEFAULT_ENV_COLORS).sort().join(),
+  'an environment in neither list could never be given a color');
+
+// Visibility is derived from the colors already stored, so nothing is migrated
+// and nobody who had colored a scratch org loses that row on upgrade.
+check('an optional row shows once it has a color of its own',
+  /ORG_COLOR_OPTIONAL_ENVIRONMENTS\.filter\(env => environments\[env\]\)/.test(popupSrc),
+  'no new stored field, and existing overrides keep their row');
+check('adding one writes the shipped default, which is what makes it appear',
+  /saveEnvColor\(env, SFTabs\.utils\.DEFAULT_ENV_COLORS\[env\]\)/.test(popupSrc));
+check('removing one deletes the override rather than storing a blank',
+  /async function removeEnvColor[\s\S]{0,220}delete next\[env\]/.test(popupSrc),
+  'that org type goes back to the shipped color, which is what it had before');
+check('Production and Sandbox have no remove control',
+  /const removable = !ORG_COLOR_ENVIRONMENTS\.includes\(env\)/.test(popupSrc));
+check('the picklist disappears when there is nothing left to add',
+  /wrap\.hidden = available\.length === 0/.test(popupSrc),
+  'a disabled control would only invite a click');
+
 check('the presets are gone, as are their handlers',
   !/ORG_COLOR_PRESETS/.test(popupSrc) && !/data-color-pick=/.test(popupSrc),
   'the reset button still restores every shipped color at once');

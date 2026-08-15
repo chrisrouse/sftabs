@@ -2934,7 +2934,39 @@ function orgColorSwatch(color) {
  * Developer Pro all arrive as `--name.sandbox` with nothing to tell them apart.
  * Separating those is what the per-org list below is for.
  */
-const ORG_COLOR_ENVIRONMENTS = ['production', 'sandbox', 'developer', 'scratch', 'demo', 'playground', 'patch'];
+/**
+ * The two nearly everyone has. Always listed, never removable.
+ *
+ * Seven rows was the whole table, and five of them were dead weight for most
+ * people — a scratch org, a patch org and a Trailhead Playground are not
+ * things a typical admin has open, and they pushed the per-org list below the
+ * fold. The rest are added on demand.
+ */
+const ORG_COLOR_ENVIRONMENTS = ['production', 'sandbox'];
+
+/**
+ * The rest, in the order they are offered.
+ *
+ * Developer Edition and Trailhead Playground first: between them they cover
+ * almost everyone who needs a third row at all. Scratch, demo and patch orgs
+ * are rarer and shorter-lived, and someone who has one will look for it.
+ */
+const ORG_COLOR_OPTIONAL_ENVIRONMENTS = ['developer', 'playground', 'scratch', 'demo', 'patch'];
+
+/**
+ * Which environments the table shows.
+ *
+ * An optional one appears once it has a color of its own — which is also what
+ * "add" does, by writing its shipped default. No new stored field, and nothing
+ * to migrate: anyone who had already colored their scratch orgs still sees that
+ * row, because the entry that makes it visible is the one they already have.
+ */
+function visibleEnvColorRows(environments) {
+  return [
+    ...ORG_COLOR_ENVIRONMENTS,
+    ...ORG_COLOR_OPTIONAL_ENVIRONMENTS.filter(env => environments[env]),
+  ];
+}
 
 function renderEnvColors() {
   const rows = document.getElementById('env-color-rows');
@@ -2947,18 +2979,49 @@ function renderEnvColors() {
   document.getElementById('btn-reset-env-colors').disabled =
     Object.keys(environments).length === 0;
 
-  rows.innerHTML = ORG_COLOR_ENVIRONMENTS.map(env => {
+  rows.innerHTML = visibleEnvColorRows(environments).map(env => {
     const color = environments[env] || defaults[env];
     const id = 'env-' + env;
+    const removable = !ORG_COLOR_ENVIRONMENTS.includes(env);
     return `<tr>
       <td class="color-table-swatch">${orgColorSwatch(color)}</td>
       <td class="color-table-name">${esc(t('orgEnv_' + env))}</td>
       <td class="color-table-input">
         ${orgColorTrigger(id, color, t('orgEnv_' + env))}
       </td>
+      <td class="color-table-del">
+        ${removable
+          ? `<button type="button" class="tab-btn tab-btn--delete" data-env-remove="${esc(env)}"
+               aria-label="${esc(t('removeButton'))}" title="${esc(t('removeButton'))}">${ICON_DELETE}</button>`
+          : ''}
+      </td>
     </tr>
-    ${orgColorPickerRow(id, color, 3)}`;
+    ${orgColorPickerRow(id, color, 4)}`;
   }).join('');
+
+  renderEnvColorAdd(environments);
+}
+
+/**
+ * The add control: a picklist of what is not already listed.
+ *
+ * Hidden outright once every environment is on the table, rather than left
+ * behind as an empty select — there is nothing left to choose and a disabled
+ * control would only invite a click.
+ */
+function renderEnvColorAdd(environments) {
+  const wrap = document.getElementById('env-color-add');
+  const select = document.getElementById('env-color-add-select');
+  if (!wrap || !select) return;
+
+  const available = ORG_COLOR_OPTIONAL_ENVIRONMENTS.filter(env => !environments[env]);
+  wrap.hidden = available.length === 0;
+  if (wrap.hidden) return;
+
+  select.innerHTML =
+    `<option value="">${esc(t('orgColorsAddEnvironment'))}</option>` +
+    available.map(env => `<option value="${esc(env)}">${esc(t('orgEnv_' + env))}</option>`).join('');
+  select.value = '';
 }
 
 /**
@@ -3379,11 +3442,37 @@ function bindEvents() {
   }
 
   envRows.addEventListener('click', e => {
+    const remove = e.target.closest('[data-env-remove]');
+    if (remove) { removeEnvColor(remove.dataset.envRemove); return; }
+
     const trigger = e.target.closest('[data-color-open]');
     if (!trigger) return;
     const env = trigger.dataset.colorOpen.slice(4);
     toggleOrgColorPicker(trigger.dataset.colorOpen, envRows, hex => saveEnvColor(env, hex));
   });
+
+  // Adding writes the shipped default, which is what puts the row on the table.
+  // The row then behaves like any other: open it and pick something else.
+  document.getElementById('env-color-add-select').addEventListener('change', async e => {
+    const env = e.target.value;
+    if (!env) return;
+    await saveEnvColor(env, SFTabs.utils.DEFAULT_ENV_COLORS[env]);
+  });
+
+  /**
+   * Removing an environment drops its override rather than storing a blank.
+   *
+   * That is the same thing as taking the row off the table — orgs of that kind
+   * go back to the shipped color, which is what they had before it was added.
+   */
+  async function removeEnvColor(env) {
+    const config = orgColorConfig();
+    const next = { ...config.environments };
+    delete next[env];
+    await patchSettings({ orgColors: { ...config, environments: next } });
+    renderEnvColors();
+    renderOrgColors();
+  }
 
   document.getElementById('btn-reset-env-colors').addEventListener('click', async () => {
     // Only the environment layer. Per-org colors were each set deliberately and

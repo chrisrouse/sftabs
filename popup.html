@@ -679,6 +679,12 @@
                       <!-- Populated by renderEnvColors() -->
                     </tbody>
                   </table>
+                  <!-- Only the environments not already on the table. Hidden by
+                       renderEnvColorAdd() once there are none left. -->
+                  <div class="env-add" id="env-color-add">
+                    <select id="env-color-add-select"
+                      aria-label="__MSG_orgColorsAddEnvironment__"></select>
+                  </div>
                   <p class="form-hint">__MSG_orgColorsEnvHint__</p>
 
                   <h4 class="settings-subhead">__MSG_orgColorsSpecificOrgs__</h4>

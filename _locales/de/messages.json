@@ -1558,6 +1558,10 @@
     "message": "Nach Umgebung",
     "description": "Subheading for the environment color table"
   },
+  "orgColorsAddEnvironment": {
+    "message": "Umgebung hinzufügen…",
+    "description": "Placeholder option in the picklist that adds another environment row to the org color table"
+  },
   "orgColorsEnvHint": {
     "message": "Wird für jede Org ohne eigene Farbe verwendet.",
     "description": "Hint under the environment table"

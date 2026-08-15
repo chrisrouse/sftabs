@@ -1719,6 +1719,10 @@
     "message": "By environment",
     "description": "Subheading for the environment color table"
   },
+  "orgColorsAddEnvironment": {
+    "message": "Add an environment…",
+    "description": "Placeholder option in the picklist that adds another environment row to the org color table"
+  },
   "orgColorsEnvHint": {
     "message": "Used for any org without a color of its own.",
     "description": "Hint under the environment table"
