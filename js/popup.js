@@ -1100,6 +1100,11 @@ async function persistProfileForm() {
     saved = profiles.find(p => p.id === editing.id);
     saved.name = name;
     saved.urlPatterns = urlPatterns;
+    // Stamped so a storage report can date a change. createFirstProfile set
+    // this field and nothing else ever did, so every profile made through this
+    // form carried no date at all — which is exactly the column you want when
+    // working out whether an edit survived.
+    saved.updatedAt = new Date().toISOString();
   } else {
     saved = {
       id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -1107,6 +1112,7 @@ async function persistProfileForm() {
       isDefault: false,
       urlPatterns,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       lastActive: null,
       position: profiles.length
     };
