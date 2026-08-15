@@ -195,7 +195,6 @@ async function checkAndSwitchProfile(url) {
 
     // Switch to the target profile
     settings.activeProfileId = targetProfile.id;
-    targetProfile.lastActive = new Date().toISOString();
 
     // Re-read immediately before writing and change only the two fields that
     // belong to this decision. The snapshot above may be seconds old by now,
@@ -212,10 +211,21 @@ async function checkAndSwitchProfile(url) {
       }
     });
 
-    // saveChunkedSync, not a raw set: writing the direct key beside stale chunk
-    // metadata leaves the next read reassembling the old list.
-    if (useSync) await saveChunkedSync('profiles', profiles);
-    else await browser.storage.local.set({ profiles });
+    // The profile list is deliberately NOT written back here.
+    //
+    // It used to be, to record lastActive on the profile being switched to —
+    // a field written in four places and read in none. The cost of persisting
+    // it was writing the whole array from the snapshot read at the top of this
+    // function, seconds earlier. Anything the popup changed in between was
+    // reverted: a rename, the linked-org list, the starred default, the order
+    // profiles are dragged into. The userSettings write above avoids exactly
+    // this by re-reading first; this one never did.
+    //
+    // Switching profiles does not change the profile list, so there is nothing
+    // here to save. Deleting the write closes the window rather than narrowing
+    // it, and drops a sync write from every switch — which now includes
+    // switching to the default on an org no profile claims, so it happens far
+    // more often than it used to.
 
     // Notify all open tabs to refresh their tab bars
     const allTabs = await browser.tabs.query({

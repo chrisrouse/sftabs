@@ -103,8 +103,35 @@ check('the flag ships defaulted to by-hand',
 check('no starred default leaves the active profile in place',
   resolveProfileForUrl(SANDBOX, [{ id: 'p_prod', urlPatterns: ['amplify'] }], auto) === 'p_prod');
 
-// The worker has to mark its own writes, or the flag never becomes true.
+// ── Switching a profile must not rewrite the profile list ──
+// It used to, from the snapshot read at the top of checkAndSwitchProfile, in
+// order to persist lastActive — a field written in four places and read in
+// none. Anything the popup changed in the seconds between that read and the
+// write was reverted: a rename, the linked orgs, the starred default, the order
+// they are dragged into. The userSettings write beside it re-reads first to
+// avoid exactly this; the profiles write never did.
+//
+// Now more dangerous than it was: since an auto-set profile gives way to the
+// default on an unclaimed org, the worker switches — and so wrote the list —
+// on far more navigations than before.
 const bgSrc = fs.readFileSync(path.join(__dirname, '..', 'background.js'), 'utf8');
+const switcher = /async function checkAndSwitchProfile[\s\S]*?\n\}/.exec(bgSrc);
+
+check('checkAndSwitchProfile exists', Boolean(switcher));
+check('switching does not write the profile list back',
+  Boolean(switcher) &&
+  !/saveChunkedSync\('profiles'/.test(switcher[0]) &&
+  !/storage\.local\.set\(\{ profiles \}\)/.test(switcher[0]),
+  'a whole-array write from a stale snapshot reverts whatever was edited meanwhile');
+check('and nothing sets the dead field it was written for',
+  !/lastActive = new Date/.test(bgSrc),
+  'lastActive is written in four places and read in none');
+check('the settings write still re-reads and touches only its own fields',
+  Boolean(switcher) &&
+  /const current = \(await browser\.storage\.sync\.get\('userSettings'\)\)/.test(switcher[0]) &&
+  /\.\.\.current,\s*\n\s*activeProfileId:/.test(switcher[0]));
+
+// The worker has to mark its own writes, or the flag never becomes true.
 check('the worker marks a profile it set as auto',
   /activeProfileAuto: true/.test(bgSrc));
 check('and drops an auto-set profile on an org nothing claims',
