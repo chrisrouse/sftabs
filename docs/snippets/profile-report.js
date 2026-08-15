@@ -2,92 +2,114 @@
 //
 // What is actually in storage for profiles, and when it last changed.
 //
-// Paste into the console of the extension's own page — right-click the popup →
-// Inspect, or about:debugging → Inspect on Firefox. Not a Salesforce page: a
+// WHERE TO PASTE — it must be an extension page, not a Salesforce page. A
 // content script cannot read the profile list.
 //
-// Answers the question "did my change save, or did something overwrite it",
-// which the UI cannot: the popup renders from its own in-memory copy, so a
-// reverted write and a stale render look identical on screen.
+//   Chrome   right-click the toolbar icon -> Inspect popup
+//   Firefox  about:debugging -> This Firefox -> SF Tabs -> Inspect
 //
-//   sftabsProfiles.report()   print everything, as a table
-//   sftabsProfiles.watch()    log every write to profiles or tabs as it happens
-//   sftabsProfiles.stop()     stop watching
+// Chrome blocks pasting into the console until you type `allow pasting` once.
+//
+// This prints its report immediately rather than defining something to call
+// later — a first draft did the latter and broke, because Chrome's service
+// worker idles out after about thirty seconds and takes any global with it,
+// and the popup's context dies the moment the popup closes.
+//
+// It also leaves sftabsProfiles.watch() behind for the live case, which is the
+// one worth using: reproduce the problem with it running and the write that
+// reverts something names itself. Start it and keep the inspector open.
 
-(function () {
+(async function () {
   'use strict';
 
   const api = globalThis.browser?.storage ? globalThis.browser : globalThis.chrome;
+  if (!api?.storage) {
+    console.error('No extension storage here. This has to run on an extension ' +
+      'page — see the header. A Salesforce tab cannot read the profile list.');
+    return;
+  }
+
   const U = globalThis.SFTabs?.utils;
 
-  const read = async key => {
-    const useSync = U ? await U.storagePreference() : true;
-    const area = useSync ? api.storage.sync : api.storage.local;
-    if (!useSync) return (await area.get(key))[key];
-    // Chunk-aware: a profile past ~7KB lives in key_chunk_N, and a plain get
-    // returns undefined for it.
-    try { return await U.readChunkedSyncValue(key); }
-    catch (e) { return { ERROR: String(e) }; }
-  };
+  /** Which area holds the data. Falls back to the raw flag if utils is absent. */
+  async function usingSync() {
+    if (U?.storagePreference) return U.storagePreference();
+    const device = (await api.storage.local.get('deviceSettings')).deviceSettings;
+    return device?.useSyncStorage !== false;
+  }
+
+  /** Chunk-aware: a value past ~7KB lives in key_chunk_N and a plain get misses it. */
+  async function read(key) {
+    if (!(await usingSync())) return (await api.storage.local.get(key))[key];
+    if (U?.readChunkedSyncValue) {
+      try { return await U.readChunkedSyncValue(key); }
+      catch (error) { return { UNREADABLE: String(error) }; }
+    }
+    return (await api.storage.sync.get(key))[key];
+  }
 
   async function report() {
-    const useSync = U ? await U.storagePreference() : true;
+    const sync = await usingSync();
     const settings = (await api.storage.local.get('userSettings')).userSettings || {};
     const profiles = (await read('profiles')) || [];
 
-    console.log('%cstorage area: ' + (useSync ? 'SYNC' : 'LOCAL'),
-      'font-weight:bold');
-    console.log('activeProfileId  ', settings.activeProfileId,
+    console.log('%cSF Tabs — profile storage', 'font-weight:bold;font-size:13px');
+    console.log('area              ', sync ? 'SYNC' : 'LOCAL');
+    console.log('activeProfileId   ', settings.activeProfileId,
       '(' + (profiles.find(p => p.id === settings.activeProfileId)?.name ?? '?') + ')');
-    console.log('activeProfileAuto', settings.activeProfileAuto,
+    console.log('activeProfileAuto ', settings.activeProfileAuto,
       settings.activeProfileAuto
-        ? '— set by auto-switch, so it will not follow you to an unclaimed org'
-        : '— picked by hand, so it will');
-    console.log('autoSwitch       ', settings.autoSwitchProfiles,
-      ' profilesEnabled', settings.profilesEnabled);
+        ? '— set by auto-switch, so it will NOT follow you to an unclaimed org'
+        : '— picked by hand, so it WILL');
+    console.log('autoSwitch        ', settings.autoSwitchProfiles,
+      '  profilesEnabled', settings.profilesEnabled);
 
     const rows = [];
-    for (const p of profiles) {
-      const tabs = (await read(`profile_${p.id}_tabs`)) || [];
+    for (const profile of profiles) {
+      const tabs = (await read(`profile_${profile.id}_tabs`)) || [];
       rows.push({
-        name: p.name,
-        id: p.id,
-        starred: !!p.isDefault,
-        linkedOrgs: (p.urlPatterns || []).join(', ') || '—',
-        tabs: tabs.length,
-        firstTab: tabs[0]?.label ?? '—',
-        updatedAt: p.updatedAt || '—',
+        name: profile.name,
+        starred: !!profile.isDefault,
+        linkedOrgs: (profile.urlPatterns || []).join(', ') || '—',
+        tabs: Array.isArray(tabs) ? tabs.length : '?',
+        tabOrder: Array.isArray(tabs) ? tabs.map(t => t.label).join(' · ') : '?',
+        updatedAt: profile.updatedAt || '—',
+        id: profile.id,
       });
     }
     console.table(rows);
-    console.log('If a change you just made is missing here, it never reached ' +
-      'storage or was overwritten — not a rendering problem.');
+    console.log('A change missing here never reached storage, or was overwritten. ' +
+      'That is not a rendering problem.');
     return { settings, profiles };
   }
 
+  // ── Live watch, for the reverting case ──
   let listener = null;
 
   function watch() {
     if (listener) return console.log('already watching');
     listener = (changes, area) => {
       for (const [key, change] of Object.entries(changes)) {
-        if (!/^profiles|^profile_|^userSettings$/.test(key)) continue;
         if (key === 'userSettings') {
-          const before = change.oldValue || {}, after = change.newValue || {};
+          const before = change.oldValue || {};
+          const after = change.newValue || {};
           const moved = ['activeProfileId', 'activeProfileAuto']
-            .filter(k => before[k] !== after[k])
-            .map(k => `${k}: ${before[k]} -> ${after[k]}`);
-          if (moved.length) console.log(`[${area}] userSettings`, moved.join(', '));
+            .filter(field => before[field] !== after[field])
+            .map(field => `${field}: ${before[field]} -> ${after[field]}`);
+          if (moved.length) console.log(`[${area}] userSettings  ${moved.join(', ')}`);
           continue;
         }
-        const size = v => (Array.isArray(v) ? v.length + ' items' : typeof v);
-        console.log(`[${area}] ${key}`,
-          size(change.oldValue), '->', size(change.newValue));
+        if (!/^profiles($|_)|^profile_/.test(key)) continue;
+        const describe = value =>
+          Array.isArray(value) ? value.length + ' items' : typeof value;
+        const shrank = Array.isArray(change.oldValue) && Array.isArray(change.newValue) &&
+          change.newValue.length < change.oldValue.length;
+        console.log(`[${area}] ${key}  ${describe(change.oldValue)} -> ` +
+          `${describe(change.newValue)}${shrank ? '   <-- SHRANK' : ''}`);
       }
     };
     api.storage.onChanged.addListener(listener);
-    console.log('watching. Reproduce the problem, then read the log: the write ' +
-      'that shrinks or reverts a list is the culprit.');
+    console.log('watching — reproduce the problem now, keeping this inspector open');
   }
 
   function stop() {
@@ -98,5 +120,8 @@
   }
 
   globalThis.sftabsProfiles = { report, watch, stop };
-  console.log('sftabsProfiles.report() | .watch() | .stop()');
+
+  await report();
+  console.log('\nsftabsProfiles.watch() to log writes as they land, .stop() to end. ' +
+    'If those come back undefined, the context was torn down — paste this again.');
 })();
