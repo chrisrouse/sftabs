@@ -111,70 +111,22 @@ async function initTabs(tabContainer) {
     // The floating button location is handled separately
 
     if (!tabsToUse || tabsToUse.length === 0) {
-      // If activeProfileId exists, respect empty profiles (don't use defaults)
-      // This means profiles system is active internally even if UI is disabled
-      if (settings.activeProfileId) {
-        tabsToUse = [];
-      } else {
-        // No profile system - get default tabs from constants if available, otherwise use fallback
-        if (window.SFTabs && window.SFTabs.constants && window.SFTabs.constants.DEFAULT_TABS) {
-          tabsToUse = window.SFTabs.constants.DEFAULT_TABS;
-        } else {
-          // Fallback default tabs
-          tabsToUse = [
-            {
-              id: 'default_tab_flows',
-              label: 'Flows',
-              path: 'Flows',
-              openInNewTab: false,
-              isObject: false,
-              isCustomUrl: false,
-              isSetupObject: false,
-              position: 0
-            },
-            {
-              id: 'default_tab_packages',
-              label: 'Installed Packages',
-              path: 'ImportedPackage',
-              openInNewTab: false,
-              isObject: false,
-              isCustomUrl: false,
-              isSetupObject: false,
-              position: 1
-            },
-            {
-              id: 'default_tab_users',
-              label: 'Users',
-              path: 'ManageUsers',
-              openInNewTab: false,
-              isObject: false,
-              isCustomUrl: false,
-              isSetupObject: false,
-              position: 2
-            },
-            {
-              id: 'default_tab_profiles',
-              label: 'Profiles',
-              path: 'EnhancedProfiles',
-              openInNewTab: false,
-              isObject: false,
-              isCustomUrl: false,
-              isSetupObject: false,
-            position: 3
-          },
-          {
-            id: 'default_tab_permsets',
-            label: 'Permission Sets',
-            path: 'PermSets',
-            openInNewTab: false,
-            isObject: false,
-            isCustomUrl: false,
-            isSetupObject: false,
-            position: 4
-          }
-        ];
-        }
-      }
+      // An empty list is a real answer, not a gap to fill.
+      //
+      // This used to fall back to the five shipped DEFAULT_TABS whenever the
+      // list came back empty and settings carried no activeProfileId. Both are
+      // also true when the read simply failed — a torn chunk throws, and an
+      // unreadable settings object leaves activeProfileId undefined — so a
+      // transient failure painted the Setup bar with five tabs the user had
+      // never configured, while the floating panel beside it, reading a moment
+      // later, showed their real profile. Three surfaces on one page disagreed.
+      //
+      // Nothing is invented now. If a profile exists, its list is whatever it
+      // is, empty included. If none exists, the pre-profiles `customTabs` list
+      // already answered above, and an install with neither has nothing to draw
+      // — the popup seeds DEFAULT_TABS at first launch, which is where that
+      // belongs.
+      tabsToUse = [];
     }
 
     // Sort tabs by position (only top-level tabs)

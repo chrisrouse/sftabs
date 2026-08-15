@@ -50,19 +50,39 @@
 
   async function report() {
     const sync = await usingSync();
-    const settings = (await api.storage.local.get('userSettings')).userSettings || {};
+
+    // BOTH copies. userSettings is stored twice — the synced one, and a full
+    // local mirror — and different readers reach for different ones. A first
+    // draft of this printed only the local copy and reported "picked by hand"
+    // while the copy quick-add actually reads said the opposite, which sent a
+    // real investigation the wrong way for a round.
+    const settings = (await read('userSettings')) || {};
+    const mirror = (await api.storage.local.get('userSettings')).userSettings || {};
     const profiles = (await read('profiles')) || [];
+    const name = id => profiles.find(p => p.id === id)?.name ?? '?';
 
     console.log('%cSF Tabs — profile storage', 'font-weight:bold;font-size:13px');
-    console.log('area              ', sync ? 'SYNC' : 'LOCAL');
-    console.log('activeProfileId   ', settings.activeProfileId,
-      '(' + (profiles.find(p => p.id === settings.activeProfileId)?.name ?? '?') + ')');
+    console.log('area              ', sync ? 'SYNC' : 'LOCAL', '(what most readers use)');
+    console.log('activeProfileId   ', settings.activeProfileId, '(' + name(settings.activeProfileId) + ')');
     console.log('activeProfileAuto ', settings.activeProfileAuto,
       settings.activeProfileAuto
         ? '— set by auto-switch, so it will NOT follow you to an unclaimed org'
         : '— picked by hand, so it WILL');
     console.log('autoSwitch        ', settings.autoSwitchProfiles,
       '  profilesEnabled', settings.profilesEnabled);
+
+    if (sync) {
+      const drifted = ['activeProfileId', 'activeProfileAuto', 'autoSwitchProfiles', 'profilesEnabled']
+        .filter(field => settings[field] !== mirror[field]);
+      if (drifted.length) {
+        console.warn('the local mirror disagrees with the synced copy: ' +
+          drifted.map(f => `${f} sync=${settings[f]} local=${mirror[f]}`).join(', '));
+        console.warn('  the banner and the favicon read the local one; quick-add ' +
+          'and the tab bar read the synced one. They will not agree until this does.');
+      } else {
+        console.log('local mirror       in step');
+      }
+    }
 
     const rows = [];
     for (const profile of profiles) {

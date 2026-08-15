@@ -126,10 +126,52 @@ check('switching does not write the profile list back',
 check('and nothing sets the dead field it was written for',
   !/lastActive = new Date/.test(bgSrc),
   'lastActive is written in four places and read in none');
-check('the settings write still re-reads and touches only its own fields',
+check('the settings write re-reads each copy and touches only its own fields',
   Boolean(switcher) &&
+  /const local = \(await browser\.storage\.local\.get\('userSettings'\)\)/.test(switcher[0]) &&
   /const current = \(await browser\.storage\.sync\.get\('userSettings'\)\)/.test(switcher[0]) &&
-  /\.\.\.current,\s*\n\s*activeProfileId:/.test(switcher[0]));
+  /\{ \.\.\.local, \.\.\.change \}/.test(switcher[0]) &&
+  /\{ \.\.\.current, \.\.\.change \}/.test(switcher[0]));
+
+// ── userSettings lives in two places and both must move together ──
+// The synced copy, and a full local mirror the popup keeps in step. The worker
+// wrote only the synced one, so the two disagreed about which profile was
+// active and how it got that way — and different readers reach for different
+// copies. Quick-add and the tab bar read through the storage preference; the
+// banner, the favicon and the floating modal read the local mirror. A tab added
+// on an unclaimed org went to the starred default while the UI showed the
+// profile the user had picked by hand.
+check('the worker updates the local mirror as well as the synced copy',
+  Boolean(switcher) &&
+  /browser\.storage\.local\.set\(\{ userSettings:/.test(switcher[0]) &&
+  /browser\.storage\.sync\.set\(\{ userSettings:/.test(switcher[0]),
+  'readers split across the two, so leaving one behind splits the UI with it');
+
+// Reading sync unconditionally meant a local-storage install had no settings at
+// all from here: profilesEnabled came back undefined and auto-switch returned
+// before doing anything, silently, forever.
+check('and reads the area this device actually uses',
+  Boolean(switcher) &&
+  /readStoredValue\(\s*\n?\s*'userSettings', await SFTabs\.utils\.storagePreference\(\)\)/.test(switcher[0]),
+  'auto-switch never ran at all on a local-storage install');
+
+
+// ── The tab bar does not invent tabs when a read comes back empty ──
+// It used to fall back to the five shipped DEFAULT_TABS whenever the list was
+// empty and settings carried no activeProfileId — which is also what an
+// unreadable settings object looks like. A transient failure painted the Setup
+// bar with tabs the user had never configured while the panel beside it, read a
+// moment later, showed their real profile.
+// Comments stripped, or the prose explaining the removal counts as a use of it.
+const rendererSrc = fs.readFileSync(path.join(__dirname, '..', 'content/tab-renderer.js'), 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/^[ \t]*\/\/.*$/gm, '');
+check('the Setup bar has no DEFAULT_TABS fallback',
+  !/DEFAULT_TABS/.test(rendererSrc),
+  'an empty list is a real answer, not a gap to fill');
+check('and no hand-copied duplicate of them either',
+  !/default_tab_permsets/.test(rendererSrc),
+  'the popup seeds the shipped tabs at first launch, which is where that belongs');
 
 // The worker has to mark its own writes, or the flag never becomes true.
 check('the worker marks a profile it set as auto',

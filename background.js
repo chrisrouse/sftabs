@@ -116,8 +116,12 @@ async function checkAndSwitchProfile(url) {
       return;
     }
 
-    const settingsResult = await browser.storage.sync.get('userSettings');
-    const settings = settingsResult.userSettings || {};
+    // The area this device actually uses, not sync unconditionally. A
+    // local-storage install keeps nothing in sync, so reading it returned {},
+    // profilesEnabled was undefined, and auto-switching silently never ran for
+    // those users at all.
+    const settings = await SFTabs.utils.readStoredValue(
+      'userSettings', await SFTabs.utils.storagePreference()) || {};
 
     // Check if profiles and auto-switching are enabled
     if (!settings.profilesEnabled || !settings.autoSwitchProfiles) {
@@ -196,20 +200,38 @@ async function checkAndSwitchProfile(url) {
     // Switch to the target profile
     settings.activeProfileId = targetProfile.id;
 
-    // Re-read immediately before writing and change only the two fields that
-    // belong to this decision. The snapshot above may be seconds old by now,
-    // and writing it back whole would revert anything the popup changed in
+    // Both copies, the way saveUserSettings does it.
+    //
+    // userSettings lives in two places: the synced copy, and a full local
+    // mirror the popup keeps in step so content scripts have something to read
+    // without consulting the preference first. This function used to write only
+    // the synced one, and the two then disagreed about which profile was active
+    // and how it got that way.
+    //
+    // That was visible. On a sync install, quick-add reads through the
+    // preference and saw `auto` — so on an org no profile claims it wrote the
+    // tab to the starred default — while the banner and the favicon read the
+    // stale local mirror and still saw the profile the user had picked by hand.
+    // A tab added on a sandbox landed in a profile the UI was not showing.
+    //
+    // Re-read each immediately before writing and change only the two fields
+    // that belong to this decision. The snapshot above may be seconds old by
+    // now, and writing it back whole would revert anything the popup changed in
     // between — toggling tab colors while a Salesforce page finished loading
     // was enough to lose the toggle.
+    const change = {
+      activeProfileId: targetProfile.id,
+      // Ours, not the user's — so it will not follow them off this org.
+      activeProfileAuto: true,
+    };
+
+    const local = (await browser.storage.local.get('userSettings')).userSettings || {};
+    await browser.storage.local.set({ userSettings: { ...local, ...change } });
+
+    // useSyncStorage is device-specific and deliberately absent from the synced
+    // copy; spreading `current` rather than the local one keeps it that way.
     const current = (await browser.storage.sync.get('userSettings')).userSettings || {};
-    await browser.storage.sync.set({
-      userSettings: {
-        ...current,
-        activeProfileId: targetProfile.id,
-        // Ours, not the user's — so it will not follow them off this org.
-        activeProfileAuto: true,
-      }
-    });
+    await browser.storage.sync.set({ userSettings: { ...current, ...change } });
 
     // The profile list is deliberately NOT written back here.
     //
