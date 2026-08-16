@@ -8,9 +8,11 @@ description: Every SF Tabs setting explained, from theme and compact mode to pro
 
 Settings now live inside the popup itself. Click the gear icon in the bottom-right corner of the popup to open the Settings hub — a set of tiles, one per section. Click a tile to open that section in place; click back to return to the hub.
 
-<div class="v3-shot">Screenshot: the Settings hub inside the popup, showing the row of section tiles</div>
+<img width="781" height="550" alt="sftabs-settings" src="https://github.com/user-attachments/assets/e3fa6ce0-bd04-425f-b328-a9ce066eb101" />
 
 ## General
+
+<img width="377" height="443" alt="sftabs-settings-general" src="https://github.com/user-attachments/assets/39b2e3d3-5ee9-4e2a-8f7f-fd25aa0bebec" />
 
 | Setting | What it does |
 | --- | --- |
@@ -20,6 +22,8 @@ Settings now live inside the popup itself. Click the gear icon in the bottom-rig
 
 ## Tabs
 
+<img width="376" height="443" alt="sftabs-settings-tabs" src="https://github.com/user-attachments/assets/22e3066c-aa4f-459a-9daa-7d8484e9106f" />
+
 | Setting | What it does |
 | --- | --- |
 | Color-code tabs | Give individual tabs a color. Tabs without one keep the standard look. |
@@ -27,6 +31,8 @@ Settings now live inside the popup itself. Click the gear icon in the bottom-rig
 | Quick Add in the Salesforce menu bar | Adds a + at the end of your tabs that captures the current page without opening this popup |
 
 ## Profiles
+
+<img width="375" height="502" alt="sftabs-settings-profiles" src="https://github.com/user-attachments/assets/56eefd48-337e-481b-acae-c421bf442a51" />
 
 | Setting | What it does |
 | --- | --- |
@@ -39,6 +45,8 @@ Auto-Switch Profiles and Quick Add adds to all profiles only appear once Enable 
 This is the short version — see the full [Profiles]({{ '/v3/profiles' | relative_url }}) page for how to create, switch, and match profiles to orgs.
 
 ## Button
+
+<img width="369" height="826" alt="sftabs-settings-button" src="https://github.com/user-attachments/assets/7415e38e-7065-4595-adaa-41a10aaadca4" />
 
 SF Tabs can put your tabs one click away on every Salesforce page, either as a floating button, a menu in Salesforce's own header, or both.
 
@@ -57,6 +65,8 @@ See [Quick Access]({{ '/v3/quick-access' | relative_url }}) for more on how thes
 
 ## Org Colors
 
+<img width="368" height="819" alt="sftabs-settings-org-colors" src="https://github.com/user-attachments/assets/d3b26a6e-a099-4002-a548-7e0200a0b65b" />
+
 | Setting | What it does |
 | --- | --- |
 | Color the browser tab icon | Tints the Salesforce icon in your browser tab so you can tell orgs apart at a glance |
@@ -66,6 +76,9 @@ See [Quick Access]({{ '/v3/quick-access' | relative_url }}) for more on how thes
 See [Org Colors]({{ '/v3/org-colors' | relative_url }}) for how colors are chosen and applied.
 
 ## Data
+
+<img width="376" height="501" alt="sftabs-settings-data" src="https://github.com/user-attachments/assets/827fa502-eeba-47b0-946e-a6dbba024735" />
+
 
 | Setting | What it does |
 | --- | --- |
@@ -80,7 +93,3 @@ Two tiles in the Settings hub open a page instead of a section:
 
 - **Import & Export** — see [Import & Export]({{ '/v3/import-export' | relative_url }})
 - **User Guide** — opens this documentation site
-
-## Keyboard Shortcuts
-
-There is no keyboard shortcuts section in Settings anymore. Shortcuts are configured in your browser, not in SF Tabs. See [Keyboard Shortcuts]({{ '/v3/keyboard-shortcuts' | relative_url }}) for setup instructions.
