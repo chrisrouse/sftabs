@@ -13,7 +13,7 @@ Production and a sandbox look identical in a row of browser tabs, right up until
 
 You can turn either one on by itself, or both together.
 
-<div class="v3-shot">Screenshot: the Org Colors settings section with the tab icon and banner toggles</div>
+<img width="368" height="819" alt="sftabs-settings-org-colors" src="https://github.com/user-attachments/assets/e59f8e76-6b98-4e0c-92e6-eb0bc0f560db" />
 
 ## How the Color Is Chosen
 
@@ -31,11 +31,16 @@ SF Tabs decides which color to use in two steps:
    | Demo |
    | Trailhead Playground |
 
+Production and Sandbox are always enabled. If you need any of the the other org types, use the dropdown to add them.
+
+<img width="383" height="283" alt="sftabs-org-colors-new-org-types" src="https://github.com/user-attachments/assets/f0bc93f5-8900-4e54-a9bd-127ce18fb944" />
+
 2. **Per-org overrides.** An entry for a specific org overrides the environment default for that org alone.
 
 Per-org entries exist because the hostname alone can't tell two sandboxes of the same org apart — several sandboxes all look like `acme--name.sandbox`. A per-org override is the only way to give each one its own color. There's a button to capture the org you're currently on, so you don't have to type its identifier by hand.
 
-<div class="v3-shot">Screenshot: the per-org color list with the "capture current org" button</div>
+<img width="380" height="354" alt="sftabs-per-org-color" src="https://github.com/user-attachments/assets/466ed18f-1016-4805-8cb9-71b5120d9d48" />
+
 
 ## Editing Environment Defaults
 
@@ -57,7 +62,7 @@ The banner also takes a location choice, the same one used by the floating butto
 - Only in Setup
 - Outside Setup
 
-<div class="v3-shot">Screenshot: the banner across the top of a Salesforce Setup page, showing the org name and environment</div>
+<img width="637" height="231" alt="sftabs-org-banner" src="https://github.com/user-attachments/assets/75cb086d-4f35-45c5-9ec4-214c543490c1" />
 
 ## Where It Works
 
