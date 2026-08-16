@@ -134,8 +134,16 @@ See [Org Colors]({{ '/v3/org-colors' | relative_url }}) for how colors are chose
 </div>
 
 ## Links
+<div class="v3-setting" markdown="1">
+
+<img width="374" height="93" alt="sftabs-settings-links" src="https://github.com/user-attachments/assets/e5781fe6-3d52-4e47-a47d-daff0ebb709a" />
+
+<div markdown="1">
 
 Two tiles in the Settings hub open a page instead of a section:
 
 - **Import & Export** — see [Import & Export]({{ '/v3/import-export' | relative_url }})
 - **User Guide** — opens this documentation site
+
+ </div>
+ </div>
