@@ -337,6 +337,52 @@
       flex-shrink: 0;
     }
 
+    /* ── Setting block: screenshot beside its explanation ──
+       Every settings section is one screenshot and one table, and stacked they
+       push the table off the fold — so the shot sits in a fixed column on the
+       left and the table takes the rest.
+
+       Fixed rather than fractional because the popup is 380px wide and every
+       shot is that same width: a fractional column would size each one
+       differently depending on how tall it happened to be, and a column of
+       screenshots that do not line up reads as sloppy.
+
+       Kramdown needs markdown="1" on the wrapper, or the tables inside arrive
+       as literal pipes. */
+    .v3-setting {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+      margin: 20px 0 32px;
+    }
+    /* The shot is a UI panel on a page the same colour, so it needs an edge of
+       its own to sit on. */
+    .v3-setting > p:first-child > img,
+    .v3-setting > img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--b-subtle);
+      border-radius: var(--r-md);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    .v3-setting > p:first-child { margin: 0; }
+    /* The table is the first thing in the right column and should start level
+       with the top of the image, not a paragraph's worth below it. */
+    .v3-setting > div > :first-child,
+    .v3-setting > :nth-child(2) { margin-top: 0; }
+    .v3-setting table { margin-top: 0; }
+
+    /* One column below the width where 300px + a readable table stops fitting.
+       The shot is capped so it does not become a full-bleed 380px slab on a
+       phone. */
+    @media (max-width: 900px) {
+      .v3-setting { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .v3-setting > p:first-child > img,
+      .v3-setting > img { max-width: 340px; }
+    }
+
     /* ── Notice ── */
     .v3-notice {
       display: flex;
