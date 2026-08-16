@@ -21,7 +21,9 @@ The bookmark icon fills in to show when the page you're on is already one of you
 
 The header menu works everywhere in Salesforce, not only in Setup, and works alongside the floating button or on its own.
 
-<div class="v3-shot">Screenshot: the split bookmark button in the Salesforce header, next to Favorites</div>
+<img width="357" height="285" alt="sftabs-quick-access-settings" src="https://github.com/user-attachments/assets/38057e1a-eddb-48c2-bda4-c2c979e81804" />
+
+<img width="446" height="341" alt="sftabs-quick-access-object-slds2" src="https://github.com/user-attachments/assets/a7a6cd18-df17-458a-a7cc-4a15ed3cf41d" />
 
 ## The Floating Button
 
@@ -38,13 +40,15 @@ The floating button has several options:
 
 The panel lists your tabs, including nested ones, and highlights the tab matching the page you're on.
 
-<div class="v3-shot">Screenshot: the floating button panel open over a Salesforce page, showing the tab list with the current page highlighted</div>
+<img width="521" height="319" alt="sftabs-pill-menu" src="https://github.com/user-attachments/assets/c1ba3dee-cbaf-40ca-b8c9-34bcb146f86a" />
+
+<img width="368" height="525" alt="sftabs-round-menu" src="https://github.com/user-attachments/assets/1ff271e2-bf22-437f-b9ff-de183bace4ee" />
 
 ## Quick Add in the Setup Tab Bar
 
 Turn on **Quick Add in the Salesforce menu bar** (Settings > Tabs) to add a "+" at the end of your tabs in the Setup menu bar. Clicking it captures the current page without opening the popup.
 
-<div class="v3-shot">Screenshot: the "+" button at the end of the tab row in Setup</div>
+<img width="1046" height="96" alt="sftabs-settings-quick-add-menu-bar" src="https://github.com/user-attachments/assets/c36eb5b9-cdfa-4c3e-9eca-aa14f94ce356" />
 
 ## A Few Things That Apply to All Three
 
