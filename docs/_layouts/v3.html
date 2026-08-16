@@ -396,22 +396,36 @@
 
        340px because the round-menu shot is the tallest at 525 and its menu text
        stops being legible much below that. */
+       The row shrinks rather than wrapping. At 340px tall the header-menu pair
+       comes to 822px and the floating-button pair to 779px, and the content
+       column is 884px only when the window is at least 1180 wide — so on a
+       narrower window the wider pair wrapped and the other did not, which looked
+       like a bug in one of them rather than a width they both share. nowrap plus
+       min-width:0 lets the figures scale down together and stay a pair. */
     .v3-pair {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: flex-start;
       gap: 20px;
       margin: 20px 0 32px;
     }
-    .v3-pair figure { margin: 0; min-width: 0; }
+    /* flex-shrink and min-width:0 are what allow the shrinking; without the
+       second, a flex item will not go below its content's intrinsic width. */
+    .v3-pair figure { margin: 0; flex: 0 1 auto; min-width: 0; }
     .v3-pair img {
       display: block;
       max-height: 340px;
-      width: auto;
       max-width: 100%;
+      width: auto;
+      height: auto;
       border: 1px solid var(--b-subtle);
       border-radius: var(--r-md);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    /* Below this, side by side makes both too small to read; stack instead. */
+    @media (max-width: 760px) {
+      .v3-pair { flex-wrap: wrap; }
+      .v3-pair img { max-height: none; }
     }
     .v3-pair figcaption {
       margin-top: 8px;
