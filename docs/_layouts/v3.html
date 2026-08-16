@@ -383,6 +383,43 @@
       .v3-setting > img { max-width: 340px; }
     }
 
+    /* ── Paired screenshots ──
+       Two shots of the same feature, side by side.
+
+       Capped by HEIGHT, not width, which is the opposite of .v3-setting above.
+       There every shot is the 380px popup and a fixed column lines them up. Here
+       the pairs are mixed: a 521x319 landscape next to a 368x525 portrait. Equal
+       columns would scale both to the same width and leave the portrait towering
+       over the landscape at more than twice its height. A shared height puts them
+       on one baseline and lets each keep its own width, which is how a pair reads
+       as a pair.
+
+       340px because the round-menu shot is the tallest at 525 and its menu text
+       stops being legible much below that. */
+    .v3-pair {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 20px;
+      margin: 20px 0 32px;
+    }
+    .v3-pair figure { margin: 0; min-width: 0; }
+    .v3-pair img {
+      display: block;
+      max-height: 340px;
+      width: auto;
+      max-width: 100%;
+      border: 1px solid var(--b-subtle);
+      border-radius: var(--r-md);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    .v3-pair figcaption {
+      margin-top: 8px;
+      font-size: 0.8125rem;
+      color: var(--t-weak);
+      max-width: 44ch;
+    }
+
     /* ── Notice ── */
     .v3-notice {
       display: flex;

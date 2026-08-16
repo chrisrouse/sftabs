@@ -21,9 +21,16 @@ The bookmark icon fills in to show when the page you're on is already one of you
 
 The header menu works everywhere in Salesforce, not only in Setup, and works alongside the floating button or on its own.
 
-<img width="357" height="285" alt="sftabs-quick-access-settings" src="https://github.com/user-attachments/assets/38057e1a-eddb-48c2-bda4-c2c979e81804" />
-
-<img width="446" height="341" alt="sftabs-quick-access-object-slds2" src="https://github.com/user-attachments/assets/a7a6cd18-df17-458a-a7cc-4a15ed3cf41d" />
+<div class="v3-pair">
+  <figure>
+    <img width="357" height="285" alt="The Show a menu in the Salesforce header setting, switched on" src="https://github.com/user-attachments/assets/38057e1a-eddb-48c2-bda4-c2c979e81804" />
+    <figcaption>Turning it on in Settings &rsaquo; Button</figcaption>
+  </figure>
+  <figure>
+    <img width="446" height="341" alt="The SF Tabs split button in the Salesforce header, its menu open beside Favorites" src="https://github.com/user-attachments/assets/a7a6cd18-df17-458a-a7cc-4a15ed3cf41d" />
+    <figcaption>The result: a split button beside Favorites, with the menu open</figcaption>
+  </figure>
+</div>
 
 ## The Floating Button
 
@@ -40,9 +47,16 @@ The floating button has several options:
 
 The panel lists your tabs, including nested ones, and highlights the tab matching the page you're on.
 
-<img width="521" height="319" alt="sftabs-pill-menu" src="https://github.com/user-attachments/assets/c1ba3dee-cbaf-40ca-b8c9-34bcb146f86a" />
-
-<img width="368" height="525" alt="sftabs-round-menu" src="https://github.com/user-attachments/assets/1ff271e2-bf22-437f-b9ff-de183bace4ee" />
+<div class="v3-pair">
+  <figure>
+    <img width="521" height="319" alt="The floating button as a labeled pill, with its panel of tabs open" src="https://github.com/user-attachments/assets/c1ba3dee-cbaf-40ca-b8c9-34bcb146f86a" />
+    <figcaption>The labeled pill layout</figcaption>
+  </figure>
+  <figure>
+    <img width="368" height="525" alt="The floating button as a round button, with its panel of tabs open" src="https://github.com/user-attachments/assets/1ff271e2-bf22-437f-b9ff-de183bace4ee" />
+    <figcaption>The round button layout</figcaption>
+  </figure>
+</div>
 
 ## Quick Add in the Setup Tab Bar
 
