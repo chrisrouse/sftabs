@@ -8,7 +8,7 @@ description: Use profiles to keep separate sets of tabs for different Salesforce
 
 Profiles let you keep separate sets of tabs for different Salesforce orgs, projects, or work contexts. Each profile has its own tabs, and a tab can belong to more than one profile at a time.
 
-<div class="v3-shot">Screenshot: the profile switcher open in the popup header, listing several profiles</div>
+<img width="375" height="502" alt="sftabs-settings-profiles" src="https://github.com/user-attachments/assets/56eefd48-337e-481b-acae-c421bf442a51" />
 
 ## Enabling Profiles
 
@@ -34,8 +34,6 @@ Profiles let you keep separate sets of tabs for different Salesforce orgs, proje
 
 3. **Choose a starting point:**
 
-<div class="v3-shot">Screenshot: the profile creation wizard's starting point step</div>
-
    - **Start empty:** Begin with no tabs and add them manually.
    - **Start with the default tabs:** Begin with the standard set of tabs (Flows, Users, Profiles, etc.).
    - **Copy an existing profile:** Duplicate the tabs from a profile you already have.
@@ -53,6 +51,8 @@ There are two ways to switch profiles: manually, from the popup, or automaticall
 
 ### Manual Switching
 
+<img width="234" height="204" alt="sftabs-profile-switch" src="https://github.com/user-attachments/assets/2732f8e1-803a-4210-a283-d5646a250f6b" />
+
 1. **Click the profile button**
    It's in the popup header and shows your current profile's name.
 
@@ -68,6 +68,8 @@ Two orgs open in separate browser windows each keep their own profile — switch
 
 Set up profiles to automatically switch based on the Salesforce org you're visiting.
 
+<img width="379" height="390" alt="sftabs-profiles-auto-switch" src="https://github.com/user-attachments/assets/bfa42b59-843b-4594-ba78-2a694ee40ed4" />
+
 1. **Enable Auto-Switch in Settings**
    Go to Settings > Profiles and turn on "Auto-Switch Profiles".
 
@@ -77,11 +79,6 @@ Set up profiles to automatically switch based on the Salesforce org you're visit
 3. **Add the org's identifier**
    Enter the org identifier from the URL — for example `acme` or `acme--dev1`.
    There's a button to capture the current org automatically, rather than typing it, if you're already on that org's page.
-
-<div class="v3-shot">Screenshot: a profile's edit screen with the org identifier field and the “Add the org I’m on” button</div>
-
-4. **Test automatic switching**
-   Navigate to a Salesforce org that matches one of your linked identifiers. SF Tabs automatically switches to the matching profile.
 
 3.0 recognizes many more org types when matching, including sandboxes, Developer Edition orgs, scratch orgs, demo orgs, patch orgs, and Trailhead Playgrounds. Experience Builder pages resolve to the same org as their Lightning pages, so a single identifier covers both.
 
