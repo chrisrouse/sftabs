@@ -6,6 +6,15 @@ description: Edit, reorder, color, delete and organize your SF Tabs into dropdow
 
 # Tabs
 
+## New tabs
+There are several ways to add new tabs. 
+
+### From the SF Tabs popup
+1. Click on the ﹢ button to use Quick Add. This captures your current page and sets the correct defaults for you. You can then edit the tab further.
+2. Click on the ⊕ to manually add a tab or a folder.
+3. If you have enabled the [header menu]({{ '/v3/quick-access' | relative_url }}#the-header-menu) you can click on the bookmark icon to add the current page.
+4. If you have enabled [Quick Add in the Setup tab bar]({{ '/v3/quick-access' | relative_url }}#quick-add-in-the-setup-tab-bar) you can click on the + there.
+
 ## Editing Tabs
 
 1. **Open SF Tabs**
