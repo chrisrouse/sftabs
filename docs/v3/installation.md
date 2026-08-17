@@ -23,3 +23,13 @@ SF Tabs requires the following permissions to function:
 - **Access browser tabs** - Required to open tabs when you click on them
 
 After installing SF Tabs in your browser, you may need to allow permissions for the plugin. Your browser should prompt you to allow the necessary permissions. If not, visit your browser's extension pages.
+
+## Getting Started
+
+<img width="391" height="541" alt="sftabs-first-launch" src="https://github.com/user-attachments/assets/c42cf576-f866-4662-8411-29bd56c6b383" />
+
+The first time you run SF Tabs you will be shown the first launch wizard. Choose if you want to start with the default tabs, no tabs, or import an existing configuration. 
+
+If you want to use profiles, you can choose to enable profiles now, or wait until later.
+
+By default, the storage will be set to Sync Storage, so if you use the same browser profile on multiple computers, SF Tabs will appear the same on each computer, depending on your browser's sync settings.
