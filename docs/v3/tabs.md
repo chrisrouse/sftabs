@@ -127,7 +127,6 @@ Create custom dropdown menus by dragging existing tabs onto a parent tab.
 2. **Drag a tab onto the parent**
    Click and hold a tab, then drag it over another tab. Release when you see the drop indicator.
 
-<div class="v3-shot">Screenshot: a tab being dragged over another tab in the popup, showing the drop indicator</div>
 
 3. **The dragged tab becomes a dropdown item**
    It's now nested under the parent tab.
