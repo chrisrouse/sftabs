@@ -23,5 +23,3 @@ SF Tabs requires the following permissions to function:
 - **Access browser tabs** - Required to open tabs when you click on them
 
 After installing SF Tabs in your browser, you may need to allow permissions for the plugin. Your browser should prompt you to allow the necessary permissions. If not, visit your browser's extension pages.
-
-<div class="v3-shot">Screenshot: the browser prompt asking to allow SF Tabs access to your Salesforce domain</div>
