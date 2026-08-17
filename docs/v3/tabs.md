@@ -20,6 +20,36 @@ description: Edit, reorder, color, delete and organize your SF Tabs into dropdow
 4. **Save your changes**
    Click Save Tab to apply the updates.
 
+## Tab Types
+
+SF Tabs supports three types of tabs:
+
+### Setup Pages
+
+Links to standard Salesforce Setup pages. Use the Setup page name as the path.
+
+**Examples:**
+- `Flows` - Links to Flow Builder
+- `ManageUsersLightning` - Links to Users page
+
+### Object Pages
+
+Links to Object Manager pages for standard or custom objects.
+
+**Examples:**
+- `Account` - Account Object
+- `Custom_Object__c` - Custom Object
+- `My Opportunities` - List View
+
+### Custom URLs
+
+Links to any Lightning URL path within Salesforce.
+
+**Examples:**
+- `interaction_explorer/flowExplorer.app` - Flow Trigger Explorer
+- `Opportunity/list?filterName=ClosingNextMonth` - Opportunity "Closing Next Month" list view
+
+
 ### Profile Membership
 
 If you have [profiles]({{ '/v3/profiles' | relative_url }}) enabled, the edit form includes a checkbox for each profile. Tick the profiles a tab should belong to — a tab can belong to more than one profile at the same time.
