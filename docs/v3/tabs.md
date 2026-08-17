@@ -50,7 +50,7 @@ Links to any Lightning URL path within Salesforce.
 - `Opportunity/list?filterName=ClosingNextMonth` - Opportunity "Closing Next Month" list view
 
 
-### Profile Membership
+## Profile Membership
 
 If you have [profiles]({{ '/v3/profiles' | relative_url }}) enabled, the edit form includes a checkbox for each profile. Tick the profiles a tab should belong to — a tab can belong to more than one profile at the same time.
 
