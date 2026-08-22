@@ -32,8 +32,10 @@
   ],
   "action": {
     "default_icon": {
-      "48": "icons/sftabs-icon-48.png",
-      "96": "icons/sftabs-icon-96.png"
+      "16": "icons/sftabs_v3_full_16.png",
+      "32": "icons/sftabs_v3_full_32.png",
+      "48": "icons/sftabs_v3_full_48.png",
+      "96": "icons/sftabs_v3_full_96.png"
     },
     "default_title": "SF Tabs",
     "default_popup": "popup.html"
@@ -104,9 +106,11 @@
     }
   ],
   "icons": {
-    "16": "icons/sftabs-icon-16.png",
-    "48": "icons/sftabs-icon-48.png",
-    "96": "icons/sftabs-icon-96.png"
+    "16": "icons/sftabs_v3_full_16.png",
+    "32": "icons/sftabs_v3_full_32.png",
+    "48": "icons/sftabs_v3_full_48.png",
+    "96": "icons/sftabs_v3_full_96.png",
+    "128": "icons/sftabs_v3_full_128.png"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"

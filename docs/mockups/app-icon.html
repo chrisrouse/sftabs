@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SF Tabs — app icon directions</title>
+<style>
+  :root {
+    --blue: #0250d9;
+    --blue-deep: #022ac0;
+    --blue-light: #d6e6ff;
+    --ink: #181818;
+    --grey: #5c5c5c;
+    --hair: #e5e5e5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px;
+    font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif;
+    color: var(--ink);
+    background: #f8f8f8;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--grey); margin: 0 0 32px; }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 2px; }
+  .card p { margin: 0 0 16px; color: var(--grey); font-size: 13px; max-width: 62ch; }
+
+  .rows { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-end; }
+  .strip {
+    display: flex;
+    gap: 18px;
+    align-items: flex-end;
+    padding: 14px 18px;
+    border-radius: 10px;
+  }
+  .strip.light { background: #f3f3f3; }
+  .strip.dark  { background: #1a1a1a; }
+  .strip.chrome { background: #dee1e6; }
+
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .cell span { font-size: 10px; color: var(--grey); font-variant-numeric: tabular-nums; }
+  .strip.dark .cell span { color: #9a9a9a; }
+
+  .note { font-size: 12px; color: var(--grey); border-top: 1px solid var(--hair); margin-top: 16px; padding-top: 12px; }
+  .note b { color: var(--ink); font-weight: 600; }
+  code { background: #f3f3f3; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>SF Tabs — app icon directions</h1>
+<p class="sub">Arrow&rarr;bar glyph kept throughout. Each direction shown at 128 / 48 / 32 / 16&nbsp;px on light, dark, and Chrome-toolbar grey.</p>
+
+<div id="out"></div>
+
+<!-- Hidden defs: the glyph and the cloud silhouette, authored once -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Arrow + bar, bbox x 8..97, y 24..76, centre (52.5,50).
+         Head stops at 74 so the gap to the bar survives down to 16px. -->
+    <g id="glyph">
+      <rect x="8" y="42" width="42" height="16" rx="4"/>
+      <path d="M46 25 L74 50 L46 75 Z"/>
+      <rect x="84" y="24" width="13" height="52" rx="6.5"/>
+    </g>
+    <!-- Rounded-terminal variant: chunkier, softer, better at 16px.
+         Head inset to 72 to absorb the 5px round join without touching the bar. -->
+    <g id="glyphSoft">
+      <rect x="8" y="40" width="40" height="20" rx="10"/>
+      <path d="M44 24 L72 50 L44 76 Z" stroke-linejoin="round" stroke-width="5"/>
+      <rect x="84" y="22" width="15" height="56" rx="7.5"/>
+    </g>
+    <!-- Salesforce-style cloud, from the existing logo, normalised to 0..128 -->
+    <path id="cloud" transform="scale(0.5691)" d="M 127.683594 0.0585938 C 130.148438 0.0585938 132.628906 0.0585938 135.089844 0.0585938 C 154.71875 3.816406 166.984375 16.320312 172.570312 36.777344 C 205.292969 34.046875 229.082031 72.730469 214.585938 110.699219 C 219.40625 118.675781 223.425781 127.601562 224.878906 139.578125 C 224.878906 143.007812 224.878906 146.433594 224.878906 149.863281 C 220.550781 180.347656 201.921875 200.945312 171.34375 195.398438 C 163.472656 211.050781 149.472656 226.113281 127.6875 224.773438 C 116.425781 223.746094 108.589844 217.796875 101.730469 210.5625 C 94.507812 216.574219 86.683594 221.292969 75.378906 221.34375 C 49.222656 221.433594 31.726562 198.277344 31.300781 166.511719 C 14.488281 159.082031 3.101562 145.210938 0 121.476562 C 0 118.046875 0 114.609375 0 111.195312 C 3.421875 87.675781 14.191406 72.902344 32.121094 66.640625 C 31.042969 26.964844 66.910156 2.175781 96.375 19.652344 C 103.390625 11.011719 113.316406 1.582031 127.683594 0.0585938 Z"/>
+  </defs>
+</svg>
+
+<script>
+const BLUE = '#0250d9', DEEP = '#022ac0', LIGHT = '#d6e6ff', WHITE = '#fff';
+
+// Both glyphs share a centre of (52.5, 50) in their own 100-unit space.
+const GC = 52.5;
+
+// Place the glyph at scale s, centred on (cx, cy) of a 128 box.
+function glyph(s, fill, id = 'glyph', cx = 64, cy = 64) {
+  const t = `translate(${cx - s * GC} ${cy - s * 50}) scale(${s})`;
+  return `<g transform="${t}" fill="${fill}" stroke="${fill}"><use href="#${id}"/></g>`;
+}
+
+const DIRECTIONS = [
+  {
+    key: 'A',
+    name: 'Squircle',
+    desc: 'Drops the cloud for a rounded-square app tile in SLDS blue. The shape browsers, docks, and app stores all expect in 2026 — and the flat field keeps the glyph crisp at 16px.',
+    note: 'Loses the Salesforce cloud cue, so it reads less obviously "Salesforce" in a crowded toolbar.',
+    svg: () => `<rect x="0" y="0" width="128" height="128" rx="30" fill="${BLUE}"/>${glyph(0.86, WHITE)}`
+  },
+  {
+    key: 'B',
+    name: 'Cloud, refreshed',
+    desc: 'Keeps the cloud silhouette but moves to SLDS blue and enlarges the glyph with rounded terminals. The smallest change that still reads as new.',
+    note: 'The cloud\'s bumps mush together below ~20px — that is the flaw in the current icon too.',
+    svg: () => `<use href="#cloud" fill="${BLUE}"/>${glyph(0.62, WHITE, 'glyphSoft')}`
+  },
+  {
+    key: 'C',
+    name: 'Tab silhouette',
+    desc: 'The container becomes an actual browser tab sitting on a baseline. Says "tabs" without a word of copy — the most literal fit for the product name.',
+    note: 'Asymmetric, so it sits slightly off-centre next to round icons in the toolbar.',
+    svg: () => `
+      <path d="M10 99 C20 99 26 94 26 84 L26 44 C26 36 32 30 40 30 L88 30 C96 30 102 36 102 44 L102 84 C102 94 108 99 118 99 Z" fill="${BLUE}"/>
+      <rect x="8" y="99" width="112" height="14" rx="7" fill="${DEEP}"/>
+      ${glyph(0.62, WHITE, 'glyph', 64, 64)}`
+  },
+  {
+    key: 'D',
+    name: 'Bare glyph, two-tone',
+    desc: 'No container at all. Blue arrow, deep-blue bar. Maximum legibility at 16px because every pixel is glyph, and it sits equally well on light or dark chrome.',
+    note: 'Least "branded" — no silhouette to recognise at a glance, and thin edges on light-grey toolbars.',
+    svg: () => `
+      <g transform="translate(${64 - 1.2 * GC} ${64 - 1.2 * 50}) scale(1.2)">
+        <rect x="8" y="40" width="40" height="20" rx="10" fill="${BLUE}"/>
+        <path d="M44 24 L72 50 L44 76 Z" fill="${BLUE}" stroke="${BLUE}" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="84" y="22" width="15" height="56" rx="7.5" fill="${DEEP}"/>
+      </g>`
+  },
+  {
+    key: 'E',
+    name: 'Light chip',
+    desc: 'Inverts the fill: near-white tile, blue glyph, hairline edge. Pops against dark browser toolbars, which is where the solid-blue options go muddy.',
+    note: 'Nearly disappears on a light toolbar — the inverse of the problem it solves.',
+    svg: () => `
+      <rect x="1" y="1" width="126" height="126" rx="30" fill="#fbfcff" stroke="${LIGHT}" stroke-width="2"/>
+      ${glyph(0.86, BLUE)}`
+  },
+  {
+    key: 'F',
+    name: 'Arrow through tab stack',
+    desc: 'Arrow crosses a stack of tabs, so the mark carries both halves of the product: many tabs, and jumping straight to one.',
+    note: 'Busiest of the six. The stack collapses to a blue smudge at 16px.',
+    svg: () => `
+      <rect x="0" y="0" width="128" height="128" rx="30" fill="${BLUE}"/>
+      <rect x="32" y="28" width="64" height="11" rx="5.5" fill="${LIGHT}" opacity="0.45"/>
+      <rect x="32" y="89" width="64" height="11" rx="5.5" fill="${LIGHT}" opacity="0.45"/>
+      ${glyph(0.80, WHITE)}`
+  }
+];
+
+const SIZES = [128, 48, 32, 16];
+const BACKDROPS = [
+  { cls: 'light',  label: 'light' },
+  { cls: 'chrome', label: 'toolbar grey' },
+  { cls: 'dark',   label: 'dark' }
+];
+
+document.getElementById('out').innerHTML = DIRECTIONS.map(d => `
+  <div class="card">
+    <h2>${d.key} &middot; ${d.name}</h2>
+    <p>${d.desc}</p>
+    <div class="rows">
+      ${BACKDROPS.map(b => `
+        <div class="strip ${b.cls}">
+          ${SIZES.map(s => `
+            <div class="cell">
+              <svg width="${s}" height="${s}" viewBox="0 0 128 128">${d.svg()}</svg>
+              <span>${s}</span>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>
+    <p class="note"><b>Trade-off:</b> ${d.note}</p>
+  </div>`).join('');
+</script>
+
+</body>
+</html>

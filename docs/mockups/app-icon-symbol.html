@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SF Tabs — symbol alternatives</title>
+<style>
+  :root { --ink:#181818; --grey:#5c5c5c; --hair:#e5e5e5; --blue:#0250d9; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:40px; font:14px/1.5 -apple-system,"Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f8f8f8; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .sub { color:var(--grey); margin:0 0 28px; max-width:82ch; }
+
+  .card { background:#fff; border:1px solid var(--hair); border-radius:12px; padding:20px 24px; margin-bottom:18px; }
+  .card.control { background:#fcfcfc; }
+  .card.pick { border-color:var(--blue); box-shadow:0 0 0 3px #d6e6ff; }
+  .card h2 { font-size:15px; margin:0 0 2px; }
+  .card h2 em { font-style:normal; color:var(--grey); font-weight:400; font-size:13px; }
+  .card .means { margin:0 0 14px; font-size:13px; color:var(--grey); max-width:72ch; }
+
+  .rows { display:flex; gap:24px; flex-wrap:wrap; align-items:flex-end; }
+  .strip { display:flex; gap:14px; align-items:flex-end; padding:14px 18px; border-radius:10px; }
+  .strip.light { background:#f3f3f3; }
+  .strip.dark  { background:#1a1a1a; }
+  .cell { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .cell span { font-size:10px; color:var(--grey); font-variant-numeric:tabular-nums; }
+  .strip.dark .cell span { color:#9a9a9a; }
+  .cell.hero span { font-weight:600; color:var(--ink); }
+
+  .verdict { font-size:12px; color:var(--grey); border-top:1px solid var(--hair); margin-top:14px; padding-top:12px; }
+  .verdict b { color:var(--ink); font-weight:600; }
+  .toolbar { display:flex; align-items:center; gap:10px; background:#dee1e6; padding:9px 14px; border-radius:8px; margin-top:10px; width:max-content; }
+  .toolbar .dot { width:16px; height:16px; border-radius:50%; background:#9aa0a6; }
+
+  .rejected { background:#fff; border:1px dashed #c9c9c9; border-radius:12px; padding:18px 24px; color:var(--grey); font-size:13px; }
+  .rejected h2 { font-size:15px; margin:0 0 8px; color:var(--ink); }
+  .rejected li { margin-bottom:6px; }
+</style>
+</head>
+<body>
+
+<h1>SF Tabs — is there a better symbol?</h1>
+<p class="sub">All in the A4 treatment: <code>#0250d9</code> squircle, white glyph, bold weight. The control is the current arrow&rarr;bar. Judge at 16&nbsp;px first — the toolbar strip under each card is actual size.</p>
+
+<div id="out"></div>
+
+<script>
+const BLUE = '#0250d9', W = '#fff';
+
+// Rounded-top tab: square at the bottom, radius r on the top two corners.
+function tab(x0, x1, yTop, yBot, r, fill = W, opacity = 1) {
+  return `<path d="M${x0} ${yBot} L${x0} ${yTop + r} Q${x0} ${yTop} ${x0 + r} ${yTop}
+    L${x1 - r} ${yTop} Q${x1} ${yTop} ${x1} ${yTop + r} L${x1} ${yBot} Z"
+    fill="${fill}" opacity="${opacity}"/>`;
+}
+function plus(cx, cy, len, th, fill) {
+  const h = len / 2, t = th / 2;
+  return `<rect x="${cx - h}" y="${cy - t}" width="${len}" height="${th}" rx="${t}" fill="${fill}"/>
+          <rect x="${cx - t}" y="${cy - h}" width="${th}" height="${len}" rx="${t}" fill="${fill}"/>`;
+}
+
+const SYMBOLS = [
+  {
+    key: 'S0', name: 'Arrow &rarr; bar', control: true,
+    label: 'the current mark (A4 weight)',
+    means: 'Reads as the Tab key: “advance to the next field.” A pun on the word “tab” rather than a picture of the product.',
+    verdict: 'Cleanest at 16px of anything here, and it is what your users already recognise. The equity is real — that is the argument for keeping it.',
+    art: () => `
+      <rect x="8" y="39.5" width="41" height="21" rx="10.5" fill="${W}"/>
+      <path d="M45 21 L74 50 L45 79 Z" fill="${W}"/>
+      <rect x="84" y="21" width="16" height="58" rx="8" fill="${W}"/>`,
+    scale: 1.0, cx: 54
+  },
+  {
+    key: 'S1', name: 'Tab bar, one active',
+    label: 'a row of tabs with the current one selected',
+    means: 'Depicts the actual surface SF Tabs creates — the tab strip in the setup menu — with one tab active, distinguished by opacity. Tops are level on purpose: unequal heights read as a bar chart.',
+    verdict: 'The purest idea here — the only mark that shows what the product <i>is</i> rather than punning on its name. But three shapes plus a baseline is more than 16px can hold, and a row of blocks is not especially distinctive. Choose it for a clean break, not for legibility.',
+    // Wide and short, all tops level: unequal heights read as a bar chart.
+    // The active tab is distinguished by opacity alone.
+    art: () => `
+      ${tab(20, 46.5, 54, 88, 6, W, 0.42)}
+      ${tab(50.5, 77, 54, 88, 6, W, 1)}
+      ${tab(81, 107.5, 54, 88, 6, W, 0.42)}
+      <rect x="20" y="88" width="87.5" height="11" rx="5.5" fill="${W}"/>`
+  },
+  {
+    key: 'S2', name: 'Tab + plus',
+    label: 'add the current page as a tab',
+    means: 'Shows the core action rather than the object: capture where you are as a new tab. The plus is knocked out of the tab in blue.',
+    verdict: 'Strong, unambiguous action semantics. But it advertises one feature — adding — when v3 is equally about profiles, colours, and org switching.',
+    // The tab must be clearly narrower than its baseline, or the two merge
+    // into one rounded square and the tab silhouette disappears.
+    art: () => `
+      ${tab(30, 98, 34, 92, 10, W, 1)}
+      <rect x="20" y="92" width="88" height="11" rx="5.5" fill="${W}"/>
+      ${plus(64, 63, 34, 10, BLUE)}`
+  },
+  {
+    key: 'S3', name: 'Index tab (folder)',
+    label: 'the original, pre-browser meaning of “tab”',
+    means: 'A page with a protruding index tab — the filing-cabinet metaphor every browser tab descends from. Says “organised, labelled, quick to find.”',
+    verdict: 'Distinctive and warmer than the geometric options. Risks reading as a generic “file” or “folder” icon, which is a crowded space in any toolbar.',
+    art: () => `
+      ${tab(30, 64, 28, 46, 6, W, 1)}
+      <rect x="24" y="44" width="80" height="58" rx="10" fill="${W}"/>`
+  },
+  {
+    key: 'S4', name: 'Arrow into a tab', pick: true,
+    label: 'hybrid — keeps the arrow, fixes the target',
+    means: 'Keeps your existing arrow equity, but the bar it points into becomes an actual tab sitting on a baseline instead of a keyboard tab stop. “Jump straight to this tab.” The baseline is load-bearing: without it the mark reads as a sign-in door.',
+    verdict: 'The best balance on offer. The arrow still carries the mark at 16px, so legibility barely drops from S0, while the target now depicts a tab instead of a keystroke. Recognisably an evolution of today’s icon rather than a replacement — and it keeps your equity.',
+    // Without a baseline the target is just a rounded box and the whole mark
+    // reads as a sign-in / exit door. The baseline is what makes it a tab.
+    art: () => `
+      <rect x="14" y="51" width="30" height="20" rx="10" fill="${W}"/>
+      <path d="M40 37 L68 61 L40 85 Z" fill="${W}"/>
+      ${tab(76, 104, 30, 92, 8, W, 1)}
+      <rect x="70" y="92" width="40" height="10" rx="5" fill="${W}"/>`,
+    cx: 62
+  },
+  {
+    key: 'S5', name: 'Stacked tabs',
+    label: 'many tabs, many profiles',
+    means: 'Overlapping tabbed cards, nodding at profiles and multiple orgs — the thing v3 leans on most heavily.',
+    verdict: 'Carries the most meaning and the least legibility. At 16px the offset layers collapse into a single white smudge. Included to rule it out honestly.',
+    art: () => `
+      ${tab(20, 84, 24, 76, 7, W, 0.4)}
+      ${tab(34, 98, 40, 92, 7, W, 0.65)}
+      ${tab(48, 112, 56, 104, 7, W, 1)}`,
+    cx: 66
+  }
+];
+
+const SIZES = [16, 20, 24, 32, 48, 128];
+
+function tile(s) {
+  const scale = s.scale || 1;
+  const cx = s.cx || 64;
+  const t = `translate(${(64 - cx * scale).toFixed(2)} ${(64 - 64 * scale).toFixed(2)}) scale(${scale})`;
+  return `<svg viewBox="0 0 128 128">
+    <rect width="128" height="128" rx="30" fill="${BLUE}"/>
+    <g transform="${t}">${s.art()}</g>
+  </svg>`;
+}
+
+document.getElementById('out').innerHTML = SYMBOLS.map(s => {
+  const svg = tile(s);
+  const at = n => `<div class="cell${n === 16 ? ' hero' : ''}">${svg.replace('<svg', `<svg width="${n}" height="${n}"`)}<span>${n}</span></div>`;
+  const cls = s.control ? ' control' : (s.pick ? ' pick' : '');
+  return `
+  <div class="card${cls}">
+    <h2>${s.key} &middot; ${s.name} <em>&mdash; ${s.label}</em></h2>
+    <p class="means">${s.means}</p>
+    <div class="rows">
+      ${['light','dark'].map(bg => `<div class="strip ${bg}">${SIZES.map(at).join('')}</div>`).join('')}
+    </div>
+    <div class="verdict">
+      <b>Verdict:</b> ${s.verdict}
+      <div class="toolbar">
+        <div class="dot"></div><div class="dot"></div>
+        ${svg.replace('<svg', '<svg width="16" height="16"')}
+        <div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>`;
+}).join('') + `
+  <div class="rejected">
+    <h2>Ruled out before drawing</h2>
+    <ul>
+      <li><b>Star or bookmark</b> — Salesforce Favorites already owns the star, and SF Tabs sits directly beside it in the header. Guaranteed confusion.</li>
+      <li><b>2&times;2 or 3&times;3 grid of squares</b> — that is the App Launcher waffle. Same reason.</li>
+      <li><b>Lightning bolt</b> — SLDS-adjacent, overused, and says “fast” rather than “tabs.”</li>
+      <li><b>Pin</b> — you already ship a pin icon inside the UI (<code>icons/slds/pin.svg</code>); reusing it as the app mark would blur the two.</li>
+      <li><b>Wordmark or monogram (“SF”, “T”)</b> — illegible at 16px, and “SF” invites trademark trouble.</li>
+    </ul>
+  </div>`;
+</script>
+
+</body>
+</html>

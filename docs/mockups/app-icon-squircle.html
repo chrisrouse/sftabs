@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SF Tabs — squircle icon, glyph sizing</title>
+<style>
+  :root { --ink:#181818; --grey:#5c5c5c; --hair:#e5e5e5; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:40px;
+    font:14px/1.5 -apple-system,"Segoe UI",system-ui,sans-serif;
+    color:var(--ink); background:#f8f8f8;
+  }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .sub { color:var(--grey); margin:0 0 28px; max-width:78ch; }
+
+  .card { background:#fff; border:1px solid var(--hair); border-radius:12px; padding:20px 24px; margin-bottom:18px; }
+  .card.pick { border-color:#0250d9; box-shadow:0 0 0 3px #d6e6ff; }
+  .card h2 { font-size:15px; margin:0 0 2px; }
+  .card h2 em { font-style:normal; color:var(--grey); font-weight:400; }
+  .card p { margin:0 0 16px; color:var(--grey); font-size:13px; max-width:70ch; }
+
+  .rows { display:flex; gap:26px; flex-wrap:wrap; align-items:flex-end; }
+  .strip { display:flex; gap:16px; align-items:flex-end; padding:14px 18px; border-radius:10px; }
+  .strip.light  { background:#f3f3f3; }
+  .strip.chrome { background:#dee1e6; }
+  .strip.dark   { background:#1a1a1a; }
+  .cell { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .cell span { font-size:10px; color:var(--grey); font-variant-numeric:tabular-nums; }
+  .strip.dark .cell span { color:#9a9a9a; }
+  .cell.hero span { font-weight:600; color:var(--ink); }
+
+  .metrics { font-size:12px; color:var(--grey); border-top:1px solid var(--hair); margin-top:16px; padding-top:12px; }
+  .metrics b { color:var(--ink); font-weight:600; }
+
+  .toolbar { display:flex; align-items:center; gap:10px; background:#dee1e6; padding:10px 14px; border-radius:8px; margin-top:10px; }
+  .toolbar .dot { width:16px; height:16px; border-radius:50%; background:#9aa0a6; }
+</style>
+</head>
+<body>
+
+<h1>Direction A — squircle, glyph sizing</h1>
+<p class="sub">Same tile and colour throughout; only the glyph's <b>scale</b> and <b>stroke weight</b> change. Small sizes come first, because the toolbar renders at 16&nbsp;px far more than anywhere else. A1 is the size from the first round, for reference.</p>
+
+<div id="out"></div>
+
+<script>
+const BLUE = '#0250d9', WHITE = '#fff';
+
+// Parametric arrow+bar. All coordinates live in a 100-unit space; the builder
+// returns both the markup and its true bbox so centring stays honest as the
+// weight changes.
+function mark({ shaftH, headHalf, tipX = 74, gap, barW, barH }) {
+  const left = 8;
+  const headBase = tipX - headHalf;          // 45-degree head, so run == rise
+  const barX = tipX + gap;
+  const shaftY = 50 - shaftH / 2;
+  const body = `
+    <rect x="${left}" y="${shaftY}" width="${headBase - left + 4}" height="${shaftH}" rx="${shaftH / 2}"/>
+    <path d="M${headBase} ${50 - headHalf} L${tipX} 50 L${headBase} ${50 + headHalf} Z"/>
+    <rect x="${barX}" y="${50 - barH / 2}" width="${barW}" height="${barH}" rx="${barW / 2}"/>`;
+  return { body, cx: (left + barX + barW) / 2, right: barX + barW };
+}
+
+const WEIGHTS = {
+  regular: { shaftH: 16, headHalf: 25, gap: 10, barW: 13, barH: 52 },
+  bold:    { shaftH: 21, headHalf: 29, gap: 10, barW: 16, barH: 58 }
+};
+
+function tile(scale, weight) {
+  const m = mark(WEIGHTS[weight]);
+  const t = `translate(${64 - scale * m.cx} ${64 - scale * 50}) scale(${scale})`;
+  return `<svg viewBox="0 0 128 128">
+    <rect width="128" height="128" rx="30" fill="${BLUE}"/>
+    <g transform="${t}" fill="${WHITE}" stroke="${WHITE}">${m.body}</g>
+  </svg>`;
+}
+
+// Glyph width as a share of the tile, the number that actually predicts 16px legibility.
+function coverage(scale, weight) {
+  const m = mark(WEIGHTS[weight]);
+  return Math.round(((m.right - 8) * scale / 128) * 100);
+}
+
+const OPTIONS = [
+  { key:'A1', name:'0.86 regular', scale:0.86, weight:'regular',
+    desc:'The size shown in the first round. Included only as a baseline to judge the others against.' },
+  { key:'A2', name:'1.00 regular', scale:1.00, weight:'regular',
+    desc:'Glyph pushed out to the tile edges with the original stroke weight. Bigger, but the shaft and bar are still thin.' },
+  { key:'A3', name:'1.10 regular', scale:1.10, weight:'regular',
+    desc:'About as far as scaling alone can go before the bar crowds the rounded corner.' },
+  { key:'A4', name:'1.00 bold', scale:1.00, weight:'bold', pick:true,
+    desc:'Thicker shaft, taller bar, chunkier head at a moderate scale. Weight rather than size is what survives downsampling to 16px.' },
+  { key:'A5', name:'1.10 bold', scale:1.10, weight:'bold',
+    desc:'Both dialled up. The most forceful of the set — watch whether it starts to feel cramped inside the tile.' }
+];
+
+document.getElementById('out').innerHTML = OPTIONS.map(o => {
+  const svg = tile(o.scale, o.weight);
+  const at = s => `<div class="cell${s === 16 ? ' hero' : ''}">${svg.replace('<svg', `<svg width="${s}" height="${s}"`)}<span>${s}</span></div>`;
+  return `
+  <div class="card${o.pick ? ' pick' : ''}">
+    <h2>${o.key} &middot; ${o.name} <em>&mdash; glyph spans ${coverage(o.scale, o.weight)}% of the tile</em></h2>
+    <p>${o.desc}</p>
+    <div class="rows">
+      ${['light','chrome','dark'].map(bg => `
+        <div class="strip ${bg}">${[16,20,24,32,48,128].map(at).join('')}</div>`).join('')}
+    </div>
+    <div class="metrics">
+      <b>In a toolbar, actual size:</b>
+      <div class="toolbar">
+        <div class="dot"></div><div class="dot"></div>
+        ${svg.replace('<svg', '<svg width="16" height="16"')}
+        <div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>`;
+}).join('');
+</script>
+
+</body>
+</html>

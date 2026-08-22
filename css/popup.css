@@ -176,8 +176,8 @@ a:hover { text-decoration: underline; }
 .brand-logo {
   width: 22px;
   height: 22px;
-  /* Single-color mark, so this is an exact white */
-  filter: brightness(0) invert(1);
+  /* No filter: the asset is already white (sftabs_v3_arrow_white.svg), which
+     is what reads on the brand-blue header behind it. */
 }
 
 .brand-name {

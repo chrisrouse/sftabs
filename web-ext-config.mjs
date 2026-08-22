@@ -84,7 +84,36 @@ export default {
     // Referenced only by the GitHub Pages site under docs/, which is itself
     // excluded above.
     'icons/invert.png',
-    'icons/sftabs_blue.svg'
+    'icons/sftabs_blue.svg',
+
+    // The v3 icon exploration. Every candidate that lost, plus the vector
+    // sources the shipped PNGs were rendered from. Kept in the repo as the
+    // record of how the mark was arrived at; none is loaded at runtime.
+    //
+    // What DOES ship, for reference: sftabs_v3_full_{16,32,48,96,128}.png
+    // (manifest icons + action), sftabs_v3_arrow_white.svg (popup header),
+    // sftabs-logo.svg (settings topbar, floating modal), and invert.svg +
+    // sftabs-icon-16.png (web_accessible_resources).
+    'icons/1.svg',
+    'icons/2.svg',
+    'icons/3.svg',
+    'icons/sftabsv3icon.svg',
+    'icons/sftabsv3icon_*.png',
+    'icons/sftabs-v3-*.png',
+    'icons/sftabs_v3_300x300.png',
+    'icons/sftabs_v3_300x300.svg',
+    'icons/sftabs_v3_stripes_300x300.svg',
+    'icons/sftabs_v3_arrow_blue.png',
+    'icons/sftabs_v3_arrow_blue.svg',
+    // The white arrow's .svg ships; only its .png is redundant.
+    'icons/sftabs_v3_arrow_white.png',
+    // Vector sources for the shipped raster set — not the set itself.
+    'icons/sftabs_v3_full.png',
+    'icons/sftabs_v3_full.svg',
+    // Superseded by the sftabs_v3_full_* set. The 16 still ships: it is named
+    // in web_accessible_resources, though nothing currently loads it.
+    'icons/sftabs-icon-48.png',
+    'icons/sftabs-icon-96.png'
   ],
 
   // Build configuration
