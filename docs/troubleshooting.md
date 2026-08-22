@@ -1,6 +1,9 @@
 ---
-layout: default
+layout: v3
 title: Troubleshooting
+description: Fixes for the most common SF Tabs issues, from missing tabs to storage and profile switching problems.
+redirect_from:
+  - /v3/troubleshooting
 ---
 
 # Troubleshooting
@@ -23,6 +26,22 @@ title: Troubleshooting
 - Check that the extension has storage permissions
 - Try disabling and re-enabling the extension
 - Clear browser cache and restart
+
+## The org banner or tab icon color isn't showing
+
+Check that the feature is switched on in Settings > Org Colors, and that the banner's location setting covers the page you are on.
+
+## Switching profiles doesn't stick
+
+If Auto-Switch Profiles is on and the current org is linked to a profile, auto-switch decides which profile is used there and the switcher is locked, showing a note naming that profile. See [Profiles]({{ '/profiles' | relative_url }}).
+
+## The header menu or floating button isn't there
+
+Both are off by default and are enabled in Settings > Button. See [Quick Access]({{ '/quick-access' | relative_url }}).
+
+## Running out of storage
+
+Sync storage is small; switch to Local in Settings > Data if you have a lot of tabs. See [Import & Export]({{ '/import-export' | relative_url }}) to back up your data first.
 
 ## Still having issues?
 

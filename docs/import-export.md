@@ -2,6 +2,8 @@
 layout: v3
 title: Import & Export
 description: Back up, share, or migrate your SF Tabs configuration, and choose where your data is stored.
+redirect_from:
+  - /v3/import-export
 ---
 
 # Import & Export

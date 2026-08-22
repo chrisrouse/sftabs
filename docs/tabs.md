@@ -2,6 +2,8 @@
 layout: v3
 title: Tabs
 description: Edit, reorder, color, delete and organize your SF Tabs into dropdown menus.
+redirect_from:
+  - /v3/tabs
 ---
 
 # Tabs
@@ -12,8 +14,8 @@ There are several ways to add new tabs.
 ### From the SF Tabs popup
 1. Click on the ﹢ button to use Quick Add. This captures your current page and sets the correct defaults for you. You can then edit the tab further.
 2. Click on the ⊕ to manually add a tab or a folder.
-3. If you have enabled the [header menu]({{ '/v3/quick-access' | relative_url }}#the-header-menu) you can click on the bookmark icon to add the current page.
-4. If you have enabled [Quick Add in the Setup tab bar]({{ '/v3/quick-access' | relative_url }}#quick-add-in-the-setup-tab-bar) you can click on the + there.
+3. If you have enabled the [header menu]({{ '/quick-access' | relative_url }}#the-header-menu) you can click on the bookmark icon to add the current page.
+4. If you have enabled [Quick Add in the Setup tab bar]({{ '/quick-access' | relative_url }}#quick-add-in-the-setup-tab-bar) you can click on the + there.
 
 ## Editing Tabs
 
@@ -61,7 +63,7 @@ Links to any Lightning URL path within Salesforce.
 
 ## Profile Membership
 
-If you have [profiles]({{ '/v3/profiles' | relative_url }}) enabled, the edit form includes a checkbox for each profile. Tick the profiles a tab should belong to — a tab can belong to more than one profile at the same time.
+If you have [profiles]({{ '/profiles' | relative_url }}) enabled, the edit form includes a checkbox for each profile. Tick the profiles a tab should belong to — a tab can belong to more than one profile at the same time.
 
 <img width="770" height="857" alt="sftabs-edit-tab" src="https://github.com/user-attachments/assets/34c78b4d-44cf-4eac-b217-51d1e552419d" />
 
@@ -130,7 +132,7 @@ When you create a tab that links to an Object Manager page, you can create a dro
    Go to any object in Salesforce (e.g., Setup → Object Manager → Account).
 
 2. **Add the current page as a tab**
-   Use one of the ways to add a tab described in [Getting Started]({{ '/v3/getting-started' | relative_url }}).
+   Use Quick Add in the popup, or any of the other ways to capture a page described in [Quick Access]({{ '/quick-access' | relative_url }}).
 
 3. **Open the tab hierarchy settings**
    The hierarchy icon is the one to the left of the pencil.

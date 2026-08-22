@@ -534,13 +534,13 @@
 
 {%- assign here = page.url | remove: '.html' -%}
 <header class="v3-header">
-  <a class="v3-brand" href="{{ '/v3/' | relative_url }}">
+  <a class="v3-brand" href="{{ '/' | relative_url }}">
     <img src="{{ '/assets/images/icons/sftabsv3icon.svg' | relative_url }}" alt="" aria-hidden="true">
     <span>SF Tabs</span>
     <span class="v3-badge">v{{ site.v3_version }}</span>
   </a>
   <nav class="v3-nav" aria-label="Documentation">
-    <a href="{{ '/v3/' | relative_url }}"{% if here == '/v3/' %} aria-current="page"{% endif %}>Home</a>
+    <a href="{{ '/' | relative_url }}"{% if here == '/' %} aria-current="page"{% endif %}>Home</a>
     {%- for s in site.data.v3_sections -%}
       {%- if s.ready %}
     <a href="{{ s.url | relative_url }}"{% if here == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
@@ -555,14 +555,14 @@
   {%- if site.v3_in_review %}
   <div class="v3-notice">
     <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-    <p><strong>Version 3 is in review at the browser stores.</strong> These pages describe 3.0. If you are running {{ site.v2_version }} from the Chrome Web Store or Firefox Add-ons, the <a href="{{ '/' | relative_url }}">version 2 documentation</a> is the one you want &mdash; or install 3.0 early from the <a href="https://github.com/chrisrouse/sftabs/releases/tag/v{{ site.v3_version }}">GitHub release</a>.</p>
+    <p><strong>Version 3 is in review at the browser stores.</strong> These pages describe 3.0. If you are running {{ site.v2_version }} from the Chrome Web Store or Firefox Add-ons, the <a href="{{ '/v2/' | relative_url }}">version 2 documentation</a> is the one you want &mdash; or install 3.0 early from the <a href="https://github.com/chrisrouse/sftabs/releases/tag/v{{ site.v3_version }}">GitHub release</a>.</p>
   </div>
   {%- endif %}
 
   <div class="v3-body">
     <nav class="v3-side" aria-label="Sections">
       <span class="v3-side-label">Documentation</span>
-      <a class="v3-siderow" href="{{ '/v3/' | relative_url }}"{% if here == '/v3/' %} aria-current="page"{% endif %}>Home</a>
+      <a class="v3-siderow" href="{{ '/' | relative_url }}"{% if here == '/' %} aria-current="page"{% endif %}>Home</a>
       {%- for s in site.data.v3_sections %}
         {%- if s.ready %}
       <a class="v3-siderow" href="{{ s.url | relative_url }}"{% if here == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
@@ -588,7 +588,7 @@
   <div class="v3-footer-inner">
     <div>SF Tabs v{{ site.v3_version }} &middot; documentation for version 3</div>
     <div class="v3-footer-links">
-      <a href="{{ '/' | relative_url }}">Version 2 docs</a>
+      <a href="{{ '/v2/' | relative_url }}">Version 2 docs</a>
       <a href="{{ site.github.repository_url }}">GitHub</a>
       <a href="{{ site.github.issues_url }}">Report an issue</a>
     </div>

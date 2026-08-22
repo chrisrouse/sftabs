@@ -2,6 +2,8 @@
 layout: v3
 title: Org Colors
 description: Color-code your browser tab icon and add a page banner so production and sandbox never look the same.
+redirect_from:
+  - /v3/org-colors
 ---
 
 # Org Colors
@@ -72,4 +74,4 @@ Org Colors works on every Salesforce host the extension runs on, including Exper
 
 If you installed a separate extension purely to color your orgs, you no longer need it — Org Colors covers the tab icon and the page banner in one place.
 
-See [Settings]({{ '/v3/settings' | relative_url }}) for where these options live, and [Quick Access]({{ '/v3/quick-access' | relative_url }}) for the floating button's shared location setting.
+See [Settings]({{ '/settings' | relative_url }}) for where these options live, and [Quick Access]({{ '/quick-access' | relative_url }}) for the floating button's shared location setting.

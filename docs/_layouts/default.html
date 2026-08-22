@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ page.title }} | {{ site.title }}</title>
+    <title>{{ page.title }} | {{ site.title }} {{ site.v2_version }}</title>
     <meta name="description" content="{{ page.description | default: site.description }}">
+
+    <!-- These are the superseded v2 pages, retained under /v2/ only so old links
+         and bookmarks still resolve. Keep them out of search results so they
+         cannot outrank the current docs at the site root. -->
+    <meta name="robots" content="noindex, follow">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -40,7 +45,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-primary sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="{{ '/' | relative_url }}" style="text-decoration: none !important;">
+            <a class="navbar-brand d-flex align-items-center" href="{{ '/v2/' | relative_url }}" style="text-decoration: none !important;">
                 <img src="{{ '/assets/images/invert.png' | relative_url }}" alt="SF Tabs Logo" class="navbar-logo me-2">
                 <strong>SF Tabs</strong>
                 <span class="badge bg-success text-light ms-2" style="font-size: 0.8rem; vertical-align: middle;">2.1.1</span>
@@ -52,22 +57,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">
+                        <a class="nav-link{% if page.url == '/v2/' %} active{% endif %}" href="{{ '/v2/' | relative_url }}">
                             <i class="bi bi-house-fill me-1"></i>Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link{% if page.url contains 'installation' %} active{% endif %}" href="{{ '/installation' | relative_url }}">
+                        <a class="nav-link{% if page.url contains 'installation' %} active{% endif %}" href="{{ '/v2/installation' | relative_url }}">
                             <i class="bi bi-download me-1"></i>Installation
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link{% if page.url contains 'new-features' %} active{% endif %}" href="{{ '/new-features' | relative_url }}">
+                        <a class="nav-link{% if page.url contains 'new-features' %} active{% endif %}" href="{{ '/v2/new-features' | relative_url }}">
                             <i class="bi bi-stars me-1"></i>New Features
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link{% if page.url contains 'getting-started' or page.url contains 'managing-tabs' or page.url contains 'profiles' or page.url contains 'settings' or page.url contains 'keyboard-shortcuts' or page.url contains 'upgrading' or page.url contains 'translations' or page.url contains 'troubleshooting' or page.url contains 'beta' %} active{% endif %}" href="{{ '/getting-started' | relative_url }}">
+                        <a class="nav-link{% if page.url contains 'getting-started' or page.url contains 'managing-tabs' or page.url contains 'profiles' or page.url contains 'settings' or page.url contains 'keyboard-shortcuts' or page.url contains 'upgrading' or page.url contains 'translations' or page.url contains 'troubleshooting' or page.url contains 'beta' %} active{% endif %}" href="{{ '/v2/getting-started' | relative_url }}">
                             <i class="bi bi-book-fill me-1"></i>User Guide
                         </a>
                     </li>
@@ -79,7 +84,7 @@
                 </ul>
             </div>
         </div>
-        {% if page.url != '/' %}
+        {% if page.url != '/v2/' %}
         <!-- Mobile Menu Button (only visible on mobile for doc pages) -->
         <div class="container-fluid d-lg-none border-top" style="background-color: #c2deff; border-color: rgba(0,0,0,0.1) !important;">
             <button class="btn btn-outline-dark btn-sm my-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-controls="mobileNav">
@@ -90,7 +95,7 @@
     </nav>
 
     <!-- Mobile Navigation (only on documentation pages) -->
-    {% if page.url != '/' %}
+    {% if page.url != '/v2/' %}
     <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileNav" aria-labelledby="mobileNavLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="mobileNavLabel">User Guide</h5>
@@ -120,13 +125,13 @@
                         <div class="collapse" id="mobileGettingStarted">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/getting-started#opening-the-extension' | relative_url }}">Opening the Extension</a>
+                                    <a class="nav-link" href="{{ '/v2/getting-started#opening-the-extension' | relative_url }}">Opening the Extension</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/getting-started#adding-a-new-tab' | relative_url }}">Adding a New Tab</a>
+                                    <a class="nav-link" href="{{ '/v2/getting-started#adding-a-new-tab' | relative_url }}">Adding a New Tab</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/getting-started#tab-types' | relative_url }}">Tab Types</a>
+                                    <a class="nav-link" href="{{ '/v2/getting-started#tab-types' | relative_url }}">Tab Types</a>
                                 </li>
                             </ul>
                         </div>
@@ -140,22 +145,22 @@
                         <div class="collapse" id="mobileManagingTabs">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#editing-tabs' | relative_url }}">Editing Tabs</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#editing-tabs' | relative_url }}">Editing Tabs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#reordering-tabs' | relative_url }}">Reordering Tabs</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#reordering-tabs' | relative_url }}">Reordering Tabs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#open-in-new-tab' | relative_url }}">Open in New Tab</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#open-in-new-tab' | relative_url }}">Open in New Tab</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#deleting-tabs' | relative_url }}">Deleting Tabs</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#deleting-tabs' | relative_url }}">Deleting Tabs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#creating-dropdown-menus' | relative_url }}">Creating Dropdown Menus</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#creating-dropdown-menus' | relative_url }}">Creating Dropdown Menus</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#floating-button' | relative_url }}">Floating Button</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#floating-button' | relative_url }}">Floating Button</a>
                                 </li>
                             </ul>
                         </div>
@@ -169,10 +174,10 @@
                         <div class="collapse" id="mobileKeyboardShortcuts">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/keyboard-shortcuts#setting-up-shortcuts-in-firefox' | relative_url }}">Setting Up Shortcuts in Firefox</a>
+                                    <a class="nav-link" href="{{ '/v2/keyboard-shortcuts#setting-up-shortcuts-in-firefox' | relative_url }}">Setting Up Shortcuts in Firefox</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/keyboard-shortcuts#setting-up-shortcuts-in-chrome' | relative_url }}">Setting Up Shortcuts in Chrome</a>
+                                    <a class="nav-link" href="{{ '/v2/keyboard-shortcuts#setting-up-shortcuts-in-chrome' | relative_url }}">Setting Up Shortcuts in Chrome</a>
                                 </li>
                             </ul>
                         </div>
@@ -186,19 +191,19 @@
                         <div class="collapse" id="mobileSettings">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/settings#general' | relative_url }}">General</a>
+                                    <a class="nav-link" href="{{ '/v2/settings#general' | relative_url }}">General</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/settings#floating-button' | relative_url }}">Floating Button</a>
+                                    <a class="nav-link" href="{{ '/v2/settings#floating-button' | relative_url }}">Floating Button</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/settings#keyboard-shortcuts' | relative_url }}">Keyboard Shortcuts</a>
+                                    <a class="nav-link" href="{{ '/v2/settings#keyboard-shortcuts' | relative_url }}">Keyboard Shortcuts</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/settings#data' | relative_url }}">Data</a>
+                                    <a class="nav-link" href="{{ '/v2/settings#data' | relative_url }}">Data</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/settings#import-export-configuration' | relative_url }}">Import/Export Configuration</a>
+                                    <a class="nav-link" href="{{ '/v2/settings#import-export-configuration' | relative_url }}">Import/Export Configuration</a>
                                 </li>
                             </ul>
                         </div>
@@ -212,22 +217,22 @@
                         <div class="collapse" id="mobileProfiles">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/profiles#enabling-profiles' | relative_url }}">Enabling Profiles</a>
+                                    <a class="nav-link" href="{{ '/v2/profiles#enabling-profiles' | relative_url }}">Enabling Profiles</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/profiles#creating-a-profile' | relative_url }}">Creating a Profile</a>
+                                    <a class="nav-link" href="{{ '/v2/profiles#creating-a-profile' | relative_url }}">Creating a Profile</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/profiles#switching-profiles' | relative_url }}">Switching Profiles</a>
+                                    <a class="nav-link" href="{{ '/v2/profiles#switching-profiles' | relative_url }}">Switching Profiles</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/profiles#managing-profiles' | relative_url }}">Managing Profiles</a>
+                                    <a class="nav-link" href="{{ '/v2/profiles#managing-profiles' | relative_url }}">Managing Profiles</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/profiles#best-practices' | relative_url }}">Best Practices</a>
+                                    <a class="nav-link" href="{{ '/v2/profiles#best-practices' | relative_url }}">Best Practices</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/profiles#disabling-profiles' | relative_url }}">Disabling Profiles</a>
+                                    <a class="nav-link" href="{{ '/v2/profiles#disabling-profiles' | relative_url }}">Disabling Profiles</a>
                                 </li>
                             </ul>
                         </div>
@@ -241,13 +246,13 @@
                         <div class="collapse" id="mobileUpgrading">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/upgrading#migration-wizard' | relative_url }}">Migration Wizard</a>
+                                    <a class="nav-link" href="{{ '/v2/upgrading#migration-wizard' | relative_url }}">Migration Wizard</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/upgrading#what-gets-migrated' | relative_url }}">What Gets Migrated</a>
+                                    <a class="nav-link" href="{{ '/v2/upgrading#what-gets-migrated' | relative_url }}">What Gets Migrated</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/upgrading#important-notes' | relative_url }}">Important Notes</a>
+                                    <a class="nav-link" href="{{ '/v2/upgrading#important-notes' | relative_url }}">Important Notes</a>
                                 </li>
                             </ul>
                         </div>
@@ -261,13 +266,13 @@
                         <div class="collapse" id="mobileTranslations">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/translations#available-languages' | relative_url }}">Available Languages</a>
+                                    <a class="nav-link" href="{{ '/v2/translations#available-languages' | relative_url }}">Available Languages</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/translations#contributing-translations' | relative_url }}">Contributing Translations</a>
+                                    <a class="nav-link" href="{{ '/v2/translations#contributing-translations' | relative_url }}">Contributing Translations</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/translations#request-a-language' | relative_url }}">Request a Language</a>
+                                    <a class="nav-link" href="{{ '/v2/translations#request-a-language' | relative_url }}">Request a Language</a>
                                 </li>
                             </ul>
                         </div>
@@ -281,16 +286,16 @@
                         <div class="collapse" id="mobileTroubleshooting">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/troubleshooting#tabs-not-appearing-in-salesforce' | relative_url }}">Tabs Not Appearing</a>
+                                    <a class="nav-link" href="{{ '/v2/troubleshooting#tabs-not-appearing-in-salesforce' | relative_url }}">Tabs Not Appearing</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/troubleshooting#tab-links-not-working' | relative_url }}">Tab Links Not Working</a>
+                                    <a class="nav-link" href="{{ '/v2/troubleshooting#tab-links-not-working' | relative_url }}">Tab Links Not Working</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/troubleshooting#settings-not-saving' | relative_url }}">Settings Not Saving</a>
+                                    <a class="nav-link" href="{{ '/v2/troubleshooting#settings-not-saving' | relative_url }}">Settings Not Saving</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/troubleshooting#still-having-issues' | relative_url }}">Still Having Issues?</a>
+                                    <a class="nav-link" href="{{ '/v2/troubleshooting#still-having-issues' | relative_url }}">Still Having Issues?</a>
                                 </li>
                             </ul>
                         </div>
@@ -298,7 +303,7 @@
 
                     <!-- Install Beta -->
                     <div class="mobile-nav-section">
-                        <a class="mobile-nav-toggle" href="{{ '/beta' | relative_url }}">
+                        <a class="mobile-nav-toggle" href="{{ '/v2/beta' | relative_url }}">
                             <span class="me-1" style="display: inline-block; width: 0.875rem;"></span><i class="bi bi-flask me-2"></i>Install Beta
                         </a>
                     </div>
@@ -312,7 +317,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar (only on documentation pages) -->
-            {% if page.url != '/' %}
+            {% if page.url != '/v2/' %}
             <aside class="col-lg-3 col-xl-2 d-none d-lg-block sidebar">
                 <div class="sidebar-sticky">
                     <!-- Sticky Header -->
@@ -342,13 +347,13 @@
                             <div class="collapse" id="gettingStarted">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/getting-started#opening-the-extension' | relative_url }}">Opening the Extension</a>
+                                    <a class="nav-link" href="{{ '/v2/getting-started#opening-the-extension' | relative_url }}">Opening the Extension</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/getting-started#adding-a-new-tab' | relative_url }}">Adding a New Tab</a>
+                                    <a class="nav-link" href="{{ '/v2/getting-started#adding-a-new-tab' | relative_url }}">Adding a New Tab</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/getting-started#tab-types' | relative_url }}">Tab Types</a>
+                                    <a class="nav-link" href="{{ '/v2/getting-started#tab-types' | relative_url }}">Tab Types</a>
                                 </li>
                             </ul>
                         </div>
@@ -362,22 +367,22 @@
                             <div class="collapse" id="managingTabs">
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#editing-tabs' | relative_url }}">Editing Tabs</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#editing-tabs' | relative_url }}">Editing Tabs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#reordering-tabs' | relative_url }}">Reordering Tabs</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#reordering-tabs' | relative_url }}">Reordering Tabs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#open-in-new-tab' | relative_url }}">Open in New Tab</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#open-in-new-tab' | relative_url }}">Open in New Tab</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#deleting-tabs' | relative_url }}">Deleting Tabs</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#deleting-tabs' | relative_url }}">Deleting Tabs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#creating-dropdown-menus' | relative_url }}">Creating Dropdown Menus</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#creating-dropdown-menus' | relative_url }}">Creating Dropdown Menus</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ '/managing-tabs#floating-button' | relative_url }}">Floating Button</a>
+                                    <a class="nav-link" href="{{ '/v2/managing-tabs#floating-button' | relative_url }}">Floating Button</a>
                                 </li>
                             </ul>
                         </div>
@@ -391,10 +396,10 @@
                             <div class="collapse" id="keyboardShortcuts">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/keyboard-shortcuts#setting-up-shortcuts-in-firefox' | relative_url }}">Setting Up Shortcuts in Firefox</a>
+                                        <a class="nav-link" href="{{ '/v2/keyboard-shortcuts#setting-up-shortcuts-in-firefox' | relative_url }}">Setting Up Shortcuts in Firefox</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/keyboard-shortcuts#setting-up-shortcuts-in-chrome' | relative_url }}">Setting Up Shortcuts in Chrome</a>
+                                        <a class="nav-link" href="{{ '/v2/keyboard-shortcuts#setting-up-shortcuts-in-chrome' | relative_url }}">Setting Up Shortcuts in Chrome</a>
                                     </li>
                                 </ul>
                             </div>
@@ -408,22 +413,22 @@
                             <div class="collapse" id="settings">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/settings#general' | relative_url }}">General</a>
+                                        <a class="nav-link" href="{{ '/v2/settings#general' | relative_url }}">General</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/settings#floating-button' | relative_url }}">Floating Button</a>
+                                        <a class="nav-link" href="{{ '/v2/settings#floating-button' | relative_url }}">Floating Button</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/settings#profiles' | relative_url }}">Profiles</a>
+                                        <a class="nav-link" href="{{ '/v2/settings#profiles' | relative_url }}">Profiles</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/settings#keyboard-shortcuts' | relative_url }}">Keyboard Shortcuts</a>
+                                        <a class="nav-link" href="{{ '/v2/settings#keyboard-shortcuts' | relative_url }}">Keyboard Shortcuts</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/settings#data' | relative_url }}">Data</a>
+                                        <a class="nav-link" href="{{ '/v2/settings#data' | relative_url }}">Data</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/settings#importexport-configuration' | relative_url }}">Import/Export Configuration</a>
+                                        <a class="nav-link" href="{{ '/v2/settings#importexport-configuration' | relative_url }}">Import/Export Configuration</a>
                                     </li>
                                 </ul>
                             </div>
@@ -437,16 +442,16 @@
                             <div class="collapse" id="profiles">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/profiles#creating-a-new-profile' | relative_url }}">Creating a New Profile</a>
+                                        <a class="nav-link" href="{{ '/v2/profiles#creating-a-new-profile' | relative_url }}">Creating a New Profile</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/profiles#managing-profiles' | relative_url }}">Managing Profiles</a>
+                                        <a class="nav-link" href="{{ '/v2/profiles#managing-profiles' | relative_url }}">Managing Profiles</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/profiles#profile-best-practices' | relative_url }}">Profile Best Practices</a>
+                                        <a class="nav-link" href="{{ '/v2/profiles#profile-best-practices' | relative_url }}">Profile Best Practices</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/profiles#disabling-profiles' | relative_url }}">Disabling Profiles</a>
+                                        <a class="nav-link" href="{{ '/v2/profiles#disabling-profiles' | relative_url }}">Disabling Profiles</a>
                                     </li>
                                 </ul>
                             </div>
@@ -460,19 +465,19 @@
                             <div class="collapse" id="upgrading">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/upgrading#whats-being-migrated' | relative_url }}">What's Being Migrated?</a>
+                                        <a class="nav-link" href="{{ '/v2/upgrading#whats-being-migrated' | relative_url }}">What's Being Migrated?</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/upgrading#migration-wizard-screens' | relative_url }}">Migration Wizard Screens</a>
+                                        <a class="nav-link" href="{{ '/v2/upgrading#migration-wizard-screens' | relative_url }}">Migration Wizard Screens</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/upgrading#what-if-migration-fails' | relative_url }}">What If Migration Fails?</a>
+                                        <a class="nav-link" href="{{ '/v2/upgrading#what-if-migration-fails' | relative_url }}">What If Migration Fails?</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/upgrading#after-migration' | relative_url }}">After Migration</a>
+                                        <a class="nav-link" href="{{ '/v2/upgrading#after-migration' | relative_url }}">After Migration</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/upgrading#can-i-revert-after-migration' | relative_url }}">Can I Revert After Migration?</a>
+                                        <a class="nav-link" href="{{ '/v2/upgrading#can-i-revert-after-migration' | relative_url }}">Can I Revert After Migration?</a>
                                     </li>
                                 </ul>
                             </div>
@@ -486,13 +491,13 @@
                             <div class="collapse" id="translations">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/translations#available-languages' | relative_url }}">Available Languages</a>
+                                        <a class="nav-link" href="{{ '/v2/translations#available-languages' | relative_url }}">Available Languages</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/translations#contributing-translations' | relative_url }}">Contributing Translations</a>
+                                        <a class="nav-link" href="{{ '/v2/translations#contributing-translations' | relative_url }}">Contributing Translations</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/translations#request-a-language' | relative_url }}">Request a Language</a>
+                                        <a class="nav-link" href="{{ '/v2/translations#request-a-language' | relative_url }}">Request a Language</a>
                                     </li>
                                 </ul>
                             </div>
@@ -506,16 +511,16 @@
                             <div class="collapse" id="troubleshooting">
                                 <ul class="nav flex-column ms-3">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/troubleshooting#tabs-not-appearing-in-salesforce' | relative_url }}">Tabs not appearing in Salesforce</a>
+                                        <a class="nav-link" href="{{ '/v2/troubleshooting#tabs-not-appearing-in-salesforce' | relative_url }}">Tabs not appearing in Salesforce</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/troubleshooting#tab-links-not-working' | relative_url }}">Tab links not working</a>
+                                        <a class="nav-link" href="{{ '/v2/troubleshooting#tab-links-not-working' | relative_url }}">Tab links not working</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/troubleshooting#settings-not-saving' | relative_url }}">Settings not saving</a>
+                                        <a class="nav-link" href="{{ '/v2/troubleshooting#settings-not-saving' | relative_url }}">Settings not saving</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="{{ '/troubleshooting#still-having-issues' | relative_url }}">Still having issues?</a>
+                                        <a class="nav-link" href="{{ '/v2/troubleshooting#still-having-issues' | relative_url }}">Still having issues?</a>
                                     </li>
                                 </ul>
                             </div>
@@ -523,7 +528,7 @@
 
                         <!-- Install Beta -->
                         <div class="sidebar-section">
-                            <a class="sidebar-toggle" href="{{ '/beta' | relative_url }}">
+                            <a class="sidebar-toggle" href="{{ '/v2/beta' | relative_url }}">
                                 <span class="me-1" style="display: inline-block; width: 0.875rem;"></span><i class="bi bi-flask me-2"></i>Install Beta
                             </a>
                         </div>
@@ -533,8 +538,19 @@
             {% endif %}
 
             <!-- Main content area -->
-            <main class="{% if page.url != '/' %}col-lg-9 col-xl-10 ms-sm-auto{% else %}col-12{% endif %} px-md-4 main-content">
+            <main class="{% if page.url != '/v2/' %}col-lg-9 col-xl-10 ms-sm-auto{% else %}col-12{% endif %} px-md-4 main-content">
                 <div class="content-wrapper">
+                    <!-- Every retained v2 page says so, and points at the current
+                         docs. Without this, someone arriving from an old bookmark
+                         has no way to tell they are reading superseded pages. -->
+                    <div class="alert alert-warning d-flex align-items-start gap-2" role="note">
+                        <i class="bi bi-clock-history mt-1" aria-hidden="true"></i>
+                        <div>
+                            <strong>Documentation for SF Tabs {{ site.v2_version }}.</strong>
+                            SF Tabs {{ site.v3_version }} is current &mdash;
+                            <a href="{{ '/' | relative_url }}">see the latest documentation</a>.
+                        </div>
+                    </div>
                     {{ content }}
                 </div>
 

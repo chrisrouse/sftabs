@@ -1,0 +1,112 @@
+---
+layout: default
+title: Home
+---
+
+<div class="text-center mb-5">
+  <h1 class="display-4 fw-bold mb-3">SF Tabs</h1>
+  <p class="lead fs-4">Customize your Salesforce Setup menu with quick-access tabs</p>
+</div>
+
+<!-- 3.0 has shipped and its docs are now the site root. These pages are kept
+     for anyone on 2.1.1 or following an old link; the layout adds a notice and
+     a noindex to every one of them. -->
+<div class="alert alert-primary d-flex align-items-center gap-3 mb-5" role="note">
+  <i class="bi bi-stars fs-4 flex-shrink-0" aria-hidden="true"></i>
+  <div>
+    <strong>SF Tabs {{ site.v3_version }} is out.</strong>
+    Settings back in the popup, org colors and banners, a menu in the Salesforce header, and one-click page capture.
+    <a href="{{ '/' | relative_url }}" class="alert-link">Read the {{ site.v3_version }} documentation</a>
+    or <a href="{{ '/installation' | relative_url }}" class="alert-link">install the update</a>.
+  </div>
+</div>
+
+<!-- Feature Tiles -->
+<div class="row g-4 mb-5">
+  <!-- Installation -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-download display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">Installation</h3>
+        <p class="text-muted mb-3">Get started with SF Tabs on Firefox, Chrome, or Edge browsers in minutes.</p>
+        <a href="installation" class="btn btn-outline-primary">Install Now</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Features -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-stars display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">New in v2.1</h3>
+        <p class="text-muted mb-3">German and Spanish translations, release notes, and more.</p>
+        <a href="new-features" class="btn btn-outline-primary">Learn More</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Guide -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 feature-tile">
+      <div class="card-body text-center">
+        <div class="feature-icon mb-3">
+          <i class="bi bi-book-fill display-4 text-primary"></i>
+        </div>
+        <h3 class="h5 mb-3">User Guide</h3>
+        <p class="text-muted mb-3">Complete documentation covering all features, settings, and advanced usage.</p>
+        <a href="getting-started" class="btn btn-outline-primary">Read Docs</a>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- Key Features Section -->
+<div class="mt-5 pt-5">
+  <h2 class="text-center mb-4">Key Features</h2>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <h5><i class="bi bi-plus-circle-fill text-primary me-2"></i>Custom Tabs</h5>
+      <p class="text-muted">Quickly add custom tabs for setup or object pages to streamline your Salesforce navigation.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-list-nested text-primary me-2"></i>Dropdowns</h5>
+      <p class="text-muted">Organize related tabs under dropdown menus with auto-populated Object Manager menus or custom drag-and-drop structures.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-people-fill text-primary me-2"></i>Profiles</h5>
+      <p class="text-muted">Create multiple tab configurations for different Salesforce orgs or work contexts with automatic switching based on URL patterns.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-arrows-move text-primary me-2"></i>Drag and Drop</h5>
+      <p class="text-muted">Easily organize your tabs by dragging them into your preferred order with intuitive visual feedback.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-keyboard-fill text-primary me-2"></i>Shortcuts</h5>
+      <p class="text-muted">Quick access to your first 10 tabs via configurable keyboard shortcuts for power users.</p>
+    </div>
+    <div class="col-md-6">
+      <h5><i class="bi bi-translate text-primary me-2"></i>Translations</h5>
+      <p class="text-muted">SF Tabs is available in English, German, and Spanish.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Browser Badges -->
+<div class="mt-5 pt-4 text-center">
+  <h4 class="mb-3">Available For</h4>
+  <div class="d-flex justify-content-center gap-3 flex-wrap">
+    <a href="https://chromewebstore.google.com/detail/sf-tabs/lkimhffllnjkacnhjfehaihcjilcmdlo" target="_blank">
+      <img src="https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Chrome">
+    </a>
+    <a href="https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/" target="_blank">
+      <img src="https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white" alt="Firefox">
+    </a>
+  </div>
+</div>

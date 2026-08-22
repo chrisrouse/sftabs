@@ -1,112 +1,44 @@
 ---
-layout: default
+layout: v3
 title: Home
+# Builds its own hero, tiles and cards, so it is not wrapped in one.
+card: false
+description: Documentation for SF Tabs 3.0 — custom tabs, org colors, profiles and quick access for the Salesforce Setup menu.
+redirect_from:
+  - /v3/
 ---
 
-<div class="text-center mb-5">
-  <h1 class="display-4 fw-bold mb-3">SF Tabs</h1>
-  <p class="lead fs-4">Customize your Salesforce Setup menu with quick-access tabs</p>
+<div class="v3-hero">
+  <h1>SF Tabs 3.0</h1>
+  <p>Custom navigation for the Salesforce Setup menu — and a few ways to tell your orgs apart.</p>
 </div>
 
-<!-- Version 3 preview. Remove this block, and these pages, once 3.0 has
-     cleared review in both stores and /v3/ becomes the site root. -->
-<div class="alert alert-primary d-flex align-items-center gap-3 mb-5" role="note">
-  <i class="bi bi-stars fs-4 flex-shrink-0" aria-hidden="true"></i>
-  <div>
-    <strong>SF Tabs 3.0 is on the way.</strong>
-    Settings back in the popup, org colors and banners, a menu in the Salesforce header, and one-click page capture.
-    It is in review at the browser stores now &mdash; you can
-    <a href="{{ '/v3/' | relative_url }}" class="alert-link">read the 3.0 documentation</a>
-    or <a href="https://github.com/chrisrouse/sftabs/releases/tag/v3.0.0" class="alert-link">install it early from GitHub</a>.
-  </div>
-</div>
-
-<!-- Feature Tiles -->
-<div class="row g-4 mb-5">
-  <!-- Installation -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 feature-tile">
-      <div class="card-body text-center">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-download display-4 text-primary"></i>
-        </div>
-        <h3 class="h5 mb-3">Installation</h3>
-        <p class="text-muted mb-3">Get started with SF Tabs on Firefox, Chrome, or Edge browsers in minutes.</p>
-        <a href="installation" class="btn btn-outline-primary">Install Now</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- New Features -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 feature-tile">
-      <div class="card-body text-center">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-stars display-4 text-primary"></i>
-        </div>
-        <h3 class="h5 mb-3">New in v2.1</h3>
-        <p class="text-muted mb-3">German and Spanish translations, release notes, and more.</p>
-        <a href="new-features" class="btn btn-outline-primary">Learn More</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- User Guide -->
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100 feature-tile">
-      <div class="card-body text-center">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-book-fill display-4 text-primary"></i>
-        </div>
-        <h3 class="h5 mb-3">User Guide</h3>
-        <p class="text-muted mb-3">Complete documentation covering all features, settings, and advanced usage.</p>
-        <a href="getting-started" class="btn btn-outline-primary">Read Docs</a>
-      </div>
-    </div>
-  </div>
-
-
-
-<!-- Key Features Section -->
-<div class="mt-5 pt-5">
-  <h2 class="text-center mb-4">Key Features</h2>
-  <div class="row g-4">
-    <div class="col-md-6">
-      <h5><i class="bi bi-plus-circle-fill text-primary me-2"></i>Custom Tabs</h5>
-      <p class="text-muted">Quickly add custom tabs for setup or object pages to streamline your Salesforce navigation.</p>
-    </div>
-    <div class="col-md-6">
-      <h5><i class="bi bi-list-nested text-primary me-2"></i>Dropdowns</h5>
-      <p class="text-muted">Organize related tabs under dropdown menus with auto-populated Object Manager menus or custom drag-and-drop structures.</p>
-    </div>
-    <div class="col-md-6">
-      <h5><i class="bi bi-people-fill text-primary me-2"></i>Profiles</h5>
-      <p class="text-muted">Create multiple tab configurations for different Salesforce orgs or work contexts with automatic switching based on URL patterns.</p>
-    </div>
-    <div class="col-md-6">
-      <h5><i class="bi bi-arrows-move text-primary me-2"></i>Drag and Drop</h5>
-      <p class="text-muted">Easily organize your tabs by dragging them into your preferred order with intuitive visual feedback.</p>
-    </div>
-    <div class="col-md-6">
-      <h5><i class="bi bi-keyboard-fill text-primary me-2"></i>Shortcuts</h5>
-      <p class="text-muted">Quick access to your first 10 tabs via configurable keyboard shortcuts for power users.</p>
-    </div>
-    <div class="col-md-6">
-      <h5><i class="bi bi-translate text-primary me-2"></i>Translations</h5>
-      <p class="text-muted">SF Tabs is available in English, German, and Spanish.</p>
-    </div>
-  </div>
-</div>
-
-<!-- Browser Badges -->
-<div class="mt-5 pt-4 text-center">
-  <h4 class="mb-3">Available For</h4>
-  <div class="d-flex justify-content-center gap-3 flex-wrap">
-    <a href="https://chromewebstore.google.com/detail/sf-tabs/lkimhffllnjkacnhjfehaihcjilcmdlo" target="_blank">
-      <img src="https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Chrome">
+<ul class="v3-tiles">
+{%- for s in site.data.v3_sections %}
+  {%- if s.ready %}
+  <li>
+    <a class="v3-tile" href="{{ s.url | relative_url }}">
+      <i class="bi {{ s.icon }}" aria-hidden="true"></i>
+      <span class="v3-tile-title">{{ s.title }}</span>
+      <span class="v3-tile-blurb">{{ s.blurb }}</span>
     </a>
-    <a href="https://addons.mozilla.org/en-US/firefox/addon/sf-tabs/" target="_blank">
-      <img src="https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white" alt="Firefox">
-    </a>
-  </div>
+  </li>
+  {%- else %}
+  <li>
+    <div class="v3-tile is-pending" aria-disabled="true">
+      <i class="bi {{ s.icon }}" aria-hidden="true"></i>
+      <span class="v3-tile-title">{{ s.title }}</span>
+      <span class="v3-tile-blurb">{{ s.blurb }}</span>
+      <span class="v3-tile-soon">Coming soon</span>
+    </div>
+  </li>
+  {%- endif %}
+{%- endfor %}
+</ul>
+
+<div class="v3-card">
+  <h2>What changed in 3.0</h2>
+  <p>Settings moved back into the popup, so there is no separate page to hunt for. Every Salesforce tab's icon can carry a color picked from the kind of org you are in, and an optional banner names the org across the top of the page. Individual tabs can take a color too.</p>
+  <p>There is a new SF Tabs menu in Salesforce's own header, next to Favorites, and a one-click way to capture the page you are on — from that menu, or from a <code>+</code> at the end of your tab bar. Tabs you drag in the Setup bar now keep their new order, and a tab can belong to more than one profile.</p>
+  <p>The full list is in the <a href="https://github.com/chrisrouse/sftabs/releases/tag/v3.0.0">3.0.0 release notes</a>.</p>
 </div>

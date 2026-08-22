@@ -2,6 +2,8 @@
 layout: v3
 title: Quick Access
 description: Three ways to reach your tabs and capture a page without opening the SF Tabs popup.
+redirect_from:
+  - /v3/quick-access
 ---
 
 # Quick Access
@@ -67,7 +69,7 @@ Turn on **Quick Add in the Salesforce menu bar** (Settings > Tabs) to add a "+" 
 ## A Few Things That Apply to All Three
 
 - Capture works on record pages and list views, not just Setup pages.
-- **Quick Add adds to all profiles** (Settings > Profiles) sends a captured page to every profile rather than only the active one. This is off by default. See [Profiles]({{ '/v3/profiles' | relative_url }}) for how profiles work.
+- **Quick Add adds to all profiles** (Settings > Profiles) sends a captured page to every profile rather than only the active one. This is off by default. See [Profiles]({{ '/profiles' | relative_url }}) for how profiles work.
 - You can always add a tab from the popup itself, no matter which of these you have turned on.
 
-See [Tabs]({{ '/v3/tabs' | relative_url }}) for how captured tabs behave once they're added, and [Settings]({{ '/v3/settings' | relative_url }}) for where each of these options lives.
+See [Tabs]({{ '/tabs' | relative_url }}) for how captured tabs behave once they're added, and [Settings]({{ '/settings' | relative_url }}) for where each of these options lives.
