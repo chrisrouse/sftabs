@@ -31,3 +31,6 @@ web-ext-artifacts/sftabs-firefox-2.0.0.zip
 docs/_site/
 docs/Gemfile.lock
 _locales/messages.gsheet
+
+# Salesforce CLI local org state — machine-specific, never shared
+.sf/
