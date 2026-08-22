@@ -433,10 +433,10 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #288aff;
+  background: #066afe;
   box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
-.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button:hover { background: #0f6fd4; }
+.sftabs-floating-modal[data-layout="fab"] .modal-toggle-button:hover { background: #0250d9; }
 .sftabs-floating-modal[data-layout="fab"] .modal-toggle-button img {
   width: 20px;
   height: 20px;
@@ -450,13 +450,13 @@
   padding: 0 14px 0 10px;
   gap: 8px;
   border-radius: 999px;
-  background: #288aff;
+  background: #066afe;
   color: #fff;
   font-size: 13px;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
-.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button:hover { background: #0f6fd4; }
+.sftabs-floating-modal[data-layout="pill"] .modal-toggle-button:hover { background: #0250d9; }
 .sftabs-floating-modal[data-layout="pill"] .modal-toggle-button::after {
   content: 'SF Tabs';
 }
@@ -500,11 +500,11 @@
       plus an accent edge hinting at the brand ── */
 .sftabs-floating-modal[data-layout="handle"]:not(.open)[data-side="right"] .modal-toggle-button {
   border-radius: 8px 0 0 8px;
-  border-left: 3px solid #288aff;
+  border-left: 3px solid #066afe;
 }
 .sftabs-floating-modal[data-layout="handle"]:not(.open)[data-side="left"] .modal-toggle-button {
   border-radius: 0 8px 8px 0;
-  border-right: 3px solid #288aff;
+  border-right: 3px solid #066afe;
 }
 
 /* Closed handle wears the same blue-and-white identity as the open state, so
@@ -516,14 +516,14 @@
    no saturation to lose. */
 .sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button {
   height: 27px;                       /* 36px, a quarter shorter */
-  background: #288aff;
+  background: #066afe;
   filter: saturate(0.55);
   transition: background var(--sft-duration-promptly, 0.2s) ease,
               filter var(--sft-duration-promptly, 0.2s) ease;
 }
 .sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button:hover,
 .sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button:focus-visible {
-  background: #288aff;                /* beats the neutral hover on the base rule */
+  background: #066afe;                /* beats the neutral hover on the base rule */
   filter: saturate(1);
 }
 .sftabs-floating-modal[data-layout="handle"]:not(.open) .modal-toggle-button img {
@@ -550,19 +550,19 @@
   box-shadow: none;
   /* Fills with brand blue and stretches to the panel's height, so handle and
      panel share one obvious "on" state */
-  background: #288aff;
+  background: #066afe;
   align-self: stretch;
   height: auto;
 }
 .sftabs-floating-modal[data-layout="handle"].open .modal-toggle-button:hover {
-  background: #0f6fd4;
+  background: #0250d9;
 }
 .sftabs-floating-modal[data-layout="handle"].open .modal-toggle-button img {
   /* Single-color logo, so this is a clean white silhouette on the blue */
   filter: brightness(0) invert(1);
 }
 .sftabs-floating-modal[data-layout="handle"].open .modal-panel {
-  border-top: 3px solid #288aff;
+  border-top: 3px solid #066afe;
 }
 
 .sftabs-floating-modal[data-layout="handle"][data-theme="dark"].open .modal-content {
