@@ -121,7 +121,8 @@
       flex-shrink: 0;
     }
     .v3-brand:hover { color: var(--t-on-accent); text-decoration: none; }
-    .v3-brand img { width: 22px; height: 22px; display: block; }
+    /* 20px, matching the popup header: the mark reads large at 22 next to the wordmark */
+    .v3-brand img { width: 20px; height: 20px; display: block; }
     .v3-badge {
       font-size: 0.7rem;
       font-weight: 600;
@@ -534,7 +535,7 @@
 {%- assign here = page.url | remove: '.html' -%}
 <header class="v3-header">
   <a class="v3-brand" href="{{ '/v3/' | relative_url }}">
-    <img src="{{ '/assets/images/icons/sftabs_blue.svg' | relative_url }}" alt="" aria-hidden="true">
+    <img src="{{ '/assets/images/icons/sftabsv3icon.svg' | relative_url }}" alt="" aria-hidden="true">
     <span>SF Tabs</span>
     <span class="v3-badge">v{{ site.v3_version }}</span>
   </a>
