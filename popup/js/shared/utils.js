@@ -152,14 +152,29 @@ const ORG_PARTITIONS = {
  * Experience Builder is on its own domain entirely — the manifest injects there
  * but this list did not know the host, so every builder page resolved to no org
  * at all: no favicon tint, and no profile match either.
+ *
+ * Bare `salesforce.com` is deliberately NOT here. It matched every subdomain
+ * Salesforce owns, and since a single leftover label parses as an org
+ * identifier, `developer.salesforce.com` resolved to an org named "developer"
+ * with no partition word — which detectOrgEnvironment then called production.
+ * The docs site, help, trailhead, appexchange, www, login and test all wore the
+ * production favicon tint. Real org hosts always carry `my` or `lightning`, so
+ * no org loses anything; the cost is legacy pre-My-Domain instance hosts like
+ * `na44.salesforce.com`, which Salesforce has retired.
  */
+/**
+ * Experience Builder's own domain, named because two things need it: the suffix
+ * list below, and page capture — which has to store a builder URL whole, since
+ * a path relative to the org cannot reach another domain.
+ */
+const EXPERIENCE_BUILDER_HOST = 'builder.salesforce-experience.com';
+
 const SALESFORCE_HOST_SUFFIXES = [
-  'builder.salesforce-experience.com',   // Experience Builder
+  EXPERIENCE_BUILDER_HOST,
   'my.salesforce-setup.com',
   'my.salesforce.com',
   'lightning.force.com',
   'salesforce-setup.com',
-  'salesforce.com',
 ];
 
 /**
@@ -198,6 +213,25 @@ function splitOrgHost(url) {
 function extractOrgIdentifier(url) {
   const parsed = splitOrgHost(url);
   return parsed ? parsed.identifier : null;
+}
+
+/**
+ * Whether a URL is on a Salesforce org domain at all.
+ *
+ * Only the host suffix, deliberately — splitOrgHost additionally insists on a
+ * label shape it recognizes and returns null for anything else, so gating a
+ * visible feature on it would hide that feature on any real org host whose
+ * shape we have not thought of. This asks the weaker question, which is the
+ * right one for "should we be on this page": `developer.salesforce.com` fails
+ * it because bare salesforce.com is not a suffix we accept.
+ */
+function isSalesforceOrgHost(url) {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return SALESFORCE_HOST_SUFFIXES.some(suffix => hostname.endsWith('.' + suffix));
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -863,6 +897,11 @@ function locationAllows(url, location) {
 function floatingButtonAllowedHere(url, floatingButton) {
   const fb = floatingButton || {};
   if (!fb.enabled) return false;
+  // An org page or nothing. The location choice only distinguishes Setup from
+  // the rest of an org, so with no org check at all the button also drew itself
+  // on developer.salesforce.com and every other Salesforce-owned subdomain the
+  // manifest used to inject into.
+  if (!isSalesforceOrgHost(url)) return false;
   return locationAllows(url, fb.location);
 }
 
@@ -1059,7 +1098,27 @@ function parsePageToTab(url, pageTitle) {
   let isSetupObject = false;
   let path = '';
 
-  if (url.includes('/lightning/setup/')) {
+  if (url.includes('.' + EXPERIENCE_BUILDER_HOST + '/')) {
+    // Experience Builder is on its own domain, so this is checked before the
+    // path shapes below: it is a custom URL kept whole, both because a path
+    // relative to the org resolves against the org's host and would never reach
+    // the builder, and because the query string is the entire payload — the
+    // site being edited is identified only inside exitURL. Stripping it, as the
+    // custom-URL branch does for same-host links, would leave a link to a
+    // builder with no site.
+    //
+    // Absolute means it names one org. That is the honest answer: the network id
+    // in the URL belongs to one org, so the tab does too, and a profile linked
+    // to that org is how it gets scoped. Capture used to return null here, so
+    // the popup reported "not a Salesforce Setup page" and the page could not be
+    // saved at all.
+    isCustomUrl = true;
+    path = url;
+    // generateTabName falls back to the last path segment when there is no
+    // title, which for a whole URL is "Https:". A tab captured before the
+    // builder finished setting its title gets a name someone can read instead.
+    if (!pageTitle) pageTitle = 'Experience Builder';
+  } else if (url.includes('/lightning/setup/')) {
     const parts = url.split('/lightning/setup/');
     if (parts.length > 1) {
       const fullPath = parts[1].split('?')[0];
@@ -1349,6 +1408,7 @@ if (typeof module !== 'undefined' && module.exports) {
     generateId,
     extractOrgIdentifier,
     detectOrgEnvironment,
+    isSalesforceOrgHost,
     DEFAULT_ENV_COLORS,
     resolveOrgColor,
     orgBannerColor,
@@ -1412,6 +1472,7 @@ if (typeof module !== 'undefined' && module.exports) {
     generateId,
     extractOrgIdentifier,
     detectOrgEnvironment,
+    isSalesforceOrgHost,
     DEFAULT_ENV_COLORS,
     resolveOrgColor,
     orgBannerColor,

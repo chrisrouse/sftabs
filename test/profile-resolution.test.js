@@ -274,7 +274,6 @@ const HOSTS = [
   ['acme.my.salesforce.com',                     'acme',       'production'],
   ['acme.lightning.force.com',                   'acme',       'production'],
   ['acme.my.salesforce-setup.com',               'acme',       'production'],
-  ['acme.salesforce.com',                        'acme',       'production'],
   ['acme--dev1.sandbox.my.salesforce.com',       'acme--dev1', 'sandbox'],
   ['acme--dev1.sandbox.lightning.force.com',     'acme--dev1', 'sandbox'],
   ['acme--dev1.sandbox.my.salesforce-setup.com', 'acme--dev1', 'sandbox'],
@@ -332,6 +331,32 @@ check('a production org is not mistaken for one',
 for (const host of ['example.com', 'foo.bar.lightning.force.com', 'not a url']) {
   check(`${host} yields no identifier`, extractOrgIdentifier(`https://${host}/`) === null);
   check(`${host} yields no environment`, detectOrgEnvironment(`https://${host}/`) === null);
+}
+
+// ── Salesforce's own sites are not orgs ──
+// Bare `salesforce.com` used to be an accepted host suffix, so the single
+// remaining label parsed as an org identifier and, having no partition word,
+// fell through detectOrgEnvironment to `production`. Every one of these wore
+// the production favicon tint — reported against developer.salesforce.com.
+// `login` and `test` are the worst of them: red on a login page reads as a
+// warning about the org you are about to sign in to.
+for (const host of [
+  'developer.salesforce.com',
+  'help.salesforce.com',
+  'trailhead.salesforce.com',
+  'architect.salesforce.com',
+  'admin.salesforce.com',
+  'appexchange.salesforce.com',
+  'partners.salesforce.com',
+  'www.salesforce.com',
+  'login.salesforce.com',
+  'test.salesforce.com',
+]) {
+  const url = `https://${host}/docs/platform/lwc/guide`;
+  check(`${host} is not an org`, extractOrgIdentifier(url) === null,
+    String(extractOrgIdentifier(url)));
+  check(`${host} has no environment`, detectOrgEnvironment(url) === null,
+    String(detectOrgEnvironment(url)));
 }
 
 const failed = results.filter(x => !x).length;

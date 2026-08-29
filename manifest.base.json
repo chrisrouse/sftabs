@@ -26,7 +26,6 @@
     "*://*.lightning.force.com/*",
     "*://*.salesforce-setup.com/*",
     "*://*.my.salesforce-setup.com/*",
-    "*://*.salesforce.com/*",
     "*://*.my.salesforce.com/*",
     "*://*.builder.salesforce-experience.com/*"
   ],
@@ -46,7 +45,6 @@
         "*://*.lightning.force.com/*",
         "*://*.salesforce-setup.com/*",
         "*://*.my.salesforce-setup.com/*",
-        "*://*.salesforce.com/*",
         "*://*.my.salesforce.com/*",
         "*://*.builder.salesforce-experience.com/*"
       ],
@@ -73,7 +71,6 @@
         "*://*.lightning.force.com/lightning/setup/*",
         "*://*.salesforce-setup.com/lightning/setup/*",
         "*://*.my.salesforce-setup.com/lightning/setup/*",
-        "*://*.salesforce.com/lightning/setup/*",
         "*://*.my.salesforce.com/lightning/setup/*"
       ],
       "js": [
@@ -99,7 +96,6 @@
         "*://*.lightning.force.com/*",
         "*://*.salesforce-setup.com/*",
         "*://*.my.salesforce-setup.com/*",
-        "*://*.salesforce.com/*",
         "*://*.my.salesforce.com/*",
         "*://*.builder.salesforce-experience.com/*"
       ]

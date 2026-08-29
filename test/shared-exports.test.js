@@ -45,7 +45,10 @@ const ROOT = path.join(__dirname, '..');
 
 /** What the file attaches to SFTabs when there is no `module` to export to. */
 function browserExports(rel, namespace) {
-  const context = { console };
+  // URL because the host parsers use it and every browser scope has it. Without
+  // it `new URL()` throws in here, the catch swallows it, and org detection
+  // answers "not an org" for a reason that exists only in this sandbox.
+  const context = { console, URL };
   context.globalThis = context;
   context.window = context;
   vm.createContext(context);
@@ -130,7 +133,7 @@ check('the worker loads at least one shared module', workerScripts.length > 0,
 for (const rel of workerScripts) {
   let error = null;
   try {
-    const context = { console };
+    const context = { console, URL };
     context.globalThis = context;          // deliberately no `window`
     vm.createContext(context);
     vm.runInContext(fs.readFileSync(path.join(ROOT, rel), 'utf8'), context);

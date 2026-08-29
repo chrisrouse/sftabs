@@ -231,5 +231,23 @@ check('every page the narrow entry runs on is also matched by the broad one',
 check('and both run at the same time, so ordering is manifest order',
   (broad.run_at || 'document_idle') === (narrow.run_at || 'document_idle'));
 
+// ── Nothing may claim all of salesforce.com ──
+// `*://*.salesforce.com/*` matches every subdomain Salesforce owns, so the
+// content scripts ran on developer.salesforce.com, help, trailhead, www,
+// appexchange, login and test. Combined with a host parser that read the
+// leftover label as an org name, the docs site got tinted with the production
+// org color. Org hosts always carry `my` or `lightning`, so the narrow patterns
+// lose nothing. Reported against developer.salesforce.com in 3.0.
+const everyPattern = [
+  ...manifest.content_scripts.flatMap(e => e.matches),
+  ...(manifest.host_permissions || []),
+  ...(manifest.web_accessible_resources || []).flatMap(r => r.matches || []),
+];
+const tooBroad = everyPattern.filter(p => /^\*:\/\/\*\.(salesforce|force)\.com\//.test(p));
+check('no pattern matches every salesforce.com subdomain',
+  tooBroad.length === 0,
+  tooBroad.length ? [...new Set(tooBroad)].join(', ')
+                  : everyPattern.length + ' patterns checked');
+
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

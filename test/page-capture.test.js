@@ -14,7 +14,7 @@
  *
  * Run: npm test
  */
-const { parsePageToTab, DEFAULT_SETTINGS } = (() => ({
+const { parsePageToTab, tabDestinationUrl, DEFAULT_SETTINGS } = (() => ({
   ...require('../popup/js/shared/utils.js'),
   ...require('../popup/js/shared/constants.js'),
 }))();
@@ -93,6 +93,42 @@ check('and falls back to the path when there is none',
   parsePageToTab(`${HOST}/apex/MyPage`, '').label === 'My Page');
 check('my.salesforce.com counts as a custom url host',
   parsePageToTab('https://acme.my.salesforce.com/0015f00000abcde', 'Record').isCustomUrl === true);
+
+// ── Experience Builder ──
+// Its own domain, so a path relative to the org can never reach it, and the
+// query string is the whole payload: the site being edited is named only inside
+// exitURL. Capture used to return null for these, so the popup answered "not a
+// Salesforce Setup page" and an Experience Cloud site could not be saved at all.
+//
+// The URL is absolute, so the tab names one org. That is inherent — the network
+// id in it belongs to one org — and a profile linked to that org is how it gets
+// scoped. Sandbox and production differ only in the host prefix here because
+// this sandbox is a refresh of that production org; a site built separately in
+// each would carry a different id, which no amount of rewriting can derive.
+const BUILDER_PROD = 'https://amplify.builder.salesforce-experience.com/sfsites/picasso/core/config/commeditor.jsp?exitURL=https%3A%2F%2Famplify.my.salesforce.com%2Fservlet%2Fnetworks%2Fswitch%3FnetworkId%3D0DBPD0000000MtN%26startURL%3D%252FcommunitySetup%252FcwApp.app%2523%252Fc%252Fhome';
+const BUILDER_SANDBOX = BUILDER_PROD
+  .replace('amplify.builder', 'amplify--dev1.sandbox.builder')
+  .replace('amplify.my', 'amplify--dev1.sandbox.my');
+
+for (const [name, url] of [['production', BUILDER_PROD], ['sandbox', BUILDER_SANDBOX]]) {
+  const built = parsePageToTab(url, 'Builder | Amplify Help Center');
+  check(`the ${name} builder is captured at all`, built !== null);
+  check(`the ${name} builder is a custom url`, built && built.isCustomUrl === true);
+  check(`the ${name} builder keeps the whole URL, query and all`,
+    built && built.path === url,
+    'exitURL carries the network id — without it the link opens a builder with no site');
+  check(`the ${name} builder is not mistaken for an object or setup node`,
+    built && built.isObject === false && built.isSetupObject === false);
+}
+
+check('a builder tab rebuilds byte-for-byte, whichever org you click it from',
+  tabDestinationUrl(parsePageToTab(BUILDER_PROD, 'Builder'), 'https://amplify--dev1.sandbox.my.salesforce.com')
+    === BUILDER_PROD,
+  'an absolute custom url is used verbatim, so the host is not rewritten');
+
+check('a builder page with no title still gets a readable name',
+  parsePageToTab(BUILDER_PROD, '').label === 'Experience Builder',
+  'the generic fallback would name it "Https:"');
 
 // ── The shape the caller relies on ──
 const keys = Object.keys(flows).sort().join(',');

@@ -255,7 +255,6 @@ async function checkAndSwitchProfile(url) {
         "*://*.lightning.force.com/lightning/setup/*",
         "*://*.salesforce-setup.com/lightning/setup/*",
         "*://*.my.salesforce-setup.com/lightning/setup/*",
-        "*://*.salesforce.com/lightning/setup/*",
         "*://*.my.salesforce.com/lightning/setup/*",
         "*://*.sandbox.my.salesforce-setup.com/lightning/setup/*",
         "*://*.sandbox.my.salesforce.com/lightning/setup/*",
@@ -457,8 +456,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // own bar has to grow the new tab too.
       const tabs = await browser.tabs.query({ url: [
         '*://*.lightning.force.com/*', '*://*.salesforce-setup.com/*',
-        '*://*.my.salesforce-setup.com/*', '*://*.salesforce.com/*',
-        '*://*.my.salesforce.com/*',
+        '*://*.my.salesforce-setup.com/*', '*://*.my.salesforce.com/*',
       ] });
       await Promise.all(tabs.map(t =>
         browser.tabs.sendMessage(t.id, { action: 'refresh_tabs' }).catch(() => {})));

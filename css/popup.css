@@ -65,7 +65,10 @@
 
   /* Footer (ours — stays dark in both schemes) */
   --footer-bg:       light-dark(#03234d, #020202);
-  --footer-fg:       rgba(255,255,255,0.55);
+  /* Full white, not a dimmed alpha: at 11px on the navy footer the 55% we used
+     to ship was hard to read. Hover is a background change, so the two staying
+     the same colour costs nothing. */
+  --footer-fg:       #ffffff;
   --footer-fg-hover: #ffffff;
 
   /* Shadows */
@@ -248,6 +251,10 @@ nav[aria-label="Custom tabs"] {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  /* Firefox ignores the ::-webkit-scrollbar rules below and would otherwise
+     draw its full-width default over the tab rows */
+  scrollbar-width: thin;
+  scrollbar-color: var(--b-medium) transparent;
 }
 nav[aria-label="Custom tabs"]::-webkit-scrollbar { width: 3px; }
 nav[aria-label="Custom tabs"]::-webkit-scrollbar-thumb { background: var(--b-medium); border-radius: var(--sft-radius-1); }
@@ -1578,9 +1585,14 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
   border-top: 1px solid rgba(255,255,255,0.05);
 }
 
+/* width:0 rather than min-width:0 — the popup is width:fit-content, so a flex
+   item with no definite width contributes its whole one-line max-content width
+   to the popup's intrinsic size. That widened the window past the 390px tab
+   list, leaving dead space beside the cards and a stretched footer. A definite
+   0 contributes nothing and flex-grow still fills the line. */
 .review-prompt-text {
   flex: 1;
-  min-width: 0;
+  width: 0;
   margin: 0;
   font-size: var(--sft-font-size-xs);
   line-height: var(--sft-line-height-snug);
@@ -1615,7 +1627,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 
 .review-prompt-no {
   background: transparent;
-  color: rgba(255,255,255,0.55);
+  color: var(--footer-fg);
 }
 .review-prompt-no:hover { background: rgba(255,255,255,0.09); color: var(--footer-fg-hover); }
 
@@ -1676,7 +1688,7 @@ body.is-dragging-active * { cursor: grabbing !important; user-select: none; }
 
 .status-region {
   font-size: var(--sft-font-size-xs);
-  color: rgba(255,255,255,0.55);
+  color: var(--footer-fg);
   line-height: var(--sft-line-height-snug);
   padding-left: 4px;
   min-width: 0;

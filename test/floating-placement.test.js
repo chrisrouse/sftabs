@@ -111,9 +111,23 @@ check('a missing location behaves as everywhere',
   floatingButtonAllowedHere(APP, { enabled: true }));
 check('missing config hides, and does not throw',
   !floatingButtonAllowedHere(APP, null) && !floatingButtonAllowedHere(APP, undefined));
-check('a missing url does not throw',
-  floatingButtonAllowedHere(undefined, fb('everywhere')) === true &&
+// A url we cannot parse is not an org page, so the button stays away. This used
+// to assert `everywhere` showed the button on an undefined url — harmless when
+// the only gate was Setup-or-not, wrong once the org host is a gate too.
+check('a missing url does not throw, and shows nothing',
+  floatingButtonAllowedHere(undefined, fb('everywhere')) === false &&
   floatingButtonAllowedHere(undefined, fb('setup-only')) === false);
+
+// The button is an org surface. It injected into every Salesforce-owned
+// subdomain — docs, help, trailhead — because `location` only ever asked
+// whether a page was Setup, never whether it belonged to an org at all.
+for (const host of ['developer.salesforce.com', 'help.salesforce.com', 'www.salesforce.com']) {
+  check(`no button on ${host}`,
+    !floatingButtonAllowedHere(`https://${host}/docs/`, fb('everywhere')));
+}
+check('still shows on a real org page',
+  floatingButtonAllowedHere(APP, fb('everywhere')) &&
+  floatingButtonAllowedHere('https://acme.my.salesforce.com/lightning/o/Account/list', fb('everywhere')));
 
 console.log('\n' + passed + '/' + (passed + failed) + ' passed');
 process.exit(failed ? 1 : 0);

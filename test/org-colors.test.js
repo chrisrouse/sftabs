@@ -50,6 +50,19 @@ check('missing config paints nothing',
 check('a non-Salesforce page paints nothing',
   resolveOrgColor('https://example.com/', on()) === null);
 
+// Salesforce's own sites are not orgs. Bare `salesforce.com` was an accepted
+// host suffix, so `developer.salesforce.com` parsed as an org named "developer"
+// with no partition word, and production is what detectOrgEnvironment falls
+// through to — so the docs site was painted with the production color, which is
+// the one that is supposed to mean "be careful, this is live".
+for (const host of ['developer.salesforce.com', 'help.salesforce.com',
+                    'trailhead.salesforce.com', 'login.salesforce.com',
+                    'www.salesforce.com']) {
+  check(`${host} paints nothing`,
+    resolveOrgColor(`https://${host}/docs/`, on()) === null,
+    String(resolveOrgColor(`https://${host}/docs/`, on())));
+}
+
 // ── The environment layer ──
 check('production takes its environment color',
   resolveOrgColor(PROD, on()) === DEFAULT_ENV_COLORS.production);
