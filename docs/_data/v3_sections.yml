@@ -67,3 +67,11 @@
   icon: bi-life-preserver
   blurb: What to check when something is not showing up where you expect it.
   ready: true
+
+# Generated from CHANGELOG.md by scripts/build-release-notes.js — see the note at
+# the top of docs/release-notes.md before editing that page.
+- title: Release Notes
+  url: /release-notes
+  icon: bi-journal-text
+  blurb: What changed in each release, newest first.
+  ready: true

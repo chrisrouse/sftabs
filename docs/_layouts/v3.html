@@ -131,14 +131,21 @@
       border-radius: var(--r-pill);
       background: rgba(255,255,255,0.16);
     }
-    .v3-nav {
+    /* ── Header nav ──
+       One section menu at any width: the sidebar above 860px, the hamburger
+       below it. Both render the same list, and showing both at once was the
+       original fault — the header repeated the sidebar, and the list is far too
+       long to fit one row.
+
+       .v3-header is a fixed height, so a wrapped second row of links never grew
+       the bar; it escaped it and painted over the page. That was visible on
+       phones and, once the list passed eleven items, at desktop widths too.
+       Nothing in the header wraps now, so it cannot come back. */
+
+    /* The one link kept in the bar on wide screens; it is not a section. */
+    .v3-header-link {
       margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-    .v3-nav a {
+      flex-shrink: 0;
       color: rgba(255,255,255,0.85);
       font-size: 0.875rem;
       font-weight: 500;
@@ -146,11 +153,83 @@
       border-radius: var(--r-md);
       transition: background var(--ease), color var(--ease);
     }
-    .v3-nav a:hover,
-    .v3-nav a[aria-current="page"] {
+    .v3-header-link:hover {
       background: rgba(255,255,255,0.14);
       color: #fff;
       text-decoration: none;
+    }
+
+    /* A <details>, so the menu opens, closes and takes keyboard focus with no
+       JavaScript on a site that otherwise ships none. Choosing a link reloads
+       the page, which closes it. */
+    .v3-menu {
+      display: none;             /* wide screens navigate by the sidebar */
+      margin-left: auto;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .v3-menu > summary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--r-md);
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      list-style: none;                                             /* Firefox */
+      -webkit-tap-highlight-color: transparent;
+    }
+    .v3-menu > summary::-webkit-details-marker { display: none; }    /* Safari */
+    .v3-menu > summary:hover,
+    .v3-menu[open] > summary { background: rgba(255,255,255,0.16); }
+    .v3-menu > summary:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    .v3-menu-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: max-content;
+      min-width: 220px;
+      max-width: calc(100vw - 32px);
+      /* Thirteen rows do not fit a phone in landscape, so cap to the viewport
+         and scroll rather than running off the bottom of the screen. */
+      max-height: calc(100vh - var(--header-h) - 24px);
+      overflow-y: auto;
+      padding: 8px;
+      background: var(--s-1);
+      border: 1px solid var(--b-subtle);
+      border-radius: var(--r-lg);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+    }
+    .v3-menu-panel a {
+      padding: 10px 12px;
+      border-radius: var(--r-md);
+      color: var(--t-base);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .v3-menu-panel a:hover { background: var(--s-hover); text-decoration: none; }
+    .v3-menu-panel a[aria-current="page"] {
+      background: var(--accent-tint);
+      color: var(--accent);
+    }
+    .v3-menu-panel .is-pending {
+      padding: 10px 12px;
+      font-size: 0.9375rem;
+      color: var(--t-faint);
+    }
+    .v3-menu-sep {
+      margin: 6px 4px;
+      border: 0;
+      border-top: 1px solid var(--b-subtle);
     }
 
     /* ── Content ── */
@@ -236,10 +315,16 @@
       border-style: dashed;
     }
 
+    /* The one breakpoint that matters: below it the sidebar is replaced by the
+       hamburger, not moved. It used to go `position: static` inside a
+       single-column grid, which dropped the entire section list on top of the
+       page — every visitor on a phone scrolled past thirteen nav cards before
+       reaching a word of content. */
     @media (max-width: 860px) {
       .v3-body { grid-template-columns: 1fr; gap: 20px; }
-      .v3-side { position: static; }
-      .v3-side.is-collapsed { display: none; }
+      .v3-side { display: none; }
+      .v3-menu { display: block; }
+      .v3-header-link { display: none; }   /* it is in the menu instead */
     }
 
     .v3-hero { margin-bottom: 28px; }
@@ -436,24 +521,6 @@
       max-width: 44ch;
     }
 
-    /* ── Notice ── */
-    .v3-notice {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      background: var(--accent-tint);
-      border: 1px solid var(--accent);
-      border-radius: var(--r-md);
-      padding: 14px 16px;
-      margin-bottom: 28px;
-      font-size: 0.9375rem;
-    }
-    .v3-notice i { color: var(--accent); font-size: 1.1rem; line-height: 1.4; }
-    .v3-notice p { margin: 0; }
-    @media (prefers-color-scheme: dark) {
-      .v3-notice { color: #e5e5e5; }
-    }
-
     /* ── Prose ── */
     .v3-prose > :first-child { margin-top: 0; }
     .v3-prose > :last-child { margin-bottom: 0; }
@@ -524,8 +591,6 @@
     .v3-footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
 
     @media (max-width: 560px) {
-      .v3-nav { gap: 0; }
-      .v3-nav a { padding: 6px 8px; }
       .v3-hero h1 { font-size: 1.75rem; }
     }
     </style>
@@ -539,25 +604,31 @@
     <span>SF Tabs</span>
     <span class="v3-badge">v{{ site.v3_version }}</span>
   </a>
-  <nav class="v3-nav" aria-label="Documentation">
-    <a href="{{ '/' | relative_url }}"{% if here == '/' %} aria-current="page"{% endif %}>Home</a>
-    {%- for s in site.data.v3_sections -%}
-      {%- if s.ready %}
-    <a href="{{ s.url | relative_url }}"{% if here == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
-      {%- endif -%}
-    {%- endfor %}
-    <a href="{{ site.github.repository_url }}">GitHub</a>
-  </nav>
+  <!-- Wide screens: the sidebar is the section nav, so the bar carries only
+       this. Repeating the sections here is what used to overflow the header. -->
+  <a class="v3-header-link" href="{{ site.github.repository_url }}">GitHub</a>
+
+  <!-- Narrow screens: the only menu. Swapped with the sidebar at 860px. -->
+  <details class="v3-menu">
+    <summary role="button" aria-label="Documentation menu">
+      <i class="bi bi-list" aria-hidden="true"></i>
+    </summary>
+    <nav class="v3-menu-panel" aria-label="Documentation">
+      <a href="{{ '/' | relative_url }}"{% if here == '/' %} aria-current="page"{% endif %}>Home</a>
+      {%- for s in site.data.v3_sections %}
+        {%- if s.ready %}
+      <a href="{{ s.url | relative_url }}"{% if here == s.url %} aria-current="page"{% endif %}>{{ s.title }}</a>
+        {%- else %}
+      <span class="is-pending" aria-disabled="true">{{ s.title }}</span>
+        {%- endif %}
+      {%- endfor %}
+      <hr class="v3-menu-sep">
+      <a href="{{ site.github.repository_url }}">GitHub</a>
+    </nav>
+  </details>
 </header>
 
 <main class="v3-main">
-
-  {%- if site.v3_in_review %}
-  <div class="v3-notice">
-    <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-    <p><strong>Version 3 is in review at the browser stores.</strong> These pages describe 3.0. If you are running {{ site.v2_version }} from the Chrome Web Store or Firefox Add-ons, the <a href="{{ '/v2/' | relative_url }}">version 2 documentation</a> is the one you want &mdash; or install 3.0 early from the <a href="https://github.com/chrisrouse/sftabs/releases/tag/v{{ site.v3_version }}">GitHub release</a>.</p>
-  </div>
-  {%- endif %}
 
   <div class="v3-body">
     <nav class="v3-side" aria-label="Sections">
@@ -588,7 +659,6 @@
   <div class="v3-footer-inner">
     <div>SF Tabs v{{ site.v3_version }} &middot; documentation for version 3</div>
     <div class="v3-footer-links">
-      <a href="{{ '/v2/' | relative_url }}">Version 2 docs</a>
       <a href="{{ site.github.repository_url }}">GitHub</a>
       <a href="{{ site.github.issues_url }}">Report an issue</a>
     </div>

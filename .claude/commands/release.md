@@ -93,6 +93,31 @@ acceptable for an emergency revert.
 
 ---
 
+## Step 3b — Regenerate the docs release-notes page
+
+```
+npm run docs:release-notes
+```
+
+`docs/release-notes.md` is generated from `CHANGELOG.md` by
+`scripts/build-release-notes.js` and is a section of the v3 docs site. Do not
+write it by hand — run the command.
+
+It exists as a generated copy because the docs site cannot read the changelog:
+Jekyll's source is `docs/`, `CHANGELOG.md` is above it, and GitHub Pages runs
+Jekyll in safe mode, so no plugin or symlink reaches outside the source
+directory.
+
+The page states the current version from `manifest.base.json`, so this must run
+**after** Step 2. `test/release-notes-sync.test.js` re-runs the renderer and
+fails if the committed page does not match, so a skipped sync shows up in
+Step 4 rather than on the live site.
+
+Also update `v3_version` in `docs/_config.yml` to the new version — it feeds the
+docs header badge and footer, and the notice on the retained /v2/ pages.
+
+---
+
 ## Step 4 — Verify
 
 Run these and report the results:
@@ -115,8 +140,9 @@ Tell the user:
 1. the version synced, and that both `manifest.base.json` and `manifest.json`
    were bumped
 2. how many release-note items were written into `popup.html`
-3. the `npm test` result
-4. that a GitHub release is a separate step — `/release github`, or ask
+3. that `docs/release-notes.md` and `docs/_config.yml` were regenerated/updated
+4. the `npm test` result
+5. that a GitHub release is a separate step — `/release github`, or ask
 
 ---
 

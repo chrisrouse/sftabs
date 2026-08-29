@@ -35,10 +35,3 @@ redirect_from:
   {%- endif %}
 {%- endfor %}
 </ul>
-
-<div class="v3-card">
-  <h2>What changed in 3.0</h2>
-  <p>Settings moved back into the popup, so there is no separate page to hunt for. Every Salesforce tab's icon can carry a color picked from the kind of org you are in, and an optional banner names the org across the top of the page. Individual tabs can take a color too.</p>
-  <p>There is a new SF Tabs menu in Salesforce's own header, next to Favorites, and a one-click way to capture the page you are on — from that menu, or from a <code>+</code> at the end of your tab bar. Tabs you drag in the Setup bar now keep their new order, and a tab can belong to more than one profile.</p>
-  <p>The full list is in the <a href="https://github.com/chrisrouse/sftabs/releases/tag/v3.0.0">3.0.0 release notes</a>.</p>
-</div>
