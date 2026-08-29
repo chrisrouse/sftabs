@@ -263,14 +263,6 @@
       padding: 0;
       list-style: none;
     }
-    .v3-side-label {
-      font-size: 0.6875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--t-faint);
-      padding: 0 4px 4px;
-    }
     .v3-siderow {
       position: relative;
       display: block;
@@ -632,7 +624,6 @@
 
   <div class="v3-body">
     <nav class="v3-side" aria-label="Sections">
-      <span class="v3-side-label">Documentation</span>
       <a class="v3-siderow" href="{{ '/' | relative_url }}"{% if here == '/' %} aria-current="page"{% endif %}>Home</a>
       {%- for s in site.data.v3_sections %}
         {%- if s.ready %}
