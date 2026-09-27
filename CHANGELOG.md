@@ -12,6 +12,15 @@ The popup derives its "new notes" badge from the newest version block in
 `popup.html`, so there is no version constant to bump by hand.
 
 ---
+## 3.0.2
+
+**Fixed tabs sometimes not loading in Setup on Chrome**
+Fixed an issue with Chrome where tabs would sometimes fail to load in Setup. Thanks to *joelslackfsm* for the [bug report](https://github.com/chrisrouse/sftabs/issues/20).
+
+**Fixed the header menu tooltip hiding at the top of the page**
+Fixed an issue with the tooltip on the header menu that caused it to be shy and hide behind the browser menu bar at the top of the page. It now has better spatial awareness.
+
+---
 ## 3.0.1
 
 **A couple small UI adjustments to the footer**

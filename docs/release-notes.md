@@ -10,7 +10,19 @@ description: What changed in each release of SF Tabs, newest first.
 
 # Release Notes
 
-The current release is **3.0.1**. These notes are also in the extension itself — open the popup and click the bell.
+The current release is **3.0.2**. These notes are also in the extension itself — open the popup and click the bell.
+
+## 3.0.2
+
+### Fixed tabs sometimes not loading in Setup on Chrome
+
+Fixed an issue with Chrome where tabs would sometimes fail to load in Setup. Thanks to *joelslackfsm* for the [bug report](https://github.com/chrisrouse/sftabs/issues/20).
+
+### Fixed the header menu tooltip hiding at the top of the page
+
+Fixed an issue with the tooltip on the header menu that caused it to be shy and hide behind the browser menu bar at the top of the page. It now has better spatial awareness.
+
+---
 
 ## 3.0.1
 
