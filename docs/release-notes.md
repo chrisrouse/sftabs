@@ -22,6 +22,10 @@ Fixed an issue with Chrome where tabs would sometimes fail to load in Setup. Tha
 
 Fixed an issue with the tooltip on the header menu that caused it to be shy and hide behind the browser menu bar at the top of the page. It now has better spatial awareness.
 
+### Drag and drop to import
+
+You can now drag a backup file onto the Import Configuration section of the Import/Export page instead of clicking Choose File to Import.
+
 ---
 
 ## 3.0.1
