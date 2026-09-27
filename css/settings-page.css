@@ -127,6 +127,19 @@ button, input, select { font: inherit; color: inherit; }
 .choice-title { font-weight: var(--sft-font-weight-medium); }
 .choice-desc { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
 
+/* ── Import drop zone ── */
+.dropzone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  border: var(--sft-border-width-2) dashed var(--b-subtle);
+  border-radius: var(--sft-radius-2);
+  transition: background var(--ease-page), border-color var(--ease-page);
+}
+.dropzone-hint { font-size: var(--sft-font-size-xs); color: var(--t-weak); }
+.dropzone.is-dragover { border-color: var(--accent); background: var(--accent-bg); }
+
 /* ── Sunken sub-panels ── */
 .subpanel {
   padding: 14px 16px;

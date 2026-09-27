@@ -112,6 +112,28 @@ function setupEventListeners() {
 		}
 	});
 
+	// Import drop zone. dragover must be cancelled for drop to fire at all.
+	// dragleave also fires when the pointer crosses onto the button inside the
+	// zone, so the highlight only clears once it has left the zone itself.
+	const dropzone = document.getElementById('import-dropzone');
+	dropzone.addEventListener('dragover', (e) => {
+		e.preventDefault();
+		dropzone.classList.add('is-dragover');
+	});
+	dropzone.addEventListener('dragleave', (e) => {
+		if (!dropzone.contains(e.relatedTarget)) {
+			dropzone.classList.remove('is-dragover');
+		}
+	});
+	dropzone.addEventListener('drop', (e) => {
+		e.preventDefault();
+		dropzone.classList.remove('is-dragover');
+		const file = e.dataTransfer.files[0];
+		if (file) {
+			importConfiguration(file);
+		}
+	});
+
 	// Import cancel button
 	document.getElementById('import-cancel-button').addEventListener('click', () => {
 		hideImportOptions();

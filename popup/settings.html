@@ -65,7 +65,10 @@
       </div>
       <div class="card-body">
 
-        <button id="import-button" class="btn">__MSG_chooseFileToImport__</button>
+        <div class="dropzone" id="import-dropzone">
+          <button id="import-button" class="btn">__MSG_chooseFileToImport__</button>
+          <span class="dropzone-hint">__MSG_importDropHint__</span>
+        </div>
         <input type="file" id="import-file-input" accept=".json" style="display: none;" aria-label="__MSG_chooseFileToImport__">
 
         <!-- Everything below appears once a file is chosen, via populateImportOptions().

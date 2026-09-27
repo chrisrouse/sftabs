@@ -483,6 +483,10 @@
     "message": "Choose File to Import",
     "description": "Button label to trigger the file picker for import"
   },
+  "importDropHint": {
+    "message": "or drop a file here",
+    "description": "Hint beside the import button: a backup file can also be dragged onto the import area"
+  },
   "importSelectedFile": {
     "message": "Selected file",
     "description": "Default placeholder in the import filename display"
