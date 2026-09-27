@@ -32,6 +32,8 @@
   // is the space the nubbin occupies. Measured, not guessed — see
   // docs/snippets/dump-menu-styles.js.
   const NUBBIN_GAP = 13;
+  // Distance between a tooltip and its button; matches the 10px in header-menu.css.
+  const TIP_GAP = 10;
 
   let observer = null;
   /** setInterval id for the URL watch, held so teardown can stop it. */
@@ -214,9 +216,33 @@
       }
     });
 
+    // Measured as each tooltip is about to show, not once at inject: the room
+    // above depends on the browser's toolbars and on scroll, both of which
+    // change after the button is placed.
+    const placeTip = event => {
+      const button = event.target.closest && event.target.closest('.slds-button');
+      const tip = button && button.querySelector('.sftabs-hm-tip');
+      if (tip) placeTooltip(button, tip);
+    };
+    li.addEventListener('mouseover', placeTip);
+    li.addEventListener('focusin', placeTip);
+
     syncBookmarkState();
     watchUrl();
     return true;
+  }
+
+  /**
+   * Open the tooltip below its button when there is no room above.
+   *
+   * Above is the preferred side, but the global header sits at the very top of
+   * the page, so above is usually off screen — Favorites' own tooltip opens
+   * downward for that reason. offsetHeight is readable while the tooltip is
+   * still hidden, since visibility keeps it in layout.
+   */
+  function placeTooltip(button, tip) {
+    const needed = tip.offsetHeight + TIP_GAP;
+    tip.classList.toggle('sftabs-hm-tip_below', button.getBoundingClientRect().top < needed);
   }
 
   // ── Menu ─────────────────────────────────────────────────────────

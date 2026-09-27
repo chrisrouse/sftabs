@@ -319,6 +319,20 @@
   border-top-color: #022d5f;
 }
 
+/* Flipped below the button when there is no room above — set by placeTooltip
+   in header-menu.js, and the usual case, since the header is at the top. */
+#sftabs-header-item .sftabs-hm-tip.sftabs-hm-tip_below {
+  top: calc(100% + 10px);
+  bottom: auto;
+}
+
+#sftabs-header-item .sftabs-hm-tip.sftabs-hm-tip_below::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: #022d5f;
+}
+
 #sftabs-header-item .slds-button:hover .sftabs-hm-tip,
 #sftabs-header-item .slds-button:focus-visible .sftabs-hm-tip {
   visibility: visible;
