@@ -819,26 +819,34 @@ async function importSelectedProfiles(importData, selectedProfileIds, importSett
 	// Filter and import selected profiles
 	const profilesToImport = importData.profiles.filter(p => selectedProfileIds.includes(p.id));
 
-	// Add imported profiles to current profiles
+	// A profile whose id is already here is the same profile, exported earlier:
+	// restoring a backup. It is overwritten in place, tabs included. Giving it a
+	// new id instead added a second copy beside the old one, and the imported
+	// settings still named the old ids — so the popup kept showing the old
+	// profiles, and the restored tabs sat in copies nothing pointed at.
+	//
+	// Ids come from a timestamp and a random suffix, so a file from another
+	// install never matches and still adds alongside what is here.
 	for (const profile of profilesToImport) {
-		// New id, so an import cannot collide with a profile already here.
+		const profileTabs = importData.profileData[profile.id] || [];
+		const existingIndex = currentProfiles.findIndex(p => p.id === profile.id);
+
+		if (existingIndex >= 0) {
+			currentProfiles[existingIndex] = { ...profile };
+			await SFTabs.storage.saveProfileTabs(profile.id, profileTabs);
+			continue;
+		}
+
 		// No 'profile_' prefix: the storage layer adds one when it builds the key,
-		// so including it here produced profile_profile_<id>_tabs. Harmless, since
-		// the key is derived from the id either way, but inconsistent with the ids
-		// the popup's own New Profile flow generates.
-		const newProfileId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-		const newProfile = {
+		// so including it here produced profile_profile_<id>_tabs.
+		const profileId = profile.id || Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+		currentProfiles.push({
 			...profile,
-			id: newProfileId,
+			id: profileId,
 			createdAt: new Date().toISOString(),
 			lastActive: new Date().toISOString()
-		};
-
-		currentProfiles.push(newProfile);
-
-		// Import tabs for this profile
-		const profileTabs = importData.profileData[profile.id] || [];
-		await SFTabs.storage.saveProfileTabs(newProfileId, profileTabs);
+		});
+		await SFTabs.storage.saveProfileTabs(profileId, profileTabs);
 	}
 
 	// saveProfiles chunks once the list outgrows a single sync value. A raw set
