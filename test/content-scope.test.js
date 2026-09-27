@@ -135,9 +135,8 @@ check('the storage listener routes through it too, with no timer of its own',
 
 // ── The Chrome shim covers every browser.* API content scripts actually use ──
 // Firefox has `browser` natively; Chrome does not, so browser-compat.js builds
-// one. Content scripts from BOTH manifest entries share a single isolated
-// world, and entry 0's match patterns are a superset of entry 1's — so
-// browser-compat.js always defines `browser` first, and the fallback shim in
+// one. It is first in the only content_scripts entry, so it always defines
+// `browser` before anything else runs, and the fallback shim in
 // content-main.js, guarded by `typeof browser === 'undefined'`, never runs on
 // Chrome. Anything missing from browser-compat.js is therefore simply absent.
 //
@@ -212,24 +211,30 @@ check('no file is injected by more than one entry',
   doubled.length ? doubled.map(([f, e]) => f + ' (entries ' + e.join(',') + ')').join('; ')
                  : injectedBy.size + ' files');
 
-// ── Entries that rely on another entry's scripts must be covered by it ──
-// Entry 1 lists none of the shared modules; it reaches debounce, SFTabs.utils
-// and the rest through entry 0's copies. That only holds where entry 0 also
-// matches, so entry 0's patterns must cover every page entry 1 runs on.
-const prefixOf = pattern => pattern.replace(/\*$/, '');
-const covers = (outer, inner) => inner.startsWith(prefixOf(outer));
+// ── Nothing relies on another entry's scripts ──
+// Chrome orders scripts within an entry but not across entries
+// (w3c/webextensions#872). A Setup-only entry once reached debounce and
+// getCurrentPageInfo through the broad entry's shared modules; now and then it
+// ran first, threw ReferenceErrors, and the tabs vanished (issue #20). So the
+// shared modules have exactly one entry, and every script that uses them is in
+// it, after them.
+const sharedEntries = manifest.content_scripts.filter(e =>
+  e.js.some(f => f.startsWith('popup/js/shared/')));
+check('the shared modules are injected by exactly one entry', sharedEntries.length === 1);
 
-const [broad, narrow] = manifest.content_scripts;
-const usesSharedModules = narrow.js.some(f => f.startsWith('popup/js/shared/'));
-check('the narrower entry carries no shared modules of its own', !usesSharedModules);
+const shared = sharedEntries[0] ? sharedEntries[0].js : [];
+const lastShared = Math.max(...shared.map((f, i) => (f.startsWith('popup/js/shared/') ? i : -1)));
+const outOfOrder = shared.filter((f, i) => f.startsWith('content/') && i < lastShared);
+check('every content script in that entry loads after the shared modules',
+  outOfOrder.length === 0,
+  outOfOrder.length ? 'before them: ' + outOfOrder.join(', ') : shared.length + ' files');
 
-const uncovered = narrow.matches.filter(m => !broad.matches.some(b => covers(b, m)));
-check('every page the narrow entry runs on is also matched by the broad one',
-  uncovered.length === 0,
-  uncovered.length ? 'not covered: ' + uncovered.join(', ') : narrow.matches.length + ' patterns');
-
-check('and both run at the same time, so ordering is manifest order',
-  (broad.run_at || 'document_idle') === (narrow.run_at || 'document_idle'));
+const stranded = manifest.content_scripts
+  .filter(e => e !== sharedEntries[0])
+  .flatMap(e => e.js);
+check('no content script lives in an entry without the shared modules',
+  stranded.length === 0,
+  stranded.length ? stranded.join(', ') : 'none');
 
 // ── Nothing may claim all of salesforce.com ──
 // `*://*.salesforce.com/*` matches every subdomain Salesforce owns, so the

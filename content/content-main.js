@@ -76,8 +76,15 @@
   }
 })();
 
+// This file shares one content_scripts entry with the shared modules, because
+// Chrome does not order scripts across entries and would sometimes run it
+// before debounce existed. That entry matches every org page, so the Setup
+// scoping the manifest used to provide happens here instead.
+const isSetupPage = window.location.pathname.startsWith('/lightning/setup/');
+
 // Inject the Lightning navigation script
 (function() {
+  if (!isSetupPage) return;
   const script = document.createElement("script");
   script.src = browser.runtime.getURL("content/inject.js");
   script.onload = function() {
@@ -622,7 +629,9 @@ function setupMutationObserver() {
 }
 
 // Initialize when DOM is ready
-if (document.readyState === 'loading') {
+if (!isSetupPage) {
+  // Not a Setup page: nothing to render
+} else if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeContentScript);
 } else {
   initializeContentScript();

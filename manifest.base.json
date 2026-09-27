@@ -56,7 +56,10 @@
         "content/favicon.js",
         "content/floating-button.js",
         "content/floating-modal.js",
-        "content/header-menu.js"
+        "content/header-menu.js",
+        "content/navigation-parser.js",
+        "content/tab-renderer.js",
+        "content/content-main.js"
       ],
       "css": [
         "content/floating-button.css",
@@ -65,23 +68,6 @@
         "content/env-banner.css"
       ],
       "run_at": "document_idle"
-    },
-    {
-      "matches": [
-        "*://*.lightning.force.com/lightning/setup/*",
-        "*://*.salesforce-setup.com/lightning/setup/*",
-        "*://*.my.salesforce-setup.com/lightning/setup/*",
-        "*://*.my.salesforce.com/lightning/setup/*"
-      ],
-      "js": [
-        "content/navigation-parser.js",
-        "content/tab-renderer.js",
-        "content/content-main.js"
-      ],
-      "run_at": "document_idle",
-      "css": [
-        "content/tab-colors.css"
-      ]
     }
   ],
   "web_accessible_resources": [
