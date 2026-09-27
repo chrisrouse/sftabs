@@ -12,7 +12,7 @@ theme: null
 
 # Version shown in the v3 layout's header badge and footer. The v2 layout
 # hardcodes 2.1.1 at default.html:46; this exists so the v3 side has one place.
-v3_version: "3.0.1"
+v3_version: "3.0.2"
 
 # The superseded version, named in the notice on the retained /v2/ pages.
 v2_version: "2.1.1"
